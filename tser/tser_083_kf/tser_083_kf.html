@@ -16,238 +16,431 @@
   <title>Kalman Filtreleri</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="kalman-filtreleri">Kalman Filtreleri</h1>
-<p>Diyelim ki bir video kameradan gelen imajları kullanarak obje takip eden bir yazılım istiyoruz. Matematiksel olarak obje nedir? İmajı nedir? obje kendi dünyasında bir süreci takip etmektedir, 3 boyutlu uzayda bir yer kaplamaktadır ve orada hareket etmektedir. Biz bu hareketi belli bir güven aralığı / hata payı üzerinden biliyor olabiliriz. Diğer yandan objenin kameraya yansıttığı imaj vardır, bu imaj 2 boyutlu ve kameranın özellikleriyle alakalı parametreler sebebiyle belli bir şekilde &quot;yansıtılmış (project)'' olacaktır. Biz bu yansıtma formülünü de, belli bir hata payı üzerinden, biliyor olabiliriz.</p>
+<p>Diyelim ki bir video kameradan gelen imajları kullanarak obje takip
+eden bir yazılım istiyoruz. Matematiksel olarak obje nedir? İmajı nedir?
+obje kendi dünyasında bir süreci takip etmektedir, 3 boyutlu uzayda bir
+yer kaplamaktadır ve orada hareket etmektedir. Biz bu hareketi belli bir
+güven aralığı / hata payı üzerinden biliyor olabiliriz. Diğer yandan
+objenin kameraya yansıttığı imaj vardır, bu imaj 2 boyutlu ve kameranın
+özellikleriyle alakalı parametreler sebebiyle belli bir şekilde
+“yansıtılmış (project)’’ olacaktır. Biz bu yansıtma formülünü de, belli
+bir hata payı üzerinden, biliyor olabiliriz.</p>
 <p>Bu durumu şöyle modelleyebiliriz,</p>
-<p><span class="math display">\[ x_k = \Phi_{k-1}x_{k-1} + w_{k-1} \]</span></p>
+<p><span class="math display">\[ x_k = \Phi_{k-1}x_{k-1} + w_{k-1}
+\]</span></p>
 <p><span class="math display">\[ z_k = H_k x_k + v_k \]</span></p>
-<p><span class="math inline">\(x_k = (n \times 1)\)</span> vektörü, <span class="math inline">\(k\)</span> anındaki sürecin durumu (state)</p>
-<p><span class="math inline">\(\Phi_k = (n \times n)\)</span> matrisi, <span class="math inline">\(x_{k-1}\)</span> durumundan <span class="math inline">\(x_{k}\)</span> durumuna geçişi tarif eden formül.</p>
-<p><span class="math inline">\(w_k = (n \times 1)\)</span> vektörü, sıfır ortalamalı, kovaryansı <span class="math inline">\(Q_k\)</span> olan beyaz gürültü.</p>
-<p><span class="math inline">\(z_k = (n \times 1)\)</span> vektörü, dışarıdan alınan ölçüm.</p>
-<p><span class="math inline">\(H_k = (m \times n)\)</span> matrisi, gizli konum bilgisinin dışarıya nasıl ölçüm olarak yansıdığının formülü. Bu dönüşüm ideal, yani gürültüsüz durumu tarif eder.</p>
-<p><span class="math inline">\(v_k = (m \times 1)\)</span> vektörü, ölçüm hatası.</p>
-<p>Yani formüllerin söylediği şudur: ilk formül bize izlenen her ne ise onun hareketini tarif ediyor, <span class="math inline">\(k-1\)</span> anından <span class="math inline">\(k\)</span> anına geçişini tarif ediyor. <span class="math inline">\(z_k\)</span> ise bu <span class="math inline">\(x_k\)</span>'nin dışarıdan alınan ölçümü. Bizim yapmak istediğimiz <span class="math inline">\(z_k\)</span>'leri kullanarak <span class="math inline">\(x_k\)</span>'nin nerede olduğunu kestirebilmek.</p>
+<p><span class="math inline">\(x_k = (n \times 1)\)</span> vektörü,
+<span class="math inline">\(k\)</span> anındaki sürecin durumu
+(state)</p>
+<p><span class="math inline">\(\Phi_k = (n \times n)\)</span> matrisi,
+<span class="math inline">\(x_{k-1}\)</span> durumundan <span
+class="math inline">\(x_{k}\)</span> durumuna geçişi tarif eden
+formül.</p>
+<p><span class="math inline">\(w_k = (n \times 1)\)</span> vektörü,
+sıfır ortalamalı, kovaryansı <span class="math inline">\(Q_k\)</span>
+olan beyaz gürültü.</p>
+<p><span class="math inline">\(z_k = (n \times 1)\)</span> vektörü,
+dışarıdan alınan ölçüm.</p>
+<p><span class="math inline">\(H_k = (m \times n)\)</span> matrisi,
+gizli konum bilgisinin dışarıya nasıl ölçüm olarak yansıdığının formülü.
+Bu dönüşüm ideal, yani gürültüsüz durumu tarif eder.</p>
+<p><span class="math inline">\(v_k = (m \times 1)\)</span> vektörü,
+ölçüm hatası.</p>
+<p>Yani formüllerin söylediği şudur: ilk formül bize izlenen her ne ise
+onun hareketini tarif ediyor, <span class="math inline">\(k-1\)</span>
+anından <span class="math inline">\(k\)</span> anına geçişini tarif
+ediyor. <span class="math inline">\(z_k\)</span> ise bu <span
+class="math inline">\(x_k\)</span>’nin dışarıdan alınan ölçümü. Bizim
+yapmak istediğimiz <span class="math inline">\(z_k\)</span>’leri
+kullanarak <span class="math inline">\(x_k\)</span>’nin nerede olduğunu
+kestirebilmek.</p>
 <p>Sıfır merkezli gürültü şu demektir,</p>
 <p><span class="math display">\[ E[v_k] = E[w_k] = 0 \]</span></p>
 <p>Ayrıca,</p>
 <p><span class="math display">\[ E[v_kv_k^T] = R_k \]</span></p>
 <p><span class="math display">\[ E[w_kw_k^T] = Q_k \]</span></p>
-<p>Kalman filtreleri (KF) ile yapmak istediğimizin dışarıdan görünen <span class="math inline">\(z_k\)</span>'yi kullanarak gizli <span class="math inline">\(x_k\)</span>'yi kestirmek olduğunu söylemiştik. Ayrıca bu tahminleri her gelen veri noktasına göre sürekli güncelliyor olacağız, yani 100 tane veri noktasını almak için bekleyip sonra toptan bir analiz yapmaya gerek yok (istenirse yöntem toptan işleyecek şekilde de kullanılabilir tabii). Tahmin edilebileceği üzere bu tür bir gerçek zamanlı kabiliyetin pek çok mühendislik uygulaması olabilir; hakikaten de mesella aya ilk insanlı ınışı yapan Apollo modülü bir Kalman filtresi kullanıyordu.</p>
-<p>KF'i türetmek için önce bir lineer tahmin edici (estimator) tanımlamak gerekir, ve sonra bu tahmin ediciyi optimize eden şartların ne olduğu incelenir. Şu notasyonu kullanalım: Tilde yani <span class="math inline">\(\tilde{x}\)</span> üzerindeki işaret, o değişkenin tahmin ile gerçeği arasındaki hatayı temsil etmesi içindir, <span class="math inline">\(\hat{x}\)</span> üzerindeki şapka ise istatistik dersinden hatırlayacağımız üzere tahmin edici (estimator). Ayrıca bir değişkenin üzerindeki <span class="math inline">\(^-\)</span> ve <span class="math inline">\(^+\)</span> işaretlerini bu değişkenin ölçüm dikkate alındıktan önceki ve sonraki (o sırayla) hali olarak tanımlayalım.</p>
+<p>Kalman filtreleri (KF) ile yapmak istediğimizin dışarıdan görünen
+<span class="math inline">\(z_k\)</span>’yi kullanarak gizli <span
+class="math inline">\(x_k\)</span>’yi kestirmek olduğunu söylemiştik.
+Ayrıca bu tahminleri her gelen veri noktasına göre sürekli güncelliyor
+olacağız, yani 100 tane veri noktasını almak için bekleyip sonra toptan
+bir analiz yapmaya gerek yok (istenirse yöntem toptan işleyecek şekilde
+de kullanılabilir tabii). Tahmin edilebileceği üzere bu tür bir gerçek
+zamanlı kabiliyetin pek çok mühendislik uygulaması olabilir; hakikaten
+de mesella aya ilk insanlı ınışı yapan Apollo modülü bir Kalman filtresi
+kullanıyordu.</p>
+<p>KF’i türetmek için önce bir lineer tahmin edici (estimator)
+tanımlamak gerekir, ve sonra bu tahmin ediciyi optimize eden şartların
+ne olduğu incelenir. Şu notasyonu kullanalım: Tilde yani <span
+class="math inline">\(\tilde{x}\)</span> üzerindeki işaret, o değişkenin
+tahmin ile gerçeği arasındaki hatayı temsil etmesi içindir, <span
+class="math inline">\(\hat{x}\)</span> üzerindeki şapka ise istatistik
+dersinden hatırlayacağımız üzere tahmin edici (estimator). Ayrıca bir
+değişkenin üzerindeki <span class="math inline">\(^-\)</span> ve <span
+class="math inline">\(^+\)</span> işaretlerini bu değişkenin ölçüm
+dikkate alındıktan önceki ve sonraki (o sırayla) hali olarak
+tanımlayalım.</p>
 <p>Konum bilgisi ve hata arasındaki ilişkiyi şu şekilde belirtelim,</p>
-<p><span class="math display">\[ \hat{x}_k^+ = x_k + \tilde{x_k}^+ \]</span></p>
-<p><span class="math display">\[ \hat{x}_k^- = x_k + \tilde{x_k}^- \]</span></p>
-<p>Elimizdeki en iyi tahmin <span class="math inline">\(\hat{x}_k^-\)</span>'i yeni veri / ölçüm elde ettikten sonra güncellemek istiyoruz. Bunu yaparken gürültülü ölçümle eldeki en son tahmini lineer bir şekilde birleştirmek istiyoruz. Bu birleştirmeyi,</p>
-<p><span class="math display">\[ \hat{x}_k^+ = \hat{x}_k^- + K_k (z_k - H_k \hat{x}_k^-)   \]</span></p>
-<p>olarak temsil edebiliriz, <span class="math inline">\(\hat{x}_k^+\)</span> güncellenmiş tahmindir, <span class="math inline">\(K_k\)</span> ise birleştirme faktörüdür (blending factor), ki bu değerin ne olduğunu şu anda bilmiyoruz.</p>
+<p><span class="math display">\[ \hat{x}_k^+ = x_k + \tilde{x_k}^+
+\]</span></p>
+<p><span class="math display">\[ \hat{x}_k^- = x_k + \tilde{x_k}^-
+\]</span></p>
+<p>Elimizdeki en iyi tahmin <span
+class="math inline">\(\hat{x}_k^-\)</span>’i yeni veri / ölçüm elde
+ettikten sonra güncellemek istiyoruz. Bunu yaparken gürültülü ölçümle
+eldeki en son tahmini lineer bir şekilde birleştirmek istiyoruz. Bu
+birleştirmeyi,</p>
+<p><span class="math display">\[ \hat{x}_k^+ = \hat{x}_k^- + K_k (z_k -
+H_k \hat{x}_k^-)   \]</span></p>
+<p>olarak temsil edebiliriz, <span
+class="math inline">\(\hat{x}_k^+\)</span> güncellenmiş tahmindir, <span
+class="math inline">\(K_k\)</span> ise birleştirme faktörüdür (blending
+factor), ki bu değerin ne olduğunu şu anda bilmiyoruz.</p>
 <p>Tekrar düzenlersek,</p>
-<p><span class="math display">\[= \hat{x}_k^- - K_kH_k\hat{x}_k^- + K_kz_k    \]</span></p>
-<p><span class="math display">\[ \hat{x}_k^+ = \hat{x}_k^- (I - K_kH_k) + K_kz_k \]</span></p>
-<p>Daha temiz olması için <span class="math inline">\(K_k&#39; = I - K_kH_k\)</span> diyelim, ve en baştaki formülleri bir daha alta alta yazalım,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[= \hat{x}_k^- - K_kH_k\hat{x}_k^- +
+K_kz_k    \]</span></p>
+<p><span class="math display">\[ \hat{x}_k^+ = \hat{x}_k^- (I - K_kH_k)
++ K_kz_k \]</span></p>
+<p>Daha temiz olması için <span class="math inline">\(K_k&#39; = I -
+K_kH_k\)</span> diyelim, ve en baştaki formülleri bir daha alta alta
+yazalım,</p>
+<p><span class="math display">\[
 \hat{x}_k^+  = K_k&#39; \hat{x}_k^- + K_kz_k  
 \qquad (1)  
 \]</span></p>
-<p><span class="math display">\[ 
-z_k = H_k x_k + v_k 
-\qquad (2) 
+<p><span class="math display">\[
+z_k = H_k x_k + v_k
+\qquad (2)
 \]</span></p>
-<p><span class="math display">\[ 
-\hat{x}_k^+ = x_k + \tilde{x_k}^+ 
-\qquad (3) 
+<p><span class="math display">\[
+\hat{x}_k^+ = x_k + \tilde{x_k}^+
+\qquad (3)
 \]</span></p>
-<p><span class="math display">\[ 
-\hat{x}_k^- = x_k + \tilde{x_k}^- 
+<p><span class="math display">\[
+\hat{x}_k^- = x_k + \tilde{x_k}^-
 \qquad (4)
 \]</span></p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>içine (2)</li>
 </ol>
-<p><span class="math display">\[ \hat{x}_k^+ = K_k&#39; \hat{x}_k^- + K_k(H_k x_k + v_k)   \]</span></p>
+<p><span class="math display">\[ \hat{x}_k^+ = K_k&#39; \hat{x}_k^- +
+K_k(H_k x_k + v_k)   \]</span></p>
 <p>Eşitliğin solunu (3) ile açalım,</p>
-<p><span class="math display">\[ x_k + \tilde{x_k}^+ = K_k&#39; \hat{x}_k^- + K_k(H_k x_k + v_k)   \]</span></p>
-<p>ve <span class="math inline">\(x_k\)</span>'yi sağa geçirelim,</p>
-<p><span class="math display">\[ \tilde{x_k}^+ = K_k&#39; \hat{x}_k^- + K_k(H_k x_k + v_k) - x_k   \]</span></p>
+<p><span class="math display">\[ x_k + \tilde{x_k}^+ = K_k&#39;
+\hat{x}_k^- + K_k(H_k x_k + v_k)   \]</span></p>
+<p>ve <span class="math inline">\(x_k\)</span>’yi sağa geçirelim,</p>
+<p><span class="math display">\[ \tilde{x_k}^+ = K_k&#39; \hat{x}_k^- +
+K_k(H_k x_k + v_k) - x_k   \]</span></p>
 <p><span class="math inline">\(\hat{x}_k^-\)</span> yerine (4)</p>
-<p><span class="math display">\[  = K_k&#39; (x_k + \tilde{x_k}^-) + K_k(H_k x_k + v_k) - x_k   \]</span></p>
-<p><span class="math inline">\(x_k\)</span>'leri yanyana getirip gruplayalım,</p>
-<p><span class="math display">\[  = K_k&#39; x_k + K_kH_k x_k  - x_k + K_k&#39;\tilde{x_k}^- + K_kv_k   \]</span></p>
-<p><span class="math display">\[ \tilde{x_k}^+ = x_k (K_k&#39; + K_kH_k - I) + K_k&#39;\tilde{x_k}^- + K_kv_k   \]</span></p>
+<p><span class="math display">\[  = K_k&#39; (x_k + \tilde{x_k}^-) +
+K_k(H_k x_k + v_k) - x_k   \]</span></p>
+<p><span class="math inline">\(x_k\)</span>’leri yanyana getirip
+gruplayalım,</p>
+<p><span class="math display">\[  = K_k&#39; x_k + K_kH_k x_k  - x_k +
+K_k&#39;\tilde{x_k}^- + K_kv_k   \]</span></p>
+<p><span class="math display">\[ \tilde{x_k}^+ = x_k (K_k&#39; + K_kH_k
+- I) + K_k&#39;\tilde{x_k}^- + K_kv_k   \]</span></p>
 <p>Üstteki tüm ifadenin beklentisini aldığımız zaman,</p>
-<p><span class="math display">\[ E[\tilde{x_k}^+] = E[x_k (K_k&#39; + K_kH_k - I)] + E[K_k&#39;\tilde{x_k}^-] + E[K_kv_k]  \]</span></p>
-<p>olacak değil mi? Burada biraz duralım, ve yansızlık kavramını düşünelim. Eğer tahmin edici <span class="math inline">\(\hat{x}^+\)</span> yansız (unbiased) olsun istiyorsak, bu şu anlama gelir,</p>
+<p><span class="math display">\[ E[\tilde{x_k}^+] = E[x_k (K_k&#39; +
+K_kH_k - I)] + E[K_k&#39;\tilde{x_k}^-] + E[K_kv_k]  \]</span></p>
+<p>olacak değil mi? Burada biraz duralım, ve yansızlık kavramını
+düşünelim. Eğer tahmin edici <span
+class="math inline">\(\hat{x}^+\)</span> yansız (unbiased) olsun
+istiyorsak, bu şu anlama gelir,</p>
 <p><span class="math display">\[ E[\hat{x_k}^+] = E[x_k] \]</span></p>
 <p>Düzenleyelim,</p>
-<p><span class="math display">\[ E[\hat{x_k}^+] - E[x_k] = 0\]</span></p>
+<p><span class="math display">\[ E[\hat{x_k}^+] - E[x_k] =
+0\]</span></p>
 <p><span class="math display">\[ E[\hat{x_k}^+ - x_k] = 0\]</span></p>
 <p><span class="math display">\[ E[ \tilde{x_k}^+] = 0\]</span></p>
-<p>Şimdi, formülü son bıraktığımız yere dönelim, orada eğer <span class="math inline">\(E[\tilde{x_k}^+]=0\)</span> olsun istiyorsak ve <span class="math inline">\(E[\tilde{x_k}^-] = 0\)</span>'in da doğru olduğu durumda geriye tek kalan <span class="math inline">\(K_k&#39; + K_kH_k - I\)</span> ifadesinin sıfır olmasıdır (çünkü <span class="math inline">\(E[v_k]=0\)</span> olacak zaten), bu durumda herhangi bir <span class="math inline">\(x_k\)</span> için beklentinin sıfır gelmesi</p>
+<p>Şimdi, formülü son bıraktığımız yere dönelim, orada eğer <span
+class="math inline">\(E[\tilde{x_k}^+]=0\)</span> olsun istiyorsak ve
+<span class="math inline">\(E[\tilde{x_k}^-] = 0\)</span>’in da doğru
+olduğu durumda geriye tek kalan <span class="math inline">\(K_k&#39; +
+K_kH_k - I\)</span> ifadesinin sıfır olmasıdır (çünkü <span
+class="math inline">\(E[v_k]=0\)</span> olacak zaten), bu durumda
+herhangi bir <span class="math inline">\(x_k\)</span> için beklentinin
+sıfır gelmesi</p>
 <p><span class="math display">\[ K_k&#39; + K_kH_k - I = 0 \]</span></p>
 <p>olmasına bağlıdır. Tabii o doğru ise,</p>
 <p><span class="math display">\[ K_k&#39; = I - K_kH_k  \]</span></p>
-<p>Bu ifadeyi geriye, (1)'deki tahmin edicinin içine koyarsak</p>
-<p><span class="math display">\[ \hat{x}_k^+  = (I - K_kH_k ) \hat{x}_k^- + K_kz_k  \]</span></p>
+<p>Bu ifadeyi geriye, (1)’deki tahmin edicinin içine koyarsak</p>
+<p><span class="math display">\[ \hat{x}_k^+  = (I - K_kH_k )
+\hat{x}_k^- + K_kz_k  \]</span></p>
 <p>Ya da</p>
-<p><span class="math display">\[ \hat{x}_k^+  = \hat{x}_k^- + K_k(z_k - H_k\hat{x}_k^- )  \]</span></p>
-<p>Eğer <span class="math inline">\(\hat{x}_k^-\)</span> için (4) kullanırsak,</p>
-<p><span class="math display">\[ \hat{x}_k^+  =  (x_k + \tilde{x_k}^-) + K_k(z_k - H_k( x_k + \tilde{x_k}^-) )  \]</span></p>
+<p><span class="math display">\[ \hat{x}_k^+  = \hat{x}_k^- + K_k(z_k -
+H_k\hat{x}_k^- )  \]</span></p>
+<p>Eğer <span class="math inline">\(\hat{x}_k^-\)</span> için (4)
+kullanırsak,</p>
+<p><span class="math display">\[ \hat{x}_k^+  =  (x_k + \tilde{x_k}^-) +
+K_k(z_k - H_k( x_k + \tilde{x_k}^-) )  \]</span></p>
 <p>Tekrar gruplama,</p>
-<p><span class="math display">\[ \hat{x}_k^+  =  \tilde{x_k}^- (I - K_kH_k) + x_k + K_k(z_k - H_kx_k)   \]</span></p>
-<p>Ve (2)'yi <span class="math inline">\(z_k - H_kx_k\)</span> için kullanalım,</p>
-<p><span class="math display">\[ \hat{x}_k^+ - x_k =  (I - K_kH_k)\tilde{x_k}^- + K_kv_k   \]</span></p>
-<p><span class="math display">\[ \tilde{x}_k^+ = (I - K_kH_k)\tilde{x_k}^- + K_kv_k   \]</span></p>
+<p><span class="math display">\[ \hat{x}_k^+  =  \tilde{x_k}^- (I -
+K_kH_k) + x_k + K_k(z_k - H_kx_k)   \]</span></p>
+<p>Ve (2)’yi <span class="math inline">\(z_k - H_kx_k\)</span> için
+kullanalım,</p>
+<p><span class="math display">\[ \hat{x}_k^+ - x_k =  (I -
+K_kH_k)\tilde{x_k}^- + K_kv_k   \]</span></p>
+<p><span class="math display">\[ \tilde{x}_k^+ = (I -
+K_kH_k)\tilde{x_k}^- + K_kv_k   \]</span></p>
 <p>Böylece tekabül eden tahmin hatasını hesaplamış olduk.</p>
 <p>Tanım</p>
-<p><span class="math display">\[ P_k^+ = E[ \tilde{x_k}^+\tilde{x_k}^{+T} ]\]</span></p>
-<p><span class="math display">\[ P_k^- = E[ \tilde{x_k}^- \tilde{x_k}^{-T} ]\]</span></p>
-<p>Bu kovaryans hesabının uygulanmasından ibaret aslında. Şimdi üç üstteki formülü üstten ikincisine sokarsak,</p>
-<p><span class="math display">\[ =  E \big[ (I - K_kH_k)\tilde{x_k}^- + K_kv_k \big] \big[\tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T \big] \]</span></p>
+<p><span class="math display">\[ P_k^+ = E[
+\tilde{x_k}^+\tilde{x_k}^{+T} ]\]</span></p>
+<p><span class="math display">\[ P_k^- = E[ \tilde{x_k}^-
+\tilde{x_k}^{-T} ]\]</span></p>
+<p>Bu kovaryans hesabının uygulanmasından ibaret aslında. Şimdi üç
+üstteki formülü üstten ikincisine sokarsak,</p>
+<p><span class="math display">\[ =  E \big[ (I - K_kH_k)\tilde{x_k}^- +
+K_kv_k \big] \big[\tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T \big]
+\]</span></p>
 <p>Yani</p>
-<p><span class="math display">\[ 
-= E \bigg[ (I - K_kH_k)\tilde{x_k}^- \big( \tilde{x_k}^{-T}(I - H_k^TK_k^T)
-+ v_k^TK_k^T \big) + 
+<p><span class="math display">\[
+= E \bigg[ (I - K_kH_k)\tilde{x_k}^- \big( \tilde{x_k}^{-T}(I -
+H_k^TK_k^T)
++ v_k^TK_k^T \big) +
 \qquad (5)
 \]</span></p>
-<p><span class="math display">\[ K_kv_k \big( \tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T  \big) \bigg] \]</span></p>
+<p><span class="math display">\[ K_kv_k \big( \tilde{x_k}^{-T}(I -
+H_k^TK_k^T) + v_k^TK_k^T  \big) \bigg] \]</span></p>
 <p>Önceden tanımlamıştık,</p>
-<p><span class="math display">\[ P_k^- = E[ \tilde{x_k}^- \tilde{x_k}^{-T} ]\]</span></p>
+<p><span class="math display">\[ P_k^- = E[ \tilde{x_k}^-
+\tilde{x_k}^{-T} ]\]</span></p>
 <p><span class="math display">\[ E[v_kv_k^T] = R_k \]</span></p>
-<p>Ayrıca ölçüm hataları ve gürültü arasında korelasyon olmadığını farz ettiğimiz için,</p>
-<p><span class="math display">\[ E[\tilde{x_k}^-v_k^T] = E[v_k\tilde{x_k}^{-T}] = 0 \]</span></p>
-<p>Tüm bunları (5)'i basitleştirmek için kullanırsak,</p>
-<p><span class="math display">\[ 
-P_k^{+} =  (I - K_kH_k)P_k^-(I - H_k^TK_k^T) + K_kR_kK_k^T 
+<p>Ayrıca ölçüm hataları ve gürültü arasında korelasyon olmadığını farz
+ettiğimiz için,</p>
+<p><span class="math display">\[ E[\tilde{x_k}^-v_k^T] =
+E[v_k\tilde{x_k}^{-T}] = 0 \]</span></p>
+<p>Tüm bunları (5)’i basitleştirmek için kullanırsak,</p>
+<p><span class="math display">\[
+P_k^{+} =  (I - K_kH_k)P_k^-(I - H_k^TK_k^T) + K_kR_kK_k^T
 \qquad (6)
 \]</span></p>
-<p>En optimal <span class="math inline">\(K_k\)</span>'yi nasıl buluruz? Amaç <span class="math inline">\(P_k^+\)</span> matrisinin çaprazındaki değerleri minimize etmektir, bu durumda optimize etmek istediğimiz bedel (cost) fonksiyonu</p>
-<p><span class="math display">\[ J_k = E[ \tilde{x_k}^{+T}\tilde{x_k} ] \]</span></p>
+<p>En optimal <span class="math inline">\(K_k\)</span>’yi nasıl buluruz?
+Amaç <span class="math inline">\(P_k^+\)</span> matrisinin çaprazındaki
+değerleri minimize etmektir, bu durumda optimize etmek istediğimiz bedel
+(cost) fonksiyonu</p>
+<p><span class="math display">\[ J_k = E[ \tilde{x_k}^{+T}\tilde{x_k} ]
+\]</span></p>
 <p>olsun, ki bu tek bir sayısal değer verir. Bu aslında</p>
 <p><span class="math display">\[ J_k = Tr(P_k^+) \]</span></p>
-<p>değerinin optimize edilmesi ile aynı şeydir. Değil mi? Ya iki üstteki gibi vektör uzunluğunu minimize ediyoruz, ya da kovaryansın çaprazının izini (trace) minimize ediyoruz, çünkü her ikisinde de aynı değerler var. İz operatörü hatırlayacağımız üzere bir matrisin çaprazındaki değerleri toplar. İz kullanmamızın sebebi bize bazı türevsel numaralar sağlaması,</p>
-<p>Biliyoruz ki, eger <span class="math inline">\(B\)</span> simetrik ise,</p>
-<p><span class="math display">\[ \frac{\partial }{\partial A} Tr(ABA^T) = 2AB \]</span></p>
-<p><span class="math display">\[ Tr(P_k^{+}) =  Tr((I - K_kH_k)P_k^-(I - H_k^TK_k^T)) + Tr(K_kR_kK_k^T) \]</span></p>
-<p>İki tane iz var, bu izler içinde bir <span class="math inline">\(ABA^T\)</span> formu görebiliyoruz herhalde, onların <span class="math inline">\(K_k\)</span>'ye göre türevini alıyoruz,</p>
-<p><span class="math display">\[ 
+<p>değerinin optimize edilmesi ile aynı şeydir. Değil mi? Ya iki üstteki
+gibi vektör uzunluğunu minimize ediyoruz, ya da kovaryansın çaprazının
+izini (trace) minimize ediyoruz, çünkü her ikisinde de aynı değerler
+var. İz operatörü hatırlayacağımız üzere bir matrisin çaprazındaki
+değerleri toplar. İz kullanmamızın sebebi bize bazı türevsel numaralar
+sağlaması,</p>
+<p>Biliyoruz ki, eger <span class="math inline">\(B\)</span> simetrik
+ise,</p>
+<p><span class="math display">\[ \frac{\partial }{\partial A} Tr(ABA^T)
+= 2AB \]</span></p>
+<p><span class="math display">\[ Tr(P_k^{+}) =  Tr((I - K_kH_k)P_k^-(I -
+H_k^TK_k^T)) + Tr(K_kR_kK_k^T) \]</span></p>
+<p>İki tane iz var, bu izler içinde bir <span
+class="math inline">\(ABA^T\)</span> formu görebiliyoruz herhalde,
+onların <span class="math inline">\(K_k\)</span>’ye göre türevini
+alıyoruz,</p>
+<p><span class="math display">\[
 \frac{\partial Tr(P_k^{+})}{\partial K_k}  =
 -2(I - K_kH_k)P_k^- H_k^T + 2K_kR_k
 \]</span></p>
-<p>Şimdi sıfıra eşitleyip <span class="math inline">\(K_k\)</span> için çözelim,</p>
-<p><span class="math display">\[ 0 = -2(I - K_kH_k)P_k^- H_k^T + 2K_kR_k \]</span></p>
-<p><span class="math display">\[  2P_k^- H_k^T = 2K_kH_kP_k^- H_k^T + 2K_kR_k \]</span></p>
-<p><span class="math display">\[  P_k^- H_k^T = K_kH_kP_k^- H_k^T + K_kR_k  \]</span></p>
-<p><span class="math display">\[  P_k^- H_k^T = K_k(H_kP_k^- H_k^T + R_k)  \]</span></p>
-<p><span class="math display">\[  K_k = P_k^- H_k^T(H_kP_k^- H_k^T + R_k)^{-1} \]</span></p>
-<p><span class="math inline">\(K_k\)</span> matrisine Kalman kazanç matrisi (Kalman gain matrix) ismi de verilir. Ve en son olarak bu sonucu (6) içine koyarsak, ve biraz manipülasyon ardından,</p>
-<p><span class="math display">\[ P_k^+ = P_k^- -P_k^- H_k^T (H_kP_k^- H_k^T + R_k)^{-1}H_kP_k^-  \]</span></p>
+<p>Şimdi sıfıra eşitleyip <span class="math inline">\(K_k\)</span> için
+çözelim,</p>
+<p><span class="math display">\[ 0 = -2(I - K_kH_k)P_k^- H_k^T + 2K_kR_k
+\]</span></p>
+<p><span class="math display">\[  2P_k^- H_k^T = 2K_kH_kP_k^- H_k^T +
+2K_kR_k \]</span></p>
+<p><span class="math display">\[  P_k^- H_k^T = K_kH_kP_k^- H_k^T +
+K_kR_k  \]</span></p>
+<p><span class="math display">\[  P_k^- H_k^T = K_k(H_kP_k^- H_k^T +
+R_k)  \]</span></p>
+<p><span class="math display">\[  K_k = P_k^- H_k^T(H_kP_k^- H_k^T +
+R_k)^{-1} \]</span></p>
+<p><span class="math inline">\(K_k\)</span> matrisine Kalman kazanç
+matrisi (Kalman gain matrix) ismi de verilir. Ve en son olarak bu sonucu
+(6) içine koyarsak, ve biraz manipülasyon ardından,</p>
+<p><span class="math display">\[ P_k^+ = P_k^- -P_k^- H_k^T (H_kP_k^-
+H_k^T + R_k)^{-1}H_kP_k^-  \]</span></p>
 <p><span class="math display">\[ = [I - K_kH_k]P_k^-  \]</span></p>
 <p>sonucunu elde ederiz.</p>
-<p>Bu hesaplar ölçüm aldıktan <em>sonra</em> tahmini güncellemek içindi. Peki ölçüm almadan önceki tahmini nasıl yaparız? Bunu yapmamız gerekir çünkü ölçüm gelmeden önce yeni bir tahmin yapılmalı ki o tahmini, onun hatasını bir sonraki ölçüm ile düzeltilebilelim. Bu geçişin nasıl olacağını en başta belirttiğimiz KF modeli gösteriyor zaten, konum geçişi / adımı ona göre atıp, sonucun beklentisini ve kovaryansını hesaplıyoruz,</p>
-<p><span class="math display">\[ \hat{x}_k^- = E[\Phi_{k-1}x_{k-1}^+ + w] = \Phi_{k-1}x_{k-1}^+ \]</span></p>
-<p><span class="math display">\[ P_k^- = Cov(\Phi_{k-1}x_{k-1}^+) = E[(\Phi_{k-1}x_{k-1}^+ + w)(\Phi_{k-1}x_{k-1}^+ + w)^T) \]</span></p>
-<p><span class="math display">\[ =  \Phi_{k-1}P_{k-1}^+\Phi_{k-1}^T + Q_{k-1}  \]</span></p>
-<p><span class="math inline">\(P_k^-\)</span> hesabında ne olduğuna dikkat, bir sonraki ölçüm olmadan sadece geçiş formülü üzerinde tahmin etmeye uğraştık, ve bu tabii ki bilinmezliği arttırdı (<span class="math inline">\(Q\)</span> toplanıyor).</p>
-<p>En son adım bu; <span class="math inline">\(\hat{x}_k^-,P_k^-\)</span> artık bir sonraki güncelleme için kullanılacak değerlerdir. Bu noktada başa dönüyoruz, ve aynı işlemleri tekrarlıyoruz. Eğer verinin alımı, model güncellemesi, ileri tahmin adımında olanları bir figürle göstermek gerekirse (indisler resimde bir ileri alınmış, bunu aklımızda düzelterek bakalım),</p>
-<div class="figure">
-<img src="tser_kf_01.png" />
-
-</div>
-<p>Aslında tüm bu süreci bir sözde kod (pseudocode) parçası ile göstermeyi düşünmüştük, ki ölçüm verisi bir <code>for</code> döngüsü ile listeden alınarak teker teker işlenecekti, fakat bu üstteki tarifi tam anlatamayacaktı, çünkü KF için illa elde belli sayıda &quot;işlenip bitirilen'' ölçüm olması gerekmez. Güncelleme her yeni ölçüm için, o tek ölçüm bazında yapılabildiği için şimdi 1 tane, sonra 10 tane, sonra bekleyip 2 tane daha, vs. şeklinde veri işlenmesi gayet mümkündür. Bu işlem gerçek zamanlı olabilir, ya da bir listeyi gezerek anlık olmayan bir şekilde olabilir. Bu yüzden üstteki döngü resmini tercih ettik.</p>
-<p>Not: Bazı kaynaklarda Kalman Filtrelerinin uygun bir model üzerinden en az kareler (least square) ile yani çizgi / düzlem uydurması ile aynı sonuca varabileceği söylenir, bu tam doğru degil, KF üstel ağırlıklı (exponentially weighted) en az kareler ile aynıdır, yani en son veri noktalarının daha öncekilere göre daha çok ağırlığı vardır. KF ile regresyon örneği için bkz [5] yazısı.</p>
-<p>Bir not daha: <span class="math inline">\(x_k = \Phi_{k-1}x_{k-1} + w_{k-1}\)</span> geçişinde <span class="math inline">\(\Phi_{k-1}\)</span> ile çarpım bir lineer konum değişimini modeller, o zaman lineer olmayan geçişlerin KF modellenmesi mümkün değildir. Mesela bir topun ileri, havaya doğru atıldığı bir örneği düşünelim, ölçümlerde Gaussian gürültü olsun. Topun gidişi bir parabolu takip edecektir, oldukca basit bir gidiştir, fakat KF'in bu gidişi takip etmesi mümkün değildir. Parçacık filtreleri, genişletilmiş KF (EKF), UKF gibi yaklaşımlar bu sebeple alternatif haline gelmişlerdir.</p>
+<p>Bu hesaplar ölçüm aldıktan <em>sonra</em> tahmini güncellemek içindi.
+Peki ölçüm almadan önceki tahmini nasıl yaparız? Bunu yapmamız gerekir
+çünkü ölçüm gelmeden önce yeni bir tahmin yapılmalı ki o tahmini, onun
+hatasını bir sonraki ölçüm ile düzeltilebilelim. Bu geçişin nasıl
+olacağını en başta belirttiğimiz KF modeli gösteriyor zaten, konum
+geçişi / adımı ona göre atıp, sonucun beklentisini ve kovaryansını
+hesaplıyoruz,</p>
+<p><span class="math display">\[ \hat{x}_k^- = E[\Phi_{k-1}x_{k-1}^+ +
+w] = \Phi_{k-1}x_{k-1}^+ \]</span></p>
+<p><span class="math display">\[ P_k^- = Cov(\Phi_{k-1}x_{k-1}^+) =
+E[(\Phi_{k-1}x_{k-1}^+ + w)(\Phi_{k-1}x_{k-1}^+ + w)^T) \]</span></p>
+<p><span class="math display">\[ =  \Phi_{k-1}P_{k-1}^+\Phi_{k-1}^T +
+Q_{k-1}  \]</span></p>
+<p><span class="math inline">\(P_k^-\)</span> hesabında ne olduğuna
+dikkat, bir sonraki ölçüm olmadan sadece geçiş formülü üzerinde tahmin
+etmeye uğraştık, ve bu tabii ki bilinmezliği arttırdı (<span
+class="math inline">\(Q\)</span> toplanıyor).</p>
+<p>En son adım bu; <span
+class="math inline">\(\hat{x}_k^-,P_k^-\)</span> artık bir sonraki
+güncelleme için kullanılacak değerlerdir. Bu noktada başa dönüyoruz, ve
+aynı işlemleri tekrarlıyoruz. Eğer verinin alımı, model güncellemesi,
+ileri tahmin adımında olanları bir figürle göstermek gerekirse (indisler
+resimde bir ileri alınmış, bunu aklımızda düzelterek bakalım),</p>
+<p><img src="tser_kf_01.png" /></p>
+<p>Aslında tüm bu süreci bir sözde kod (pseudocode) parçası ile
+göstermeyi düşünmüştük, ki ölçüm verisi bir <code>for</code> döngüsü ile
+listeden alınarak teker teker işlenecekti, fakat bu üstteki tarifi tam
+anlatamayacaktı, çünkü KF için illa elde belli sayıda “işlenip
+bitirilen’’ ölçüm olması gerekmez. Güncelleme her yeni ölçüm için, o tek
+ölçüm bazında yapılabildiği için şimdi 1 tane, sonra 10 tane, sonra
+bekleyip 2 tane daha, vs. şeklinde veri işlenmesi gayet mümkündür. Bu
+işlem gerçek zamanlı olabilir, ya da bir listeyi gezerek anlık olmayan
+bir şekilde olabilir. Bu yüzden üstteki döngü resmini tercih ettik.</p>
+<p>Not: Bazı kaynaklarda Kalman Filtrelerinin uygun bir model üzerinden
+en az kareler (least square) ile yani çizgi / düzlem uydurması ile aynı
+sonuca varabileceği söylenir, bu tam doğru degil, KF üstel ağırlıklı
+(exponentially weighted) en az kareler ile aynıdır, yani en son veri
+noktalarının daha öncekilere göre daha çok ağırlığı vardır. KF ile
+regresyon örneği için bkz [5] yazısı.</p>
+<p>Bir not daha: <span class="math inline">\(x_k = \Phi_{k-1}x_{k-1} +
+w_{k-1}\)</span> geçişinde <span
+class="math inline">\(\Phi_{k-1}\)</span> ile çarpım bir lineer konum
+değişimini modeller, o zaman lineer olmayan geçişlerin KF modellenmesi
+mümkün değildir. Mesela bir topun ileri, havaya doğru atıldığı bir
+örneği düşünelim, ölçümlerde Gaussian gürültü olsun. Topun gidişi bir
+parabolu takip edecektir, oldukca basit bir gidiştir, fakat KF’in bu
+gidişi takip etmesi mümkün değildir. Parçacık filtreleri, genişletilmiş
+KF (EKF), UKF gibi yaklaşımlar bu sebeple alternatif haline
+gelmişlerdir.</p>
 <p>Bir KF kodlaması alttadır.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy <span class="im">import</span> <span class="op">*</span>
-
-<span class="co"># x_{t+1} = Phi x_t + Sigma_x</span>
-<span class="co"># y_t = Hx_t + R    </span>
-<span class="kw">class</span> Kalman:
-    <span class="co"># T is the translation matrix</span>
-    <span class="co"># K is the camera matrix calculated by calibration</span>
-    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, K, mu_init):
-        <span class="va">self</span>.ndim <span class="op">=</span> <span class="dv">3</span>
-        <span class="va">self</span>.Sigma_x <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">150</span>
-        <span class="va">self</span>.Phi <span class="op">=</span> eye(<span class="dv">4</span>)
-        <span class="va">self</span>.Phi[<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">=</span> <span class="fl">-0.5</span>
-        <span class="va">self</span>.H <span class="op">=</span> append(K, [[<span class="dv">0</span>], [<span class="dv">0</span>], [<span class="dv">0</span>]], axis<span class="op">=</span><span class="dv">1</span>)
-        <span class="va">self</span>.mu_hat <span class="op">=</span> mu_init
-        <span class="va">self</span>.cov <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>)
-        <span class="va">self</span>.R <span class="op">=</span> eye(<span class="va">self</span>.ndim)<span class="op">*</span><span class="fl">1.5</span>
-        
-    <span class="kw">def</span> normalize_2d(<span class="va">self</span>, x): 
-        <span class="cf">return</span> array([x[<span class="dv">0</span>]<span class="op">/</span>x[<span class="dv">2</span>], x[<span class="dv">1</span>]<span class="op">/</span>x[<span class="dv">2</span>], <span class="fl">1.0</span>])
-    
-    <span class="kw">def</span> update(<span class="va">self</span>, obs):
-
-        <span class="co"># Make prediction</span>
-        <span class="co">#print &quot;self.mu_hat=&quot; + str(self.mu_hat)</span>
-        <span class="va">self</span>.mu_hat_est <span class="op">=</span> dot(<span class="va">self</span>.Phi,<span class="va">self</span>.mu_hat) 
-        prod <span class="op">=</span> dot(<span class="va">self</span>.Phi, dot(<span class="va">self</span>.cov, transpose(<span class="va">self</span>.Phi)))
-        <span class="va">self</span>.cov_est <span class="op">=</span> prod <span class="op">+</span> <span class="va">self</span>.Sigma_x
-        <span class="co">#print &quot;self.mu_hat_est=&quot; + str(self.mu_hat_est)</span>
-        <span class="co">#print &quot;self.cov_est=&quot; + str(self.cov_est)</span>
-                
-        <span class="co"># Update estimate</span>
-        prod <span class="op">=</span> <span class="va">self</span>.normalize_2d(dot(<span class="va">self</span>.H,<span class="va">self</span>.mu_hat_est))
-        <span class="va">self</span>.error_mu <span class="op">=</span> obs <span class="op">-</span> prod
-        
-        prod <span class="op">=</span> dot(<span class="va">self</span>.cov,transpose(<span class="va">self</span>.H))
-        prod <span class="op">=</span> dot(<span class="va">self</span>.H,prod)
-        <span class="va">self</span>.error_cov <span class="op">=</span> prod <span class="op">+</span> <span class="va">self</span>.R
-        prod <span class="op">=</span> dot(<span class="va">self</span>.cov_est,transpose(<span class="va">self</span>.H))
-        <span class="va">self</span>.K <span class="op">=</span> dot(prod,linalg.inv(<span class="va">self</span>.error_cov))
-        <span class="va">self</span>.mu_hat <span class="op">=</span> <span class="va">self</span>.mu_hat_est <span class="op">+</span> dot(<span class="va">self</span>.K,<span class="va">self</span>.error_mu)
-        
-        prod <span class="op">=</span> dot(<span class="va">self</span>.K,<span class="va">self</span>.H)
-        left <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>) 
-        diff <span class="op">=</span> left <span class="op">-</span> prod
-        <span class="va">self</span>.cov <span class="op">=</span> dot(diff, <span class="va">self</span>.cov_est)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># x_{t+1} = Phi x_t + Sigma_x</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># y_t = Hx_t + R    </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Kalman:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># T is the translation matrix</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># K is the camera matrix calculated by calibration</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, K, mu_init):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.ndim <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Sigma_x <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">150</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Phi <span class="op">=</span> eye(<span class="dv">4</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Phi[<span class="dv">2</span>,<span class="dv">3</span>] <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.H <span class="op">=</span> append(K, [[<span class="dv">0</span>], [<span class="dv">0</span>], [<span class="dv">0</span>]], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu_hat <span class="op">=</span> mu_init</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cov <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.R <span class="op">=</span> eye(<span class="va">self</span>.ndim)<span class="op">*</span><span class="fl">1.5</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> normalize_2d(<span class="va">self</span>, x): </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> array([x[<span class="dv">0</span>]<span class="op">/</span>x[<span class="dv">2</span>], x[<span class="dv">1</span>]<span class="op">/</span>x[<span class="dv">2</span>], <span class="fl">1.0</span>])</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, obs):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Make prediction</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print &quot;self.mu_hat=&quot; + str(self.mu_hat)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu_hat_est <span class="op">=</span> dot(<span class="va">self</span>.Phi,<span class="va">self</span>.mu_hat) </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> dot(<span class="va">self</span>.Phi, dot(<span class="va">self</span>.cov, transpose(<span class="va">self</span>.Phi)))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cov_est <span class="op">=</span> prod <span class="op">+</span> <span class="va">self</span>.Sigma_x</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print &quot;self.mu_hat_est=&quot; + str(self.mu_hat_est)</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co">#print &quot;self.cov_est=&quot; + str(self.cov_est)</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update estimate</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> <span class="va">self</span>.normalize_2d(dot(<span class="va">self</span>.H,<span class="va">self</span>.mu_hat_est))</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.error_mu <span class="op">=</span> obs <span class="op">-</span> prod</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> dot(<span class="va">self</span>.cov,transpose(<span class="va">self</span>.H))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> dot(<span class="va">self</span>.H,prod)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.error_cov <span class="op">=</span> prod <span class="op">+</span> <span class="va">self</span>.R</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> dot(<span class="va">self</span>.cov_est,transpose(<span class="va">self</span>.H))</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.K <span class="op">=</span> dot(prod,linalg.inv(<span class="va">self</span>.error_cov))</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu_hat <span class="op">=</span> <span class="va">self</span>.mu_hat_est <span class="op">+</span> dot(<span class="va">self</span>.K,<span class="va">self</span>.error_mu)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        prod <span class="op">=</span> dot(<span class="va">self</span>.K,<span class="va">self</span>.H)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        left <span class="op">=</span> eye(<span class="va">self</span>.ndim<span class="op">+</span><span class="dv">1</span>) </span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        diff <span class="op">=</span> left <span class="op">-</span> prod</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cov <span class="op">=</span> dot(diff, <span class="va">self</span>.cov_est)</span></code></pre></div>
 <p>Örnek</p>
-<p>Diyelim ki tek boyutta bir köpeğin gidişini modellemek istiyoruz [4, pg. 191]. Köpek sabit bir hızda ilerliyor olsun (bu geçiş modeli), ve biz onu sadece havlamaların nereden geldiği ile bulmaya uğraşacağız (bu da gürültülü ölçüm). Geçiş</p>
+<p>Diyelim ki tek boyutta bir köpeğin gidişini modellemek istiyoruz [4,
+pg. 191]. Köpek sabit bir hızda ilerliyor olsun (bu geçiş modeli), ve
+biz onu sadece havlamaların nereden geldiği ile bulmaya uğraşacağız (bu
+da gürültülü ölçüm). Geçiş</p>
 <p><span class="math display">\[ x = v \Delta t + x_0\]</span></p>
-<p>Hız <span class="math inline">\(v\)</span> yerine <span class="math inline">\(\dot{x}\)</span> kullanalım, o zaman</p>
-<p><span class="math display">\[\bar x = x + \dot x \Delta t\]</span></p>
+<p>Hız <span class="math inline">\(v\)</span> yerine <span
+class="math inline">\(\dot{x}\)</span> kullanalım, o zaman</p>
+<p><span class="math display">\[\bar x = x + \dot x \Delta
+t\]</span></p>
 <p>Hız sabit olacağı için onun geçişi şöyle,</p>
 <p><span class="math display">\[\bar{\dot x} = \dot x\]</span></p>
 <p>Alt alta yazalım,</p>
@@ -266,380 +459,393 @@ P_k^{+} =  (I - K_kH_k)P_k^-(I - H_k^TK_k^T) + K_kR_kK_k^T
 \end{cases}\]</span></p>
 <p>Matris formunda</p>
 <p><span class="math display">\[\begin{aligned}
-\begin{bmatrix}\bar x \\ \bar{\dot x}\end{bmatrix} &amp;= \begin{bmatrix}1&amp;\Delta t  \\ 0&amp;1\end{bmatrix}  \begin{bmatrix}x \\ \dot x\end{bmatrix}\\
+\begin{bmatrix}\bar x \\ \bar{\dot x}\end{bmatrix} &amp;=
+\begin{bmatrix}1&amp;\Delta t  \\ 0&amp;1\end{bmatrix}  \begin{bmatrix}x
+\\ \dot x\end{bmatrix}\\
 \end{aligned}\]</span></p>
-<p><span class="math display">\[ \mathbf{\bar x} = \mathbf{Fx} \]</span></p>
+<p><span class="math display">\[ \mathbf{\bar x} = \mathbf{Fx}
+\]</span></p>
 <p>Yani konumu iki boyutlu olarak modellemiş olduk.</p>
-<p><span class="math display">\[\mathbf x =\begin{bmatrix}x \\ \dot x\end{bmatrix}\]</span></p>
-<p>Peki ölçüm tahminlerini üretecek <span class="math inline">\(H\)</span> nasıl olmalı?</p>
-<p><span class="math display">\[\mathbf H=\begin{bmatrix}1&amp;0\end{bmatrix}\]</span></p>
-<p>Bunu yaptık çünkü <span class="math inline">\(Hx\)</span> çarpımı yapılınca sadece <span class="math inline">\(x\)</span> çarpıma girecek, hız sıfırlanacak, yani ölçümde kullanılmayacak. Bu tam istediğimiz şey zaten. Ne kadar ilginç değil mi? Hız konumda yer alan bir şey, tahmin / ölçüm / düzeltme döngüsü sırasında KF onu da değiştirecek, düzeltecek, ölçümde kullanılmıyor olsa bile!</p>
+<p><span class="math display">\[\mathbf x =\begin{bmatrix}x \\ \dot
+x\end{bmatrix}\]</span></p>
+<p>Peki ölçüm tahminlerini üretecek <span
+class="math inline">\(H\)</span> nasıl olmalı?</p>
+<p><span class="math display">\[\mathbf
+H=\begin{bmatrix}1&amp;0\end{bmatrix}\]</span></p>
+<p>Bunu yaptık çünkü <span class="math inline">\(Hx\)</span> çarpımı
+yapılınca sadece <span class="math inline">\(x\)</span> çarpıma girecek,
+hız sıfırlanacak, yani ölçümde kullanılmayacak. Bu tam istediğimiz şey
+zaten. Ne kadar ilginç değil mi? Hız konumda yer alan bir şey, tahmin /
+ölçüm / düzeltme döngüsü sırasında KF onu da değiştirecek, düzeltecek,
+ölçümde kullanılmıyor olsa bile!</p>
 <p>Ölçümdeki belirsizliğe 10 metre diyelim,</p>
-<p><span class="math inline">\(R = \begin{bmatrix}10\end{bmatrix}\)</span></p>
+<p><span class="math inline">\(R =
+\begin{bmatrix}10\end{bmatrix}\)</span></p>
 <p>Altta alternatif bir KF kodu ve örneğin kodlamasını görüyoruz,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal
-<span class="im">import</span> pandas <span class="im">as</span> pd, math
-<span class="im">import</span> numpy <span class="im">as</span> np, numpy.linalg <span class="im">as</span> linalg
-<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
-
-<span class="kw">def</span> logpdf(x, mean, cov):
-    flat_mean <span class="op">=</span> np.asarray(mean).flatten()
-    flat_x <span class="op">=</span> np.asarray(x).flatten()
-    <span class="cf">return</span> multivariate_normal.logpdf(flat_x, flat_mean, cov, <span class="va">True</span>)
-
-<span class="kw">def</span> dot3(A,B,C):
-    <span class="cf">return</span> np.dot(A, np.dot(B,C))
-
-<span class="kw">def</span> setter_scalar(value, dim_x):
-    <span class="cf">if</span> np.isscalar(value):
-        v <span class="op">=</span> np.eye(dim_x) <span class="op">*</span> value
-    <span class="cf">else</span>:
-        v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)
-        dim_x <span class="op">=</span> v.shape[<span class="dv">0</span>]
-
-    <span class="cf">if</span> v.shape <span class="op">!=</span> (dim_x, dim_x):
-        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(dim_x, dim_x))
-    <span class="cf">return</span> v
-
-<span class="kw">def</span> setter(value, dim_x, dim_y):
-    v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)
-    <span class="cf">if</span> v.shape <span class="op">!=</span> (dim_x, dim_y):
-        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(dim_x, dim_y))
-    <span class="cf">return</span> v
-
-<span class="kw">def</span> setter_1d(value, dim_x):
-    v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)
-    shape <span class="op">=</span> v.shape
-    <span class="cf">if</span> shape[<span class="dv">0</span>] <span class="op">!=</span> (dim_x) <span class="kw">or</span> v.ndim <span class="op">&gt;</span> <span class="dv">2</span> <span class="kw">or</span> (v.ndim<span class="op">==</span><span class="dv">2</span> <span class="kw">and</span> shape[<span class="dv">1</span>] <span class="op">!=</span> <span class="dv">1</span>):
-        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;has shape </span><span class="sc">{}</span><span class="st">, must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(shape, dim_x, <span class="dv">1</span>))
-    <span class="cf">return</span> v
-
-
-<span class="kw">def</span> Q_discrete_white_noise(dim, dt<span class="op">=</span><span class="fl">1.</span>, var<span class="op">=</span><span class="fl">1.</span>):
-    <span class="cf">assert</span> dim <span class="op">==</span> <span class="dv">2</span> <span class="kw">or</span> dim <span class="op">==</span> <span class="dv">3</span>
-    <span class="cf">if</span> dim <span class="op">==</span> <span class="dv">2</span>:
-        Q <span class="op">=</span> np.array([[.<span class="dv">25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>],
-                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
-    <span class="cf">else</span>:
-        Q <span class="op">=</span> np.array([[.<span class="dv">25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>],
-                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>,       dt],
-                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>,       dt,        <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)
-
-    <span class="cf">return</span> Q <span class="op">*</span> var
-
-<span class="kw">class</span> KalmanFilter(<span class="bu">object</span>):
-    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim_x, dim_z, dim_u<span class="op">=</span><span class="dv">0</span>):
-        <span class="cf">assert</span> dim_x <span class="op">&gt;</span> <span class="dv">0</span>
-        <span class="cf">assert</span> dim_z <span class="op">&gt;</span> <span class="dv">0</span>
-        <span class="cf">assert</span> dim_u <span class="op">&gt;=</span> <span class="dv">0</span>
-
-        <span class="va">self</span>.dim_x <span class="op">=</span> dim_x
-        <span class="va">self</span>.dim_z <span class="op">=</span> dim_z
-        <span class="va">self</span>.dim_u <span class="op">=</span> dim_u
-
-        <span class="va">self</span>._x <span class="op">=</span> np.zeros((dim_x,<span class="dv">1</span>)) <span class="co"># state</span>
-        <span class="va">self</span>._P <span class="op">=</span> np.eye(dim_x)       <span class="co"># uncertainty covariance</span>
-        <span class="va">self</span>._Q <span class="op">=</span> np.eye(dim_x)       <span class="co"># process uncertainty</span>
-        <span class="va">self</span>._B <span class="op">=</span> <span class="dv">0</span>                <span class="co"># control transition matrix</span>
-        <span class="va">self</span>._F <span class="op">=</span> <span class="dv">0</span>                <span class="co"># state transition matrix</span>
-        <span class="va">self</span>.H <span class="op">=</span> <span class="dv">0</span>                 <span class="co"># Measurement function</span>
-        <span class="va">self</span>.R <span class="op">=</span> np.eye(dim_z)        <span class="co"># state uncertainty</span>
-        <span class="va">self</span>._alpha_sq <span class="op">=</span> <span class="fl">1.</span>        <span class="co"># fading memory control</span>
-        <span class="va">self</span>.M <span class="op">=</span> <span class="dv">0</span>                 <span class="co"># process-measurement cross correlation</span>
-
-        <span class="co"># gain and residual are computed during the innovation step. We</span>
-        <span class="co"># save them so that in case you want to inspect them for various</span>
-        <span class="co"># purposes</span>
-        <span class="va">self</span>._K <span class="op">=</span> <span class="dv">0</span> <span class="co"># kalman gain</span>
-        <span class="va">self</span>._y <span class="op">=</span> np.zeros((dim_z, <span class="dv">1</span>))
-        <span class="va">self</span>._S <span class="op">=</span> np.zeros((dim_z, dim_z)) <span class="co"># system uncertainty</span>
-
-        <span class="co"># identity matrix. Do not alter this.</span>
-        <span class="va">self</span>._I <span class="op">=</span> np.eye(dim_x)
-
-
-    <span class="kw">def</span> update(<span class="va">self</span>, z, R<span class="op">=</span><span class="va">None</span>, H<span class="op">=</span><span class="va">None</span>):
-        <span class="cf">if</span> z <span class="kw">is</span> <span class="va">None</span>:
-            <span class="cf">return</span>
-
-        <span class="cf">if</span> R <span class="kw">is</span> <span class="va">None</span>:
-            R <span class="op">=</span> <span class="va">self</span>.R
-        <span class="cf">elif</span> isscalar(R):
-            R <span class="op">=</span> eye(<span class="va">self</span>.dim_z) <span class="op">*</span> R
-
-        <span class="co"># rename for readability and a tiny extra bit of speed</span>
-        <span class="cf">if</span> H <span class="kw">is</span> <span class="va">None</span>:
-            H <span class="op">=</span> <span class="va">self</span>.H
-        P <span class="op">=</span> <span class="va">self</span>._P
-        x <span class="op">=</span> <span class="va">self</span>._x
-
-        <span class="co"># handle special case: if z is in form [[z]] but x is not a column</span>
-        <span class="co"># vector dimensions will not match</span>
-        <span class="cf">if</span> x.ndim<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> np.shape(z) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>):
-            z <span class="op">=</span> z[<span class="dv">0</span>]
-
-        <span class="cf">if</span> np.shape(z) <span class="op">==</span> (): <span class="co"># is it scalar, e.g. z=3 or z=np.array(3)</span>
-            z <span class="op">=</span> np.asarray([z])
-
-        <span class="co"># y = z - Hx</span>
-        <span class="co"># error (residual) between measurement and prediction</span>
-        Hx <span class="op">=</span> np.dot(H, x)
-
-        <span class="cf">assert</span> np.shape(Hx) <span class="op">==</span> np.shape(z) <span class="kw">or</span> (np.shape(Hx) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>) <span class="kw">and</span> np.shape(z) <span class="op">==</span> (<span class="dv">1</span>,)), <span class="op">\</span>
-               <span class="co">&#39;shape of z should be {}, but it is {}&#39;</span>.<span class="bu">format</span>(
-               np.shape(Hx), np.shape(z))
-        <span class="va">self</span>._y <span class="op">=</span> z <span class="op">-</span> Hx
-
-        <span class="co"># S = HPH&#39; + R</span>
-        <span class="co"># project system uncertainty into measurement space</span>
-        S <span class="op">=</span> dot3(H, P, H.T) <span class="op">+</span> R
-
-        <span class="co"># K = PH&#39;inv(S)</span>
-        <span class="co"># map system uncertainty into kalman gain</span>
-        K <span class="op">=</span> dot3(P, H.T, linalg.inv(S))
-
-        <span class="co"># x = x + Ky</span>
-        <span class="co"># predict new x with residual scaled by the kalman gain</span>
-        <span class="va">self</span>._x <span class="op">=</span> x <span class="op">+</span> np.dot(K, <span class="va">self</span>._y)
-
-        <span class="co"># P = (I-KH)P(I-KH)&#39; + KRK&#39;</span>
-        I_KH <span class="op">=</span> <span class="va">self</span>._I <span class="op">-</span> np.dot(K, H)
-        <span class="va">self</span>._P <span class="op">=</span> dot3(I_KH, P, I_KH.T) <span class="op">+</span> dot3(K, R, K.T)
-
-        <span class="va">self</span>._S <span class="op">=</span> S
-        <span class="va">self</span>._K <span class="op">=</span> K
-
-        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(z, np.dot(H, x), S)
-
-
-    <span class="kw">def</span> update_correlated(<span class="va">self</span>, z, R<span class="op">=</span><span class="va">None</span>, H<span class="op">=</span><span class="va">None</span>):
-        <span class="cf">if</span> z <span class="kw">is</span> <span class="va">None</span>:
-            <span class="cf">return</span>
-
-        <span class="cf">if</span> R <span class="kw">is</span> <span class="va">None</span>:
-            R <span class="op">=</span> <span class="va">self</span>.R
-        <span class="cf">elif</span> isscalar(R):
-            R <span class="op">=</span> eye(<span class="va">self</span>.dim_z) <span class="op">*</span> R
-
-        <span class="co"># rename for readability and a tiny extra bit of speed</span>
-        <span class="cf">if</span> H <span class="kw">is</span> <span class="va">None</span>:
-            H <span class="op">=</span> <span class="va">self</span>.H
-        x <span class="op">=</span> <span class="va">self</span>._x
-        P <span class="op">=</span> <span class="va">self</span>._P
-        M <span class="op">=</span> <span class="va">self</span>.M
-
-        <span class="co"># handle special case: if z is in form [[z]] but x is not a column</span>
-        <span class="co"># vector dimensions will not match</span>
-        <span class="cf">if</span> x.ndim<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> shape(z) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>):
-            z <span class="op">=</span> z[<span class="dv">0</span>]
-
-        <span class="cf">if</span> shape(z) <span class="op">==</span> (): <span class="co"># is it scalar, e.g. z=3 or z=np.array(3)</span>
-            z <span class="op">=</span> np.asarray([z])
-
-        <span class="co"># y = z - Hx</span>
-        <span class="co"># error (residual) between measurement and prediction</span>
-        <span class="va">self</span>._y <span class="op">=</span> z <span class="op">-</span> dot(H, x)
-
-        <span class="co"># project system uncertainty into measurement space</span>
-        S <span class="op">=</span> dot3(H, P, H.T) <span class="op">+</span> dot(H, M) <span class="op">+</span> dot(M.T, H.T) <span class="op">+</span> R
-
-        <span class="co"># K = PH&#39;inv(S)</span>
-        <span class="co"># map system uncertainty into kalman gain</span>
-        K <span class="op">=</span> dot(dot(P, H.T) <span class="op">+</span> M, linalg.inv(S))
-
-        <span class="co"># x = x + Ky</span>
-        <span class="co"># predict new x with residual scaled by the kalman gain</span>
-        <span class="va">self</span>._x <span class="op">=</span> x <span class="op">+</span> dot(K, <span class="va">self</span>._y)
-        <span class="va">self</span>._P <span class="op">=</span> P <span class="op">-</span> dot(K, dot(H, P) <span class="op">+</span> M.T)
-
-        <span class="va">self</span>._S <span class="op">=</span> S
-        <span class="va">self</span>._K <span class="op">=</span> K
-
-        <span class="co"># compute log likelihood</span>
-        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(z, dot(H, x), S)
-
-
-    <span class="kw">def</span> predict(<span class="va">self</span>, u<span class="op">=</span><span class="dv">0</span>, B<span class="op">=</span><span class="va">None</span>, F<span class="op">=</span><span class="va">None</span>, Q<span class="op">=</span><span class="va">None</span>):
-        <span class="cf">if</span> B <span class="kw">is</span> <span class="va">None</span>:
-            B <span class="op">=</span> <span class="va">self</span>._B
-        <span class="cf">if</span> F <span class="kw">is</span> <span class="va">None</span>:
-            F <span class="op">=</span> <span class="va">self</span>._F
-        <span class="cf">if</span> Q <span class="kw">is</span> <span class="va">None</span>:
-            Q <span class="op">=</span> <span class="va">self</span>._Q
-        <span class="cf">elif</span> np.isscalar(Q):
-            Q <span class="op">=</span> np.eye(<span class="va">self</span>.dim_x) <span class="op">*</span> Q
-
-        <span class="co"># x = Fx + Bu</span>
-        <span class="va">self</span>._x <span class="op">=</span> np.dot(F, <span class="va">self</span>.x) <span class="op">+</span> np.dot(B, u)
-
-        <span class="co"># P = FPF&#39; + Q</span>
-        <span class="va">self</span>._P <span class="op">=</span> <span class="va">self</span>._alpha_sq <span class="op">*</span> dot3(F, <span class="va">self</span>._P, F.T) <span class="op">+</span> Q
-
-    <span class="kw">def</span> get_prediction(<span class="va">self</span>, u<span class="op">=</span><span class="dv">0</span>):
-        x <span class="op">=</span> dot(<span class="va">self</span>._F, <span class="va">self</span>._x) <span class="op">+</span> dot(<span class="va">self</span>._B, u)
-        P <span class="op">=</span> <span class="va">self</span>._alpha_sq <span class="op">*</span> dot3(<span class="va">self</span>._F, <span class="va">self</span>._P, <span class="va">self</span>._F.T) <span class="op">+</span> <span class="va">self</span>._Q
-        <span class="cf">return</span> (x, P)
-
-
-    <span class="kw">def</span> residual_of(<span class="va">self</span>, z):
-        <span class="cf">return</span> z <span class="op">-</span> dot(<span class="va">self</span>.H, <span class="va">self</span>._x)
-
-
-    <span class="kw">def</span> measurement_of_state(<span class="va">self</span>, x):
-        <span class="cf">return</span> dot(<span class="va">self</span>.H, x)
-
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> alpha(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._alpha_sq<span class="op">**</span>.<span class="dv">5</span>
-
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> likelihood(<span class="va">self</span>):
-        <span class="cf">return</span> math.exp(<span class="va">self</span>.log_likelihood)
-
-
-    <span class="at">@alpha.setter</span>
-    <span class="kw">def</span> alpha(<span class="va">self</span>, value):
-        <span class="cf">assert</span> np.isscalar(value)
-        <span class="cf">assert</span> value <span class="op">&gt;</span> <span class="dv">0</span>
-
-        <span class="va">self</span>._alpha_sq <span class="op">=</span> value<span class="op">**</span><span class="dv">2</span>
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> Q(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._Q
-
-
-    <span class="at">@Q.setter</span>
-    <span class="kw">def</span> Q(<span class="va">self</span>, value):
-        <span class="va">self</span>._Q <span class="op">=</span> setter_scalar(value, <span class="va">self</span>.dim_x)
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> P(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._P
-
-
-    <span class="at">@P.setter</span>
-    <span class="kw">def</span> P(<span class="va">self</span>, value):
-        <span class="va">self</span>._P <span class="op">=</span> setter_scalar(value, <span class="va">self</span>.dim_x)
-
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> F(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._F
-
-
-    <span class="at">@F.setter</span>
-    <span class="kw">def</span> F(<span class="va">self</span>, value):
-        <span class="va">self</span>._F <span class="op">=</span> setter(value, <span class="va">self</span>.dim_x, <span class="va">self</span>.dim_x)
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> B(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._B
-
-
-    <span class="at">@B.setter</span>
-    <span class="kw">def</span> B(<span class="va">self</span>, value):
-        <span class="cf">if</span> np.isscalar(value):
-            <span class="va">self</span>._B <span class="op">=</span> value
-        <span class="cf">else</span>:
-            <span class="va">self</span>._B <span class="op">=</span> setter (value, <span class="va">self</span>.dim_x, <span class="va">self</span>.dim_u)
-
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> x(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._x
-
-    <span class="at">@x.setter</span>
-    <span class="kw">def</span> x(<span class="va">self</span>, value):
-        <span class="va">self</span>._x <span class="op">=</span> setter_1d(value, <span class="va">self</span>.dim_x)
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> K(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._K
-
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> y(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._y
-
-    <span class="at">@property</span>
-    <span class="kw">def</span> S(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="va">self</span>._S</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal
-<span class="im">import</span> pandas <span class="im">as</span> pd, math
-<span class="im">import</span> numpy <span class="im">as</span> np, numpy.linalg <span class="im">as</span> linalg
-<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
-<span class="im">import</span> kalman
-
-<span class="kw">def</span> pos_vel_filter(x, P, R, Q<span class="op">=</span><span class="fl">0.</span>, dt<span class="op">=</span><span class="fl">1.0</span>):    
-    kf <span class="op">=</span> kalman.KalmanFilter(dim_x<span class="op">=</span><span class="dv">2</span>, dim_z<span class="op">=</span><span class="dv">1</span>)
-    kf.x <span class="op">=</span> np.array([x[<span class="dv">0</span>], x[<span class="dv">1</span>]]) <span class="co"># yer ve hiz</span>
-    kf.F <span class="op">=</span> np.array([[<span class="fl">1.</span>, dt],
-                     [<span class="fl">0.</span>,  <span class="fl">1.</span>]])  <span class="co"># konum gecis matrisi</span>
-    kf.H <span class="op">=</span> np.array([[<span class="fl">1.</span>, <span class="dv">0</span>]])    <span class="co"># olcum fonksiyonu</span>
-    kf.R <span class="op">*=</span> R                     <span class="co"># olcum belirsizligi</span>
-    <span class="cf">if</span> np.isscalar(P):
-        kf.P <span class="op">*=</span> P                 <span class="co"># kovaryans matrisi</span>
-    <span class="cf">else</span>:
-        kf.P[:] <span class="op">=</span> P               <span class="co"># [:] komutu derin kopya yapar</span>
-    <span class="cf">if</span> np.isscalar(Q):
-        kf.Q <span class="op">=</span> kalman.Q_discrete_white_noise(dim<span class="op">=</span><span class="dv">2</span>, dt<span class="op">=</span>dt, var<span class="op">=</span>Q)
-    <span class="cf">else</span>:
-        kf.Q[:] <span class="op">=</span> Q
-    <span class="cf">return</span> kf
-
-<span class="kw">def</span> compute_dog_data(z_var, process_var, count<span class="op">=</span><span class="dv">1</span>, dt<span class="op">=</span><span class="fl">1.</span>):
-    x, vel <span class="op">=</span> <span class="fl">0.</span>, <span class="fl">1.</span>
-    z_std <span class="op">=</span> math.sqrt(z_var) 
-    p_std <span class="op">=</span> math.sqrt(process_var)
-    xs, zs <span class="op">=</span> [], []
-    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(count):
-        v <span class="op">=</span> vel <span class="op">+</span> (np.random.randn() <span class="op">*</span> p_std <span class="op">*</span> dt)
-        x <span class="op">+=</span> v<span class="op">*</span>dt        
-        xs.append(x)
-        zs.append(x <span class="op">+</span> np.random.randn() <span class="op">*</span> z_std)        
-    <span class="cf">return</span> np.array(xs), np.array(zs)
-
-<span class="kw">def</span> run(x0<span class="op">=</span>(<span class="fl">0.</span>,<span class="fl">0.</span>), P<span class="op">=</span><span class="dv">500</span>, R<span class="op">=</span><span class="dv">0</span>, Q<span class="op">=</span><span class="dv">0</span>, dt<span class="op">=</span><span class="fl">1.0</span>, 
-        track<span class="op">=</span><span class="va">None</span>, zs<span class="op">=</span><span class="va">None</span>,
-        count<span class="op">=</span><span class="dv">0</span>, do_plot<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs):
-
-    <span class="co"># Simulate dog if no data provided. </span>
-    <span class="cf">if</span> zs <span class="kw">is</span> <span class="va">None</span>:
-        track, zs <span class="op">=</span> compute_dog_data(R, Q, count)
-
-    <span class="co"># create the Kalman filter</span>
-    kf <span class="op">=</span> pos_vel_filter(x0, R<span class="op">=</span>R, P<span class="op">=</span>P, Q<span class="op">=</span>Q, dt<span class="op">=</span>dt)  
-
-    <span class="co"># run the kalman filter and store the results</span>
-    xs, cov <span class="op">=</span> [], []
-    <span class="cf">for</span> z <span class="kw">in</span> zs:
-        kf.predict()
-        kf.update(z)
-        xs.append(kf.x)
-        cov.append(kf.P)
-
-    xs, cov <span class="op">=</span> np.array(xs), np.array(cov)
-    <span class="cf">return</span> xs, cov
-
-P <span class="op">=</span> np.diag([<span class="fl">500.</span>, <span class="fl">49.</span>])
-Ms, Ps <span class="op">=</span> run(count<span class="op">=</span><span class="dv">50</span>, R<span class="op">=</span><span class="dv">10</span>, Q<span class="op">=</span><span class="fl">0.01</span>, P<span class="op">=</span>P)
-<span class="bu">print</span> Ms[<span class="op">-</span><span class="dv">4</span>:,]</code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, math</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, numpy.linalg <span class="im">as</span> linalg</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logpdf(x, mean, cov):</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    flat_mean <span class="op">=</span> np.asarray(mean).flatten()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    flat_x <span class="op">=</span> np.asarray(x).flatten()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> multivariate_normal.logpdf(flat_x, flat_mean, cov, <span class="va">True</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dot3(A,B,C):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(A, np.dot(B,C))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setter_scalar(value, dim_x):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.isscalar(value):</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.eye(dim_x) <span class="op">*</span> value</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        dim_x <span class="op">=</span> v.shape[<span class="dv">0</span>]</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> v.shape <span class="op">!=</span> (dim_x, dim_x):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(dim_x, dim_x))</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setter(value, dim_x, dim_y):</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> v.shape <span class="op">!=</span> (dim_x, dim_y):</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(dim_x, dim_y))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> setter_1d(value, dim_x):</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> np.array(value, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    shape <span class="op">=</span> v.shape</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> shape[<span class="dv">0</span>] <span class="op">!=</span> (dim_x) <span class="kw">or</span> v.ndim <span class="op">&gt;</span> <span class="dv">2</span> <span class="kw">or</span> (v.ndim<span class="op">==</span><span class="dv">2</span> <span class="kw">and</span> shape[<span class="dv">1</span>] <span class="op">!=</span> <span class="dv">1</span>):</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;has shape </span><span class="sc">{}</span><span class="st">, must have shape (</span><span class="sc">{}</span><span class="st">,</span><span class="sc">{}</span><span class="st">)&#39;</span>.<span class="bu">format</span>(shape, dim_x, <span class="dv">1</span>))</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Q_discrete_white_noise(dim, dt<span class="op">=</span><span class="fl">1.</span>, var<span class="op">=</span><span class="fl">1.</span>):</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> dim <span class="op">==</span> <span class="dv">2</span> <span class="kw">or</span> dim <span class="op">==</span> <span class="dv">3</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dim <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>],</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>],</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>,       dt],</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>,       dt,        <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q <span class="op">*</span> var</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> KalmanFilter(<span class="bu">object</span>):</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim_x, dim_z, dim_u<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> dim_x <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> dim_z <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> dim_u <span class="op">&gt;=</span> <span class="dv">0</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dim_x <span class="op">=</span> dim_x</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dim_z <span class="op">=</span> dim_z</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dim_u <span class="op">=</span> dim_u</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._x <span class="op">=</span> np.zeros((dim_x,<span class="dv">1</span>)) <span class="co"># state</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._P <span class="op">=</span> np.eye(dim_x)       <span class="co"># uncertainty covariance</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._Q <span class="op">=</span> np.eye(dim_x)       <span class="co"># process uncertainty</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._B <span class="op">=</span> <span class="dv">0</span>                <span class="co"># control transition matrix</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._F <span class="op">=</span> <span class="dv">0</span>                <span class="co"># state transition matrix</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.H <span class="op">=</span> <span class="dv">0</span>                 <span class="co"># Measurement function</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.R <span class="op">=</span> np.eye(dim_z)        <span class="co"># state uncertainty</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._alpha_sq <span class="op">=</span> <span class="fl">1.</span>        <span class="co"># fading memory control</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.M <span class="op">=</span> <span class="dv">0</span>                 <span class="co"># process-measurement cross correlation</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># gain and residual are computed during the innovation step. We</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="co"># save them so that in case you want to inspect them for various</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="co"># purposes</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._K <span class="op">=</span> <span class="dv">0</span> <span class="co"># kalman gain</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._y <span class="op">=</span> np.zeros((dim_z, <span class="dv">1</span>))</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._S <span class="op">=</span> np.zeros((dim_z, dim_z)) <span class="co"># system uncertainty</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="co"># identity matrix. Do not alter this.</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._I <span class="op">=</span> np.eye(dim_x)</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, z, R<span class="op">=</span><span class="va">None</span>, H<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> z <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> R <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>            R <span class="op">=</span> <span class="va">self</span>.R</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> isscalar(R):</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>            R <span class="op">=</span> eye(<span class="va">self</span>.dim_z) <span class="op">*</span> R</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        <span class="co"># rename for readability and a tiny extra bit of speed</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> H <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>            H <span class="op">=</span> <span class="va">self</span>.H</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> <span class="va">self</span>._P</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>._x</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        <span class="co"># handle special case: if z is in form [[z]] but x is not a column</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        <span class="co"># vector dimensions will not match</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> x.ndim<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> np.shape(z) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>):</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>            z <span class="op">=</span> z[<span class="dv">0</span>]</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.shape(z) <span class="op">==</span> (): <span class="co"># is it scalar, e.g. z=3 or z=np.array(3)</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>            z <span class="op">=</span> np.asarray([z])</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>        <span class="co"># y = z - Hx</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>        <span class="co"># error (residual) between measurement and prediction</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>        Hx <span class="op">=</span> np.dot(H, x)</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> np.shape(Hx) <span class="op">==</span> np.shape(z) <span class="kw">or</span> (np.shape(Hx) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>) <span class="kw">and</span> np.shape(z) <span class="op">==</span> (<span class="dv">1</span>,)), <span class="op">\</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>               <span class="st">&#39;shape of z should be </span><span class="sc">{}</span><span class="st">, but it is </span><span class="sc">{}</span><span class="st">&#39;</span>.<span class="bu">format</span>(</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>               np.shape(Hx), np.shape(z))</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._y <span class="op">=</span> z <span class="op">-</span> Hx</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>        <span class="co"># S = HPH&#39; + R</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>        <span class="co"># project system uncertainty into measurement space</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>        S <span class="op">=</span> dot3(H, P, H.T) <span class="op">+</span> R</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>        <span class="co"># K = PH&#39;inv(S)</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>        <span class="co"># map system uncertainty into kalman gain</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        K <span class="op">=</span> dot3(P, H.T, linalg.inv(S))</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x = x + Ky</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>        <span class="co"># predict new x with residual scaled by the kalman gain</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._x <span class="op">=</span> x <span class="op">+</span> np.dot(K, <span class="va">self</span>._y)</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>        <span class="co"># P = (I-KH)P(I-KH)&#39; + KRK&#39;</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>        I_KH <span class="op">=</span> <span class="va">self</span>._I <span class="op">-</span> np.dot(K, H)</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._P <span class="op">=</span> dot3(I_KH, P, I_KH.T) <span class="op">+</span> dot3(K, R, K.T)</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._S <span class="op">=</span> S</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._K <span class="op">=</span> K</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(z, np.dot(H, x), S)</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update_correlated(<span class="va">self</span>, z, R<span class="op">=</span><span class="va">None</span>, H<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> z <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> R <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>            R <span class="op">=</span> <span class="va">self</span>.R</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> isscalar(R):</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>            R <span class="op">=</span> eye(<span class="va">self</span>.dim_z) <span class="op">*</span> R</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>        <span class="co"># rename for readability and a tiny extra bit of speed</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> H <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>            H <span class="op">=</span> <span class="va">self</span>.H</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>._x</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> <span class="va">self</span>._P</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>        M <span class="op">=</span> <span class="va">self</span>.M</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>        <span class="co"># handle special case: if z is in form [[z]] but x is not a column</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>        <span class="co"># vector dimensions will not match</span></span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> x.ndim<span class="op">==</span><span class="dv">1</span> <span class="kw">and</span> shape(z) <span class="op">==</span> (<span class="dv">1</span>,<span class="dv">1</span>):</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>            z <span class="op">=</span> z[<span class="dv">0</span>]</span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shape(z) <span class="op">==</span> (): <span class="co"># is it scalar, e.g. z=3 or z=np.array(3)</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>            z <span class="op">=</span> np.asarray([z])</span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>        <span class="co"># y = z - Hx</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="co"># error (residual) between measurement and prediction</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._y <span class="op">=</span> z <span class="op">-</span> dot(H, x)</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>        <span class="co"># project system uncertainty into measurement space</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>        S <span class="op">=</span> dot3(H, P, H.T) <span class="op">+</span> dot(H, M) <span class="op">+</span> dot(M.T, H.T) <span class="op">+</span> R</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>        <span class="co"># K = PH&#39;inv(S)</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>        <span class="co"># map system uncertainty into kalman gain</span></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>        K <span class="op">=</span> dot(dot(P, H.T) <span class="op">+</span> M, linalg.inv(S))</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x = x + Ky</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>        <span class="co"># predict new x with residual scaled by the kalman gain</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._x <span class="op">=</span> x <span class="op">+</span> dot(K, <span class="va">self</span>._y)</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._P <span class="op">=</span> P <span class="op">-</span> dot(K, dot(H, P) <span class="op">+</span> M.T)</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._S <span class="op">=</span> S</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._K <span class="op">=</span> K</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>        <span class="co"># compute log likelihood</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(z, dot(H, x), S)</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, u<span class="op">=</span><span class="dv">0</span>, B<span class="op">=</span><span class="va">None</span>, F<span class="op">=</span><span class="va">None</span>, Q<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> B <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>            B <span class="op">=</span> <span class="va">self</span>._B</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> F <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>            F <span class="op">=</span> <span class="va">self</span>._F</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> Q <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>            Q <span class="op">=</span> <span class="va">self</span>._Q</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> np.isscalar(Q):</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>            Q <span class="op">=</span> np.eye(<span class="va">self</span>.dim_x) <span class="op">*</span> Q</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>        <span class="co"># x = Fx + Bu</span></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._x <span class="op">=</span> np.dot(F, <span class="va">self</span>.x) <span class="op">+</span> np.dot(B, u)</span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>        <span class="co"># P = FPF&#39; + Q</span></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._P <span class="op">=</span> <span class="va">self</span>._alpha_sq <span class="op">*</span> dot3(F, <span class="va">self</span>._P, F.T) <span class="op">+</span> Q</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_prediction(<span class="va">self</span>, u<span class="op">=</span><span class="dv">0</span>):</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> dot(<span class="va">self</span>._F, <span class="va">self</span>._x) <span class="op">+</span> dot(<span class="va">self</span>._B, u)</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> <span class="va">self</span>._alpha_sq <span class="op">*</span> dot3(<span class="va">self</span>._F, <span class="va">self</span>._P, <span class="va">self</span>._F.T) <span class="op">+</span> <span class="va">self</span>._Q</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (x, P)</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> residual_of(<span class="va">self</span>, z):</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> z <span class="op">-</span> dot(<span class="va">self</span>.H, <span class="va">self</span>._x)</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> measurement_of_state(<span class="va">self</span>, x):</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> dot(<span class="va">self</span>.H, x)</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> alpha(<span class="va">self</span>):</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._alpha_sq<span class="op">**</span><span class="fl">.5</span></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> likelihood(<span class="va">self</span>):</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.exp(<span class="va">self</span>.log_likelihood)</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>    <span class="at">@alpha.setter</span></span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> alpha(<span class="va">self</span>, value):</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> np.isscalar(value)</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> value <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._alpha_sq <span class="op">=</span> value<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Q(<span class="va">self</span>):</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._Q</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Q.setter</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> Q(<span class="va">self</span>, value):</span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._Q <span class="op">=</span> setter_scalar(value, <span class="va">self</span>.dim_x)</span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> P(<span class="va">self</span>):</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._P</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    <span class="at">@P.setter</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> P(<span class="va">self</span>, value):</span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._P <span class="op">=</span> setter_scalar(value, <span class="va">self</span>.dim_x)</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> F(<span class="va">self</span>):</span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._F</span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>    <span class="at">@F.setter</span></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> F(<span class="va">self</span>, value):</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._F <span class="op">=</span> setter(value, <span class="va">self</span>.dim_x, <span class="va">self</span>.dim_x)</span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> B(<span class="va">self</span>):</span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._B</span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="at">@B.setter</span></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> B(<span class="va">self</span>, value):</span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.isscalar(value):</span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._B <span class="op">=</span> value</span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._B <span class="op">=</span> setter (value, <span class="va">self</span>.dim_x, <span class="va">self</span>.dim_u)</span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> x(<span class="va">self</span>):</span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._x</span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>    <span class="at">@x.setter</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> x(<span class="va">self</span>, value):</span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._x <span class="op">=</span> setter_1d(value, <span class="va">self</span>.dim_x)</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> K(<span class="va">self</span>):</span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._K</span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> y(<span class="va">self</span>):</span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._y</span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> S(<span class="va">self</span>):</span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._S</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, math</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, numpy.linalg <span class="im">as</span> linalg</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> kalman</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pos_vel_filter(x, P, R, Q<span class="op">=</span><span class="fl">0.</span>, dt<span class="op">=</span><span class="fl">1.0</span>):    </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    kf <span class="op">=</span> kalman.KalmanFilter(dim_x<span class="op">=</span><span class="dv">2</span>, dim_z<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    kf.x <span class="op">=</span> np.array([x[<span class="dv">0</span>], x[<span class="dv">1</span>]]) <span class="co"># yer ve hiz</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    kf.F <span class="op">=</span> np.array([[<span class="fl">1.</span>, dt],</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                     [<span class="fl">0.</span>,  <span class="fl">1.</span>]])  <span class="co"># konum gecis matrisi</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    kf.H <span class="op">=</span> np.array([[<span class="fl">1.</span>, <span class="dv">0</span>]])    <span class="co"># olcum fonksiyonu</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    kf.R <span class="op">*=</span> R                     <span class="co"># olcum belirsizligi</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.isscalar(P):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        kf.P <span class="op">*=</span> P                 <span class="co"># kovaryans matrisi</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        kf.P[:] <span class="op">=</span> P               <span class="co"># [:] komutu derin kopya yapar</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.isscalar(Q):</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        kf.Q <span class="op">=</span> kalman.Q_discrete_white_noise(dim<span class="op">=</span><span class="dv">2</span>, dt<span class="op">=</span>dt, var<span class="op">=</span>Q)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        kf.Q[:] <span class="op">=</span> Q</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kf</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_dog_data(z_var, process_var, count<span class="op">=</span><span class="dv">1</span>, dt<span class="op">=</span><span class="fl">1.</span>):</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    x, vel <span class="op">=</span> <span class="fl">0.</span>, <span class="fl">1.</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    z_std <span class="op">=</span> math.sqrt(z_var) </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    p_std <span class="op">=</span> math.sqrt(process_var)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    xs, zs <span class="op">=</span> [], []</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(count):</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        v <span class="op">=</span> vel <span class="op">+</span> (np.random.randn() <span class="op">*</span> p_std <span class="op">*</span> dt)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        x <span class="op">+=</span> v<span class="op">*</span>dt        </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        xs.append(x)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        zs.append(x <span class="op">+</span> np.random.randn() <span class="op">*</span> z_std)        </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(xs), np.array(zs)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run(x0<span class="op">=</span>(<span class="fl">0.</span>,<span class="fl">0.</span>), P<span class="op">=</span><span class="dv">500</span>, R<span class="op">=</span><span class="dv">0</span>, Q<span class="op">=</span><span class="dv">0</span>, dt<span class="op">=</span><span class="fl">1.0</span>, </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        track<span class="op">=</span><span class="va">None</span>, zs<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        count<span class="op">=</span><span class="dv">0</span>, do_plot<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs):</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate dog if no data provided. </span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> zs <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        track, zs <span class="op">=</span> compute_dog_data(R, Q, count)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create the Kalman filter</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    kf <span class="op">=</span> pos_vel_filter(x0, R<span class="op">=</span>R, P<span class="op">=</span>P, Q<span class="op">=</span>Q, dt<span class="op">=</span>dt)  </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># run the kalman filter and store the results</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    xs, cov <span class="op">=</span> [], []</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> z <span class="kw">in</span> zs:</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        kf.predict()</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        kf.update(z)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        xs.append(kf.x)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        cov.append(kf.P)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    xs, cov <span class="op">=</span> np.array(xs), np.array(cov)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> xs, cov</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.diag([<span class="fl">500.</span>, <span class="fl">49.</span>])</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>Ms, Ps <span class="op">=</span> run(count<span class="op">=</span><span class="dv">50</span>, R<span class="op">=</span><span class="dv">10</span>, Q<span class="op">=</span><span class="fl">0.01</span>, P<span class="op">=</span>P)</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> Ms[<span class="op">-</span><span class="dv">4</span>:,]</span></code></pre></div>
 <pre><code>[[ 48.01227584   1.04168185]
  [ 49.29870875   1.07239646]
  [ 49.72124553   0.99084303]
  [ 49.69899438   0.86370533]]</code></pre>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(Ms)), Ms[:,<span class="dv">0</span>])
-plt.savefig(<span class="st">&#39;tser_kf_02.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="tser_kf_02.png" />
-
-</div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(Ms)), Ms[:,<span class="dv">0</span>])</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_kf_02.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_kf_02.png" /></p>
 <p>Kaynaklar</p>
 <p>[1] Gelb, <em>Applied Optimal Estimation</em></p>
-<p>[2] Brown, osf. 143, <em>Introduction to Random Signals and Applied Kalman Filtering</em></p>
+<p>[2] Brown, osf. 143, <em>Introduction to Random Signals and Applied
+Kalman Filtering</em></p>
 <p>[3] Hartley, Zisserman, <em>Multiple View Geometry</em></p>
 <p>[4] Labbe, <em>Kalman and Bayesian Filters in Python</em></p>
 <p>[5] Bayramlı, Zaman Serileri, <em>Ortalamaya Dönüş ile İşlem</em></p>

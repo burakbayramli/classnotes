@@ -16,247 +16,402 @@
   <title>Parçacık Filtreleri (Particle Filters)</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
-<h1 id="parçacık-filtreleri-particle-filters">Parçacık Filtreleri (Particle Filters)</h1>
-<p>Parcaçık filtreleri Kalman filtrelerinde olduğu gibi saklı bir konum bilgisi hakkında dış ölçümler üzerinden kestirme hesabı yapabilir. Her parçacık bir hipotezi, farklı bir konum bilgisini temsil eder, olasılığı, olurluğu ölçüm fonksiyonudur. Eğer bu olasılık değeri problemden direk elde edilebilen bir şey değilse, bir ölçüm / hipotez / tahmin arasındaki mesafeyi (hatayı) olurluğa çevirmek mümkün. Burada genellikle</p>
-<p><span class="math display">\[ p(y_t|x_t) \sim e^{-\lambda \varepsilon^2}\]</span></p>
-<p>fonksiyonu kullanılır, <span class="math inline">\(\lambda\)</span> bir tür hassaslık parametresi, bu parametre üzerinden olurluk ya daha az ya da daha fazla etkin hale gelir, <span class="math inline">\(\varepsilon\)</span> ölçüm ve tahmin arasındaki bir mesafe olacaktır.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">100</span>)
-<span class="kw">def</span> f(x,lam): <span class="cf">return</span> np.exp(<span class="op">-</span>lam <span class="op">*</span> x<span class="op">**</span><span class="dv">2</span>)
-plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">0.1</span>))
-plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">0.5</span>))
-plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">1.0</span>))
-plt.savefig(<span class="st">&#39;tser_pf_03.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="tser_pf_03.png" />
-
-</div>
-<p>Kalman Filtrelerine ve Saklı Markov Modellerinde gördüğümüz modeli hatırlayalım,</p>
-<div class="figure">
-<img src="tser_pf_02.png" />
-
-</div>
-<p>Bu modelde gözlemler, yani dışarıdan görülen ölçümler <span class="math inline">\(y_1,y_2,..\)</span> ve bu rasgele değişkenler şartsal olarak eğer <span class="math inline">\(x_0,x_1,.\)</span> verili ise birbirlerinden bağımsızlar. Model,</p>
+<h1 id="parçacık-filtreleri-particle-filters">Parçacık Filtreleri
+(Particle Filters)</h1>
+<p>Parcaçık filtreleri Kalman filtrelerinde olduğu gibi saklı bir konum
+bilgisi hakkında dış ölçümler üzerinden kestirme hesabı yapabilir. Her
+parçacık bir hipotezi, farklı bir konum bilgisini temsil eder,
+olasılığı, olurluğu ölçüm fonksiyonudur. Eğer bu olasılık değeri
+problemden direk elde edilebilen bir şey değilse, bir ölçüm / hipotez /
+tahmin arasındaki mesafeyi (hatayı) olurluğa çevirmek mümkün. Burada
+genellikle</p>
+<p><span class="math display">\[ p(y_t|x_t) \sim e^{-\lambda
+\varepsilon^2}\]</span></p>
+<p>fonksiyonu kullanılır, <span class="math inline">\(\lambda\)</span>
+bir tür hassaslık parametresi, bu parametre üzerinden olurluk ya daha az
+ya da daha fazla etkin hale gelir, <span
+class="math inline">\(\varepsilon\)</span> ölçüm ve tahmin arasındaki
+bir mesafe olacaktır.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">100</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(x,lam): <span class="cf">return</span> np.exp(<span class="op">-</span>lam <span class="op">*</span> x<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">0.1</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">0.5</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>plt.plot(x,f(x,lam<span class="op">=</span><span class="fl">1.0</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_pf_03.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_pf_03.png" /></p>
+<p>Kalman Filtrelerine ve Saklı Markov Modellerinde gördüğümüz modeli
+hatırlayalım,</p>
+<p><img src="tser_pf_02.png" /></p>
+<p>Bu modelde gözlemler, yani dışarıdan görülen ölçümler <span
+class="math inline">\(y_1,y_2,..\)</span> ve bu rasgele değişkenler
+şartsal olarak eğer <span class="math inline">\(x_0,x_1,.\)</span>
+verili ise birbirlerinden bağımsızlar. Model,</p>
 <p><span class="math inline">\(\pi(x_0)\)</span> başlangıç dağılımı</p>
-<p><span class="math inline">\(f(x_t|x_{t-1})\)</span>, <span class="math inline">\(t \ge 1\)</span> geçiş fonksiyonu</p>
-<p><span class="math inline">\(g(y_t|x_t)\)</span>, <span class="math inline">\(t \ge 1\)</span>, gözlemlerin dağılımı</p>
-<p><span class="math inline">\(x_{0:t} = (x_0,..,x_t)\)</span>, <span class="math inline">\(t\)</span> anına kadar olan gizli konum zinciri</p>
-<p><span class="math inline">\(y_{1:t} = (y_1,..,y_t)\)</span>, <span class="math inline">\(t\)</span> anına kadar olan gözlemler</p>
-<p>Genel olarak filtreleme işleminin yaptığı şudur: nasıl davrandığını, ve dışarıdan görülebilen bir ölçütü olasılıksal olarak dışarı nasıl yansıttığını bildiğimiz bir sistemi, sadece bu ölçümlerine bakarak nasıl davrandığını anlamak, ve bunu sadece en son noktaya bakarak yapmak, yani sistemin konumu hakkındaki tahminimizi sürekli güncellemek.</p>
-<p>Mesela bir obje zikzak çizerek hareket ediyor. Bu zikzak hareketinin formülleri vardır, bu hareketi belli bir hata payıyla modelleriz. Fakat bu hareket 3 boyutta, diyelim ki biz sadece 2 boyutlu dijital imajlar üzerinden bu objeyi görüyoruz. 3D/2D geçişi bir yansıtma işlemidir ve bir matris çarpımı ile temsil edilebilir, fakat bu geçiş sırasında bir kayıp olur, derinlik bilgisi gider, artı bir ölçüm gürültüsü orada eklenir diyelim. Fakat tüm bunlara rağmen, sadece eldeki en son imaja bakarak bu objenin yerini tahmin etmek mümkündür.</p>
-<p>Mesela zikzaklı harekete yandan bakıyor olsak obje sağa giderken bir bizden uzaklaşacak yani 2 boyutta küçülecek, ya da yakınlaşacak yani 2 boyutta büyüyecek. Tüm bu acaipliğe (!) rağmen eğer yansıtma modeli doğru kodlanmış ise filtre yeri tespit eder. Her parçacık farklı bir obje konumu hakkında bir hipotez olur, sonra objenin hareketi zikzak modeline göre, algoritmanin kendi zihninde yapılır, bu geçiş tüm parçacıklar / hipotezler üzerinde işletilir, sonra yine tüm parçacıklar ölçüm modeli üzerinden yansıtılır. Son olarak eldeki veri ile bu yansıtma arasındaki farka bakılır. Hangi parçacıklar daha yakın ise (daha doğrusu hangi ölçümün olasılığı mevcut modele göre daha yüksek ise) o parçacıklar hayatta kalır, çünkü o parçacıkların hipotezi daha doğrudur, onlar daha &quot;önemli'' hale gelir, diğerleri devreden çıkmaya başlar. Böylece yavaşça elimizde hipotez doğru olana yaklaşmaya başlar.</p>
-<p>Matematiksel olarak belirtmek gerekirse, elde etmek istediğimiz sonsal dağılım <span class="math inline">\(p(x_{0:t} | y_{1:t})\)</span> ve ondan elde edilebilecek yan sonuçlar, mesela <span class="math inline">\(p(x_t | y_{1:t})\)</span>. Bu kısmi (marginal) dağılıma <em>filtreleme dağılımı</em> ismi de veriliyor, kısmi çünkü <span class="math inline">\(x_{1:t-1}\)</span> entegre edilip dışarı çıkartılmış. Bir diğer ilgilenen yan ürün <span class="math inline">\(\phi\)</span> üzerinden <span class="math inline">\(p(x_{0:t} | y_{1:t})\)</span>'nin beklentisi, ona <span class="math inline">\(I\)</span> diyelim,</p>
-<p><span class="math display">\[ I(f_t) = \int \phi_t(x_{0:t}) p(x_{0:t} | y_{1:t}) \mathrm{d} x_{0:t} \]</span></p>
-<p>En basit durumda eğer <span class="math inline">\(\phi_t(x_{0:t}) =x_{0:t}\)</span> alırsak, o zaman şartsal ortalama (conditional mean) elde ederiz. Farklı fonksiyonlar da mümkündür [1].</p>
-<p>Üstteki entegrali <span class="math inline">\(x_{0:t} | y_{1:t}\)</span>'den örneklem alarak ve entegrali toplam haline getirerek yaklaşıksal şekilde hesaplayabileceğimizi [2] yazısında gördük. Fakat <span class="math inline">\(x_{0:t} | y_{1:t}\)</span>'den örnekleyemiyoruz. Bu durumda yine aynı yazıda görmüştük ki örneklenebilen başka bir dağılımı baz alarak örneklem yapabiliriz, bu tekniğe önemsel örnekleme (importance sampling) adı veriliyordu. Mesela mesela herhangi bir yoğunluk <span class="math inline">\(h(x_{0:t})\)</span> üzerinden,</p>
+<p><span class="math inline">\(f(x_t|x_{t-1})\)</span>, <span
+class="math inline">\(t \ge 1\)</span> geçiş fonksiyonu</p>
+<p><span class="math inline">\(g(y_t|x_t)\)</span>, <span
+class="math inline">\(t \ge 1\)</span>, gözlemlerin dağılımı</p>
+<p><span class="math inline">\(x_{0:t} = (x_0,..,x_t)\)</span>, <span
+class="math inline">\(t\)</span> anına kadar olan gizli konum
+zinciri</p>
+<p><span class="math inline">\(y_{1:t} = (y_1,..,y_t)\)</span>, <span
+class="math inline">\(t\)</span> anına kadar olan gözlemler</p>
+<p>Genel olarak filtreleme işleminin yaptığı şudur: nasıl davrandığını,
+ve dışarıdan görülebilen bir ölçütü olasılıksal olarak dışarı nasıl
+yansıttığını bildiğimiz bir sistemi, sadece bu ölçümlerine bakarak nasıl
+davrandığını anlamak, ve bunu sadece en son noktaya bakarak yapmak, yani
+sistemin konumu hakkındaki tahminimizi sürekli güncellemek.</p>
+<p>Mesela bir obje zikzak çizerek hareket ediyor. Bu zikzak hareketinin
+formülleri vardır, bu hareketi belli bir hata payıyla modelleriz. Fakat
+bu hareket 3 boyutta, diyelim ki biz sadece 2 boyutlu dijital imajlar
+üzerinden bu objeyi görüyoruz. 3D/2D geçişi bir yansıtma işlemidir ve
+bir matris çarpımı ile temsil edilebilir, fakat bu geçiş sırasında bir
+kayıp olur, derinlik bilgisi gider, artı bir ölçüm gürültüsü orada
+eklenir diyelim. Fakat tüm bunlara rağmen, sadece eldeki en son imaja
+bakarak bu objenin yerini tahmin etmek mümkündür.</p>
+<p>Mesela zikzaklı harekete yandan bakıyor olsak obje sağa giderken bir
+bizden uzaklaşacak yani 2 boyutta küçülecek, ya da yakınlaşacak yani 2
+boyutta büyüyecek. Tüm bu acaipliğe (!) rağmen eğer yansıtma modeli
+doğru kodlanmış ise filtre yeri tespit eder. Her parçacık farklı bir
+obje konumu hakkında bir hipotez olur, sonra objenin hareketi zikzak
+modeline göre, algoritmanin kendi zihninde yapılır, bu geçiş tüm
+parçacıklar / hipotezler üzerinde işletilir, sonra yine tüm parçacıklar
+ölçüm modeli üzerinden yansıtılır. Son olarak eldeki veri ile bu
+yansıtma arasındaki farka bakılır. Hangi parçacıklar daha yakın ise
+(daha doğrusu hangi ölçümün olasılığı mevcut modele göre daha yüksek
+ise) o parçacıklar hayatta kalır, çünkü o parçacıkların hipotezi daha
+doğrudur, onlar daha “önemli’’ hale gelir, diğerleri devreden çıkmaya
+başlar. Böylece yavaşça elimizde hipotez doğru olana yaklaşmaya
+başlar.</p>
+<p>Matematiksel olarak belirtmek gerekirse, elde etmek istediğimiz
+sonsal dağılım <span class="math inline">\(p(x_{0:t} | y_{1:t})\)</span>
+ve ondan elde edilebilecek yan sonuçlar, mesela <span
+class="math inline">\(p(x_t | y_{1:t})\)</span>. Bu kısmi (marginal)
+dağılıma <em>filtreleme dağılımı</em> ismi de veriliyor, kısmi çünkü
+<span class="math inline">\(x_{1:t-1}\)</span> entegre edilip dışarı
+çıkartılmış. Bir diğer ilgilenen yan ürün <span
+class="math inline">\(\phi\)</span> üzerinden <span
+class="math inline">\(p(x_{0:t} | y_{1:t})\)</span>’nin beklentisi, ona
+<span class="math inline">\(I\)</span> diyelim,</p>
+<p><span class="math display">\[ I(f_t) = \int \phi_t(x_{0:t}) p(x_{0:t}
+| y_{1:t}) \mathrm{d} x_{0:t} \]</span></p>
+<p>En basit durumda eğer <span class="math inline">\(\phi_t(x_{0:t})
+=x_{0:t}\)</span> alırsak, o zaman şartsal ortalama (conditional mean)
+elde ederiz. Farklı fonksiyonlar da mümkündür [1].</p>
+<p>Üstteki entegrali <span class="math inline">\(x_{0:t} |
+y_{1:t}\)</span>’den örneklem alarak ve entegrali toplam haline
+getirerek yaklaşıksal şekilde hesaplayabileceğimizi [2] yazısında
+gördük. Fakat <span class="math inline">\(x_{0:t} | y_{1:t}\)</span>’den
+örnekleyemiyoruz. Bu durumda yine aynı yazıda görmüştük ki
+örneklenebilen başka bir dağılımı baz alarak örneklem yapabiliriz, bu
+tekniğe önemsel örnekleme (importance sampling) adı veriliyordu. Mesela
+mesela herhangi bir yoğunluk <span
+class="math inline">\(h(x_{0:t})\)</span> üzerinden,</p>
 <p><span class="math display">\[ I = \int
 \phi(x_{0:t})
 \frac{ p(x_{0:t}|y_{1:t}) }{ h(x_{0:t}) } h_{0:t} \mathrm{d} x_{0:t}
 \]</span></p>
 <p>yaklaşıksal olarak</p>
-<p><span class="math display">\[ \hat{I} = \frac{1}{N} \sum_{i=1}^{N} \phi (x^i_{0:t}) w^i_t  \]</span></p>
+<p><span class="math display">\[ \hat{I} = \frac{1}{N} \sum_{i=1}^{N}
+\phi (x^i_{0:t}) w^i_t  \]</span></p>
 <p>ki</p>
-<p><span class="math display">\[ 
-w^i_t = \frac{p(x^i_{0:t}|y_{1:t})}{h(x^i_{0:t})} 
-\qquad (1) 
+<p><span class="math display">\[
+w^i_t = \frac{p(x^i_{0:t}|y_{1:t})}{h(x^i_{0:t})}
+\qquad (1)
 \]</span></p>
-<p>ve bağımsız özdeşçe dağılmış (i.i.d.) <span class="math inline">\(x^1_{0:t}, .., x^N_{0:t} \sim h\)</span> olacak şekilde. Yani örneklem <span class="math inline">\(h\)</span>'den alınıyor.</p>
-<p>Bu güzel, fakat acaba <span class="math inline">\(w^i_t\)</span> formülündeki <span class="math inline">\(p(x^i_{0:t}|y_{1:t})\)</span>'yi nasıl hesaplayacağız? Ayrıca <span class="math inline">\(h\)</span> nasıl seçilecek? Acaba üstteki hesap özyineli olarak yapılamaz mı, yani tüm <span class="math inline">\(1:t\)</span> ölçümlerini bir kerede kullanmadan, <span class="math inline">\(t\)</span> andaki hesap sadece <span class="math inline">\(t-1\)</span> adımındaki hesaba bağlı olsa hesapsal olarak daha iyi olmaz mı?</p>
-<p>Bu mümkün. Mesela önemsel dağılım <span class="math inline">\(h\)</span> için,</p>
-<p><span class="math display">\[ 
-h(x_{0:t}) = h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) 
+<p>ve bağımsız özdeşçe dağılmış (i.i.d.) <span
+class="math inline">\(x^1_{0:t}, .., x^N_{0:t} \sim h\)</span> olacak
+şekilde. Yani örneklem <span class="math inline">\(h\)</span>’den
+alınıyor.</p>
+<p>Bu güzel, fakat acaba <span class="math inline">\(w^i_t\)</span>
+formülündeki <span
+class="math inline">\(p(x^i_{0:t}|y_{1:t})\)</span>’yi nasıl
+hesaplayacağız? Ayrıca <span class="math inline">\(h\)</span> nasıl
+seçilecek? Acaba üstteki hesap özyineli olarak yapılamaz mı, yani tüm
+<span class="math inline">\(1:t\)</span> ölçümlerini bir kerede
+kullanmadan, <span class="math inline">\(t\)</span> andaki hesap sadece
+<span class="math inline">\(t-1\)</span> adımındaki hesaba bağlı olsa
+hesapsal olarak daha iyi olmaz mı?</p>
+<p>Bu mümkün. Mesela önemsel dağılım <span
+class="math inline">\(h\)</span> için,</p>
+<p><span class="math display">\[
+h(x_{0:t}) = h(x_t | x_{0:t-1}) h(x_{{0:t-1}})
 \qquad (2)
 \]</span></p>
-<p>Üstteki ifade koşulsal olasılığın doğal bir sonucu. Peki ağırlıklar özyineli olarak hesaplanabilir mi? Bayes Teorisini kullanarak (1)'in bölünen kısmını açabiliriz,</p>
+<p>Üstteki ifade koşulsal olasılığın doğal bir sonucu. Peki ağırlıklar
+özyineli olarak hesaplanabilir mi? Bayes Teorisini kullanarak (1)’in
+bölünen kısmını açabiliriz,</p>
 <p><span class="math display">\[
 w_t =
 \frac{p(x_{0:t}|y_{1:t})}{h(x_{0:t})} =
 \frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_{0:t})p(y_{1:t}) }
 \qquad (3)
 \]</span></p>
-<p>çünkü hatırlarsak <span class="math inline">\(P(A|B) = P(B|A)P(A) / P(B)\)</span>, teknik işliyor çünkü <span class="math inline">\(P(B,A)=P(A,B)\)</span>.</p>
-<p>Şimdi <span class="math inline">\(h(x_{0:t})\)</span> için (2)'de gördüğümüz açılımı yerine koyalım,</p>
+<p>çünkü hatırlarsak <span class="math inline">\(P(A|B) = P(B|A)P(A) /
+P(B)\)</span>, teknik işliyor çünkü <span
+class="math inline">\(P(B,A)=P(A,B)\)</span>.</p>
+<p>Şimdi <span class="math inline">\(h(x_{0:t})\)</span> için (2)’de
+gördüğümüz açılımı yerine koyalım,</p>
 <p><span class="math display">\[ w_t =
-\frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t}) }
+\frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_t | x_{0:t-1}) h(x_{{0:t-1}})
+p(y_{1:t}) }
 \]</span></p>
-<p>Ayrıca gözlem dağılımı <span class="math inline">\(g\)</span>'yi <span class="math inline">\(p(y_{1:t}|x_{0:t})\)</span>'yi, ve gizli geçiş dağılımı <span class="math inline">\(f\)</span>'i <span class="math inline">\(p(x_{0:t})\)</span> açmak için kullanırsak,</p>
+<p>Ayrıca gözlem dağılımı <span class="math inline">\(g\)</span>’yi
+<span class="math inline">\(p(y_{1:t}|x_{0:t})\)</span>’yi, ve gizli
+geçiş dağılımı <span class="math inline">\(f\)</span>’i <span
+class="math inline">\(p(x_{0:t})\)</span> açmak için kullanırsak,</p>
 <p><span class="math display">\[ = \frac
 {g(y_t|x_t) p(y_{1:t-1}|x_{0:t-1}) f(x_t|x_{t-1})p(x_{0:t-1}) }
 {h(x_t|x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t})}
 \]</span></p>
-<p>Ustteki formülde bolunendeki 2. carpan 4. carpan ve bolende ortadaki carpana bakalım, bu aslında (3)'e göre <span class="math inline">\(w_{t-1}\)</span>'in tanımı değil mi?</p>
-<p>Neredeyse; arada tek bir fark var, bir <span class="math inline">\(p(y_{1:t-1})\)</span> lazım, o üstteki formülde yok, ama onu bölünene ekleyebiliriz, o zaman</p>
+<p>Ustteki formülde bolunendeki 2. carpan 4. carpan ve bolende ortadaki
+carpana bakalım, bu aslında (3)’e göre <span
+class="math inline">\(w_{t-1}\)</span>’in tanımı değil mi?</p>
+<p>Neredeyse; arada tek bir fark var, bir <span
+class="math inline">\(p(y_{1:t-1})\)</span> lazım, o üstteki formülde
+yok, ama onu bölünene ekleyebiliriz, o zaman</p>
 <p><span class="math display">\[ =
 w_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1})p(y_{1:t-1}) }
 {h(x_t|x_{0:t-1}) p(y_{1:t})}
 \]</span></p>
-<p>Hem <span class="math inline">\(p(y_{1:t})\)</span> hem de <span class="math inline">\(p(y_{1:t})\)</span> birer sabittir, o zaman o değişkenleri atarak üstteki eşitliğin oransal doğru olduğunu söyleyebiliriz. Ayrıca bu ağırlıkları artık normalize edilmiş parçacıklar bazında düşünürsek, <span class="math inline">\(\tilde{w}^i_t = \frac{w_t^i}{\sum_j w_t^j}\)</span>, o zaman</p>
+<p>Hem <span class="math inline">\(p(y_{1:t})\)</span> hem de <span
+class="math inline">\(p(y_{1:t})\)</span> birer sabittir, o zaman o
+değişkenleri atarak üstteki eşitliğin oransal doğru olduğunu
+söyleyebiliriz. Ayrıca bu ağırlıkları artık normalize edilmiş
+parçacıklar bazında düşünürsek, <span
+class="math inline">\(\tilde{w}^i_t = \frac{w_t^i}{\sum_j
+w_t^j}\)</span>, o zaman</p>
 <p><span class="math display">\[
 \tilde{w}^i_{t} \propto
 \tilde{w}^i_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1}) } {h(x_t|x_{0:t-1}) }
 \]</span></p>
-<p>Eğer başlangıç dağılımı <span class="math inline">\(x_0^{(1)}, ..., x_0^{(N)} \sim \pi(x_0)\)</span>'dan geliyor ise, ve biz <span class="math inline">\(h(x_0) = \pi(x_0)\)</span> dersek, ayrıca önem dağılımı <span class="math inline">\(h\)</span> için <span class="math inline">\(h(x_t|x_{0:t-1}) = f(x_t|x_{t-1})\)</span> kullanırsak, geriye</p>
+<p>Eğer başlangıç dağılımı <span class="math inline">\(x_0^{(1)}, ...,
+x_0^{(N)} \sim \pi(x_0)\)</span>’dan geliyor ise, ve biz <span
+class="math inline">\(h(x_0) = \pi(x_0)\)</span> dersek, ayrıca önem
+dağılımı <span class="math inline">\(h\)</span> için <span
+class="math inline">\(h(x_t|x_{0:t-1}) = f(x_t|x_{t-1})\)</span>
+kullanırsak, geriye</p>
 <p><span class="math display">\[
 \tilde{w}^i_{t} \propto \tilde{w}^i_{t-1} g(y_t|x_t)
 \]</span></p>
 <p>kalacaktır.</p>
-<p>Burada ilginç bir nokta sistemin geçiş modeli <span class="math inline">\(f\)</span>'in önemlilik örneklemindeki teklif (proposal) dağılımı olarak kullanılmış olması.</p>
+<p>Burada ilginç bir nokta sistemin geçiş modeli <span
+class="math inline">\(f\)</span>’in önemlilik örneklemindeki teklif
+(proposal) dağılımı olarak kullanılmış olması.</p>
 <p>Tekrar Örnekleme</p>
-<p>Buraya kadar gördüklerimiz sıralı önemsel örnekleme (sequential importance sampling) algoritması olarak biliniyor. Fakat gerçek dünya uygulamalarında görüldü ki ağırlıklar her adımda çarpıla çarpıla dejenere hale geliyorlar. Bir ilerleme olarak ağırlıkları her adımda çarpmak yerine her adımda <span class="math inline">\(w_t\)</span> <span class="math inline">\(g\)</span> üzerinden hesaplanır, ve bir ek işlem daha yapılır, eldeki ağırlıklara göre parçacıklardan &quot;tekrar örneklem'' alınır. Bu sayede daha kuvvetli olan hipotezlerin hayatta kalması diğerlerinin yokolması sağlanır.</p>
+<p>Buraya kadar gördüklerimiz sıralı önemsel örnekleme (sequential
+importance sampling) algoritması olarak biliniyor. Fakat gerçek dünya
+uygulamalarında görüldü ki ağırlıklar her adımda çarpıla çarpıla
+dejenere hale geliyorlar. Bir ilerleme olarak ağırlıkları her adımda
+çarpmak yerine her adımda <span class="math inline">\(w_t\)</span> <span
+class="math inline">\(g\)</span> üzerinden hesaplanır, ve bir ek işlem
+daha yapılır, eldeki ağırlıklara göre parçacıklardan “tekrar örneklem’’
+alınır. Bu sayede daha kuvvetli olan hipotezlerin hayatta kalması
+diğerlerinin yokolması sağlanır.</p>
 <p>Nihai parcaçık filtre algoritması şöyledir,</p>
-<p><code>particle_filter</code><span class="math inline">\(\left( f, g, y_{1:t} \right)\)</span></p>
+<p><code>particle_filter</code><span class="math inline">\(\left( f, g,
+y_{1:t} \right)\)</span></p>
 <ul>
 <li><p>Her <span class="math inline">\(i=1,..,N\)</span> için</p>
 <ul>
-<li><span class="math inline">\(\tilde{x}_t^{(i)} \sim f(x_t|x_{t-1}^{(i)})\)</span> örneklemini al, ve <span class="math inline">\(\tilde{x}_{0:t}^{(i)} = ( \tilde{x}_{0:t-1}^{(i)},\tilde{x}_{t}^{(i)})\)</span> yap.</li>
-<li>Önemsel ağırlıklar <span class="math inline">\(\tilde{w}_t^{(i)} = g(y_t|\tilde{x}^{{i}})\)</span>'ı hesapla.</li>
-<li><span class="math inline">\(N\)</span> tane yeni parçacık <span class="math inline">\((x_{0:t}^{(i)}; i=1,..,N )\)</span> eski parçacıklar <span class="math inline">\(\{ \tilde{x}^{(i)}_{0:t},...,\tilde{x}^{(i)}_{0:t} \}\)</span> içinden normalize edilmiş önemsel ağırlıklara göre örnekle.</li>
+<li><span class="math inline">\(\tilde{x}_t^{(i)} \sim
+f(x_t|x_{t-1}^{(i)})\)</span> örneklemini al, ve <span
+class="math inline">\(\tilde{x}_{0:t}^{(i)} = (
+\tilde{x}_{0:t-1}^{(i)},\tilde{x}_{t}^{(i)})\)</span> yap.</li>
+<li>Önemsel ağırlıklar <span class="math inline">\(\tilde{w}_t^{(i)} =
+g(y_t|\tilde{x}^{{i}})\)</span>’ı hesapla.</li>
+<li><span class="math inline">\(N\)</span> tane yeni parçacık <span
+class="math inline">\((x_{0:t}^{(i)}; i=1,..,N )\)</span> eski
+parçacıklar <span class="math inline">\(\{
+\tilde{x}^{(i)}_{0:t},...,\tilde{x}^{(i)}_{0:t} \}\)</span> içinden
+normalize edilmiş önemsel ağırlıklara göre örnekle.</li>
 <li><span class="math inline">\(t = t + 1\)</span></li>
 </ul></li>
 </ul>
 <p>Örnek</p>
-<p>Ali'nin ruh halini modelleyelim. Ali mutlu ya da üzgün olabiliyor, her 10 dakikada Ali'nin ruh hali 0.1 olasılıkla değişiyor, mutluysa üzgün, üzgünse mutlu olabiliyor. Eğer Ali mutlu ise 0.8 şansıyla gülmesi mümkün, üzgün ise 0.2 olasılıkla gülebilir. Önce kendimiz verili olasılıklara göre yapay bir veri üreteceğiz. Ardından bu veriye bakıp sadece gülme / gülmeme verilerine, ölçümlerine bakarak Ali'nin hangi ruh halinde olduğunu takip etmeye uğraşacağız.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> smile
-  
-y,Ttotal,a,b,xs <span class="op">=</span> smile.prepare_data()
-            
-M<span class="op">=</span><span class="dv">100</span>
-
-xp<span class="op">=</span>np.ones((M,Ttotal))
-x<span class="op">=</span> np.random.randint(<span class="dv">2</span>,size<span class="op">=</span>(M,Ttotal))
-
-<span class="co">#contains weights for each particle at each time step</span>
-w<span class="op">=</span>np.ones((M,Ttotal))
-
-<span class="co">#normalize weights</span>
-w<span class="op">=</span>w<span class="op">/</span>M
-
-k<span class="op">=</span><span class="dv">0</span>
-<span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,Ttotal):
-    r1 <span class="op">=</span> np.random.rand(M) 
-    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(M):
-        <span class="cf">if</span> r1[i] <span class="op">&lt;</span> a:
-            xp[i,t] <span class="op">=</span> <span class="dv">1</span><span class="op">-</span>x[i,t<span class="dv">-1</span>] 
-            k<span class="op">=</span>k<span class="op">+</span><span class="dv">1</span>
-        <span class="cf">else</span>:
-            xp[i,t] <span class="op">=</span> x[i,t<span class="dv">-1</span>] 
-        <span class="cf">if</span> y[t] <span class="op">==</span> xp[i,t]:
-            w[i,t] <span class="op">=</span> b
-        <span class="cf">else</span>:
-            w[i,t] <span class="op">=</span> <span class="dv">1</span><span class="op">-</span>b
-
-    w[:,t] <span class="op">=</span> w[:,t] <span class="op">/</span> <span class="bu">sum</span>(w[:,t])    
-    j<span class="op">=</span><span class="dv">0</span>
-    <span class="cf">while</span> j <span class="op">&lt;</span> M<span class="dv">-1</span>:
-        i <span class="op">=</span> np.random.randint(M)
-        <span class="cf">if</span> np.random.rand() <span class="op">&lt;</span> w[i,t]:
-            x[j,t] <span class="op">=</span> xp[i,t]
-            j <span class="op">=</span> j<span class="op">+</span><span class="dv">1</span>
-
-pred <span class="op">=</span> np.zeros(Ttotal)
-<span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(Ttotal):
-    pred[t] <span class="op">=</span> (<span class="bu">sum</span>(xp[:,t])<span class="op">/</span>M)
-
-plt.plot([i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(Ttotal)], xs)
-plt.ylim([<span class="op">-</span><span class="dv">1</span>,<span class="dv">2</span>])
-plt.plot([i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(Ttotal)], pred)
-plt.legend([<span class="st">u&#39;gerçek gizli konum&#39;</span>, <span class="st">&#39;tahmin edilen gizli konum&#39;</span>])
-plt.xlabel(<span class="st">&#39;time&#39;</span>)
-plt.ylabel(<span class="st">&#39;mood&#39;</span>)
-plt.savefig(<span class="st">&#39;tser_pf_01.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="tser_pf_01.png" />
-
-</div>
+<p>Ali’nin ruh halini modelleyelim. Ali mutlu ya da üzgün olabiliyor,
+her 10 dakikada Ali’nin ruh hali 0.1 olasılıkla değişiyor, mutluysa
+üzgün, üzgünse mutlu olabiliyor. Eğer Ali mutlu ise 0.8 şansıyla gülmesi
+mümkün, üzgün ise 0.2 olasılıkla gülebilir. Önce kendimiz verili
+olasılıklara göre yapay bir veri üreteceğiz. Ardından bu veriye bakıp
+sadece gülme / gülmeme verilerine, ölçümlerine bakarak Ali’nin hangi ruh
+halinde olduğunu takip etmeye uğraşacağız.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> smile</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y,Ttotal,a,b,xs <span class="op">=</span> smile.prepare_data()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>M<span class="op">=</span><span class="dv">100</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>xp<span class="op">=</span>np.ones((M,Ttotal))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span> np.random.randint(<span class="dv">2</span>,size<span class="op">=</span>(M,Ttotal))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#contains weights for each particle at each time step</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>w<span class="op">=</span>np.ones((M,Ttotal))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#normalize weights</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>w<span class="op">=</span>w<span class="op">/</span>M</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>k<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,Ttotal):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    r1 <span class="op">=</span> np.random.rand(M) </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(M):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> r1[i] <span class="op">&lt;</span> a:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            xp[i,t] <span class="op">=</span> <span class="dv">1</span><span class="op">-</span>x[i,t<span class="op">-</span><span class="dv">1</span>] </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            k<span class="op">=</span>k<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            xp[i,t] <span class="op">=</span> x[i,t<span class="op">-</span><span class="dv">1</span>] </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> y[t] <span class="op">==</span> xp[i,t]:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            w[i,t] <span class="op">=</span> b</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            w[i,t] <span class="op">=</span> <span class="dv">1</span><span class="op">-</span>b</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    w[:,t] <span class="op">=</span> w[:,t] <span class="op">/</span> <span class="bu">sum</span>(w[:,t])    </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    j<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> j <span class="op">&lt;</span> M<span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> np.random.randint(M)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.random.rand() <span class="op">&lt;</span> w[i,t]:</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            x[j,t] <span class="op">=</span> xp[i,t]</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            j <span class="op">=</span> j<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> np.zeros(Ttotal)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(Ttotal):</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    pred[t] <span class="op">=</span> (<span class="bu">sum</span>(xp[:,t])<span class="op">/</span>M)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>plt.plot([i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(Ttotal)], xs)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>plt.ylim([<span class="op">-</span><span class="dv">1</span>,<span class="dv">2</span>])</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>plt.plot([i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(Ttotal)], pred)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>plt.legend([<span class="st">u&#39;gerçek gizli konum&#39;</span>, <span class="st">&#39;tahmin edilen gizli konum&#39;</span>])</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;time&#39;</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;mood&#39;</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_pf_01.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_pf_01.png" /></p>
 <p>Hata fonksiyonu</p>
 <p><span class="math display">\[
 w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
 \]</span></p>
-<p>olan parçacık filtreleri için kod şurada. Bu filtrenin kullanımı için bakınız [3] yazısı.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> numpy <span class="im">import</span> <span class="op">*</span>
-<span class="im">from</span> numpy.random <span class="im">import</span> <span class="op">*</span>
-
-<span class="kw">class</span> PF:
-    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, K, n):
-        <span class="va">self</span>.H <span class="op">=</span> append(K, [[<span class="dv">0</span>], [<span class="dv">0</span>], [<span class="dv">0</span>]], axis<span class="op">=</span><span class="dv">1</span>)
-        <span class="va">self</span>.n <span class="op">=</span> n
-        <span class="va">self</span>.x <span class="op">=</span> zeros((<span class="va">self</span>.n, <span class="dv">4</span>))
-        <span class="va">self</span>.x[:,:] <span class="op">=</span> array([<span class="fl">1.</span>, <span class="fl">1.</span>, <span class="fl">165.</span>, <span class="dv">-1</span>])
-        
-    <span class="kw">def</span> normalize_2d(<span class="va">self</span>, x): 
-        <span class="cf">return</span> array([x[<span class="dv">0</span>]<span class="op">/</span>x[<span class="dv">2</span>], x[<span class="dv">1</span>]<span class="op">/</span>x[<span class="dv">2</span>], <span class="fl">1.0</span>])
-        
-    <span class="kw">def</span> resample(<span class="va">self</span>, weights):
-       n <span class="op">=</span> <span class="bu">len</span>(weights)
-       indices <span class="op">=</span> []
-       C <span class="op">=</span> [<span class="fl">0.</span>] <span class="op">+</span> [<span class="bu">sum</span>(weights[:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]
-       u0, j <span class="op">=</span> random(), <span class="dv">0</span>
-       <span class="cf">for</span> u <span class="kw">in</span> [(u0<span class="op">+</span>i)<span class="op">/</span>n <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]:
-         <span class="cf">while</span> u <span class="op">&gt;</span> C[j]:
-           j<span class="op">+=</span><span class="dv">1</span>
-         indices.append(j<span class="dv">-1</span>)
-       <span class="cf">return</span> indices
- 
-    <span class="kw">def</span> update(<span class="va">self</span>, y):
-        u <span class="op">=</span> uniform(<span class="op">-</span><span class="fl">0.1</span>, <span class="dv">-1</span>, <span class="va">self</span>.n) <span class="co"># forward with uncertainty</span>
-        <span class="va">self</span>.x[:,<span class="dv">2</span>] <span class="op">+=</span> u
-        u <span class="op">=</span> uniform(<span class="op">-</span><span class="dv">40</span>,<span class="dv">40</span>, <span class="va">self</span>.n) <span class="co"># left right uncertainty</span>
-        <span class="va">self</span>.x[:,<span class="dv">0</span>] <span class="op">+=</span> u
-        p <span class="op">=</span> dot(<span class="va">self</span>.x,<span class="va">self</span>.H.T)
-        <span class="cf">for</span> i, item <span class="kw">in</span> <span class="bu">enumerate</span>(p): <span class="co"># modify in place</span>
-            p[i,:] <span class="op">=</span> <span class="va">self</span>.normalize_2d(item)
-        <span class="va">self</span>.w  <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span>(<span class="fl">1.</span> <span class="op">+</span> (y<span class="op">-</span>p)<span class="op">**</span><span class="dv">2</span>)
-        <span class="va">self</span>.w <span class="op">=</span> <span class="va">self</span>.w[:,<span class="dv">0</span>]<span class="op">+</span><span class="va">self</span>.w[:,<span class="dv">1</span>]
-        <span class="co">#self.w = self.w[:,0]</span>
-        <span class="va">self</span>.w <span class="op">/=</span> <span class="bu">sum</span>(<span class="va">self</span>.w)
-        <span class="va">self</span>.x  <span class="op">=</span> <span class="va">self</span>.x[<span class="va">self</span>.resample(<span class="va">self</span>.w),:]
-        
-    <span class="kw">def</span> average(<span class="va">self</span>):
-        <span class="cf">return</span> <span class="bu">sum</span>(<span class="va">self</span>.x.T<span class="op">*</span><span class="va">self</span>.w, axis<span class="op">=</span><span class="dv">1</span>)
-            </code></pre></div>
+<p>olan parçacık filtreleri için kod şurada. Bu filtrenin kullanımı için
+bakınız [3] yazısı.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PF:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, K, n):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.H <span class="op">=</span> append(K, [[<span class="dv">0</span>], [<span class="dv">0</span>], [<span class="dv">0</span>]], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n <span class="op">=</span> n</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> zeros((<span class="va">self</span>.n, <span class="dv">4</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x[:,:] <span class="op">=</span> array([<span class="fl">1.</span>, <span class="fl">1.</span>, <span class="fl">165.</span>, <span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> normalize_2d(<span class="va">self</span>, x): </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> array([x[<span class="dv">0</span>]<span class="op">/</span>x[<span class="dv">2</span>], x[<span class="dv">1</span>]<span class="op">/</span>x[<span class="dv">2</span>], <span class="fl">1.0</span>])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> resample(<span class="va">self</span>, weights):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>       n <span class="op">=</span> <span class="bu">len</span>(weights)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>       indices <span class="op">=</span> []</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>       C <span class="op">=</span> [<span class="fl">0.</span>] <span class="op">+</span> [<span class="bu">sum</span>(weights[:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>       u0, j <span class="op">=</span> random(), <span class="dv">0</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>       <span class="cf">for</span> u <span class="kw">in</span> [(u0<span class="op">+</span>i)<span class="op">/</span>n <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]:</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>         <span class="cf">while</span> u <span class="op">&gt;</span> C[j]:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>           j<span class="op">+=</span><span class="dv">1</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>         indices.append(j<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>       <span class="cf">return</span> indices</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, y):</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        u <span class="op">=</span> uniform(<span class="op">-</span><span class="fl">0.1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="va">self</span>.n) <span class="co"># forward with uncertainty</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x[:,<span class="dv">2</span>] <span class="op">+=</span> u</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        u <span class="op">=</span> uniform(<span class="op">-</span><span class="dv">40</span>,<span class="dv">40</span>, <span class="va">self</span>.n) <span class="co"># left right uncertainty</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x[:,<span class="dv">0</span>] <span class="op">+=</span> u</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> dot(<span class="va">self</span>.x,<span class="va">self</span>.H.T)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, item <span class="kw">in</span> <span class="bu">enumerate</span>(p): <span class="co"># modify in place</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>            p[i,:] <span class="op">=</span> <span class="va">self</span>.normalize_2d(item)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.w  <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span>(<span class="fl">1.</span> <span class="op">+</span> (y<span class="op">-</span>p)<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.w <span class="op">=</span> <span class="va">self</span>.w[:,<span class="dv">0</span>]<span class="op">+</span><span class="va">self</span>.w[:,<span class="dv">1</span>]</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="co">#self.w = self.w[:,0]</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.w <span class="op">/=</span> <span class="bu">sum</span>(<span class="va">self</span>.w)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x  <span class="op">=</span> <span class="va">self</span>.x[<span class="va">self</span>.resample(<span class="va">self</span>.w),:]</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> average(<span class="va">self</span>):</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">sum</span>(<span class="va">self</span>.x.T<span class="op">*</span><span class="va">self</span>.w, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>            </span></code></pre></div>
 <p>Kaynaklar</p>
-<p>[1] Gandy, <em>LTCC - Advanced Computational Methods in Statistics</em>, <a href="http://wwwf.imperial.ac.uk/~agandy/ltcc.html" class="uri">http://wwwf.imperial.ac.uk/~agandy/ltcc.html</a></p>
-<p>[2] Bayramlı, Istatistik, <em>İstatistik, Monte Carlo, Entegraller, MCMC</em></p>
+<p>[1] Gandy, <em>LTCC - Advanced Computational Methods in
+Statistics</em>, <a
+href="http://wwwf.imperial.ac.uk/~agandy/ltcc.html">http://wwwf.imperial.ac.uk/~agandy/ltcc.html</a></p>
+<p>[2] Bayramlı, Istatistik, <em>İstatistik, Monte Carlo, Entegraller,
+MCMC</em></p>
 <p>[3] Bayramlı, Yapay Görüş, <em>Obje Takibi</em></p>
 <p>
   <a href="..">Yukarı</a>

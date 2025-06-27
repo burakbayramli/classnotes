@@ -30,7 +30,7 @@ returns = df['Adj Close'].pct_change()
 print (returns.head())
 ```
 
-```
+```text
 Date
 1993-01-29         NaN
 1993-02-01    0.007022
@@ -76,8 +76,8 @@ alan o alanın x-eksenindeki değerlerin ortaya çıkma olasılığını verir. 
 print (returns.quantile(q=0.05))
 ```
 
-```
--0.0177541105196
+```text
+-0.01775411051963858
 ```
 
 Gaussian durumu ilginç; kabaca Gaussian kabulü yapılabilir, fakat literatürdeki
@@ -100,8 +100,8 @@ tanıdığımız, bildiğimiz $\sigma$ hesabı direk burada kullanılabilir,
 print (returns.std())
 ```
 
-```
-0.010654265587
+```text
+0.010654265586994397
 ```
 
 Üstte en soldan yüzde 5 noktasına baktık, her iki yönde tek sigma büyüklüğünde
@@ -207,7 +207,6 @@ def random_walk(i,mu=0):
     plt.plot(X_t)
     plt.title('Rasgele Yürüyüş %d' % i)
     plt.savefig('tser_stoc_0%d.png' % i)
-    plt.hold(False)
 random_walk(1)
 random_walk(2)
 random_walk(3,mu=0.5)
@@ -276,7 +275,7 @@ plt.savefig('tser_stoc_05.png')
 
 ```python
 import pandas as pd
-df = pd.read_csv('lynx.csv',index_col=0)
+df = pd.read_csv('../tser_015_stoc/lynx.csv',index_col=0)
 df.plot()
 plt.title('Lynx')
 plt.savefig('tser_stoc_06.png')
@@ -398,7 +397,6 @@ Python Pandas ile korelasyon grafiği şöyle basılır,
 
 ```python
 fig = plt.figure(figsize=(12,8))
-plt.hold(True)
 ax1 = fig.add_subplot(211)
 fig = sm.graphics.tsa.plot_acf(df.values.squeeze(), lags=40, ax=ax1)
 ax2 = fig.add_subplot(212)
@@ -410,10 +408,8 @@ plt.savefig('tser_stoc_07.png')
 
 ```python
 fig = plt.figure(figsize=(12,8))
-plt.hold(True)
 ax1 = fig.add_subplot(211)
 fig = sm.graphics.tsa.plot_acf(df_artificial.values.squeeze(), lags=40, ax=ax1)
-plt.hold(True)
 ax2 = fig.add_subplot(212)
 fig = sm.graphics.tsa.plot_pacf(df_artificial, lags=40, ax=ax2)
 plt.savefig('tser_stoc_08.png')
