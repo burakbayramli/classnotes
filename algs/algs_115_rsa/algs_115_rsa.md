@@ -29,7 +29,7 @@ algoritma demektir, toplama, çıkartma, sıralamak bu tür algoritmalardır.
 
 ```python
 ls = 'abcdefghijklmnopqrstuvyz'
-print ls[7],ls[8]
+print (ls[7],ls[8])
 m = 78
 ```
 
@@ -40,9 +40,9 @@ h i
 ```python
 p1 = 53; p2 = 59
 n = p1*p2
-print 'n =',n
+print ('n =',n)
 phi_n = (p1-1)*(p2-1)
-print 'phi(n) =', phi_n
+print ('phi(n) =', phi_n)
 ```
 
 ```
@@ -53,7 +53,7 @@ phi(n) = 3016
 ```python
 e = 3
 d = int( (2 * (phi_n) + 1 ) / 3. )
-print d
+print (d)
 ```
 
 ```
@@ -65,7 +65,7 @@ $n,e$ haricinde her seyi sakla, onlar acik anahtar.
 ```python
 import math
 c = int( math.pow(m,3) % n )
-print 'sifrelenmis mesaj', c
+print ('sifrelenmis mesaj', c)
 ```
 
 ```
@@ -73,7 +73,7 @@ sifrelenmis mesaj 2375
 ```
 
 ```python
-print pow(c,d,n)
+print (pow(c,d,n))
 ```
 
 ```

@@ -129,9 +129,9 @@ with tf.Session() as sess:
     init.run()
     Y0_val, Y1_val = sess.run([Y0, Y1], feed_dict={X0: X0_batch, X1: X1_batch})
 
-print 't=0'
+print ('t=0')
 print(Y0_val)
-print 't=1'
+print ('t=1')
 print(Y1_val)
 ```
 
@@ -171,9 +171,9 @@ output_seqs, states = tf.contrib.rnn.static_rnn(basic_cell, [X0, X1],
                                                 dtype=tf.float32)
 Y0, Y1 = output_seqs
 
-print 't=0'
+print ('t=0')
 print(Y0_val)
-print 't=1'
+print ('t=1')
 print(Y1_val)
 ```
 
@@ -399,7 +399,7 @@ değil, bu konu hakkında daha fazla detay için [2].
 
 ```python
 f = "../../stat/stat_naive/data/a1.txt"
-print open(f).read()[:300]
+print (open(f).read()[:300])
 ```
 
 ```
@@ -414,7 +414,7 @@ little old lady at the
 import lm
 lmm = lm.train_char_lm(f, order=4)
 res = lm.generate_text(lmm, 4)
-print res[:400]
+print (res[:400])
 ```
 
 ```
@@ -426,8 +426,8 @@ lies one looking the North orbiting questimate thought spheres the superior smil
 
 
 ```python
-print lmm.keys()[:10]
-print lmm.get('pla')
+print (lmm.keys()[:10])
+print (lmm.get('pla'))
 ```
 
 ```
@@ -471,7 +471,7 @@ n_steps = 3
 t0 = np.random.rand(batch_size, 1) * (t_max - t_min - n_steps * resolution)
 Ts = t0 + np.arange(0., n_steps+1) * resolution
 ys = f(Ts)
-print ys
+print (ys)
 ```
 
 ```
