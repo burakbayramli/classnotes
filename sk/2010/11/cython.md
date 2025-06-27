@@ -6,7 +6,7 @@ artıyor. Bu araç ile Python içinde, Python sözdizimine benzer bir
 şekilde yazdığınız kodlardan C kodu üretilmesi mümkün. Bir fark, bu
 kodu derlemek için "python" çağrısı yerine "cython" çağrısı kullanmak
 gerekli. Bu çağrı sonrası .c dosyası üretilecek, bu dosya gcc ile .o
-sonra .sö döşyasına derlenecek. Elde edilen .so dosyası artık pür
+sonra .so dosyasına derlenecek. Elde edilen .so dosyası artık pür
 Python tarafından "import" edilebilir bir modül olacaktır.
 
 Kurmak icin
@@ -109,11 +109,4 @@ gcc -Wall  -I/usr/include/python2.7 -lpython2.7 -c c1.c
 
 gcc -shared c1.o -o c1.so
 ```
-
-
-
-
-
-
-
 

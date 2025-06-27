@@ -172,7 +172,7 @@ def kruskal(G):
     E = [(G[u][v],u,v) for u in G for v in G[u]]
     T = set()
     C, R = {u:u for u in G}, {u:0 for u in G}   # Comp. reps and ranks
-    print list(sorted(E))
+    print (list(sorted(E)))
     for _, u, v in sorted(E):
         if find(C, u) != find(C, v):
             T.add((u, v))
@@ -181,7 +181,7 @@ def kruskal(G):
     return T
 
 mst = list(kruskal(G1))
-print 'MST', mst
+print ('MST', mst)
 ```
 
 ```
@@ -204,9 +204,9 @@ alttaki hesaba bakalım, eğer 100,000 tane kenar olsaydı,
 
 ```python
 e = 100 * 1000
-print 'n^2', e**2
-print 'log', np.log(e)
-print 'kruskal', e*np.log(e)
+print ('n^2', e**2)
+print ('log', np.log(e))
+print ('kruskal', e*np.log(e))
 ```
 
 ```
@@ -239,7 +239,7 @@ G2 = {
 } 
 
 mst = list(kruskal(G2))
-print 'MST', mst
+print ('MST', mst)
 ```
 
 ```

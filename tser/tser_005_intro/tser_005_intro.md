@@ -8,7 +8,7 @@ kapanış hesaplarını baz alarak),
 
 ```python
 import pandas as pd
-df = pd.read_csv('../tser_risk/SPY2.csv',parse_dates=True,index_col='Date')
+df = pd.read_csv('../tser_065_kelly/SPY2.csv',parse_dates=True,index_col='Date')
 df = df.sort_index()
 df = df[df.index > '1950-01-01']
 ```
@@ -27,7 +27,7 @@ ederiz. Pandas ile,
 
 ```python
 returns = df['Adj Close'].pct_change()
-print returns.head()
+print (returns.head())
 ```
 
 ```
@@ -73,7 +73,7 @@ alan o alanın x-eksenindeki değerlerin ortaya çıkma olasılığını verir. 
 Çıplak gözle bakmak yerine direk veriden bu hesabı yapabiliriz,
 
 ```python
-print returns.quantile(q=0.05)
+print (returns.quantile(q=0.05))
 ```
 
 ```
@@ -97,7 +97,7 @@ hareketle getirilerin standart sapması $\sigma$'dan (sigma) ibarettir, o zaman
 tanıdığımız, bildiğimiz $\sigma$ hesabı direk burada kullanılabilir,
 
 ```python
-print returns.std()
+print (returns.std())
 ```
 
 ```

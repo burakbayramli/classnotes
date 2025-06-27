@@ -19,7 +19,7 @@ def huffman(seq, frq):
 seq = "abcdefghi"
 frq = [4, 5, 6, 9, 11, 12, 15, 16, 20]
 tree = huffman(seq, frq)
-print tree
+print (tree)
 ```
 
 ```
@@ -35,7 +35,7 @@ def codes(tree, prefix=""):
         for pair in codes(child, prefix + bit): # Get codes recursively
             yield pair
 	    
-print list(codes(tree))
+print (list(codes(tree)))
 ```
 
 ```
