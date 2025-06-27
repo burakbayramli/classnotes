@@ -272,7 +272,7 @@ board_state = ((1, 0, 0),
                (1, -1, -1))
 
 res, move = tictac_uct.monte_carlo_tree_search_uct(board_state, 1, 1000)
-print move
+print (move)
 ```
 
 ```
@@ -285,7 +285,7 @@ hatırlarsak), bu hareketi yapıyoruz,
 ```python
 b = np.array(board_state)
 b[move] = 1.0
-print b
+print (b)
 ```
 
 Ve bu kazanan hareket, resimde ikinci seviyede en sağdaki hamle
