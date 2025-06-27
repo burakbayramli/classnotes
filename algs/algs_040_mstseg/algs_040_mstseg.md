@@ -197,7 +197,7 @@ class Felzenswalb:
         print (X.shape)
         G = {}
         for i in range(X.shape[0]): G[i] = {}
-        for u,v,w in itertools.izip(X.row, X.col, X.data): G[u][v] = w
+        for u,v,w in zip(X.row, X.col, X.data): G[u][v] = w
         E = [(G[u][v],u,v) for u in G for v in G[u]]
         E = sorted(E)        
         T = set()
@@ -226,7 +226,7 @@ class Felzenswalb:
 Basit bir örnek
 
 ```python
-import scipy.sparse as sps, felz
+import scipy.sparse as sps
 import scipy.io as io
 X = np.array([[0.,    0.5,   0.,    0.,    0.   ],
               [0.,    0.,    1.,    0.,    0.5  ],
@@ -234,7 +234,7 @@ X = np.array([[0.,    0.5,   0.,    0.,    0.   ],
               [0.,    0.,    0.,    0.,    0.   ],
               [0.,    0.,    0.,    0.,    0.   ]])
 X = sps.coo_matrix(X)
-clf = felz.Felzenswalb(min_size=1,c=1.0)
+clf = Felzenswalb(min_size=1,c=1.0)
 clf.fit(X)
 print (clf.labels_)
 ```

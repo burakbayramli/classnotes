@@ -82,12 +82,12 @@ göre daha hızlı işleyeceği tahmin edilebilir. Hakikaten de böyledir.
 
 ```python
 from pandas import *
-data = read_csv("../kmeans/synthetic.txt",comment='#',header=None,sep="   ")
-print data.shape
+data = read_csv("../algs_080_kmeans/synthetic2.txt",comment='#',header=None,sep=";")
+print (data.shape)
 data = np.array(data)
 ```
 
-```
+```text
 (3000, 2)
 ```
 
@@ -97,9 +97,10 @@ plt.savefig('meanshift_1.png')
 ```
 
 ![](meanshift_1.png)
+
 ```python
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils import extmath
+import numpy.linalg as lin
 
 def mean_shift(X, bandwidth=None, max_iterations=300):
     
@@ -122,7 +123,7 @@ def mean_shift(X, bandwidth=None, max_iterations=300):
             my_old_mean = my_mean  # save the old mean
             my_mean = np.mean(points_within, axis=0)
             # If converged or at max_iterations, addS the cluster
-            if (extmath.norm(my_mean - my_old_mean) < stop_thresh or
+            if (lin.norm(my_mean - my_old_mean) < stop_thresh or
                     completed_iterations == max_iterations):
                 center_intensity_dict[tuple(my_mean)] = len(points_within)
                 break
@@ -147,7 +148,7 @@ def mean_shift(X, bandwidth=None, max_iterations=300):
 
     # ASSIGN LABELS: a point belongs to the cluster that it is closest to
     nbrs = NearestNeighbors(n_neighbors=1).fit(cluster_centers)
-    labels = np.zeros(n_samples, dtype=np.int)
+    labels = np.zeros(n_samples, dtype=int)
     distances, idxs = nbrs.kneighbors(X)
     labels = idxs.flatten()
     
@@ -155,17 +156,16 @@ def mean_shift(X, bandwidth=None, max_iterations=300):
 
 cluster_centers, labels = mean_shift(np.array(data), 4000)
 
-print len(cluster_centers)
+print (len(cluster_centers))
 ```
 
-```
+```text
 17
 ```
 
 ```python
 plt.scatter(data[:,0],data[:,1])
-plt.hold(True)
-for x in asarray(cluster_centers): plt.plot(x[0],x[1],'rd')
+for x in np.array(cluster_centers): plt.plot(x[0],x[1],'rd')
 plt.savefig('meanshift_2.png')
 ```
 

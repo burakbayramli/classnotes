@@ -151,17 +151,17 @@ gereken noktalar azalacaktır ve yöntemin bu sebeple klasik yönteme göre
 daha hızlı işleyeceği tahmin edilebilir. Hakikaten de böyledir.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> read_csv(<span class="st">&quot;../kmeans/synthetic.txt&quot;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&quot;   &quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> data.shape</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> read_csv(<span class="st">&quot;../algs_080_kmeans/synthetic2.txt&quot;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,header<span class="op">=</span><span class="va">None</span>,sep<span class="op">=</span><span class="st">&quot;;&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (data.shape)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.array(data)</span></code></pre></div>
-<pre><code>(3000, 2)</code></pre>
+<pre class="text"><code>(3000, 2)</code></pre>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[:,<span class="dv">0</span>],data[:,<span class="dv">1</span>])</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;meanshift_1.png&#39;</span>)</span></code></pre></div>
 <p><img src="meanshift_1.png" /></p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.utils <span class="im">import</span> extmath</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> lin</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mean_shift(X, bandwidth<span class="op">=</span><span class="va">None</span>, max_iterations<span class="op">=</span><span class="dv">300</span>):</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -184,7 +184,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>            my_old_mean <span class="op">=</span> my_mean  <span class="co"># save the old mean</span></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>            my_mean <span class="op">=</span> np.mean(points_within, axis<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>            <span class="co"># If converged or at max_iterations, addS the cluster</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (extmath.norm(my_mean <span class="op">-</span> my_old_mean) <span class="op">&lt;</span> stop_thresh <span class="kw">or</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (lin.norm(my_mean <span class="op">-</span> my_old_mean) <span class="op">&lt;</span> stop_thresh <span class="kw">or</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>                    completed_iterations <span class="op">==</span> max_iterations):</span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                center_intensity_dict[<span class="bu">tuple</span>(my_mean)] <span class="op">=</span> <span class="bu">len</span>(points_within)</span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
@@ -209,7 +209,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ASSIGN LABELS: a point belongs to the cluster that it is closest to</span></span>
 <span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    nbrs <span class="op">=</span> NearestNeighbors(n_neighbors<span class="op">=</span><span class="dv">1</span>).fit(cluster_centers)</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> np.zeros(n_samples, dtype<span class="op">=</span>np.<span class="bu">int</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> np.zeros(n_samples, dtype<span class="op">=</span><span class="bu">int</span>)</span>
 <span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    distances, idxs <span class="op">=</span> nbrs.kneighbors(X)</span>
 <span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> idxs.flatten()</span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -217,13 +217,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>cluster_centers, labels <span class="op">=</span> mean_shift(np.array(data), <span class="dv">4000</span>)</span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="bu">len</span>(cluster_centers)</span></code></pre></div>
-<pre><code>17</code></pre>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(cluster_centers))</span></code></pre></div>
+<pre class="text"><code>17</code></pre>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(data[:,<span class="dv">0</span>],data[:,<span class="dv">1</span>])</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> asarray(cluster_centers): plt.plot(x[<span class="dv">0</span>],x[<span class="dv">1</span>],<span class="st">&#39;rd&#39;</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;meanshift_2.png&#39;</span>)</span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> np.array(cluster_centers): plt.plot(x[<span class="dv">0</span>],x[<span class="dv">1</span>],<span class="st">&#39;rd&#39;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;meanshift_2.png&#39;</span>)</span></code></pre></div>
 <p><img src="meanshift_2.png" /></p>
 <p>Teorik Konular</p>
 <p>Bu metotu teorik bir yapıya oturtmak için onu yazının ilk başındaki

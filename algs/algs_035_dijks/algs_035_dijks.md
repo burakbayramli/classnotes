@@ -132,7 +132,7 @@ def dijkstra2(G, s, e):
     return path
 
 path = dijkstra2(G, 's','x')
-print path
+print (path)
 ```
 
 ```
