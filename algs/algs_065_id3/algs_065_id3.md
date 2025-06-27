@@ -384,7 +384,8 @@ def createTree(dataSet,labels):
 
 def getNumLeafs(myTree):
     numLeafs = 0
-    firstStr = myTree.keys()[0]
+    # FIX: Convert dict_keys to a list
+    firstStr = list(myTree.keys())[0] 
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
         if type(secondDict[key]).__name__=='dict':
@@ -394,7 +395,8 @@ def getNumLeafs(myTree):
 
 def getTreeDepth(myTree):
     maxDepth = 0
-    firstStr = myTree.keys()[0]
+    # FIX: Convert dict_keys to a list
+    firstStr = list(myTree.keys())[0]
     secondDict = myTree[firstStr]
     for key in secondDict.keys():
         if type(secondDict[key]).__name__=='dict':
@@ -402,6 +404,7 @@ def getTreeDepth(myTree):
         else:   thisDepth = 1
         if thisDepth > maxDepth: maxDepth = thisDepth
     return maxDepth
+
 
 def plotNode(nodeTxt, centerPt, parentPt, nodeType):
     createPlot.ax1.annotate(nodeTxt, xy=parentPt,  xycoords='axes fraction',
@@ -417,7 +420,8 @@ def plotMidText(cntrPt, parentPt, txtString):
 def plotTree(myTree, parentPt, nodeTxt):
     numLeafs = getNumLeafs(myTree)  
     depth = getTreeDepth(myTree)
-    firstStr = myTree.keys()[0]     
+    # FIX: Convert dict_keys to a list here as well
+    firstStr = list(myTree.keys())[0]       
     cntrPt = (plotTree.xOff + (1.0 + float(numLeafs))/2.0/plotTree.totalW,\
               plotTree.yOff)
     plotMidText(cntrPt, parentPt, nodeTxt)
@@ -426,13 +430,14 @@ def plotTree(myTree, parentPt, nodeTxt):
     plotTree.yOff = plotTree.yOff - 1.0/plotTree.totalD
     for key in secondDict.keys():
         if type(secondDict[key]).__name__=='dict':
-            plotTree(secondDict[key],cntrPt,str(key))        
-        else:  
+            plotTree(secondDict[key],cntrPt,str(key))          
+        else:   
             plotTree.xOff = plotTree.xOff + 1.0/plotTree.totalW
             plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), \
             cntrPt, leafNode)
             plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
     plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
+
 
 def createPlot(inTree):
     fig = plt.figure(1, facecolor='white')
@@ -457,7 +462,7 @@ createPlot(tree)
 
 Aynı kodu LİSP ile görelim,
 
-```python
+```lisp
 ;;
 ;; Ilk kolon, her satir icin kimlik gorevini yapiyor. Yani, d1'i
 ;; kullanarak d1 ile baslayan tum veri satirina ulasmak mumkun.

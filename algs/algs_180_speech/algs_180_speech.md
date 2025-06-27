@@ -16,7 +16,7 @@ import io, time, os, random, re
 f = util.train_dir + '/down/004ae714_nohash_0.wav'
 wav = io.BytesIO(open(f).read())
 v = scipy.io.wavfile.read(wav)
-print v[1]
+print (v[1])
 plt.plot(v[1])
 plt.savefig('speech_01.png')
 ```
@@ -88,18 +88,18 @@ import tensorflow as tf
 
 init_op = tf.global_variables_initializer()
 data = tf.placeholder(tf.float32, [1, 16000])
-print data
+print (data)
 stfts = tf.contrib.signal.stft(data, frame_length=400, 
                                frame_step=100, fft_length=512)
 
 spec = tf.abs(stfts)
-print spec
+print (spec)
 
 s = np.random.rand(1,16000) # rasgele bir zaman serisi uret
 with tf.Session() as sess:
      sess.run(tf.global_variables_initializer())
      res = sess.run(spec, feed_dict={data: s })  
-print res
+print (res)
 ```
 
 ```
@@ -169,16 +169,16 @@ class Model:
         
         self.data = tf.placeholder(tf.float32, [None, util.fs])
 
-        print self.data 
+        print (self.data)
         
         self.stfts = tf.contrib.signal.stft(self.data, frame_length=256,
                                             frame_step=128, fft_length=256)
 
-        print self.stfts
+        print (self.stfts)
         
         self.fingerprint = tf.abs(self.stfts)
         
-        print self.fingerprint
+        print (self.fingerprint)
 
         self.y = tf.placeholder(tf.float32, shape=[None, len(util.labels)])
         cells = []
@@ -188,17 +188,17 @@ class Model:
             cells.append(cell)
         cell = tf.contrib.rnn.MultiRNNCell(cells)
         output, states = tf.nn.dynamic_rnn(cell, self.fingerprint, dtype=tf.float32)
-        print output
-        for x in states: print x
+        print (output)
+        for x in states: print (x)
         self.last = states[-1][0] # en ust sagdaki son hucre
 
-        print self.last
+        print (self.last)
 
         self.logits = tf.contrib.layers.fully_connected(inputs=self.last,
                                                         num_outputs=len(util.labels),
                                                         activation_fn=None)
 
-        print self.logits
+        print (self.logits)
         
         self.softmax = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits,
                                                                labels=self.y) 
@@ -261,10 +261,10 @@ sess.run(tf.global_variables_initializer())
 saver = tf.train.Saver()
 
 # eger model diskte varsa yukle
-print m.mfile
+print (m.mfile)
 print 'model file exists', os.path.isfile(m.mfile + ".index")
 if os.path.isfile(m.mfile + ".index"):
-     print 'restoring'
+     print ('restoring')
      saver.restore(sess, m.mfile)
 
 train_files, val_files = util.init_files()
@@ -273,14 +273,14 @@ for i in range(m.num_epochs):
     train_x, train_y = util.get_minibatch(m.batch_size, train_files, val_files)
     d = { m.data:train_x, m.y:train_y, m.dop:m.dop_param}
     acc, _ = sess.run([m.evaluation_step, m.train_step], feed_dict=d)
-    print i, 'accuracy', acc 
+    print (i, 'accuracy', acc )
     if i % 5 == 0:
          d = { m.data:train_x, m.y:train_y, m.dop:m.dop_param }
          tacc = sess.run(m.evaluation_step, feed_dict=d)
 	 val_x, val_y = util.get_minibatch(m.batch_size,train_files, val_files,validation=True)
          d = { m.data:val_x, m.y:val_y, m.dop:0}
          vacc = sess.run(m.evaluation_step, feed_dict=d)
-         print i, 'training', tacc, 'validation', vacc
+         print (i, 'training', tacc, 'validation', vacc)
 
 # modeli diske yaz
 saver.save(sess, m.mfile)
@@ -311,7 +311,7 @@ bulunabilir. Performans gerçek zamanlı kullanım için yeterliydi, DYSA ufak
 bir şey değil aslında, kaç parametre olduğuna bakalım,
 
 ```python
-print util.network_parameters(), 'tane degisken var'
+print (util.network_parameters(), 'tane degisken var')
 ```
 
 ```
@@ -510,7 +510,7 @@ def run_ctc():
                 batch_cost, _ = session.run([cost, optimizer], feed)
                 train_ler += session.run(ler, feed_dict=feed)
                 
-                print 'batch_cost', batch_cost, 'train_ler', train_ler
+                print ('batch_cost', batch_cost, 'train_ler', train_ler)
 
             # Decoding
             d = session.run(decoded[0], feed_dict=feed)
