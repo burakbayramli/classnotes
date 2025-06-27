@@ -95,6 +95,8 @@ düşünelim. Verinin satırları her LSTM adımı, her kolon alfabedeki farklı
 bir karakter. 
 
 ```python
+import tensorflow as tf
+
 train_inputs_0 = np.asarray(
     [[0.633766, 0.221185, 0.0917319, 0.0129757, 0.0142857, 0.0260553],
      [0.111121, 0.588392, 0.278779, 0.0055756, 0.00569609, 0.010436],
@@ -108,42 +110,68 @@ Bu yapı üzerinde için mesela `[0, 1, 2, 1, 0]` dizisini kontrol
 etmemiz istense dizinin kaybı / hatası nedir?
 
 ```python
-import tensorflow as tf
-
 def sparse_tuple_from(sequences, dtype=np.int32):
     indices = []
     values = []
+    lengths = []
     for n, seq in enumerate(sequences):
         indices.extend(zip([n] * len(seq), range(len(seq))))
         values.extend(seq)
+        lengths.append(len(seq))
     indices = np.asarray(indices, dtype=np.int64)
     values = np.asarray(values, dtype=dtype)
-    shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
-    return indices, values, shape
+    if indices.size == 0:
+        shape = np.asarray([len(sequences), 0], dtype=np.int64)
+    else:
+        shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
+    return indices, values, shape, np.asarray(lengths, dtype=np.int32)
 
-train_seq_len = [5]
-num_features = 6
 
-tf.reset_default_graph()
+single_dummy_target = [[1, 2, 3]]
+target_indices, target_values, target_shape, target_lengths = sparse_tuple_from(single_dummy_target)
 
-targets = tf.sparse_placeholder(tf.int32)
-logits1 = tf.placeholder(tf.float32, [None, num_features] )
-logits2 = tf.reshape(logits1, [1, -1, num_features])
-logits3 = tf.transpose(logits2, (1, 0, 2))
-seq_len = tf.placeholder(tf.int32, [None])
-loss = tf.nn.ctc_loss(targets, logits3, seq_len)
-decoded, log_prob = tf.nn.ctc_greedy_decoder(logits3, seq_len)
+num_features = 6 # This represents the number of classes in your output (plus one for blank if blank is not a separate feature)
 
-with tf.Session() as sess:
+@tf.function
+def ctc_model(logits_input_batch, target_indices, target_values, target_shape, sequence_lengths, label_lengths):
+    logits_transposed = tf.transpose(logits_input_batch, (1, 0, 2)) # [max_time, batch_size, num_features]
 
-     sess.run(tf.global_variables_initializer())
+    targets = tf.SparseTensor(indices=target_indices, values=target_values, dense_shape=target_shape)
 
-     train_targets = sparse_tuple_from([[0, 1, 2, 1, 0]])     
-     feed_t = { logits1: train_inputs_0, 
-                targets: train_targets, 
-                seq_len: train_seq_len }
-     res = sess.run(loss, feed_t)     
-     print u'kayıp', res
+    blank_idx = num_features - 1 # Assuming num_features already includes the blank class as the last one
+
+    loss = tf.nn.ctc_loss(
+        targets,
+        logits_transposed,
+        tf.cast(label_lengths, tf.int32),
+        tf.cast(sequence_lengths, tf.int32),
+        blank_index=blank_idx # Explicitly provide blank_index
+    )
+
+    decoded, log_prob = tf.nn.ctc_greedy_decoder(
+        inputs=logits_transposed,
+        sequence_length=tf.cast(sequence_lengths, tf.int32),
+        blank_index=blank_idx # Also provide blank_index here for consistency
+    )
+
+    return loss, decoded, log_prob
+
+batch_logits = tf.expand_dims(tf.constant(train_inputs_0, dtype=tf.float32), axis=0) # Shape becomes (1, 5, 6)
+batch_seq_len = tf.constant([5], dtype=tf.int32)
+
+loss_val, decoded_val, log_prob_val = ctc_model(
+    logits_input_batch=batch_logits,
+    target_indices=tf.constant(target_indices, dtype=tf.int64),
+    target_values=tf.constant(target_values, dtype=tf.int32),
+    target_shape=tf.constant(target_shape, dtype=tf.int64),
+    sequence_lengths=batch_seq_len,
+    label_lengths=tf.constant(target_lengths, dtype=tf.int32)
+)
+
+print("Loss:", loss_val.numpy())
+for i, d in enumerate(decoded_val):
+    print(f"Decoded sequence {i}:", tf.sparse.to_dense(d).numpy())
+print("Log Probabilities:", log_prob_val.numpy())
 ```
 
 ```
@@ -161,16 +189,17 @@ train_inputs_1 = np.asarray(
      [0.423286, 0.315517, 0.0338439, 0.0393744, 0.0339315, 0.154046]],
     dtype=np.float32)
 
-with tf.Session() as sess:
+batch_logits = tf.expand_dims(tf.constant(train_inputs_1, dtype=tf.float32), axis=0) # Shape becomes (1, 5, 6)
+batch_seq_len = tf.constant([5], dtype=tf.int32)
 
-     sess.run(tf.global_variables_initializer())
-
-     train_targets = sparse_tuple_from([[0, 1, 1, 0]])     
-     feed_t = { logits1: train_inputs_1, 
-                targets: train_targets, 
-                seq_len: train_seq_len }
-     res = sess.run(loss, feed_t)     
-     print u'kayıp', res
+loss_val, decoded_val, log_prob_val = ctc_model(
+    logits_input_batch=batch_logits,
+    target_indices=tf.constant(target_indices, dtype=tf.int64),
+    target_values=tf.constant(target_values, dtype=tf.int32),
+    target_shape=tf.constant(target_shape, dtype=tf.int64),
+    sequence_lengths=batch_seq_len,
+    label_lengths=tf.constant(target_lengths, dtype=tf.int32)
+)
 ```
 
 ```
@@ -198,14 +227,14 @@ with tf.Session() as sess:
                 targets: train_targets, 
                 seq_len: train_seq_len }
      res = sess.run(loss, feed_t)     
-     print u'kayıp', res
+     print (u'kayıp', res)
 
      train_targets = sparse_tuple_from([[0, 1, 1, 0]]) 
      feed_t = { logits1: train_inputs_2, 
                 targets: train_targets, 
                 seq_len: train_seq_len }
      res = sess.run(loss, feed_t)     
-     print u'kayıp', res
+     print (u'kayıp', res)
 ```
 
 ```
@@ -224,15 +253,15 @@ with tf.Session() as sess:
 
      feed_dec = { logits1: train_inputs_0, seq_len: train_seq_len }
      decoded_res = sess.run(decoded, feed_dec)     
-     print 'dekode', decoded_res
+     print ('dekode', decoded_res)
      
      feed_dec = { logits1: train_inputs_1, seq_len: train_seq_len }
      decoded_res = sess.run(decoded, feed_dec)     
-     print 'dekode', decoded_res
+     print ('dekode', decoded_res)
      
      feed_dec = { logits1: train_inputs_2, seq_len: train_seq_len }
      decoded_res = sess.run(decoded, feed_dec)     
-     print 'dekode', decoded_res
+     print ('dekode', decoded_res)
 ```
 
 ```
@@ -393,7 +422,7 @@ if __name__ == '__main__':
     model, dummy = get_model(img_w,img_h,minibatch_size,pool_size)
     mfile = "/tmp/ocr.h5"
     if os.path.isfile(mfile):
-        print 'Loaded', mfile
+        print ('Loaded', mfile)
         model.load_weights(mfile)
 
     model.fit_generator(generator=img_gen.next_train(),
@@ -429,7 +458,7 @@ img_gen = util.TextImageGenerator(minibatch_size=1,
 
 for x in img_gen.next_train(): break
 img = x[0]['the_input'].reshape(img_w,img_h).T
-print x[0]['source_str'],
+print (x[0]['source_str'],)
 plt.imshow(img,cmap='gray',interpolation="none")
 plt.savefig('ocr_06.png')    
 ```
@@ -544,7 +573,7 @@ def decode_batch(test_func, word_batch):
     return ret
 
 pred_result = decode_batch(test_func, x[0]['the_input'])[0]
-print pred_result
+print (pred_result)
 ```
 
 ```
