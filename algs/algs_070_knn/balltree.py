@@ -60,12 +60,11 @@ def search_tree(new_point, knn_matches, node, k):
     min_dist_new_pt_node = zero_if_neg(min_dist_new_pt_node)
     
     knn_matches_out = None
-    
     # min is greater than so far
     if min_dist_new_pt_node >= knn_matches[0]:
         # nothing to do
         return knn_matches
-    elif node_points != None: # if node is a leaf
+    elif "NoneType" not in str(type(node_points)) : # if node is a leaf
         print (knn_matches_out)
         knn_matches_out = knn_matches[:] # copy it
         for p in node_points: # linear scan

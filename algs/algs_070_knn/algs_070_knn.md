@@ -59,9 +59,6 @@ işleyiş ağacın altına doğru benzer şekilde devam eder, her seviyede farkl
 bir kordinat seçilir.
 
 ```python
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
 import operator, math
 from collections import deque
 from functools import wraps
@@ -440,13 +437,13 @@ for kx in kres: print (kx)
 ```
 
 ```text
-(<KDNode - [np.float64(39.364728144553865), np.float64(39.05146120930619)]>, 0.13567487549296073)
-(<KDNode - [np.float64(40.26032144132441), np.float64(37.867345065620206)]>, 2.8713173358369266)
-(<KDNode - [np.float64(41.027532514928566), np.float64(39.98338309762837)]>, 5.077930415793724)
-(<KDNode - [np.float64(41.19458364933335), np.float64(37.654723299101256)]>, 6.625966795902305)
-(<KDNode - [np.float64(36.46902062671158), np.float64(41.335617219637236)]>, 11.8609643846774)
-(<KDNode - [np.float64(40.23345261800878), np.float64(35.58095468251084)]>, 13.211276243917254)
-(<KDNode - [np.float64(38.09174668525085), np.float64(42.90978409879636)]>, 16.111335782953674)
+(<KDNode - [np.float64(41.58318446182781), np.float64(36.16843648141742)]>, 14.690593923596388)
+(<KDNode - [np.float64(37.11341550440898), np.float64(34.99984577352483)]>, 19.560434894591584)
+(<KDNode - [np.float64(34.59509500855086), np.float64(40.16431974630661)]>, 20.758828455333067)
+(<KDNode - [np.float64(34.7055483494366), np.float64(41.54136955831751)]>, 24.900874210969683)
+(<KDNode - [np.float64(37.00287710690802), np.float64(43.72832391865485)]>, 26.345546929835663)
+(<KDNode - [np.float64(43.41951605287259), np.float64(35.918873233735546)]>, 29.025464291389753)
+(<KDNode - [np.float64(43.729862280495965), np.float64(42.63097347492666)]>, 35.555565568079494)
 ```
 
 Küre Agaçları (Ball Tree, BT) 
@@ -685,7 +682,7 @@ def search_tree(new_point, knn_matches, node, k):
     if min_dist_new_pt_node >= knn_matches[0]:
         # nothing to do
         return knn_matches
-    elif node_points != None: # if node is a leaf
+    elif "NoneType" not in str(type(node_points)) : # if node is a leaf
         print (knn_matches_out)
         knn_matches_out = knn_matches[:] # copy it
         for p in node_points: # linear scan
@@ -727,6 +724,48 @@ newp = np.array([7.,7.])
 dummyp = [np.inf,np.inf] # it should be removed immediately
 res = balltree.search_tree(newp,[np.inf, [dummyp]], tree, k=2)
 print ("done", res)
+```
+
+```text
+tree
+[   array([3., 4.]),
+    np.float64(7.0710678118654755),
+    None,
+    [   [   array([8., 9.]),
+            np.float64(3.1622776601683795),
+            array([[8., 9.],
+       [7., 6.]]),
+            [None, None]],
+        [   array([3., 4.]),
+            np.float64(6.324555320336759),
+            None,
+            [   [   array([9., 2.]),
+                    np.float64(3.605551275463989),
+                    None,
+                    [   [   array([7., 5.]),
+                            np.float64(1.4142135623730951),
+                            array([[7., 5.],
+       [8., 4.]]),
+                            [None, None]],
+                        [   array([9., 2.]),
+                            np.float64(3.0),
+                            array([[9., 2.],
+       [6., 2.]]),
+                            [None, None]]]],
+                [   array([3., 4.]),
+                    np.float64(2.23606797749979),
+                    None,
+                    [   [   array([5., 5.]),
+                            np.float64(0.0),
+                            array([[5., 5.]]),
+                            [None, None]],
+                        [   array([3., 4.]),
+                            np.float64(1.019803902718557),
+                            array([[3. , 4. ],
+       [3.2, 5. ]]),
+                            [None, None]]]]]]]]
+None
+done [np.float64(1.0), [[[np.float64(8.0), np.float64(9.0)]], [[np.float64(7.0), np.float64(6.0)]]]]
 ```
 
 Bu iki grup, o anda işlemekte olduğumuz ağaç düğümün (node) iki
@@ -838,11 +877,75 @@ eğitim veri yapısına eklenecek bir etiket bilgisi ve sınıflama sonrası k
 noktanın ağırlıklı etiketinin hesabı ile basit şekilde
 gerçekleştirilebilir.
 
+Ağaç oluşumu sırasındaki kürelerin grafiğini çizen kodlar alttadır. 
+
 ```python
-!python plot_circles.py
+from matplotlib.patches import Circle
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+
+__rmin__ = 2
+
+def dist(vect,x):
+    return np.fromiter(map
+                       (np.linalg.norm, vect-x),dtype=float)
+
+# node: [pivot, radius, points, [child1,child2]]
+def new_node(): return  [None,None,None,[None,None]]
+
+def circle(x,rad,ax):
+    c = Circle([x[0], x[1]], rad, color='lightgreen')
+    ax.add_patch(c)
+    plt.xlim(-5,15)
+    plt.ylim(-5,15)
+
+def plot_points(pts,color,ax):
+    for x in pts: ax.plot(x[0],x[1],color)
+
+def plot_circles(pivot, radius, points, all_points):
+    global i
+    f = plt.figure()
+    ax = f.gca()
+    plot_points(all_points,'ko',ax)
+    plot_points(points,'ro',ax)
+    i += 1
+    circle(pivot,radius,ax)
+    plt.savefig('knn%s.png' % str(i))
+    
+    
+def form_tree(points,node,all_points):
+    pivot = points[0]
+    radius = np.max(dist(points,pivot))
+    plot_circles(pivot, radius, points, all_points)
+    
+    node[0] = pivot
+    node[1] = radius
+    if len(points) <= __rmin__:
+        node[2] = points
+        return
+    idx = np.argmax(dist(points,pivot))
+    furthest = points[idx,:]
+    idx = np.argmax(dist(points,furthest))
+    furthest2 = points[idx,:]
+    dist1=dist(points,furthest)
+    dist2=dist(points,furthest2)
+    diffs = dist1-dist2
+    p1 = points[diffs <= 0]
+    p2 = points[diffs > 0]
+    node[3][0] = new_node() # left child
+    node[3][1] = new_node() # right child
+    form_tree(p1,node[3][0],all_points)
+    form_tree(p2,node[3][1],all_points)
 ```
 
-Ağaç oluşumu sırasındaki kürelerin grafiği alttadır. 
+```python
+i = 0
+points = np.array([[3.,4.],[5.,5.],[9.,2.],[3.2,5.],[7.,5.],
+                   [8.,9.],[7.,6.],[8,4],[6,2]])
+tree = new_node()
+form_tree(points,tree,points)
+```
 
 ![](knn0.png)
 ![](knn1.png)
@@ -863,10 +966,3 @@ Kaynaklar
 [2] Alpaydın, *Introduction to Machine Learning*
 
 [3] *A simple kd-tree in Python*, [https://github.com/stefankoegl/kdtree](https://github.com/stefankoegl/kdtree)
-
-
-
-
-
-
-
