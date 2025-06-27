@@ -6,11 +6,12 @@ varsa bunu nasıl yakalarız?
 Bir örnek üzerinde görelim, bir şirketin şampuan satış kazancı, veri [1]'den,
 
 ```python
-import pandas as pd
+import pandas as pd, datetime
+
 def parser(x):
-    return pd.datetime.strptime( '190'+x, '%Y-%m' )
+    return datetime.datetime.strptime( '190'+x, '%Y-%m' )
     
-df = pd.read_csv('shampoo-sales.csv', header=0, index_col=0, \
+df = pd.read_csv('../tser_022_de/shampoo-sales.csv', header=0, index_col=0, \
      parse_dates=True, date_parser=parser)
 df.Satis.plot()
 plt.savefig('tser_022_de_07.png')
@@ -77,8 +78,8 @@ val,pval = stats.shapiro(detrended)
 print ('p degeri =', pval)
 ```
 
-```
-p degeri = 0.09782794862985611
+```text
+p degeri = 0.09782825233013859
 ```
 
 Shapiro-Wilk testinde p-değerinin 0.05'ten küçük olması normalliğin reddedilmesi
@@ -113,7 +114,7 @@ görüyoruz. Ona modeli uyduralım,
 
 ```python
 import pandas as pd
-df = pd.read_csv('daily-min-temperatures.csv', header=0,\
+df = pd.read_csv('../tser_022_de/daily-min-temperatures.csv', header=0,\
                  index_col=0, parse_dates=True)
 X = [i%365 for i in range(0, len(df))]
 y = df.values
@@ -144,8 +145,8 @@ val,pval = stats.shapiro(deseasoned)
 print ('p degeri =', pval)
 ```
 
-```
-p degeri = 4.155807920014354e-10
+```text
+p degeri = 4.1306918038416617e-10
 ```
 
 Normal değil. Bunun sebebi veri içinde birden fazla sezonsallık, ya da başka bir
@@ -196,53 +197,49 @@ hesaplayacak. Önce $\sin$ içinde $2\pi x$ ile başlarız,
 ```python
 import statsmodels.formula.api as smf
 results = smf.ols('degs ~ np.sin(2*np.pi*toy) + np.cos(2*np.pi*toy)', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                   degs   R-squared:                       0.969
 Model:                            OLS   Adj. R-squared:                  0.968
 Method:                 Least Squares   F-statistic:                     704.3
-Date:                Fri, 12 May 2017   Prob (F-statistic):           1.10e-34
-Time:                        16:01:50   Log-Likelihood:                -63.360
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):           1.10e-34
+Time:                        12:37:22   Log-Likelihood:                -63.360
 No. Observations:                  48   AIC:                             132.7
 Df Residuals:                      45   BIC:                             138.3
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 ===========================================================================================
-                              coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                              coef    std err          t      P>|t|      [0.025      0.975]
 -------------------------------------------------------------------------------------------
-Intercept                   8.2917      0.135     61.407      0.000         8.020     8.564
-np.sin(2 * np.pi * toy)    -5.9156      0.191    -30.979      0.000        -6.300    -5.531
-np.cos(2 * np.pi * toy)    -4.0463      0.191    -21.190      0.000        -4.431    -3.662
+Intercept                   8.2917      0.135     61.407      0.000       8.020       8.564
+np.sin(2 * np.pi * toy)    -5.9156      0.191    -30.979      0.000      -6.300      -5.531
+np.cos(2 * np.pi * toy)    -4.0463      0.191    -21.190      0.000      -4.431      -3.662
 ==============================================================================
 Omnibus:                       28.673   Durbin-Watson:                   1.051
 Prob(Omnibus):                  0.000   Jarque-Bera (JB):                4.298
 Skew:                          -0.158   Prob(JB):                        0.117
 Kurtosis:                       1.569   Cond. No.                         1.41
 ==============================================================================
-
-Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 ```
 
 ```python
 a,b = results.params[1],results.params[2]
 A = (a**2+b**2)
-print A, np.rad2deg(np.arcsin(b**2 / A))
+print (A, np.rad2deg(np.arcsin(b**2 / A)))
 ```
 
-```
-51.3672864144 18.5866613969
+```text
+51.367286414382804 18.586661396939277
 ```
 
 ```python
 fit1 = results.params[0] + results.params[1] * np.sin(2*np.pi*df.toy) + \
        results.params[2] * np.cos(2*np.pi*df.toy)
 plt.scatter(df.toy,df.degs)
-plt.hold(True)
 plt.plot(df.toy,fit1)
 plt.savefig('tser_sinreg_02.png')
 ```
@@ -257,29 +254,29 @@ import statsmodels.formula.api as smf
 formula = 'degs ~ np.sin(2*np.pi*toy) + np.cos(2*np.pi*toy) + ' + \
           '       np.sin(4*np.pi*toy) + np.cos(4*np.pi*toy)'
 results = smf.ols(formula, data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                   degs   R-squared:                       0.999
 Model:                            OLS   Adj. R-squared:                  0.999
 Method:                 Least Squares   F-statistic:                     9519.
-Date:                Fri, 23 Sep 2016   Prob (F-statistic):           9.48e-63
-Time:                        10:56:56   Log-Likelihood:                 16.130
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):           9.48e-63
+Time:                        12:37:40   Log-Likelihood:                 16.130
 No. Observations:                  48   AIC:                            -22.26
 Df Residuals:                      43   BIC:                            -12.90
 Df Model:                           4                                         
 Covariance Type:            nonrobust                                         
 ===========================================================================================
-                              coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                              coef    std err          t      P>|t|      [0.025      0.975]
 -------------------------------------------------------------------------------------------
-Intercept                   8.2917      0.026    314.450      0.000         8.238     8.345
-np.sin(2 * np.pi * toy)    -5.9156      0.037   -158.634      0.000        -5.991    -5.840
-np.cos(2 * np.pi * toy)    -4.0463      0.037   -108.506      0.000        -4.122    -3.971
-np.sin(4 * np.pi * toy)     1.2124      0.037     32.513      0.000         1.137     1.288
-np.cos(4 * np.pi * toy)     0.3333      0.037      8.939      0.000         0.258     0.409
+Intercept                   8.2917      0.026    314.450      0.000       8.238       8.345
+np.sin(2 * np.pi * toy)    -5.9156      0.037   -158.634      0.000      -5.991      -5.840
+np.cos(2 * np.pi * toy)    -4.0463      0.037   -108.506      0.000      -4.122      -3.971
+np.sin(4 * np.pi * toy)     1.2124      0.037     32.513      0.000       1.137       1.288
+np.cos(4 * np.pi * toy)     0.3333      0.037      8.939      0.000       0.258       0.409
 ==============================================================================
 Omnibus:                        0.473   Durbin-Watson:                   2.983
 Prob(Omnibus):                  0.790   Jarque-Bera (JB):                0.338
@@ -287,8 +284,6 @@ Skew:                          -0.200   Prob(JB):                        0.845
 Kurtosis:                       2.909   Cond. No.                         1.41
 ==============================================================================
 
-Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 ```
 
 ```python
@@ -299,7 +294,6 @@ fit2 = results.params[0] + \
        results.params[4]*np.cos(4*np.pi*df.toy) 
       
 plt.scatter(df.toy,df.degs)
-plt.hold(True)
 plt.plot(df.toy, fit2)
 plt.savefig('tser_sinreg_03.png')
 ```
@@ -326,32 +320,32 @@ plt.savefig('tser_sinreg_04.png')
 ```python
 import statsmodels.formula.api as smf
 results = smf.ols('y ~ np.abs(np.sin(2*np.pi*x)) + np.abs(np.cos(2*np.pi*x))', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       0.830
 Model:                            OLS   Adj. R-squared:                  0.829
-Method:                 Least Squares   F-statistic:                     967.6
-Date:                Fri, 23 Sep 2016   Prob (F-statistic):          2.30e-153
-Time:                        17:23:34   Log-Likelihood:                 209.20
-No. Observations:                 400   AIC:                            -412.4
-Df Residuals:                     397   BIC:                            -400.4
+Method:                 Least Squares   F-statistic:                     968.9
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):          1.84e-153
+Time:                        12:38:04   Log-Likelihood:                 206.22
+No. Observations:                 400   AIC:                            -406.4
+Df Residuals:                     397   BIC:                            -394.5
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 =================================================================================================
-                                    coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                                    coef    std err          t      P>|t|      [0.025      0.975]
 -------------------------------------------------------------------------------------------------
-Intercept                         0.0995      0.074      1.351      0.177        -0.045     0.244
-np.abs(np.sin(2 * np.pi * x))     1.1266      0.059     19.195      0.000         1.011     1.242
-np.abs(np.cos(2 * np.pi * x))     0.1125      0.059      1.910      0.057        -0.003     0.228
+Intercept                         0.3500      0.074      4.719      0.000       0.204       0.496
+np.abs(np.sin(2 * np.pi * x))     0.9428      0.059     15.943      0.000       0.827       1.059
+np.abs(np.cos(2 * np.pi * x))    -0.0979      0.059     -1.650      0.100      -0.215       0.019
 ==============================================================================
-Omnibus:                      171.148   Durbin-Watson:                   2.049
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               22.018
-Skew:                           0.024   Prob(JB):                     1.66e-05
-Kurtosis:                       1.852   Cond. No.                         20.5
+Omnibus:                      292.929   Durbin-Watson:                   1.972
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               25.280
+Skew:                           0.035   Prob(JB):                     3.24e-06
+Kurtosis:                       1.770   Cond. No.                         20.5
 ==============================================================================
 
 ```
