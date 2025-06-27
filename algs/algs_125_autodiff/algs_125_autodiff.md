@@ -148,14 +148,14 @@ def f(x1, x2):
     w5 = w3 + w4
     return w5
 
-print 'f', f(10, 20)
+print ('f', f(10, 20))
 h = 0.01
-print u'sayısal türev', (f(10+h, 20)-f(10, 20)) / h
+print (u'sayısal türev', (f(10+h, 20)-f(10, 20)) / h)
 ```
 
-```
-f 199.455978889
-sayısal türev 19.1636625383
+```text
+f 199.45597888911064
+sayısal türev 19.163662538264248
 ```
 
 ```python
@@ -170,11 +170,11 @@ def f(x1, x2, dx1, dx2):
     df[0] = w5
     df[1] = dw5
     return df
-print 'AD', f(10,20,1,0)
+print ('AD', f(10,20,1,0))
 ```
 
-```
-AD [199.45597888911064, 19.160928470923547]
+```text
+AD [np.float64(199.45597888911064), np.float64(19.160928470923547)]
 ```
 
 Sembolik olarak türevin $\frac{\partial f}{\partial x_2} = x_1$ olduğunu biliyoruz Üstteki program aynı 
@@ -195,11 +195,11 @@ def f(x1, x2):
     return w5
 
 fg = grad(f)
-print fg(10,20)
+print (fg(10.0,20.0))
 ```
 
-```
-19.1609284709
+```text
+19.160928470923547
 ```
 
 Dikkat: üstteki kod daha önce gösterilen ile aynı tek bir fark ile,
@@ -227,11 +227,11 @@ def f(xvec):
 
 fg = grad(f)
 x0 = np.array([10.,20.])
-print fg(x0)
+print (fg(x0))
 ```
 
-```
-[ 19.16092847  10.        ]
+```text
+[19.16092847 10.        ]
 ```
 
 Daha bitmedi: Altta $\tanh$'nin türevini alıyoruz, hatta türevin türevi,
@@ -360,7 +360,7 @@ gradient = grad(compute_loss)
 for i in range(iters):  
     # Print diagnostic
     loss = compute_loss((W1, b1, W2, b2))      
-    if i % 200 == 0: print "iteration %d: loss %f" % (i, loss)        
+    if i % 200 == 0: print ("iteration %d: loss %f" % (i, loss))
     dW1, db1, dW2, db2 = gradient((W1, b1, W2, b2))    
     # perform a parameter update
     W1 += -eta * dW1
@@ -378,7 +378,7 @@ plot_model(predict(X_test))
 plt.savefig('autodiff_01.png')
 ```
 
-```
+```text
 iteration 0: loss 0.693097
 iteration 200: loss 0.291406
 iteration 400: loss 0.277980
@@ -421,11 +421,11 @@ weights = np.array([0.0, 0.0, 0.0])
 for i in range(100):
     weights -= training_gradient_fun(weights) * 0.1
 print("Trained loss:", training_loss(weights))
-print weights
+print (weights)
 ```
 
-```
-('Trained loss:', 0.042172397668071952)
+```text
+Trained loss: 0.04217239766807184
 [ 1.40509236 -0.37749486  2.34249055]
 ```
 

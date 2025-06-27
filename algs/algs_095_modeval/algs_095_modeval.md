@@ -24,7 +24,7 @@ için tahmin etme başarısını gösterecektir. Mesela herhangi bir yapay
 from sklearn.metrics import confusion_matrix
 y_gercek = ["kedi", "sinek", "kedi", "kedi", "sinek", "balik"]
 y_tahmin = ["sinek", "sinek", "kedi", "kedi", "sinek", "kedi"]
-print confusion_matrix(y_gercek, y_tahmin, labels=["sinek", "balik", "kedi"])
+print (confusion_matrix(y_gercek, y_tahmin, labels=["sinek", "balik", "kedi"]))
 ```
 
 ```
