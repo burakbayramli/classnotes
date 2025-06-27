@@ -94,8 +94,9 @@ tahminler yapabilen bir araştırmacı. Girdi olarak alttaki gibi bir
 veriyi alıp,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dfemis <span class="op">=</span> pd.read_csv(<span class="st">&#39;emission.csv&#39;</span>)<span class="op">;</span> <span class="bu">print</span> dfemis</span></code></pre></div>
-<pre><code>         Actor  Capability  Position  Salience
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dfemis <span class="op">=</span> pd.read_csv(<span class="st">&#39;emission.csv&#39;</span>)<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (dfemis)</span></code></pre></div>
+<pre class="text"><code>         Actor  Capability  Position  Salience
 0  Netherlands        0.08         4        80
 1      Belgium        0.08         7        40
 2   Luxembourg        0.03         4        20
@@ -147,12 +148,13 @@ Burada aynı kavram sadece <span class="math inline">\(c_i,s_i\)</span>
 işin içinde.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scholz</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dfiran.Salience <span class="op">=</span> dfiran.Salience<span class="op">/</span><span class="fl">100.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game <span class="op">=</span> scholz.Game(dfiran)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;ortalama&#39;</span>, game.mean()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;mode&#39;</span>, game.weighted_median()</span></code></pre></div>
-<pre><code>ortalama 54.3833734112
-mode 50.0</code></pre>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dfiran <span class="op">=</span> pd.read_csv(<span class="st">&#39;iran.csv&#39;</span>)<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dfiran.Salience <span class="op">=</span> dfiran.Salience<span class="op">/</span><span class="fl">100.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>game <span class="op">=</span> scholz.Game(dfiran)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;ortalama&#39;</span>, game.mean())</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;mode&#39;</span>, game.weighted_median())</span></code></pre></div>
+<pre class="text"><code>ortalama 5.43833734111989
+mode 5.0</code></pre>
 <p>Her evrede hesaplanan ana formüller şunlar,</p>
 <p><span class="math display">\[ E(U_{ij}|\textrm{teklif et}) =
 (1-s_j)U_{si} + s_jP_i^i U_{si} + s_j(1-P_i^i)U_{fi} \]</span></p>
@@ -234,7 +236,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> weighted_median(<span class="va">self</span>):</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> <span class="va">self</span>.df.copy()</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df.Capability<span class="op">*</span>df.Salience</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> df.sort_index(by<span class="op">=</span><span class="st">&#39;Position&#39;</span>,ascending<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> df.sort_values(<span class="st">&#39;Position&#39;</span>,ascending<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;w&#39;</span>] <span class="op">/</span> df[<span class="st">&#39;w&#39;</span>].<span class="bu">sum</span>()</span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">&#39;w&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;w&#39;</span>].cumsum()       </span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">float</span>(df[df[<span class="st">&#39;w&#39;</span>]<span class="op">&gt;=</span><span class="fl">0.5</span>].head(<span class="dv">1</span>).Position)</span>
@@ -242,15 +244,6 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> mean(<span class="va">self</span>):</span>
 <span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (<span class="va">self</span>.df.Capability<span class="op">*</span><span class="va">self</span>.df.Position<span class="op">*</span><span class="va">self</span>.df.Salience).<span class="bu">sum</span>() <span class="op">/</span> <span class="op">\</span></span>
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>               (<span class="va">self</span>.df.Capability<span class="op">*</span><span class="va">self</span>.df.Salience).<span class="bu">sum</span>()</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;v&#39;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> game.v(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">2</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> game.v(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> game.v(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">3</span>)</span></code></pre></div>
-<pre><code>v
-63.1578947368
-84.2105263158
-94.7368421053</code></pre>
 <p>Kabiliyet ve ilgi ile çarpmak mantıklı herhalde, çünkü aktörün oyunu
 hesaplıyoruz, bu oy aktörün gücüne oranlı olmalı. Hesapta <span
 class="math inline">\(i\)</span> aktörünün <span
@@ -287,242 +280,241 @@ formülleri bu ağacın”düzleştirilmiş’’ hali bir bakıma. Her seçenek
 seçilebilecek her yol o yolun olasılığı ve nihai uç değeri ile çarpılıp
 toplanıyor.</p>
 <p><img src="gametree.png" /></p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> division</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Actor(<span class="bu">object</span>):</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, model, x, c, s):</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> x</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.c <span class="op">=</span> c</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.s <span class="op">=</span> s</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.basic_utilities <span class="op">=</span> {}</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.probs <span class="op">=</span> {}</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.expected_utilities <span class="op">=</span> {}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [] </span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_utilities(<span class="va">self</span>, alter):</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        dx <span class="op">=</span> <span class="va">self</span>.model.xmax <span class="op">-</span> <span class="va">self</span>.model.xmin</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        mu <span class="op">=</span> <span class="va">self</span>.model.mu</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        Us <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        Uf <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        Ub <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        Uw <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        Usq <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span><span class="fl">0.5</span><span class="op">**</span><span class="va">self</span>.r</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.basic_utilities[alter.name] <span class="op">=</span> {<span class="st">&quot;Us&quot;</span>: Us,</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Uf&quot;</span>: Uf,</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Ub&quot;</span>: Ub,</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Uw&quot;</span>: Uw,</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Usq&quot;</span>: Usq}</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_prob(<span class="va">self</span>, alter):</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.x <span class="op">==</span> alter.x:</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.probs[alter.name] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        top <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        bottom <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> agent <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>            d <span class="op">=</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> alter.x) <span class="op">-</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> <span class="va">self</span>.x)</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>            top <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> d</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>            bottom <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> <span class="bu">abs</span>(d)</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>        top <span class="op">=</span> <span class="bu">max</span>(top, <span class="dv">0</span>)</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.probs[alter.name] <span class="op">=</span> top<span class="op">/</span>bottom</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_expected_utility(<span class="va">self</span>, alter):</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> <span class="va">self</span>.probs[alter.name]</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>        utils <span class="op">=</span> <span class="va">self</span>.basic_utilities[alter.name]</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> <span class="va">self</span>.model.Q</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>        T <span class="op">=</span> <span class="va">self</span>.model.T</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> alter.s</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>        EU <span class="op">=</span> s <span class="op">*</span> (p <span class="op">*</span> utils[<span class="st">&quot;Us&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>p)<span class="op">*</span>utils[<span class="st">&quot;Uf&quot;</span>]) <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>s)<span class="op">*</span>utils[<span class="st">&quot;Us&quot;</span>]</span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>        EU <span class="op">-=</span> Q<span class="op">*</span>utils[<span class="st">&quot;Usq&quot;</span>] <span class="op">-</span> (<span class="dv">1</span><span class="op">-</span>Q)<span class="op">*</span>(T<span class="op">*</span>utils[<span class="st">&quot;Ub&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>T)<span class="op">*</span>utils[<span class="st">&quot;Uw&quot;</span>])</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.expected_utilities[alter.name] <span class="op">=</span> EU</span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_r(<span class="va">self</span>):</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>        attack_utils <span class="op">=</span> [alter.expected_utilities[<span class="va">self</span>.name] </span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> <span class="va">self</span>]</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>        security_levels <span class="op">=</span> []</span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>            security <span class="op">=</span> <span class="bu">sum</span>([alter.expected_utilities[actor.name] </span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> actor])</span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>            security_levels.append(security)</span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>        max_security <span class="op">=</span> <span class="bu">max</span>(security_levels)</span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>        min_security <span class="op">=</span> <span class="bu">min</span>(security_levels)</span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>        R <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> <span class="bu">sum</span>(attack_utils) <span class="op">-</span> max_security <span class="op">-</span> min_security) <span class="op">/</span> <span class="op">\</span></span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>            <span class="bu">max</span>(<span class="fl">0.001</span>,(max_security <span class="op">-</span> min_security))</span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> R<span class="op">/</span><span class="dv">3</span>)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>R<span class="op">/</span><span class="dv">3</span>)</span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> send_offers(<span class="va">self</span>):</span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> actor.name <span class="kw">in</span> <span class="va">self</span>.expected_utilities:</span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">self</span>.expected_utilities[actor.name] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># Send a challenge!                    </span></span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>                    offer <span class="op">=</span> {<span class="st">&quot;Sender&quot;</span>: <span class="va">self</span>.name,</span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;x&quot;</span>: <span class="va">self</span>.x, <span class="co"># Target position</span></span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;EU&quot;</span>: <span class="va">self</span>.expected_utilities[actor.name]</span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>                            }</span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>                    actor.offers.append(offer)</span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> choose_offer(<span class="va">self</span>):</span>
-<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.offers) <span class="op">==</span> <span class="dv">0</span>: <span class="cf">return</span></span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>        max_util <span class="op">=</span> <span class="bu">max</span>([offer[<span class="st">&quot;EU&quot;</span>] <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers])</span>
-<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [offer <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers <span class="cf">if</span> offer[<span class="st">&quot;EU&quot;</span>] <span class="op">==</span> max_util]</span>
-<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>        offer <span class="op">=</span> <span class="bu">min</span>(<span class="va">self</span>.offers, key<span class="op">=</span><span class="kw">lambda</span> x: <span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>x[<span class="st">&quot;x&quot;</span>]))</span>
-<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Resolve offer</span></span>
-<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>        Uj <span class="op">=</span> offer[<span class="st">&quot;EU&quot;</span>]</span>
-<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>        Ui <span class="op">=</span> <span class="va">self</span>.expected_utilities[offer[<span class="st">&quot;Sender&quot;</span>]]</span>
-<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> Ui <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> Ui <span class="op">&lt;</span> Uj:</span>
-<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>            <span class="co"># There was a conflict, and this actor lost</span></span>
-<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; kaybediyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]</span>
-<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]</span>
-<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>            <span class="co"># If the actor won the conflict, action will be taken on the other end</span></span>
-<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&lt;</span> Uj:</span>
-<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Compromise</span></span>
-<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; orta noktada anlasiyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]</span>
-<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">+=</span> (offer[<span class="st">&quot;x&quot;</span>] <span class="op">-</span> <span class="va">self</span>.x) <span class="op">*</span> <span class="bu">abs</span>(Ui<span class="op">/</span>Uj)</span>
-<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&gt;</span> Uj:</span>
-<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Capituate</span></span>
-<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> <span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; tarafina geciyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>]</span>
-<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]</span>
-<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [] <span class="co"># Reset offers</span></span>
-<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Model(<span class="bu">object</span>):</span>
-<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, Actors, xmax, xmin, Q<span class="op">=</span><span class="fl">1.0</span>, T<span class="op">=</span><span class="fl">1.0</span>):</span>
-<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Actors <span class="op">=</span> Actors</span>
-<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>            actor.model <span class="op">=</span> <span class="va">self</span></span>
-<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.xmax <span class="op">=</span> xmax</span>
-<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.xmin <span class="op">=</span> xmin</span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dx <span class="op">=</span> xmax <span class="op">-</span> xmin</span>
-<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="dv">0</span> <span class="co"># Current median position</span></span>
-<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Q <span class="op">=</span>  Q</span>
-<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.T <span class="op">=</span> T</span>
-<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.actor <span class="op">=</span> {actor.name: actor <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors}</span>
-<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> vote(<span class="va">self</span>, verbose<span class="op">=</span><span class="va">False</span>):</span>
-<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a>        pairwise_contests <span class="op">=</span> {}</span>
-<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> k <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a>                votes <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> i <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>                    votes <span class="op">+=</span> i.c<span class="op">*</span>i.s<span class="op">*</span>((<span class="bu">abs</span>(i.x <span class="op">-</span> k.x) <span class="op">-</span> <span class="bu">abs</span>(i.x <span class="op">-</span> j.x))<span class="op">/</span>(<span class="va">self</span>.dx))</span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a>                pairwise_contests[(j.x, k.x)] <span class="op">=</span> votes</span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose:</span>
-<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> key, val <span class="kw">in</span> pairwise_contests.items():</span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span> key, val</span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">max</span>(pairwise_contests, key<span class="op">=</span><span class="kw">lambda</span> x: pairwise_contests[x])[<span class="dv">0</span>]</span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> find_mean(<span class="va">self</span>):</span>
-<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running weighted total</span></span>
-<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running total weight</span></span>
-<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a>            w <span class="op">+=</span> actor.s <span class="op">*</span> actor.c</span>
-<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>            t <span class="op">+=</span> actor.s <span class="op">*</span> actor.c <span class="op">*</span> actor.x</span>
-<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> t<span class="op">/</span>w</span>
-<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_basic_utilities(<span class="va">self</span>):</span>
-<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
-<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_utilities(alter)</span>
-<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_win_probabilities(<span class="va">self</span>):</span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_prob(alter)</span>
-<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_expected_utilities(<span class="va">self</span>):</span>
-<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
-<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_expected_utility(alter)</span>
-<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_r(<span class="va">self</span>):</span>
-<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>            actor.calculate_r()</span>
-<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_offers(<span class="va">self</span>):</span>
-<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a>            actor.send_offers()</span>
-<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> resolve_offers(<span class="va">self</span>):</span>
-<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>            actor.choose_offer()</span>
-<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> run_model(<span class="va">self</span>):</span>
-<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
-<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>            actor.r <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.vote(<span class="va">False</span>)</span>
-<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_basic_utilities()</span>
-<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_win_probabilities()</span>
-<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_expected_utilities()</span>
-<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_r()</span>
-<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.find_mean()</span>
-<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_basic_utilities()</span>
-<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_win_probabilities()</span>
-<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_expected_utilities()</span>
-<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.make_offers()</span>
-<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.resolve_offers()</span>
-<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run(csv_file, <span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>, xmin<span class="op">=</span><span class="dv">1</span>, xmax<span class="op">=</span><span class="dv">10</span>,T<span class="op">=</span><span class="fl">1.0</span>,Q<span class="op">=</span><span class="fl">1.0</span>):</span>
-<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(csv_file, <span class="st">&#39;rU&#39;</span>) <span class="im">as</span> f:</span>
-<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a>        reader <span class="op">=</span> csv.DictReader(f, )</span>
-<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a>        actors <span class="op">=</span> [actor <span class="cf">for</span> actor <span class="kw">in</span> reader]</span>
-<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> actors:</span>
-<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> key <span class="kw">in</span> actor:</span>
-<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
-<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>                actor[key] <span class="op">=</span> <span class="bu">float</span>(actor[key])</span>
-<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span>:</span>
-<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
-<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a>    Actors <span class="op">=</span> []</span>
-<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> actors:</span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a>        new_actor <span class="op">=</span> Actor(actor[<span class="st">&quot;Actor&quot;</span>],</span>
-<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>                          <span class="va">None</span>,</span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Position&quot;</span>],</span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Capability&quot;</span>],</span>
-<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Salience&quot;</span>]<span class="op">/</span><span class="fl">100.0</span>)</span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>        Actors.append(new_actor)</span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Model(Actors, xmax, xmin)</span>
-<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> model.Actors:</span>
-<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>        actor.model <span class="op">=</span> model</span>
-<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a>    model.T <span class="op">=</span> T</span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a>    model.Q <span class="op">=</span> Q</span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>    model.vote()</span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>    model.find_mean()</span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>    [actor.x <span class="cf">for</span> actor <span class="kw">in</span> model.Actors]</span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">iter</span>):</span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>        model.run_model()</span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> model.vote(<span class="va">False</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Actor(<span class="bu">object</span>):</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, model, x, c, s):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.name <span class="op">=</span> name</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> x</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.c <span class="op">=</span> c</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.s <span class="op">=</span> s</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.basic_utilities <span class="op">=</span> {}</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.probs <span class="op">=</span> {}</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.expected_utilities <span class="op">=</span> {}</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [] </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_utilities(<span class="va">self</span>, alter):</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        dx <span class="op">=</span> <span class="va">self</span>.model.xmax <span class="op">-</span> <span class="va">self</span>.model.xmin</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        mu <span class="op">=</span> <span class="va">self</span>.model.mu</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        Us <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        Uf <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">abs</span>((<span class="va">self</span>.x <span class="op">-</span> alter.x)<span class="op">/</span>(dx)))<span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        Ub <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">-</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        Uw <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span>(<span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.25</span><span class="op">*</span>((<span class="bu">abs</span>(<span class="va">self</span>.x <span class="op">-</span> mu)<span class="op">+</span><span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>alter.x))<span class="op">/</span>dx)) <span class="op">\</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>             <span class="op">**</span><span class="bu">int</span>(<span class="va">self</span>.r)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        Usq <span class="op">=</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">4</span><span class="op">*</span><span class="fl">0.5</span><span class="op">**</span><span class="va">self</span>.r</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.basic_utilities[alter.name] <span class="op">=</span> {<span class="st">&quot;Us&quot;</span>: Us,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Uf&quot;</span>: Uf,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Ub&quot;</span>: Ub,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Uw&quot;</span>: Uw,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                                            <span class="st">&quot;Usq&quot;</span>: Usq}</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_prob(<span class="va">self</span>, alter):</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.x <span class="op">==</span> alter.x:</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.probs[alter.name] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        top <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        bottom <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> agent <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>            d <span class="op">=</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> alter.x) <span class="op">-</span> <span class="bu">abs</span>(agent.x <span class="op">-</span> <span class="va">self</span>.x)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>            top <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> d</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>            bottom <span class="op">+=</span> agent.c <span class="op">*</span> agent.s <span class="op">*</span> <span class="bu">abs</span>(d)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        top <span class="op">=</span> <span class="bu">max</span>(top, <span class="dv">0</span>)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.probs[alter.name] <span class="op">=</span> top<span class="op">/</span>bottom</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_expected_utility(<span class="va">self</span>, alter):</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> <span class="va">self</span>.probs[alter.name]</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>        utils <span class="op">=</span> <span class="va">self</span>.basic_utilities[alter.name]</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> <span class="va">self</span>.model.Q</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>        T <span class="op">=</span> <span class="va">self</span>.model.T</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> alter.s</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>        EU <span class="op">=</span> s <span class="op">*</span> (p <span class="op">*</span> utils[<span class="st">&quot;Us&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>p)<span class="op">*</span>utils[<span class="st">&quot;Uf&quot;</span>]) <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>s)<span class="op">*</span>utils[<span class="st">&quot;Us&quot;</span>]</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>        EU <span class="op">-=</span> Q<span class="op">*</span>utils[<span class="st">&quot;Usq&quot;</span>] <span class="op">-</span> (<span class="dv">1</span><span class="op">-</span>Q)<span class="op">*</span>(T<span class="op">*</span>utils[<span class="st">&quot;Ub&quot;</span>] <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>T)<span class="op">*</span>utils[<span class="st">&quot;Uw&quot;</span>])</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.expected_utilities[alter.name] <span class="op">=</span> EU</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_r(<span class="va">self</span>):</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>        attack_utils <span class="op">=</span> [alter.expected_utilities[<span class="va">self</span>.name] </span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> <span class="va">self</span>]</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>        security_levels <span class="op">=</span> []</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>            security <span class="op">=</span> <span class="bu">sum</span>([alter.expected_utilities[actor.name] </span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.model.Actors <span class="cf">if</span> alter <span class="kw">is</span> <span class="kw">not</span> actor])</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>            security_levels.append(security)</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>        max_security <span class="op">=</span> <span class="bu">max</span>(security_levels)</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>        min_security <span class="op">=</span> <span class="bu">min</span>(security_levels)</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>        R <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> <span class="bu">sum</span>(attack_utils) <span class="op">-</span> max_security <span class="op">-</span> min_security) <span class="op">/</span> <span class="op">\</span></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>            <span class="bu">max</span>(<span class="fl">0.001</span>,(max_security <span class="op">-</span> min_security))</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.r <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> R<span class="op">/</span><span class="dv">3</span>)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span>R<span class="op">/</span><span class="dv">3</span>)</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> send_offers(<span class="va">self</span>):</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.model.Actors:</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> actor.name <span class="kw">in</span> <span class="va">self</span>.expected_utilities:</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">self</span>.expected_utilities[actor.name] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># Send a challenge!                    </span></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>                    offer <span class="op">=</span> {<span class="st">&quot;Sender&quot;</span>: <span class="va">self</span>.name,</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;x&quot;</span>: <span class="va">self</span>.x, <span class="co"># Target position</span></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;EU&quot;</span>: <span class="va">self</span>.expected_utilities[actor.name]</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>                            }</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>                    actor.offers.append(offer)</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> choose_offer(<span class="va">self</span>):</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.offers) <span class="op">==</span> <span class="dv">0</span>: <span class="cf">return</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>        max_util <span class="op">=</span> <span class="bu">max</span>([offer[<span class="st">&quot;EU&quot;</span>] <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers])</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [offer <span class="cf">for</span> offer <span class="kw">in</span> <span class="va">self</span>.offers <span class="cf">if</span> offer[<span class="st">&quot;EU&quot;</span>] <span class="op">==</span> max_util]</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>        offer <span class="op">=</span> <span class="bu">min</span>(<span class="va">self</span>.offers, key<span class="op">=</span><span class="kw">lambda</span> x: <span class="bu">abs</span>(<span class="va">self</span>.x<span class="op">-</span>x[<span class="st">&quot;x&quot;</span>]))</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Resolve offer</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>        Uj <span class="op">=</span> offer[<span class="st">&quot;EU&quot;</span>]</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>        Ui <span class="op">=</span> <span class="va">self</span>.expected_utilities[offer[<span class="st">&quot;Sender&quot;</span>]]</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> Ui <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> Ui <span class="op">&lt;</span> Uj:</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>            <span class="co"># There was a conflict, and this actor lost</span></span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> (<span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; kaybediyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>])</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>            <span class="co"># If the actor won the conflict, action will be taken on the other end</span></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&lt;</span> Uj:</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Compromise</span></span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> (<span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; orta noktada anlasiyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>])</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">+=</span> (offer[<span class="st">&quot;x&quot;</span>] <span class="op">-</span> <span class="va">self</span>.x) <span class="op">*</span> <span class="bu">abs</span>(Ui<span class="op">/</span>Uj)</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> Ui <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> <span class="bu">abs</span>(Ui) <span class="op">&gt;</span> Uj:</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Capituate</span></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span> (<span class="va">self</span>.name <span class="op">+</span> <span class="st">&quot; tarafina geciyor &quot;</span> <span class="op">+</span> offer[<span class="st">&quot;Sender&quot;</span>])</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.x <span class="op">=</span> offer[<span class="st">&quot;x&quot;</span>]</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.offers <span class="op">=</span> [] <span class="co"># Reset offers</span></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Model(<span class="bu">object</span>):</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, Actors, xmax, xmin, Q<span class="op">=</span><span class="fl">1.0</span>, T<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Actors <span class="op">=</span> Actors</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>            actor.model <span class="op">=</span> <span class="va">self</span></span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.xmax <span class="op">=</span> xmax</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.xmin <span class="op">=</span> xmin</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dx <span class="op">=</span> xmax <span class="op">-</span> xmin</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="dv">0</span> <span class="co"># Current median position</span></span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Q <span class="op">=</span>  Q</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.T <span class="op">=</span> T</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.actor <span class="op">=</span> {actor.name: actor <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors}</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> vote(<span class="va">self</span>, verbose<span class="op">=</span><span class="va">False</span>):</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>        pairwise_contests <span class="op">=</span> {}</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> k <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>                votes <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> i <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>                    votes <span class="op">+=</span> i.c<span class="op">*</span>i.s<span class="op">*</span>((<span class="bu">abs</span>(i.x <span class="op">-</span> k.x) <span class="op">-</span> <span class="bu">abs</span>(i.x <span class="op">-</span> j.x))<span class="op">/</span>(<span class="va">self</span>.dx))</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>                pairwise_contests[(j.x, k.x)] <span class="op">=</span> votes</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose:</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> key, val <span class="kw">in</span> pairwise_contests.items():</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span> (key, val)</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">max</span>(pairwise_contests, key<span class="op">=</span><span class="kw">lambda</span> x: pairwise_contests[x])[<span class="dv">0</span>]</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> find_mean(<span class="va">self</span>):</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running weighted total</span></span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> <span class="dv">0</span> <span class="co"># Running total weight</span></span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>            w <span class="op">+=</span> actor.s <span class="op">*</span> actor.c</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>            t <span class="op">+=</span> actor.s <span class="op">*</span> actor.c <span class="op">*</span> actor.x</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> t<span class="op">/</span>w</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_basic_utilities(<span class="va">self</span>):</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_utilities(alter)</span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_win_probabilities(<span class="va">self</span>):</span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_prob(alter)</span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_expected_utilities(<span class="va">self</span>):</span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> alter <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> actor <span class="kw">is</span> <span class="kw">not</span> alter:</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>                    actor.calculate_expected_utility(alter)</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> calculate_r(<span class="va">self</span>):</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>            actor.calculate_r()</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_offers(<span class="va">self</span>):</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a>            actor.send_offers()</span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> resolve_offers(<span class="va">self</span>):</span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a>            actor.choose_offer()</span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> run_model(<span class="va">self</span>):</span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> actor <span class="kw">in</span> <span class="va">self</span>.Actors:</span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a>            actor.r <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.vote(<span class="va">False</span>)</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_basic_utilities()</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_win_probabilities()</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_expected_utilities()</span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_r()</span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mu <span class="op">=</span> <span class="va">self</span>.find_mean()</span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_basic_utilities()</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_win_probabilities()</span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.calculate_expected_utilities()</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.make_offers()</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.resolve_offers()</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run(csv_file, <span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>, xmin<span class="op">=</span><span class="dv">1</span>, xmax<span class="op">=</span><span class="dv">10</span>,T<span class="op">=</span><span class="fl">1.0</span>,Q<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(csv_file, <span class="st">&#39;rU&#39;</span>) <span class="im">as</span> f:</span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>        reader <span class="op">=</span> csv.DictReader(f, )</span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a>        actors <span class="op">=</span> [actor <span class="cf">for</span> actor <span class="kw">in</span> reader]</span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> actors:</span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> key <span class="kw">in</span> actor:</span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a>                actor[key] <span class="op">=</span> <span class="bu">float</span>(actor[key])</span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span>:</span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a>    Actors <span class="op">=</span> []</span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> actors:</span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>        new_actor <span class="op">=</span> Actor(actor[<span class="st">&quot;Actor&quot;</span>],</span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>                          <span class="va">None</span>,</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Position&quot;</span>],</span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Capability&quot;</span>],</span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a>                          actor[<span class="st">&quot;Salience&quot;</span>]<span class="op">/</span><span class="fl">100.0</span>)</span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a>        Actors.append(new_actor)</span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> Model(Actors, xmax, xmin)</span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> actor <span class="kw">in</span> model.Actors:</span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a>        actor.model <span class="op">=</span> model</span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a>    model.T <span class="op">=</span> T</span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a>    model.Q <span class="op">=</span> Q</span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>    model.vote()</span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a>    model.find_mean()</span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>    [actor.x <span class="cf">for</span> actor <span class="kw">in</span> model.Actors]</span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">iter</span>):</span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a>        model.run_model()</span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> (model.vote(<span class="va">False</span>))</span></code></pre></div>
 <p>Bu yaklaşımı örnek olarak 1998’de Britanya’nın Avro para birliğine
 girip girmeyeceği kararı üzerinde uygulayalım [6]. Alttaki değerler İşçi
 Partisinin iktidarda olduğu senaryosuna göre seçilmiş, Muhafazakar
 iktidarı seçeneğinde sadece aktörlerin gücü / etkileri değişiyor,
 pozisyonlar her iki durumda da aynı. Skalada güç 0-1 arası, pozisyon
 0-10.</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dfuk <span class="op">=</span> pd.read_csv(<span class="st">&#39;uk_emu_labor.csv&#39;</span>)<span class="op">;</span> <span class="bu">print</span> dfuk</span></code></pre></div>
-<pre><code>                       Actor  Capability  Position  Salience
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dfuk <span class="op">=</span> pd.read_csv(<span class="st">&#39;uk_emu_labor.csv&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (dfuk)</span></code></pre></div>
+<pre class="text"><code>                       Actor  Capability  Position  Salience
 0      Isci Partisi (Avrocu)         1.0         8        40
 1  Isci Partisi (AB Karsiti)         0.5         4        40
 2     Ingiliz Merkez Bankasi         0.1         5        60
@@ -533,10 +525,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 7     Muhafazakar AB Karsiti         0.3         1        95
 8   Muhafazakar AB Taraftari         0.3         6        50</code></pre>
 <p>Oyunu isletince sonuc,</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;uk_emu_labor.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
-<pre><code>Isci Partisi (Avrocu) tarafina geciyor Sanayiciler
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;uk_emu_labor.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
+<pre class="text"><code>Isci Partisi (Avrocu) tarafina geciyor Sanayiciler
 Isci Partisi (AB Karsiti) tarafina geciyor Finanscilar
 Teknokratlar tarafina geciyor Sanayiciler
 Direktorler Enstitusu tarafina geciyor Finanscilar
@@ -551,10 +543,10 @@ Direktorler Enstitusu tarafina geciyor Isci Partisi (Avrocu)
 5.0</code></pre>
 <p>5 değeri çıktı, ki bu [6]’daki sonuca yakın. Eğer Muhafazakar Parti
 iktidarına göre işletirsek,</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;uk_emu_cons.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
-<pre><code>Isci Partisi (Avrocu) tarafina geciyor Ingiliz Merkez Bankasi
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;uk_emu_cons.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">5</span>)</span></code></pre></div>
+<pre class="text"><code>Isci Partisi (Avrocu) tarafina geciyor Ingiliz Merkez Bankasi
 Isci Partisi (AB Karsiti) tarafina geciyor Ingiliz Merkez Bankasi
 Teknokratlar tarafina geciyor Ingiliz Merkez Bankasi
 Direktorler Enstitusu tarafina geciyor Ingiliz Merkez Bankasi
@@ -567,9 +559,6 @@ Teknokratlar tarafina geciyor Muhafazakar AB Karsiti
 Sanayiciler tarafina geciyor Muhafazakar AB Karsiti
 Direktorler Enstitusu tarafina geciyor Muhafazakar AB Karsiti
 1.0
-Ingiliz Merkez Bankasi tarafina geciyor Muhafazakar AB Karsiti
-Finanscilar tarafina geciyor Muhafazakar AB Karsiti
-Muhafazakar AB Taraftari tarafina geciyor Muhafazakar AB Karsiti
 1.0
 1.0
 1.0</code></pre>
@@ -583,10 +572,10 @@ yaratabilir. Aktörler herhalde üstteki örneğe yakın olur, halkın
 seçiminin bu aktörlerin seçimini yansıttığı varsayılabilir. Sonuç ne
 olur?</p>
 <p>İlk baştaki emisyon örneği,</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;emission.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>,xmin<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
-<pre><code>Belgium tarafina geciyor France
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bdm</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>bdm.run(<span class="st">&quot;emission.csv&quot;</span>,<span class="bu">iter</span><span class="op">=</span><span class="dv">10</span>,xmin<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div>
+<pre class="text"><code>Belgium tarafina geciyor France
 Luxembourg orta noktada anlasiyor France
 Ireland tarafina geciyor France
 10.0

@@ -95,16 +95,16 @@ class Actor(object):
         Ui = self.expected_utilities[offer["Sender"]]
         if Ui > 0 and Ui < Uj:
             # There was a conflict, and this actor lost
-            print self.name + " kaybediyor " + offer["Sender"]
+            print (self.name + " kaybediyor " + offer["Sender"])
             self.x = offer["x"]
             # If the actor won the conflict, action will be taken on the other end
         elif Ui < 0 and abs(Ui) < Uj:
             # Compromise
-            print self.name + " orta noktada anlasiyor " + offer["Sender"]
+            print (self.name + " orta noktada anlasiyor " + offer["Sender"])
             self.x += (offer["x"] - self.x) * abs(Ui/Uj)
         elif Ui < 0 and abs(Ui) > Uj:
             # Capituate
-            print self.name + " tarafina geciyor " + offer["Sender"]
+            print (self.name + " tarafina geciyor " + offer["Sender"])
             self.x = offer["x"]
 
         self.offers = [] # Reset offers
@@ -135,7 +135,7 @@ class Model(object):
         
         if verbose:
             for key, val in pairwise_contests.items():
-                print key, val
+                print (key, val)
         return max(pairwise_contests, key=lambda x: pairwise_contests[x])[0]
 
     def find_mean(self):
@@ -193,7 +193,7 @@ class Model(object):
         self.resolve_offers()
 
 def run(csv_file, iter=10, xmin=1, xmax=10,T=1.0,Q=1.0):
-    with open(csv_file, 'rU') as f:
+    with open(csv_file, 'r') as f:
         reader = csv.DictReader(f, )
         actors = [actor for actor in reader]
     for actor in actors:
@@ -222,4 +222,4 @@ def run(csv_file, iter=10, xmin=1, xmax=10,T=1.0,Q=1.0):
     [actor.x for actor in model.Actors]
     for i in range(iter):
         model.run_model()
-        print model.vote(False)
+        print (model.vote(False))

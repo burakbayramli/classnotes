@@ -18,7 +18,7 @@ class Game:
     def weighted_median(self):
         df = self.df.copy()
         df['w'] = df.Capability*df.Salience
-        df = df.sort_index(by='Position',ascending=True)
+        df = df.sort_values('Position',ascending=True)
         df['w'] = df['w'] / df['w'].sum()
         df['w'] = df['w'].cumsum()       
         return float(df[df['w']>=0.5].head(1).Position)

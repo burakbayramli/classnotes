@@ -5,10 +5,11 @@ yapabilen bir araştırmacı. Girdi olarak alttaki gibi bir veriyi alıp,
 
 ```python
 import pandas as pd
-dfemis = pd.read_csv('emission.csv'); print dfemis
+dfemis = pd.read_csv('emission.csv');
+print (dfemis)
 ```
 
-```
+```text
          Actor  Capability  Position  Salience
 0  Netherlands        0.08         4        80
 1      Belgium        0.08         7        40
@@ -64,15 +65,16 @@ seçiliyordu. Burada aynı kavram sadece $c_i,s_i$ işin içinde.
 
 ```python
 import scholz
+dfiran = pd.read_csv('iran.csv');
 dfiran.Salience = dfiran.Salience/100.
 game = scholz.Game(dfiran)
-print 'ortalama', game.mean()
-print 'mode', game.weighted_median()
+print ('ortalama', game.mean())
+print ('mode', game.weighted_median())
 ```
 
-```
-ortalama 54.3833734112
-mode 50.0
+```text
+ortalama 5.43833734111989
+mode 5.0
 ```
 
 Her evrede hesaplanan ana formüller şunlar,
@@ -160,7 +162,7 @@ class Game:
     def weighted_median(self):
         df = self.df.copy()
         df['w'] = df.Capability*df.Salience
-        df = df.sort_index(by='Position',ascending=True)
+        df = df.sort_values('Position',ascending=True)
         df['w'] = df['w'] / df['w'].sum()
         df['w'] = df['w'].cumsum()       
         return float(df[df['w']>=0.5].head(1).Position)
@@ -169,20 +171,6 @@ class Game:
         return (self.df.Capability*self.df.Position*self.df.Salience).sum() / \
                (self.df.Capability*self.df.Salience).sum()
 
-```
-
-```python
-print 'v'
-print game.v(1,0,2)
-print game.v(0,1,2)
-print game.v(0,2,3)
-```
-
-```
-v
-63.1578947368
-84.2105263158
-94.7368421053
 ```
 
 Kabiliyet ve ilgi ile çarpmak mantıklı herhalde, çünkü aktörün oyunu
@@ -219,7 +207,6 @@ yolun olasılığı ve nihai uç değeri ile çarpılıp toplanıyor.
 ![](gametree.png)
 
 ```python
-from __future__ import division
 import csv
 
 class Actor(object):
@@ -316,16 +303,16 @@ class Actor(object):
         Ui = self.expected_utilities[offer["Sender"]]
         if Ui > 0 and Ui < Uj:
             # There was a conflict, and this actor lost
-            print self.name + " kaybediyor " + offer["Sender"]
+            print (self.name + " kaybediyor " + offer["Sender"])
             self.x = offer["x"]
             # If the actor won the conflict, action will be taken on the other end
         elif Ui < 0 and abs(Ui) < Uj:
             # Compromise
-            print self.name + " orta noktada anlasiyor " + offer["Sender"]
+            print (self.name + " orta noktada anlasiyor " + offer["Sender"])
             self.x += (offer["x"] - self.x) * abs(Ui/Uj)
         elif Ui < 0 and abs(Ui) > Uj:
             # Capituate
-            print self.name + " tarafina geciyor " + offer["Sender"]
+            print (self.name + " tarafina geciyor " + offer["Sender"])
             self.x = offer["x"]
 
         self.offers = [] # Reset offers
@@ -356,7 +343,7 @@ class Model(object):
         
         if verbose:
             for key, val in pairwise_contests.items():
-                print key, val
+                print (key, val)
         return max(pairwise_contests, key=lambda x: pairwise_contests[x])[0]
 
     def find_mean(self):
@@ -443,7 +430,7 @@ def run(csv_file, iter=10, xmin=1, xmax=10,T=1.0,Q=1.0):
     [actor.x for actor in model.Actors]
     for i in range(iter):
         model.run_model()
-        print model.vote(False)
+        print (model.vote(False))
 ```
 
 Bu yaklaşımı örnek olarak 1998'de Britanya'nın Avro para birliğine girip
@@ -454,10 +441,10 @@ aynı. Skalada güç 0-1 arası, pozisyon 0-10.
 
 ```python
 import pandas as pd
-dfuk = pd.read_csv('uk_emu_labor.csv'); print dfuk
+dfuk = pd.read_csv('uk_emu_labor.csv'); print (dfuk)
 ```
 
-```
+```text
                        Actor  Capability  Position  Salience
 0      Isci Partisi (Avrocu)         1.0         8        40
 1  Isci Partisi (AB Karsiti)         0.5         4        40
@@ -477,7 +464,7 @@ import bdm
 bdm.run("uk_emu_labor.csv",iter=5)
 ```
 
-```
+```text
 Isci Partisi (Avrocu) tarafina geciyor Sanayiciler
 Isci Partisi (AB Karsiti) tarafina geciyor Finanscilar
 Teknokratlar tarafina geciyor Sanayiciler
@@ -501,7 +488,7 @@ import bdm
 bdm.run("uk_emu_cons.csv",iter=5)
 ```
 
-```
+```text
 Isci Partisi (Avrocu) tarafina geciyor Ingiliz Merkez Bankasi
 Isci Partisi (AB Karsiti) tarafina geciyor Ingiliz Merkez Bankasi
 Teknokratlar tarafina geciyor Ingiliz Merkez Bankasi
@@ -515,9 +502,6 @@ Teknokratlar tarafina geciyor Muhafazakar AB Karsiti
 Sanayiciler tarafina geciyor Muhafazakar AB Karsiti
 Direktorler Enstitusu tarafina geciyor Muhafazakar AB Karsiti
 1.0
-Ingiliz Merkez Bankasi tarafina geciyor Muhafazakar AB Karsiti
-Finanscilar tarafina geciyor Muhafazakar AB Karsiti
-Muhafazakar AB Taraftari tarafina geciyor Muhafazakar AB Karsiti
 1.0
 1.0
 1.0
@@ -540,7 +524,7 @@ import bdm
 bdm.run("emission.csv",iter=10,xmin=4)
 ```
 
-```
+```text
 Belgium tarafina geciyor France
 Luxembourg orta noktada anlasiyor France
 Ireland tarafina geciyor France
