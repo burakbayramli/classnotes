@@ -31,25 +31,25 @@ bir alt liste ekleriz, arama o noktadan sonra kaba kuvvet ile devam eder.
 Programlama dillerinin çoğunda böleç kabiliyeti vardır;
 
 ```python
-print hash('portakal')
-print hash('armut')
+print (hash('portakal'))
+print (hash('armut'))
 ```
 
-```
-5699995722992068222
-4709300584609918268
+```text
+1625896577505283192
+7027255142208074575
 ```
 
 Modülo uygulayalım, 
 
 ```python
-print hash('portakal') % 15 # dizin 15 buyuklugunde 
-print hash('armut') % 15
+print (hash('portakal') % 15) # dizin 15 buyuklugunde 
+print (hash('armut') % 15)
 ```
 
-```
+```text
 7
-8
+10
 ```
 
 Yığıt (Stacks)
@@ -66,12 +66,12 @@ düz listeler direk yığıt olarak kullanılabiliyor, ve üzerinde ekleme icin
 a  = []
 a.extend(["ddd"])
 a.extend(["eddd"])
-print a
-print a.pop()
-print a
+print (a)
+print (a.pop())
+print (a)
 ```
 
-```
+```text
 ['ddd', 'eddd']
 eddd
 ['ddd']
@@ -90,16 +90,16 @@ class Queue(deque):
     push = deque.append
 
 q = Queue([3,4,5,4])
-print q.pull()
+print (q.pull())
 q.push(44)
-print q.pull()
-print q
+print (q.pull())
+print (q)
 ```
 
-```
+```text
 3
 4
-deque([5, 4, 44])
+Queue([5, 4, 44])
 ```
 
 ![](basic_01.png)
@@ -149,7 +149,7 @@ class LinkedList(object):
     def _printList(self):
         node = self.head
         while node:
-            print node.value,
+            print (node.value,)
             node = node.next
         print 
             
@@ -187,11 +187,13 @@ ll._add(99)
 ll._add(12)
 ll._printList()
 node, prev, i = ll._find(1)
-print str(node), 'bulundu'
+print (str(node), 'bulundu')
 ```
 
-```
-12 99 37
+```text
+12
+99
+37
 99 bulundu
 ```
 
@@ -213,8 +215,10 @@ ll._insert_middle(1,37)
 ll._printList()
 ```
 
-```
-12 37 99
+```text
+12
+37
+99
 ```
 
 Aradan bir öğe silelim. Silmek için yine göstergeç cambazlığı; silinecek
@@ -242,9 +246,12 @@ ll._delete(prev, node)
 ll._printList()
 ```
 
-```
-12 99 37
-12 37
+```text
+12
+99
+37
+12
+37
 ```
 
 Bağlantılı listelerin yığıt, kuyruk gibi yapıların kodlaması için ne kadar
@@ -299,11 +306,11 @@ def dfs(graph, start):
             visited[vertex] = ''
             stack.extend(graph[vertex])
     return visited
-print dfs(graph, 'A')
+print (dfs(graph, 'A'))
 ```
 
-```
-OrderedDict([('A', ''), ('B', ''), ('D', ''), ('E', ''), ('F', ''), ('C', '')])
+```text
+OrderedDict({'A': '', 'B': '', 'E': '', 'F': '', 'C': '', 'D': ''})
 ```
 
 Özyineli formda da yazabiliriz, eğer her komşu için teker teker
@@ -323,11 +330,11 @@ def dfs(graph,curr,path = collections.OrderedDict()):
             path = dfs(graph,edge,path)
     return path
 
-print dfs(graph,'A')
+print (dfs(graph,'A'))
 ```
 
-```
-OrderedDict([('A', ''), ('C', ''), ('F', ''), ('E', ''), ('B', ''), ('D', '')])
+```text
+OrderedDict({'A': '', 'C': '', 'F': '', 'E': '', 'B': '', 'D': ''})
 ```
 
 Şimdi diğer arama şekline, önce genişliğine aramaya gelelim. Bunu yapmak
@@ -346,11 +353,11 @@ def bfs(graph, start):
             visited[vertex] = ''
             for x in graph[vertex]: queue.push(x)
     return visited
-print bfs(graph, 'A')
+print (bfs(graph, 'A'))
 ```
 
-```
-OrderedDict([('A', ''), ('C', ''), ('B', ''), ('F', ''), ('E', ''), ('D', '')])
+```text
+OrderedDict({'A': '', 'C': '', 'B': '', 'F': '', 'D': '', 'E': ''})
 ```
 
 İkisel Arama Ağaçları (Binary Search Trees -BST-)
@@ -431,7 +438,7 @@ class BST:
     def _printInOrder(self, node):
         if(node != None):
             self._printInOrder(node.l)
-            print str(node.v) + ' '
+            print (str(node.v) + ' ')
             self._printInOrder(node.r)
 
     def printPreOrder(self):
@@ -440,7 +447,7 @@ class BST:
 
     def _printPreOrder(self, node):
         if(node != None):
-            print str(node.v) + ' '
+            print (str(node.v) + ' ')
             self._printPreOrder(node.l)
             self._printPreOrder(node.r)            
                         
@@ -450,7 +457,7 @@ class BST:
 
     def _printPostOrder(self, node):
         if(node != None):
-            print str(node.v) + ' '
+            print (str(node.v) + ' ')
             self._printPostOrder(node.l)
             self._printPostOrder(node.r)
                         
@@ -471,28 +478,26 @@ class BST:
         return closest.v
 
 bst = BST()
-print "Adding nodes 1 to 10 in the tree..."
+print ("Adding nodes 1 to 10 in the tree...")
 for i in range(1, 11):
     bst.add(i)
 
 print
-print "Searching for nodes 16 and 6"
+print ("Searching for nodes 16 and 6")
 f = bst.find(16)
-if f: print f.v
+if f: print (f.v)
 f = bst.find(6)
-if f: print f.v
+if f: print (f.v)
 
 print
-print "Printing preorder..."
+print ("Printing preorder...")
 bst.printInOrder()
 ```
 
-```
+```text
 Adding nodes 1 to 10 in the tree...
-
 Searching for nodes 16 and 6
 6
-
 Printing preorder...
 1 
 2 
@@ -548,7 +553,7 @@ print(binary_search(testlist, 13))
 print(binary_search(testlist, 20))
 ```
 
-```
+```text
 (False, 3)
 (True, 4)
 (False, 7)
@@ -596,16 +601,16 @@ class pqueue():
 pq = pqueue()
 # rasgele degerler
 for i in range(10): pq.push(randrange(100))
-print pq
-print pq.pull()
+print (pq)
+print (pq.pull())
 pq.push(100)
-print pq
+print (pq)
 ```
 
-```
-[2, 12, 15, 37, 70, 54, 42, 92, 54, 82]
-2
-[12, 37, 15, 54, 70, 54, 42, 92, 82, 100]
+```text
+[3, 8, 86, 50, 19, 91, 97, 90, 62, 70]
+3
+[8, 19, 86, 50, 70, 91, 97, 90, 62, 100]
 ```
 
 Biraz daha kapsamlı bir kod `pqdict` paketinde, bu önemsel kuyruğa anahtar /
@@ -621,13 +626,13 @@ Q = pqdict()
 Q['toyota'] = 4
 Q['mercedes'] = 10
 Q['bmw'] = 6
-for c in Q: print c
+for c in Q: print (c)
 ```
 
-```
+```text
 toyota
-bmw
 mercedes
+bmw
 ```
 
 Bir ilginç özellik daha: bir döngü içinde değilsek `[]`  operatörü hem
@@ -638,18 +643,18 @@ Bir ilginç özellik daha: bir döngü içinde değilsek `[]`  operatörü hem
 Q['toyota'] = 4
 Q['mercedes'] = 10
 Q['bmw'] = 6
-print len(Q)
+print (len(Q))
 Q['bmw'] = 1
-print 'hala', len(Q)
-for c in Q: print c
+print ('hala', len(Q))
+for c in Q: print (c)
 ```
 
-```
+```text
 3
 hala 3
 bmw
-toyota
 mercedes
+toyota
 ```
 
 Silmeden bakabilmek ve güncelleyebilmek önemli bir özellik (Java karşılığı
