@@ -52,8 +52,8 @@ def _drop_unbalanced_matches(data):
 
 def _swap_pairwise(col):
     """ 0 ile 1, 2 ile 2, vs.. seklinda satir degis tokusu yap """
-    col = pd.np.array(col)
-    for index in xrange(0, len(col), 2):
+    col = np.array(col)
+    for index in range(0, len(col), 2):
         val = col[index]
         col[index] = col[index + 1]
         col[index+1] = val
@@ -115,7 +115,7 @@ def _check_eq(value):
     uymadigini kontrol etsin. Dikkat, geriye gecilen degeri kontrol eden
     _fonksiyon_ donduruyoruz, o degeri burada kontrol etmiyoruz.
     """
-    return lambda (x): int(x) == int(value)
+    return lambda x: int(x) == int(value)
 
 
 L1_ALPHA = 16.0
@@ -167,7 +167,7 @@ def validate(label, target, predictions, baseline=0.5, compute_auc=False,
     expect = len(target) * baseline
     
     (true_pos, true_neg, false_pos, false_neg) = (0, 0, 0, 0)
-    for index in xrange(len(target)):
+    for index in range(len(target)):
         (yval, prob) = zipped[index]
         if float(prob) == 0.0:
             predicted = False
@@ -213,12 +213,12 @@ def validate(label, target, predictions, baseline=0.5, compute_auc=False,
     else:
         auc_value = 'NA'
 
-    print '(%s) Lift: %0.03g Auc: %s' % (label, lift, auc_value)
+    print ('(%s) Lift: %0.03g Auc: %s' % (label, lift, auc_value))
     if not quiet:
-        print '    Base: %0.03g Acc: %0.03g P(1|t): %0.03g P(0|f): %0.03g' % (
-            baseline, accuracy, prob1_t, prob0_f)
-        print '    Fp/Fn/Tp/Tn p/n/c: %d/%d/%d/%d %d/%d/%d' % (
-            false_pos, false_neg, true_pos, true_neg, pos, neg, len(target))
+        print ('    Base: %0.03g Acc: %0.03g P(1|t): %0.03g P(0|f): %0.03g' % (
+            baseline, accuracy, prob1_t, prob0_f))
+        print ('    Fp/Fn/Tp/Tn p/n/c: %d/%d/%d/%d %d/%d/%d' % (
+            false_pos, false_neg, true_pos, true_neg, pos, neg, len(target)))
     
 
 def _coerce_types(vals):
@@ -271,7 +271,7 @@ def _games(data):
         ardi ardina ayni mac hakkinda iki satira ihtiyacimiz olmuyor
         bir tanesi yeterli.
     """
-    return data[[idx % 2 == 0 for idx in xrange(len(data))]] 
+    return data[[idx % 2 == 0 for idx in range(len(data))]] 
   
 
 def _team_test_prob(target):
@@ -280,7 +280,7 @@ def _team_test_prob(target):
         bir olasilik hesabi yap.
     """
     results = []
-    for idx in range(len(target)/2):
+    for idx in range(int(len(target)/2)):
         game0 = float(target.iloc[idx*2])
         game1 = float(target.iloc[idx*2+1])
         results.append(game0/(game0+game1))
@@ -297,7 +297,7 @@ def extract_predictions(data, predictions):
     teams0 = []
     teams1 = []
     points = []
-    for game in xrange(len(data)/2):
+    for game in range(int(len(data)/2)):
         if data['matchid'].iloc[game*2] != data['matchid'].iloc[game*2+1]:
             raise Exception('Unexpeted match id %d vs %d', (
                                data['matchid'].iloc[game * 2],
@@ -315,7 +315,7 @@ def extract_predictions(data, predictions):
          columns = ['team_name', 'op_team_name', 'predicted'])
 
     expected_winner = []
-    for game in xrange(len(results)):
+    for game in range(len(results)):
         row = results.iloc[game]
         col = 'team_name' if row['predicted'] >= 50 else 'op_team_name' 
         expected_winner.append(row[col])
@@ -324,7 +324,7 @@ def extract_predictions(data, predictions):
 
     if len(points) > 0:
         winners = []
-        for game in xrange(len(results)):
+        for game in range(len(results)):
             row = results.iloc[game]
             point = points[game]
             if point > 1.1:
