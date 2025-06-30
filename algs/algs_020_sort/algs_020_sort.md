@@ -37,7 +37,7 @@ def bubble_sort(l):
 arr = [703, 765, 677, 612, 509, 154, 426, 653, 275, 897, \
        170, 908, 61, 512, 87, 503]
 
-print bubble_sort(arr)
+print (bubble_sort(arr))
 ```
 
 ```
@@ -102,10 +102,10 @@ def quicksort(seq):
     
 array = [97, 200, 100, 101, 211, 107]
 res = quicksort(array)
-print res
+print (res)
 letters = list('KRATELEPUIMQCXOS')
 res = quicksort(letters)
-print res
+print (res)
 ```
 
 ```

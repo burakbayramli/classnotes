@@ -777,6 +777,8 @@ farklı da olabilirdi).
 Sürekli dağılım bazlı HMM matematiği biraz daha farklı, bu konunun
 detayları için [3, sf. 603].
 
+Kodlar [dhmm.py](dhmm.py).
+
 Kaynaklar 
 
 [1] Rabiner, {\em A Tutorial on Hidden Markov Models and Selected Applications in Speech
