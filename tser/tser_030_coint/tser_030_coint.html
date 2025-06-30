@@ -122,8 +122,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;ewc ~ ewa&#39;</span>, data<span class="op">=</span>df).fit()</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>hedgeRatio <span class="op">=</span> results.params[<span class="st">&#39;ewa&#39;</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> hedgeRatio</span></code></pre></div>
-<pre><code>0.962429398685</code></pre>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (hedgeRatio)</span></code></pre></div>
+<pre class="text"><code>0.9624293986852102</code></pre>
 <p>Birleştirince</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;coint&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;ewc&#39;</span>]<span class="op">-</span>hedgeRatio<span class="op">*</span>df[<span class="st">&#39;ewa&#39;</span>]</span>
@@ -184,11 +184,11 @@ yapıldığında da önemli tabii ki). Ayrıca bu test sadece iki değişken
 için işliyor. Daha çok değişken için başka bir yöntem gerekecek.</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyconometrics</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> pyconometrics.cadf(np.matrix(df[<span class="st">&#39;ewa&#39;</span>]).H,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                         np.matrix(df[<span class="st">&#39;ewc&#39;</span>]).H,<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
-<pre><code>{&#39;adf&#39;: -3.6434663488715664, &#39;alpha&#39;: -0.02041081198399386, &#39;nlag&#39;: 1,
-&#39;crit&#39;: matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
-0.15312]]), &#39;nvar&#39;: 1} </code></pre>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (pyconometrics.cadf(np.matrix(df[<span class="st">&#39;ewa&#39;</span>]).H,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                         np.matrix(df[<span class="st">&#39;ewc&#39;</span>]).H,<span class="dv">0</span>,<span class="dv">1</span>))</span></code></pre></div>
+<pre class="text"><code>{&#39;alpha&#39;: np.float64(-0.020410811983993898), &#39;adf&#39;:
+np.float64(-3.6434663488715717), &#39;crit&#39;: matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), &#39;nlag&#39;: 1, &#39;nvar&#39;: 1}</code></pre>
 <p>Bu sonuçları şu şekilde okuyabiliriz; -3.64 değeri %95 seviyesindeki
 değer -3.35’den daha negatiftir (eşik değerleri sırasıyla %99,%95,%90).
 O zaman sıfır hipotezini (null hypothesis) reddederiz, yani yani EWA ve
@@ -196,15 +196,10 @@ EWC’nin %95 kesinlikle koentegre olduğunu söyleyebiliriz.</p>
 <p>Sonuç zaman serisi üzerinde Hurst hesabını yaparsak,</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.tsa.stattools <span class="im">as</span> st</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_mean&#39;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_025_mean&#39;</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hurst </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;hurst&#39;</span>, hurst.hurst(df[<span class="st">&#39;coint&#39;</span>])</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> st.adfuller(df[<span class="st">&#39;coint&#39;</span>],maxlag<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
-<pre><code>hurst 0.418507486699
-(-3.6422479807847292, 0.0050028483243865635, 1, 1498, {&#39;5%&#39;:
-                                %-2.863471337969528, &#39;1%&#39;:
-                                %-3.4347228578139943, &#39;10%&#39;:
-                                %-2.5677982210726897}, 550.21641296353755) </code></pre>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (st.adfuller(df[<span class="st">&#39;coint&#39;</span>],maxlag<span class="op">=</span><span class="dv">1</span>))</span></code></pre></div>
+<pre class="text"><code>(np.float64(-3.6422479807847266), np.float64(0.005002848324386615), 1, 1498, {&#39;1%&#39;: np.float64(-3.4347228578139943), &#39;5%&#39;: np.float64(-2.863471337969528), &#39;10%&#39;: np.float64(-2.5677982210726897)}, np.float64(550.2164129635376))</code></pre>
 <p>Johansen Testi</p>
 <p>Eğer birden fazla zaman serisi arasında koentegrasyon arıyorsak,
 başka bir yöntem gerekli. Bu konuda ilk akla şu gelebilir: regresyon
@@ -219,20 +214,16 @@ hesabı ile tam da bunu gerçekleştiriyor (detaylar için [1, sf.
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> johansen <span class="im">import</span> coint_johansen, print_johan_stats</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> coint_johansen(df[[<span class="st">&#39;ewa&#39;</span>,<span class="st">&#39;ewc&#39;</span>]], <span class="dv">0</span>, <span class="dv">1</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>print_johan_stats(res)</span></code></pre></div>
-<pre><code>trace statistic [ 19.98321869   3.98276124]
+<pre class="text"><code>trace statistic [19.98321869  3.98276124]
 critical vals %90,%95,%99
-r&lt;=0 [ 13.4294  15.4943  19.9349]
-r&lt;=1 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 16.00045745   3.98276124]
+r&lt;=0 [13.4294 15.4943 19.9349]
+r&lt;=1 [2.7055 3.8415 6.6349]
+eigen statistic [16.00045745  3.98276124]
 critical values  %90,%95,%99
-r&lt;=0 [ 12.2971  14.2639  18.52  ]
-r&lt;=1 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.01062437  0.00265519]
-
+r&lt;=0 [12.2971 14.2639 18.52  ]
+r&lt;=1 [2.7055 3.8415 6.6349]
+ozdegerler [0.01062437 0.00265519]
 ozvektorler
-
 [[ 0.74078233 -0.12758778]
  [-0.74218753 -0.08957951]]</code></pre>
 <p>Şimdi üçüncü bir varlık, IGE ekleyelim, ve üçü arasında koentegrasyon
@@ -241,22 +232,18 @@ testi yapalım,</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;ewc&#39;</span>,<span class="st">&#39;ewa&#39;</span>,<span class="st">&#39;ige&#39;</span>]</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>res3 <span class="op">=</span> coint_johansen(df[cols], <span class="dv">0</span>, <span class="dv">1</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>print_johan_stats(res3)</span></code></pre></div>
-<pre><code>trace statistic [ 34.42862022  17.53171895   4.47102054]
+<pre class="text"><code>trace statistic [34.42862022 17.53171895  4.47102054]
 critical vals %90,%95,%99
-r&lt;=0 [ 27.0669  29.7961  35.4628]
-r&lt;=1 [ 13.4294  15.4943  19.9349]
-r&lt;=2 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 16.89690127  13.06069841   4.47102054]
+r&lt;=0 [27.0669 29.7961 35.4628]
+r&lt;=1 [13.4294 15.4943 19.9349]
+r&lt;=2 [2.7055 3.8415 6.6349]
+eigen statistic [16.89690127 13.06069841  4.47102054]
 critical values  %90,%95,%99
-r&lt;=0 [ 18.8928  21.1314  25.865 ]
-r&lt;=1 [ 12.2971  14.2639  18.52  ]
-r&lt;=2 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.01121626  0.00868086  0.00298021]
-
+r&lt;=0 [18.8928 21.1314 25.865 ]
+r&lt;=1 [12.2971 14.2639 18.52  ]
+r&lt;=2 [2.7055 3.8415 6.6349]
+ozdegerler [0.01121626 0.00868086 0.00298021]
 ozvektorler
-
 [[-1.04602749 -0.5796762  -0.26467204]
  [ 0.7599635  -0.11204898 -0.0789828 ]
  [ 0.22330592  0.53159644  0.09515547]]</code></pre>
@@ -275,11 +262,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_coint_05.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_coint_05.png" /></p>
 <div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_stat&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_015_stoc&#39;</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> halflife</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>hf <span class="op">=</span> halflife.halflife(df, <span class="st">&#39;yport&#39;</span>)[<span class="dv">1</span>]</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(df[<span class="st">&#39;yport&#39;</span>], window<span class="op">=</span>hf)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(df[<span class="st">&#39;yport&#39;</span>], window<span class="op">=</span>hf)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> df[<span class="st">&#39;yport&#39;</span>].rolling(window<span class="op">=</span><span class="bu">int</span>(hf)).mean()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> df[<span class="st">&#39;yport&#39;</span>].rolling(<span class="bu">int</span>(hf)).std()</span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># yport evec ile senet carpimi</span></span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># numUnits yport&#39;un Z skoru</span></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(df[<span class="st">&#39;yport&#39;</span>]<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span></code></pre></div>
@@ -302,10 +289,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a h
 <span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_coint_06.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_coint_06.png" /></p>
 <div class="sourceCode" id="cb18"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.123570040726
-Sharpe 1.37987492827</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.12357004072558575
+Sharpe 1.3798749282666087</code></pre>
 <p>Ne kadar para kazanabileceğimizi ölçmek için yine Z skoru yarattık,
 ve bu skora ters oranda alım ve satım farz ediyoruz. Tabii özvektör
 üzerinden birleştirilmiş yeni seri üzerinden Z skoru yarattık, sonra bu
@@ -367,7 +354,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a h
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span>,evec <span class="op">=</span> lin.eig(Sigma)</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">eval</span>)</span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (evec)</span></code></pre></div>
-<pre><code>           ewc        ewa        ige
+<pre class="text"><code>           ewc        ewa        ige
 ewc  21.837037  20.803273  30.010970
 ewa  20.803273  21.615375  28.060908
 ige  30.010970  28.060908  44.363554
@@ -383,7 +370,7 @@ varyansı hesaplarsak,</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.std(np.dot(df[cols], evec[:,<span class="dv">0</span>]))<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.std(np.dot(df[cols], evec[:,<span class="dv">1</span>]))<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.std(np.dot(df[cols], evec[:,<span class="dv">2</span>]))<span class="op">**</span><span class="dv">2</span>)</span></code></pre></div>
-<pre><code>84.47694263816774
+<pre class="text"><code>84.47694263816774
 0.4927291128202164
 2.787750186745372</code></pre>
 <p>Hakikaten de varyansların özdeğer büyüklük sırasına uyduğunu
@@ -416,9 +403,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a h
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfuller(df[<span class="st">&#39;yport0&#39;</span>])[<span class="dv">1</span>])</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfuller(df[<span class="st">&#39;yport1&#39;</span>])[<span class="dv">1</span>])</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfuller(df[<span class="st">&#39;yport2&#39;</span>])[<span class="dv">1</span>])</span></code></pre></div>
-<pre><code>0.32289800956874337
-0.011909826790814142
-0.06403183470108954</code></pre>
+<pre class="text"><code>0.322898009568744
+0.011909826790814027
+0.06403183470109003</code></pre>
 <p>Hakikaten de 0.05’ten küçük olan tek zaman serisi ortadaki, o zaman
 en küçük özdeğere tekabül eden birleştirim durağan bir seri ortaya
 çıkarttı.</p>
@@ -448,17 +435,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a h
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>dfpepko[<span class="st">&#39;retko&#39;</span>] <span class="op">=</span> dfpepko.ko.pct_change()</span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>dfpepko <span class="op">=</span> dfpepko.dropna()</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>c,tval, pval <span class="op">=</span> corr.p_corr(dfpepko.retpep, dfpepko.retko)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> c, <span class="st">&#39;p degeri&#39;</span>, pval</span></code></pre></div>
-<pre><code>0.484740095488 p degeri 0.0</code></pre>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (c, <span class="st">&#39;p degeri&#39;</span>, pval)</span></code></pre></div>
+<pre class="text"><code>0.48474009548752744 p degeri 0.0</code></pre>
 <p>0 seviyesinde p-değeri senetlerin yüksek korelasyona sahip olduğunu
 söylüyor.</p>
 <div class="sourceCode" id="cb31"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyconometrics</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> pyconometrics.cadf(np.matrix(dfpepko.ko).H,</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                         np.matrix(dfpepko.pep).H,<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
-<pre><code>{&#39;adf&#39;: -2.6276464487688465, &#39;alpha&#39;: -0.0013797381503306329, &#39;nlag&#39;: 1,
-&#39;crit&#39;: matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
-0.15312]]), &#39;nvar&#39;: 1} </code></pre>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (pyconometrics.cadf(np.matrix(dfpepko.ko).H,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                         np.matrix(dfpepko.pep).H,<span class="dv">0</span>,<span class="dv">1</span>))</span></code></pre></div>
+<pre class="text"><code>{&#39;alpha&#39;: np.float64(-0.0013666542750326804), &#39;adf&#39;:
+np.float64(-2.6029998443124756), &#39;crit&#39;: matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), &#39;nlag&#39;: 1, &#39;nvar&#39;: 1}</code></pre>
 <p>Koentegrasyon ise -2.62 değeri vermiş, kritik değerler %99,%95,%90
 için gösteriliyor, ve bu değer %90 için olan kritik değerden bile daha
 büyük, yani koentegrasyon ihtimali yüzde 90’dan düşük. Demek ki PEP ve
@@ -468,6 +455,9 @@ regresyondur, serilerden birinin diğerini “açıklaması’’ üzerine
 kurulmuştur. Korelasyon ise aynı tek tek, atomik noktalardaki
 değişimlerin aynı yönde olup olmadığının istatistiği bir anlamda. Bu iki
 hesap çok farklı şeyleri anlatıyorlar.</p>
+<p>Kodlar <a href="corr.py">corr.py</a>, <a
+href="johansen.py">johansen.py</a>, <a
+href="pyconometrics.py">pyconometrics.py</a>.</p>
 <p>Kaynaklar</p>
 <p>[1] Maddala, <em>Unit Roots, Cointegration, and Structural
 Change</em></p>

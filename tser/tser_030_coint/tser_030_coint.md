@@ -41,11 +41,11 @@ plt.savefig('tser_coint_02.png')
 import statsmodels.formula.api as smf
 results = smf.ols('ewc ~ ewa', data=df).fit()
 hedgeRatio = results.params['ewa']
-print hedgeRatio
+print (hedgeRatio)
 ```
 
-```
-0.962429398685
+```text
+0.9624293986852102
 ```
 
 Birleştirince 
@@ -111,14 +111,14 @@ işliyor. Daha çok değişken için başka bir yöntem gerekecek.
 
 ```python
 import pyconometrics
-print pyconometrics.cadf(np.matrix(df['ewa']).H,
-                         np.matrix(df['ewc']).H,0,1)
+print (pyconometrics.cadf(np.matrix(df['ewa']).H,
+                         np.matrix(df['ewc']).H,0,1))
 ```
 
-```
-{'adf': -3.6434663488715664, 'alpha': -0.02041081198399386, 'nlag': 1,
-'crit': matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
-0.15312]]), 'nvar': 1} 
+```text
+{'alpha': np.float64(-0.020410811983993898), 'adf':
+np.float64(-3.6434663488715717), 'crit': matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), 'nlag': 1, 'nvar': 1}
 ```
 
 Bu sonuçları şu şekilde okuyabiliriz; -3.64 değeri \%95 seviyesindeki değer
@@ -130,18 +130,13 @@ Sonuç zaman serisi üzerinde Hurst hesabını yaparsak,
 
 ```python
 import statsmodels.tsa.stattools as st
-import sys; sys.path.append('../tser_mean')
+import sys; sys.path.append('../tser_025_mean')
 import hurst 
-print 'hurst', hurst.hurst(df['coint'])
-print st.adfuller(df['coint'],maxlag=1)
+print (st.adfuller(df['coint'],maxlag=1))
 ```
 
-```
-hurst 0.418507486699
-(-3.6422479807847292, 0.0050028483243865635, 1, 1498, {'5%':
-                                %-2.863471337969528, '1%':
-                                %-3.4347228578139943, '10%':
-                                %-2.5677982210726897}, 550.21641296353755) 
+```text
+(np.float64(-3.6422479807847266), np.float64(0.005002848324386615), 1, 1498, {'1%': np.float64(-3.4347228578139943), '5%': np.float64(-2.863471337969528), '10%': np.float64(-2.5677982210726897)}, np.float64(550.2164129635376))
 ```
 
 Johansen Testi
@@ -160,21 +155,17 @@ res = coint_johansen(df[['ewa','ewc']], 0, 1)
 print_johan_stats(res)
 ```
 
-```
-trace statistic [ 19.98321869   3.98276124]
+```text
+trace statistic [19.98321869  3.98276124]
 critical vals %90,%95,%99
-r<=0 [ 13.4294  15.4943  19.9349]
-r<=1 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 16.00045745   3.98276124]
+r<=0 [13.4294 15.4943 19.9349]
+r<=1 [2.7055 3.8415 6.6349]
+eigen statistic [16.00045745  3.98276124]
 critical values  %90,%95,%99
-r<=0 [ 12.2971  14.2639  18.52  ]
-r<=1 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.01062437  0.00265519]
-
+r<=0 [12.2971 14.2639 18.52  ]
+r<=1 [2.7055 3.8415 6.6349]
+ozdegerler [0.01062437 0.00265519]
 ozvektorler
-
 [[ 0.74078233 -0.12758778]
  [-0.74218753 -0.08957951]]
 ```
@@ -188,23 +179,19 @@ res3 = coint_johansen(df[cols], 0, 1)
 print_johan_stats(res3)
 ```
 
-```
-trace statistic [ 34.42862022  17.53171895   4.47102054]
+```text
+trace statistic [34.42862022 17.53171895  4.47102054]
 critical vals %90,%95,%99
-r<=0 [ 27.0669  29.7961  35.4628]
-r<=1 [ 13.4294  15.4943  19.9349]
-r<=2 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 16.89690127  13.06069841   4.47102054]
+r<=0 [27.0669 29.7961 35.4628]
+r<=1 [13.4294 15.4943 19.9349]
+r<=2 [2.7055 3.8415 6.6349]
+eigen statistic [16.89690127 13.06069841  4.47102054]
 critical values  %90,%95,%99
-r<=0 [ 18.8928  21.1314  25.865 ]
-r<=1 [ 12.2971  14.2639  18.52  ]
-r<=2 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.01121626  0.00868086  0.00298021]
-
+r<=0 [18.8928 21.1314 25.865 ]
+r<=1 [12.2971 14.2639 18.52  ]
+r<=2 [2.7055 3.8415 6.6349]
+ozdegerler [0.01121626 0.00868086 0.00298021]
 ozvektorler
-
 [[-1.04602749 -0.5796762  -0.26467204]
  [ 0.7599635  -0.11204898 -0.0789828 ]
  [ 0.22330592  0.53159644  0.09515547]]
@@ -228,11 +215,11 @@ plt.savefig('tser_coint_05.png')
 ![](tser_coint_05.png)
 
 ```python
-import sys; sys.path.append('../tser_stat')
+import sys; sys.path.append('../tser_015_stoc')
 import halflife
 hf = halflife.halflife(df, 'yport')[1]
-data_mean = pd.rolling_mean(df['yport'], window=hf)
-data_std = pd.rolling_std(df['yport'], window=hf)
+data_mean = df['yport'].rolling(window=int(hf)).mean()
+data_std = df['yport'].rolling(int(hf)).std()
 # yport evec ile senet carpimi
 # numUnits yport'un Z skoru
 df['numUnits'] = -1*(df['yport']-data_mean) / data_std
@@ -260,13 +247,13 @@ plt.savefig('tser_coint_06.png')
 ![](tser_coint_06.png)
 
 ```python
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR 0.123570040726
-Sharpe 1.37987492827
+```text
+APR 0.12357004072558575
+Sharpe 1.3798749282666087
 ```
 
 Ne kadar para kazanabileceğimizi ölçmek için yine Z skoru yarattık, ve bu
@@ -327,7 +314,7 @@ print (eval)
 print (evec)
 ```
 
-```
+```text
            ewc        ewa        ige
 ewc  21.837037  20.803273  30.010970
 ewa  20.803273  21.615375  28.060908
@@ -348,7 +335,7 @@ print (np.std(np.dot(df[cols], evec[:,1]))**2)
 print (np.std(np.dot(df[cols], evec[:,2]))**2)
 ```
 
-```
+```text
 84.47694263816774
 0.4927291128202164
 2.787750186745372
@@ -391,10 +378,10 @@ print (adfuller(df['yport1'])[1])
 print (adfuller(df['yport2'])[1])
 ```
 
-```
-0.32289800956874337
-0.011909826790814142
-0.06403183470108954
+```text
+0.322898009568744
+0.011909826790814027
+0.06403183470109003
 ```
 
 Hakikaten de 0.05'ten küçük olan tek zaman serisi ortadaki, o zaman
@@ -434,11 +421,11 @@ dfpepko['retpep'] = dfpepko.pep.pct_change()
 dfpepko['retko'] = dfpepko.ko.pct_change()
 dfpepko = dfpepko.dropna()
 c,tval, pval = corr.p_corr(dfpepko.retpep, dfpepko.retko)
-print c, 'p degeri', pval
+print (c, 'p degeri', pval)
 ```
 
-```
-0.484740095488 p degeri 0.0
+```text
+0.48474009548752744 p degeri 0.0
 ```
 
 0 seviyesinde p-değeri senetlerin yüksek korelasyona sahip olduğunu
@@ -446,14 +433,14 @@ söylüyor.
 
 ```python
 import pyconometrics
-print pyconometrics.cadf(np.matrix(dfpepko.ko).H,
-                         np.matrix(dfpepko.pep).H,0,1)
+print (pyconometrics.cadf(np.matrix(dfpepko.ko).H,
+                         np.matrix(dfpepko.pep).H,0,1))
 ```
 
-```
-{'adf': -2.6276464487688465, 'alpha': -0.0013797381503306329, 'nlag': 1,
-'crit': matrix([[-3.88031, -3.35851, -3.03798, -1.01144, -0.65334,
-0.15312]]), 'nvar': 1} 
+```text
+{'alpha': np.float64(-0.0013666542750326804), 'adf':
+np.float64(-2.6029998443124756), 'crit': matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), 'nlag': 1, 'nvar': 1}
 ```
 
 Koentegrasyon ise -2.62 değeri vermiş, kritik değerler \%99,\%95,\%90 için
@@ -466,6 +453,8 @@ regresyondur, serilerden birinin diğerini "açıklaması'' üzerine
 kurulmuştur. Korelasyon ise aynı tek tek, atomik noktalardaki değişimlerin
 aynı yönde olup olmadığının istatistiği bir anlamda. Bu iki hesap çok
 farklı şeyleri anlatıyorlar.
+
+Kodlar [corr.py](corr.py), [johansen.py](johansen.py), [pyconometrics.py](pyconometrics.py).
 
 Kaynaklar 
 

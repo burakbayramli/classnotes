@@ -8,10 +8,10 @@ from numpy import *
 
 def cadf(inMatX, inMatY, p, nlags):
     if (p < -1):
-        print "Error: p cannot be less than -1"
+        print ("Error: p cannot be less than -1")
     numObs = inMatX.shape[0]
     if ((numObs - 2*nlags + 1) < 1):
-        print "Error nlags is too large in cadf, negative degrees of freedom"
+        print ("Error nlags is too large in cadf, negative degrees of freedom")
         
     inMatX = detrend(inMatX,p)
     inMatY = detrend(inMatY,p)
