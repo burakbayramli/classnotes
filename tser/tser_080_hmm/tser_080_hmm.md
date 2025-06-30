@@ -193,11 +193,11 @@ gizli konumların tüm permutasyonlarının düşünelim,
 ```python
 import itertools
 l = list(itertools.permutations([1, 2, 3, 4]))[:10]
-for x in l: print x
-print '...'
+for x in l: print (x)
+print ('...')
 ```
 
-```
+```text
 (1, 2, 3, 4)
 (1, 2, 4, 3)
 (1, 3, 2, 4)
@@ -265,10 +265,13 @@ b = np.array([[1/6., 1/6., 1/6., 1/6., 1/6., 1/6.],
 pi = np.array([0.5, 0.5])
 
 hmm = dhmm.HMM(2,6,pi,a,b)
-print hmm.viterbi_path(rolls)
+print (hmm.viterbi_path(rolls))
 ```
 
-```
+```text
+Shape of self.obsmat after init: (2, 6)
+Shape of self.transmat after init: (2, 2)
+Shape of self.prior after init: (2,)
 [0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
  1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 ```
@@ -311,10 +314,13 @@ b = np.array([[0.5,0.5],[0.8,0.2],[0.2,0.8]])
 pi = np.array([0.5, 0, 0.5])
 
 hmm = dhmm.HMM(3,2,pi,a,b)
-print hmm.viterbi_path([0,1,1])
+print (hmm.viterbi_path([0,1,1]))
 ```
 
-```
+```text
+Shape of self.obsmat after init: (3, 2)
+Shape of self.transmat after init: (3, 3)
+Shape of self.prior after init: (3,)
 [0 2 0]
 ```
 
@@ -341,24 +347,278 @@ hesaplayabilecegiz. Kumarhane örneğine dönelim, yeni bir HMM yaratalım, ve
 dışarıdan bir model tanımlamadan, onu direk veri ile eğitelim.
 
 ```python
-hmm2 = dhmm.HMM(2,6)
-hmm2.train([rolls],iter=20)
-print hmm2.viterbi_path(rolls)
-print 'aic', hmm2.aic()
-print hmm2.transmat
-print hmm2.prior
-print hmm2.obsmat
+a2 = np.array([[0.1,0.4,0.4],[0.2,0.3,0.5],[0.6,0.3,0.1]])
+b2 = np.array([[1/6.,1/6.,1/6.,1/6.,1/6.,1/6.],
+               [1/10.,1/10.,1/10.,1/10.,1/10.,1/2.],
+               [1/8.,1/8.,1/8.,1/8.,1/8.,1/8.]])
+pi2 = np.array([0.5,0.2,0.3])
+rolls2 = [1,2,4,5,5,2,6,4,6,2,1,4,6,1,4,6,1,3,6,1,3,6,\
+          6,6,1,6,6,4,6,6,1,6,3,6,6,1,6,3,6,6,1,6,3,6,1,\
+          6,5,1,5,6,1,5,1,1,5,1,4,6,1,2,3,5,6,2,3,4,4]
+rolls2 = np.array(rolls2)-1
+
+# Add debug prints to confirm the shapes before initialization
+print(f"DEBUG: Shape of 'a2' before hmm2 init: {np.shape(a2)}")
+print(f"DEBUG: Shape of 'b2' before hmm2 init: {np.shape(b2)}")
+print(f"DEBUG: Shape of 'pi2' before hmm2 init: {np.shape(pi2)}")
+
+# Use the new variables for hmm2
+hmm2 = dhmm.HMM(3, 6, pi2, a2, b2) # Pass the new variables
+print(f"DEBUG: hmm2.prior before train: {hmm2.prior}")
+print(f"DEBUG: type(hmm2.prior) before train: {type(hmm2.prior)}")
+hmm2.train([rolls2],iter=20) # Use rolls2 here
+print (hmm2.viterbi_path(rolls))
+print ('aic', hmm2.aic())
+print (hmm2.transmat)
+print (hmm2.prior)
+print (hmm2.obsmat)
 ```
 
-```
-[0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
- 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
-aic 233.31799296
-[[ 0.97008754  0.02991246]
- [ 0.32816368  0.67183632]]
-[ 0.5  0.5]
-[[ 0.12184793  0.23208224  0.19549656  0.10143301  0.27422243  0.07491783]
- [ 0.18905143  0.2018225   0.17782606  0.17010257  0.01788689  0.24331055]]
+```text
+DEBUG: Shape of 'a2' before hmm2 init: (3, 3)
+DEBUG: Shape of 'b2' before hmm2 init: (3, 6)
+DEBUG: Shape of 'pi2' before hmm2 init: (3,)
+Shape of self.obsmat after init: (3, 6)
+Shape of self.transmat after init: (3, 3)
+Shape of self.prior after init: (3,)
+DEBUG: hmm2.prior before train: [0.5 0.2 0.3]
+DEBUG: type(hmm2.prior) before train: <class 'numpy.ndarray'>
+dhmm_em: prior at start: [0.5 0.2 0.3]
+Shape of emission_matrix at start of dhmm_em: (3, 6)
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 2.0608551  10.14930143  6.99962993]
+ [ 5.56696363  9.29166847 11.67271293]
+ [11.43694417  7.20878736  1.61313697]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 5.5321326   1.70482453  2.6112982   3.05089483  2.54744945  4.16575774]
+ [ 4.03268235  1.39589882  1.80014433  2.09477351  1.94254    15.53649922]
+ [ 6.43518505  1.89927665  2.58855747  2.85433166  2.51001055  4.29774304]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 2.01274751 10.38353432  6.76968643]
+ [ 5.71038183  8.90613699 11.93280042]
+ [11.26803967  7.44393405  1.57273878]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 5.31424165  1.63967966  2.7129312   3.2173627   2.59484706  4.07641105]
+ [ 3.73071271  1.48366009  1.71887708  2.05299984  2.06193754 15.77638965]
+ [ 6.95504563  1.87666025  2.56819171  2.72963746  2.34321541  4.1471993 ]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.94791604 10.71383697  6.40892947]
+ [ 5.82544627  8.4710943  12.30948197]
+ [11.14911624  7.64772506  1.52645367]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 5.03832912  1.60417404  2.82697522  3.41240522  2.6629127   3.92576965]
+ [ 3.34020723  1.59127772  1.60575796  1.97852206  2.21388838 16.15190195]
+ [ 7.62146366  1.80454824  2.56726682  2.60907272  2.12319892  3.9223284 ]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.86137074 11.18179807  5.87912151]
+ [ 5.88778705  7.96943652 12.85094034]
+ [11.09583731  7.80792343  1.46578503]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 4.63598248  1.60487291  2.9591339   3.66039413  2.75789403  3.71631438]
+ [ 2.86351266  1.72468564  1.45265212  1.86183664  2.40261456 16.67642115]
+ [ 8.50050485  1.67044145  2.58821399  2.47776924  1.83949141  3.60726446]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.74293302 11.8108341   5.14865938]
+ [ 5.84532671  7.3940254  13.61205411]
+ [11.16220098  7.90819602  1.37577028]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 4.03877853  1.6448022   3.11622193  3.98750275  2.88247814  3.46066271]
+ [ 2.30400457  1.88755829  1.25238125  1.69326258  2.62831558 17.35574026]
+ [ 9.6572169   1.4676395   2.63139682  2.31923467  1.48920627  3.18359704]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.58360272 12.57543931  4.24722894]
+ [ 5.62600798  6.77103755 14.61902046]
+ [11.41348554  7.93339507  1.23078242]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 3.23259891  1.70479951  3.29553084  4.40078041  3.02005885  3.20034636]
+ [ 1.69031736  2.08006125  1.00794374  1.47435347  2.88130523 18.14793067]
+ [11.07708373  1.21513924  2.69652542  2.12486612  1.09863592  2.65172297]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.39736004 13.34730545  3.30777234]
+ [ 5.19968287  6.19805543 15.79643496]
+ [11.82815976  7.91313106  1.01209807]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 2.35442829  1.72067762  3.45857978  4.84102207  3.11904076  3.02862928]
+ [ 1.11061999  2.31210443  0.74571881  1.23691043  3.14461607 18.90881137]
+ [12.53495172  0.96721795  2.79570141  1.9220675   0.73634318  2.06255935]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.23502957 13.93024081  2.48000049]
+ [ 4.64107338  5.80917657 16.97082252]
+ [12.228385    7.95243633  0.75283533]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 1.64028997  1.60743429  3.52341042  5.18007963  3.12341856  3.05681146]
+ [ 0.68218777  2.62027211  0.50828624  1.03648827  3.40836454 19.4362755 ]
+ [13.67752227  0.7722936   2.96830334  1.7834321   0.46821689  1.50691304]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.13538401 14.24701768  1.80210542]
+ [ 4.04525265  5.61248984 18.03155017]
+ [12.48396931  8.11845782  0.5237731 ]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 1.20294197  1.33644821  3.43394889  5.33586642  3.04221529  3.31851936]
+ [ 0.4364618   3.03090392  0.3186357   0.89943362  3.66104715 19.63148391]
+ [14.36059623  0.63264787  3.24741541  1.76469997  0.29673756  1.04999672]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.08942932 14.3934306   1.2496213 ]
+ [ 3.44400889  5.46914975 18.98087385]
+ [12.66599916  8.34899537  0.35849176]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 0.99762606  0.96870382  3.21648409  5.32291744  2.94127617  3.75330246]
+ [ 0.31366284  3.50046026  0.17789374  0.80821705  3.87372521 19.53761664]
+ [14.6887111   0.53083592  3.60562217  1.86886551  0.18499862  0.7090809 ]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.07074123 14.48674745  0.82106024]
+ [ 2.84425871  5.25432577 19.83019016]
+ [12.91046472  8.53652536  0.24568636]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 0.93176054  0.60950432  2.9507612   5.18546385  2.8789615   4.26915086]
+ [ 0.24970889  3.92564219  0.08576928  0.74022427  4.01576209 19.26049185]
+ [14.81853056  0.46485349  3.96346952  2.07431188  0.10527641  0.47035729]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.06305667 14.58346196  0.52371086]
+ [ 2.26045807  4.94191824 20.56552993]
+ [13.27920869  8.61585332  0.16680228]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[ 0.92793708  0.33366752  2.71747066  4.96632416  2.87513034  4.78221689]
+ [ 0.20921305  4.21988516  0.0361133   0.69021981  4.07555129 18.91025089]
+ [14.86284987  0.44644732  4.24641604  2.34345603  0.04931837  0.30753222]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.06125837 14.6955677   0.33787771]
+ [ 1.7256606   4.57183783 21.1743683 ]
+ [13.72733542  8.59451662  0.11157745]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.38866269e-01 1.56415810e-01 2.55630851e+00 4.72103092e+00
+  2.91237161e+00 5.22926561e+00]
+ [1.78911906e-01 4.36109296e+00 1.39085188e-02 6.63992623e-01
+  4.07056351e+00 1.85734526e+01]
+ [1.48822218e+01 4.82491228e-01 4.42978297e+00 2.61497646e+00
+  1.70648825e-02 1.97281757e-01]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.06090965 14.81858953  0.22664149]
+ [ 1.28886402  4.18881376 21.65635387]
+ [14.1565464   8.52920036  0.07408093]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.45157989e-01 6.00508937e-02 2.46572782e+00 4.50367165e+00
+  2.95698853e+00 5.57472406e+00]
+ [1.55454310e-01 4.37236748e+00 5.14804459e-03 6.64064211e-01
+  4.03900221e+00 1.83005674e+01]
+ [1.48993877e+01 5.67581629e-01 4.52912414e+00 2.83226414e+00
+  4.00925371e-03 1.24708538e-01]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.05389707 14.94573433  0.15853434]
+ [ 0.98035425  3.82207711 22.02381495]
+ [14.49576928  8.47048363  0.04933505]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.45888767e-01 1.80895028e-02 2.43058060e+00 4.33316572e+00
+  2.98498069e+00 5.81731552e+00]
+ [1.37431098e-01 4.29594254e+00 1.89790667e-03 6.85579319e-01
+  4.01439093e+00 1.81030533e+01]
+ [1.49166801e+01 6.85967961e-01 4.56752149e+00 2.98125496e+00
+  6.28378173e-04 7.96312118e-02]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[ 1.03206432 15.07399949  0.11436162]
+ [ 0.7906072   3.4874602  22.30048809]
+ [14.7338035   8.43408328  0.03313231]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.46281121e-01 4.25309467e-03 2.43648867e+00 4.19604237e+00
+  2.99170331e+00 5.98170649e+00]
+ [1.22935541e-01 4.17730381e+00 7.12275894e-04 7.21127708e-01
+  4.00822713e+00 1.79652365e+01]
+ [1.49307833e+01 8.18443092e-01 4.56279905e+00 3.08282992e+00
+  6.95618190e-05 5.30570110e-02]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[9.89935230e-01 1.52070370e+01 8.40204024e-02]
+ [6.90463281e-01 3.18452397e+00 2.25133755e+01]
+ [1.48956551e+01 8.41260214e+00 2.23872731e-02]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.49711911e-01 8.05873456e-04 2.47114058e+00 4.07254549e+00
+  2.98411660e+00 6.09773322e+00]
+ [1.10031350e-01 4.04844206e+00 2.75275153e-04 7.64943827e-01
+  4.01587751e+00 1.78645931e+01]
+ [1.49402567e+01 9.50752066e-01 4.52858414e+00 3.16251068e+00
+  5.88809207e-06 3.76736558e-02]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[9.24079275e-01 1.53530792e+01 6.23095154e-02]
+ [6.55067290e-01 2.89818625e+00 2.26856772e+01]
+ [1.50113266e+01 8.39517713e+00 1.50975689e-02]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.56731487e-01 1.29019708e-04 2.52485805e+00 3.95038318e+00
+  2.97012757e+00 6.18824383e+00]
+ [9.74718776e-02 3.92254143e+00 1.09941372e-04 8.13346489e-01
+  4.02987203e+00 1.77831009e+01]
+ [1.49457966e+01 1.07732955e+00 4.47503201e+00 3.23627033e+00
+  4.02725113e-07 2.86553089e-02]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[8.32135053e-01 1.55220651e+01 4.63712945e-02]
+ [6.70980001e-01 2.60503177e+00 2.28350535e+01]
+ [1.51034152e+01 8.37490033e+00 1.00476284e-02]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.66796955e-01 1.82908085e-05 2.59155022e+00 3.82447135e+00
+  2.95440729e+00 6.26928618e+00]
+ [8.47641029e-02 3.80042268e+00 4.52806644e-05 8.63674804e-01
+  4.04559269e+00 1.77074977e+01]
+ [1.49484389e+01 1.19955903e+00 4.40840450e+00 3.31185384e+00
+  2.28394974e-08 2.32161219e-02]]
+mk_stochastic input T shape: (3, 3)
+mk_stochastic input T content:
+[[7.13148971e-01 1.57250243e+01 3.44745828e-02]
+ [7.34117802e-01 2.27841244e+00 2.29737620e+01]
+ [1.51876432e+01 8.34690848e+00 6.50827202e-03]]
+mk_stochastic input T shape: (3, 6)
+mk_stochastic input T content:
+[[9.79380303e-01 2.39736990e-06 2.66843995e+00 3.69367047e+00
+  2.93929592e+00 6.35412091e+00]
+ [7.18940550e-02 3.67826440e+00 1.91283254e-05 9.13374301e-01
+  4.06070408e+00 1.76260893e+01]
+ [1.49487256e+01 1.32173320e+00 4.33154093e+00 3.39295523e+00
+  1.07652183e-09 1.97898248e-02]]
+[0 0 1 2 0 2 0 1 2 1 2 0 2 1 2 0 1 2 0 1 2 0 1 1 1 2 1 1 2 1 1 2 1 2 1 1 2
+ 1 2 1 1 2 1 2 1 2 1 2 0 2 1 2 0 2 0 1 2 0 1 2 0 2 0 1 1 2 0]
+aic 244.32189063865465
+[[0.1 0.4 0.4]
+ [0.2 0.3 0.5]
+ [0.6 0.3 0.1]]
+[0.5 0.2 0.3]
+[[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667]
+ [0.1        0.1        0.1        0.1        0.1        0.5       ]
+ [0.125      0.125      0.125      0.125      0.125      0.125     ]]
 ```
 
 Saklı konum geçişleri aynı çıktı! Gerçi eğitimi birkaç kez işletmek gerekti,
@@ -515,161 +775,7 @@ geçiş zinciri aynı, ki bu durum modele uygun, fakat saklı zincir biraz daha
 farklı da olabilirdi).
 
 Sürekli dağılım bazlı HMM matematiği biraz daha farklı, bu konunun
-detayları için [3, sf. 603]. Bu tür HMM hesapları için `mhmm`
-modülünü paylaştık. Bu modülle salım dağılımlarını hem çok boyutlu
-Gaussian, hem de her konum için çok boyutlu *birkaç* Gaussian karışımı
-olarak modelleyebiliriz. 
-
-Bu modül ile [4, sf. 50]'de gösterilen deprem örneğini çözebiliriz.
-
-```python
-import pandas as pd
-df = pd.read_csv('earthquakes.txt',sep='\s*',header=None,index_col=0)
-data = df[1]
-data.plot()
-plt.title('Depremler')
-plt.savefig('tser_hmm_04.png')
-```
-
-![](tser_hmm_04.png)
-
-Üstteki grafikte dünyada her sene kaç tane büyük (Richter ölçeği 7 ve
-üzeri) deprem olduğu gösteriliyor. Eşit büyüklükteki zaman aralıklarında
-vuku bulan olayların sayısı çoğunlukla Poisson ile modellenir, ki [4]
-problemi böyle çözmüş. Gaussian karışımları ile herhangi bir dağılımı
-yaklaşıklayabileceğimizi biliyoruz, o zaman tek boyutlu iki Gaussian
-karışımı üzerinden salımları modelleyebiliriz.  Kaç tane saklı konum
-olmalı? [4]'te 2 ve 3 denenmiş; 2 konumlu durum depremlerin düşük seviyeli
-ya da yüksek seviyeli zaman bloklarında meydana geldiği şeklinde
-görülebilir. 3 konum veriyi düşük, orta, yüksek olarak ayırır. Bu
-modellerden hangisi daha iyidir?
-
-```python
-import mhmm
-c=2
-prior0 = np.ones(c) * 1/c
-transmat0, _ = mhmm.mk_stochastic(np.random.rand(c,c))
-d = np.reshape(data,(1,len(data),1))
-hmm = mhmm.HMM(n_components=c, n_mix=2, startprob=prior0, 
-               transmat=transmat0, covariance_type='diag')        
-hmm.fit(dd)
-
-print 'aic', hmm.aic()        
-print hmm.score(d)
-print hmm.transmat_
-```
-
-```
-(4, 1)
-iteration 1, loglik = -344.981925
-iteration 2, loglik = -339.666685
-iteration 3, loglik = -338.222636
-aic 696.445271513
-[-337.77961902]
-[[ 0.92211706  0.07788294]
- [ 0.06461021  0.93538979]]
-```
-
-```python
-c=3
-prior0 = np.ones(c) * 1/c
-transmat0, _ = mhmm.mk_stochastic(np.random.rand(c,c))
-d = np.reshape(data,(1,len(data),1))
-hmm = mhmm.HMM(n_components=c, n_mix=2, startprob=prior0, 
-               transmat=transmat0, covariance_type='diag')        
-hmm.fit(d)
-print 'aic', hmm.aic()        
-print hmm.score(d)
-print hmm.transmat_
-```
-
-```
-(6, 1)
-iteration 1, loglik = -363.687193
-iteration 2, loglik = -355.604032
-iteration 3, loglik = -351.994401
-iteration 4, loglik = -347.108994
-iteration 5, loglik = -341.249047
-iteration 6, loglik = -336.556782
-iteration 7, loglik = -333.417138
-aic 702.834275264
-[-331.17921244]
-[[ 0.85777432  0.10857336  0.03365233]
- [ 0.16314564  0.70421656  0.1326378 ]
- [ 0.05122129  0.16358917  0.78518954]]
-```
-
-Her iki örnek için geçiş matrisi [4, sf. 51]'de gösterilen sonuçlara
-oldukça yakın çıktı. AIC sonuçlarına göre 2 saklı konumlu model 3 saklı
-modelliden biraz daha iyi gibi duruyor. AIC değerleri de [4. sf. 91]'de
-raporlanan değerlere oldukça yakın.
-
-Ses Tanımak
-
-Bir ses kaydı zaman dilimlerinin birbiri ile bağlantılı olduğu bir zaman
-serisine örnektir. `rec.py` ile istediğimiz sesi bilgisayarımızın
-mikrofonu ile kaydedebiliriz. Bizim önceden kaydettiğimiz bazı sesler altta,
-
-```python
-import scipy.io.wavfile
-from scikits.talkbox.features import mfcc
-
-sample_rate, computer = scipy.io.wavfile.read('computer.wav')
-sample_rate, emacs = scipy.io.wavfile.read('emacs.wav')
-sample_rate, nothing = scipy.io.wavfile.read('nothing.wav')
-```
-
-```python
-plt.plot(computer)
-plt.title('Computer')
-plt.savefig('tser_hmm_05.png')
-plt.hold(False)
-plt.plot(emacs)
-plt.title('Emacs')
-plt.savefig('tser_hmm_06.png')
-plt.hold(False)
-plt.plot(nothing)
-plt.title('Nothing')
-plt.savefig('tser_hmm_07.png')
-plt.hold(False)
-```
-
-![](tser_hmm_05.png)
-![](tser_hmm_06.png)
-![](tser_hmm_07.png)
-
-HMM'ler ses tanıma için biçilmiş kaftan. Fakat genellikle üstteki zaman
-serileri direk oldukları şekilde kullanılmazlar. Ses kayıtları belli
-dilimlere bölünerek, o bölümler üzerinde özellik çıkarımı (feature
-extraction) uygulanır. Bu özelliklerden en popüleri Mel Frekansı Cepstral
-Katsayıları (MFCC). Alttaki çağrıyla 2 saniyelik kaydımız üzerinde MFCC
-hesabını görüyoruz,
-
-```python
-from scikits.talkbox.features import mfcc
-ceps_c, mspec, spec = mfcc(emacs)
-print 'ses kaydi', len(emacs) , 'boyut', ceps_c.shape
-print len(emacs) / 549
-```
-
-```
-ses kaydi 88064 boyut (549, 13)
-160
-```
-
-Eğer HMM'ses tanımak için kullanmak istiyorsak HMM eğitimini üstte
-boyutları gösterilen MFCC vektör dizisi üzerinde uygularız. HMM salımı 13
-boyutlu bir Gaussian karışımı olur (karışım sayısı uygulamaya göre farklı
-olabilir). Optimal saklı konum sayısı AIC üzerinden saptanır. Her bilinen
-ses kaydı için ayrı bir HMM eğitilir, mesela 'emacs' kaydı için bir HMM,
-'computer' sesi için ayrı bir HMM... Nihai uygulama ise mikrofondan gelen
-sesleri 2. saniyelik kısımlara bölerek üzerlerinde yine aynı MFCC hesabını
-yapar, ve bu vektör dizisinin ne kadar olası olduğunu her HMM'e
-"sorar''. Hangi HMM daha iyi olurluk rapor ediyorsa ses o etikete aittir.
-
-Ödev: Ekteki `mic.py`'da mikrofondan sürekli gelen verilerin işlenmesi
-gösteriliyor, bu örnek üstteki teknik ile HMM için uzatılabilir.
-
+detayları için [3, sf. 603].
 
 Kaynaklar 
 
@@ -685,7 +791,3 @@ Recoognition}
 [5] Bayramlı, Lineer Cebir, *Ders 21*
 
 [6] Bayramlı, Bilgisayar Bilim, *Dinamik Programlama*
-
-
-
-

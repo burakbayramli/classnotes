@@ -64,7 +64,7 @@ def normalize(A,dim=None):
 
     '''
     if dim is None:
-        z=sum(A.flatten(1))
+        z=sum(A.flatten('C'))
         s=1.0*(z+(z==0.0))
         M=A/s
     elif dim==1:
@@ -79,45 +79,26 @@ def normalize(A,dim=None):
     return [M,s]
 
 
+# In dhmm.py, inside mk_stochastic function
 def mk_stochastic(T):
-    '''
-    mk_stochastic: Ensure that the argument is a stochastic matrix, sum over last dimension is 1
-    Inputs
-    ------
-    A: Array of type floating point
-   
-    Outputs
-    -------
-    M: Normalized Array
-        
-    Examples
-    --------
+    print(f"mk_stochastic input T shape: {np.shape(T)}") # Add this line
+    print(f"mk_stochastic input T content:\n{T}") # Add this line
     
-    Example 1: Making a vector stochastic 
-    normalized_array=mk_stochastic(np.array([1,2,3]))
-    
-    Output
-    
-    normalized_array= array([ 0.16666667,  0.33333333,  0.5])
-    
-    Example 2: Making a 2d matrix stochastic 
-    [normalized_array, normalizing_constant]=mk_stochastic(np.array([[1,2,3],[4,5,6]]))
-    
-    Output
-    normalized_array=array([[ 0.16666667,  0.33333333,  0.5       ],
-       [ 0.26666667,  0.33333333,  0.4       ]])
-
-    '''
     if ((np.ndim(T)==2) and (T.shape[0]==1 or T.shape[1]==1)) or np.ndim(T)==1: # isvector
         [out,Z] = normalize(T);
     else:
         out=np.zeros((np.shape(T)))
         number_of_rows=np.shape(T)[0]
-        for row in range(0,number_of_rows):            
-            sum_row=1.0*np.sum(T[row,:])           
-            a=T[row,:]
-            b=a/sum_row            
-            out[row,:]=b
+        for row in range(0,number_of_rows):
+            sum_row=1.0*np.sum(T[row,:])
+            if sum_row == 0:
+                # Handle the case where the row sum is zero.
+                # Assign a uniform distribution or a very small positive value.
+                out[row,:] = np.ones(np.shape(T)[1]) / np.shape(T)[1]
+            else:
+                a=T[row,:]
+                b=a/sum_row
+                out[row,:]=b
     return out
         
 
@@ -221,28 +202,28 @@ def forward_backward(prior,transition_matrix,emission_matrix,observation_vector,
       
 
 def evaluate_pdf_cond_multinomial(data, obsmat):
-'''% EVAL_PDF_COND_MULTINOMIAL Evaluate pdf of conditional multinomial 
-% function B = eval_pdf_cond_multinomial(data, obsmat)
-%
-% Notation: Y = observation (O values), Q = conditioning variable (K values)
-%
-% Inputs:
-% data(t) = t'th observation - must be an integer in {1,2,...,K}: cannot be 0!
-% obsmat(i,o) = Pr(Y(t)=o | Q(t)=i)
-%
-% Output:
-% B(i,t) = Pr(y(t) | Q(t)=i)
+    '''
+    % EVAL_PDF_COND_MULTINOMIAL Evaluate pdf of conditional multinomial 
+    % function B = eval_pdf_cond_multinomial(data, obsmat)
+    %
+    % Notation: Y = observation (O values), Q = conditioning variable (K values)
+    %
+    % Inputs:
+    % data(t) = t'th observation - must be an integer in {1,2,...,K}: cannot be 0!
+    % obsmat(i,o) = Pr(Y(t)=o | Q(t)=i)
+    %
+    % Output:
+    % B(i,t) = Pr(y(t) | Q(t)=i)
 
-data array([1, 1, 2, 1, 1, 3, 2, 3, 2, 3])
-array([[ 0.0284 ,  0.315  ,  0.06565],
+    data array([1, 1, 2, 1, 1, 3, 2, 3, 2, 3])
+    array([[ 0.0284 ,  0.315  ,  0.06565],
        [ 0.3154 ,  0.5503 ,  0.1343 ]])
 
-Output: array([[ 0.0284 ,  0.0284 ,  0.315  ,  0.0284 ,  0.0284 ,  0.06565,
+    Output: array([[ 0.0284 ,  0.0284 ,  0.315  ,  0.0284 ,  0.0284 ,  0.06565,
          0.315  ,  0.06565,  0.315  ,  0.06565],
        [ 0.3154 ,  0.3154 ,  0.5503 ,  0.3154 ,  0.3154 ,  0.1343 ,
-         0.5503 ,  0.1343 ,  0.5503 ,  0.1343 ]])
-         
-'''
+         0.5503 ,  0.1343 ,  0.5503 ,  0.1343 ]])         
+    '''
 
 
     (Q,O) = np.shape(obsmat)
@@ -265,8 +246,8 @@ Output: array([[ 0.0284 ,  0.0284 ,  0.315  ,  0.0284 ,  0.0284 ,  0.06565,
 def compute_ess_dhmm(observation_vector,prior,transition_matrix,emission_matrix, dirichlet):
     (S,O)=np.shape(emission_matrix)
     exp_num_trans=np.zeros((S,S))
-    exp_num_visits1=np.zeros((1,S)).flatten(1)
-    exp_num_visitsT=np.zeros((1,S)).flatten(1)
+    exp_num_visits1=np.zeros(S)
+    exp_num_visitsT=np.zeros((1,S)).flatten('C')
     exp_num_emit = dirichlet*np.ones((S,O))
     loglik = 0
     num_sequences=len(observation_vector)
@@ -291,11 +272,11 @@ def compute_ess_dhmm(observation_vector,prior,transition_matrix,emission_matrix,
         new_A=xi_summed/np.sum(gamma,1)
         (number_of_hidden_states,number_of_observation_states)=np.shape(emission_matrix)
         B_new = np.zeros(np.shape(emission_matrix))
-        for j in xrange(number_of_hidden_states):
-            for k in xrange(number_of_observation_states):
+        for j in range(number_of_hidden_states):
+            for k in range(number_of_observation_states):
                 numer = 0.0
                 denom = 0.0
-                for t in xrange(T):
+                for t in range(T):
                     if observation_i[t] == k:
                         numer += gamma[j][t]
                     denom += gamma[j][t]
@@ -304,27 +285,27 @@ def compute_ess_dhmm(observation_vector,prior,transition_matrix,emission_matrix,
     return [loglik,exp_num_visits1,exp_num_visitsT,exp_num_trans,exp_num_emit]
 
     
-def dhmm_em(observation_i, prior, transition_matrix, emission_matrix, max_iter, thresh):
-    
+def dhmm_em(observation_i, prior, transition_matrix, emission_matrix, max_iter, thresh):    
+    print(f"dhmm_em: prior at start: {prior}") # Add this line
+    print(f"Shape of emission_matrix at start of dhmm_em: {np.shape(emission_matrix)}") # Add this line
     previous_loglik = -np.inf
     loglik = 0
     converged = False
     num_iter = 1
     LL = []
     
-    while (num_iter <= max_iter) and not converged :
-         
-         #E step
-         [loglik,exp_num_visits1,exp_num_visitsT,exp_num_trans,exp_num_emit]=compute_ess_dhmm(observation_i,prior,transition_matrix,emission_matrix, 0)
-         #M Step
-         prior=normalize(exp_num_visits1)[0]
-         transition_matrix = mk_stochastic(exp_num_trans)         
-         emission_matrix=mk_stochastic(exp_num_emit)
+    while (num_iter <= max_iter) and not converged :         
+        #E step
+        [loglik,exp_num_visits1,exp_num_visitsT,exp_num_trans,exp_num_emit]=compute_ess_dhmm(observation_i,prior,transition_matrix,emission_matrix, 0)
+        #M Step
+        prior=normalize(exp_num_visits1)[0]
+        transition_matrix = mk_stochastic(exp_num_trans)         
+        emission_matrix=mk_stochastic(exp_num_emit)
                  
-         num_iter =  num_iter + 1
-         [converged,decrease] = em_converged(loglik, previous_loglik, thresh,False)
-         previous_loglik = loglik
-         LL.append(loglik)
+        num_iter =  num_iter + 1
+        [converged,decrease] = em_converged(loglik, previous_loglik, thresh,False)
+        previous_loglik = loglik
+        LL.append(loglik)
                   
     return [LL, prior, transition_matrix, emission_matrix, num_iter]
 
@@ -335,9 +316,9 @@ def path(prior,transition_matrix,emission_matrix,observation_vector,scaling=True
     shape_delta=(number_of_hidden_states,number_of_observations)
     shape_psi=shape_delta
     delta=np.zeros(shape_delta)
-    psi=np.zeros(shape_psi,dtype=np.int)
+    psi=np.zeros(shape_psi,dtype=int)
     scale=np.ones(number_of_observations)
-    optimum_path=np.zeros(number_of_observations,dtype=np.int)
+    optimum_path=np.zeros(number_of_observations,dtype=int)
     
     # 1.Initialization
     first_observation=observation_vector[0]
@@ -376,18 +357,33 @@ def path(prior,transition_matrix,emission_matrix,observation_vector,scaling=True
         loglik=np.log(p_star)
     return [optimum_path,delta,loglik]
     
-  
 class HMM:
     def __init__(self,n,m,prior=None,transmat=None,obsmat=None):
         self.n = n
-        self.m = m
-        self.prior = prior
-        self.transmat = transmat
-        self.obsmat = obsmat
-        if prior == None: self.prior = np.ones(self.n) / self.n
-        if transmat == None: self.transmat = mk_stochastic(np.random.rand(self.n,self.n))
-        if obsmat == None: self.obsmat = mk_stochastic(np.random.rand(self.n,self.m))
+        self.m = m # This is the correct number of observation states (6 for dice rolls)
 
+        # Initialize attributes based on whether parameters are provided or None
+        if prior is None:
+            self.prior = np.ones(self.n) / self.n
+        else:
+            self.prior = prior
+
+        if transmat is None:
+            self.transmat = mk_stochastic(np.random.rand(self.n, self.n))
+        else:
+            self.transmat = transmat
+
+        # Correct handling of obsmat: Use provided obsmat if available, otherwise randomize
+        if obsmat is None:
+            random_matrix = np.random.rand(self.n, self.m)
+            self.obsmat = mk_stochastic(random_matrix)
+        else:
+            self.obsmat = obsmat # Directly assign the provided obsmat (e.g., 'b')
+
+        print(f"Shape of self.obsmat after init: {np.shape(self.obsmat)}") # Keep this
+        print(f"Shape of self.transmat after init: {np.shape(self.transmat)}") # Add for completeness
+        print(f"Shape of self.prior after init: {np.shape(self.prior)}") # Add for completeness
+        
     def train(self, obs,iter=10,threshold=0.0001):
         [LL, prior2, transmat2, obsmat2, nr_iter] = dhmm_em(obs,
                                                             self.prior,
@@ -413,6 +409,6 @@ if __name__ == "__main__":
     transmat = mk_stochastic(np.random.rand(Q,Q))
     obsmat = mk_stochastic(np.random.rand(Q,O))
     [LL, prior2, transmat2, obsmat2,nr_iter] = dhmm_em(obs, prior, transmat, obsmat, 10,.0001 );
-    print LL
+    print (LL)
  
         

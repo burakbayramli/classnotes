@@ -41,6 +41,9 @@ import world_cup
 import features
 import match_stats
 import pandas as pd
+import math
+
+pd.set_option('display.max_columns', None)
 
 history_size = 3
 
@@ -128,12 +131,12 @@ diğer kolonları tahmin etmeye uğraşırlar, mesela atılan gol sayısı gibi.
 `op_goals`: `op_teamid` ile gösterilen takımın attığı gol sayısı.
 
 ```python
-club_data = data[data['competitionid'] <> 4]
+club_data = data[data['competitionid'] != 4]
 # Show the features latest game in competition id 4, which is the world cup.
-print data[data['competitionid'] == 4].iloc[0]
+print (data[data['competitionid'] == 4].iloc[0])
 ```
 
-```
+```text
 matchid                                  731828
 teamid                                      366
 op_teamid                                   632
@@ -146,31 +149,31 @@ timestamp            2014-07-09 21:00:00.000000
 goals                                         0
 op_goals                                      0
 points                                        1
-avg_points                              2.33333
-avg_goals                               1.33333
+avg_points                             2.333333
+avg_goals                              1.333333
 op_avg_goals                           0.333333
 pass_70                                0.472036
 pass_80                                0.150698
 op_pass_70                              0.26478
 op_pass_80                             0.078501
-expected_goals                          1.44437
+expected_goals                         1.444374
 op_expected_goals                      0.411425
-passes                                  3.83486
-bad_passes                              1.01362
+passes                                 3.834864
+bad_passes                             1.013622
 pass_ratio                             0.765595
-corners                               0.0709912
+corners                                0.070991
 fouls                                  0.126237
-cards                                         1
+cards                                       1.0
 shots                                  0.155226
 op_passes                               3.38986
-op_bad_passes                           1.02455
-op_corners                            0.0346796
+op_bad_passes                          1.024551
+op_corners                              0.03468
 op_fouls                               0.157066
-op_cards                                2.66667
-op_shots                              0.0924966
-goals_op_ratio                          1.33333
-shots_op_ratio                          1.70227
-pass_op_ratio                           1.02543
+op_cards                               2.666667
+op_shots                               0.092497
+goals_op_ratio                         1.333333
+shots_op_ratio                         1.702273
+pass_op_ratio                          1.025426
 Name: 0, dtype: object
 ```
 
@@ -179,14 +182,14 @@ yaratalım (crosstab).
 
 ```python
 import pandas as pd
-print pd.crosstab(
+print (pd.crosstab(
     club_data['goals'], 
     club_data.replace(
         {'points': {
-            0: 'lose', 1: 'tie', 3: 'win'}})['points'])
+            0: 'lose', 1: 'tie', 3: 'win'}})['points']))
 ```
 
-```
+```text
 points  lose  tie  win
 goals                 
 0        768  279    0
@@ -217,20 +220,19 @@ gösteren bir rakamdır, ne kadar yüksekse o kadar iyidir.
 
 ```python
 import world_cup
-reload(world_cup)
 import match_stats
 pd.set_option('display.width', 80)
 
 # Don't train on games that ended in a draw, since they have less signal.
-train = club_data.loc[club_data['points'] <> 1] 
+train = club_data.loc[club_data['points'] != 1] 
 # train = club_data
 
 (model, test) = world_cup.train_model(
      train, match_stats.get_non_feature_columns())
-print "Rsquared: %0.03g" % model.prsquared
+print ("Rsquared: %0.03g" % model.prsquared)
 ```
 
-```
+```text
 Rsquared: 0.149
 ```
 
@@ -253,64 +255,64 @@ edilirse aşırı uygunluk (overfitting) durumu ortaya çıkar.
 ```python
 def print_params(model, limit=None):    
     params = model.params.copy()
-    params.sort(ascending=False)
+    params.sort_values(ascending=False)
     del params['intercept']
     
     if not limit:
         limit = len(params)
 
     print("Pozitif ozellikler")
-    params.sort(ascending=False)
-    print np.exp(params[[param > 0.001 for param in params]]).sub(1)[:limit]
+    params.sort_values(ascending=False)
+    print (np.exp(params[[param > 0.001 for param in params]]).sub(1)[:limit])
 
     print("\nAtilan ozellikler")
-    print params[[param  == 0.0 for param in params]][:limit]
+    print (params[[param  == 0.0 for param in params]][:limit])
 
     print("\nNegatif ozellikler")
-    params.sort(ascending=True)
-    print np.exp(params[[param < -0.001 for param in params]]).sub(1)[:limit]
+    params.sort_values(ascending=True)
+    print (np.exp(params[[param < -0.001 for param in params]]).sub(1)[:limit])
 
 print_params(model, 10)
 ```
 
-```
+```text
 Pozitif ozellikler
 is_home           0.848337
+avg_goals         0.092000
 pass_70           0.254729
 expected_goals    0.169235
-opp_op_corners    0.159163
-op_passes         0.120319
-opp_op_pass_80    0.095970
-avg_goals         0.092000
-opp_bad_passes    0.075657
-opp_cards         0.068903
+passes            0.051791
 fouls             0.062809
+shots             0.001786
+op_passes         0.120319
+pass_op_ratio     0.018882
+opp_pass_80       0.014662
 dtype: float64
 
 Atilan ozellikler
-op_pass_70            0
-opp_op_cards          0
-op_bad_passes         0
-opp_op_bad_passes     0
-opp_op_fouls          0
-corners               0
-pass_ratio            0
-opp_corners           0
-op_fouls              0
-opp_goals_op_ratio    0
+avg_points        0.0
+op_avg_goals      0.0
+op_pass_70        0.0
+pass_ratio        0.0
+corners           0.0
+op_bad_passes     0.0
+op_fouls          0.0
+op_cards          0.0
+goals_op_ratio    0.0
+shots_op_ratio    0.0
 dtype: float64
 
 Negatif ozellikler
-opp_pass_70          -0.203015
-opp_expected_goals   -0.144740
-op_corners           -0.137309
-opp_op_passes        -0.107397
+pass_80              -0.014450
 op_pass_80           -0.087566
-opp_avg_goals        -0.084249
+op_expected_goals    -0.042092
 bad_passes           -0.070335
 cards                -0.064461
-opp_fouls            -0.059097
-opp_passes           -0.049240
+op_corners           -0.137309
+op_shots             -0.017699
+opp_avg_goals        -0.084249
+opp_pass_70          -0.203015
+opp_expected_goals   -0.144740
 dtype: float64
 ```
 
@@ -321,38 +323,37 @@ Klüp verisi üzerinde tahmin
 `points`: Gerçekten ne oldu.
 
 ```python
-reload(world_cup)
 results = world_cup.predict_model(model, test, match_stats.get_non_feature_columns())
 
 predictions = world_cup.extract_predictions(results.copy(), results['predicted'])
 
-print 'Dogru tahminler:'
-print predictions[(predictions['predicted'] > 50) & (predictions['points'] == 3)][:5]
+print ('Dogru tahminler:')
+print (predictions[(predictions['predicted'] > 50) & (predictions['points'] == 3)][:5])
 ```
 
-```
+```text
 Dogru tahminler:
              team_name         op_team_name  predicted            expected  \
 8     Portland Timbers       Real Salt Lake  52.418756    Portland Timbers   
 42      Rayo Vallecano           Granada CF  60.862465      Rayo Vallecano   
-49  Atltico de Madrid               Getafe  64.383541  Atltico de Madrid   
+49  Atlético de Madrid               Getafe  64.383541  Atlético de Madrid   
 57     Colorado Rapids  Vancouver Whitecaps  51.836366     Colorado Rapids   
 58         Real Madrid        Real Sociedad  64.100904         Real Madrid   
 
                 winner  points  
 8     Portland Timbers       3  
 42      Rayo Vallecano       3  
-49  Atltico de Madrid       3  
+49  Atlético de Madrid       3  
 57     Colorado Rapids       3  
 58         Real Madrid       3  
 ```
 
 ```python
-print 'Yanlis tahminler:'
-print predictions[(predictions['predicted'] > 50) & (predictions['points'] < 3)][:5]
+print ('Yanlis tahminler:')
+print (predictions[(predictions['predicted'] > 50) & (predictions['points'] < 3)][:5])
 ```
 
-```
+```text
 Yanlis tahminler:
                  team_name         op_team_name  predicted  \
 1      Seattle Sounders FC  Vancouver Whitecaps  51.544963   
@@ -389,7 +390,7 @@ world_cup.validate(3, y, results['predicted'], baseline,
 plt.savefig('stat_worldcup_01.png')
 ```
 
-```
+```text
 (3) Lift: 1.42 Auc: 0.738
 ```
 
@@ -435,8 +436,6 @@ edince başarı oranımızın zıplama yaptığını göreceğiz.
 
 ```python
 import power
-reload(power)
-reload(world_cup)
 def points_to_sgn(p):
   if p > 0.1: return 1.0
   elif p < -0.1: return -1.0
@@ -446,14 +445,14 @@ power_cols = [
 ]
 
 power_data = power.add_power(club_data, game_summaries, power_cols)
-power_train = power_data.loc[power_data['points'] <> 1] 
+power_train = power_data.loc[power_data['points'] != 1] 
 
 # power_train = power_data
 (power_model, power_test) = world_cup.train_model(
     power_train, match_stats.get_non_feature_columns())
-print "\nRsquared: %0.03g, Power Coef %0.03g" % (
+print ("\nRsquared: %0.03g, Power Coef %0.03g" % (
     power_model.prsquared, 
-    math.exp(power_model.params['power_points']))
+    math.exp(power_model.params['power_points'])))
 
 power_results = world_cup.predict_model(power_model, power_test, 
     match_stats.get_non_feature_columns())
@@ -471,7 +470,7 @@ plt.legend(loc="lower right")
 plt.savefig('world_cup_02.png')
 ```
 
-```
+```text
 New season 2014
 New season 2013
 New season 2013
@@ -479,64 +478,66 @@ New season 2012
 New season 2012
 New season 2011
 
-['Blackburn Rovers: 0.000', 'Real Betis: 0.000', 'D.C. United: 0.000',
-'Celta de Vigo: 0.004', 'Deportivo de La Coru\xc3\xb1a: 0.009',
-'Wolverhampton Wanderers: 0.021', 'Reading: 0.022', 'Real Zaragoza: 0.026',
-'Real Valladolid: 0.044', 'Granada CF: 0.062', 'Queens Park Rangers:
-0.073', 'Mallorca: 0.089', 'Aston Villa: 0.092', 'Bolton Wanderers: 0.102',
-'Osasuna: 0.109', 'Espanyol: 0.112', 'Wigan Athletic: 0.124', 'Sunderland:
-0.130', 'Rayo Vallecano: 0.138', 'Almer\xc3\xada: 0.145', 'Levante: 0.148',
-'Elche: 0.154', 'Getafe: 0.170', 'Swansea City: 0.192', 'Southampton:
-0.197', 'Norwich City: 0.206', 'Toronto FC: 0.211', 'Chivas USA: 0.218',
-'West Ham United: 0.220', 'West Bromwich Albion: 0.224', 'Villarreal:
-0.231', 'Stoke City: 0.255', 'Fulham: 0.274', 'Valencia: 0.296', 'Valencia
-CF: 0.296', 'M\xc3\xa1laga: 0.305', 'Newcastle United: 0.342', 'Sevilla:
-0.365', 'Columbus Crew: 0.366', 'Athletic Club: 0.386', 'Liverpool: 0.397',
-'Everton: 0.417', 'Philadelphia Union: 0.466', 'Montreal Impact: 0.470',
-'Chelsea: 0.530', 'Real Sociedad: 0.535', 'Tottenham Hotspur: 0.551',
-'Arsenal: 0.592', 'Houston Dynamo: 0.593', 'FC Dallas: 0.612', 'Chicago
-Fire: 0.612', 'Vancouver Whitecaps: 0.615', 'San Jose Earthquakes: 0.632',
-'New England Revolution: 0.634', 'Atl\xc3\xa9tico de Madrid: 0.672',
-'Colorado Rapids: 0.743', 'Barcelona: 0.759', 'Seattle Sounders FC: 0.781',
-'New York Red Bulls: 0.814', 'Sporting Kansas City: 0.854', 'LA Galaxy:
-0.882', 'Real Salt Lake: 0.922', 'Manchester City: 0.928', 'Real Madrid:
-1.000', 'Manchester United: 1.000', 'Portland Timbers: 1.000'] 
+['D.C. United: 0.000', 'Real Zaragoza: 0.000', 'Blackburn Rovers:
+0.000', 'Toronto FC: 0.015', 'Deportivo de La Coruña: 0.019',
+'Reading: 0.019', 'Mallorca: 0.022', 'Wolverhampton Wanderers: 0.027',
+'Almería: 0.034', 'Osasuna: 0.044', 'Bolton Wanderers: 0.045',
+'Granada CF: 0.047', 'Queens Park Rangers: 0.049', 'Chivas USA:
+0.050', 'Espanyol: 0.050', 'Aston Villa: 0.057', 'Real Betis: 0.062',
+'Norwich City: 0.068', 'Getafe: 0.070', 'Rayo Vallecano: 0.074',
+'Levante: 0.082', 'Real Valladolid: 0.084', 'Celta de Vigo: 0.090',
+'Southampton: 0.117', 'Swansea City: 0.119', 'Sunderland: 0.119',
+'Stoke City: 0.126', 'Fulham: 0.144', 'West Bromwich Albion: 0.148',
+'Málaga: 0.151', 'Villarreal: 0.157', 'Athletic Club: 0.159',
+'Valencia CF: 0.166', 'Valencia: 0.166', 'Sevilla: 0.176', 'West Ham
+United: 0.183', 'Columbus Crew: 0.195', 'Real Sociedad: 0.264',
+'Liverpool: 0.298', 'Everton: 0.316', 'Newcastle United: 0.322',
+'Arsenal: 0.332', 'Montreal Impact: 0.370', 'Chelsea: 0.399', 'Chicago
+Fire: 0.418', 'New England Revolution: 0.436', 'San Jose Earthquakes:
+0.470', 'Atlético de Madrid: 0.473', 'Tottenham Hotspur: 0.496',
+'Elche: 0.500', 'Wigan Athletic: 0.500', 'New York Red Bulls: 0.587',
+'Philadelphia Union: 0.602', 'Houston Dynamo: 0.614', 'Sporting Kansas
+City: 0.672', 'FC Dallas: 0.712', 'Real Madrid: 0.744', 'Vancouver
+Whitecaps: 0.768', 'Real Salt Lake: 0.775', 'LA Galaxy: 0.803',
+'Portland Timbers: 0.810', 'Seattle Sounders FC: 0.813', 'Manchester
+City: 0.854', 'Colorado Rapids: 1.000', 'Barcelona: 1.000',
+'Manchester United: 1.000']
 
-Rsquared: 0.22, Power Coef 2.18
-(3) Lift: 1.56 Auc: 0.791
-    Base: 0.374 Acc: 0.708 P(1|t): 0.778 P(0|f): 0.667
-    Fp/Fn/Tp/Tn p/n/c: 99/248/347/496 595/595/1190
+Rsquared: 0.215, Power Coef 1.88
+(3) Lift: 1.46 Auc: 0.75
+    Base: 0.374 Acc: 0.671 P(1|t): 0.728 P(0|f): 0.637
+    Fp/Fn/Tp/Tn p/n/c: 110/245/295/430 540/540/1080
 Pozitif ozellikler
-power_points      1.177169
-is_home           0.787110
-opp_op_corners    0.170848
-expected_goals    0.058597
-opp_cards         0.045538
-pass_70           0.036267
-avg_goals         0.035456
-opp_avg_points    0.033857
+is_home           0.985326
+pass_70           0.086559
+pass_80           0.085011
+expected_goals    0.035091
+passes            0.045325
+fouls             0.074550
+op_passes         0.123758
+op_bad_passes     0.006521
 dtype: float64
 
 Atilan ozellikler
-passes                0
-op_pass_80            0
-op_expected_goals     0
-opp_shots_op_ratio    0
-bad_passes            0
-pass_ratio            0
-opp_pass_op_ratio     0
-shots                 0
+avg_points    0.0
+avg_goals     0.0
+op_pass_70    0.0
+bad_passes    0.0
+pass_ratio    0.0
+corners       0.0
+cards         0.0
+shots         0.0
 dtype: float64
 
 Negatif ozellikler
-opp_power_points     -0.540688
-op_corners           -0.145918
-opp_expected_goals   -0.055353
-cards                -0.043555
-opp_pass_70          -0.034997
-opp_avg_goals        -0.034242
-avg_points           -0.032748
-opp_fouls            -0.022867
+op_avg_goals         -0.008003
+op_pass_80           -0.024318
+op_expected_goals    -0.062309
+op_corners           -0.040983
+opp_pass_70          -0.079663
+opp_pass_80          -0.078350
+opp_expected_goals   -0.033901
+opp_passes           -0.043359
 dtype: float64
 (old) Lift: 1.42 Auc: 0.738
 ```
@@ -559,9 +560,6 @@ gereken özellikleri yaratıp döndürecektir.
 ```python
 import world_cup
 import features
-reload(match_stats)
-reload(features)
-reload(world_cup)
 wc_data = world_cup.prepare_data(features.get_wc_features(history_size))
 wc_labeled = world_cup.prepare_data(features.get_features(history_size))
 wc_labeled = wc_labeled[wc_labeled['competitionid'] == 4]
@@ -595,12 +593,12 @@ takımları vardı, ama çok taraftar gönderen takımlar da vardı, mesela
 Meksika. Ya da ABD vardı, çok taraftarı vardı ama sessizdiler, onlar daha
 düşük skorlar aldılar.
 
-```
+```python
 import pandas as pd
 wc_home = pd.read_csv('wc_home.csv')
 
 def add_home_override(df, home_map):
-  for ii in xrange(len(df)):
+  for ii in range(len(df)):
     team = df.iloc[ii]['teamid']
     if team in home_map:
         df['is_home'].iloc[ii] = home_map[team]
@@ -609,7 +607,7 @@ def add_home_override(df, home_map):
         df['is_home'].iloc[ii] = 0.0
         
 home_override = {}
-for ii in xrange(len(wc_home)):
+for ii in range(len(wc_home)):
     row = wc_home.iloc[ii]
     home_override[row['teamid']] = row['is_home']
 
@@ -641,21 +639,23 @@ wc_results = world_cup.predict_model(power_model, wc_power_data,
     match_stats.get_non_feature_columns())
 ```
 
-```python
+```text
 New season 2013
 New season 2009
 New season 6
-['Australia: 0.000', 'Serbia: 0.016', 'USA: 0.017', 'Cameroon: 0.035',
-'Iran: 0.081', 'Croatia: 0.180', 'Nigeria: 0.204', "C\xc3\xb4te d'Ivoire:
-0.244", 'Costa Rica: 0.254', 'Algeria: 0.267', 'Paraguay: 0.277',
-'Honduras: 0.279', 'Slovakia: 0.281', 'Greece: 0.284', 'Switzerland:
-0.291', 'Ecuador: 0.342', 'Uruguay: 0.367', 'Sweden: 0.386', 'Japan:
-0.406', 'Mexico: 0.409', 'Chile: 0.413', 'Colombia: 0.438', 'England:
-0.460', 'Belgium: 0.467', 'Ukraine: 0.470', 'Portugal: 0.487', 'Ghana:
-0.519', 'South Korea: 0.532', 'France: 0.648', 'Spain: 0.736', 'Argentina:
-0.793', 'Italy: 0.798', 'Brazil: 0.898', 'Netherlands: 0.918', 'Germany:
-1.000'] 
+
+['Cameroon: 0.000', 'Honduras: 0.024', 'Nigeria: 0.047', 'Serbia:
+0.072', 'USA: 0.073', 'Sweden: 0.098', 'Iran: 0.099', 'Algeria:
+0.104', 'Japan: 0.115', 'Mexico: 0.127', 'Costa Rica: 0.130', "Côte
+d'Ivoire: 0.148", 'Ecuador: 0.156', 'Chile: 0.166', 'England: 0.169',
+'Australia: 0.177', 'Ukraine: 0.201', 'South Korea: 0.213',
+'Switzerland: 0.240', 'France: 0.251', 'Uruguay: 0.318', 'Portugal:
+0.382', 'Belgium: 0.466', 'Brazil: 0.470', 'Argentina: 0.486', 'Italy:
+0.491', 'Greece: 0.500', 'Ghana: 0.500', 'Croatia: 0.500', 'Paraguay:
+0.500', 'Slovakia: 0.500', 'Spain: 0.685', 'Germany: 0.740',
+'Netherlands: 0.812', 'Colombia: 1.000']
 ```
+
 
 Güç sırası da ayrı bir lojistik regresyon aslında, `power.py` içinde
 biz bu regresyona giren matris ve etiketleri hesap yapılmadan önce çekip
@@ -669,24 +669,24 @@ outcomes = pd.read_csv('/tmp/outcomes.csv')
 Herhangi bir satıra göz atalım,
 
 ```python
-print 'mac', games[100:101]
-print 'sonuc', outcomes[100:101]
+print ('mac', games[100:101])
+print ('sonuc', outcomes[100:101])
 ```
 
-```
-mac      1041  1042  114  1161  118  119  1215  1216  1219  1221  1223  1224  \
-100     0     0    0     0    0    0     0     0     0     0     0     0   
+```text
+mac      366  632  614  357  838  360  832  368  596  497  1215  1216  517  659  \
+100  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0   0.0   0.0  0.0  0.0   
 
-     1264  1266  1794  1801  1804  357  359  360  361  364  365  366  367  \
-100     0     0     0     0     0    0    0    0    0    0    0    0    0   
+     837  831  1041  536  359  1219  830  847  1042  537  1221  1266  119  \
+100  0.0  0.0   0.0  0.0  0.0   0.0  0.0  0.0   0.0  0.0   0.0   0.0  0.0   
 
-     368     369     494  497  507  510  511  517  522  535  536  537  575  \
-100    0 -1.5625  1.5625    0    0    0    0    0    0    0    0    0    0   
+     114     494  535  118  575  835  507  1801     369  1804  364  365  522  \
+100  0.0  1.5625  0.0  0.0  0.0  0.0  0.0   0.0 -1.5625   0.0  0.0  0.0  0.0   
 
-     596  614  632  659  830  831  832  835  837  838  847  
-100    0    0    0    0    0    0    0    0    0    0    0  
-sonuc      0.0
-100    0
+     1161  510  361  1264  1223  511  1794  367  1224  
+100   0.0  0.0  0.0   0.0   0.0  0.0   0.0  0.0   0.0  
+sonuc        0
+100 -1.0
 ```
 
 Yani güç sıralaması lojistik regresyonuna girdi olan matrisin her satırı
@@ -698,10 +698,10 @@ ve rakipte 494. takım için,
 raw_games = pd.read_csv('results-20140714-124014.csv')
 tmp = raw_games[(raw_games['teamid'] == 369) & (raw_games['op_teamid'] == 494)]
 tmp = tmp[['teamid','team_name','op_team_name','is_home','points']]
-print tmp
+print (tmp)
 ```
 
-```
+```text
       teamid team_name op_team_name  is_home  points
 4231     369   Denmark     Cameroon        0       3
 ```
@@ -778,748 +778,118 @@ wc_pred = world_cup.extract_predictions(wc_with_points,
 # Reverse our predictions to show the most recent first.
 wc_pred.reindex(index=wc_pred.index[::-1])
 # Show our predictions for the games that have already happenned.
-print wc_pred
+print (wc_pred)
 ```
 
-```
+```text
         team_name   op_team_name  predicted       expected         winner  points
-0       Argentina        Germany  46.070814        Germany             NA     NaN
-1     Netherlands         Brazil  42.833863         Brazil             NA     NaN
-2     Netherlands      Argentina  48.641542      Argentina           draw       1
-3         Germany         Brazil  44.011593         Brazil        Germany       3
-4      Costa Rica    Netherlands  14.442625    Netherlands           draw       1
-5         Belgium      Argentina  18.596031      Argentina      Argentina       0
-6        Colombia         Brazil  23.890421         Brazil         Brazil       0
-7         Germany         France  75.116349        Germany        Germany       3
-8             USA        Belgium  32.400646        Belgium        Belgium       0
-9     Switzerland      Argentina  19.272768      Argentina      Argentina       0
-10        Algeria        Germany   5.926496        Germany        Germany       0
-11        Nigeria         France   8.694729         France         France       0
-12         Greece     Costa Rica  40.448104     Costa Rica           draw       1
-13         Mexico    Netherlands  20.402491    Netherlands    Netherlands       0
-14        Uruguay       Colombia  46.480264       Colombia       Colombia       0
-15          Chile         Brazil  26.574916         Brazil           draw       1
-16        Germany            USA  91.980986        Germany        Germany       3
-17          Ghana       Portugal  49.051707       Portugal       Portugal       0
-18    Switzerland       Honduras  60.223070    Switzerland    Switzerland       3
-19         France        Ecuador  84.538857         France           draw       1
-20      Argentina        Nigeria  88.491450      Argentina      Argentina       3
-21  CÃ´te d'Ivoire         Greece  61.074502  CÃ´te d'Ivoire         Greece       0
-22        Uruguay          Italy  32.685428          Italy        Uruguay       3
-23        England     Costa Rica  63.457326        England           draw       1
-24         Brazil       Cameroon  94.788074         Brazil         Brazil       3
-25         Mexico        Croatia  78.020214         Mexico         Mexico       3
-26          Spain      Australia  90.521542          Spain          Spain       3
-27          Chile    Netherlands  28.342133    Netherlands    Netherlands       0
-28       Portugal            USA  65.457259       Portugal           draw       1
-29        Algeria    South Korea  17.376285    South Korea        Algeria       3
-30          Ghana        Germany  14.588539        Germany           draw       1
-31           Iran      Argentina   5.193843      Argentina      Argentina       0
-32        Ecuador       Honduras  53.848926        Ecuador        Ecuador       3
-33         France    Switzerland  78.659381         France         France       3
-34     Costa Rica          Italy  24.836756          Italy     Costa Rica       3
-35         Greece          Japan  44.355013          Japan           draw       1
-36        England        Uruguay  61.012694        England        Uruguay       0
-37        Croatia       Cameroon  40.212875       Cameroon        Croatia       3
-38          Chile          Spain  42.624474          Spain          Chile       3
-39    Netherlands      Australia  93.535889    Netherlands    Netherlands       3
-40         Mexico         Brazil  20.372064         Brazil           draw       1
-41            USA          Ghana  39.500993          Ghana            USA       3
-42        Nigeria           Iran  53.813244        Nigeria           draw       1
-43       Portugal        Germany  15.337884        Germany        Germany       0
-44       Honduras         France  22.953848         France         France       0
-45        Ecuador    Switzerland  59.987076        Ecuador    Switzerland       0
-46          Japan  CÃ´te d'Ivoire  51.528885          Japan  CÃ´te d'Ivoire       0
-47          Italy        England  68.767968          Italy          Italy       3
-48     Costa Rica        Uruguay  45.347946        Uruguay     Costa Rica       3
-49      Australia          Chile  19.487987          Chile          Chile       0
-50    Netherlands          Spain  60.493928    Netherlands    Netherlands       3
-51       Cameroon         Mexico  30.018950         Mexico         Mexico       0
-52        Croatia         Brazil   6.268704         Brazil         Brazil       0
-53          Spain    Netherlands  35.602227    Netherlands          Spain       3
-54        Germany        Uruguay  76.467450        Germany        Germany       3
-55          Spain        Germany  29.438134        Germany          Spain       3
-56    Netherlands        Uruguay  71.342186    Netherlands    Netherlands       3
-57          Spain       Paraguay  83.007655          Spain          Spain       3
-58        Germany      Argentina  42.635127      Argentina        Germany       3
-59          Ghana        Uruguay  41.784682        Uruguay           draw       1
-60         Brazil    Netherlands  60.821972         Brazil    Netherlands       0
-61       Portugal          Spain  23.464891          Spain          Spain       0
-62          Japan       Paraguay  61.278000          Japan           draw       1
-63          Chile         Brazil  24.459600         Brazil         Brazil       0
-64       Slovakia    Netherlands  12.082967    Netherlands    Netherlands       0
-65         Mexico      Argentina  17.626748      Argentina      Argentina       0
-66        England        Germany  20.763176        Germany        Germany       0
-67          Ghana            USA  71.310871          Ghana          Ghana       3
-68    South Korea        Uruguay  45.148588        Uruguay        Uruguay       0
-69         Brazil       Portugal  81.610878         Brazil           draw       1
-70        Germany          Ghana  81.621494        Germany        Germany       3
-71         Serbia      Australia  38.204905      Australia      Australia       0
-72  CÃ´te d'Ivoire         Brazil  10.186423         Brazil         Brazil       0
-73      Australia          Ghana  23.702414          Ghana           draw       1
-74          Japan    Netherlands  10.773998    Netherlands    Netherlands       0
-75         Serbia        Germany   4.731113        Germany         Serbia       3
-76         Mexico         France  42.801515         France         Mexico       3
-77    South Korea      Argentina  15.255040      Argentina      Argentina       0
-78    Switzerland          Spain  18.747704          Spain    Switzerland       3
-79       Portugal  CÃ´te d'Ivoire  65.031075       Portugal           draw       1
-80       Paraguay          Italy  12.288896          Italy           draw       1
-81      Australia        Germany   7.395354        Germany        Germany       0
-82          Ghana         Serbia  83.682899          Ghana          Ghana       3
-83            USA        England  34.763699        England           draw       1
-84         France          Italy  28.651132          Italy           draw       1
-85       Portugal        Germany  14.833907        Germany        Germany       0
-86         France       Portugal  72.141913         France         France       3
-87          Italy        Germany  33.364112        Germany          Italy       3
-88         France         Brazil  22.742882         Brazil         France       3
-89       Portugal        England  49.550454        England           draw       1
-90        Ukraine          Italy  28.378865          Italy          Italy       0
-91      Argentina        Germany  46.801014        Germany           draw       1
-92         France          Spain  47.126654          Spain         France       3
-93          Ghana         Brazil   9.144470         Brazil         Brazil       0
-94        Ukraine    Switzerland  62.637340        Ukraine           draw       1
-95      Australia          Italy   8.365416          Italy          Italy       0
-96    Netherlands       Portugal  70.231295    Netherlands       Portugal       0
-97        Ecuador        England  34.379086        England        England       0
-98         Mexico      Argentina  29.233199      Argentina      Argentina       0
-99         Sweden        Germany  10.914079        Germany        Germany       0
+0       Argentina        Germany  44.097950        Germany             NA     NaN
+1     Netherlands         Brazil  52.711308    Netherlands             NA     NaN
+2     Netherlands      Argentina  55.089671    Netherlands           draw     1.0
+3         Germany         Brazil  52.791680        Germany        Germany     3.0
+4      Costa Rica    Netherlands  17.418232    Netherlands           draw     1.0
+5         Belgium      Argentina  29.081041      Argentina      Argentina     0.0
+6        Colombia         Brazil  54.574633       Colombia         Brazil     0.0
+7         Germany         France  81.681317        Germany        Germany     3.0
+8             USA        Belgium  30.412694        Belgium        Belgium     0.0
+9     Switzerland      Argentina  23.703298      Argentina      Argentina     0.0
+10        Algeria        Germany   5.044527        Germany        Germany     0.0
+11        Nigeria         France  10.745266         France         France     0.0
+12         Greece     Costa Rica  57.996999         Greece           draw     1.0
+13         Mexico    Netherlands  15.457466    Netherlands    Netherlands     0.0
+14        Uruguay       Colombia  21.643826       Colombia       Colombia     0.0
+15          Chile         Brazil  33.248079         Brazil           draw     1.0
+16        Germany            USA  85.693707        Germany        Germany     3.0
+17          Ghana       Portugal  63.890478          Ghana       Portugal     0.0
+18    Switzerland       Honduras  67.070892    Switzerland    Switzerland     3.0
+19         France        Ecuador  70.147018         France           draw     1.0
+20      Argentina        Nigeria  89.621653      Argentina      Argentina     3.0
+21  Côte d'Ivoire         Greece  36.873530         Greece         Greece     0.0
+22        Uruguay          Italy  44.068286          Italy        Uruguay     3.0
+23        England     Costa Rica  50.811389        England           draw     1.0
+24         Brazil       Cameroon  91.057925         Brazil         Brazil     3.0
+25         Mexico        Croatia  34.390212        Croatia         Mexico     3.0
+26          Spain      Australia  86.025932          Spain          Spain     3.0
+27          Chile    Netherlands  28.282544    Netherlands    Netherlands     0.0
+28       Portugal            USA  52.652170       Portugal           draw     1.0
+29        Algeria    South Korea  26.317364    South Korea        Algeria     3.0
+30          Ghana        Germany  24.399186        Germany           draw     1.0
+31           Iran      Argentina  12.232761      Argentina      Argentina     0.0
+32        Ecuador       Honduras  54.617619        Ecuador        Ecuador     3.0
+33         France    Switzerland  56.941174         France         France     3.0
+34     Costa Rica          Italy  33.018788          Italy     Costa Rica     3.0
+35         Greece          Japan  79.512996         Greece           draw     1.0
+36        England        Uruguay  48.133873        Uruguay        Uruguay     0.0
+37        Croatia       Cameroon  75.721526        Croatia        Croatia     3.0
+38          Chile          Spain  33.871803          Spain          Chile     3.0
+39    Netherlands      Australia  88.036065    Netherlands    Netherlands     3.0
+40         Mexico         Brazil  25.555167         Brazil           draw     1.0
+41            USA          Ghana  37.708800          Ghana            USA     3.0
+42        Nigeria           Iran  30.426153           Iran           draw     1.0
+43       Portugal        Germany  18.933847        Germany        Germany     0.0
+44       Honduras         France  35.414093         France         France     0.0
+45        Ecuador    Switzerland  49.518118    Switzerland    Switzerland     0.0
+46          Japan  Côte d'Ivoire  32.050843  Côte d'Ivoire  Côte d'Ivoire     0.0
+47          Italy        England  68.182745          Italy          Italy     3.0
+48     Costa Rica        Uruguay  41.624123        Uruguay     Costa Rica     3.0
+49      Australia          Chile  28.013709          Chile          Chile     0.0
+50    Netherlands          Spain  45.491918          Spain    Netherlands     3.0
+51       Cameroon         Mexico  36.828052         Mexico         Mexico     0.0
+52        Croatia         Brazil  26.510888         Brazil         Brazil     0.0
+53          Spain    Netherlands  53.126882          Spain          Spain     3.0
+54        Germany        Uruguay  69.230393        Germany        Germany     3.0
+55          Spain        Germany  49.094405        Germany          Spain     3.0
+56    Netherlands        Uruguay  71.470148    Netherlands    Netherlands     3.0
+57          Spain       Paraguay  78.167146          Spain          Spain     3.0
+58        Germany      Argentina  41.107626      Argentina        Germany     3.0
+59          Ghana        Uruguay  47.702576        Uruguay           draw     1.0
+60         Brazil    Netherlands  49.262939    Netherlands    Netherlands     0.0
+61       Portugal          Spain  11.149447          Spain          Spain     0.0
+62          Japan       Paraguay  22.665241       Paraguay           draw     1.0
+63          Chile         Brazil  34.753812         Brazil         Brazil     0.0
+64       Slovakia    Netherlands  17.862216    Netherlands    Netherlands     0.0
+65         Mexico      Argentina  19.963579      Argentina      Argentina     0.0
+66        England        Germany  19.612815        Germany        Germany     0.0
+67          Ghana            USA  70.369020          Ghana          Ghana     3.0
+68    South Korea        Uruguay  27.634301        Uruguay        Uruguay     0.0
+69         Brazil       Portugal  77.683818         Brazil           draw     1.0
+70        Germany          Ghana  73.474151        Germany        Germany     3.0
+71         Serbia      Australia  31.253679      Australia      Australia     0.0
+72  Côte d'Ivoire         Brazil  16.341842         Brazil         Brazil     0.0
+73      Australia          Ghana  38.165116          Ghana           draw     1.0
+74          Japan    Netherlands   6.998814    Netherlands    Netherlands     0.0
+75         Serbia        Germany   6.130914        Germany         Serbia     3.0
+76         Mexico         France  52.503379         Mexico         Mexico     3.0
+77    South Korea      Argentina  14.223277      Argentina      Argentina     0.0
+78    Switzerland          Spain  15.908251          Spain    Switzerland     3.0
+79       Portugal  Côte d'Ivoire  69.916891       Portugal           draw     1.0
+80       Paraguay          Italy  43.871427          Italy           draw     1.0
+81      Australia        Germany  16.694780        Germany        Germany     0.0
+82          Ghana         Serbia  85.417376          Ghana          Ghana     3.0
+83            USA        England  52.553244            USA           draw     1.0
+84         France          Italy  34.562803          Italy           draw     1.0
+85       Portugal        Germany  16.075847        Germany        Germany     0.0
+86         France       Portugal  56.422181         France         France     3.0
+87          Italy        Germany  21.500138        Germany          Italy     3.0
+88         France         Brazil  23.160437         Brazil         France     3.0
+89       Portugal        England  52.083159       Portugal           draw     1.0
+90        Ukraine          Italy  26.756031          Italy          Italy     0.0
+91      Argentina        Germany  41.445493        Germany           draw     1.0
+92         France          Spain  20.617480          Spain         France     3.0
+93          Ghana         Brazil  16.941207         Brazil         Brazil     0.0
+94        Ukraine    Switzerland  48.073103    Switzerland           draw     1.0
+95      Australia          Italy  22.532935          Italy          Italy     0.0
+96    Netherlands       Portugal  75.542414    Netherlands       Portugal     0.0
+97        Ecuador        England  39.677182        England        England     0.0
+98         Mexico      Argentina  31.243456      Argentina      Argentina     0.0
+99         Sweden        Germany   8.403587        Germany        Germany     0.0
 ```
 
-### Kodlar
-
-### world_cup.py
-
-```python
-"""
-    Futbol maclarinin sonucunu lojistik regresyon kullanarak tahmin eder.
-"""
-
-import random
-import math
-
-import numpy as np
-random.seed(987654321)
-np.random.seed(987654321)
-import pandas as pd
-import pylab as pl
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve
-import statsmodels.api as sm
-
-
-def _drop_unbalanced_matches(data):
-    """
-    Mac sirasinda her iki takim hakkinda elimide veri olmadigi icin,
-    tarihi veride bir macta oynayan iki takimin ikisininde hakkinda veri
-    yoksa o iki takimi egitim verisinden at. Bu durum eger bir takim hakkinda
-    10 mactan daha az veri var ise ortaya cikabilir.
-    """
-    keep = []
-    index = 0
-    data = data.dropna()
-    while index < len(data) - 1:
-        skipped = False
-        for col in data:
-            if isinstance(col, float) and math.isnan(col):
-                keep.append(False)
-                index += 1
-                skipped = True
-             
-        if skipped:
-            pass
-        elif data.iloc[index]['matchid'] == data.iloc[index+1]['matchid']:
-            keep.append(True)
-            keep.append(True)
-            index += 2
-        else:
-            keep.append(False)
-            index += 1
-    while len(keep) < len(data):
-        keep.append(False)
-    results = data[keep]
-    if len(results) % 2 != 0:
-        raise Exception('Unexpected results')
-    return results
-
-
-def _swap_pairwise(col):
-    """ 0 ile 1, 2 ile 2, vs.. seklinda satir degis tokusu yap """
-    col = pd.np.array(col)
-    for index in xrange(0, len(col), 2):
-        val = col[index]
-        col[index] = col[index + 1]
-        col[index+1] = val
-    return col
-
-
-def _splice(data):
-    """ Bir maci temsil eden iki satiri tek bir satir olacak sekilde birlestir """
-    data = data.copy()
-    opp = data.copy()
-    opp_cols = ['opp_%s' % (col,) for col in opp.columns]
-    opp.columns = opp_cols
-    opp = opp.apply(_swap_pairwise)
-    del opp['opp_is_home']
-    
-    return data.join(opp)
-
-
-def split(data, test_proportion=0.4):
-    """
-    Bir dataframe'i egitim set'i ve test set'i olarak ikiyi ayirir.
-    Dikkatli olmak lazim cunku dataframe icinde bir macin satirlari ardi
-    ardina gelmeli, bu sebeple bir macin tum verileri ya tamamen
-    egitim ya da tamamen test set'inde olmali.
-    """
-    
-    train_vec = []
-    if len(data) % 2 != 0:
-        raise Exception('Unexpected data length')
-    while len(train_vec) < len(data):
-        rnd = random.random()
-        train_vec.append(rnd > test_proportion) 
-        train_vec.append(rnd > test_proportion)
-            
-    test_vec = [not val for val in train_vec]
-    train = data[train_vec]
-    test = data[test_vec]
-    if len(train) % 2 != 0:
-        raise Exception('Unexpected train length')
-    if len(test) % 2 != 0:
-        raise Exception('Unexpected test length')
-    return (train, test)
-
-
-def _extract_target(data, target_col):
-    """
-    Egitimde hedef olarak kullanilan kolonu dataframe'den cikart.
-    Geriye verilen dataframe eksi o kolonu dondur.
-    """
-    target = data[target_col]
-    train_df = data.copy()
-    del train_df[target_col]
-    return target, train_df
-
-
-def _check_eq(value): 
-    """
-    Geriye oyle bir fonksiyon dondur ki gecilen tamsayi degerine (value) uyup
-    uymadigini kontrol etsin. Dikkat, geriye gecilen degeri kontrol eden
-    _fonksiyon_ donduruyoruz, o degeri burada kontrol etmiyoruz.
-    """
-    return lambda (x): int(x) == int(value)
-
-
-L1_ALPHA = 16.0
-def build_model_logistic(target, data, acc=0.00000001, alpha=L1_ALPHA):
-    """
-    Bir lojistik regresyon modelini egitir. target parametresi
-    hedef, yani etiket. target vektorunun satir sayisi data icindeki
-    egitim verisinin satir sayisi kadar olmali.
-    """
-    data = data.copy()
-    data['intercept'] = 1.0
-    target = np.array(target)
-    if np.any(target==-1): target[target==-1] = 0
-    logit = sm.Logit(target, data, disp=False)
-    return logit.fit_regularized(maxiter=1024, alpha=alpha, acc=acc, disp=False)
-
-
-def validate(label, target, predictions, baseline=0.5, compute_auc=False,
-             quiet=True):
-    """
-    Ikisel tahminleri kontrol et, karisiklik matrisi (confusion matrix) ve
-    AUC hesaplar.
-
-    Verili bir tahmin vektoru ve gercek degerlere bakarak tahminde ne kadar
-    basarili oldugumuzu hesaplar.
-
-    Argumanlar:
-
-    label: kontrol ettigimiz seyin etiketi
-    target: gercek degerlerin vektoru
-    predictions: tahmin edilen degerleri - bu bir olasilik vektoru
-       olabilir, ki bu durumda onu siralayip (sort) en emin olunan
-       degerleri aliriz, emin olmak bir esik degerine gore hesaplanir.
-       Tabii tahmin 1 ya da 0 ise direk dogru ya da yanlis sonucuna
-       varabiliriz.
-    compute_auc: Eger dogru ise tahminler icin bir AUC hesaplar.
-       Bu arguman dogru ise tahminlerin de bir olasilik vektoru
-       olmasi gerekir. 
-    """
-
-    if len(target) != len(predictions):
-        raise Exception('Length mismatch %d vs %d' % (len(target), 
-                                                      len(predictions)))
-    if baseline > 1.0:
-        # Baseline number is expected count, not proportion. Get the proportion.
-        baseline = baseline * 1.0 / len(target)
-
-    zipped = sorted(zip(target, predictions), key=lambda tup: -tup[1])
-    expect = len(target) * baseline
-    
-    (true_pos, true_neg, false_pos, false_neg) = (0, 0, 0, 0)
-    for index in xrange(len(target)):
-        (yval, prob) = zipped[index]
-        if float(prob) == 0.0:
-            predicted = False
-        elif float(prob) == 1.0:
-            predicted = True
-        else:
-            predicted = index < expect
-        if predicted:
-            if yval:
-                true_pos += 1
-            else:
-                false_pos += 1 
-        else:
-            if yval:
-                false_neg += 1
-            else:
-                true_neg += 1
-    pos = true_pos + false_neg
-    neg = true_neg + false_pos
-    # P(1 | predicted(1)) and P(0 | predicted(f))
-    pred_t = true_pos + false_pos
-    pred_f = true_neg + false_neg
-    prob1_t = true_pos * 1.0 / pred_t if pred_t > 0.0 else -1.0
-    prob0_f = true_neg * 1.0 / pred_f if pred_f > 0.0 else -1.0
-              
-    # Lift = P(1 | t) / P(1)
-    prob_1 = pos * 1.0 / (pos + neg)
-    lift = prob1_t / prob_1 if prob_1 > 0 else 0.0
-              
-    accuracy = (true_pos + true_neg) * 1.0 / len(target)
-              
-    if compute_auc:
-        y_bool =  [True if yval else False for (yval, _) in zipped]
-        x_vec = [xval for (_, xval) in zipped]
-        auc_value = roc_auc_score(y_bool, x_vec)
-        fpr, tpr, _ = roc_curve(y_bool, x_vec)
-        pl.plot(fpr, tpr, lw=1.5,
-            label='ROC %s (area = %0.2f)' % (label, auc_value))
-        pl.xlabel('False Positive Rate', fontsize=18)
-        pl.ylabel('True Positive Rate', fontsize=18)
-        pl.title('ROC curve', fontsize=18)
-        auc_value = '%0.03g' % auc_value
-    else:
-        auc_value = 'NA'
-
-    print '(%s) Lift: %0.03g Auc: %s' % (label, lift, auc_value)
-    if not quiet:
-        print '    Base: %0.03g Acc: %0.03g P(1|t): %0.03g P(0|f): %0.03g' % (
-            baseline, accuracy, prob1_t, prob0_f)
-        print '    Fp/Fn/Tp/Tn p/n/c: %d/%d/%d/%d %d/%d/%d' % (
-            false_pos, false_neg, true_pos, true_neg, pos, neg, len(target))
-    
-
-def _coerce_types(vals):
-    """ Bir liste icindeki tum degerlerin float (reel sayi) oldugunu kontrol et """
-    return [1.0 * val for val in vals]
-
-
-def _coerce(data):
-    """
-    Dataframe icindeki tum degerleri float'a cevir ve degerleri
-    standardize et
-    """
-    return _standardize(data.apply(_coerce_types))
-
-
-def _standardize_col(col):
-    """ Tek bir kolonu standardize et (ortalamayi cikar, standart sapma
-        ile bol
-    """
-    std = np.std(col)
-    mean = np.mean(col)
-    if abs(std) > 0.001:
-        return col.apply(lambda val: (val - mean)/std)
-    else:
-        return col
-
-
-def _standardize(data):
-    """ Tum dataframe'i standardize et. Tum kolonlar sayisal olmali """
-    return data.apply(_standardize_col)
-
-
-def _clone_and_drop(data, drop_cols):
-    """ Icinde belli bazi kolonlarin atildigi bir Dataframe'in kopyasini dondur """
-    clone = data.copy()
-    for col in drop_cols:
-        if col in clone.columns:
-            del clone[col]
-    return clone
-
-
-def _normalize(vec):
-    """ Listeyi normalize et ki toplami 1 olsun """
-    total = float(sum(vec))
-    return [val / total for val in vec]
-
-
-def _games(data):
-    """ Tek sayili satirlari at. Bu fonksiyon faydali cunku bazen
-        ardi ardina ayni mac hakkinda iki satira ihtiyacimiz olmuyor
-        bir tanesi yeterli.
-    """
-    return data[[idx % 2 == 0 for idx in xrange(len(data))]] 
-  
-
-def _team_test_prob(target):
-    """ A takiminin B takimini, ve B takiminin A takimini yenme olasiliklarini
-        hesapliyoruz. Her iki yondeki olasiliklari kullanarak genel
-        bir olasilik hesabi yap.
-    """
-    results = []
-    for idx in range(len(target)/2):
-        game0 = float(target.iloc[idx*2])
-        game1 = float(target.iloc[idx*2+1])
-        results.append(game0/(game0+game1))
-    return results
-
-
-def extract_predictions(data, predictions):
-    """
-         Uyum verileri ve tahminleri iceren Dataframe'leri birlestir.
-         Geriye dondurulen DF icinde takim isimleri, tahminler, ve
-         (eger mevcut ise) puan olarak sonuc. 
-    """
-    probs = _team_test_prob(predictions)
-    teams0 = []
-    teams1 = []
-    points = []
-    for game in xrange(len(data)/2):
-        if data['matchid'].iloc[game*2] != data['matchid'].iloc[game*2+1]:
-            raise Exception('Unexpeted match id %d vs %d', (
-                               data['matchid'].iloc[game * 2],
-                               data['matchid'].iloc[game * 2 + 1]))
-        team0 = data['team_name'].iloc[game * 2]
-        team1 = data['op_team_name'].iloc[game * 2]
-        if 'points' in data.columns: 
-            points.append(data['points'].iloc[game * 2])
-        teams0.append(team0)
-        teams1.append(team1)
-    results =  pd.DataFrame(
-        {'team_name': pd.Series(teams0), 
-         'op_team_name': pd.Series(teams1),
-         'predicted': pd.Series(probs).mul(100)},
-         columns = ['team_name', 'op_team_name', 'predicted'])
-
-    expected_winner = []
-    for game in xrange(len(results)):
-        row = results.iloc[game]
-        col = 'team_name' if row['predicted'] >= 50 else 'op_team_name' 
-        expected_winner.append(row[col])
-
-    results['expected'] = pd.Series(expected_winner)
-
-    if len(points) > 0:
-        winners = []
-        for game in xrange(len(results)):
-            row = results.iloc[game]
-            point = points[game]
-            if point > 1.1:
-                winners.append(row['team_name'])
-            elif point < 0.9:
-                winners.append(row['op_team_name'])
-            elif point > -0.1:
-                winners.append('draw')
-            else:
-                winners.append('NA')
-        results['winner'] = pd.Series(winners)
-        results['points'] = pd.Series(points)
-    return results
-
-
-def _check_data(data):
-    """ Dataframe'i gez ve her seyin iyi durumda olup olmadigini kontrol et """
-    i = 0
-    if len(data) % 2 != 0:
-        raise Exception('Unexpeted length')
-    matches = data['matchid']
-    teams = data['teamid']
-    op_teams = data['op_teamid']
-    while i < len(data) - 1:
-        if matches.iloc[i] != matches.iloc[i + 1]:
-            raise Exception('Match mismatch: %s vs %s ' % (
-                            matches.iloc[i], matches.iloc[i + 1]))
-        if teams.iloc[i] != op_teams.iloc[i + 1]:
-            raise Exception('Team mismatch: match %s team %s vs %s' % (
-                            matches.iloc[i], teams.iloc[i], 
-                            op_teams.iloc[i + 1]))
-        if teams.iloc[i + 1] != op_teams.iloc[i]:
-            raise Exception('Team mismatch: match %s team %s vs %s' % (
-                            matches.iloc[i], teams.iloc[i + 1], 
-                            op_teams.iloc[i]))
-        i += 2
-
-
-def prepare_data(data):
-    """ birbiri ile uyan ama iki takim hakkinda veri olmadigi durumda o satirlari at"""
-    data = data.copy()
-    data = _drop_unbalanced_matches(data)
-    _check_data(data)
-    return data
-
-
-def train_model(data, ignore_cols):
-    """
-    Veri uzerinde bir lojistik regresyon modeli egitir. ignore_cols icinde
-    gecilen kolonlar dikkate alinmaz. 
-    """
-    # Validate the data
-    data = prepare_data(data)
-    target_col = 'points'
-    (train, test) = split(data)
-    train.to_csv('/tmp/out3.csv')
-    (y_train, x_train) = _extract_target(train, target_col)
-    x_train2 = _splice(_coerce(_clone_and_drop(x_train, ignore_cols)))
-
-    y_train2 = [int(yval) == 3 for yval in y_train]
-    model = build_model_logistic(y_train2, x_train2, alpha=8.0)
-    return (model, test)
-
-
-def predict_model(model, test, ignore_cols):
-    """
-    Bir takimin kazanip kazanmayacaginin tahmin eden basit bir algoritma
-    """
-      
-    x_test = _splice(_coerce(_clone_and_drop(test, ignore_cols)))
-    x_test['intercept'] = 1.0
-    predicted =  model.predict(x_test)
-    result = test.copy()
-    result['predicted'] = predicted
-    return result
-```
-
-### power.py
-
-```python
-"""
-Futbol takimlarin gecmiste oynadiklari maclara gore bir guc indisi atayarak
-derecelendirir.
-"""
-
-import numpy as np
-from numpy.linalg import LinAlgError
-import pandas as pd
-
-import world_cup
-
-def _build_team_matrix(data, target_col):
-    """
-    Verili bir mac dataframe'ine gore bir seyrek guc matrisi yaratir.
-    Girdi verisinde her mac icin arka arkaya iki tane satir kaydi olmasini
-    bekliyoruz. Ilk satir deplasman takimi hakkinda bilgi tasiyacak,
-    ikinci satir konuk takim hakkinda. Hesap yapilan matriste takimlar kolonlarda
-    maclar ise satirlarda olacak. Her mac icin deplasman takiminin
-    kolonunda pozitif bir deger olacak. Konuk takim icin negatif bir deger
-    olacak. Futbolde deplasman avantaji cok onemli oldugu icin
-    bu deplasmanda oynayan takimdan biraz avantaj cikartiyoruz. Tabii
-    burada dikatli olmak ta lazim, cunku dunya kupasi icin is_home (deplasman mi?)
-    kolonu evet/hayir formatinda degil (0.0 ile 1.0 arasinda reel degerler).
-    Guc matrisindeki en son kolon bir puan matrisi, bu kolona
-    deplasman takimi ile konuk takimin hedef kolonlari arasindaki fark
-    yazilmis.
-    """
-    teams = {}
-    nrows = len(data) / 2
-    for teamid in data['teamid']:
-        teams[str(teamid)] = pd.Series(np.zeros(nrows))
-
-    result = pd.Series(np.empty(nrows))
-    teams[target_col] = result
-
-    current_season = None
-    current_discount = 2.0
-
-    for game in xrange(nrows):
-        home = data.iloc[game * 2]
-        away = data.iloc[game * 2 + 1]
-        if home['seasonid'] != current_season:
-            # Discount older seasons.
-            current_season = home['seasonid']
-            current_discount *= 0.6
-            print "New season %s" % (current_season,)
-
-        home_id = str(home['teamid'])
-        away_id = str(away['teamid'])
-        points = home[target_col] - away[target_col]
-
-        # Discount home team's performance.
-        teams[home_id][game] = (1.0 + home['is_home'] * .25) / current_discount
-        teams[away_id][game] = (-1.0 - away['is_home'] * .25) / current_discount
-        result[game] = points
-
-    return pd.DataFrame(teams)
-
-
-def _build_power(games, outcomes, coerce_fn, acc=0.0001, alpha=1.0, snap=True):
-    """ Birbiri ile alakali bir kume mac uzerinden bir guc modeli
-        hazirlar (tum bu maclar ayni turnuvadan, musabakadan olmalidir mesela).
-        Bu maclar ve onlarin sonucunu alarak bu fonksiyon bir lojistik
-        regresyon modeli kurar, ve bu model tum takimlarin birbirine
-        olan izafi bir siralamasini hesaplar. Geriye takim id'si ve
-        o takimin 0 ve 1 arasindaki bir guc indisini dondurur. Eger
-        snap degiskeni True ise, indisler ceyreklere bolunur. Bu faydali
-        cunku siralama tahmini oldukca kabaca yapilan bir tahmin ve
-        tek bir numaradan elde edilecek bir tur "asiri spesifiklik" 
-        bizi yaniltabilirdi. 
-    """
-    outcomes = pd.Series([coerce_fn(val) for val in outcomes])
-    games.to_csv('/tmp/games.csv',index=None)
-    outcomes.to_csv('/tmp/outcomes.csv',index=None)
-    model = world_cup.build_model_logistic(outcomes, games, 
-        acc=acc, alpha=alpha)
-
-    #print model.summary()
-    params = np.exp(model.params)
-    del params['intercept']
-    params = params[params != 1.0]
-    max_param = params.max()
-    min_param = params.min()
-    param_range = max_param - min_param
-    if len(params) == 0 or param_range < 0.0001:
-        return None
-    
-    params = params.sub(min_param)
-    params = params.div(param_range)
-    qqs = np.percentile(params, [20, 40, 60, 80])
-    def _snap(val): 
-        """ Snaps a value to a quartile. """
-        for idx in xrange(len(qqs)):
-            if (qqs[idx] > val):
-                return idx * 0.25
-        return 1.0
-      
-    if snap:
-        # Snap power data to rough quartiles.
-        return params.apply(_snap).to_dict()
-    else:
-        return params.to_dict()
-
-
-def _get_power_map(competition, competition_data, col, coerce_fn):
-    """
-       Verili bir musabakadaki maclar ve sonuclarini iceren hedef kolonlarini
-       kullanarak tum bu takimlarin guc siralamasini hesapla. Uyum biraz
-       gevsek olacaktir, evet, bu sebeple uydurma islemini farkli
-       regularizasyon ve alpha parametreleri ile birkac kez denememiz
-       gerekebilir, ki boylece uydurmanin yakinsamasini (converge)
-       elde edebilmis oluruz. Geriye takim id ve guc siralamsini dondurur.
-    """
-    acc = 0.000001
-    alpha = 0.5
-    while True:
-        if alpha < 0.1:
-            print "Skipping power ranking for competition %s column %s" % (
-                competition, col)
-            return {}
-        try:
-            games = _build_team_matrix(competition_data, col)
-            outcomes = games[col]
-            del games[col]
-            competition_power = _build_power(games, outcomes, coerce_fn, acc,
-                                             alpha, snap=False)
-            if not competition_power:
-                alpha /= 2
-                print 'Reducing alpha for %s to %f due lack of range' % (
-                    competition, alpha)
-            else:
-                return competition_power
-        except LinAlgError, err:
-            alpha /= 2  
-            print 'Reducing alpha for %s to %f due to error %s' % (
-                competition, alpha, err)
-
-
-def add_power(data, power_train_data, cols):
-    """
-        Dataframe'e bazi guc kolonlari ekliyor. Egitim power_train_data
-        verisini musabakalara boler (cunku bu parcalar birbirinden farkli
-        guc istatistigine sahip olacaktir; mesela EPL takimlari MLS takimlari
-        ile normal lig maclarinda oynamazlar), hangi takimin daha fazla ya da
-        az guclu olup olmadigini bu maclar bazinda anlamak faydali olmazdi.
-
-        cols icinde bir kolon ismi olacak, ki bu kolon tahmin etmek
-        icin kullanilacak, bir fonksiyon ki onceden bahsedilen kolondaki
-        farki irdelemekle gorevli, ve sonucun yazilacagi hedef kolon.
-
-        Geriye bir dataframe dondurur, bu dataframe 'data' parametresiyle
-        ayni boyutlardadir, sadece ekl olarak guc istatistigi eklemis olacaktir.
-    """   
-    data = data.copy()
-    competitions = data['competitionid'].unique()
-    for (col, coerce_fn, final_name) in cols:
-        power = {}
-        for competition in competitions:
-            competition_data = power_train_data[
-                power_train_data['competitionid'] == competition]
-            power.update(
-                _get_power_map(competition, competition_data, col, coerce_fn))
-
-        names = {}
-        power_col = pd.Series(np.zeros(len(data)), data.index)
-        for index in xrange(len(data)):
-            teamid = str(data.iloc[index]['teamid'])
-            names[data.iloc[index]['team_name']] = power.get(teamid, 0.5)
-            power_col.iloc[index] = power.get(teamid, 0.5)
-        print ['%s: %0.03f' % (x[0], x[1])
-               for x in sorted(names.items(), key=(lambda x: x[1]))]
-        data['power_%s' % (final_name)] = power_col
-    return data
-```
-
-### features.py
-
-```python
-"""
-    Mac hakkindaki ham veriyi tahmin icin kullanabilecegimiz
-    ozelliklere donusturur. Tarihi verideki birkac maci birlestirip
-    birlesik / ozetsel bazi hesaplar uret ki boylece sonraki maci
-    tahmin edebilelim.
-"""
-
-import pandas as pd
-
-import match_stats
-
-def get_wc_features(history_size):
-    return pd.read_csv('results-20140714-123022.csv',sep=',')
-
-def get_features(history_size):
-    return pd.read_csv('results-20140714-123519.csv',sep=',')
-
-def get_game_summaries():
-    return pd.read_csv('results-20140714-124014.csv',sep=',')
-```
-
-### match_stats.py
-
-```python
-def get_non_feature_columns():
-    """ 
-    Ozellikler dataframe'inin kolon isimlerini dondur. Bu dataframe
-    tahmin icin kullanilmayan bir dataframe; kolonlari metaveri
-    aslinda (yani veri hakkinda veri), mesela takim ismi gibi, ya da
-    regresyon icin kaynak degil hedef veri iceren kolonlar. Hedef kolonunu
-    kullanmak istemiyoruz cunku bir macin verisini kullanarak ayni maci tahmin
-    ettigimiz bir durumda olmak istemeyiz.
-    """
-    return ['teamid', 'op_teamid', 'matchid', 'competitionid', 'seasonid',
-            'goals', 'op_goals', 'points', 'timestamp', 'team_name', 
-            'op_team_name']
-
-def get_feature_columns(all_cols):
-    """
-    Tahminde kullanilmasi gereken tum kolonlari geri dondurur, mesela
-    mesela dataframe'de olan ama features.get_non_feature_column() icinde
-    olmayan tum ogeler (kolonlar)
-    """
-    return [col for col in all_cols if col not in get_non_feature_columns()]
-```
+Helper codes are under
+[features.py](features.py),
+[match_stats.py](match_stats.py),
+[power.py)(power.py),
+[world_cup.py](world_cup.py)
 
 Kaynaklar
 
