@@ -348,12 +348,9 @@ class Kalman:
     def update(self, obs):
 
         # Make prediction
-        #print "self.mu_hat=" + str(self.mu_hat)
         self.mu_hat_est = dot(self.Phi,self.mu_hat) 
         prod = dot(self.Phi, dot(self.cov, transpose(self.Phi)))
         self.cov_est = prod + self.Sigma_x
-        #print "self.mu_hat_est=" + str(self.mu_hat_est)
-        #print "self.cov_est=" + str(self.cov_est)
                 
         # Update estimate
         prod = self.normalize_2d(dot(self.H,self.mu_hat_est))
@@ -789,7 +786,7 @@ def run(x0=(0.,0.), P=500, R=0, Q=0, dt=1.0,
 
 P = np.diag([500., 49.])
 Ms, Ps = run(count=50, R=10, Q=0.01, P=P)
-print Ms[-4:,]
+print (Ms[-4:,])
 ```
 
 ```

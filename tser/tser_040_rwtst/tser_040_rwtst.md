@@ -156,38 +156,38 @@ dfind['t'] = range(len(dfind))
 
 res1 = smf.ols('dy ~ t + ylag + dylag', data=dfind).fit()
 sse1 = np.sum(res1.resid**2)
-print list(res1.params)
-print 'sse1',sse1
+print (list(res1.params))
+print ('sse1',sse1)
 
 res2 = smf.ols('dy ~ dylag ', data=dfind).fit()
 sse2 = np.sum(res2.resid**2)
-print list(res2.params)
-print 'sse2',sse2
+print (list(res2.params))
+print ('sse2',sse2)
 
 # dikkat kesi yok burada
 res3 = smf.ols('dy ~ 0 + dylag', data=dfind).fit()
-print list(res3.params)
+print (list(res3.params))
 sse3 = np.sum(res3.resid**2)
-print 'sse3',sse3
+print ('sse3',sse3)
 
 k = 3
 phi2 = (sse3-sse1)/(k*sse1/(len(dfind)-4))
-print '\nphi2', phi2
+print ('\nphi2', phi2)
 k = 2
 phi3 = (sse2-sse1)/(k*sse1/(len(dfind)-4))
-print 'phi3', phi3
+print ('phi3', phi3)
 ```
 
-```
-[0.32890563193314926, 0.0012176940580472463, -0.11592339963358432, 0.47618947733620209]
-sse1 0.0439920148353
-[0.0054652611288141572, 0.41767827251937806]
-sse2 0.0490062183592
+```text
+[0.3289056319331478, 0.0012176940580472435, -0.11592339963358392, 0.47618947733620076]
+sse1 0.04399201483525674
+[0.0054652611288141546, 0.41767827251937806]
+sse2 0.04900621835916848
 [0.49810699391267177]
-sse3 0.0517366340291
+sse3 0.051736634029084336
 
-phi2 6.22029276313
-phi3 6.04093237744
+phi2 6.220292763129694
+phi3 6.040932377444517
 ```
 
 Kontrol için aynı hesabı `urca` paketi üzerinden işletelim, ki kritik
@@ -212,11 +212,10 @@ series = np.log(dfind.indpro)
 %R -i series
 %R  adf <- ur.df(series, type = 'trend',lags=1)
 %R -o adfout adfout <- summary(adf)
-print adfout
+print (adfout)
 ```
 
 ```
-
 ############################################### 
 # Augmented Dickey-Fuller Test Unit Root Test # 
 ############################################### 
@@ -286,11 +285,11 @@ doğrusu onun t değeridir, yani regresyon katsayısını standart hatası ile
 bölersek sonucu elde ederiz,
 
 ```python
-print 't degeri', res1.params['ylag'] / res1.bse['ylag']
+print ('t degeri', res1.params['ylag'] / res1.bse['ylag'])
 ```
 
-```
-t degeri -3.43932388217
+```text
+t degeri -3.4393238821734706
 ```
 
 ki üstteki kritik değerlere göre bu değeri yüzde 5 seviyesi -3.43'ten küçük
@@ -312,7 +311,7 @@ halini grafikleyelim,
 
 ```python
 import pandas as pd
-dfpe = pd.read_csv('pe.dat',sep='\s*')
+dfpe = pd.read_csv('pe.csv',sep='\s+',engine='python')
 dfpe['ln_price_earnings'] = np.log(dfpe.PRICE/dfpe.EARNINGS)
 dfpe.ln_price_earnings.plot()
 plt.savefig('tser_rwtst_01.png')
@@ -329,11 +328,10 @@ series = dfpe.ln_price_earnings
 %R -i series
 %R  adf <- ur.df(series, type = 'drift',lags=0)
 %R -o adfout adfout <- summary(adf)
-print adfout
+print (adfout)
 ```
 
 ```
-
 ############################################### 
 # Augmented Dickey-Fuller Test Unit Root Test # 
 ############################################### 
@@ -375,13 +373,13 @@ görülebileceği üzere, serinin durağan-olmadığını da tam
 reddedemiyoruz. Hurst hesabı,
 
 ```python
-import sys; sys.path.append('../tser_mean')
+import sys; sys.path.append('../tser_025_mean')
 import hurst as h
-print h.hurst(dfpe.ln_price_earnings)
+print (h.hurst(dfpe.ln_price_earnings))
 ```
 
-```
-0.0756699198133
+```text
+0.07566991981330642
 ```
 
 Bu değer 0.5'ten oldukça uzak.
@@ -424,7 +422,7 @@ series = dfclim.Temp
 %R -i series
 %R  adf <- ur.df(series, type = 'trend',selectlags="AIC")
 %R -o adfout adfout <- summary(adf)
-print adfout
+print (adfout)
 ```
 
 ```
@@ -474,13 +472,13 @@ dönüş var'' diyebilirler, eh tabii ki sıcaklık verisinde ortalama dönüş
 var, evet Hurst hesabına bakarsak,
 
 ```python
-import sys; sys.path.append('../tser_mean')
+import sys; sys.path.append('../tser_025_mean')
 import hurst as h
-print h.hurst(dfclim.Temp)
+print (h.hurst(dfclim.Temp))
 ```
 
-```
-0.040611546891
+```text
+0.04061154689100931
 ```
 
 Varyans Oranı
@@ -491,13 +489,14 @@ vr = VarianceRatio(dfclim.Temp, 12)
 print(vr.summary().as_text())
 ```
 
-```
+```text
      Variance-Ratio Test Results     
 =====================================
-Test Statistic                -15.768
+Test Statistic                 -7.884
 P-value                         0.000
 Lags                               12
 -------------------------------------
+
 Computed with overlapping blocks (de-biased)
 ```
 

@@ -115,38 +115,39 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    df.loc[t,<span class="st">&#39;hedgeRatio&#39;</span>] <span class="op">=</span> sm.OLS(y,x).fit().params[<span class="dv">1</span>]</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> np.ones(df[cols].shape)<span class="op">;</span> yport[:,<span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> np.<span class="bu">sum</span>(yport,axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(yport, window<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(yport, window<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(yport<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="op">=</span> np.ones(df[cols].shape) <span class="op">*</span> np.array([df[<span class="st">&#39;numUnits&#39;</span>]]).T</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="op">=</span> np.ones(df[cols].shape)<span class="op">;</span> tmp2[:, <span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> pd.DataFrame(tmp1 <span class="op">*</span> tmp2 <span class="op">*</span> df[cols])</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> positions.shift(<span class="dv">1</span>) <span class="op">*</span> (df[cols] <span class="op">-</span> df[cols].shift(<span class="dv">1</span>))  <span class="op">/</span> df[cols].shift(<span class="dv">1</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.233190876207
-Sharpe 1.12157265435</code></pre>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> yport.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> pd.Series(yport)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> yport.rolling(window<span class="op">=</span><span class="dv">20</span>).mean()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> yport.rolling(window<span class="op">=</span><span class="dv">20</span>).std()</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(yport<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="op">=</span> np.ones(df[cols].shape) <span class="op">*</span> np.array([df[<span class="st">&#39;numUnits&#39;</span>]]).T</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="op">=</span> np.ones(df[cols].shape)<span class="op">;</span> tmp2[:, <span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> pd.DataFrame(tmp1 <span class="op">*</span> tmp2 <span class="op">*</span> df[cols])</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> positions.shift(<span class="dv">1</span>) <span class="op">*</span> (df[cols] <span class="op">-</span> df[cols].shift(<span class="dv">1</span>))  <span class="op">/</span> df[cols].shift(<span class="dv">1</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.23319087620701384
+Sharpe 1.1215726543503066</code></pre>
 <p>Yıllık getiri yüzde 23 Sharpe oranı 1.12. Fena değil çünkü bu seri
 koentegre bile değil,</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_coint&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_030_coint&#39;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyconometrics</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> pyconometrics.cadf(np.matrix(df[<span class="st">&#39;GLD&#39;</span>]).H,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                         np.matrix(df[<span class="st">&#39;USO&#39;</span>]).H,<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
-<pre><code>{&#39;adf&#39;: -1.5150247935770809, &#39;alpha&#39;: -0.003112483397873777,
-&#39;nlag&#39;: 1, &#39;crit&#39;: matrix([[-3.88031, -3.35851, -3.03798,
--1.01144, -0.65334,  0.15312]]), &#39;nvar&#39;: 1}</code></pre>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (pyconometrics.cadf(np.matrix(df[<span class="st">&#39;GLD&#39;</span>]).H,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                         np.matrix(df[<span class="st">&#39;USO&#39;</span>]).H,<span class="dv">0</span>,<span class="dv">1</span>))</span></code></pre></div>
+<pre class="text"><code>{&#39;alpha&#39;: np.float64(-0.0031124833978737783), &#39;adf&#39;:
+np.float64(-1.5150247935770818), &#39;crit&#39;: matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), &#39;nlag&#39;: 1, &#39;nvar&#39;: 1}</code></pre>
 <p>Oran Kullanımı</p>
 <p>Eğer basit bir şekilde <span class="math inline">\(y/x\)</span> ile
 iki varlığını oranını “işlem sinyali’’ olarak kullansaydık ne olurdu?
 Ayrıca diyelim ki her iki varlığa eşit para yatırıyoruz,</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;hedgeRatio&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;USO&#39;</span>] <span class="op">/</span> df[<span class="st">&#39;GLD&#39;</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(df[<span class="st">&#39;hedgeRatio&#39;</span>], window<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(df[<span class="st">&#39;hedgeRatio&#39;</span>], window<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> df[<span class="st">&#39;hedgeRatio&#39;</span>].rolling(window<span class="op">=</span><span class="dv">20</span>).mean()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> df[<span class="st">&#39;hedgeRatio&#39;</span>].rolling(window<span class="op">=</span><span class="dv">20</span>).std()</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(df[<span class="st">&#39;hedgeRatio&#39;</span>]<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> df[[<span class="st">&#39;numUnits&#39;</span>,<span class="st">&#39;numUnits&#39;</span>]].copy()</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> positions <span class="op">*</span> np.array([<span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>])</span>
@@ -154,15 +155,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">/</span> df[cols].shift(<span class="dv">1</span>))</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.fillna(<span class="dv">0</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="fl">1.</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR -0.140673558863
-Sharpe -0.749582932902</code></pre>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="fl">1.</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR -0.14067355886298372
+Sharpe -0.7495829329023052</code></pre>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>plt.plot(np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_01.png&#39;</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_01.png" /></p>
 <p>Sonuç iyi değil.</p>
 <p>Bollinger Bantları</p>
@@ -204,50 +203,49 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a h
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>yport[:,<span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> yport <span class="op">*</span> df[cols]</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> yport[cols].<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(yport, window<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(yport, window<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>zScore<span class="op">=</span>(yport<span class="op">-</span>data_mean)<span class="op">/</span>data_std</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>entryZscore<span class="op">=</span><span class="fl">1.</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>exitZscore<span class="op">=</span><span class="dv">0</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>longsEntry<span class="op">=</span>zScore <span class="op">&lt;</span> <span class="op">-</span>entryZscore</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>longsExit<span class="op">=</span>zScore <span class="op">&gt;</span> <span class="op">-</span>exitZscore</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>shortsEntry<span class="op">=</span>zScore <span class="op">&gt;</span> entryZscore</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>shortsExit<span class="op">=</span>zScore <span class="op">&lt;</span> exitZscore</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>numUnitsLong <span class="op">=</span> pd.Series([np.nan <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(df))])</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>numUnitsShort <span class="op">=</span> pd.Series([np.nan <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(df))])</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>numUnitsLong[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>numUnitsShort[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>numUnitsLong[longsEntry] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>numUnitsLong[longsExit] <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>numUnitsLong <span class="op">=</span> numUnitsLong.fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>numUnitsShort[shortsEntry] <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>numUnitsShort[shortsExit] <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>numUnitsShort <span class="op">=</span> numUnitsShort.fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> numUnitsShort <span class="op">+</span> numUnitsLong</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="op">=</span> np.ones(df[cols].shape) <span class="op">*</span> np.array([df[<span class="st">&#39;numUnits&#39;</span>]]).T</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="op">=</span> np.ones(df[cols].shape)<span class="op">;</span> tmp2[:, <span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> pd.DataFrame(tmp1 <span class="op">*</span> tmp2 <span class="op">*</span> df[cols])</span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> positions.shift(<span class="dv">1</span>) <span class="op">*</span> (df[cols] <span class="op">-</span> df[cols].shift(<span class="dv">1</span>))  <span class="op">/</span> df[cols].shift(<span class="dv">1</span>)</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>ret.fillna(<span class="dv">0</span>)</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.197715854801
-Sharpe 1.06408761242</code></pre>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>yport <span class="op">=</span> pd.Series(yport)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> yport.rolling(window<span class="op">=</span><span class="dv">20</span>).mean()</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> yport.rolling(window<span class="op">=</span><span class="dv">20</span>).std()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>zScore<span class="op">=</span>(yport<span class="op">-</span>data_mean)<span class="op">/</span>data_std</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>entryZscore<span class="op">=</span><span class="fl">1.</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>exitZscore<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>longsEntry<span class="op">=</span>zScore <span class="op">&lt;</span> <span class="op">-</span>entryZscore</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>longsExit<span class="op">=</span>zScore <span class="op">&gt;</span> <span class="op">-</span>exitZscore</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>shortsEntry<span class="op">=</span>zScore <span class="op">&gt;</span> entryZscore</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>shortsExit<span class="op">=</span>zScore <span class="op">&lt;</span> exitZscore</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>numUnitsLong <span class="op">=</span> pd.Series([np.nan <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(df))])</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>numUnitsShort <span class="op">=</span> pd.Series([np.nan <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(df))])</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>numUnitsLong[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>numUnitsShort[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>numUnitsLong[longsEntry] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>numUnitsLong[longsExit] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>numUnitsLong <span class="op">=</span> numUnitsLong.fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>numUnitsShort[shortsEntry] <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>numUnitsShort[shortsExit] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>numUnitsShort <span class="op">=</span> numUnitsShort.fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;numUnits&#39;</span>] <span class="op">=</span> numUnitsShort <span class="op">+</span> numUnitsLong</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="op">=</span> np.ones(df[cols].shape) <span class="op">*</span> np.array([df[<span class="st">&#39;numUnits&#39;</span>]]).T</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="op">=</span> np.ones(df[cols].shape)<span class="op">;</span> tmp2[:, <span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span>df[<span class="st">&#39;hedgeRatio&#39;</span>]</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>positions <span class="op">=</span> pd.DataFrame(tmp1 <span class="op">*</span> tmp2 <span class="op">*</span> df[cols])</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> positions.shift(<span class="dv">1</span>) <span class="op">*</span> (df[cols] <span class="op">-</span> df[cols].shift(<span class="dv">1</span>))  <span class="op">/</span> df[cols].shift(<span class="dv">1</span>)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>ret.fillna(<span class="dv">0</span>)</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.1977158548013851
+Sharpe 1.064087612417886</code></pre>
 <div class="sourceCode" id="cb12"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plt.plot(np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_02.png&#39;</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_02.png" /></p>
 <p>Kalman Filtreleri ile Dinamik Lineer Regresyon</p>
 <p>Gerçekten koentegre halinde olan iki fiyat zaman serisi için
@@ -338,7 +336,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> beta, e, Q</span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, kf</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ewdf <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_coint/ETF.csv&#39;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ewdf <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_030_coint/ETF.csv&#39;</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> ewdf[[<span class="st">&#39;ewa&#39;</span>]].copy()</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ewdf[[<span class="st">&#39;ewc&#39;</span>]].copy()</span>
@@ -350,17 +348,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>beta, e, Q <span class="op">=</span> kf.kalman_filter(x,y)</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plt.plot(beta[<span class="dv">0</span>, :].T)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;EWC(y) ve EWA(x) Arasındaki Eğim - Beta[0,t]&#39;</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_03.png&#39;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;EWC(y) ve EWA(x) Arasındaki Eğim - Beta[0,t]&#39;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_03.png" /></p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plt.plot(beta[<span class="dv">1</span>, :].T)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Kesi, Beta[1,t]&#39;</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_04.png&#39;</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Kesi, Beta[1,t]&#39;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_04.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_04.png" /></p>
 <p>Bu modelin güzel yan etkilerinden biri şu oldu: KF’in doğal olarak
 hesapladığı parametreler ile direk bir ortalamaya-dönüş stratejisi
@@ -375,11 +369,8 @@ class="math inline">\(\sqrt{Q_t}\)</span> içinde! Her iki parametreyi
 grafiklersek alttaki görüntü çıkıyor.</p>
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plt.plot(e[<span class="dv">2</span>:], <span class="st">&#39;r&#39;</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.plot(np.sqrt(Q[<span class="dv">2</span>:]))</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_05.png&#39;</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.plot(np.sqrt(Q[<span class="dv">2</span>:]))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_05.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_05.png" /></p>
 <p>Geri kalanlar daha önce Bollinger bantlarında gördüğümüz gibi.</p>
 <div class="sourceCode" id="cb18"><pre
@@ -424,10 +415,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a h
 <span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> np.<span class="bu">sum</span>(tmp1 <span class="op">*</span> tmp2 <span class="op">/</span> tmp3,axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> ret.fillna(<span class="dv">0</span>)</span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.262251943494
-Sharpe 2.36194908518</code></pre>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.262251943494046
+Sharpe 2.361949085176113</code></pre>
 <p>ETF ve ETF’in Öğe Hisseleri Arasında Arbitraj</p>
 <p>Bir ETF ve onu oluşturan öğe hisseler arasında da arbitraj fırsatları
 vardır. Bu portföyü oluşturmak için her öğe hisse ile ETF arasında teker
@@ -469,8 +460,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a h
 <span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>   res <span class="op">=</span> coint_johansen(data, <span class="dv">0</span>, <span class="dv">1</span>)</span>
 <span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> res.lr1[<span class="dv">0</span>] <span class="op">&gt;</span> res.cvt[<span class="dv">0</span>][<span class="dv">0</span>]: </span>
 <span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>       resdf.loc[s,<span class="st">&#39;isCoint&#39;</span>] <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> resdf.isCoint.<span class="bu">sum</span>()</span></code></pre></div>
-<pre><code>98</code></pre>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (resdf.isCoint.<span class="bu">sum</span>())</span></code></pre></div>
+<pre class="text"><code>98</code></pre>
 <p>98 tane senet koentegre imiş. Şimdi bu senetlerle portföy
 oluşturalım, ve tekrar koentegrasyon testi yapalım,</p>
 <div class="sourceCode" id="cb22"><pre
@@ -480,20 +471,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a h
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>ytest <span class="op">=</span> pd.concat([logMktVal_long, np.log(train.SPY)],axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> coint_johansen(ytest, <span class="dv">0</span>, <span class="dv">1</span>)</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>print_johan_stats(res)</span></code></pre></div>
-<pre><code>trace statistic [ 15.86864835   6.19735725]
+<pre class="text"><code>trace statistic [15.86864835  6.19735725]
 critical vals %90,%95,%99
-r&lt;=0 [ 13.4294  15.4943  19.9349]
-r&lt;=1 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 9.6712911   6.19735725]
+r&lt;=0 [13.4294 15.4943 19.9349]
+r&lt;=1 [2.7055 3.8415 6.6349]
+eigen statistic [9.6712911  6.19735725]
 critical values  %90,%95,%99
-r&lt;=0 [ 12.2971  14.2639  18.52  ]
-r&lt;=1 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.0380959   0.02458181]
-
+r&lt;=0 [12.2971 14.2639 18.52  ]
+r&lt;=1 [2.7055 3.8415 6.6349]
+ozdegerler [0.0380959  0.02458181]
 ozvektorler
-
 [[   1.09386171   -0.27989806]
  [-105.55999232   56.09328286]]</code></pre>
 <div class="sourceCode" id="cb24"><pre
@@ -503,8 +490,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a h
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>yNplus <span class="op">=</span> testspy3[coint_cols <span class="op">+</span> [<span class="st">&#39;SPY&#39;</span>]]</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>logMktVal <span class="op">=</span> np.<span class="bu">sum</span>(weights <span class="op">*</span> np.log(yNplus),axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>lookback<span class="op">=</span><span class="dv">5</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(logMktVal, window<span class="op">=</span>lookback)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(logMktVal, window<span class="op">=</span>lookback)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> logMktVal.rolling(window<span class="op">=</span>lookback).mean()</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> logMktVal.rolling(window<span class="op">=</span>lookback).std()</span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>numUnits <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(logMktVal<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>numUnits2 <span class="op">=</span> np.reshape(numUnits, (<span class="bu">len</span>(numUnits),<span class="dv">1</span>))</span>
@@ -513,18 +500,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a h
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="op">=</span> np.log(yNplus)<span class="op">-</span>np.log(yNplus.shift(<span class="dv">1</span>))</span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> np.<span class="bu">sum</span>(np.array(positions.shift(<span class="dv">1</span>)) <span class="op">*</span> np.array(tmp1), axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.0449298745128
-Sharpe 1.32310985261</code></pre>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.044929874512839474
+Sharpe 1.323109852605057</code></pre>
 <p>Sonuç ilk deneme için fena sayılmaz; Bazı basit ilerlemeler
 mümkündür, mesela her zaman aralığı için portföyü oluşturan senetleri
 değiştirmek.</p>
 <div class="sourceCode" id="cb26"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>plt.plot(np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_06.png&#39;</span>)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_06.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_06.png" /></p>
 <p>Trendli Ortalamaya Dönüş</p>
 <p>Bir tane de benden. Finans zaman serilerinin çoğunlukla bir trend’e
@@ -533,7 +518,7 @@ nedir? Ortalamaya dönüş yapan, durağan bir zaman serisi değil mi?
 S&amp;P 500 üzerinde görelim,</p>
 <div class="sourceCode" id="cb27"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_draw_sharpe/SPY.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_010_back/SPY.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;SPY&#39;</span>] <span class="op">=</span> df[[<span class="st">&#39;Adj Close&#39;</span>]]</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df.index <span class="op">&lt;</span> <span class="st">&#39;2005-01-01&#39;</span>]</span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>df.SPY.plot()</span>
@@ -547,25 +532,23 @@ altına düşüşlerde alım, yukarı çıkışlarda satım yapıyoruz.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lookback <span class="op">=</span> <span class="dv">100</span><span class="op">;</span> forward <span class="op">=</span> <span class="dv">30</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>forward_points <span class="op">=</span> <span class="bu">range</span>(lookback, <span class="bu">len</span>(df), forward)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#print forward_points</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.ones((lookback,<span class="dv">2</span>))</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>x[:,<span class="dv">1</span>] <span class="op">=</span> np.array(<span class="bu">range</span>(lookback))</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> forward_points:    </span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> df.SPY[t<span class="op">-</span>lookback:t]</span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> sm.OLS(y,x).fit()</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    df.loc[df.index[t],<span class="st">&#39;intercept&#39;</span>] <span class="op">=</span> f.params[<span class="dv">0</span>]</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    df.loc[df.index[t],<span class="st">&#39;slope&#39;</span>] <span class="op">=</span> f.params[<span class="dv">1</span>]</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#print t, f.params[0], f.params[1]</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;ols&#39;</span>] <span class="op">=</span> np.nan</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>x_lookback <span class="op">=</span> np.array(<span class="bu">range</span>(lookback))</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> forward_points:</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>   y <span class="op">=</span> x_lookback <span class="op">*</span> df.ix[t].slope <span class="op">+</span> df.ix[t].intercept</span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>   df.loc[t<span class="op">-</span>lookback:t,<span class="st">&#39;ols&#39;</span>] <span class="op">=</span> y</span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">&#39;SPY&#39;</span>,<span class="st">&#39;ols&#39;</span>]].plot()</span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_08.png&#39;</span>)</span></code></pre></div>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.ones((lookback,<span class="dv">2</span>))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>x[:,<span class="dv">1</span>] <span class="op">=</span> np.array(<span class="bu">range</span>(lookback))</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> forward_points:    </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> df.SPY[t<span class="op">-</span>lookback:t]</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> sm.OLS(y,x).fit()</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    df.loc[df.index[t],<span class="st">&#39;intercept&#39;</span>] <span class="op">=</span> f.params[<span class="dv">0</span>]</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    df.loc[df.index[t],<span class="st">&#39;slope&#39;</span>] <span class="op">=</span> f.params[<span class="dv">1</span>]</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;ols&#39;</span>] <span class="op">=</span> np.nan</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>x_lookback <span class="op">=</span> np.array(<span class="bu">range</span>(lookback))</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> forward_points:</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>   y <span class="op">=</span> x_lookback <span class="op">*</span> df.iloc[t].slope <span class="op">+</span> df.iloc[t].intercept</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>   df.iloc[t<span class="op">-</span>lookback:t].loc[:,<span class="st">&#39;ols&#39;</span>] <span class="op">=</span> y</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">&#39;SPY&#39;</span>,<span class="st">&#39;ols&#39;</span>]].plot()</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mrimp_08.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_mrimp_08.png" /></p>
 <p>Trend’i çıkartınca geriye kalanın hakikaten durağan olduğunu
 görelim,</p>
@@ -576,15 +559,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a h
 <p><img src="tser_mrimp_09.png" /></p>
 <div class="sourceCode" id="cb30"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>win<span class="op">=</span><span class="dv">5</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> pd.rolling_mean(df.MR, window<span class="op">=</span>win)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> pd.rolling_std(df.MR, window<span class="op">=</span>win)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>data_mean <span class="op">=</span> df.MR.rolling(window<span class="op">=</span>win).mean()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>data_std <span class="op">=</span> df.MR.rolling(window<span class="op">=</span>win).std()</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;mktVal&#39;</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">*</span>(df.MR<span class="op">-</span>data_mean) <span class="op">/</span> data_std</span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> df[<span class="st">&#39;mktVal&#39;</span>].shift(<span class="dv">1</span>) <span class="op">*</span> (df[<span class="st">&#39;MR&#39;</span>]<span class="op">-</span>df[<span class="st">&#39;MR&#39;</span>].shift(<span class="dv">1</span>))<span class="op">/</span> df[<span class="st">&#39;MR&#39;</span>].shift(<span class="dv">1</span>)</span>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl.fillna(<span class="dv">0</span>) <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(df[<span class="st">&#39;mktVal&#39;</span>].shift(<span class="dv">1</span>)))</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="fl">1.</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span></code></pre></div>
-<pre><code>APR 0.280181769408
-Sharpe 0.888414859744</code></pre>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="fl">1.</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span></code></pre></div>
+<pre class="text"><code>APR 0.2801817694094304
+Sharpe 0.8884148597414459</code></pre>
 <p>Kaynaklar</p>
 <p>[1] Chan, <em>Algorithmic Trading</em></p>
 <p>[2] Bayramlı, Fizik, <em>Kalman Filtreleri</em></p>

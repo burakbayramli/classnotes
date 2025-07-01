@@ -30,9 +30,10 @@ for t in range(lookback,len(df)):
     df.loc[t,'hedgeRatio'] = sm.OLS(y,x).fit().params[1]
 
 yport = np.ones(df[cols].shape); yport[:,0] = -df['hedgeRatio']
-yport = np.sum(yport,axis=1)
-data_mean = pd.rolling_mean(yport, window=20)
-data_std = pd.rolling_std(yport, window=20)
+yport = yport.sum(axis=1)
+yport = pd.Series(yport)
+data_mean = yport.rolling(window=20).mean()
+data_std = yport.rolling(window=20).std()
 df['numUnits'] = -1*(yport-data_mean) / data_std
 tmp1 = np.ones(df[cols].shape) * np.array([df['numUnits']]).T
 tmp2 = np.ones(df[cols].shape); tmp2[:, 0] = -df['hedgeRatio']
@@ -40,30 +41,30 @@ positions = pd.DataFrame(tmp1 * tmp2 * df[cols])
 pnl = positions.shift(1) * (df[cols] - df[cols].shift(1))  / df[cols].shift(1)
 pnl = pnl.sum(axis=1)
 ret=pnl / np.sum(np.abs(positions.shift(1)),axis=1)
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR 0.233190876207
-Sharpe 1.12157265435
+```text
+APR 0.23319087620701384
+Sharpe 1.1215726543503066
 ```
 
 Yıllık getiri yüzde 23 Sharpe oranı 1.12. Fena değil çünkü bu seri
 koentegre bile değil,
 
 ```python
-import sys; sys.path.append('../tser_coint')
+import sys; sys.path.append('../tser_030_coint')
 import pyconometrics
-print pyconometrics.cadf(np.matrix(df['GLD']).H,
-                         np.matrix(df['USO']).H,0,1)
+print (pyconometrics.cadf(np.matrix(df['GLD']).H,
+                         np.matrix(df['USO']).H,0,1))
 
 ```
 
-```
-{'adf': -1.5150247935770809, 'alpha': -0.003112483397873777,
-'nlag': 1, 'crit': matrix([[-3.88031, -3.35851, -3.03798,
--1.01144, -0.65334,  0.15312]]), 'nvar': 1}
+```text
+{'alpha': np.float64(-0.0031124833978737783), 'adf':
+np.float64(-1.5150247935770818), 'crit': matrix([[-3.88031, -3.35851,
+-3.03798, -1.01144, -0.65334, 0.15312]]), 'nlag': 1, 'nvar': 1}
 ```
 
 Oran Kullanımı
@@ -74,8 +75,8 @@ yatırıyoruz,
 
 ```python
 df['hedgeRatio'] = df['USO'] / df['GLD']
-data_mean = pd.rolling_mean(df['hedgeRatio'], window=20)
-data_std = pd.rolling_std(df['hedgeRatio'], window=20)
+data_mean = df['hedgeRatio'].rolling(window=20).mean()
+data_std = df['hedgeRatio'].rolling(window=20).std()
 df['numUnits'] = -1*(df['hedgeRatio']-data_mean) / data_std
 positions = df[['numUnits','numUnits']].copy()
 positions = positions * np.array([-1., 1.])
@@ -83,20 +84,18 @@ pnl = positions.shift(1) * np.array((df[cols] - df[cols].shift(1))
       / df[cols].shift(1))
 pnl = pnl.fillna(0).sum(axis=1)
 ret=pnl / np.sum(np.abs(positions.shift(1)),axis=1)
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1.
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1.)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR -0.140673558863
-Sharpe -0.749582932902
+```text
+APR -0.14067355886298372
+Sharpe -0.7495829329023052
 ```
 
 ```python
 plt.plot(np.cumprod(1+ret)-1)
-plt.hold(False)
 plt.savefig('tser_mrimp_01.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_01.png)
@@ -145,9 +144,10 @@ yport = np.ones(df[cols].shape)
 yport[:,0] = -df['hedgeRatio']
 yport = yport * df[cols]
 yport = yport[cols].sum(axis=1)
+yport = pd.Series(yport)
 
-data_mean = pd.rolling_mean(yport, window=20)
-data_std = pd.rolling_std(yport, window=20)
+data_mean = yport.rolling(window=20).mean()
+data_std = yport.rolling(window=20).std()
 zScore=(yport-data_mean)/data_std
 
 entryZscore=1.
@@ -179,21 +179,19 @@ pnl = positions.shift(1) * (df[cols] - df[cols].shift(1))  / df[cols].shift(1)
 pnl = pnl.sum(axis=1)
 ret=pnl / np.sum(np.abs(positions.shift(1)),axis=1)
 ret=ret.fillna(0)
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR 0.197715854801
-Sharpe 1.06408761242
+```text
+APR 0.1977158548013851
+Sharpe 1.064087612417886
 ```
 
 ```python
 plt.plot(np.cumprod(1+ret)-1)
-plt.hold(False)
 plt.title(u'Kümülatif Birleşik Getiri')
 plt.savefig('tser_mrimp_02.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_02.png)
@@ -285,7 +283,7 @@ def kalman_filter(x,y):
 
 ```python
 import pandas as pd, kf
-ewdf = pd.read_csv('../tser_coint/ETF.csv')
+ewdf = pd.read_csv('../tser_030_coint/ETF.csv')
 
 x = ewdf[['ewa']].copy()
 y = ewdf[['ewc']].copy()
@@ -299,20 +297,16 @@ beta, e, Q = kf.kalman_filter(x,y)
 
 ```python
 plt.plot(beta[0, :].T)
-plt.hold(True)
 plt.title('EWC(y) ve EWA(x) Arasındaki Eğim - Beta[0,t]')
 plt.savefig('tser_mrimp_03.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_03.png)
 
 ```python
 plt.plot(beta[1, :].T)
-plt.hold(True)
 plt.title('Kesi, Beta[1,t]')
 plt.savefig('tser_mrimp_04.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_04.png)
@@ -329,11 +323,8 @@ görüntü çıkıyor.
 
 ```python
 plt.plot(e[2:], 'r')
-plt.hold(True)
 plt.plot(np.sqrt(Q[2:]))
-plt.hold(True)
 plt.savefig('tser_mrimp_05.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_05.png)
@@ -382,13 +373,13 @@ tmp3 = np.array(y2.shift(1))
 pnl = np.sum(tmp1 * tmp2 / tmp3,axis=1)
 ret = pnl / np.sum(np.abs(positions.shift(1)),axis=1)
 ret = ret.fillna(0)
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR 0.262251943494
-Sharpe 2.36194908518
+```text
+APR 0.262251943494046
+Sharpe 2.361949085176113
 ```
 
 ETF ve ETF'in Öğe Hisseleri Arasında Arbitraj
@@ -434,10 +425,10 @@ for s in dfspy3.columns:
    res = coint_johansen(data, 0, 1)
    if res.lr1[0] > res.cvt[0][0]: 
        resdf.loc[s,'isCoint'] = True
-print resdf.isCoint.sum()
+print (resdf.isCoint.sum())
 ```
 
-```
+```text
 98
 ```
 
@@ -453,21 +444,17 @@ res = coint_johansen(ytest, 0, 1)
 print_johan_stats(res)
 ```
 
-```
-trace statistic [ 15.86864835   6.19735725]
+```text
+trace statistic [15.86864835  6.19735725]
 critical vals %90,%95,%99
-r<=0 [ 13.4294  15.4943  19.9349]
-r<=1 [ 2.7055  3.8415  6.6349]
-
-eigen statistic [ 9.6712911   6.19735725]
+r<=0 [13.4294 15.4943 19.9349]
+r<=1 [2.7055 3.8415 6.6349]
+eigen statistic [9.6712911  6.19735725]
 critical values  %90,%95,%99
-r<=0 [ 12.2971  14.2639  18.52  ]
-r<=1 [ 2.7055  3.8415  6.6349]
-
-ozdegerler [ 0.0380959   0.02458181]
-
+r<=0 [12.2971 14.2639 18.52  ]
+r<=1 [2.7055 3.8415 6.6349]
+ozdegerler [0.0380959  0.02458181]
 ozvektorler
-
 [[   1.09386171   -0.27989806]
  [-105.55999232   56.09328286]]
 ```
@@ -479,8 +466,8 @@ weights = np.hstack((tmp1,tmp2))
 yNplus = testspy3[coint_cols + ['SPY']]
 logMktVal = np.sum(weights * np.log(yNplus),axis=1)
 lookback=5
-data_mean = pd.rolling_mean(logMktVal, window=lookback)
-data_std = pd.rolling_std(logMktVal, window=lookback)
+data_mean = logMktVal.rolling(window=lookback).mean()
+data_std = logMktVal.rolling(window=lookback).std()
 numUnits = -1*(logMktVal-data_mean) / data_std
 
 numUnits2 = np.reshape(numUnits, (len(numUnits),1))
@@ -489,13 +476,13 @@ positions = pd.DataFrame(np.tile(numUnits2, weights.shape[1]),\
 tmp1 = np.log(yNplus)-np.log(yNplus.shift(1))
 pnl = np.sum(np.array(positions.shift(1)) * np.array(tmp1), axis=1)
 ret = pnl / np.sum(np.abs(positions.shift(1)),axis=1)
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
-```
-APR 0.0449298745128
-Sharpe 1.32310985261
+```text
+APR 0.044929874512839474
+Sharpe 1.323109852605057
 ```
 
 Sonuç ilk deneme için fena sayılmaz; Bazı basit ilerlemeler mümkündür,
@@ -503,9 +490,7 @@ mesela her zaman aralığı için portföyü oluşturan senetleri değiştirmek.
 
 ```python
 plt.plot(np.cumprod(1+ret)-1)
-plt.hold(True)
 plt.savefig('tser_mrimp_06.png')
-plt.hold(False)
 ```
 
 ![](tser_mrimp_06.png)
@@ -519,7 +504,7 @@ görelim,
 
 ```python
 import pandas as pd
-df = pd.read_csv('../tser_draw_sharpe/SPY.csv',index_col='Date',parse_dates=True)
+df = pd.read_csv('../tser_010_back/SPY.csv',index_col='Date',parse_dates=True)
 df['SPY'] = df[['Adj Close']]
 df = df[df.index < '2005-01-01']
 df.SPY.plot()
@@ -537,7 +522,6 @@ dönük tahmin olarak kullanıyoruz, bu tahminin altına düşüşlerde alım, y
 import statsmodels.api as sm
 lookback = 100; forward = 30
 forward_points = range(lookback, len(df), forward)
-#print forward_points
 
 x = np.ones((lookback,2))
 x[:,1] = np.array(range(lookback))
@@ -547,13 +531,12 @@ for t in forward_points:
     f = sm.OLS(y,x).fit()
     df.loc[df.index[t],'intercept'] = f.params[0]
     df.loc[df.index[t],'slope'] = f.params[1]
-    #print t, f.params[0], f.params[1]
     
 df['ols'] = np.nan
 x_lookback = np.array(range(lookback))
 for t in forward_points:
-   y = x_lookback * df.ix[t].slope + df.ix[t].intercept
-   df.loc[t-lookback:t,'ols'] = y
+   y = x_lookback * df.iloc[t].slope + df.iloc[t].intercept
+   df.iloc[t-lookback:t].loc[:,'ols'] = y
 df[['SPY','ols']].plot()
 plt.savefig('tser_mrimp_08.png')
 ```
@@ -572,20 +555,19 @@ plt.savefig('tser_mrimp_09.png')
 
 ```python
 win=5
-data_mean = pd.rolling_mean(df.MR, window=win)
-data_std = pd.rolling_std(df.MR, window=win)
+data_mean = df.MR.rolling(window=win).mean()
+data_std = df.MR.rolling(window=win).std()
 df['mktVal'] = -1*(df.MR-data_mean) / data_std
 pnl = df['mktVal'].shift(1) * (df['MR']-df['MR'].shift(1))/ df['MR'].shift(1)
 ret=pnl.fillna(0) / np.sum(np.abs(df['mktVal'].shift(1)))
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1.
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1.)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
 ```
 
+```text
+APR 0.2801817694094304
+Sharpe 0.8884148597414459
 ```
-APR 0.280181769408
-Sharpe 0.888414859744
-```
-
 
 Kaynaklar
 
