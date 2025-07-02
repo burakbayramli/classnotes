@@ -225,12 +225,12 @@ def svm(X, y):
     # solve QP problem
     solution = cvxopt.solvers.qp(P, q, G, h, A, b)
 
-    print solution
+    print (solution)
     
     # Lagrange multipliers
     a = np.ravel(solution['x'])
     
-    print "a", a
+    print ("a", a)
 
     # Support vectors have non zero lagrange multipliers
     ssv = a > 1e-5
@@ -238,9 +238,9 @@ def svm(X, y):
     a = a[ssv]
     sv = X[ssv]
     sv_y = y[ssv]
-    print "%d support vectors out of %d points" % (len(a), n_samples)
-    print "sv", sv
-    print "sv_y", sv_y
+    print ("%d support vectors out of %d points" % (len(a), n_samples))
+    print ("sv", sv)
+    print ("sv_y", sv_y)
 
     # Intercept
     b = 0
@@ -254,40 +254,40 @@ def svm(X, y):
     for n in range(len(a)):
         w += a[n] * sv_y[n] * sv[n]
 
-    print "a", a
+    print ("a", a)
     return w, b, sv_y, sv, a
 
 X = np.array([[3.,3.],[4.,4.],[7.,7.],[8.,8.]])
 y = np.array([1.,1.,-1.,-1.])
 w, b, sv_y, sv, a = svm(X, y)
-print "w", w
-print "b", b
-print 'test points'
-print np.dot([2.,2.], w) + b # > 1
-print np.dot([9.,9.], w) + b # < -1
+print ("w", w)
+print ("b", b)
+print ('test points')
+print (np.dot([2.,2.], w) + b) # > 1
+print (np.dot([9.,9.], w) + b) # < -1
 ```
 
-```
+```text
      pcost       dcost       gap    pres   dres
  0: -2.9061e-01 -5.0286e-01  6e+00  2e+00  1e+00
- 1: -3.6857e-02 -3.0976e-01  3e-01  4e-16  1e-15
- 2: -1.0255e-01 -1.2816e-01  3e-02  3e-17  7e-16
- 3: -1.1074e-01 -1.1128e-01  5e-04  3e-17  7e-16
- 4: -1.1111e-01 -1.1111e-01  5e-06  4e-17  7e-16
- 5: -1.1111e-01 -1.1111e-01  5e-08  1e-17  6e-16
+ 1: -3.6857e-02 -3.0976e-01  3e-01  3e-16  2e-15
+ 2: -1.0255e-01 -1.2816e-01  3e-02  3e-17  1e-15
+ 3: -1.1074e-01 -1.1128e-01  5e-04  2e-17  9e-16
+ 4: -1.1111e-01 -1.1111e-01  5e-06  3e-17  3e-16
+ 5: -1.1111e-01 -1.1111e-01  5e-08  4e-17  4e-16
 Optimal solution found.
-{'status': 'optimal', 'dual slack': 7.403425105865883e-08, 'iterations': 5, 'relative gap': 4.79718822391507e-07, 'dual objective': -0.11111112756316754, 'gap': 5.330207369918724e-08, 'primal objective': -0.11111107426109389, 'primal slack': 2.7637512517768505e-08, 's': <4x1 matrix, tc='d'>, 'primal infeasibility': 1.077377601559697e-17, 'dual infeasibility': 6.043668397566901e-16, 'y': <1x1 matrix, tc='d'>, 'x': <4x1 matrix, tc='d'>, 'z': <4x1 matrix, tc='d'>}
-a [  2.76375125e-08   1.11111073e-01   1.11111073e-01   2.76375125e-08]
+{'x': <4x1 matrix, tc='d'>, 'y': <1x1 matrix, tc='d'>, 's': <4x1 matrix, tc='d'>, 'z': <4x1 matrix, tc='d'>, 'status': 'optimal', 'gap': 5.330207369919097e-08, 'relative gap': 4.797188223915408e-07, 'primal objective': -0.11111107426109383, 'dual objective': -0.11111112756316754, 'primal infeasibility': 4.388541835878497e-17, 'dual infeasibility': 3.646862906299076e-16, 'primal slack': 2.76375125177696e-08, 'dual slack': 7.403425105865937e-08, 'iterations': 5}
+a [2.76375125e-08 1.11111073e-01 1.11111073e-01 2.76375125e-08]
 2 support vectors out of 4 points
-sv [[ 4.  4.]
- [ 7.  7.]]
+sv [[4. 4.]
+ [7. 7.]]
 sv_y [ 1. -1.]
-a [ 0.11111107  0.11111107]
+a [0.11111107 0.11111107]
 w [-0.33333322 -0.33333322]
-b 3.66666541806
+b 3.666665418062399
 test points
-2.33333253877
--2.33333253877
+2.3333325387669808
+-2.3333325387669817
 ```
 
 Not: İkizdeki $L_d$'yi maksimize ediyoruz, fakat hala `qp()`'deki
@@ -363,7 +363,7 @@ def predict(w, x):
 
 def train_sgd(data, labels, lam, iter, batch_size):
     m,n = data.shape; w = np.zeros(n)
-    idx = range(m)
+    idx = list(range(m)) # Convert range object to a list
     eta = 0.0001
     for t in range(1, iter):
         w_delta = np.zeros(n)
@@ -378,13 +378,13 @@ def train_sgd(data, labels, lam, iter, batch_size):
 ```
 
 ```python
-import numpy as np, pandas as pd, pegasos, zipfile
+import numpy as np, pandas as pd, zipfile
 
 with zipfile.ZipFile('svmdata.zip', 'r') as z:
     df =  pd.read_csv(z.open('features.txt'),sep=',')
     labels =  pd.read_csv(z.open('target.txt'))
     
-print df.shape, labels.shape
+print (df.shape, labels.shape)
 
 data_train = df.head(5413)
 data_test = df.tail(1000)
@@ -400,7 +400,7 @@ def show_auc(d1, d2):
     return 'AUC', roc_auc
 ```
 
-```
+```text
 (6413, 122) (6413, 1)
 ```
 
@@ -409,41 +409,41 @@ np.random.seed(0)
   
 for epoch in [10,50,100,200]:
     for batch_size in [1,10,100]:
-        w = pegasos.train_sgd(np.array(data_train),labels=np.array(label_train),
+        w = train_sgd(np.array(data_train),labels=np.array(label_train),
                               lam=1, iter=epoch,batch_size=batch_size)
-        pred = pegasos.predict(w, data_train.T)
+        pred = predict(w, data_train.T)
         score = show_auc(np.array(label_train.T)[0], pred[0])
-        print 'iter', epoch, 'batch', batch_size, 'egitim', score
-        pred = pegasos.predict(w, data_test.T)
+        print ('iter', epoch, 'batch', batch_size, 'egitim', score)
+        pred = predict(w, data_test.T)
         score = show_auc(np.array(label_test.T)[0], pred[0])
-        print 'iter', epoch, 'batch', batch_size, 'test', score
+        print ('iter', epoch, 'batch', batch_size, 'test', score)
 ```
 
-```
-iter 10 batch 1 egitim ('AUC', 0.80632699788480933)
-iter 10 batch 1 test ('AUC', 0.79744266666666663)
-iter 10 batch 10 egitim ('AUC', 0.78954806549498469)
-iter 10 batch 10 test ('AUC', 0.78614666666666666)
-iter 10 batch 100 egitim ('AUC', 0.76682726584846694)
-iter 10 batch 100 test ('AUC', 0.76497599999999999)
-iter 50 batch 1 egitim ('AUC', 0.75623733098567281)
-iter 50 batch 1 test ('AUC', 0.76376266666666659)
-iter 50 batch 10 egitim ('AUC', 0.79475937530208407)
-iter 50 batch 10 test ('AUC', 0.7964026666666667)
-iter 50 batch 100 egitim ('AUC', 0.75772752003431121)
-iter 50 batch 100 test ('AUC', 0.75512000000000001)
-iter 100 batch 1 egitim ('AUC', 0.78479444205966464)
+```text
+iter 10 batch 1 egitim ('AUC', 0.8047518086158001)
+iter 10 batch 1 test ('AUC', 0.7971786666666667)
+iter 10 batch 10 egitim ('AUC', 0.7894177873794489)
+iter 10 batch 10 test ('AUC', 0.7861306666666668)
+iter 10 batch 100 egitim ('AUC', 0.7668542103627676)
+iter 10 batch 100 test ('AUC', 0.7649733333333333)
+iter 50 batch 1 egitim ('AUC', 0.7562366828358444)
+iter 50 batch 1 test ('AUC', 0.7637626666666666)
+iter 50 batch 10 egitim ('AUC', 0.794759653080582)
+iter 50 batch 10 test ('AUC', 0.7964026666666666)
+iter 50 batch 100 egitim ('AUC', 0.7577277052199766)
+iter 50 batch 100 test ('AUC', 0.7551173333333333)
+iter 100 batch 1 egitim ('AUC', 0.7847942568739994)
 iter 100 batch 1 test ('AUC', 0.7882906666666667)
-iter 100 batch 10 egitim ('AUC', 0.77260941046884191)
-iter 100 batch 10 test ('AUC', 0.77070400000000006)
-iter 100 batch 100 egitim ('AUC', 0.75931456118589935)
-iter 100 batch 100 test ('AUC', 0.75702400000000003)
-iter 200 batch 1 egitim ('AUC', 0.71345805340976809)
-iter 200 batch 1 test ('AUC', 0.71764000000000006)
-iter 200 batch 10 egitim ('AUC', 0.75268880326726773)
-iter 200 batch 10 test ('AUC', 0.74913333333333343)
-iter 200 batch 100 egitim ('AUC', 0.75917270896628253)
-iter 200 batch 100 test ('AUC', 0.75757600000000003)
+iter 100 batch 10 egitim ('AUC', 0.772609410468842)
+iter 100 batch 10 test ('AUC', 0.7707013333333333)
+iter 100 batch 100 egitim ('AUC', 0.7593143760002341)
+iter 100 batch 100 test ('AUC', 0.7570266666666666)
+iter 200 batch 1 egitim ('AUC', 0.7134575904456049)
+iter 200 batch 1 test ('AUC', 0.7176400000000001)
+iter 200 batch 10 egitim ('AUC', 0.7526888032672676)
+iter 200 batch 10 test ('AUC', 0.7491333333333333)
+iter 200 batch 100 egitim ('AUC', 0.7591727089662824)
+iter 200 batch 100 test ('AUC', 0.757576)
 ```
 
 Hazır bir SVM kodu scikit-learn kütüphanesi karşılaştıralım, 
@@ -453,13 +453,13 @@ from sklearn.svm import SVC
 clf = SVC(kernel='linear',tol=0.1)
 clf.fit(np.array(data_train),np.array(label_train))
 pred = clf.predict(data_train)
-print 'egitim',show_auc(np.array(label_train.T)[0], pred)
+print ('egitim',show_auc(np.array(label_train.T)[0], pred))
 pred = clf.predict(data_test)
-print 'test',show_auc(np.array(label_test.T)[0], pred)
+print ('test',show_auc(np.array(label_test.T)[0], pred))
 ```
 
-```
-egitim ('AUC', 0.76903032711566288)
+```text
+egitim ('AUC', 0.7690303271156629)
 test ('AUC', 0.7533333333333333)
 ```
 

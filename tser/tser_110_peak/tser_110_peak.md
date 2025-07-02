@@ -23,7 +23,7 @@ verinin bir grafiği,
 
 ```python
 import pandas as pd
-us = pd.read_csv('us.csv',sep='\s')
+us = pd.read_csv('us.csv',sep='\\s',engine='python')
 us1960 = us[(us['year'] < 1960)]
 us.set_index('year')['uretim'].plot(title='Amerika Petrol')
 plt.savefig('tser_peak_01.png')
@@ -38,75 +38,58 @@ kullanılabilir. Biz `lmfit` kullanacağız çünkü uydurduğu modeldeki
 parametreler için bir güven aralığı (confidence interval) geri döndürüyor.
 
 ```python
-import pandas as pd, math
+import pandas as pd
 import scipy.linalg as lin
 import lmfit
+
+us = pd.read_csv('us.csv',sep='\\s',engine='python')
+us1960 = us[(us['year'] < 1960)]
+us.set_index('year')['uretim'].plot(title='Amerika Petrol')
+plt.savefig('tser_peak_01.png')
 
 def find_peak(df,cminit,bcinit,tmcinit):
     minyear = df['year'].min()
     df['year'] = df['year'] - minyear
-    def err(w):
-        cm=w['cm'].value;bc=w['bc'].value;tmc=w['tmc'].value
+
+    def err(params):
+        cm = params['cm'].value
+        bc = params['bc'].value
+        tmc = params['tmc'].value
         tmp = (1.+np.cosh(bc*(df['year']-tmc)))
         yfit = 2.0 * cm /  tmp
         return df['uretim']-yfit
 
     p = lmfit.Parameters()
     p.add_many(('cm', cminit), ('bc', bcinit),('tmc', tmcinit))
-    mi = lmfit.minimize(err, p)
-    lmfit.printfuncs.report_fit(mi.params)
-    print mi.params['tmc'].value + minyear
-    return mi
+
+    mini = lmfit.Minimizer(err, p) #
+
+    result = mini.minimize() #
+
+    lmfit.printfuncs.report_fit(result.params)
+    print (result.params['tmc'].value + minyear)
+    return mini, result 
 ```
 
 ```python
-resus = find_peak(us1960.copy(),0,0,4)
+mini_us, resus = find_peak(us1960.copy(),2000000,0,1000)
 ```
 
-```
+```text
 [[Variables]]
-    cm:    2.8183e+06 +/- 1.34e+05 (4.76%) (init= 0)
-    bc:   -0.06663767 +/- 0.002648 (3.98%) (init= 0)
-    tmc:   66.8998632 +/- 2.142183 (3.20%) (init= 4)
-[[Correlations]] (unreported correlations are <  0.100)
-    C(cm, tmc)                   =  0.958 
-    C(bc, tmc)                   =  0.939 
-    C(cm, bc)                    =  0.825 
-1966.89986324
+    cm:   2818280.59 +/- 134112.921 (4.76%) (init = 2000000)
+    bc:   0.06663756 +/- 0.00264901 (3.98%) (init = 0)
+    tmc:  66.8999510 +/- 2.14213696 (3.20%) (init = 1000)
+[[Correlations]] (unreported correlations are < 0.100)
+    C(cm, tmc) = +0.9581
+    C(bc, tmc) = -0.9389
+    C(cm, bc)  = -0.8252
+1966.899950980365
 ```
 
 Tahmin kabaca 1967 yılı -/+ 2 sene olarak yapıldı yani bir uçta 1969
 senesini veriyor, gerçek tepe noktası 1970 yılında meydana geldi.  Fena
 değil.
-
-Bu arada, üstteki güven aralıkları en baz hesaplar kullanarak yapıldı,
-`lmfit` paketi çok daha çetrefil bir hesap ile bu aralığı hesaplayabiliyor,
-daha fazla detay için [3]'e bakınız, çağrı şöyle,
-
-```python
-cius = lmfit.conf_interval(resus)
-for ci in cius['tmc']: print ci
-```
-
-```
-(0.997, 61.74775035073711)
-(0.95, 63.323717490043805)
-(0.674, 64.99845280348576)
-(0.0, 64.814585259840328)
-(0.674, 69.12696883524737)
-(0.95, 71.83614364894831)
-(0.997, 75.45739023924693)
-```
-
-Eğer yüzde 95 güven aralığı bu hesaplara göre ayarlanırsa, 
-
-```python
-print [us['year'].min()+63, us['year'].min()+71]
-```
-
-```
-[1963, 1971]
-```
 
 Dünya Üretimi
 
@@ -116,32 +99,33 @@ tepe hangi senede bulunacaktır?
 ```python
 import pandas as pd
 import lmfit
-world = pd.read_csv('world.csv',sep='\s',comment='#')
-minyear = world['year'].min()
-resworld = find_peak(world.copy(),0,0,0)
-cm=resworld.params['cm'].value
-bc=resworld.params['bc'].value
-tmc=resworld.params['tmc'].value
-def hubbard(x): return 2*cm / (1+np.cosh(bc*(x-tmc))) 
-world['tahmin'] = map(hubbard, world['year']-minyear)
+world = pd.read_csv('world.csv',sep='\\s',comment='#',engine='python')
+mini_w, resw = find_peak(world.copy(),80,3,50)
 ```
 
-```
+```text
 [[Variables]]
-    cm:    86.4960058 +/- 2.078688 (2.40%) (init= 0)
-    bc:    0.04525865 +/- 0.002847 (6.29%) (init= 0)
-    tmc:   61.2630977 +/- 2.766022 (4.51%) (init= 0)
-[[Correlations]] (unreported correlations are <  0.100)
-    C(bc, tmc)                   = -0.905 
-    C(cm, tmc)                   =  0.693 
-    C(cm, bc)                    = -0.441 
-2011.26309773
+    cm:   86.4960122 +/- 2.07863045 (2.40%) (init = 80)
+    bc:  -0.04525854 +/- 0.00284705 (6.29%) (init = 3)
+    tmc:  61.2631753 +/- 2.76583534 (4.51%) (init = 50)
+[[Correlations]] (unreported correlations are < 0.100)
+    C(bc, tmc) = +0.9049
+    C(cm, tmc) = +0.6934
+    C(cm, bc)  = +0.4409
+2011.2631753248918
 ```
 
-Sonuç 2011 yılı -/+ 3 sene, yani bir uçta 2014 senesi! Geçtiğimiz sene tepe
-noktasını bulmuşuz demektir bu. 
+Sonuç 2011 yılı -/+ 3 sene, yani bir uçta 2014 senesi! Geçtiğimiz sene
+tepe noktasını bulmuşuz demektir bu.
 
 ```python
+cm=resw.params['cm'].value
+bc=resw.params['bc'].value
+tmc=resw.params['tmc'].value
+def hubbard(x): return 2*cm / (1+np.cosh(bc*(x-tmc)))
+wmin = world['year'].min()
+
+world['tahmin'] = world.apply(lambda x: hubbard(x['year']-wmin),axis=1)
 world.set_index('year').plot(title='Dunya Petrol')
 plt.savefig('tser_peak_02.png')
 ```

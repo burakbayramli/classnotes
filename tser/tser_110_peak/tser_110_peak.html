@@ -109,7 +109,7 @@ geleceği “bilmiyormuş gibi’’ yapıp onu tahmin etmeye uğraşalım. Önc
 verinin bir grafiği,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>us <span class="op">=</span> pd.read_csv(<span class="st">&#39;us.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s&#39;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>us <span class="op">=</span> pd.read_csv(<span class="st">&#39;us.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\\</span><span class="st">s&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>us1960 <span class="op">=</span> us[(us[<span class="st">&#39;year&#39;</span>] <span class="op">&lt;</span> <span class="dv">1960</span>)]</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>us.set_index(<span class="st">&#39;year&#39;</span>)[<span class="st">&#39;uretim&#39;</span>].plot(title<span class="op">=</span><span class="st">&#39;Amerika Petrol&#39;</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_peak_01.png&#39;</span>)</span></code></pre></div>
@@ -121,85 +121,80 @@ bunlardan biri, ya da <code>lmfit</code> adlı paket kullanılabilir. Biz
 <code>lmfit</code> kullanacağız çünkü uydurduğu modeldeki parametreler
 için bir güven aralığı (confidence interval) geri döndürüyor.</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, math</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lmfit</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_peak(df,cminit,bcinit,tmcinit):</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    minyear <span class="op">=</span> df[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;year&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;year&#39;</span>] <span class="op">-</span> minyear</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> err(w):</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        cm<span class="op">=</span>w[<span class="st">&#39;cm&#39;</span>].value<span class="op">;</span>bc<span class="op">=</span>w[<span class="st">&#39;bc&#39;</span>].value<span class="op">;</span>tmc<span class="op">=</span>w[<span class="st">&#39;tmc&#39;</span>].value</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        tmp <span class="op">=</span> (<span class="fl">1.</span><span class="op">+</span>np.cosh(bc<span class="op">*</span>(df[<span class="st">&#39;year&#39;</span>]<span class="op">-</span>tmc)))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        yfit <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> cm <span class="op">/</span>  tmp</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> df[<span class="st">&#39;uretim&#39;</span>]<span class="op">-</span>yfit</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>us <span class="op">=</span> pd.read_csv(<span class="st">&#39;us.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\\</span><span class="st">s&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>us1960 <span class="op">=</span> us[(us[<span class="st">&#39;year&#39;</span>] <span class="op">&lt;</span> <span class="dv">1960</span>)]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>us.set_index(<span class="st">&#39;year&#39;</span>)[<span class="st">&#39;uretim&#39;</span>].plot(title<span class="op">=</span><span class="st">&#39;Amerika Petrol&#39;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_peak_01.png&#39;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_peak(df,cminit,bcinit,tmcinit):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    minyear <span class="op">=</span> df[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;year&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;year&#39;</span>] <span class="op">-</span> minyear</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> lmfit.Parameters()</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    p.add_many((<span class="st">&#39;cm&#39;</span>, cminit), (<span class="st">&#39;bc&#39;</span>, bcinit),(<span class="st">&#39;tmc&#39;</span>, tmcinit))</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    mi <span class="op">=</span> lmfit.minimize(err, p)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    lmfit.printfuncs.report_fit(mi.params)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> mi.params[<span class="st">&#39;tmc&#39;</span>].value <span class="op">+</span> minyear</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mi</span></code></pre></div>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> err(params):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        cm <span class="op">=</span> params[<span class="st">&#39;cm&#39;</span>].value</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        bc <span class="op">=</span> params[<span class="st">&#39;bc&#39;</span>].value</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        tmc <span class="op">=</span> params[<span class="st">&#39;tmc&#39;</span>].value</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        tmp <span class="op">=</span> (<span class="fl">1.</span><span class="op">+</span>np.cosh(bc<span class="op">*</span>(df[<span class="st">&#39;year&#39;</span>]<span class="op">-</span>tmc)))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        yfit <span class="op">=</span> <span class="fl">2.0</span> <span class="op">*</span> cm <span class="op">/</span>  tmp</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> df[<span class="st">&#39;uretim&#39;</span>]<span class="op">-</span>yfit</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> lmfit.Parameters()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    p.add_many((<span class="st">&#39;cm&#39;</span>, cminit), (<span class="st">&#39;bc&#39;</span>, bcinit),(<span class="st">&#39;tmc&#39;</span>, tmcinit))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    mini <span class="op">=</span> lmfit.Minimizer(err, p) <span class="co">#</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> mini.minimize() <span class="co">#</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    lmfit.printfuncs.report_fit(result.params)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (result.params[<span class="st">&#39;tmc&#39;</span>].value <span class="op">+</span> minyear)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> mini, result </span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>resus <span class="op">=</span> find_peak(us1960.copy(),<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">4</span>)</span></code></pre></div>
-<pre><code>[[Variables]]
-    cm:    2.8183e+06 +/- 1.34e+05 (4.76%) (init= 0)
-    bc:   -0.06663767 +/- 0.002648 (3.98%) (init= 0)
-    tmc:   66.8998632 +/- 2.142183 (3.20%) (init= 4)
-[[Correlations]] (unreported correlations are &lt;  0.100)
-    C(cm, tmc)                   =  0.958 
-    C(bc, tmc)                   =  0.939 
-    C(cm, bc)                    =  0.825 
-1966.89986324</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mini_us, resus <span class="op">=</span> find_peak(us1960.copy(),<span class="dv">2000000</span>,<span class="dv">0</span>,<span class="dv">1000</span>)</span></code></pre></div>
+<pre class="text"><code>[[Variables]]
+    cm:   2818280.59 +/- 134112.921 (4.76%) (init = 2000000)
+    bc:   0.06663756 +/- 0.00264901 (3.98%) (init = 0)
+    tmc:  66.8999510 +/- 2.14213696 (3.20%) (init = 1000)
+[[Correlations]] (unreported correlations are &lt; 0.100)
+    C(cm, tmc) = +0.9581
+    C(bc, tmc) = -0.9389
+    C(cm, bc)  = -0.8252
+1966.899950980365</code></pre>
 <p>Tahmin kabaca 1967 yılı -/+ 2 sene olarak yapıldı yani bir uçta 1969
 senesini veriyor, gerçek tepe noktası 1970 yılında meydana geldi. Fena
 değil.</p>
-<p>Bu arada, üstteki güven aralıkları en baz hesaplar kullanarak
-yapıldı, <code>lmfit</code> paketi çok daha çetrefil bir hesap ile bu
-aralığı hesaplayabiliyor, daha fazla detay için [3]’e bakınız, çağrı
-şöyle,</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cius <span class="op">=</span> lmfit.conf_interval(resus)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ci <span class="kw">in</span> cius[<span class="st">&#39;tmc&#39;</span>]: <span class="bu">print</span> ci</span></code></pre></div>
-<pre><code>(0.997, 61.74775035073711)
-(0.95, 63.323717490043805)
-(0.674, 64.99845280348576)
-(0.0, 64.814585259840328)
-(0.674, 69.12696883524737)
-(0.95, 71.83614364894831)
-(0.997, 75.45739023924693)</code></pre>
-<p>Eğer yüzde 95 güven aralığı bu hesaplara göre ayarlanırsa,</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> [us[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()<span class="op">+</span><span class="dv">63</span>, us[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()<span class="op">+</span><span class="dv">71</span>]</span></code></pre></div>
-<pre><code>[1963, 1971]</code></pre>
 <p>Dünya Üretimi</p>
 <p>Şimdi ilginç bir örnek: Dünya için tepe noktası nedir, yani dünya
 üretiminde tepe hangi senede bulunacaktır?</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lmfit</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>world <span class="op">=</span> pd.read_csv(<span class="st">&#39;world.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s&#39;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>minyear <span class="op">=</span> world[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>resworld <span class="op">=</span> find_peak(world.copy(),<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>resworld.params[<span class="st">&#39;cm&#39;</span>].value</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>bc<span class="op">=</span>resworld.params[<span class="st">&#39;bc&#39;</span>].value</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>tmc<span class="op">=</span>resworld.params[<span class="st">&#39;tmc&#39;</span>].value</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hubbard(x): <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>cm <span class="op">/</span> (<span class="dv">1</span><span class="op">+</span>np.cosh(bc<span class="op">*</span>(x<span class="op">-</span>tmc))) </span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>world[<span class="st">&#39;tahmin&#39;</span>] <span class="op">=</span> <span class="bu">map</span>(hubbard, world[<span class="st">&#39;year&#39;</span>]<span class="op">-</span>minyear)</span></code></pre></div>
-<pre><code>[[Variables]]
-    cm:    86.4960058 +/- 2.078688 (2.40%) (init= 0)
-    bc:    0.04525865 +/- 0.002847 (6.29%) (init= 0)
-    tmc:   61.2630977 +/- 2.766022 (4.51%) (init= 0)
-[[Correlations]] (unreported correlations are &lt;  0.100)
-    C(bc, tmc)                   = -0.905 
-    C(cm, tmc)                   =  0.693 
-    C(cm, bc)                    = -0.441 
-2011.26309773</code></pre>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lmfit</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>world <span class="op">=</span> pd.read_csv(<span class="st">&#39;world.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\\</span><span class="st">s&#39;</span>,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>mini_w, resw <span class="op">=</span> find_peak(world.copy(),<span class="dv">80</span>,<span class="dv">3</span>,<span class="dv">50</span>)</span></code></pre></div>
+<pre class="text"><code>[[Variables]]
+    cm:   86.4960122 +/- 2.07863045 (2.40%) (init = 80)
+    bc:  -0.04525854 +/- 0.00284705 (6.29%) (init = 3)
+    tmc:  61.2631753 +/- 2.76583534 (4.51%) (init = 50)
+[[Correlations]] (unreported correlations are &lt; 0.100)
+    C(bc, tmc) = +0.9049
+    C(cm, tmc) = +0.6934
+    C(cm, bc)  = +0.4409
+2011.2631753248918</code></pre>
 <p>Sonuç 2011 yılı -/+ 3 sene, yani bir uçta 2014 senesi! Geçtiğimiz
 sene tepe noktasını bulmuşuz demektir bu.</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>world.set_index(<span class="st">&#39;year&#39;</span>).plot(title<span class="op">=</span><span class="st">&#39;Dunya Petrol&#39;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_peak_02.png&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cm<span class="op">=</span>resw.params[<span class="st">&#39;cm&#39;</span>].value</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>bc<span class="op">=</span>resw.params[<span class="st">&#39;bc&#39;</span>].value</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>tmc<span class="op">=</span>resw.params[<span class="st">&#39;tmc&#39;</span>].value</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hubbard(x): <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span>cm <span class="op">/</span> (<span class="dv">1</span><span class="op">+</span>np.cosh(bc<span class="op">*</span>(x<span class="op">-</span>tmc)))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>wmin <span class="op">=</span> world[<span class="st">&#39;year&#39;</span>].<span class="bu">min</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>world[<span class="st">&#39;tahmin&#39;</span>] <span class="op">=</span> world.<span class="bu">apply</span>(<span class="kw">lambda</span> x: hubbard(x[<span class="st">&#39;year&#39;</span>]<span class="op">-</span>wmin),axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>world.set_index(<span class="st">&#39;year&#39;</span>).plot(title<span class="op">=</span><span class="st">&#39;Dunya Petrol&#39;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_peak_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_peak_02.png" /></p>
 <p>Bu noktada son 10 senedeki ilginç bir gelişmeden bahsetmek lazım. Hem
 ABD hem de dünya üretiminde ilginç bir zıplama oldu, çünkü ABD’de
