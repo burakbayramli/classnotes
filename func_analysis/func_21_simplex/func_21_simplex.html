@@ -264,17 +264,35 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> linprog(<span class="op">-</span>c, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b, options<span class="op">=</span>{<span class="st">&quot;disp&quot;</span>: <span class="va">True</span>})</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span></code></pre></div>
-<pre><code>Optimization terminated successfully.
-         Current function value: -50000.000000
-         Iterations: 7
-     fun: -50000.0
- message: &#39;Optimization terminated successfully.&#39;
-     nit: 7
-   slack: array([], dtype=float64)
-  status: 0
- success: True
-       x: array([  0. ,  10. ,   7.5,  12.5,   0. ,   0. ,   0. ,
-                   0. ,   0. , 2. ,  10. ])</code></pre>
+<pre class="text"><code>        message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+        success: True
+         status: 0
+            fun: -50000.0
+              x: [ 0.000e+00  1.000e+01  7.500e+00  1.250e+01  0.000e+00
+                   0.000e+00  0.000e+00  0.000e+00  0.000e+00  2.000e+00
+                   1.000e+01]
+            nit: 5
+          lower:  residual: [ 0.000e+00  1.000e+01  7.500e+00  1.250e+01
+                              0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  2.000e+00  1.000e+01]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              3.000e+02  3.000e+02  1.000e+01  1.000e+01
+                              0.000e+00  0.000e+00  0.000e+00]
+          upper:  residual: [       inf        inf        inf        inf
+                                    inf        inf        inf        inf
+                                    inf        inf        inf]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  0.000e+00  0.000e+00]
+          eqlin:  residual: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00]
+                 marginals: [ 1.000e+01  1.000e+01 -0.000e+00 -0.000e+00
+                             -0.000e+00]
+        ineqlin:  residual: []
+                 marginals: []
+ mip_node_count: 0
+ mip_dual_bound: 0.0
+        mip_gap: 0.0</code></pre>
 <p>Sonuç ilginç, 3. tip uçaktan hiç seçim yapılmamış. Bu mantıklı
 aslında çünkü 3. tip uçağın işletim masrafı 1.’den daha fazla ve bu
 uçaklardan elimizde 1. tip kadar var.</p>
@@ -285,8 +303,8 @@ daha hızlı olmaz mı? Evet; pay bırakma değişkenlerini bir vektörde tutup
 bir birim matrisi ile çarparsak</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>svec <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>]</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.eye(<span class="dv">5</span>,<span class="dv">5</span>) <span class="op">*</span> svec</span></code></pre></div>
-<pre><code>[[-1. -0.  0.  0.  0.]
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.eye(<span class="dv">5</span>,<span class="dv">5</span>) <span class="op">*</span> svec)</span></code></pre></div>
+<pre class="text"><code>[[-1. -0.  0.  0.  0.]
  [-0. -1.  0.  0.  0.]
  [-0. -0.  1.  0.  0.]
  [-0. -0.  0.  1.  0.]
@@ -300,8 +318,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="dv">0</span>,<span class="dv">0</span>],</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>              [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">1.</span>,<span class="fl">1.</span>]])</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.hstack((A, np.eye(<span class="dv">5</span>,<span class="dv">5</span>)<span class="op">*</span>svec)) </span></code></pre></div>
-<pre><code>[[-100.    0. -200.    0. -150.    0.   -1.   -0.    0.    0.    0.]
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.hstack((A, np.eye(<span class="dv">5</span>,<span class="dv">5</span>)<span class="op">*</span>svec)) )</span></code></pre></div>
+<pre class="text"><code>[[-100.    0. -200.    0. -150.    0.   -1.   -0.    0.    0.    0.]
  [   0. -100.    0. -200.    0. -150.   -0.   -1.    0.    0.    0.]
  [   1.    1.    0.    0.    0.    0.   -0.   -0.    1.    0.    0.]
  [   0.    0.    1.    1.    0.    0.   -0.   -0.    0.    1.    0.]
@@ -334,18 +352,30 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">9000.</span>, <span class="fl">5000.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">1.</span>]])</span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="fl">44.</span>, <span class="fl">512.</span>, <span class="fl">300000.</span>])</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.array([<span class="fl">30000.</span>, <span class="fl">20000.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>, <span class="fl">0.</span>])</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> linprog(<span class="op">-</span>c, A_ub<span class="op">=</span>A_ub, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b, options<span class="op">=</span>{<span class="st">&quot;disp&quot;</span>: <span class="va">True</span>})</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span></code></pre></div>
-<pre><code>Optimization terminated successfully.
-         Current function value: -1080000.000000
-         Iterations: 3
-     fun: -1080000.0
- message: &#39;Optimization terminated successfully.&#39;
-     nit: 3
-   slack: array([], dtype=float64)
-  status: 0
- success: True
-       x: array([ 20.,  24.,   0.,   0.,   0.])</code></pre>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>A_ub <span class="op">=</span> np.array([[]]).reshape(<span class="dv">0</span>, c.shape[<span class="dv">0</span>])</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> linprog(<span class="op">-</span>c, A_ub<span class="op">=</span>A_ub, A_eq<span class="op">=</span>A, b_eq<span class="op">=</span>b, options<span class="op">=</span>{<span class="st">&quot;disp&quot;</span>: <span class="va">True</span>})</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span></code></pre></div>
+<pre class="text"><code>        message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+        success: True
+         status: 0
+            fun: -1080000.0
+              x: [ 2.000e+01  2.400e+01  0.000e+00  0.000e+00  0.000e+00]
+            nit: 2
+          lower:  residual: [ 2.000e+01  2.400e+01  0.000e+00  0.000e+00
+                              0.000e+00]
+                 marginals: [ 0.000e+00  0.000e+00  7.500e+03  0.000e+00
+                              2.500e+00]
+          upper:  residual: [       inf        inf        inf        inf
+                                    inf]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00]
+          eqlin:  residual: [ 0.000e+00  0.000e+00  0.000e+00]
+                 marginals: [-7.500e+03 -0.000e+00 -2.500e+00]
+        ineqlin:  residual: []
+                 marginals: []
+ mip_node_count: 0
+ mip_dual_bound: 0.0
+        mip_gap: 0.0</code></pre>
 <p>ekrana gelecek. Yani hesap (cost) adı verilen hedef fonksiyonu kargo
 büyüklüğünün 1080000.0 olduğu noktada maksimize oldu (haftada en fazla
 bu kadar kargo taşınabilecek), ve bu optimal nokta için <span
@@ -534,17 +564,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> matrix([<span class="fl">1.0</span>, <span class="fl">1.0</span>], (<span class="dv">1</span>,<span class="dv">2</span>))</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> matrix(<span class="fl">1.0</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>sol<span class="op">=</span>solvers.qp(Q, p, G, h, A, b)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> sol[<span class="st">&#39;x&#39;</span>]</span></code></pre></div>
-<pre><code>     pcost       dcost       gap    pres   dres
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sol[<span class="st">&#39;x&#39;</span>])</span></code></pre></div>
+<pre class="text"><code>     pcost       dcost       gap    pres   dres
  0:  1.8889e+00  7.7778e-01  1e+00  2e-16  2e+00
- 1:  1.8769e+00  1.8320e+00  4e-02  0e+00  6e-02
- 2:  1.8750e+00  1.8739e+00  1e-03  1e-16  5e-04
- 3:  1.8750e+00  1.8750e+00  1e-05  6e-17  5e-06
- 4:  1.8750e+00  1.8750e+00  1e-07  2e-16  5e-08
+ 1:  1.8769e+00  1.8320e+00  4e-02  1e-16  6e-02
+ 2:  1.8750e+00  1.8739e+00  1e-03  2e-16  5e-04
+ 3:  1.8750e+00  1.8750e+00  1e-05  1e-16  5e-06
+ 4:  1.8750e+00  1.8750e+00  1e-07  3e-16  5e-08
 Optimal solution found.
 [ 2.50e-01]
-[ 7.50e-01]
-</code></pre>
+[ 7.50e-01]</code></pre>
 <p>Bazı notlar: A matrisi yaratılırken (1,2) kullanımı görülüyor, bu
 matrisin boyutlarını tanımlamak için. Cvxopt paketi bu arada Numpy
 formatı değil kendi matris, vektör objelerini kullanıyor, ama ikisi

@@ -477,7 +477,7 @@ t = np.array(dfgdp.Year.astype(float))
 out = minimize(residual, fit_params, args=(y,t,))
 report_fit(fit_params)
 res = list(st.adfuller(out.residual,maxlag=1))
-print ('ADF testi', res[0], '%1-%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
+print 'ADF testi', res[0], '%1-%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
 ```
 
 ```

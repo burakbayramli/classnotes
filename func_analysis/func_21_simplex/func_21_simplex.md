@@ -191,18 +191,36 @@ res = linprog(-c, A_eq=A, b_eq=b, options={"disp": True})
 print (res)
 ```
 
-```
-Optimization terminated successfully.
-         Current function value: -50000.000000
-         Iterations: 7
-     fun: -50000.0
- message: 'Optimization terminated successfully.'
-     nit: 7
-   slack: array([], dtype=float64)
-  status: 0
- success: True
-       x: array([  0. ,  10. ,   7.5,  12.5,   0. ,   0. ,   0. ,
-                   0. ,   0. , 2. ,  10. ])
+```text
+        message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+        success: True
+         status: 0
+            fun: -50000.0
+              x: [ 0.000e+00  1.000e+01  7.500e+00  1.250e+01  0.000e+00
+                   0.000e+00  0.000e+00  0.000e+00  0.000e+00  2.000e+00
+                   1.000e+01]
+            nit: 5
+          lower:  residual: [ 0.000e+00  1.000e+01  7.500e+00  1.250e+01
+                              0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  2.000e+00  1.000e+01]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              3.000e+02  3.000e+02  1.000e+01  1.000e+01
+                              0.000e+00  0.000e+00  0.000e+00]
+          upper:  residual: [       inf        inf        inf        inf
+                                    inf        inf        inf        inf
+                                    inf        inf        inf]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00  0.000e+00  0.000e+00]
+          eqlin:  residual: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00]
+                 marginals: [ 1.000e+01  1.000e+01 -0.000e+00 -0.000e+00
+                             -0.000e+00]
+        ineqlin:  residual: []
+                 marginals: []
+ mip_node_count: 0
+ mip_dual_bound: 0.0
+        mip_gap: 0.0
 ```
 
 Sonuç ilginç, 3. tip uçaktan hiç seçim yapılmamış. Bu mantıklı aslında çünkü
@@ -217,10 +235,10 @@ Evet; pay bırakma değişkenlerini bir vektörde tutup bir birim matrisi ile
 
 ```python
 svec = [-1,-1,1,1,1]
-print np.eye(5,5) * svec
+print (np.eye(5,5) * svec)
 ```
 
-```
+```text
 [[-1. -0.  0.  0.  0.]
  [-0. -1.  0.  0.  0.]
  [-0. -0.  1.  0.  0.]
@@ -237,10 +255,10 @@ A = np.array([[-100.,0,-200.,0,-150.,0.],
               [0,0,1.,1.,0,0],
               [0,0,0,0,1.,1.]])
 
-print np.hstack((A, np.eye(5,5)*svec)) 
+print (np.hstack((A, np.eye(5,5)*svec)) )
 ```
-	      
-```
+
+```text
 [[-100.    0. -200.    0. -150.    0.   -1.   -0.    0.    0.    0.]
  [   0. -100.    0. -200.    0. -150.   -0.   -1.    0.    0.    0.]
  [   1.    1.    0.    0.    0.    0.   -0.   -0.    1.    0.    0.]
@@ -277,21 +295,33 @@ A = np.array([[1., 1., 1., 0., 0.],
               [9000., 5000., 0., 0., 1.]])
 b = np.array([44., 512., 300000.])
 c = np.array([30000., 20000., 0., 0., 0.])
+A_ub = np.array([[]]).reshape(0, c.shape[0])
 res = linprog(-c, A_ub=A_ub, A_eq=A, b_eq=b, options={"disp": True})
 print (res)
 ```
 
-```
-Optimization terminated successfully.
-         Current function value: -1080000.000000
-         Iterations: 3
-     fun: -1080000.0
- message: 'Optimization terminated successfully.'
-     nit: 3
-   slack: array([], dtype=float64)
-  status: 0
- success: True
-       x: array([ 20.,  24.,   0.,   0.,   0.])
+```text
+        message: Optimization terminated successfully. (HiGHS Status 7: Optimal)
+        success: True
+         status: 0
+            fun: -1080000.0
+              x: [ 2.000e+01  2.400e+01  0.000e+00  0.000e+00  0.000e+00]
+            nit: 2
+          lower:  residual: [ 2.000e+01  2.400e+01  0.000e+00  0.000e+00
+                              0.000e+00]
+                 marginals: [ 0.000e+00  0.000e+00  7.500e+03  0.000e+00
+                              2.500e+00]
+          upper:  residual: [       inf        inf        inf        inf
+                                    inf]
+                 marginals: [ 0.000e+00  0.000e+00  0.000e+00  0.000e+00
+                              0.000e+00]
+          eqlin:  residual: [ 0.000e+00  0.000e+00  0.000e+00]
+                 marginals: [-7.500e+03 -0.000e+00 -2.500e+00]
+        ineqlin:  residual: []
+                 marginals: []
+ mip_node_count: 0
+ mip_dual_bound: 0.0
+        mip_gap: 0.0
 ```
 
 ekrana gelecek. Yani hesap (cost) adı verilen hedef fonksiyonu kargo
@@ -483,20 +513,19 @@ h = matrix([0.0,0.0])
 A = matrix([1.0, 1.0], (1,2))
 b = matrix(1.0)
 sol=solvers.qp(Q, p, G, h, A, b)
-print sol['x']
+print (sol['x'])
 ```
 
-```
+```text
      pcost       dcost       gap    pres   dres
  0:  1.8889e+00  7.7778e-01  1e+00  2e-16  2e+00
- 1:  1.8769e+00  1.8320e+00  4e-02  0e+00  6e-02
- 2:  1.8750e+00  1.8739e+00  1e-03  1e-16  5e-04
- 3:  1.8750e+00  1.8750e+00  1e-05  6e-17  5e-06
- 4:  1.8750e+00  1.8750e+00  1e-07  2e-16  5e-08
+ 1:  1.8769e+00  1.8320e+00  4e-02  1e-16  6e-02
+ 2:  1.8750e+00  1.8739e+00  1e-03  2e-16  5e-04
+ 3:  1.8750e+00  1.8750e+00  1e-05  1e-16  5e-06
+ 4:  1.8750e+00  1.8750e+00  1e-07  3e-16  5e-08
 Optimal solution found.
 [ 2.50e-01]
 [ 7.50e-01]
-
 ```
 
 Bazı notlar: A matrisi yaratılırken (1,2) kullanımı görülüyor, bu matrisin
