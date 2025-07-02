@@ -122,10 +122,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fl">0.12</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> n<span class="op">*</span>p</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>std <span class="op">=</span> np.sqrt(n<span class="op">*</span>p<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p))</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> mu,std</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;olasilik&#39;</span>,norm.cdf(<span class="dv">170</span>,loc<span class="op">=</span>mu,scale<span class="op">=</span>std)</span></code></pre></div>
-<pre><code>180.0 12.585706178
-olasilik 0.213437028747</code></pre>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (mu,std)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;olasilik&#39;</span>,norm.cdf(<span class="dv">170</span>,loc<span class="op">=</span>mu,scale<span class="op">=</span>std))</span></code></pre></div>
+<pre class="text"><code>180.0 12.58570617804182
+olasilik 0.2134370287472811</code></pre>
 <p>Yani <span class="math inline">\(N(180,12.58)\)</span> dağılımını
 elde ettik ve hesapları onun üzerinden yaptık. Sonuç diyor ki verilen
 örneklem ve nüfus <span class="math inline">\(p\)</span> değeri ile 170
@@ -140,14 +140,14 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> pd.DataFrame({<span class="st">&#39;tiklama&#39;</span>: [<span class="fl">20.</span>,<span class="fl">2.</span>,<span class="fl">40.</span>,<span class="fl">5.</span>,<span class="fl">10.</span>,<span class="fl">100.</span>],</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&#39;ziyaret&#39;</span>: [<span class="fl">100.</span>,<span class="fl">10.</span>,<span class="fl">300.</span>,<span class="fl">400.</span>,<span class="fl">30.</span>,<span class="fl">800.</span>]})</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>a[<span class="st">&#39;cvr&#39;</span>] <span class="op">=</span> a[<span class="st">&#39;tiklama&#39;</span>] <span class="op">/</span> a[<span class="st">&#39;ziyaret&#39;</span>] </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> a</span></code></pre></div>
-<pre><code>   tiklama  ziyaret       cvr
-0       20      100  0.200000
-1        2       10  0.200000
-2       40      300  0.133333
-3        5      400  0.012500
-4       10       30  0.333333
-5      100      800  0.125000</code></pre>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (a)</span></code></pre></div>
+<pre class="text"><code>   tiklama  ziyaret       cvr
+0     20.0    100.0  0.200000
+1      2.0     10.0  0.200000
+2     40.0    300.0  0.133333
+3      5.0    400.0  0.012500
+4     10.0     30.0  0.333333
+5    100.0    800.0  0.125000</code></pre>
 <p>Bu veri seti için cvr’in 0.16, yani yüzde 16 olduğunu önceden
 biliyoruz. Üstteki başarı oranı binom dağılı ile modellenebilir,
 ziyaretler “deneylerdir”, yani örneklem büyüklüğünü gösterirler. Tıklama
@@ -157,15 +157,15 @@ yaklaşıksallığı üzerinden bir z-skoru hesaplayabiliriz,</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fl">0.16</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>btest <span class="op">=</span> <span class="kw">lambda</span> x: (x[<span class="st">&#39;cvr&#39;</span>]<span class="op">-</span>p) <span class="op">/</span> np.sqrt( p<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p)<span class="op">/</span>x[<span class="st">&#39;ziyaret&#39;</span>])</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>a[<span class="st">&#39;guven&#39;</span>] <span class="op">=</span> a.<span class="bu">apply</span>(btest, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>a[<span class="st">&#39;guven&#39;</span>] <span class="op">=</span> np.<span class="bu">round</span>(stats.zprob(a[<span class="st">&#39;guven&#39;</span>])<span class="op">*</span><span class="dv">100</span>,<span class="dv">2</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> a</span></code></pre></div>
-<pre><code>   tiklama  ziyaret       cvr  guven
-0       20      100  0.200000  86.24
-1        2       10  0.200000  63.50
-2       40      300  0.133333  10.39
-3        5      400  0.012500   0.00
-4       10       30  0.333333  99.52
-5      100      800  0.125000   0.35</code></pre>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>a[<span class="st">&#39;guven&#39;</span>] <span class="op">=</span> np.<span class="bu">round</span>(stats.norm.cdf(a[<span class="st">&#39;guven&#39;</span>])<span class="op">*</span><span class="dv">100</span>,<span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (a)</span></code></pre></div>
+<pre class="text"><code>   tiklama  ziyaret       cvr  guven
+0     20.0    100.0  0.200000  86.24
+1      2.0     10.0  0.200000  63.50
+2     40.0    300.0  0.133333  10.39
+3      5.0    400.0  0.012500   0.00
+4     10.0     30.0  0.333333  99.52
+5    100.0    800.0  0.125000   0.35</code></pre>
 <p>Soru</p>
 <p>Amerika’da 2009 yılında halkın ne kadarının arabalarında yakıt
 tasarrufunu desteklediği merak konusuydu. Bir Gallup telefon anketinde
@@ -186,8 +186,8 @@ class="math inline">\(p\)</span> için %95 güven aralığını bulun.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="dv">810</span><span class="op">/</span><span class="fl">1012.</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>low <span class="op">=</span> m <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>np.sqrt(m<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>m)<span class="op">/</span><span class="fl">1012.</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>high <span class="op">=</span> m <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>np.sqrt(m<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>m)<span class="op">/</span><span class="fl">1012.</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> low, high</span></code></pre></div>
-<pre><code>0.775768711331 0.825021802503</code></pre>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (low, high)</span></code></pre></div>
+<pre class="text"><code>0.7757687113313638 0.8250218025026284</code></pre>
 <p>Soru</p>
 <p>Borsa konusunda okuyuculara tiyo veren bir gazete, bir şirket
 hissesinin belli bir olay ardından çoğunlukla yükseldiğini söylüyor.
@@ -204,8 +204,8 @@ sayısını arttırarak Normal yaklaşıksallığını kullanabilmemizi sağlar.
 Güven aralığı,</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span><span class="fl">6.</span><span class="op">;</span>n<span class="op">=</span><span class="fl">9.</span><span class="op">;</span>p<span class="op">=</span>(x<span class="op">+</span><span class="dv">2</span>)<span class="op">/</span>(n<span class="op">+</span><span class="dv">4</span>)<span class="op">;</span> z <span class="op">=</span> <span class="fl">1.96</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> p <span class="op">+</span> np.array([<span class="op">-</span><span class="dv">1</span>,<span class="op">+</span><span class="dv">1</span>])<span class="op">*</span>z<span class="op">*</span>np.sqrt(p<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p)<span class="op">/</span>n)</span></code></pre></div>
-<pre><code>[ 0.29753517  0.93323406]</code></pre>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (p <span class="op">+</span> np.array([<span class="op">-</span><span class="dv">1</span>,<span class="op">+</span><span class="dv">1</span>])<span class="op">*</span>z<span class="op">*</span>np.sqrt(p<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p)<span class="op">/</span>n))</span></code></pre></div>
+<pre class="text"><code>[0.29753517 0.93323406]</code></pre>
 <p>Demek ki yazar okuyucularına kötü bir tavsiye vermiş, güven
 aralığının alt kısmı %30 olduğuna göre hissenin yükselmesi garanti
 değildir, garanti için güven aralığının iki ucu da %50 üzerinde
@@ -328,8 +328,8 @@ class="math inline">\(z_{\alpha/2} = z_{0.02/2} = z_{0.01}\)</span>
 değerine ihtiyacımız var. Python ile</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats.distributions <span class="im">import</span> norm</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> norm.ppf(<span class="fl">0.99</span>)</span></code></pre></div>
-<pre><code>2.32634787404</code></pre>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (norm.ppf(<span class="fl">0.99</span>))</span></code></pre></div>
+<pre class="text"><code>2.3263478740408408</code></pre>
 <p>Tüm hesap için</p>
 <p><span class="math display">\[ n = \frac{(2.33)^2}{4(0.05)^2} =
 543\]</span></p>
@@ -372,13 +372,13 @@ edilebilir’’ diye rapor etmiştir. A oylarının hata payı hakikaten
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="fl">597.</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">299</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> n<span class="op">/</span><span class="dv">2</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> k<span class="op">/</span>n</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (n<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (k<span class="op">/</span>n)</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="fl">0.98</span><span class="op">/</span>np.sqrt(n) </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> d<span class="op">*</span><span class="dv">100</span></span></code></pre></div>
-<pre><code>298.5
-0.500837520938
-4.01087299444</code></pre>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (d<span class="op">*</span><span class="dv">100</span>)</span></code></pre></div>
+<pre class="text"><code>298.5
+0.5008375209380235
+4.010872994443285</code></pre>
 <p>Evet hata payı %4 çıktı.</p>
 <p>Dikkat edilirse hata payının anketten gelen sonuçlarla hiçbir alakası
 yok, A için tercih %25, %75 olabilirdi ama üstteki hata payı hesabı yine
@@ -469,8 +469,8 @@ edelim, o sırada eşitsizliğin sağ tarafı da değişir,</p>
 <p>0.57’nin z-skoru (satır 0.5 kolon .07) 0.7157 olarak gösterilmiş, o
 zaman 1-0.7157 = 0.2843. Kod ile</p>
 <div class="sourceCode" id="cb15"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="dv">1</span><span class="op">-</span>norm.cdf(<span class="fl">0.57</span>)</span></code></pre></div>
-<pre><code>0.284338849046</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="dv">1</span><span class="op">-</span>norm.cdf(<span class="fl">0.57</span>))</span></code></pre></div>
+<pre class="text"><code>0.2843388490463241</code></pre>
 <p>Demek ki</p>
 <p><span class="math display">\[ P(Z \ge 0.57) = 0.2843\]</span></p>
 <p>Demek ki yeni deney sonuçlarının, eski dağılıma göre, eşik değerinden
@@ -519,8 +519,8 @@ oluyor.</p>
 <p>z-Skor tablosuna bakıyoruz, “hangi z değeri 0.95 değeri sonucunu
 verir’’, kordinatlardan 1.64 z-skorunu buluyoruz. Ya da</p>
 <div class="sourceCode" id="cb17"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> norm.ppf(<span class="fl">0.95</span>)</span></code></pre></div>
-<pre><code>1.64485362695</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (norm.ppf(<span class="fl">0.95</span>))</span></code></pre></div>
+<pre class="text"><code>1.6448536269514722</code></pre>
 <p><span class="math display">\[ P(Z \le 1.64)  = 0.95 \]</span> O
 zaman</p>
 <p><span class="math display">\[ \frac{\bar{y}^\ast - 25.0}{2.4 /
@@ -641,23 +641,23 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a h
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>mu0 <span class="op">=</span> <span class="fl">7725.</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ybar <span class="op">=</span> <span class="bu">float</span>(data.mean())</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="bu">float</span>(data.std())</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;ortalama&#39;</span>,ybar,<span class="st">&#39;std&#39;</span>,s</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;ortalama&#39;</span>,ybar,<span class="st">&#39;std&#39;</span>,s)</span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>tval <span class="op">=</span> (ybar<span class="op">-</span>mu0)<span class="op">/</span>(s<span class="op">/</span>np.sqrt(n))</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;df&#39;</span>,df,<span class="st">&#39;tval&#39;</span>,tval</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;sol&#39;</span>,t.ppf(<span class="fl">0.025</span>,df)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;sag&#39;</span>,t.ppf(<span class="fl">0.975</span>,df)</span></code></pre></div>
-<pre><code>ortalama 6753.63636364 std 1142.12322214
-df 10 tval -2.82075406083
-sol -2.22813885196
-sag 2.22813885196</code></pre>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;df&#39;</span>,df,<span class="st">&#39;tval&#39;</span>,tval)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sol&#39;</span>,t.ppf(<span class="fl">0.025</span>,df))</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sag&#39;</span>,t.ppf(<span class="fl">0.975</span>,df))</span></code></pre></div>
+<pre class="text"><code>ortalama 6753.636363636364 std 1142.1232221373727
+df 10 tval -2.8207540608310198
+sol -2.2281388519649385
+sag 2.2281388519649385</code></pre>
 <p>Sol ve sağ eşik değerlerini hesapladık ve t değeri bu aralığın içine
 düşmüyor. Yani hipotezi reddediyoruz. Bazıları bu problemde p değeri
 görmek isteyebilir,</p>
 <div class="sourceCode" id="cb22"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;t degeri&#39;</span>, tval</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;iki tarafli p degeri&#39;</span>, <span class="dv">2</span><span class="op">*</span>t.cdf(tval,df)</span></code></pre></div>
-<pre><code>t degeri -2.82075406083
-iki tarafli p degeri 0.0181372351761</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;t degeri&#39;</span>, tval)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;iki tarafli p degeri&#39;</span>, <span class="dv">2</span><span class="op">*</span>t.cdf(tval,df))</span></code></pre></div>
+<pre class="text"><code>t degeri -2.8207540608310198
+iki tarafli p degeri 0.018137235176105812</code></pre>
 <p>p değeri hesapladık 0.05’ten küçük çıktı. İkiyle çarpmamızın sebebi
 iki-taraflı p-testi yapmış olmamız, yani kabul edilebilir bölgenin hem
 solundan hem de sağından ne kadar dışına düşüyorsak, bu iki taraftaki p
@@ -669,8 +669,8 @@ taraflı p testinin <span class="math inline">\(|t| &lt;
 <div class="sourceCode" id="cb24"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> ttest_1samp</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>t_statistic, p_value <span class="op">=</span> ttest_1samp(daily_intake, mu0)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;t&#39;</span>, t_statistic, <span class="st">&#39;one-sample t-test&#39;</span>, p_value</span></code></pre></div>
-<pre><code>t -2.82075406083 one-sample t-test 0.0181372351761</code></pre>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;t&#39;</span>, t_statistic, <span class="st">&#39;one-sample t-test&#39;</span>, p_value)</span></code></pre></div>
+<pre class="text"><code>t -2.8207540608310193 one-sample t-test 0.018137235176105812</code></pre>
 <p>Sonuç p değeri 0.05’ten küçük çıktı yani yüzde 5 önemliliğini
 (significance) baz aldık bu durumda veri hipotezden önemli derecede
 (significantly) uzakta. Demek ki ortalamanın 7725 olduğu hipotezini
@@ -694,9 +694,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a h
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>[<span class="fl">9.19</span>, <span class="dv">0</span>],[<span class="fl">8.11</span>, <span class="dv">1</span>]])</span>
 <span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>group1 <span class="op">=</span> energ[energ[:, <span class="dv">1</span>] <span class="op">==</span> <span class="dv">0</span>][:, <span class="dv">0</span>]</span>
 <span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>group2 <span class="op">=</span> energ[energ[:, <span class="dv">1</span>] <span class="op">==</span> <span class="dv">1</span>][:, <span class="dv">0</span>]</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>t_statistic, p_value <span class="op">=</span> ttest_ind(group1, group2)</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;two-sample t-test&quot;</span>, p_value</span></code></pre></div>
-<pre><code>two-sample t-test 0.00079899821117</code></pre>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>t_statistic, p_value <span class="op">=</span> stats.ttest_ind(group1, group2)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;two-sample t-test&quot;</span>, p_value)</span></code></pre></div>
+<pre class="text"><code>two-sample t-test 0.0007989982111700593</code></pre>
 <p><span class="math inline">\(p\)</span> değeri <span
 class="math inline">\(&lt; 0.05\)</span> yani iki grubun ortalaması aynı
 değildir. Aynı olduğu hipotezi reddedildi.</p>
@@ -719,8 +719,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a h
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>pre <span class="op">=</span> intake[:, <span class="dv">0</span>]</span>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> intake[:, <span class="dv">1</span>]</span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>t_statistic, p_value <span class="op">=</span> ttest_1samp(post <span class="op">-</span> pre, <span class="dv">0</span>)</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;paired t-test&quot;</span>, p_value</span></code></pre></div>
-<pre><code>paired t-test 3.05902094293e-07</code></pre>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;paired t-test&quot;</span>, p_value)</span></code></pre></div>
+<pre class="text"><code>paired t-test 3.059020942934875e-07</code></pre>
 <p>Wilcoxon işaretli-sıralı testi (Wilcoxon signed-rank test)</p>
 <p>t Testleri Normal dağılıma göre sapmaları yakalamak açısından,
 özellikle büyük örneklemler var ise, oldukça sağlamdır. Fakat bazen
@@ -744,14 +744,14 @@ sonuç yine <code>0.05</code> ile karşılaştırılır.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> wilcoxon, ttest_ind</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>daily_intake <span class="op">=</span> np.array([<span class="dv">5260</span>,<span class="dv">5470</span>,<span class="dv">5640</span>,<span class="dv">6180</span>,<span class="dv">6390</span>,<span class="dv">6515</span>,<span class="dv">6805</span>,<span class="dv">7515</span>,<span class="dv">7515</span>,<span class="dv">8230</span>,<span class="dv">8770</span>])</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>z_statistic, p_value <span class="op">=</span> wilcoxon(daily_intake <span class="op">-</span> <span class="dv">7725</span>)</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;one-sample wilcoxon-test&quot;</span>, p_value</span></code></pre></div>
-<pre><code>one-sample wilcoxon-test 0.0279991628713</code></pre>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;one-sample wilcoxon-test&quot;</span>, p_value)</span></code></pre></div>
+<pre class="text"><code>one-sample wilcoxon-test 0.0244140625</code></pre>
 <p>Hipotezi reddettik.</p>
 <p>Eşlemeli t-testi şimdi Wilcoxon testi ile yapalım,</p>
 <div class="sourceCode" id="cb32"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>z_statistic, p_value <span class="op">=</span> wilcoxon(post <span class="op">-</span> pre)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;paired wilcoxon-test&quot;</span>, p_value</span></code></pre></div>
-<pre><code>paired wilcoxon-test 0.00463608893545</code></pre>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;paired wilcoxon-test&quot;</span>, p_value)</span></code></pre></div>
+<pre class="text"><code>paired wilcoxon-test 0.0009765625</code></pre>
 <p>Normallik Testi</p>
 <p>Paket <code>scipy.stats</code> altında normallik testleri için bazı
 çağrılar var, bu tekniklerden ikisini altta gösteriyoruz,</p>
@@ -760,20 +760,19 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a h
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.array([<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">444</span>,<span class="dv">444</span>,<span class="dv">3</span>,<span class="dv">98</span>])</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>arr2 <span class="op">=</span> np.array([np.random.normal() <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">100</span>)])</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;D-Agostino and Pearsons&#39;</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> st.normaltest(arr)</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> st.normaltest(arr2)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;D-Agostino and Pearsons&#39;</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (st.normaltest(arr))</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (st.normaltest(arr2))</span>
 <span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Shapiro-Wilk&#39;</span></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> st.shapiro(arr)</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> st.shapiro(arr2)</span></code></pre></div>
-<pre><code>D-Agostino and Pearsons
-(4.6919700569024814, 0.095752836393526289)
-(1.4265636263795889, 0.49003335773235424)
-
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Shapiro-Wilk&#39;</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (st.shapiro(arr))</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (st.shapiro(arr2))</span></code></pre></div>
+<pre class="text"><code>D-Agostino and Pearsons
+NormaltestResult(statistic=np.float64(4.691970056902481), pvalue=np.float64(0.09575283639352629))
+NormaltestResult(statistic=np.float64(1.8287205745005466), pvalue=np.float64(0.40077292365267525))
 Shapiro-Wilk
-(0.6167718172073364, 0.00015052134403958917)
-(0.9891485571861267, 0.5962899923324585)</code></pre>
+ShapiroResult(statistic=np.float64(0.6167717541253821), pvalue=np.float64(0.00015052019292396493))
+ShapiroResult(statistic=np.float64(0.9856167816127395), pvalue=np.float64(0.3514915790252182))</code></pre>
 <p>Sonuçlara göre Shapiro-Wilk yaklaşımı daha güvenilir gözüküyor, zaten
 [6, sf 53]’e göre örneklem sayısı <span class="math inline">\(\le
 50\)</span> olduğu durumlarda bu test tercih edilmelidir.</p>

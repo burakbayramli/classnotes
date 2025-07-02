@@ -35,13 +35,13 @@ n = 1500
 p = 0.12
 mu = n*p
 std = np.sqrt(n*p*(1-p))
-print mu,std
-print 'olasilik',norm.cdf(170,loc=mu,scale=std)
+print (mu,std)
+print ('olasilik',norm.cdf(170,loc=mu,scale=std))
 ```
 
-```
-180.0 12.585706178
-olasilik 0.213437028747
+```text
+180.0 12.58570617804182
+olasilik 0.2134370287472811
 ```
 
 Yani $N(180,12.58)$ dağılımını elde ettik ve hesapları onun üzerinden
@@ -60,17 +60,17 @@ from scipy import stats
 a = pd.DataFrame({'tiklama': [20.,2.,40.,5.,10.,100.],
                   'ziyaret': [100.,10.,300.,400.,30.,800.]})
 a['cvr'] = a['tiklama'] / a['ziyaret'] 
-print a
+print (a)
 ```
 
-```
+```text
    tiklama  ziyaret       cvr
-0       20      100  0.200000
-1        2       10  0.200000
-2       40      300  0.133333
-3        5      400  0.012500
-4       10       30  0.333333
-5      100      800  0.125000
+0     20.0    100.0  0.200000
+1      2.0     10.0  0.200000
+2     40.0    300.0  0.133333
+3      5.0    400.0  0.012500
+4     10.0     30.0  0.333333
+5    100.0    800.0  0.125000
 ```
 
 Bu veri seti için cvr'in 0.16, yani yüzde 16 olduğunu önceden biliyoruz. Üstteki
@@ -83,18 +83,18 @@ z-skoru hesaplayabiliriz,
 p = 0.16
 btest = lambda x: (x['cvr']-p) / np.sqrt( p*(1-p)/x['ziyaret'])
 a['guven'] = a.apply(btest, axis=1)
-a['guven'] = np.round(stats.zprob(a['guven'])*100,2)
-print a
+a['guven'] = np.round(stats.norm.cdf(a['guven'])*100,2)
+print (a)
 ```
 
-```
+```text
    tiklama  ziyaret       cvr  guven
-0       20      100  0.200000  86.24
-1        2       10  0.200000  63.50
-2       40      300  0.133333  10.39
-3        5      400  0.012500   0.00
-4       10       30  0.333333  99.52
-5      100      800  0.125000   0.35
+0     20.0    100.0  0.200000  86.24
+1      2.0     10.0  0.200000  63.50
+2     40.0    300.0  0.133333  10.39
+3      5.0    400.0  0.012500   0.00
+4     10.0     30.0  0.333333  99.52
+5    100.0    800.0  0.125000   0.35
 ```
 
 Soru 
@@ -122,11 +122,11 @@ Python ile
 m = 810/1012.
 low = m - 1.96*np.sqrt(m*(1-m)/1012.)
 high = m + 1.96*np.sqrt(m*(1-m)/1012.)
-print low, high
+print (low, high)
 ```
 
-```
-0.775768711331 0.825021802503
+```text
+0.7757687113313638 0.8250218025026284
 ```
 
 Soru
@@ -149,11 +149,11 @@ aralığı,
 
 ```python
 x=6.;n=9.;p=(x+2)/(n+4); z = 1.96
-print p + np.array([-1,+1])*z*np.sqrt(p*(1-p)/n)
+print (p + np.array([-1,+1])*z*np.sqrt(p*(1-p)/n))
 ```
 
-```
-[ 0.29753517  0.93323406]
+```text
+[0.29753517 0.93323406]
 ```
 
 Demek ki yazar okuyucularına kötü bir tavsiye vermiş, güven aralığının alt
@@ -275,11 +275,11 @@ Burada $100(1-\alpha) = 98$, o zaman $\alpha = 0.02$, demek ki $z_{\alpha/2}
 
 ```python
 from scipy.stats.distributions import norm
-print norm.ppf(0.99)
+print (norm.ppf(0.99))
 ```
 
-```
-2.32634787404
+```text
+2.3263478740408408
 ```
 
 Tüm hesap için
@@ -329,16 +329,16 @@ edilebilir'' diye rapor etmiştir. A oylarının hata payı hakikaten
 ```python
 n = 597.
 k = 299
-print n/2
-print k/n
+print (n/2)
+print (k/n)
 d = 0.98/np.sqrt(n) 
-print d*100
+print (d*100)
 ```
 
-```
+```text
 298.5
-0.500837520938
-4.01087299444
+0.5008375209380235
+4.010872994443285
 ```
 
 Evet hata payı \%4 çıktı. 
@@ -437,11 +437,11 @@ $$ 1 - P(Z < 0.57)$$
 1-0.7157 = 0.2843. Kod ile
 
 ```python
-print 1-norm.cdf(0.57)
+print (1-norm.cdf(0.57))
 ```
 
-```
-0.284338849046
+```text
+0.2843388490463241
 ```
 
 Demek ki
@@ -503,13 +503,12 @@ z-Skor tablosuna bakıyoruz, "hangi z değeri 0.95 değeri sonucunu verir'',
 kordinatlardan 1.64 z-skorunu buluyoruz. Ya da
 
 ```python
-print norm.ppf(0.95)
+print (norm.ppf(0.95))
 ```
 
+```text
+1.6448536269514722
 ```
-1.64485362695
-```
-
 
 $$ P(Z \le 1.64)  = 0.95 $$
 O zaman 
@@ -636,18 +635,18 @@ df = n-1 # serbestlik derecesi
 mu0 = 7725.
 ybar = float(data.mean())
 s = float(data.std())
-print 'ortalama',ybar,'std',s
+print ('ortalama',ybar,'std',s)
 tval = (ybar-mu0)/(s/np.sqrt(n))
-print 'df',df,'tval',tval
-print 'sol',t.ppf(0.025,df)
-print 'sag',t.ppf(0.975,df)
+print ('df',df,'tval',tval)
+print ('sol',t.ppf(0.025,df))
+print ('sag',t.ppf(0.975,df))
 ```
 
-```
-ortalama 6753.63636364 std 1142.12322214
-df 10 tval -2.82075406083
-sol -2.22813885196
-sag 2.22813885196
+```text
+ortalama 6753.636363636364 std 1142.1232221373727
+df 10 tval -2.8207540608310198
+sol -2.2281388519649385
+sag 2.2281388519649385
 ```
 
 Sol ve sağ eşik değerlerini hesapladık ve t değeri bu aralığın içine
@@ -655,13 +654,13 @@ düşmüyor. Yani hipotezi reddediyoruz. Bazıları bu problemde p değeri görm
 isteyebilir, 
 
 ```python
-print 't degeri', tval
-print 'iki tarafli p degeri', 2*t.cdf(tval,df)
+print ('t degeri', tval)
+print ('iki tarafli p degeri', 2*t.cdf(tval,df))
 ```
 
-```
-t degeri -2.82075406083
-iki tarafli p degeri 0.0181372351761
+```text
+t degeri -2.8207540608310198
+iki tarafli p degeri 0.018137235176105812
 ```
 
 p değeri hesapladık 0.05'ten küçük çıktı. İkiyle çarpmamızın sebebi
@@ -676,11 +675,11 @@ Benzer bir hesabı kütüphane çağrısı ile yaparsak,
 ```python
 from scipy.stats import ttest_1samp
 t_statistic, p_value = ttest_1samp(daily_intake, mu0)
-print 't', t_statistic, 'one-sample t-test', p_value
+print ('t', t_statistic, 'one-sample t-test', p_value)
 ```
 
-```
-t -2.82075406083 one-sample t-test 0.0181372351761
+```text
+t -2.8207540608310193 one-sample t-test 0.018137235176105812
 ```
 
 Sonuç p değeri 0.05'ten küçük çıktı yani yüzde 5 önemliliğini
@@ -709,12 +708,12 @@ energ = np.array([
 [9.19, 0],[8.11, 1]])
 group1 = energ[energ[:, 1] == 0][:, 0]
 group2 = energ[energ[:, 1] == 1][:, 0]
-t_statistic, p_value = ttest_ind(group1, group2)
-print "two-sample t-test", p_value
+t_statistic, p_value = stats.ttest_ind(group1, group2)
+print ("two-sample t-test", p_value)
 ```
 
-```
-two-sample t-test 0.00079899821117
+```text
+two-sample t-test 0.0007989982111700593
 ```
 
 $p$ değeri $< 0.05$ yani iki grubun ortalaması aynı değildir. Aynı olduğu
@@ -741,11 +740,11 @@ intake = np.array([
 pre = intake[:, 0]
 post = intake[:, 1]
 t_statistic, p_value = ttest_1samp(post - pre, 0)
-print "paired t-test", p_value
+print ("paired t-test", p_value)
 ```
 
-```
-paired t-test 3.05902094293e-07
+```text
+paired t-test 3.059020942934875e-07
 ```
 
 Wilcoxon işaretli-sıralı testi (Wilcoxon signed-rank test)
@@ -771,11 +770,11 @@ seçmek, ve sonuçları toplamaya tekabül etmektedir. Ve bu sonuç yine `0.05`
 from scipy.stats import wilcoxon, ttest_ind
 daily_intake = np.array([5260,5470,5640,6180,6390,6515,6805,7515,7515,8230,8770])
 z_statistic, p_value = wilcoxon(daily_intake - 7725)
-print "one-sample wilcoxon-test", p_value
+print ("one-sample wilcoxon-test", p_value)
 ```
 
-```
-one-sample wilcoxon-test 0.0279991628713
+```text
+one-sample wilcoxon-test 0.0244140625
 ```
 
 Hipotezi reddettik.
@@ -784,11 +783,11 @@ Eşlemeli t-testi şimdi Wilcoxon testi ile yapalım,
 
 ```python
 z_statistic, p_value = wilcoxon(post - pre)
-print "paired wilcoxon-test", p_value
+print ("paired wilcoxon-test", p_value)
 ```
 
-```
-paired wilcoxon-test 0.00463608893545
+```text
+paired wilcoxon-test 0.0009765625
 ```
 
 Normallik Testi
@@ -801,23 +800,22 @@ import scipy.stats as st
 arr = np.array([3,4,3,10,10,444,444,3,98])
 arr2 = np.array([np.random.normal() for i in range(100)])
 
-print 'D-Agostino and Pearsons'
-print st.normaltest(arr)
-print st.normaltest(arr2)
+print ('D-Agostino and Pearsons')
+print (st.normaltest(arr))
+print (st.normaltest(arr2))
 print
-print 'Shapiro-Wilk'
-print st.shapiro(arr)
-print st.shapiro(arr2)
+print ('Shapiro-Wilk')
+print (st.shapiro(arr))
+print (st.shapiro(arr2))
 ```
 
-```
+```text
 D-Agostino and Pearsons
-(4.6919700569024814, 0.095752836393526289)
-(1.4265636263795889, 0.49003335773235424)
-
+NormaltestResult(statistic=np.float64(4.691970056902481), pvalue=np.float64(0.09575283639352629))
+NormaltestResult(statistic=np.float64(1.8287205745005466), pvalue=np.float64(0.40077292365267525))
 Shapiro-Wilk
-(0.6167718172073364, 0.00015052134403958917)
-(0.9891485571861267, 0.5962899923324585)
+ShapiroResult(statistic=np.float64(0.6167717541253821), pvalue=np.float64(0.00015052019292396493))
+ShapiroResult(statistic=np.float64(0.9856167816127395), pvalue=np.float64(0.3514915790252182))
 ```
 
 Sonuçlara göre Shapiro-Wilk yaklaşımı daha güvenilir gözüküyor, zaten [6,
@@ -881,6 +879,7 @@ import statsmodels.api as sm
 fig = sm.qqplot(arr)
 plt.savefig('stat_tests_01.png')
 ```
+
 ![](stat_tests_01.png)
 
 Gerçekten Gaussian olan bir veri şöyle gözükür, 
@@ -889,6 +888,7 @@ Gerçekten Gaussian olan bir veri şöyle gözükür,
 fig = sm.qqplot(arr2)
 plt.savefig('stat_tests_02.png')
 ```
+
 ![](stat_tests_02.png)
 
 Kaynaklar
