@@ -16,228 +16,321 @@
   <title>Gaussian Karışım Modeli (GMM) ile Kümelemek</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
-<h1 id="gaussian-karışım-modeli-gmm-ile-kümelemek">Gaussian Karışım Modeli (GMM) ile Kümelemek</h1>
-<p>Gaussian (normal) dağılımı tek tepesi olan (unimodal) bir dağılımdır. Bu demektir ki eğer birden fazla tepe noktası olan bir veriyi modellemek istiyorsak, değişik yaklaşımlar kullanmamız gerekir. Birden fazla Gaussian'ı &quot;karıştırmak (mixing)&quot; bu tür bir yaklaşım. Karıştırmak, karışım içindeki her Gaussian'dan gelen sonuçları toplamaktır, yani kelimenin tam anlamıyla her veri noktasını teker teker karışımdaki tüm dağılımlara geçip sonuçları ve bir ağırlık üzerinden toplamaktır. Çok boyutlu Gaussian'lar için mesela,</p>
-<p><span class="math display">\[ f(x) = \sum_z \pi_k N(x | \mu_k,\Sigma_k) \]</span></p>
-<p><span class="math inline">\(\pi_k\)</span> karıştırma oranlarıdır (mixing proportions). Bernoulli karışımlarını anlatan yazıya kıyasla, oradaki <span class="math inline">\(\theta\)</span>'yi 0/1 hücreleri için olasılıklar olarak aldık, şimdi <span class="math inline">\(\theta\)</span> içinde <span class="math inline">\(\mu_k,\Sigma_k\)</span> var, yani <span class="math inline">\(\theta=(\mu_k,\Sigma_k)\)</span>.</p>
-<p>İki Gaussian olsa <span class="math inline">\(\pi_1,\pi_2\)</span> oranları 0.2, 0.8 olabilir ve her nokta her Gaussian'a verildikten sonra tekabül eden ağırlıkla mesela sırayla <span class="math inline">\(0.2,0.8\)</span> ile çarpılıp toplanır.</p>
-<p>Maksimizasyon adımı için gereken hesapların türetilmesi [5, sf. 392]'de bulunabilir.</p>
+<h1 id="gaussian-karışım-modeli-gmm-ile-kümelemek">Gaussian Karışım
+Modeli (GMM) ile Kümelemek</h1>
+<p>Gaussian (normal) dağılımı tek tepesi olan (unimodal) bir dağılımdır.
+Bu demektir ki eğer birden fazla tepe noktası olan bir veriyi modellemek
+istiyorsak, değişik yaklaşımlar kullanmamız gerekir. Birden fazla
+Gaussian’ı “karıştırmak (mixing)” bu tür bir yaklaşım. Karıştırmak,
+karışım içindeki her Gaussian’dan gelen sonuçları toplamaktır, yani
+kelimenin tam anlamıyla her veri noktasını teker teker karışımdaki tüm
+dağılımlara geçip sonuçları ve bir ağırlık üzerinden toplamaktır. Çok
+boyutlu Gaussian’lar için mesela,</p>
+<p><span class="math display">\[ f(x) = \sum_z \pi_k N(x |
+\mu_k,\Sigma_k) \]</span></p>
+<p><span class="math inline">\(\pi_k\)</span> karıştırma oranlarıdır
+(mixing proportions). Bernoulli karışımlarını anlatan yazıya kıyasla,
+oradaki <span class="math inline">\(\theta\)</span>’yi 0/1 hücreleri
+için olasılıklar olarak aldık, şimdi <span
+class="math inline">\(\theta\)</span> içinde <span
+class="math inline">\(\mu_k,\Sigma_k\)</span> var, yani <span
+class="math inline">\(\theta=(\mu_k,\Sigma_k)\)</span>.</p>
+<p>İki Gaussian olsa <span class="math inline">\(\pi_1,\pi_2\)</span>
+oranları 0.2, 0.8 olabilir ve her nokta her Gaussian’a verildikten sonra
+tekabül eden ağırlıkla mesela sırayla <span
+class="math inline">\(0.2,0.8\)</span> ile çarpılıp toplanır.</p>
+<p>Maksimizasyon adımı için gereken hesapların türetilmesi [5, sf.
+392]’de bulunabilir.</p>
 <p>Örnek olarak alttaki veriye bakalım.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-
-women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]
-men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]
-
-plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)
-plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)
-plt.plot (women[:,<span class="dv">1</span>],women[:,<span class="dv">2</span>], <span class="st">&#39;b.&#39;</span>)
-plt.hold(<span class="va">True</span>)
-plt.plot (men[:,<span class="dv">1</span>],men[:,<span class="dv">2</span>], <span class="st">&#39;r.&#39;</span>)
-plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)
-plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)
-plt.savefig(<span class="st">&#39;mixnorm_1.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="mixnorm_1.png" />
-
-</div>
-<p>Bu grafik kadınlar ve erkeklerin boy (height) ve kilolarını (weight) içeren bir veri setinden geliyor, veri setinde erkekler ve kadınlara ait olan ölçümler önceden işaretlenmiş / etiketlenmiş (labeled), biz de bu işaretleri kullanarak kadınları kırmızı erkekleri mavi ile grafikledik. Ama bu işaretler / etiketler verilmiş olsun ya da olmasın, kavramsal olarak düşünürsek eğer bu veriye bir dağılım uydurmak (fit) istersek bir karışım kullanılması gerekli, çünkü iki tepe noktasiyle daha rahat temsil edileceğini düşündüğümüz bir durum var ortada.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># Multivariate gaussian, contours</span>
-<span class="co">#</span>
-<span class="im">import</span> scipy.stats
-<span class="im">import</span> em
-
-data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-
-women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]
-men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]
-
-plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)
-plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)
-plt.plot (women[:,<span class="dv">1</span>],women[:,<span class="dv">2</span>], <span class="st">&#39;b.&#39;</span>)
-plt.hold(<span class="va">True</span>)
-plt.plot (men[:,<span class="dv">1</span>],men[:,<span class="dv">2</span>], <span class="st">&#39;r.&#39;</span>)
-plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)
-plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)
-plt.hold(<span class="va">True</span>)
-
-x <span class="op">=</span> np.arange(<span class="fl">55.</span>, <span class="fl">80.</span>, <span class="dv">1</span>)
-y <span class="op">=</span> np.arange(<span class="fl">80.</span>, <span class="fl">280.</span>, <span class="dv">1</span>)
-X, Y <span class="op">=</span> np.meshgrid(x, y)
-
-Z <span class="op">=</span> np.zeros(X.shape)
-nx, ny <span class="op">=</span> X.shape
-mu1 <span class="op">=</span> np.array([  <span class="fl">72.89350086</span>,  <span class="fl">193.21741426</span>])
-sigma1 <span class="op">=</span> np.matrix([[    <span class="fl">7.84711283</span>,    <span class="fl">25.03111826</span>],
-                    [   <span class="fl">25.03111826</span>,  <span class="fl">1339.70289046</span>]])
-<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(nx):
-    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">xrange</span>(ny):
-        Z[i,j] <span class="op">=</span> em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu1,sigma1)
-        
-levels <span class="op">=</span> np.linspace(Z.<span class="bu">min</span>(), Z.<span class="bu">max</span>(), <span class="dv">4</span>)
-
-plt.contour(X, Y, Z, colors<span class="op">=</span><span class="st">&#39;b&#39;</span>, levels<span class="op">=</span>levels)
-plt.hold(<span class="va">True</span>)
-
-Z <span class="op">=</span> np.zeros(X.shape)
-nx, ny <span class="op">=</span> X.shape
-mu2 <span class="op">=</span> np.array([  <span class="fl">66.15903841</span>,  <span class="fl">135.308125</span>  ])
-sigma2 <span class="op">=</span> np.matrix([[  <span class="fl">14.28189396</span>,   <span class="fl">51.48931033</span>],
-                    [  <span class="fl">51.48931033</span>,  <span class="fl">403.09566456</span>]])
-<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(nx):
-    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">xrange</span>(ny):
-        Z[i,j] <span class="op">=</span> em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu2,sigma2)
-        
-levels <span class="op">=</span> np.linspace(Z.<span class="bu">min</span>(), Z.<span class="bu">max</span>(), <span class="dv">4</span>)
-
-plt.contour(X, Y, Z, colors<span class="op">=</span><span class="st">&#39;r&#39;</span>, levels<span class="op">=</span>levels)
-plt.savefig(<span class="st">&#39;mixnorm_2.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="mixnorm_2.png" />
-
-</div>
-<p>Bu karışım içindeki Gaussian'ları üstteki gibi çizebilirdik (gerçi üstteki aslında ileride yapacağımız net bir hesaptan bir geliyor, ona birazdan geliyoruz, ama çıplak gözle de bu şekil uydurulabilirdi). Modeli kontrol edelim, elimizde bir karışım var, nihai olasılık değeri <span class="math inline">\(p(x)\)</span>'i nasıl kullanırız? Belli bir noktanın olasılığını hesaplamak için bu noktayı her iki Gaussian'a teker teker geçeriz (örnekte iki tane), ve gelen olasılık sonuçlarını karışım oranları ile çarparak toplarız. Ağırlıklar sayesinde karışım entegre edilince hala 1 değeri çıkıyor zaten bir dağılımın uyması gereken şartlardan biri bu. Ayrıca bir dağılımın diğerinden daha önemli olduğu ağırlıklar üzerinden modele verilmiş oluyor.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.plot (women[:,<span class="dv">1</span>],women[:,<span class="dv">2</span>], <span class="st">&#39;b.&#39;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.plot (men[:,<span class="dv">1</span>],men[:,<span class="dv">2</span>], <span class="st">&#39;r.&#39;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mixnorm_1.png&#39;</span>)</span></code></pre></div>
+<p><img src="mixnorm_1.png" /></p>
+<p>Bu grafik kadınlar ve erkeklerin boy (height) ve kilolarını (weight)
+içeren bir veri setinden geliyor, veri setinde erkekler ve kadınlara ait
+olan ölçümler önceden işaretlenmiş / etiketlenmiş (labeled), biz de bu
+işaretleri kullanarak kadınları kırmızı erkekleri mavi ile grafikledik.
+Ama bu işaretler / etiketler verilmiş olsun ya da olmasın, kavramsal
+olarak düşünürsek eğer bu veriye bir dağılım uydurmak (fit) istersek bir
+karışım kullanılması gerekli, çünkü iki tepe noktasiyle daha rahat
+temsil edileceğini düşündüğümüz bir durum var ortada.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multivariate gaussian, contours</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> em</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.plot (women[:,<span class="dv">1</span>],women[:,<span class="dv">2</span>], <span class="st">&#39;b.&#39;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>plt.plot (men[:,<span class="dv">1</span>],men[:,<span class="dv">2</span>], <span class="st">&#39;r.&#39;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="fl">55.</span>, <span class="fl">80.</span>, <span class="dv">1</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="fl">80.</span>, <span class="fl">280.</span>, <span class="dv">1</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.zeros(X.shape)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>nx, ny <span class="op">=</span> X.shape</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>mu1 <span class="op">=</span> np.array([  <span class="fl">72.89350086</span>,  <span class="fl">193.21741426</span>])</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>sigma1 <span class="op">=</span> np.matrix([[    <span class="fl">7.84711283</span>,    <span class="fl">25.03111826</span>],</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                    [   <span class="fl">25.03111826</span>,  <span class="fl">1339.70289046</span>]])</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(nx):</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">xrange</span>(ny):</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        Z[i,j] <span class="op">=</span> em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu1,sigma1)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>levels <span class="op">=</span> np.linspace(Z.<span class="bu">min</span>(), Z.<span class="bu">max</span>(), <span class="dv">4</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>plt.contour(X, Y, Z, colors<span class="op">=</span><span class="st">&#39;b&#39;</span>, levels<span class="op">=</span>levels)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.zeros(X.shape)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>nx, ny <span class="op">=</span> X.shape</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>mu2 <span class="op">=</span> np.array([  <span class="fl">66.15903841</span>,  <span class="fl">135.308125</span>  ])</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="op">=</span> np.matrix([[  <span class="fl">14.28189396</span>,   <span class="fl">51.48931033</span>],</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>                    [  <span class="fl">51.48931033</span>,  <span class="fl">403.09566456</span>]])</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(nx):</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">xrange</span>(ny):</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        Z[i,j] <span class="op">=</span> em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu2,sigma2)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>levels <span class="op">=</span> np.linspace(Z.<span class="bu">min</span>(), Z.<span class="bu">max</span>(), <span class="dv">4</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>plt.contour(X, Y, Z, colors<span class="op">=</span><span class="st">&#39;r&#39;</span>, levels<span class="op">=</span>levels)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mixnorm_2.png&#39;</span>)</span></code></pre></div>
+<p><img src="mixnorm_2.png" /></p>
+<p>Bu karışım içindeki Gaussian’ları üstteki gibi çizebilirdik (gerçi
+üstteki aslında ileride yapacağımız net bir hesaptan bir geliyor, ona
+birazdan geliyoruz, ama çıplak gözle de bu şekil uydurulabilirdi).
+Modeli kontrol edelim, elimizde bir karışım var, nihai olasılık değeri
+<span class="math inline">\(p(x)\)</span>’i nasıl kullanırız? Belli bir
+noktanın olasılığını hesaplamak için bu noktayı her iki Gaussian’a teker
+teker geçeriz (örnekte iki tane), ve gelen olasılık sonuçlarını karışım
+oranları ile çarparak toplarız. Ağırlıklar sayesinde karışım entegre
+edilince hala 1 değeri çıkıyor zaten bir dağılımın uyması gereken
+şartlardan biri bu. Ayrıca bir dağılımın diğerinden daha önemli olduğu
+ağırlıklar üzerinden modele verilmiş oluyor.</p>
 <p>Etiketler Bilinmiyorsa</p>
-<p>Eğer etiketler bize önceden verilmemiş olsaydı, hangi veri noktalarının kadınlara, hangilerinin erkeklere ait olduğunu bilmeseydik o zaman ne yapardık? Bu veriyi grafiklerken etiketleri renkleyemezdik tabii ki, şöyle bir resim çizebilirdik ancak,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> scipy.stats
-data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-
-women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]
-men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]
-
-plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)
-plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)
-plt.plot (data[:,<span class="dv">1</span>],data[:,<span class="dv">2</span>], <span class="st">&#39;k.&#39;</span>)
-plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)
-plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)
-plt.savefig(<span class="st">&#39;mixnorm_3.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="mixnorm_3.png" />
-
-</div>
-<p>Fakat yine de şekil olarak iki kümeyi görebiliyoruz. Acaba öyle bir yapay öğrenim algoritması olsa da, biz bir karışım olduğunu tahmin edip, sonra o karışımı veriye uydururken, etiket değerlerini de kendiliğinden tahmin etse?</p>
-<p>Alttaki kod Beklenti-Maksimizasyon üzerinden kümeleme yapar. Konunun teorik kısmı altta ve [6] yazısında bulunabilir.</p>
+<p>Eğer etiketler bize önceden verilmemiş olsaydı, hangi veri
+noktalarının kadınlara, hangilerinin erkeklere ait olduğunu bilmeseydik
+o zaman ne yapardık? Bu veriyi grafiklerken etiketleri renkleyemezdik
+tabii ki, şöyle bir resim çizebilirdik ancak,</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>women <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>men <span class="op">=</span> data[data[:,<span class="dv">0</span>] <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">55</span>,<span class="dv">80</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">80</span>,<span class="dv">280</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>plt.plot (data[:,<span class="dv">1</span>],data[:,<span class="dv">2</span>], <span class="st">&#39;k.&#39;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;boy (inch)&#39;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;agirlik (pound)&#39;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mixnorm_3.png&#39;</span>)</span></code></pre></div>
+<p><img src="mixnorm_3.png" /></p>
+<p>Fakat yine de şekil olarak iki kümeyi görebiliyoruz. Acaba öyle bir
+yapay öğrenim algoritması olsa da, biz bir karışım olduğunu tahmin edip,
+sonra o karışımı veriye uydururken, etiket değerlerini de kendiliğinden
+tahmin etse?</p>
+<p>Alttaki kod Beklenti-Maksimizasyon üzerinden kümeleme yapar. Konunun
+teorik kısmı altta ve [6] yazısında bulunabilir.</p>
 <p>Türetmek</p>
-<p>Karışımda birden fazla çok boyutlu Gaussian olacak, bu Gaussian'lardan <span class="math inline">\(i\)</span>'inci Gaussian</p>
-<p><span class="math display">\[ 
-f_i(x) = f(x;\mu_i,\Sigma_i) = 
-\frac{1}{(2\pi)^{d/2} |\Sigma_i|^{1/2}} \exp 
+<p>Karışımda birden fazla çok boyutlu Gaussian olacak, bu
+Gaussian’lardan <span class="math inline">\(i\)</span>’inci Gaussian</p>
+<p><span class="math display">\[
+f_i(x) = f(x;\mu_i,\Sigma_i) =
+\frac{1}{(2\pi)^{d/2} |\Sigma_i|^{1/2}} \exp
 \bigg\{
--\frac{(x-\mu)^T\Sigma_i^{-1}(x-\mu_i)}{2} 
-\bigg\} 
+-\frac{(x-\mu)^T\Sigma_i^{-1}(x-\mu_i)}{2}
+\bigg\}
 \qquad (1)
 \]</span></p>
-<p>olur, <span class="math inline">\(x\)</span> çok boyutlu veri noktasıdır, ve kümeleme başlamadan önce <span class="math inline">\(\mu_i,\Sigma_i\)</span> bilinmez, küme sayısı <span class="math inline">\(k\)</span> bilinir. O zaman karışım modeli</p>
+<p>olur, <span class="math inline">\(x\)</span> çok boyutlu veri
+noktasıdır, ve kümeleme başlamadan önce <span
+class="math inline">\(\mu_i,\Sigma_i\)</span> bilinmez, küme sayısı
+<span class="math inline">\(k\)</span> bilinir. O zaman karışım
+modeli</p>
 <p><span class="math display">\[ f(x) = \sum_{i=1}^{k} f_i(x)P(C_i) =
 \sum_{i=1}^{k} f(x;\mu_i,\Sigma_i)P(C_i)
 \]</span></p>
-<p><span class="math inline">\(P(C_i)\)</span>'a karışım oranları deniyor, ki <span class="math inline">\(\sum_i P(C_i) = 1\)</span>. Bazı metinlerde bu <span class="math inline">\(\pi_i\)</span> olarak ta gösterilebiliyor. Tüm veri için maksimum olurluk</p>
-<p><span class="math display">\[ 
+<p><span class="math inline">\(P(C_i)\)</span>’a karışım oranları
+deniyor, ki <span class="math inline">\(\sum_i P(C_i) = 1\)</span>. Bazı
+metinlerde bu <span class="math inline">\(\pi_i\)</span> olarak ta
+gösterilebiliyor. Tüm veri için maksimum olurluk</p>
+<p><span class="math display">\[
 L = \sum_{j=1}^{n} \ln f(x_j) = \sum_{j=1}^{n} \ln \bigg(
 \sum_{i=1}^{k} f(x_j;\mu_i,\Sigma_i)P(C_i)
 \bigg)
 \]</span></p>
-<p>Şimdi herhangi bir parametre <span class="math inline">\(\theta_i\)</span> için (yani <span class="math inline">\(\mu_i\)</span> ya da <span class="math inline">\(\Sigma_i\)</span>),</p>
-<p><span class="math display">\[ 
-\frac{\partial L}{\partial \theta_i} = 
-\frac{\partial }{\partial \theta_i} 
+<p>Şimdi herhangi bir parametre <span
+class="math inline">\(\theta_i\)</span> için (yani <span
+class="math inline">\(\mu_i\)</span> ya da <span
+class="math inline">\(\Sigma_i\)</span>),</p>
+<p><span class="math display">\[
+\frac{\partial L}{\partial \theta_i} =
+\frac{\partial }{\partial \theta_i}
 \bigg(\sum_{j=1}^{n} \ln f(x_j) \bigg)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \sum_{j=1}^{n} \big( \frac{1}{f(x_j)} \cdot
 \frac{\partial f(x_j)}{\partial \theta_i} \big)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \sum_{j=1}^{n} \bigg(
 \frac{1}{f(x_j)} \sum_{a=1}^{k} \frac{\partial }{\partial \theta_i}
 \big( f(x_j;\sigma_a,\Sigma_a)P(C_a) \big)
 \bigg)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \sum_{j=1}^{n} \bigg(
 \frac{1}{f(x_j)} \cdot \frac{\partial }{\partial \theta_i}
 \big( f(x_j;\sigma_i,\Sigma_i)P(C_i) \big)
 \bigg)
 \]</span></p>
-<p>En son adım mümkün çünkü <span class="math inline">\(\theta_i\)</span> parametresi <span class="math inline">\(i\)</span>'inci kümeye (Gaussian'a) ait, ve diğer kümelerin bakış açısına göre (onlara göre kısmi türev alınınca) bu parametre sabit sayılıyor.</p>
-<p>Şimdi <span class="math inline">\(|\Sigma_i| = \frac{1}{|\Sigma^{-1}|}\)</span> eşitliğinden hareketle (1)'deki çok boyutlu Gaussian'ı şöyle yazabiliriz,</p>
-<p><span class="math display">\[ 
-f(x_j;\sigma_i,\Sigma_i) = (2\pi)^{-d/2} |\Sigma^{-1}|^{1/2} 
+<p>En son adım mümkün çünkü <span
+class="math inline">\(\theta_i\)</span> parametresi <span
+class="math inline">\(i\)</span>’inci kümeye (Gaussian’a) ait, ve diğer
+kümelerin bakış açısına göre (onlara göre kısmi türev alınınca) bu
+parametre sabit sayılıyor.</p>
+<p>Şimdi <span class="math inline">\(|\Sigma_i| =
+\frac{1}{|\Sigma^{-1}|}\)</span> eşitliğinden hareketle (1)’deki çok
+boyutlu Gaussian’ı şöyle yazabiliriz,</p>
+<p><span class="math display">\[
+f(x_j;\sigma_i,\Sigma_i) = (2\pi)^{-d/2} |\Sigma^{-1}|^{1/2}
 \exp \big[ g(\mu_i,\Sigma_i) \big]
 \]</span> ki</p>
-<p><span class="math display">\[ g(\mu_i,\Sigma_i) = -\frac{1}{2}(x_j-\mu_i)^T\Sigma_i^{-1}(x_j-\mu_i) \]</span></p>
+<p><span class="math display">\[ g(\mu_i,\Sigma_i) =
+-\frac{1}{2}(x_j-\mu_i)^T\Sigma_i^{-1}(x_j-\mu_i) \]</span></p>
 <p>Yani log-olurluk fonksiyonunun türevi şu şekilde yazılabilir,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \frac{\partial L}{\partial \theta_i} =
 \sum_{j=1}^{n} \bigg(
 \frac{1}{f(x_j)} \frac{\partial }{\partial \theta_i} \big(
-(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[ 
+(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[
 g(\mu_i,\Sigma_i) \big] P(C_i)
 \big) \bigg)
 \qquad (3)
 \]</span></p>
-<p><span class="math inline">\(\mu_i\)</span> için maksimum-olurluk kestirme hesabı yapmak için log olurluğun <span class="math inline">\(\theta_i=\mu_i\)</span>'a göre türevini almamız gerekiyor. Üstteki formülde gördüğümüz gibi <span class="math inline">\(\mu_i\)</span>'a bağlı olan tek terim <span class="math inline">\(\exp\big[ g(\mu_i,\Sigma_i) \big]\)</span>. Şimdi</p>
-<p><span class="math display">\[ 
+<p><span class="math inline">\(\mu_i\)</span> için maksimum-olurluk
+kestirme hesabı yapmak için log olurluğun <span
+class="math inline">\(\theta_i=\mu_i\)</span>’a göre türevini almamız
+gerekiyor. Üstteki formülde gördüğümüz gibi <span
+class="math inline">\(\mu_i\)</span>’a bağlı olan tek terim <span
+class="math inline">\(\exp\big[ g(\mu_i,\Sigma_i) \big]\)</span>.
+Şimdi</p>
+<p><span class="math display">\[
 \frac{\partial }{\partial \theta_i} \exp \big[ g(\mu_i,\Sigma_i) \big] =
-\exp \big[ g(\mu_i,\Sigma_i) \big] \cdot 
+\exp \big[ g(\mu_i,\Sigma_i) \big] \cdot
 \frac{\partial }{\partial \theta_i} g(\mu_i,\Sigma_i)
 \qquad (2)
 \]</span></p>
-<p>ve <span class="math display">\[ \frac{\partial }{\partial \mu_i}g(\mu_i,\Sigma_i) = 
+<p>ve <span class="math display">\[ \frac{\partial }{\partial
+\mu_i}g(\mu_i,\Sigma_i) =
 \Sigma_i^{-1}(x_j-\mu_i)
 \]</span></p>
-<p>formüllerini kullanarak log olurluğun <span class="math inline">\(\mu_i\)</span>'ya göre türevi</p>
-<p><span class="math display">\[ \frac{\partial L}{\partial \mu_i} = 
+<p>formüllerini kullanarak log olurluğun <span
+class="math inline">\(\mu_i\)</span>’ya göre türevi</p>
+<p><span class="math display">\[ \frac{\partial L}{\partial \mu_i} =
 \sum_{j=1}^{n} \bigg(
-\frac{1}{f(x_j)} 
-(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[ 
-g(\mu_i,\Sigma_i) \big] P(C_i) \Sigma^{-1} 
+\frac{1}{f(x_j)}
+(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[
+g(\mu_i,\Sigma_i) \big] P(C_i) \Sigma^{-1}
 (x_j-\mu_i)
 \bigg)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \sum_{j=1}^{n} \bigg(
-\frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)} \cdot 
+\frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)} \cdot
 \Sigma_i^{-1} (x_j-\mu_i)
 \bigg)
 \]</span></p>
@@ -245,354 +338,409 @@ g(\mu_i,\Sigma_i) \big] P(C_i) \Sigma^{-1}
 \sum_{j=1}^{n} w_{ij} \Sigma_i^{-1}(x_j-\mu_i)
 \]</span></p>
 <p>Üstteki forma erişmek için (2) ve alttaki formülü kullandık.</p>
-<p><span class="math display">\[ P(C_i|x_j) = \frac{P(x_j|C_i)P(C_i)}{\sum_{a=1}^{k}P(x_j|C_a)P(C_a)}\]</span></p>
+<p><span class="math display">\[ P(C_i|x_j) =
+\frac{P(x_j|C_i)P(C_i)}{\sum_{a=1}^{k}P(x_j|C_a)P(C_a)}\]</span></p>
 <p>ki bunun anlamı</p>
-<p><span class="math display">\[ w_{ij} = P(C_i|x_j) = \frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)}\]</span></p>
-<p>Üstteki kısmi türevi sıfıra eşitleyip çözer ve her iki tarafı <span class="math inline">\(\Sigma_i\)</span> ile çarparsak,</p>
-<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij} (x_j-\mu_i) = 0 \]</span></p>
+<p><span class="math display">\[ w_{ij} = P(C_i|x_j) =
+\frac{f(x_j;\mu_i,\Sigma_i)P(C_i)}{f(x_j)}\]</span></p>
+<p>Üstteki kısmi türevi sıfıra eşitleyip çözer ve her iki tarafı <span
+class="math inline">\(\Sigma_i\)</span> ile çarparsak,</p>
+<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij} (x_j-\mu_i) = 0
+\]</span></p>
 <p>elde ederiz, bu demektir ki</p>
-<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij}x_j = \mu_i\sum_{j=1} w_{ij}  \]</span></p>
+<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij}x_j =
+\mu_i\sum_{j=1} w_{ij}  \]</span></p>
 <p>o zaman</p>
-<p><span class="math display">\[ \mu_i = \frac{\sum_{j=1}^{n} w_{ij}x_j}{\sum_{j=1}^{n} w_{ij}}\]</span></p>
-<p>Kovaryans Matrisi <span class="math inline">\(\Sigma_i\)</span>'i Hesaplamak</p>
-<p><span class="math inline">\(\Sigma_i\)</span> hesabı için (3) kısmi türevinin <span class="math inline">\(|\Sigma_i^{-1}|^{1/2} \exp(g(\mu_i,\Sigma_i))\)</span> üzerindeki çarpım kuralı (product rule) kullanılarak <span class="math inline">\(\Sigma_i^{-1}\)</span>'ye göre alınması gerekiyor.</p>
-<p>Her kare matris <span class="math inline">\(A\)</span> için <span class="math inline">\(\frac{\partial |A|}{\partial A} = |A| \cdot (A^{-1})^T\)</span> olduğundan hareketle, <span class="math inline">\(|\Sigma_i^{-1}|^{1/2}\)</span>'nin <span class="math inline">\(\Sigma_i^{-1}\)</span>'ya göre türevi</p>
-<p><span class="math display">\[ 
-\frac{\partial |\Sigma_i^{-1}|^{1/2}}{\partial \Sigma_i^{-1}} = 
-\frac{1}{2} \cdot |\Sigma_i^{-1}|^{-1/2} \cdot |\Sigma_i^{-1}| \cdot \Sigma_i  = 
+<p><span class="math display">\[ \mu_i = \frac{\sum_{j=1}^{n}
+w_{ij}x_j}{\sum_{j=1}^{n} w_{ij}}\]</span></p>
+<p>Kovaryans Matrisi <span class="math inline">\(\Sigma_i\)</span>’i
+Hesaplamak</p>
+<p><span class="math inline">\(\Sigma_i\)</span> hesabı için (3) kısmi
+türevinin <span class="math inline">\(|\Sigma_i^{-1}|^{1/2}
+\exp(g(\mu_i,\Sigma_i))\)</span> üzerindeki çarpım kuralı (product rule)
+kullanılarak <span class="math inline">\(\Sigma_i^{-1}\)</span>’ye göre
+alınması gerekiyor.</p>
+<p>Her kare matris <span class="math inline">\(A\)</span> için <span
+class="math inline">\(\frac{\partial |A|}{\partial A} = |A| \cdot
+(A^{-1})^T\)</span> olduğundan hareketle, <span
+class="math inline">\(|\Sigma_i^{-1}|^{1/2}\)</span>’nin <span
+class="math inline">\(\Sigma_i^{-1}\)</span>’ya göre türevi</p>
+<p><span class="math display">\[
+\frac{\partial |\Sigma_i^{-1}|^{1/2}}{\partial \Sigma_i^{-1}} =
+\frac{1}{2} \cdot |\Sigma_i^{-1}|^{-1/2} \cdot |\Sigma_i^{-1}| \cdot
+\Sigma_i  =
 \frac{1}{2} |\Sigma_i^{-1}|^{1/2} \cdot \Sigma_i
 \]</span></p>
-<p>Şimdi <span class="math inline">\(A \in \mathbb{R}^{d \times d}\)</span> ve vektörler <span class="math inline">\(a,b \in \mathbb{R}^d\)</span> için <span class="math inline">\(\frac{\partial }{\partial A}a^TAb = ab^T\)</span> olmasından hareketle (3)'teki <span class="math inline">\(\exp [g(\mu_i,\Sigma_i)]\)</span>'in <span class="math inline">\(\Sigma_i^{-1}\)</span> gore türevi,</p>
-<p><span class="math display">\[ 
-\frac{\partial }{\partial \Sigma^{-1}} \exp\big[ g(\mu_i,\Sigma_i)\big] = 
--\frac{1}{2} \exp \big[  g(\mu_i,\Sigma_i) (x_j-\mu_i)(x_j-\mu_i)^T \big]
+<p>Şimdi <span class="math inline">\(A \in \mathbb{R}^{d \times
+d}\)</span> ve vektörler <span class="math inline">\(a,b \in
+\mathbb{R}^d\)</span> için <span class="math inline">\(\frac{\partial
+}{\partial A}a^TAb = ab^T\)</span> olmasından hareketle (3)’teki <span
+class="math inline">\(\exp [g(\mu_i,\Sigma_i)]\)</span>’in <span
+class="math inline">\(\Sigma_i^{-1}\)</span> gore türevi,</p>
+<p><span class="math display">\[
+\frac{\partial }{\partial \Sigma^{-1}} \exp\big[ g(\mu_i,\Sigma_i)\big]
+=
+-\frac{1}{2} \exp \big[  g(\mu_i,\Sigma_i) (x_j-\mu_i)(x_j-\mu_i)^T
+\big]
 \]</span></p>
-<p>Üstteki ve iki üstteki formül üzerinde türev çarpım kuralını kullanırsak,</p>
-<p><span class="math display">\[ 
-\frac{\partial }{\partial \Sigma_i^{-1}} |\Sigma_i^{-1}|^{1/2} 
+<p>Üstteki ve iki üstteki formül üzerinde türev çarpım kuralını
+kullanırsak,</p>
+<p><span class="math display">\[
+\frac{\partial }{\partial \Sigma_i^{-1}} |\Sigma_i^{-1}|^{1/2}
 \exp\big[ g(\mu_i,\Sigma_i) \big] =
 \]</span></p>
-<p><span class="math display">\[ 
-= \frac{1}{2} |\Sigma_i^{-1}|^{1/2}  \Sigma_i \exp\big[ g(\mu_i,\Sigma_i) \big]-
+<p><span class="math display">\[
+= \frac{1}{2} |\Sigma_i^{-1}|^{1/2}  \Sigma_i \exp\big[
+g(\mu_i,\Sigma_i) \big]-
 \frac{1}{2} |\Sigma_i^{-1}|^{1/2} \exp\big[ g(\mu_i,\Sigma_i) \big]
 (x_j-\mu_i)(x_j-\mu_i)^T
 \]</span></p>
-<p><span class="math display">\[ 
-= \frac{1}{2} \cdot  |\Sigma_i^{-1}|^{1/2} \cdot 
-\exp\big[ g(\mu_i,\Sigma_i) \big] \big( 
+<p><span class="math display">\[
+= \frac{1}{2} \cdot  |\Sigma_i^{-1}|^{1/2} \cdot
+\exp\big[ g(\mu_i,\Sigma_i) \big] \big(
 \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T
 \big)
 \]</span></p>
-<p>Üstteki son formülü (3)'e sokarsak, <span class="math inline">\(\Sigma_i^{-1}\)</span>'e göre log olurluğun türevi</p>
-<p><span class="math display">\[ 
+<p>Üstteki son formülü (3)’e sokarsak, <span
+class="math inline">\(\Sigma_i^{-1}\)</span>’e göre log olurluğun
+türevi</p>
+<p><span class="math display">\[
 \frac{\partial L}{\partial \Sigma_i^{-1}} =
 \frac{1}{2} \sum_{j=1}^{n} \frac
-{(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2}\exp\big[ g(\mu_i,\Sigma_i) P(C_i) }{f(x_j)}
+{(2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2}\exp\big[ g(\mu_i,\Sigma_i) P(C_i)
+}{f(x_j)}
 \big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
 \]</span></p>
 <p><span class="math display">\[ =
-\frac{1}{2} \sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)} \cdot
+\frac{1}{2} \sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)}
+\cdot
 \big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
 \]</span></p>
-<p><span class="math display">\[ 
-= \frac{1}{2} \sum_{j=1}^{n} w_{ij} 
+<p><span class="math display">\[
+= \frac{1}{2} \sum_{j=1}^{n} w_{ij}
 \big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big)
 \]</span></p>
 <p>Türevi sıfıra eşitlersek,</p>
-<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij} \big( \Sigma_i - (x_j-\mu_i)(x_j-\mu_i)^T \big) = 0 \]</span></p>
+<p><span class="math display">\[ \sum_{j=1}^{n} w_{ij} \big( \Sigma_i -
+(x_j-\mu_i)(x_j-\mu_i)^T \big) = 0 \]</span></p>
 <p>olur, ve devam edersek alttaki sonucu elde ederiz,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \Sigma_i = \frac{\sum_{j=1}^{n} w_{ij} (x_j-\mu_i)(x_j-\mu_i)^T}
 {\sum_{j=1}^{n} w_{ij}}
 \]</span></p>
-<p>Karışım Ağırlıkları <span class="math inline">\(P(C_i)\)</span>'i Hesaplamak</p>
-<p>Bu hesabı yapmak için (3) türevinin <span class="math inline">\(P(C_i)\)</span>'a göre alınması lazım fakat <span class="math inline">\(\sum_{a=1}^{k}P(C_a)=1\)</span> şartını zorlamak için Lagrange çarpanları tekniğini kullanmamız gerekiyor. Yani türevin alttaki gibi alınması lazım,</p>
-<p><span class="math display">\[ 
+<p>Karışım Ağırlıkları <span class="math inline">\(P(C_i)\)</span>’i
+Hesaplamak</p>
+<p>Bu hesabı yapmak için (3) türevinin <span
+class="math inline">\(P(C_i)\)</span>’a göre alınması lazım fakat <span
+class="math inline">\(\sum_{a=1}^{k}P(C_a)=1\)</span> şartını zorlamak
+için Lagrange çarpanları tekniğini kullanmamız gerekiyor. Yani türevin
+alttaki gibi alınması lazım,</p>
+<p><span class="math display">\[
 \frac{\partial }{\partial P(C_i)} \bigg(
 \ln L + \alpha \big( \sum_{a=1}^{k} P(C_a)-1 \big)
 \bigg)
 \]</span></p>
-<p>Log olurluğun <span class="math inline">\(P(C_i)\)</span>'a göre kısmi türevi alınınca,</p>
-<p><span class="math display">\[ 
-\frac{\partial L}{\partial P(C_i)} = 
+<p>Log olurluğun <span class="math inline">\(P(C_i)\)</span>’a göre
+kısmi türevi alınınca,</p>
+<p><span class="math display">\[
+\frac{\partial L}{\partial P(C_i)} =
 \sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i)}{f(x_j)}
 \]</span></p>
 <p>O zaman iki üstteki türevin tamamı şu hale gelir,</p>
-<p><span class="math display">\[ 
-\bigg( \sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i)}{f(x_j)} \bigg) + \alpha
+<p><span class="math display">\[
+\bigg( \sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i)}{f(x_j)} \bigg) +
+\alpha
 \]</span></p>
-<p>Türevi sıfıra eşitlersek ve her iki tarafı <span class="math inline">\(P(C_i)\)</span> ile çarparsak,</p>
-<p><span class="math display">\[ 
-\sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)} = -\alpha P(C_i)
+<p>Türevi sıfıra eşitlersek ve her iki tarafı <span
+class="math inline">\(P(C_i)\)</span> ile çarparsak,</p>
+<p><span class="math display">\[
+\sum_{j=1}^{n} \frac{f(x_j;\mu_i,\Sigma_i) P(C_i)}{f(x_j)} = -\alpha
+P(C_i)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \sum_{j=1}^{n} w_{ij} = -\alpha P(C_i)
 \qquad (4)
 \]</span></p>
 <p>Üstteki toplamı tüm kümeler üzerinden alırsak</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 \sum_{i=1}^{k} \sum_{j=1}^{n} w_{ij} = -\alpha \sum_{i=1}^{k} P(C_i)
 \]</span></p>
 <p>ya da <span class="math inline">\(n = -\alpha\)</span>.</p>
-<p>Son adım <span class="math inline">\(\sum_{i=1}^{k}w_{ij}=1\)</span> sayesinde mümkün oldu. <span class="math inline">\(n = -\alpha\)</span>'yi (4) içine sokunca <span class="math inline">\(P(C_i)\)</span>'in maksimum olurluk hesabını elde ediyoruz,</p>
-<p><span class="math display">\[ P(C_i) = \frac{\sum_{j=1}^{n}w_{ij}}{n}\]</span></p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> scipy.stats <span class="im">import</span> multivariate_normal <span class="im">as</span> mvn
-<span class="im">import</span> pandas <span class="im">as</span> pd
-<span class="im">import</span> numpy <span class="im">as</span> np
-<span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt
-<span class="im">import</span> numpy.linalg <span class="im">as</span> linalg
-<span class="im">import</span> math, random, copy, sys
-<span class="im">import</span> scipy.stats
-
-<span class="kw">class</span> Cov_problem(<span class="pp">Exception</span>): <span class="cf">pass</span>
-
-<span class="kw">def</span> norm_pdf(b,mean,cov):
-   k <span class="op">=</span> b.shape[<span class="dv">0</span>]
-   part1 <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>k<span class="op">*</span>np.log(<span class="dv">2</span><span class="op">*</span>np.pi))
-   part2 <span class="op">=</span> np.power(np.linalg.det(cov),<span class="op">-</span><span class="fl">0.5</span>)
-   dev <span class="op">=</span> b<span class="op">-</span>mean
-   part3 <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>np.dot(np.dot(dev.transpose(),np.linalg.inv(cov)),dev))
-   dmvnorm <span class="op">=</span> part1<span class="op">*</span>part2<span class="op">*</span>part3
-   <span class="cf">return</span> dmvnorm
-
-<span class="kw">def</span> gm_log_likelihood(X, center_list, cov_list, p_k):
-    <span class="co">&quot;&quot;&quot;Finds the likelihood for a set of samples belongin to a Gaussian mixture</span>
-<span class="co">    model.</span>
-<span class="co">    </span>
-<span class="co">    Return log likelighood</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]
-    K <span class="op">=</span>  <span class="bu">len</span>(center_list)
-    log_p_Xn <span class="op">=</span> np.zeros(samples)
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        p <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])
-        <span class="cf">if</span> k <span class="op">==</span> <span class="dv">0</span>:
-            log_p_Xn <span class="op">=</span> p
-        <span class="cf">else</span>:
-            pmax <span class="op">=</span> np.<span class="bu">max</span>(np.concatenate((np.c_[log_p_Xn], np.c_[p]), axis<span class="op">=</span><span class="dv">1</span>), axis<span class="op">=</span><span class="dv">1</span>)
-            log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.exp( log_p_Xn <span class="op">-</span> pmax) <span class="op">+</span> np.exp( p<span class="op">-</span>pmax))
-    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)
-    <span class="cf">return</span> logL
-
-<span class="kw">def</span> gm_assign_to_cluster(X, center_list, cov_list, p_k):
-    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]
-    K <span class="op">=</span> <span class="bu">len</span>(center_list)
-    log_p_Xn_mat <span class="op">=</span> np.zeros((samples, K))
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        log_p_Xn_mat[:,k] <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])
-    pmax <span class="op">=</span> np.<span class="bu">max</span>(log_p_Xn_mat, axis<span class="op">=</span><span class="dv">1</span>)
-    log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.<span class="bu">sum</span>( np.exp(log_p_Xn_mat.T <span class="op">-</span> pmax), axis<span class="op">=</span><span class="dv">0</span>).T)
-    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)
-    
-    log_p_nk <span class="op">=</span> np.zeros((samples, K))
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        log_p_nk[:,k] <span class="op">=</span> log_p_Xn_mat[:,k] <span class="op">-</span> log_p_Xn
-    
-    maxP_k <span class="op">=</span> np.c_[np.<span class="bu">max</span>(log_p_nk, axis<span class="op">=</span><span class="dv">1</span>)] <span class="op">==</span> log_p_nk
-    maxP_k <span class="op">=</span> maxP_k <span class="op">*</span> (np.array(<span class="bu">range</span>(K))<span class="op">+</span><span class="dv">1</span>)
-    <span class="cf">return</span> np.<span class="bu">sum</span>(maxP_k, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span>
-
-<span class="kw">def</span> logmulnormpdf(X, MU, SIGMA):
-    <span class="cf">if</span> MU.ndim <span class="op">!=</span> <span class="dv">1</span>:
-        <span class="cf">raise</span> <span class="pp">ValueError</span>, <span class="st">&quot;MU must be a 1 dimensional array&quot;</span>
-    mu <span class="op">=</span> MU
-    x <span class="op">=</span> X.T
-    <span class="cf">if</span> x.ndim <span class="op">==</span> <span class="dv">1</span>:
-        x <span class="op">=</span> np.atleast_2d(x).T
-    sigma <span class="op">=</span> np.atleast_2d(SIGMA) <span class="co"># So we also can use it for 1-d distributions</span>
-    N <span class="op">=</span> <span class="bu">len</span>(MU)
-    ex1 <span class="op">=</span> np.dot(linalg.inv(sigma), (x.T<span class="op">-</span>mu).T)
-    ex <span class="op">=</span> <span class="fl">-0.5</span> <span class="op">*</span> (x.T<span class="op">-</span>mu).T <span class="op">*</span> ex1
-    <span class="cf">if</span> ex.ndim <span class="op">==</span> <span class="dv">2</span>: ex <span class="op">=</span> np.<span class="bu">sum</span>(ex, axis <span class="op">=</span> <span class="dv">0</span>)
-    K <span class="op">=</span> <span class="op">-</span>(N<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span>np.log(<span class="dv">2</span><span class="op">*</span>np.pi) <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span>np.log(np.linalg.det(SIGMA))
-    <span class="cf">return</span> ex <span class="op">+</span> K
-
-<span class="kw">def</span> gmm_init(X, K, verbose <span class="op">=</span> <span class="va">False</span>,
-                    cluster_init <span class="op">=</span> <span class="st">&#39;sample&#39;</span>, <span class="op">\</span>
-                    cluster_init_prop <span class="op">=</span> {}, <span class="op">\</span>
-                    max_init_iter <span class="op">=</span> <span class="dv">5</span>, <span class="op">\</span>
-                    cov_init <span class="op">=</span> <span class="st">&#39;var&#39;</span>):
-    samples, dim <span class="op">=</span> np.shape(X)
-    <span class="cf">if</span> cluster_init <span class="op">==</span> <span class="st">&#39;sample&#39;</span>:
-        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using sample GMM initalization.&quot;</span>
-        center_list <span class="op">=</span> []
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):
-            center_list.append(X[np.random.randint(samples), :])
-    <span class="cf">elif</span> cluster_init <span class="op">==</span> <span class="st">&#39;box&#39;</span>:
-        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using box GMM initalization.&quot;</span>
-        center_list <span class="op">=</span> []
-        X_max <span class="op">=</span> np.<span class="bu">max</span>(X, axis<span class="op">=</span><span class="dv">0</span>)
-        X_min <span class="op">=</span> np.<span class="bu">min</span>(X, axis<span class="op">=</span><span class="dv">0</span>)
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):
-            init_point <span class="op">=</span> ((X_max<span class="op">-</span>X_min)<span class="op">*</span>np.random.rand(<span class="dv">1</span>,dim)) <span class="op">+</span> X_min
-            center_list.append(init_point.flatten())            
-    <span class="cf">elif</span> cluster_init <span class="op">==</span> <span class="st">&#39;kmeans&#39;</span>:
-        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using K-means GMM initalization.&quot;</span>
-        <span class="co"># Normalize data (K-means is isotropic)</span>
-        normalizerX <span class="op">=</span> preproc.Normalizer(X)
-        nX <span class="op">=</span> normalizerX.transform(X)
-        center_list <span class="op">=</span> []
-        best_icv <span class="op">=</span> np.inf
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_init_iter):
-            m, kcc <span class="op">=</span> kmeans.kmeans(nX, K, <span class="bu">iter</span><span class="op">=</span><span class="dv">100</span>, <span class="op">**</span>cluster_init_prop)
-            icv <span class="op">=</span> kmeans.find_intra_cluster_variance(X, m, kcc)
-            <span class="cf">if</span> best_icv <span class="op">&gt;</span> icv:
-                membership <span class="op">=</span> m
-                cc <span class="op">=</span> kcc
-                best_icv <span class="op">=</span> icv
-        cc <span class="op">=</span> normalizerX.invtransform(cc)
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(cc.shape[<span class="dv">0</span>]):
-            center_list.append(cc[i,:])
-        <span class="bu">print</span> cc
-    <span class="cf">else</span>:
-        <span class="cf">raise</span> <span class="st">&quot;Unknown initialization of EM of MoG centers.&quot;</span>
-
-    <span class="co"># Initialize co-variance matrices</span>
-    cov_list <span class="op">=</span> []
-    <span class="cf">if</span> cov_init<span class="op">==</span><span class="st">&#39;iso&#39;</span>:
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):
-            cov_list.append(np.diag(np.ones(dim)<span class="op">/</span><span class="fl">1e10</span>))
-            <span class="co">#cov_list.append(np.diag(np.ones(dim)))</span>
-    <span class="cf">elif</span> cov_init<span class="op">==</span><span class="st">&#39;var&#39;</span>:
-        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):
-            cov_list.append(np.diag(np.var(X, axis<span class="op">=</span><span class="dv">0</span>)<span class="op">/</span><span class="fl">1e10</span>))
-    <span class="cf">else</span>:
-        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&#39;Unknown option used for cov_init&#39;</span>)
-
-    p_k <span class="op">=</span> np.ones(K) <span class="op">/</span> K <span class="co"># Uniform prior on P(k)</span>
-    <span class="cf">return</span> (center_list, cov_list, p_k)
-
-
-<span class="kw">def</span> em_gm(X, K, max_iter <span class="op">=</span> <span class="dv">50</span>, verbose <span class="op">=</span> <span class="va">False</span>, <span class="op">\</span>
-                iter_call <span class="op">=</span> <span class="va">None</span>,<span class="op">\</span>
-                delta_stop <span class="op">=</span> <span class="fl">1e-6</span>,<span class="op">\</span>
-                init_kw <span class="op">=</span> {}, <span class="op">\</span>
-                max_tries <span class="op">=</span> <span class="dv">10</span>,<span class="op">\</span>
-                diag_add <span class="op">=</span> <span class="fl">1e-3</span>):
-
-    samples, dim <span class="op">=</span> np.shape(X)
-    clusters_found <span class="op">=</span> <span class="va">False</span>
-    <span class="cf">while</span> clusters_found<span class="op">==</span><span class="va">False</span> <span class="kw">and</span> max_tries<span class="op">&gt;</span><span class="dv">0</span>:
-        max_tries <span class="op">-=</span> <span class="dv">1</span>
-        <span class="co"># Initialized clusters</span>
-        center_list, cov_list, p_k <span class="op">=</span> gmm_init(X, K, <span class="op">**</span>init_kw)
-        <span class="co"># Now perform the EM-steps:</span>
-        <span class="cf">try</span>:
-            center_list, cov_list, p_k, logL <span class="op">=</span> <span class="op">\</span>
-                gmm_em_continue(X, center_list, cov_list, p_k,
-                        max_iter<span class="op">=</span>max_iter, verbose<span class="op">=</span>verbose,
-                        iter_call<span class="op">=</span>iter_call,
-                        delta_stop<span class="op">=</span>delta_stop,
-                        diag_add<span class="op">=</span>diag_add)
-            clusters_found <span class="op">=</span> <span class="va">True</span>
-        <span class="cf">except</span> Cov_problem:
-            <span class="cf">if</span> verbose:
-                <span class="bu">print</span> <span class="st">&quot;Problems with the co-variance matrix, tries left &quot;</span>, max_tries
-
-    <span class="cf">if</span> clusters_found:
-        <span class="cf">return</span> center_list, cov_list, p_k, logL
-    <span class="cf">else</span>:
-        <span class="cf">raise</span> Cov_problem()
-
-
-<span class="kw">def</span> gmm_em_continue(X, center_list, cov_list, p_k,
-                    max_iter <span class="op">=</span> <span class="dv">50</span>, verbose <span class="op">=</span> <span class="va">False</span>, <span class="op">\</span>
-                    iter_call <span class="op">=</span> <span class="va">None</span>,<span class="op">\</span>
-                    delta_stop <span class="op">=</span> <span class="fl">1e-6</span>,<span class="op">\</span>
-                    diag_add <span class="op">=</span> <span class="fl">1e-3</span>,<span class="op">\</span>
-                    delta_stop_count_end<span class="op">=</span><span class="dv">10</span>):
-    <span class="co">&quot;&quot;&quot;</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    delta_stop_count <span class="op">=</span> <span class="dv">0</span>
-    samples, dim <span class="op">=</span> np.shape(X)
-    K <span class="op">=</span> <span class="bu">len</span>(center_list) <span class="co"># We should do some input checking</span>
-    <span class="cf">if</span> diag_add<span class="op">!=</span><span class="dv">0</span>:
-        feature_var <span class="op">=</span> np.var(X, axis<span class="op">=</span><span class="dv">0</span>)
-        diag_add_vec <span class="op">=</span> diag_add <span class="op">*</span> feature_var
-    old_logL <span class="op">=</span> np.NaN
-    logL <span class="op">=</span> np.NaN
-    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(max_iter):
-        <span class="cf">try</span>:
-            center_list, cov_list, p_k, logL <span class="op">=</span> __em_gm_step(X, center_list,<span class="op">\</span>
-                cov_list, p_k, K, diag_add_vec)
-        <span class="cf">except</span> np.linalg.linalg.LinAlgError: <span class="co"># Singular cov matrix</span>
-            <span class="cf">raise</span> Cov_problem()
-        <span class="cf">if</span> iter_call <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:
-            iter_call(center_list, cov_list, p_k, i)
-        <span class="co"># Check if we have problems with cluster sizes</span>
-        <span class="cf">for</span> i2 <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(center_list)):
-            <span class="cf">if</span> np.<span class="bu">any</span>(np.isnan(cov_list[i2])):
-                <span class="bu">print</span> <span class="st">&quot;problem&quot;</span>
-                <span class="cf">raise</span> Cov_problem()
-
-        <span class="cf">if</span> old_logL <span class="op">!=</span> np.NaN:
-            <span class="cf">if</span> verbose:
-                <span class="bu">print</span> <span class="st">&quot;iteration=&quot;</span>, i, <span class="st">&quot; delta log likelihood=&quot;</span>, <span class="op">\</span>
-                    old_logL <span class="op">-</span> logL
-            <span class="cf">if</span> np.<span class="bu">abs</span>(logL <span class="op">-</span> old_logL) <span class="op">&lt;</span> delta_stop: <span class="co">#* samples:</span>
-                delta_stop_count <span class="op">+=</span> <span class="dv">1</span>
-                <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;gmm_em_continue: delta_stop_count =&quot;</span>, delta_stop_count
-            <span class="cf">else</span>:
-                delta_stop_count <span class="op">=</span> <span class="dv">0</span>
-            <span class="cf">if</span> delta_stop_count<span class="op">&gt;=</span>delta_stop_count_end:
-                <span class="cf">break</span> <span class="co"># Sufficient precision reached</span>
-        old_logL <span class="op">=</span> logL
-    <span class="cf">try</span>:
-        gm_log_likelihood(X, center_list, cov_list, p_k)
-    <span class="cf">except</span> np.linalg.linalg.LinAlgError: <span class="co"># Singular cov matrix</span>
-        <span class="cf">raise</span> Cov_problem()
-    <span class="cf">return</span> center_list, cov_list, p_k, logL
-
-<span class="kw">def</span> __em_gm_step(X, center_list, cov_list, p_k, K, diag_add_vec):
-    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]
-    <span class="co"># New way of calculating the log likelihood:</span>
-    log_p_Xn_mat <span class="op">=</span> np.zeros((samples, K))
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        log_p_Xn_mat[:,k] <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])
-    pmax <span class="op">=</span> np.<span class="bu">max</span>(log_p_Xn_mat, axis<span class="op">=</span><span class="dv">1</span>)
-    log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.<span class="bu">sum</span>( np.exp(log_p_Xn_mat.T <span class="op">-</span> pmax), axis<span class="op">=</span><span class="dv">0</span>).T) <span class="co"># Maybe move this down</span>
-    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)
-
-    log_p_nk <span class="op">=</span> np.zeros((samples, K))
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        log_p_nk[:,k] <span class="op">=</span> log_p_Xn_mat[:,k] <span class="op">-</span> log_p_Xn
-
-    p_Xn <span class="op">=</span> np.e<span class="op">**</span>log_p_Xn
-    p_nk <span class="op">=</span> np.e<span class="op">**</span>log_p_nk
-       
-    <span class="co"># M-step:    </span>
-    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):
-        ck <span class="op">=</span> np.<span class="bu">sum</span>(p_nk[:,k] <span class="op">*</span> X.T, axis <span class="op">=</span> <span class="dv">1</span>) <span class="op">/</span> np.<span class="bu">sum</span>(p_nk[:,k])
-        center_list[k] <span class="op">=</span> ck
-        cov_list[k] <span class="op">=</span> np.dot(p_nk[:,k] <span class="op">*</span> ((X <span class="op">-</span> ck).T), (X <span class="op">-</span> ck)) <span class="op">/</span> <span class="bu">sum</span>(p_nk[:,k])
-        p_k[k] <span class="op">=</span> np.<span class="bu">sum</span>(p_nk[:,k]) <span class="op">/</span> samples
-
-    <span class="cf">return</span> (center_list, cov_list, p_k, logL)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-data <span class="op">=</span> data[:,<span class="dv">1</span>:<span class="dv">3</span>]
-<span class="im">import</span> em
-mc <span class="op">=</span> [<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.2</span>] 
-centroids <span class="op">=</span> [ np.array([<span class="dv">0</span>,<span class="dv">0</span>]), np.array([<span class="dv">3</span>,<span class="dv">3</span>]), np.array([<span class="dv">0</span>,<span class="dv">4</span>]) ]
-ccov <span class="op">=</span> [ np.array([[<span class="dv">1</span>,<span class="fl">0.4</span>],[<span class="fl">0.4</span>,<span class="dv">1</span>]]), np.diag((<span class="dv">1</span>,<span class="dv">2</span>)), np.diag((<span class="fl">0.4</span>,<span class="fl">0.1</span>)) ]
-cen_lst, cov_lst, p_k, logL <span class="op">=</span> em.em_gm(data, K <span class="op">=</span> <span class="dv">2</span>, max_iter <span class="op">=</span> <span class="dv">400</span>)
-<span class="cf">for</span> cen <span class="kw">in</span> cen_lst: <span class="bu">print</span> cen
-<span class="cf">for</span> cov <span class="kw">in</span> cov_lst: <span class="bu">print</span> cov</code></pre></div>
+<p>Son adım <span class="math inline">\(\sum_{i=1}^{k}w_{ij}=1\)</span>
+sayesinde mümkün oldu. <span class="math inline">\(n =
+-\alpha\)</span>’yi (4) içine sokunca <span
+class="math inline">\(P(C_i)\)</span>’in maksimum olurluk hesabını elde
+ediyoruz,</p>
+<p><span class="math display">\[ P(C_i) =
+\frac{\sum_{j=1}^{n}w_{ij}}{n}\]</span></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> multivariate_normal <span class="im">as</span> mvn</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> linalg</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, random, copy, sys</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Cov_problem(<span class="pp">Exception</span>): <span class="cf">pass</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> norm_pdf(b,mean,cov):</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>   k <span class="op">=</span> b.shape[<span class="dv">0</span>]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>   part1 <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>k<span class="op">*</span>np.log(<span class="dv">2</span><span class="op">*</span>np.pi))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>   part2 <span class="op">=</span> np.power(np.linalg.det(cov),<span class="op">-</span><span class="fl">0.5</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>   dev <span class="op">=</span> b<span class="op">-</span>mean</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>   part3 <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>np.dot(np.dot(dev.transpose(),np.linalg.inv(cov)),dev))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>   dmvnorm <span class="op">=</span> part1<span class="op">*</span>part2<span class="op">*</span>part3</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> dmvnorm</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gm_log_likelihood(X, center_list, cov_list, p_k):</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Finds the likelihood for a set of samples belongin to a Gaussian mixture</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">    model.</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">    Return log likelighood</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span>  <span class="bu">len</span>(center_list)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    log_p_Xn <span class="op">=</span> np.zeros(samples)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> k <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>            log_p_Xn <span class="op">=</span> p</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>            pmax <span class="op">=</span> np.<span class="bu">max</span>(np.concatenate((np.c_[log_p_Xn], np.c_[p]), axis<span class="op">=</span><span class="dv">1</span>), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.exp( log_p_Xn <span class="op">-</span> pmax) <span class="op">+</span> np.exp( p<span class="op">-</span>pmax))</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> logL</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gm_assign_to_cluster(X, center_list, cov_list, p_k):</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="bu">len</span>(center_list)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    log_p_Xn_mat <span class="op">=</span> np.zeros((samples, K))</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        log_p_Xn_mat[:,k] <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    pmax <span class="op">=</span> np.<span class="bu">max</span>(log_p_Xn_mat, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.<span class="bu">sum</span>( np.exp(log_p_Xn_mat.T <span class="op">-</span> pmax), axis<span class="op">=</span><span class="dv">0</span>).T)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    log_p_nk <span class="op">=</span> np.zeros((samples, K))</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        log_p_nk[:,k] <span class="op">=</span> log_p_Xn_mat[:,k] <span class="op">-</span> log_p_Xn</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    maxP_k <span class="op">=</span> np.c_[np.<span class="bu">max</span>(log_p_nk, axis<span class="op">=</span><span class="dv">1</span>)] <span class="op">==</span> log_p_nk</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>    maxP_k <span class="op">=</span> maxP_k <span class="op">*</span> (np.array(<span class="bu">range</span>(K))<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(maxP_k, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logmulnormpdf(X, MU, SIGMA):</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> MU.ndim <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>, <span class="st">&quot;MU must be a 1 dimensional array&quot;</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> MU</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> X.T</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x.ndim <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> np.atleast_2d(x).T</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> np.atleast_2d(SIGMA) <span class="co"># So we also can use it for 1-d distributions</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(MU)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    ex1 <span class="op">=</span> np.dot(linalg.inv(sigma), (x.T<span class="op">-</span>mu).T)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>    ex <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (x.T<span class="op">-</span>mu).T <span class="op">*</span> ex1</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ex.ndim <span class="op">==</span> <span class="dv">2</span>: ex <span class="op">=</span> np.<span class="bu">sum</span>(ex, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="op">-</span>(N<span class="op">/</span><span class="dv">2</span>)<span class="op">*</span>np.log(<span class="dv">2</span><span class="op">*</span>np.pi) <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span>np.log(np.linalg.det(SIGMA))</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ex <span class="op">+</span> K</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gmm_init(X, K, verbose <span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>                    cluster_init <span class="op">=</span> <span class="st">&#39;sample&#39;</span>, <span class="op">\</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>                    cluster_init_prop <span class="op">=</span> {}, <span class="op">\</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>                    max_init_iter <span class="op">=</span> <span class="dv">5</span>, <span class="op">\</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>                    cov_init <span class="op">=</span> <span class="st">&#39;var&#39;</span>):</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>    samples, dim <span class="op">=</span> np.shape(X)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> cluster_init <span class="op">==</span> <span class="st">&#39;sample&#39;</span>:</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using sample GMM initalization.&quot;</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>        center_list <span class="op">=</span> []</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>            center_list.append(X[np.random.randint(samples), :])</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> cluster_init <span class="op">==</span> <span class="st">&#39;box&#39;</span>:</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using box GMM initalization.&quot;</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>        center_list <span class="op">=</span> []</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>        X_max <span class="op">=</span> np.<span class="bu">max</span>(X, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>        X_min <span class="op">=</span> np.<span class="bu">min</span>(X, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>            init_point <span class="op">=</span> ((X_max<span class="op">-</span>X_min)<span class="op">*</span>np.random.rand(<span class="dv">1</span>,dim)) <span class="op">+</span> X_min</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>            center_list.append(init_point.flatten())            </span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> cluster_init <span class="op">==</span> <span class="st">&#39;kmeans&#39;</span>:</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;Using K-means GMM initalization.&quot;</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Normalize data (K-means is isotropic)</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>        normalizerX <span class="op">=</span> preproc.Normalizer(X)</span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>        nX <span class="op">=</span> normalizerX.transform(X)</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>        center_list <span class="op">=</span> []</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>        best_icv <span class="op">=</span> np.inf</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(max_init_iter):</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>            m, kcc <span class="op">=</span> kmeans.kmeans(nX, K, <span class="bu">iter</span><span class="op">=</span><span class="dv">100</span>, <span class="op">**</span>cluster_init_prop)</span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>            icv <span class="op">=</span> kmeans.find_intra_cluster_variance(X, m, kcc)</span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> best_icv <span class="op">&gt;</span> icv:</span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>                membership <span class="op">=</span> m</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>                cc <span class="op">=</span> kcc</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>                best_icv <span class="op">=</span> icv</span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>        cc <span class="op">=</span> normalizerX.invtransform(cc)</span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(cc.shape[<span class="dv">0</span>]):</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>            center_list.append(cc[i,:])</span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> cc</span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="st">&quot;Unknown initialization of EM of MoG centers.&quot;</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialize co-variance matrices</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>    cov_list <span class="op">=</span> []</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> cov_init<span class="op">==</span><span class="st">&#39;iso&#39;</span>:</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>            cov_list.append(np.diag(np.ones(dim)<span class="op">/</span><span class="fl">1e10</span>))</span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>            <span class="co">#cov_list.append(np.diag(np.ones(dim)))</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> cov_init<span class="op">==</span><span class="st">&#39;var&#39;</span>:</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>            cov_list.append(np.diag(np.var(X, axis<span class="op">=</span><span class="dv">0</span>)<span class="op">/</span><span class="fl">1e10</span>))</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&#39;Unknown option used for cov_init&#39;</span>)</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>    p_k <span class="op">=</span> np.ones(K) <span class="op">/</span> K <span class="co"># Uniform prior on P(k)</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (center_list, cov_list, p_k)</span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> em_gm(X, K, max_iter <span class="op">=</span> <span class="dv">50</span>, verbose <span class="op">=</span> <span class="va">False</span>, <span class="op">\</span></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>                iter_call <span class="op">=</span> <span class="va">None</span>,<span class="op">\</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>                delta_stop <span class="op">=</span> <span class="fl">1e-6</span>,<span class="op">\</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>                init_kw <span class="op">=</span> {}, <span class="op">\</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>                max_tries <span class="op">=</span> <span class="dv">10</span>,<span class="op">\</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>                diag_add <span class="op">=</span> <span class="fl">1e-3</span>):</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>    samples, dim <span class="op">=</span> np.shape(X)</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>    clusters_found <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> clusters_found<span class="op">==</span><span class="va">False</span> <span class="kw">and</span> max_tries<span class="op">&gt;</span><span class="dv">0</span>:</span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>        max_tries <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialized clusters</span></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>        center_list, cov_list, p_k <span class="op">=</span> gmm_init(X, K, <span class="op">**</span>init_kw)</span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Now perform the EM-steps:</span></span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a>            center_list, cov_list, p_k, logL <span class="op">=</span> <span class="op">\</span></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>                gmm_em_continue(X, center_list, cov_list, p_k,</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a>                        max_iter<span class="op">=</span>max_iter, verbose<span class="op">=</span>verbose,</span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>                        iter_call<span class="op">=</span>iter_call,</span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>                        delta_stop<span class="op">=</span>delta_stop,</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>                        diag_add<span class="op">=</span>diag_add)</span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a>            clusters_found <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> Cov_problem:</span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> verbose:</span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span> <span class="st">&quot;Problems with the co-variance matrix, tries left &quot;</span>, max_tries</span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> clusters_found:</span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> center_list, cov_list, p_k, logL</span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> Cov_problem()</span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gmm_em_continue(X, center_list, cov_list, p_k,</span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a>                    max_iter <span class="op">=</span> <span class="dv">50</span>, verbose <span class="op">=</span> <span class="va">False</span>, <span class="op">\</span></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>                    iter_call <span class="op">=</span> <span class="va">None</span>,<span class="op">\</span></span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a>                    delta_stop <span class="op">=</span> <span class="fl">1e-6</span>,<span class="op">\</span></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>                    diag_add <span class="op">=</span> <span class="fl">1e-3</span>,<span class="op">\</span></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a>                    delta_stop_count_end<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>    delta_stop_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>    samples, dim <span class="op">=</span> np.shape(X)</span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> <span class="bu">len</span>(center_list) <span class="co"># We should do some input checking</span></span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> diag_add<span class="op">!=</span><span class="dv">0</span>:</span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>        feature_var <span class="op">=</span> np.var(X, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a>        diag_add_vec <span class="op">=</span> diag_add <span class="op">*</span> feature_var</span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>    old_logL <span class="op">=</span> np.NaN</span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.NaN</span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">xrange</span>(max_iter):</span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a>            center_list, cov_list, p_k, logL <span class="op">=</span> __em_gm_step(X, center_list,<span class="op">\</span></span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a>                cov_list, p_k, K, diag_add_vec)</span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> np.linalg.linalg.LinAlgError: <span class="co"># Singular cov matrix</span></span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> Cov_problem()</span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> iter_call <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a>            iter_call(center_list, cov_list, p_k, i)</span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check if we have problems with cluster sizes</span></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i2 <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(center_list)):</span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.<span class="bu">any</span>(np.isnan(cov_list[i2])):</span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span> <span class="st">&quot;problem&quot;</span></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> Cov_problem()</span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> old_logL <span class="op">!=</span> np.NaN:</span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> verbose:</span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span> <span class="st">&quot;iteration=&quot;</span>, i, <span class="st">&quot; delta log likelihood=&quot;</span>, <span class="op">\</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a>                    old_logL <span class="op">-</span> logL</span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.<span class="bu">abs</span>(logL <span class="op">-</span> old_logL) <span class="op">&lt;</span> delta_stop: <span class="co">#* samples:</span></span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a>                delta_stop_count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> verbose: <span class="bu">print</span> <span class="st">&quot;gmm_em_continue: delta_stop_count =&quot;</span>, delta_stop_count</span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a>                delta_stop_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> delta_stop_count<span class="op">&gt;=</span>delta_stop_count_end:</span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span> <span class="co"># Sufficient precision reached</span></span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a>        old_logL <span class="op">=</span> logL</span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>        gm_log_likelihood(X, center_list, cov_list, p_k)</span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> np.linalg.linalg.LinAlgError: <span class="co"># Singular cov matrix</span></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> Cov_problem()</span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> center_list, cov_list, p_k, logL</span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> __em_gm_step(X, center_list, cov_list, p_k, K, diag_add_vec):</span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>    samples <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>    <span class="co"># New way of calculating the log likelihood:</span></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>    log_p_Xn_mat <span class="op">=</span> np.zeros((samples, K))</span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a>        log_p_Xn_mat[:,k] <span class="op">=</span> logmulnormpdf(X, center_list[k], cov_list[k]) <span class="op">+</span> np.log(p_k[k])</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a>    pmax <span class="op">=</span> np.<span class="bu">max</span>(log_p_Xn_mat, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a>    log_p_Xn <span class="op">=</span> pmax <span class="op">+</span> np.log( np.<span class="bu">sum</span>( np.exp(log_p_Xn_mat.T <span class="op">-</span> pmax), axis<span class="op">=</span><span class="dv">0</span>).T) <span class="co"># Maybe move this down</span></span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.<span class="bu">sum</span>(log_p_Xn)</span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a>    log_p_nk <span class="op">=</span> np.zeros((samples, K))</span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a>        log_p_nk[:,k] <span class="op">=</span> log_p_Xn_mat[:,k] <span class="op">-</span> log_p_Xn</span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a>    p_Xn <span class="op">=</span> np.e<span class="op">**</span>log_p_Xn</span>
+<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a>    p_nk <span class="op">=</span> np.e<span class="op">**</span>log_p_nk</span>
+<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a>       </span>
+<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a>    <span class="co"># M-step:    </span></span>
+<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a>        ck <span class="op">=</span> np.<span class="bu">sum</span>(p_nk[:,k] <span class="op">*</span> X.T, axis <span class="op">=</span> <span class="dv">1</span>) <span class="op">/</span> np.<span class="bu">sum</span>(p_nk[:,k])</span>
+<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a>        center_list[k] <span class="op">=</span> ck</span>
+<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a>        cov_list[k] <span class="op">=</span> np.dot(p_nk[:,k] <span class="op">*</span> ((X <span class="op">-</span> ck).T), (X <span class="op">-</span> ck)) <span class="op">/</span> <span class="bu">sum</span>(p_nk[:,k])</span>
+<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a>        p_k[k] <span class="op">=</span> np.<span class="bu">sum</span>(p_nk[:,k]) <span class="op">/</span> samples</span>
+<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (center_list, cov_list, p_k, logL)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&#39;biometric_data_simple.txt&#39;</span>,delimiter<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> data[:,<span class="dv">1</span>:<span class="dv">3</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> em</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>mc <span class="op">=</span> [<span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="fl">0.2</span>] </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>centroids <span class="op">=</span> [ np.array([<span class="dv">0</span>,<span class="dv">0</span>]), np.array([<span class="dv">3</span>,<span class="dv">3</span>]), np.array([<span class="dv">0</span>,<span class="dv">4</span>]) ]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ccov <span class="op">=</span> [ np.array([[<span class="dv">1</span>,<span class="fl">0.4</span>],[<span class="fl">0.4</span>,<span class="dv">1</span>]]), np.diag((<span class="dv">1</span>,<span class="dv">2</span>)), np.diag((<span class="fl">0.4</span>,<span class="fl">0.1</span>)) ]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>cen_lst, cov_lst, p_k, logL <span class="op">=</span> em.em_gm(data, K <span class="op">=</span> <span class="dv">2</span>, max_iter <span class="op">=</span> <span class="dv">400</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cen <span class="kw">in</span> cen_lst: <span class="bu">print</span> cen</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cov <span class="kw">in</span> cov_lst: <span class="bu">print</span> cov</span></code></pre></div>
 <pre><code>[  66.22733783  135.69250285]
 [  72.92994695  194.55997484]
 [[  14.62653617   53.38371315]
  [  53.38371315  414.95573112]]
 [[    7.77047547    24.7439079 ]
  [   24.7439079   1369.68034031]]</code></pre>
-<p>Kod <code>biometric_data_simple.txt</code> verisi üzerinde işletildiğinde rapor edilen <span class="math inline">\(\mu,\Sigma\)</span> değerlerini grafikleyince başta paylaştığımız grafik görüntüleri çıkacaktır, yani kümeleme başarıyla işletilmiştir.</p>
+<p>Kod <code>biometric_data_simple.txt</code> verisi üzerinde
+işletildiğinde rapor edilen <span
+class="math inline">\(\mu,\Sigma\)</span> değerlerini grafikleyince
+başta paylaştığımız grafik görüntüleri çıkacaktır, yani kümeleme
+başarıyla işletilmiştir.</p>
 <p>En İyi K Nasıl Bulunur</p>
-<p>Bu sayıyı keşfetmek artık kolay; K-Means ile atılan bir sürü taklaya, ki çoğu gayrı matematiksel, sezgisel, uydurulmuş (heuristic) yöntemlerdi, artık gerek yok. Mesela 10 ila 30 arasındaki tüm küme sayılarını deneriz, ve en iyi AIC vereni seçeriz.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd
-ff <span class="op">=</span> <span class="st">&#39;../../app_math/kmeans/synthetic.txt&#39;</span>
-df <span class="op">=</span> pd.read_csv(ff,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,names<span class="op">=</span>[<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>],sep<span class="op">=</span><span class="st">&quot;   &quot;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM
-<span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>,<span class="dv">30</span>):
-   g <span class="op">=</span> GMM(n_components<span class="op">=</span>i).fit(df)
-   <span class="bu">print</span> i, <span class="st">&#39;clusters&#39;</span>, g.aic(df)</code></pre></div>
+<p>Bu sayıyı keşfetmek artık kolay; K-Means ile atılan bir sürü taklaya,
+ki çoğu gayrı matematiksel, sezgisel, uydurulmuş (heuristic)
+yöntemlerdi, artık gerek yok. Mesela 10 ila 30 arasındaki tüm küme
+sayılarını deneriz, ve en iyi AIC vereni seçeriz.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ff <span class="op">=</span> <span class="st">&#39;../../app_math/kmeans/synthetic.txt&#39;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(ff,comment<span class="op">=</span><span class="st">&#39;#&#39;</span>,names<span class="op">=</span>[<span class="st">&#39;a&#39;</span>,<span class="st">&#39;b&#39;</span>],sep<span class="op">=</span><span class="st">&quot;   &quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>,<span class="dv">30</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   g <span class="op">=</span> GMM(n_components<span class="op">=</span>i).fit(df)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>   <span class="bu">print</span> i, <span class="st">&#39;clusters&#39;</span>, g.aic(df)</span></code></pre></div>
 <pre><code>10 clusters 124325.897319
 11 clusters 124132.382945
 12 clusters 123931.508911
@@ -613,24 +761,40 @@ df <span class="op">=</span> pd.read_csv(ff,comment<span class="op">=</span><spa
 27 clusters 122356.971927
 28 clusters 122195.916167
 29 clusters 122203.347265</code></pre>
-<p>Görüldüğü gibi AIC azalıyor, azalıyor, ve K=20'de azıcık artıyor, sonra 25'e kadar artmaya devam ediyor, sonra tekrar düşmeye başlıyor ama bizi ilgilendiren uzun süreli düşüşten sonraki bu ilk çıkış. O nokta optimal K değerini verecektir, ki bu sayı 20.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM
-g <span class="op">=</span> GMM(n_components<span class="op">=</span><span class="dv">20</span>).fit(df)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">plt.scatter(df.a,df.b)
-plt.hold(<span class="va">True</span>)
-plt.plot(g.means_[:,<span class="dv">0</span>], g.means_[:,<span class="dv">1</span>],<span class="st">&#39;ro&#39;</span>)
-plt.savefig(<span class="st">&#39;stat_gmm_03.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="stat_gmm_03.png" />
-
-</div>
+<p>Görüldüğü gibi AIC azalıyor, azalıyor, ve K=20’de azıcık artıyor,
+sonra 25’e kadar artmaya devam ediyor, sonra tekrar düşmeye başlıyor ama
+bizi ilgilendiren uzun süreli düşüşten sonraki bu ilk çıkış. O nokta
+optimal K değerini verecektir, ki bu sayı 20.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> GMM(n_components<span class="op">=</span><span class="dv">20</span>).fit(df)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(df.a,df.b)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.plot(g.means_[:,<span class="dv">0</span>], g.means_[:,<span class="dv">1</span>],<span class="st">&#39;ro&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_gmm_03.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_gmm_03.png" /></p>
 <p>Gaussian Karışımları ile Deri Rengi Saptamak</p>
-<p>Bir projemizde dijital resimlerdeki deri rengi içeren kısımları çıkartmamız gerekiyordu; çünkü fotoğrafın diğer renkleri ile ilgileniyorduk (resimdeki kişinin üzerindeki kıyafetin renkleri) ve bu sebeple deri renklerini ve o bölgeleri resimde saptamak gerekti. Bizim de önceden aklımızda kalan bir tembih vardı, Columbia Üniversitesi'nde yapay öğrenim dersi veren Tony Jebara derste paylaşmıştı bir kere (bu tür gayrı resmi, lakırdı seviyesinde tiyolar bazen çok faydalı olur), deri rengi bulmak için bir projesinde tüm deri renklerini R,G,B olarak grafiğe basmışlar, ve beyaz olsun, zenci olsun, ve sonuç grafikte deri renklerinin çok ince bir bölgede yanyana durduğunu görmüşler. İlginç değil mi?</p>
-<p>Buradan şu sonuç çıkıyor ki diğer renklerin arasında deri renklerine odaklanan, onları &quot;tanıyan'' bir yapay öğrenim algoritmasının oldukça şansı vardır. Ama ondan önce veriye bakıp grafiksel olarak ne olduğunu görelim.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile
-<span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;skin.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
-    d <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;skin.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-<span class="bu">print</span> d[:<span class="dv">3</span>]</code></pre></div>
+<p>Bir projemizde dijital resimlerdeki deri rengi içeren kısımları
+çıkartmamız gerekiyordu; çünkü fotoğrafın diğer renkleri ile
+ilgileniyorduk (resimdeki kişinin üzerindeki kıyafetin renkleri) ve bu
+sebeple deri renklerini ve o bölgeleri resimde saptamak gerekti. Bizim
+de önceden aklımızda kalan bir tembih vardı, Columbia Üniversitesi’nde
+yapay öğrenim dersi veren Tony Jebara derste paylaşmıştı bir kere (bu
+tür gayrı resmi, lakırdı seviyesinde tiyolar bazen çok faydalı olur),
+deri rengi bulmak için bir projesinde tüm deri renklerini R,G,B olarak
+grafiğe basmışlar, ve beyaz olsun, zenci olsun, ve sonuç grafikte deri
+renklerinin çok ince bir bölgede yanyana durduğunu görmüşler. İlginç
+değil mi?</p>
+<p>Buradan şu sonuç çıkıyor ki diğer renklerin arasında deri renklerine
+odaklanan, onları “tanıyan’’ bir yapay öğrenim algoritmasının oldukça
+şansı vardır. Ama ondan önce veriye bakıp grafiksel olarak ne olduğunu
+görelim.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;skin.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;skin.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> d[:<span class="dv">3</span>]</span></code></pre></div>
 <pre><code>   Unnamed: 0   rgbhex   skin         r         g         b         h  \
 0           0  #200e08  False  0.125490  0.054902  0.031373  0.041667   
 1           1  #6d6565  False  0.427451  0.396078  0.396078  0.000000   
@@ -640,88 +804,131 @@ plt.savefig(<span class="st">&#39;stat_gmm_03.png&#39;</span>)</code></pre></div
 0  0.750000  0.125490  
 1  0.073394  0.427451  
 2  0.597403  0.301961  </code></pre>
-<p>Burada önemli olan R,G,B ve H,S,V kolonları. Bu iki grup değişik renk kodlama yöntemini temsil ediyorlar. Grafikleyelim,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">nd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">False</span>]
-sd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>]
-plt.plot(nd[<span class="st">&#39;r&#39;</span>],nd[<span class="st">&#39;g&#39;</span>],<span class="st">&#39;.&#39;</span>)
-plt.hold(<span class="va">True</span>)
-plt.plot(sd[<span class="st">&#39;r&#39;</span>],sd[<span class="st">&#39;g&#39;</span>],<span class="st">&#39;rx&#39;</span>)
-plt.savefig(<span class="st">&#39;stat_gmm_01.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="stat_gmm_01.png" />
-
-</div>
+<p>Burada önemli olan R,G,B ve H,S,V kolonları. Bu iki grup değişik renk
+kodlama yöntemini temsil ediyorlar. Grafikleyelim,</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>nd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">False</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.plot(nd[<span class="st">&#39;r&#39;</span>],nd[<span class="st">&#39;g&#39;</span>],<span class="st">&#39;.&#39;</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>plt.plot(sd[<span class="st">&#39;r&#39;</span>],sd[<span class="st">&#39;g&#39;</span>],<span class="st">&#39;rx&#39;</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_gmm_01.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_gmm_01.png" /></p>
 <p>Ya da H,S üzerinden</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">nd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">False</span>]
-sd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>]
-plt.plot(nd[<span class="st">&#39;h&#39;</span>],nd[<span class="st">&#39;s&#39;</span>],<span class="st">&#39;.&#39;</span>)
-plt.hold(<span class="va">True</span>)
-plt.plot(sd[<span class="st">&#39;h&#39;</span>],sd[<span class="st">&#39;s&#39;</span>],<span class="st">&#39;rx&#39;</span>)
-plt.savefig(<span class="st">&#39;stat_gmm_02.png&#39;</span>)</code></pre></div>
-<div class="figure">
-<img src="stat_gmm_02.png" />
-
-</div>
-<p>Demek ki Jebara haklıymış. Veriye bakınca bir kabaca / sezgisel (intuitive) bazı çıkarımlar yapmak mümkün. Mesela her iki grafikte de deri renklerini belirten bölgenin grafiği sanki 3 boyutlu bir Gaussian'ın üstten görünen / kontur (contour) hali. Bunu bilmek bir avantaj, bu avantajı kullanmak lazım. Modelimiz gerçek dünya verisine ne kadar yakınsa, yapay öğrenim şansı o kadar fazlalaşacaktır. Eğer o bölgeye bir Gaussian uydurursak (fit) tanıma şansımız artacaktır.</p>
-<p>O zaman deri rengi tanıma şu şekilde yapılabilir. Scikit Learn kütüphanesinin Gaussian Karışımları (GMM) paketini kullanabiliriz. Tek problem bu karışımlar olasılık fonksiyonunu öğreniyorlar, sınıflama (classification) yapmıyorlar. Önemli değil, şöyle bir ek kod ile bunu halledebiliriz; iki tane GMM yaratırız, bir tanesi deri renk bölgeleri için, diğeri diğer bölgeler için. Eğitim sırasında her iki GMM'i kendi bölgeleri üzerinde eğitiriz. Sonra, test zamanında, her yeni (bilinmeyen) veri noktasını her iki GMM'e veririz, hangisinden daha yüksek olasılık değeri geliyorsa, etiket değeri olarak o GMM'in değerini alırız.</p>
-<p>GMM'leri, ve onların içindeki Gaussian'ların kovaryanslarını kullanmak faydalı, kovaryans bildiğimiz gibi bir Gaussian'ın hangi yönde daha fazla ağırlığının olacağını belirler, eğer kovaryans hesabı yapılmazsa, yani kovaryans matrisinin sadece çaprazında değerler varsa, mesela üç boyutta Gaussian'ın konturu bir çember olarak gözükür [1, sf 90]. Tabii her yönde aynı ağırlıkta olan bir Gaussian her türlü veriyi temsil edemez, en esneği (ki grafiğe bakınca bu gerekliliği görüyoruz) tam kovaryans kullanmaktır. Scikit Learn ile bu seçim GMM için <code>full</code> ile yapılır, sadece çaprazı kullan anlamına gelen <code>diag</code> da olabilirdi.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> zipfile
-<span class="im">from</span> sklearn.cross_validation <span class="im">import</span> train_test_split
-<span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_curve, auc
-<span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_auc_score
-<span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM
-<span class="im">import</span> pandas <span class="im">as</span> pd
-
-<span class="kw">class</span> GMMClassifier():
-   <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,k,var):
-       <span class="va">self</span>.clfs <span class="op">=</span> [GMM(n_components<span class="op">=</span>k,
-                    covariance_type<span class="op">=</span>var,thresh<span class="op">=</span><span class="fl">0.1</span>, 
-                    min_covar<span class="op">=</span><span class="fl">0.0001</span>,n_iter<span class="op">=</span><span class="dv">100</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]
-
-   <span class="kw">def</span> fit(<span class="va">self</span>,X,y):
-       <span class="va">self</span>.clfs[<span class="dv">0</span>].fit(X[y<span class="op">==</span><span class="dv">0</span>])
-       <span class="va">self</span>.clfs[<span class="dv">1</span>].fit(X[y<span class="op">==</span><span class="dv">1</span>])
-
-   <span class="kw">def</span> predict(<span class="va">self</span>,X):
-       res0 <span class="op">=</span> <span class="va">self</span>.clfs[<span class="dv">0</span>].score(X)
-       res1 <span class="op">=</span> <span class="va">self</span>.clfs[<span class="dv">1</span>].score(X)
-       res <span class="op">=</span> (res1 <span class="op">&gt;</span> res0)
-       <span class="cf">return</span> res.astype(<span class="bu">float</span>)
-
-<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: 
- 
-   <span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;skin.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:
-      df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;skin.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)
-   y <span class="op">=</span> (df[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>).astype(<span class="bu">float</span>)
-   X <span class="op">=</span> df[[<span class="st">&#39;h&#39;</span>,<span class="st">&#39;s&#39;</span>,<span class="st">&#39;v&#39;</span>,<span class="st">&#39;r&#39;</span>,<span class="st">&#39;g&#39;</span>]]
-   
-   res <span class="op">=</span> []   
-   <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):
-      clf <span class="op">=</span> GMMClassifier(k<span class="op">=</span><span class="dv">10</span>,var<span class="op">=</span><span class="st">&#39;full&#39;</span>)
-      x_train, x_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="dv">2000</span>)
-      clf.fit(x_train,y_train)
-      preds <span class="op">=</span> clf.predict(x_test)
-
-      fpr, tpr, thresholds <span class="op">=</span> roc_curve(y_test, preds)
-      roc_auc <span class="op">=</span> auc(fpr, tpr)
-      res.append(roc_auc)
-
-   <span class="bu">print</span> <span class="st">&#39;deneyler&#39;</span>
-   <span class="bu">print</span> res
-   <span class="bu">print</span> <span class="st">&#39;nihai ortalama&#39;</span>, np.array(res).mean()</code></pre></div>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>nd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">False</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> d[d[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.plot(nd[<span class="st">&#39;h&#39;</span>],nd[<span class="st">&#39;s&#39;</span>],<span class="st">&#39;.&#39;</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>plt.plot(sd[<span class="st">&#39;h&#39;</span>],sd[<span class="st">&#39;s&#39;</span>],<span class="st">&#39;rx&#39;</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_gmm_02.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_gmm_02.png" /></p>
+<p>Demek ki Jebara haklıymış. Veriye bakınca bir kabaca / sezgisel
+(intuitive) bazı çıkarımlar yapmak mümkün. Mesela her iki grafikte de
+deri renklerini belirten bölgenin grafiği sanki 3 boyutlu bir
+Gaussian’ın üstten görünen / kontur (contour) hali. Bunu bilmek bir
+avantaj, bu avantajı kullanmak lazım. Modelimiz gerçek dünya verisine ne
+kadar yakınsa, yapay öğrenim şansı o kadar fazlalaşacaktır. Eğer o
+bölgeye bir Gaussian uydurursak (fit) tanıma şansımız artacaktır.</p>
+<p>O zaman deri rengi tanıma şu şekilde yapılabilir. Scikit Learn
+kütüphanesinin Gaussian Karışımları (GMM) paketini kullanabiliriz. Tek
+problem bu karışımlar olasılık fonksiyonunu öğreniyorlar, sınıflama
+(classification) yapmıyorlar. Önemli değil, şöyle bir ek kod ile bunu
+halledebiliriz; iki tane GMM yaratırız, bir tanesi deri renk bölgeleri
+için, diğeri diğer bölgeler için. Eğitim sırasında her iki GMM’i kendi
+bölgeleri üzerinde eğitiriz. Sonra, test zamanında, her yeni
+(bilinmeyen) veri noktasını her iki GMM’e veririz, hangisinden daha
+yüksek olasılık değeri geliyorsa, etiket değeri olarak o GMM’in değerini
+alırız.</p>
+<p>GMM’leri, ve onların içindeki Gaussian’ların kovaryanslarını
+kullanmak faydalı, kovaryans bildiğimiz gibi bir Gaussian’ın hangi yönde
+daha fazla ağırlığının olacağını belirler, eğer kovaryans hesabı
+yapılmazsa, yani kovaryans matrisinin sadece çaprazında değerler varsa,
+mesela üç boyutta Gaussian’ın konturu bir çember olarak gözükür [1, sf
+90]. Tabii her yönde aynı ağırlıkta olan bir Gaussian her türlü veriyi
+temsil edemez, en esneği (ki grafiğe bakınca bu gerekliliği görüyoruz)
+tam kovaryans kullanmaktır. Scikit Learn ile bu seçim GMM için
+<code>full</code> ile yapılır, sadece çaprazı kullan anlamına gelen
+<code>diag</code> da olabilirdi.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cross_validation <span class="im">import</span> train_test_split</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_curve, auc</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_auc_score</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GMM</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> GMMClassifier():</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>   <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,k,var):</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>       <span class="va">self</span>.clfs <span class="op">=</span> [GMM(n_components<span class="op">=</span>k,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                    covariance_type<span class="op">=</span>var,thresh<span class="op">=</span><span class="fl">0.1</span>, </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                    min_covar<span class="op">=</span><span class="fl">0.0001</span>,n_iter<span class="op">=</span><span class="dv">100</span>) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>)]</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>   <span class="kw">def</span> fit(<span class="va">self</span>,X,y):</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>       <span class="va">self</span>.clfs[<span class="dv">0</span>].fit(X[y<span class="op">==</span><span class="dv">0</span>])</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>       <span class="va">self</span>.clfs[<span class="dv">1</span>].fit(X[y<span class="op">==</span><span class="dv">1</span>])</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>   <span class="kw">def</span> predict(<span class="va">self</span>,X):</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>       res0 <span class="op">=</span> <span class="va">self</span>.clfs[<span class="dv">0</span>].score(X)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>       res1 <span class="op">=</span> <span class="va">self</span>.clfs[<span class="dv">1</span>].score(X)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>       res <span class="op">=</span> (res1 <span class="op">&gt;</span> res0)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>       <span class="cf">return</span> res.astype(<span class="bu">float</span>)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>: </span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>   <span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;skin.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;skin.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>   y <span class="op">=</span> (df[<span class="st">&#39;skin&#39;</span>] <span class="op">==</span> <span class="va">True</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>   X <span class="op">=</span> df[[<span class="st">&#39;h&#39;</span>,<span class="st">&#39;s&#39;</span>,<span class="st">&#39;v&#39;</span>,<span class="st">&#39;r&#39;</span>,<span class="st">&#39;g&#39;</span>]]</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>   res <span class="op">=</span> []   </span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>   <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>      clf <span class="op">=</span> GMMClassifier(k<span class="op">=</span><span class="dv">10</span>,var<span class="op">=</span><span class="st">&#39;full&#39;</span>)</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>      x_train, x_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="dv">2000</span>)</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>      clf.fit(x_train,y_train)</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>      preds <span class="op">=</span> clf.predict(x_test)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>      fpr, tpr, thresholds <span class="op">=</span> roc_curve(y_test, preds)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>      roc_auc <span class="op">=</span> auc(fpr, tpr)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>      res.append(roc_auc)</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>   <span class="bu">print</span> <span class="st">&#39;deneyler&#39;</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>   <span class="bu">print</span> res</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>   <span class="bu">print</span> <span class="st">&#39;nihai ortalama&#39;</span>, np.array(res).mean()</span></code></pre></div>
 <pre><code>deneyler 
 [0.99075081610446136, 0.98417442945172173, 0.98641291695170819,
  0.98779826464208242, 0.99239130434782608] 
 nihai ortalama 0.9883055463</code></pre>
-<p>Başarı oranı yüzde 98.8! Bu problem üzerinde pek çok diğer yöntem denedik, mesela KNN sınıflayıcı, Lojistik Regresyon, vs. gibi, bu yöntem tüm diğerlerini geçti.</p>
-<p>İlginç bir yan bir soru, &quot;hangi kolonların kullanılacağı''. Bu bağlamda projede arkadaşlardan &quot;ama HSV değerleri RGB değerlerinden türetilebiliyor, ya birini ya ötekini kullanmak yeterli olmaz mı?'' yorumu yapanlar oldu. Evet, bu verinin diğerinden &quot;türetilmiş'' olduğu doğru, ve beklenir ki ideal bir dünyada mükemmel bir yapay öğrenim algoritmasının bu tür bir yardıma ihtiyacı olmaz, algoritma o kadar iyidir ki ona sanki aynı veriyi tekrar vermiş gibi oluruz, en iyi ihtimalle ek külfet yaratırız. Fakat pratikte bu ek veri algoritmaya ek bazı sinyaller verebilir. Mesela eğer müşterilerin kilosu üzerinden bir öğrenim yapıyor olsaydık, 80 kilodan daha az ya da daha fazla olmayı (problem alanına göre) ayrı bir kolon olarak kodlamak avantaj getirebilirdi. Tabii ki kilo verisi sayısal değer olarak azıyla fazlasıyla oradadır, fakat önem verdiğimiz noktaları türetilmiş veri olarak öğrenim algoritmasına vermenin zararı yoktur. Üstteki örnekte GB değerlerinin HSV ile beraber kullanılmasının başarı şansını biraz daha arttırdığını görebiliriz.</p>
+<p>Başarı oranı yüzde 98.8! Bu problem üzerinde pek çok diğer yöntem
+denedik, mesela KNN sınıflayıcı, Lojistik Regresyon, vs. gibi, bu yöntem
+tüm diğerlerini geçti.</p>
+<p>İlginç bir yan bir soru, “hangi kolonların kullanılacağı’‘. Bu
+bağlamda projede arkadaşlardan “ama HSV değerleri RGB değerlerinden
+türetilebiliyor, ya birini ya ötekini kullanmak yeterli olmaz mı?’’
+yorumu yapanlar oldu. Evet, bu verinin diğerinden”türetilmiş’’ olduğu
+doğru, ve beklenir ki ideal bir dünyada mükemmel bir yapay öğrenim
+algoritmasının bu tür bir yardıma ihtiyacı olmaz, algoritma o kadar
+iyidir ki ona sanki aynı veriyi tekrar vermiş gibi oluruz, en iyi
+ihtimalle ek külfet yaratırız. Fakat pratikte bu ek veri algoritmaya ek
+bazı sinyaller verebilir. Mesela eğer müşterilerin kilosu üzerinden bir
+öğrenim yapıyor olsaydık, 80 kilodan daha az ya da daha fazla olmayı
+(problem alanına göre) ayrı bir kolon olarak kodlamak avantaj
+getirebilirdi. Tabii ki kilo verisi sayısal değer olarak azıyla
+fazlasıyla oradadır, fakat önem verdiğimiz noktaları türetilmiş veri
+olarak öğrenim algoritmasına vermenin zararı yoktur. Üstteki örnekte GB
+değerlerinin HSV ile beraber kullanılmasının başarı şansını biraz daha
+arttırdığını görebiliriz.</p>
 <p>Kaynaklar</p>
 <p>[1] Alpaydin, E., <em>Introduction to Machine Learning</em></p>
 <p>[2] Jebara, T., <em>Columbia Machine Learning Course</em></p>
-<p>[3] Aaron A. D'Souza, {}, <a href="http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf" class="uri">http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf</a></p>
-<p>[4] <em>Expectation-Maximization (Python Recipe)</em>, <a href="http://code.activestate.com/recipes/577735-expectation-maximization" class="uri">http://code.activestate.com/recipes/577735-expectation-maximization</a></p>
-<p>[5] Zaki, <em>Data Mining and Analysis: Fundamental Concepts and Algorithms</em></p>
-<p>[6] Bayramlı, Istatistik, <em>Çok Değişkenli Bernoulli Karışımı</em></p>
+<p>[3] Aaron A. D’Souza, {}, <a
+href="http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf">http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf</a></p>
+<p>[4] <em>Expectation-Maximization (Python Recipe)</em>, <a
+href="http://code.activestate.com/recipes/577735-expectation-maximization">http://code.activestate.com/recipes/577735-expectation-maximization</a></p>
+<p>[5] Zaki, <em>Data Mining and Analysis: Fundamental Concepts and
+Algorithms</em></p>
+<p>[6] Bayramlı, Istatistik, <em>Çok Değişkenli Bernoulli
+Karışımı</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

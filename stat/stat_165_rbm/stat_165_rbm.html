@@ -16,381 +16,590 @@
   <title>Kısıtlı Boltzmann Makinaları (Restricted Boltzmann Machines -RBM-)</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
-<h1 id="kısıtlı-boltzmann-makinaları-restricted-boltzmann-machines--rbm-">Kısıtlı Boltzmann Makinaları (Restricted Boltzmann Machines -RBM-)</h1>
-<p>RBM aynen Boltzman Makinalarında (BM) örneğinde olduğu gibi bir dağılımdır. Verilen <span class="math inline">\(x,h\)</span> için bir olasılık değeri geri döndürebilir. <span class="math display">\[ p(x,h;W) = \exp (-E(x,h)) / Z \]</span></p>
-<p>Standart RBM için <span class="math inline">\(h,x\)</span> ikiseldir (binary). Gizli (hidden) tabaka <span class="math inline">\(h\)</span>, ve &quot;görünen (visible)'' tabaka <span class="math inline">\(x\)</span> vardır. <span class="math inline">\(Z\)</span> aynen önce gördüğümüz BM'de olduğu gibi normalizasyon sabitidir. Spesifik bir RBM'i tanımlayan şey onun <span class="math inline">\(W\)</span> matrisidir. Gizli değişkenler bazen karışıklık yaratabiliyor, bu değişkenler aynen görünen değişkenler gibi değişkendirler. Yani belli <span class="math inline">\(h\)</span>'lerin &quot;olasılığı'' sorulabilir, ya da onlar üretilebilir. Fakat RBM'i eğitirken sadece görünen kısmı tarafından eğitiriz. Gizli tabaka bu sırada örneklem ile arada sırada içi doldurulur, bu tabii ki <span class="math inline">\(W\)</span>'ye bağlı olarak yapılacaktır. Gizli tabaka daha düşük boyutlu olduğu, ve 0/1 değerlerine sahip olması mecbur olduğu için bu git/gel bir tür özetleme yapar ki öğrenim bu sırada ortaya çıkar.</p>
-<p>Devam edelim, <span class="math inline">\(E\)</span> tanımına &quot;enerji'' olarak ta atıf yapılabiliyor.</p>
-<p><span class="math display">\[ E(x,h) = -h^TWx - c^Tx - b^Th \]</span></p>
-<p>BM'lerden farklı olarak RBM'de <span class="math inline">\(c,b\)</span> değişkenleri var. Bu değişkenler yanlılık (bias) için, yani veri içindeki genel eğilimi saptamaları için modele konulmuştur. Ayrıca <span class="math inline">\(h^TWx\)</span> terimi var, bu BM'deki <span class="math inline">\(x^TWx\)</span>'den biraz farklı, daha önce belirttiğimiz gibi, <span class="math inline">\(h\)</span> üzerinden <span class="math inline">\(x\)</span>'ler arasında bağlantı yapıyor. BM ile tüm <span class="math inline">\(x\)</span> öğeleri birbirine bağlanabiliyordu, RBM ile <span class="math inline">\(h\)</span> katmanında bağlantılar paylaşılıyor. Bu <span class="math inline">\(h\)</span> üzerinden bağlantı zorunluluğu RBM'in özetleme alanını azaltarak genelleme oluşturmasını sağlıyor. Bu yüzden onlara &quot;kısıtlı'' Boltzmann makinaları adı veriliyor. Gizli değişkenlerin kendi aralarında, ve görünen değişkenlerin kendi aralarında direk bağlantıya izin verilmemiştir, ki bu daha önce bahsedilen kısıtlamanın bir diğer yönü. Bağlantılara, <span class="math inline">\(W\)</span> üzerinden sadece gizli ve görünen değişkenler (tabakalar) arasında izin verilmiştir. Bu ayrıca matematiksel olarak bazı kolaylıklar sağlıyor, bu konuyu birazdan işleyeceğiz.</p>
+<h1
+id="kısıtlı-boltzmann-makinaları-restricted-boltzmann-machines--rbm-">Kısıtlı
+Boltzmann Makinaları (Restricted Boltzmann Machines -RBM-)</h1>
+<p>RBM aynen Boltzman Makinalarında (BM) örneğinde olduğu gibi bir
+dağılımdır. Verilen <span class="math inline">\(x,h\)</span> için bir
+olasılık değeri geri döndürebilir. <span class="math display">\[
+p(x,h;W) = \exp (-E(x,h)) / Z \]</span></p>
+<p>Standart RBM için <span class="math inline">\(h,x\)</span> ikiseldir
+(binary). Gizli (hidden) tabaka <span class="math inline">\(h\)</span>,
+ve “görünen (visible)’’ tabaka <span class="math inline">\(x\)</span>
+vardır. <span class="math inline">\(Z\)</span> aynen önce gördüğümüz
+BM’de olduğu gibi normalizasyon sabitidir. Spesifik bir RBM’i tanımlayan
+şey onun <span class="math inline">\(W\)</span> matrisidir. Gizli
+değişkenler bazen karışıklık yaratabiliyor, bu değişkenler aynen görünen
+değişkenler gibi değişkendirler. Yani belli <span
+class="math inline">\(h\)</span>’lerin”olasılığı’’ sorulabilir, ya da
+onlar üretilebilir. Fakat RBM’i eğitirken sadece görünen kısmı
+tarafından eğitiriz. Gizli tabaka bu sırada örneklem ile arada sırada
+içi doldurulur, bu tabii ki <span class="math inline">\(W\)</span>’ye
+bağlı olarak yapılacaktır. Gizli tabaka daha düşük boyutlu olduğu, ve
+0/1 değerlerine sahip olması mecbur olduğu için bu git/gel bir tür
+özetleme yapar ki öğrenim bu sırada ortaya çıkar.</p>
+<p>Devam edelim, <span class="math inline">\(E\)</span> tanımına
+“enerji’’ olarak ta atıf yapılabiliyor.</p>
+<p><span class="math display">\[ E(x,h) = -h^TWx - c^Tx - b^Th
+\]</span></p>
+<p>BM’lerden farklı olarak RBM’de <span
+class="math inline">\(c,b\)</span> değişkenleri var. Bu değişkenler
+yanlılık (bias) için, yani veri içindeki genel eğilimi saptamaları için
+modele konulmuştur. Ayrıca <span class="math inline">\(h^TWx\)</span>
+terimi var, bu BM’deki <span class="math inline">\(x^TWx\)</span>’den
+biraz farklı, daha önce belirttiğimiz gibi, <span
+class="math inline">\(h\)</span> üzerinden <span
+class="math inline">\(x\)</span>’ler arasında bağlantı yapıyor. BM ile
+tüm <span class="math inline">\(x\)</span> öğeleri birbirine
+bağlanabiliyordu, RBM ile <span class="math inline">\(h\)</span>
+katmanında bağlantılar paylaşılıyor. Bu <span
+class="math inline">\(h\)</span> üzerinden bağlantı zorunluluğu RBM’in
+özetleme alanını azaltarak genelleme oluşturmasını sağlıyor. Bu yüzden
+onlara “kısıtlı’’ Boltzmann makinaları adı veriliyor. Gizli
+değişkenlerin kendi aralarında, ve görünen değişkenlerin kendi
+aralarında direk bağlantıya izin verilmemiştir, ki bu daha önce
+bahsedilen kısıtlamanın bir diğer yönü. Bağlantılara, <span
+class="math inline">\(W\)</span> üzerinden sadece gizli ve görünen
+değişkenler (tabakalar) arasında izin verilmiştir. Bu ayrıca
+matematiksel olarak bazı kolaylıklar sağlıyor, bu konuyu birazdan
+işleyeceğiz.</p>
 <p>Formül alttaki gibi de açılabilir,</p>
-<p><span class="math display">\[ = - \sum_j \sum_k W_{j,k}h_jx_k - \sum_k c_kx_k - \sum_j b_jh_j  \]</span></p>
+<p><span class="math display">\[ = - \sum_j \sum_k W_{j,k}h_jx_k -
+\sum_k c_kx_k - \sum_j b_jh_j  \]</span></p>
 <p><img src="rbm_01.png" /> <img src="rbm_02.png" /></p>
-<p>Tekrar vurgulayalım, <span class="math inline">\(h,x\)</span> değişkenleri olasılık teorisinden bilinen rasgele değişkenlerdir, yani hem <span class="math inline">\(x\)</span>'e hem de <span class="math inline">\(h\)</span>'e &quot;zar attırabiliriz'' / bu değişkenler üzerinden örneklem toplayabiliriz.</p>
-<p>Ayrıca, RBM'ler aynen BM'ler gibi bir olasılık yoğunluk fonksiyonu üzerinden tanımlanırlar, önceki formülde gördüğümüz gibi, tüm mümkün değerleri üzerinden entegralleri (ya da toplamları) alınınca sonuç 1 olur, vs.</p>
-<p>Devam edelim, ana formülden hareketle cebirsel olarak şunlar da doğrudur,</p>
-<p><span class="math display">\[ p(x,h;W) = \exp (-E(x,h)) / Z \]</span></p>
-<p><span class="math display">\[ 
+<p>Tekrar vurgulayalım, <span class="math inline">\(h,x\)</span>
+değişkenleri olasılık teorisinden bilinen rasgele değişkenlerdir, yani
+hem <span class="math inline">\(x\)</span>’e hem de <span
+class="math inline">\(h\)</span>’e “zar attırabiliriz’’ / bu değişkenler
+üzerinden örneklem toplayabiliriz.</p>
+<p>Ayrıca, RBM’ler aynen BM’ler gibi bir olasılık yoğunluk fonksiyonu
+üzerinden tanımlanırlar, önceki formülde gördüğümüz gibi, tüm mümkün
+değerleri üzerinden entegralleri (ya da toplamları) alınınca sonuç 1
+olur, vs.</p>
+<p>Devam edelim, ana formülden hareketle cebirsel olarak şunlar da
+doğrudur,</p>
+<p><span class="math display">\[ p(x,h;W) = \exp (-E(x,h)) / Z
+\]</span></p>
+<p><span class="math display">\[
 \qquad (2)
 = \exp (h^TWx + c^Tx + b^Th ) / Z \]</span></p>
-<p><span class="math display">\[ = \exp (h^TWx) \exp (c^Tx) \exp(b^Th) / Z \]</span></p>
-<p>çünkü bir toplam üzerindeki <span class="math inline">\(\exp\)</span>, ayrı ayrı <span class="math inline">\(\exp\)</span>'lerin çarpımı olur. Aynı mantıkla, eğer ana formülü matris / vektör yerine ayrı değişkenler olarak görmek istersek,</p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[ = \exp (h^TWx) \exp (c^Tx) \exp(b^Th) /
+Z \]</span></p>
+<p>çünkü bir toplam üzerindeki <span
+class="math inline">\(\exp\)</span>, ayrı ayrı <span
+class="math inline">\(\exp\)</span>’lerin çarpımı olur. Aynı mantıkla,
+eğer ana formülü matris / vektör yerine ayrı değişkenler olarak görmek
+istersek,</p>
+<p><span class="math display">\[
 p(x,h;W) = \frac{1}{Z}
-\prod_j \prod_k \exp (W_{jk}h_jx_k) \prod_k \exp(c_kx_k) \prod_j \exp(b_jh_j) 
+\prod_j \prod_k \exp (W_{jk}h_jx_k) \prod_k \exp(c_kx_k) \prod_j
+\exp(b_jh_j)
 \]</span></p>
-<p>Notasyonu kolaylaştırmak amacıyla <span class="math inline">\(b,c\)</span> terimlerini <span class="math inline">\(W\)</span> içine absorbe edebiliriz, <span class="math inline">\(x_0=1\)</span> ve <span class="math inline">\(h_0=1\)</span> değerlerini mecbur tutarsak ve <span class="math inline">\(w_{0,:}=c\)</span> ve <span class="math inline">\(w_{:,0}=b\)</span> dersek, yani <span class="math inline">\(W\)</span>'nin sıfırıncı satırının tamamının <span class="math inline">\(c\)</span> olduğunu, sıfırıncı kolonunun tamamının <span class="math inline">\(b\)</span> olduğunu kabul edersek RBM ana formülünü tekrar elde etmiş oluruz, fakat artık</p>
+<p>Notasyonu kolaylaştırmak amacıyla <span
+class="math inline">\(b,c\)</span> terimlerini <span
+class="math inline">\(W\)</span> içine absorbe edebiliriz, <span
+class="math inline">\(x_0=1\)</span> ve <span
+class="math inline">\(h_0=1\)</span> değerlerini mecbur tutarsak ve
+<span class="math inline">\(w_{0,:}=c\)</span> ve <span
+class="math inline">\(w_{:,0}=b\)</span> dersek, yani <span
+class="math inline">\(W\)</span>’nin sıfırıncı satırının tamamının <span
+class="math inline">\(c\)</span> olduğunu, sıfırıncı kolonunun tamamının
+<span class="math inline">\(b\)</span> olduğunu kabul edersek RBM ana
+formülünü tekrar elde etmiş oluruz, fakat artık</p>
 <p><span class="math display">\[ E(x,h) = -h^TWx \]</span></p>
-<p><span class="math display">\[ = - \sum_j \sum_k W_{j,k}h_jx_k  \]</span></p>
+<p><span class="math display">\[ = - \sum_j \sum_k
+W_{j,k}h_jx_k  \]</span></p>
 <p>ve</p>
-<p><span class="math display">\[ p(x,h;W)  = \exp (h^TWx) / Z \]</span></p>
-<p>yeterli olacaktır. Bir diğer kolaylık <span class="math inline">\(x,h\)</span> yerine tek değişken kullanmak,</p>
-<p>Eğer <span class="math inline">\(y \equiv (x,h)\)</span> olarak alırsak (<span class="math inline">\(\equiv\)</span> tabiri &quot;tanım'' anlamına gelir),</p>
-<p><span class="math display">\[ P(x,h;W) = \frac{1}{Z(W)} \exp 
-\bigg[ 
+<p><span class="math display">\[ p(x,h;W)  = \exp (h^TWx) / Z
+\]</span></p>
+<p>yeterli olacaktır. Bir diğer kolaylık <span
+class="math inline">\(x,h\)</span> yerine tek değişken kullanmak,</p>
+<p>Eğer <span class="math inline">\(y \equiv (x,h)\)</span> olarak
+alırsak (<span class="math inline">\(\equiv\)</span> tabiri “tanım’’
+anlamına gelir),</p>
+<p><span class="math display">\[ P(x,h;W) = \frac{1}{Z(W)} \exp
+\bigg[
 \frac{1}{2} y^T W y
 \bigg]
 \]</span></p>
-<p>Aslında açık konuşmak gerekirse &quot;enerji'' gibi kavramlarla uğraşmak, ya da içinde eksi terimler içeren bir grup değişkenin tekrar eksisini almak ve eksilerin etkisini nötralize etmiş olmaya gerek yok, bunun yerine baştan (2)'deki ifadeyle yola çıkmak daha kısa olur. İçinde enerji olan açıklamaları biraz da literatürde görülebilecek anlatımlara açıklık getirmek için yaptık.</p>
-<p>Şimdi <span class="math inline">\(h\)</span> üzerinden marjinalize edersek,</p>
-<p><span class="math display">\[ P(x;W) = \sum_h \frac{1}{Z(W)} \exp 
-\bigg[ 
+<p>Aslında açık konuşmak gerekirse “enerji’’ gibi kavramlarla uğraşmak,
+ya da içinde eksi terimler içeren bir grup değişkenin tekrar eksisini
+almak ve eksilerin etkisini nötralize etmiş olmaya gerek yok, bunun
+yerine baştan (2)’deki ifadeyle yola çıkmak daha kısa olur. İçinde
+enerji olan açıklamaları biraz da literatürde görülebilecek anlatımlara
+açıklık getirmek için yaptık.</p>
+<p>Şimdi <span class="math inline">\(h\)</span> üzerinden marjinalize
+edersek,</p>
+<p><span class="math display">\[ P(x;W) = \sum_h \frac{1}{Z(W)} \exp
+\bigg[
 \frac{1}{2} y^T W y
 \bigg]
 \]</span></p>
 <p><span class="math display">\[  
 \qquad (1)
-P(x;W) = \frac{1}{Z(W)}  \sum_h \exp 
-\bigg[ 
+P(x;W) = \frac{1}{Z(W)}  \sum_h \exp
+\bigg[
 \frac{1}{2} y^T W y
 \bigg]
 \]</span></p>
 <p>Ve <span class="math inline">\(Z(W)\)</span></p>
-<p><span class="math display">\[ Z(W) = \sum_{h,x} \exp 
-\bigg[ 
+<p><span class="math display">\[ Z(W) = \sum_{h,x} \exp
+\bigg[
 \frac{1}{2} y^T W y
 \bigg]
 \]</span></p>
-<ol style="list-style-type: decimal">
-<li>denkleminde bölümünden sonraki kısma <span class="math inline">\(Z_x(W)\)</span> dersek, sanki aynı <span class="math inline">\(\exp\)</span> denkleminin <span class="math inline">\(x\)</span>'ler üzerinden marjinalize edilmiş hali olarak gösterebiliriz onu, ve böylece daha kısa bir formül kullanabiliriz,</li>
+<ol type="1">
+<li>denkleminde bölümünden sonraki kısma <span
+class="math inline">\(Z_x(W)\)</span> dersek, sanki aynı <span
+class="math inline">\(\exp\)</span> denkleminin <span
+class="math inline">\(x\)</span>’ler üzerinden marjinalize edilmiş hali
+olarak gösterebiliriz onu, ve böylece daha kısa bir formül
+kullanabiliriz,</li>
 </ol>
 <p><span class="math display">\[  
 P(x;W) = \frac{1}{Z(W)}  
 \underbrace{
-\sum_h \exp 
-\bigg[ 
+\sum_h \exp
+\bigg[
 \frac{1}{2} y^T W y
 \bigg]
 }_{Z_x(W)}
 \]</span></p>
 <p>O zaman</p>
 <p><span class="math display">\[  
-P(x;W) = \frac{Z_x(W)}{Z(W)} 
+P(x;W) = \frac{Z_x(W)}{Z(W)}
 \]</span></p>
-<p>elde ederiz. Veri üzerinden maksimum olurluk için, yine log üzerinden bir hesap yaparız, BM için yapmıştık bunu,</p>
+<p>elde ederiz. Veri üzerinden maksimum olurluk için, yine log üzerinden
+bir hesap yaparız, BM için yapmıştık bunu,</p>
 <p><span class="math display">\[  
-\mathcal{L} = 
-\ln \big( \prod_{n=1}^{N} P(x^{n};W) \big) = 
-\sum_{n=1}^{N} \ln P(x^{n};W) 
+\mathcal{L} =
+\ln \big( \prod_{n=1}^{N} P(x^{n};W) \big) =
+\sum_{n=1}^{N} \ln P(x^{n};W)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \sum_{n=1}^{N} \ln \frac{Z_{x^{(n)}}(W)}{Z(W)}  
-= \sum_{n=1}^{N}  \big(\ln Z_{x^{(n)}} - \ln Z \big) 
+= \sum_{n=1}^{N}  \big(\ln Z_{x^{(n)}} - \ln Z \big)
 \]</span></p>
-<p><span class="math display">\[ 
-\frac{\partial \mathcal{L} }{\partial w_{ij}} = 
+<p><span class="math display">\[
+\frac{\partial \mathcal{L} }{\partial w_{ij}} =
 \sum_{n=1}^{N}  \big( \frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}}
 - \frac{\partial \ln Z }{\partial w_{ij}} \big)
 \qquad (3)
 \]</span></p>
 <p>Parantez içindeki 1. türevi alalım,</p>
-<p><span class="math display">\[ 
-\frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}} = 
+<p><span class="math display">\[
+\frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}} =
 \frac{\partial }{\partial w_{ij}}  
-\ln \bigg[ 
-\sum_h \exp \big( \frac{1}{2} y^{n^T} W y^n \big) 
+\ln \bigg[
+\sum_h \exp \big( \frac{1}{2} y^{n^T} W y^n \big)
 \bigg]
 \]</span></p>
-<p><span class="math display">\[ 
-= \frac{1}{Z_{x^{(n)}}}  \bigg[ \sum_h \frac{\partial }{\partial w_{ij}} \exp \big( \frac{1}{2} y^{n^T} W y^n  \big) \bigg]
+<p><span class="math display">\[
+= \frac{1}{Z_{x^{(n)}}}  \bigg[ \sum_h \frac{\partial }{\partial w_{ij}}
+\exp \big( \frac{1}{2} y^{n^T} W y^n  \big) \bigg]
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 = \frac{1}{Z_{x^{(n)}}}  
-\bigg[ 
-\sum_h  \exp \big( \frac{1}{2} y^{n^T} W y^n  \big) 
-\frac{\partial }{\partial w_{ij}} y^{n^T} W y^n 
+\bigg[
+\sum_h  \exp \big( \frac{1}{2} y^{n^T} W y^n  \big)
+\frac{\partial }{\partial w_{ij}} y^{n^T} W y^n
 \bigg]
 \]</span></p>
-<p><span class="math display">\[ 
-= \frac{1}{Z_{x^{(n)}}}  \sum_h  \exp \big( \frac{1}{2} y^{n^T} W y^n  \big) y_iy_j
+<p><span class="math display">\[
+= \frac{1}{Z_{x^{(n)}}}  \sum_h  \exp \big( \frac{1}{2} y^{n^T} W
+y^n  \big) y_iy_j
 \]</span></p>
-<p><span class="math display">\[ 
-= \sum_h  \frac{1}{Z_{x^{(n)}}}  \exp \big( \frac{1}{2} y^{n^T} W y^n  \big) y_iy_j
+<p><span class="math display">\[
+= \sum_h  \frac{1}{Z_{x^{(n)}}}  \exp \big( \frac{1}{2} y^{n^T} W
+y^n  \big) y_iy_j
 \]</span></p>
-<p><span class="math inline">\(Z_{x^{(n)}}\)</span>'nin ne olduğunu hatırlarsak, <span class="math inline">\(\exp\)</span> ifadesinin <span class="math inline">\(h\)</span> üzerinden marjinalize edilmiş hali,</p>
-<p><span class="math display">\[ 
+<p><span class="math inline">\(Z_{x^{(n)}}\)</span>’nin ne olduğunu
+hatırlarsak, <span class="math inline">\(\exp\)</span> ifadesinin <span
+class="math inline">\(h\)</span> üzerinden marjinalize edilmiş hali,</p>
+<p><span class="math display">\[
 = \sum_h  \frac{\exp \big( \frac{1}{2} y^{n^T} W y^n  \big)}
-{\sum_h \exp \big( \frac{1}{2} y^T W y \big) } 
+{\sum_h \exp \big( \frac{1}{2} y^T W y \big) }
 y_iy_j
 \]</span></p>
-<p>Eğer bölümün üstünü ve altını <span class="math inline">\(Z\)</span> ile bolşek,</p>
-<p><span class="math display">\[ 
+<p>Eğer bölümün üstünü ve altını <span class="math inline">\(Z\)</span>
+ile bolşek,</p>
+<p><span class="math display">\[
 = \sum_h  
-\frac{\exp \big( \frac{1}{2} y^{n^T} W y^n  \big) / Z} 
-{\sum_h \exp \big( \frac{1}{2} y^T W y \big) / Z} 
+\frac{\exp \big( \frac{1}{2} y^{n^T} W y^n  \big) / Z}
+{\sum_h \exp \big( \frac{1}{2} y^T W y \big) / Z}
 y_iy_j
 \]</span></p>
-<p>Üst kısım <span class="math inline">\(P(y;W)\)</span> yani $P(x,h;W) $ alt kısım <span class="math inline">\(P(x;W)\)</span> olmaz mı? Evet! Ve,</p>
-<p><span class="math display">\[ P(h|x^n;W) = \frac{P(x^n,h;W)}{P(x^n;W)}  \]</span></p>
+<p>Üst kısım <span class="math inline">\(P(y;W)\)</span> yani $P(x,h;W)
+$ alt kısım <span class="math inline">\(P(x;W)\)</span> olmaz mı? Evet!
+Ve,</p>
+<p><span class="math display">\[ P(h|x^n;W) =
+\frac{P(x^n,h;W)}{P(x^n;W)}  \]</span></p>
 <p>olduğuna göre,</p>
-<p><span class="math display">\[ =  \sum_h P(h|x^n;W) y_iy_j \]</span></p>
-<p>elde ederiz. Bunu da <span class="math inline">\(&lt;y_iy_j&gt;_{P(h|x^n;W)}\)</span> olarak yazabiliriz.</p>
-<p>Şimdi parantez içindeki 2. türevi alalım, yani <span class="math inline">\(\frac{\partial \ln Z }{\partial w_{ij}}\)</span>,</p>
-<p><span class="math display">\[ 
-\frac{\partial \ln Z }{\partial w_{ij}}  = 
+<p><span class="math display">\[ =  \sum_h P(h|x^n;W) y_iy_j
+\]</span></p>
+<p>elde ederiz. Bunu da <span
+class="math inline">\(&lt;y_iy_j&gt;_{P(h|x^n;W)}\)</span> olarak
+yazabiliriz.</p>
+<p>Şimdi parantez içindeki 2. türevi alalım, yani <span
+class="math inline">\(\frac{\partial \ln Z }{\partial
+w_{ij}}\)</span>,</p>
+<p><span class="math display">\[
+\frac{\partial \ln Z }{\partial w_{ij}}  =
 \sum_{h,x} \frac{1}{Z}  \exp \big( \frac{1}{2} y^{T} W y  \big) y_iy_j =
 \sum_{h,x} P(y;W)  y_iy_j
 \]</span></p>
-<p>ki bu son ifadeyi de <span class="math inline">\(&lt; y_iy_j &gt;_{P(y;W)}\)</span> olarak yazabiliriz. Tamamını, yani (3) ifadesini, artık şöyle yazabiliriz,</p>
+<p>ki bu son ifadeyi de <span class="math inline">\(&lt; y_iy_j
+&gt;_{P(y;W)}\)</span> olarak yazabiliriz. Tamamını, yani (3) ifadesini,
+artık şöyle yazabiliriz,</p>
 <p><span class="math display">\[
-\sum_{n=1}^{N}  \big( \frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}} - 
+\sum_{n=1}^{N}  \big( \frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}}
+-
 \frac{\partial \ln Z }{\partial w_{ij}} \big)
-= \sum_{n=1}^{N}  &lt; y_iy_j &gt;_{P(h|x^n;W)} - &lt; y_iy_j &gt;_{P(y;W)}
+= \sum_{n=1}^{N}  &lt; y_iy_j &gt;_{P(h|x^n;W)} - &lt; y_iy_j
+&gt;_{P(y;W)}
 \qquad (4)
 \]</span></p>
-<p>Bu formülü de BM için yaptığımız gibi bir gradyan güncelleme formülüne dönüştürebiliriz. Güncelleme formülünün hangi hesapları gerektirdiğine gelince; İlk terim tüm <span class="math inline">\(h\)</span>'ler üzerinden ki hesabı basit, ikincisi ise tüm mümkün <span class="math inline">\(x,h\)</span>'ler üzerinden bir olasılık hesabı ve örnekleme gerektirecek. Bu durum çetin hesap (intractable) denen bir durum, özellikle <span class="math inline">\(x,h\)</span> şartı için; daha önce BM için bu problemi Gibbs örneklemesi ile çözmüştük. Aynı çözümü burada da uygulayabiliriz, fakat belki daha iyi bir yaklaşım şu olacak.</p>
+<p>Bu formülü de BM için yaptığımız gibi bir gradyan güncelleme
+formülüne dönüştürebiliriz. Güncelleme formülünün hangi hesapları
+gerektirdiğine gelince; İlk terim tüm <span
+class="math inline">\(h\)</span>’ler üzerinden ki hesabı basit, ikincisi
+ise tüm mümkün <span class="math inline">\(x,h\)</span>’ler üzerinden
+bir olasılık hesabı ve örnekleme gerektirecek. Bu durum çetin hesap
+(intractable) denen bir durum, özellikle <span
+class="math inline">\(x,h\)</span> şartı için; daha önce BM için bu
+problemi Gibbs örneklemesi ile çözmüştük. Aynı çözümü burada da
+uygulayabiliriz, fakat belki daha iyi bir yaklaşım şu olacak.</p>
 <p>CD Yöntemi (Contrastive Divergence)</p>
-<p>RBM'leri eğitmek için kullanılan en popüler yöntem CD yöntemidir. Bu tekniği anlatmadan önce bazı matematiksel kolaylıkları bilmek gerekli.</p>
-<p>RBM grafiğine bakarsak, eğer <span class="math inline">\(x\)</span> biliniyor ise bu <span class="math inline">\(h\)</span> değişkenlerini bağımsız hale getirir (koşullu olasılık kuralı), ve aynı şekilde <span class="math inline">\(h\)</span> biliniyor ise <span class="math inline">\(x\)</span> bağımsız hale gelir. Bunu görsel olarak bile anlamak çok kolay, elimizle tüm <span class="math inline">\(x\)</span>'leri kapatalım mesela ve <span class="math inline">\(h\)</span> düğümlerine bakalım, aralarında hiçbir bağlantı yoktur değil mi? Aynı şekilde <span class="math inline">\(h\)</span> kapatınca <span class="math inline">\(x\)</span>'ler &quot;bağlantısız'' hale gelir.</p>
-<p>Bu bağımsızlıktan yola çıkarak, daha önce BM için yaptığımız gibi, olasılıklar şu basit formüllere dönüşür,</p>
-<p><span class="math display">\[ P(h_i=1|x) = \sigma \bigg( \sum_{j=1}^{m} w_{ij} x_j \bigg) \]</span></p>
-<p><span class="math display">\[ P(x_i=1|h) = \sigma \bigg( \sum_{i=1}^{n} w_{ij} h_i \bigg) \]</span></p>
-<p>ve tabii ki <span class="math inline">\(\sigma(x) = 1 / (1+e^{-x})\)</span>. Daha önce 1 olma olasılığını nasıl örnekleme çevireceğimizi de görmüştük zaten.</p>
-<p>Şimdi CD'nin ne olduğuna gelelim. Eğer RBM için gereken örneklemeyi klasik Gibbs ile yaparsak örnekleme zincirini &quot;yeterince uzun süre'' işletmek gerekir ki dağılımın olası noktaları gezilmiş olsun. Fakat, özellikle yüksek boyutlu durumlarda, tüm <span class="math inline">\(x,h\)</span> kombinasyonlarını düşünürsek bu çok büyük bir alandır ve gezme işlemi çok, çok uzun zaman alabilir. Bunun yerine, ve üstteki bağımsızlık formüllerinden hareketle CD yöntemi bulunmuştur, bu yönteme göre örnekleme verinin <em>kendisinden</em> başlatılır (kıyasla pür Gibbs rasgele bir noktadan), döngünün mesela ilk adımında <span class="math inline">\(x^0\)</span> (ki bu tüm verinin tamamı), baz alınarak <span class="math inline">\(p(h^0|v^0)\)</span> hesaplanır (üstteki sigmoid), onun üzerinden <span class="math inline">\(h^0\)</span> örneklemi alınır, sonra <span class="math inline">\(h^0\)</span> baz alınır ve <span class="math inline">\(x^1\)</span> üretilir, bu böyle devam eder. Böylece mümkün <span class="math inline">\(h\)</span> ve <span class="math inline">\(x\)</span>'ler gezilmiş olur. Not: Sürekli verinin kendisine dönmenin de bazı dezavantajları var, ki bunu yapmadan pür Gibbs örneklemesine daha yakın bir yaklaşım Kalıcı (Persistent) CD adlı yöntemdir (tabii başka yaklaşıksal numaralar kullanarak).</p>
+<p>RBM’leri eğitmek için kullanılan en popüler yöntem CD yöntemidir. Bu
+tekniği anlatmadan önce bazı matematiksel kolaylıkları bilmek
+gerekli.</p>
+<p>RBM grafiğine bakarsak, eğer <span class="math inline">\(x\)</span>
+biliniyor ise bu <span class="math inline">\(h\)</span> değişkenlerini
+bağımsız hale getirir (koşullu olasılık kuralı), ve aynı şekilde <span
+class="math inline">\(h\)</span> biliniyor ise <span
+class="math inline">\(x\)</span> bağımsız hale gelir. Bunu görsel olarak
+bile anlamak çok kolay, elimizle tüm <span
+class="math inline">\(x\)</span>’leri kapatalım mesela ve <span
+class="math inline">\(h\)</span> düğümlerine bakalım, aralarında hiçbir
+bağlantı yoktur değil mi? Aynı şekilde <span
+class="math inline">\(h\)</span> kapatınca <span
+class="math inline">\(x\)</span>’ler “bağlantısız’’ hale gelir.</p>
+<p>Bu bağımsızlıktan yola çıkarak, daha önce BM için yaptığımız gibi,
+olasılıklar şu basit formüllere dönüşür,</p>
+<p><span class="math display">\[ P(h_i=1|x) = \sigma \bigg(
+\sum_{j=1}^{m} w_{ij} x_j \bigg) \]</span></p>
+<p><span class="math display">\[ P(x_i=1|h) = \sigma \bigg(
+\sum_{i=1}^{n} w_{ij} h_i \bigg) \]</span></p>
+<p>ve tabii ki <span class="math inline">\(\sigma(x) = 1 /
+(1+e^{-x})\)</span>. Daha önce 1 olma olasılığını nasıl örnekleme
+çevireceğimizi de görmüştük zaten.</p>
+<p>Şimdi CD’nin ne olduğuna gelelim. Eğer RBM için gereken örneklemeyi
+klasik Gibbs ile yaparsak örnekleme zincirini “yeterince uzun süre’’
+işletmek gerekir ki dağılımın olası noktaları gezilmiş olsun. Fakat,
+özellikle yüksek boyutlu durumlarda, tüm <span
+class="math inline">\(x,h\)</span> kombinasyonlarını düşünürsek bu çok
+büyük bir alandır ve gezme işlemi çok, çok uzun zaman alabilir. Bunun
+yerine, ve üstteki bağımsızlık formüllerinden hareketle CD yöntemi
+bulunmuştur, bu yönteme göre örnekleme verinin <em>kendisinden</em>
+başlatılır (kıyasla pür Gibbs rasgele bir noktadan), döngünün mesela ilk
+adımında <span class="math inline">\(x^0\)</span> (ki bu tüm verinin
+tamamı), baz alınarak <span class="math inline">\(p(h^0|v^0)\)</span>
+hesaplanır (üstteki sigmoid), onun üzerinden <span
+class="math inline">\(h^0\)</span> örneklemi alınır, sonra <span
+class="math inline">\(h^0\)</span> baz alınır ve <span
+class="math inline">\(x^1\)</span> üretilir, bu böyle devam eder.
+Böylece mümkün <span class="math inline">\(h\)</span> ve <span
+class="math inline">\(x\)</span>’ler gezilmiş olur. Not: Sürekli verinin
+kendisine dönmenin de bazı dezavantajları var, ki bunu yapmadan pür
+Gibbs örneklemesine daha yakın bir yaklaşım Kalıcı (Persistent) CD adlı
+yöntemdir (tabii başka yaklaşıksal numaralar kullanarak).</p>
 <p>Literatürde şu şekildeki resim bolca görülebilir,</p>
-<div class="figure">
-<img src="rbm_03.png" />
-
-</div>
-<p>Bu yöntem pür Gibbs örneklemesine kıyasla çok daha hızlı işler ve iyi sonuçlar verir. Teorik olarak niye işlediği [1,2,4] makalelerinde bulunabilir. CD aslında (4) hedef formülünü değil başka bir hedefi optimize ediyor, fakat sonuç orijinal gradyan adımlarının yapmak istediğine yakın. [3] baz alınarak, şu şekilde kodlanabilir,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
-<span class="im">import</span> itertools
-
-<span class="kw">class</span> RBM:
-  
-  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_hidden, learning_rate,max_epochs, num_visible<span class="op">=</span><span class="dv">10</span>):
-    <span class="va">self</span>.num_hidden <span class="op">=</span> num_hidden
-    <span class="va">self</span>.num_visible <span class="op">=</span> num_visible
-    <span class="va">self</span>.learning_rate <span class="op">=</span> learning_rate
-    <span class="co"># Agirlik matrisi W&#39;yi yarat (buyukluk num_visible x num_hidden),</span>
-    <span class="co"># bunun icin Gaussian dagilimi kullan, ortalama=0, standart sapma 1. </span>
-    <span class="va">self</span>.weights <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> np.random.randn(<span class="va">self</span>.num_visible, <span class="va">self</span>.num_hidden)    
-    <span class="co"># Egilim (bias) icin ilk satir ve ilk kolona 1 degeri koy</span>
-    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">0</span>)
-    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">1</span>)
-    <span class="va">self</span>.max_epochs <span class="op">=</span> max_epochs
-    
-  <span class="kw">def</span> fit(<span class="va">self</span>, data):
-    <span class="co">&quot;&quot;&quot;</span>
-<span class="co">    Makinayi egit</span>
-
-<span class="co">    Parametreler</span>
-<span class="co">    ----------</span>
-<span class="co">    data: Her satirin &quot;gorunen&quot; veri oldugu bir matris</span>
-<span class="co">    &quot;&quot;&quot;</span>
-
-    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
-
-    <span class="co"># Ilk kolona egilim / meyil (bias) olarak 1 ekle</span>
-    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
-
-    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>.max_epochs):      
-      <span class="co"># Veriyi baz alarak gizli veriyi uret. </span>
-      pos_hidden_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights)
-      pos_hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(pos_hidden_activations)
-      pos_hidden_states <span class="op">=</span> pos_hidden_probs <span class="op">&gt;</span> <span class="op">\</span>
-          np.random.rand(num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>)
-
-      tmp <span class="op">=</span> np.array(pos_hidden_states).astype(<span class="bu">float</span>)
-      pos_visible_states <span class="op">=</span> <span class="va">self</span>.run_hidden(tmp[:,<span class="dv">1</span>:])
-        
-      <span class="co"># Dikkat, baglantilari hesaplarken h tabakasinin aktivasyon</span>
-      <span class="co"># olasiliklarini kullaniyoruz h&#39;nin kendi degerlerini (0/1)</span>
-      <span class="co"># kullanmiyoruz. Bunu da yapabilirdik, daha fazla detay icin</span>
-      <span class="co"># Hinton&#39;un &quot;A Practical Guide to Training Restricted Boltzmann</span>
-      <span class="co"># Machines&quot; makalesine bakilabilir</span>
-      pos_associations <span class="op">=</span> np.dot(data.T, pos_hidden_probs)
-
-      <span class="co"># Simdi gorunen veriyi gizli veriyi baz alip tekrar uret</span>
-      neg_visible_activations <span class="op">=</span> np.dot(pos_hidden_states, <span class="va">self</span>.weights.T)
-      neg_visible_probs <span class="op">=</span> <span class="va">self</span>._logistic(neg_visible_activations)
-      neg_visible_probs[:,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span> <span class="co"># Fix the bias unit.</span>
-      neg_hidden_activations <span class="op">=</span> np.dot(neg_visible_probs, <span class="va">self</span>.weights)
-      neg_hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(neg_hidden_activations)
-
-      <span class="co"># Yine ayni durum, aktivasyon olasiliklari kullaniliyor</span>
-      neg_associations <span class="op">=</span> np.dot(neg_visible_probs.T, neg_hidden_probs)
-
-      <span class="co"># Agirliklari guncelle</span>
-      <span class="va">self</span>.weights <span class="op">+=</span> <span class="va">self</span>.learning_rate <span class="op">*</span> <span class="op">\</span>
-          ((pos_associations <span class="op">-</span> neg_associations) <span class="op">/</span> num_examples)
-
-      error <span class="op">=</span> np.<span class="bu">sum</span>((data <span class="op">-</span> neg_visible_probs) <span class="op">**</span> <span class="dv">2</span>)
-      
-  <span class="kw">def</span> run_visible(<span class="va">self</span>, data):
-    <span class="co">&quot;&quot;&quot;</span>
-<span class="co">    RBM&#39;in egitilmis olduguna farz ederek, gorunen veri uzerinde</span>
-<span class="co">    RBM&#39;i islet, ve h icin bir orneklem al</span>
-
-<span class="co">    Parametreler</span>
-<span class="co">    ----------</span>
-<span class="co">    data: Her satirin gorunen veri oldugu bir matris</span>
-<span class="co">    </span>
-<span class="co">    Returns</span>
-<span class="co">    -------</span>
-<span class="co">    hidden_states: data icindeki her satira tekabul eden gizli h verisi</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
-    
-    hidden_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>))
-    
-    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
-
-    hidden_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights)
-    hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(hidden_activations)
-    hidden_states[:,:] <span class="op">=</span> hidden_probs <span class="op">&gt;</span> <span class="op">\</span>
-        np.random.rand(num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>)  
-    hidden_states <span class="op">=</span> hidden_states[:,<span class="dv">1</span>:]
-    <span class="cf">return</span> hidden_states
-
-          
-  <span class="kw">def</span> run_hidden(<span class="va">self</span>, data):
-    <span class="co">&quot;&quot;&quot;</span>
-<span class="co">    run_visible&#39;a benzer, sadece gizli veri icin gorunen veri uret</span>
-<span class="co">    &quot;&quot;&quot;</span>
-
-    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]
-
-    visible_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>))
-
-    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)
-
-    visible_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights.T)
-    visible_probs <span class="op">=</span> <span class="va">self</span>._logistic(visible_activations)
-    visible_states[:,:] <span class="op">=</span> visible_probs <span class="op">&gt;</span> <span class="op">\</span>
-        np.random.rand(num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>)
-
-    visible_states <span class="op">=</span> visible_states[:,<span class="dv">1</span>:]
-    <span class="cf">return</span> visible_states
-  
-  <span class="kw">def</span> _logistic(<span class="va">self</span>, x):
-    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))
-
-        
-<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    
-    <span class="im">import</span> numpy <span class="im">as</span> np
-    X <span class="op">=</span> np.array([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]])
-    model <span class="op">=</span> RBM(num_hidden<span class="op">=</span><span class="dv">2</span>,learning_rate<span class="op">=</span><span class="fl">0.1</span>,max_epochs<span class="op">=</span><span class="dv">10</span>,num_visible<span class="op">=</span><span class="dv">3</span>)
-    model.fit(X)
-    <span class="bu">print</span> model.weights</code></pre></div>
+<p><img src="rbm_03.png" /></p>
+<p>Bu yöntem pür Gibbs örneklemesine kıyasla çok daha hızlı işler ve iyi
+sonuçlar verir. Teorik olarak niye işlediği [1,2,4] makalelerinde
+bulunabilir. CD aslında (4) hedef formülünü değil başka bir hedefi
+optimize ediyor, fakat sonuç orijinal gradyan adımlarının yapmak
+istediğine yakın. [3] baz alınarak, şu şekilde kodlanabilir,</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> RBM:</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_hidden, learning_rate,max_epochs, num_visible<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.num_hidden <span class="op">=</span> num_hidden</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.num_visible <span class="op">=</span> num_visible</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.learning_rate <span class="op">=</span> learning_rate</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Agirlik matrisi W&#39;yi yarat (buyukluk num_visible x num_hidden),</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># bunun icin Gaussian dagilimi kullan, ortalama=0, standart sapma 1. </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.weights <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> np.random.randn(<span class="va">self</span>.num_visible, <span class="va">self</span>.num_hidden)    </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Egilim (bias) icin ilk satir ve ilk kolona 1 degeri koy</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.weights <span class="op">=</span> np.insert(<span class="va">self</span>.weights, <span class="dv">0</span>, <span class="dv">0</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.max_epochs <span class="op">=</span> max_epochs</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> fit(<span class="va">self</span>, data):</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Makinayi egit</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">    Parametreler</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">    data: Her satirin &quot;gorunen&quot; veri oldugu bir matris</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ilk kolona egilim / meyil (bias) olarak 1 ekle</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>.max_epochs):      </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Veriyi baz alarak gizli veriyi uret. </span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>      pos_hidden_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>      pos_hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(pos_hidden_activations)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>      pos_hidden_states <span class="op">=</span> pos_hidden_probs <span class="op">&gt;</span> <span class="op">\</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>          np.random.rand(num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>      tmp <span class="op">=</span> np.array(pos_hidden_states).astype(<span class="bu">float</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>      pos_visible_states <span class="op">=</span> <span class="va">self</span>.run_hidden(tmp[:,<span class="dv">1</span>:])</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Dikkat, baglantilari hesaplarken h tabakasinin aktivasyon</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>      <span class="co"># olasiliklarini kullaniyoruz h&#39;nin kendi degerlerini (0/1)</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>      <span class="co"># kullanmiyoruz. Bunu da yapabilirdik, daha fazla detay icin</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Hinton&#39;un &quot;A Practical Guide to Training Restricted Boltzmann</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Machines&quot; makalesine bakilabilir</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>      pos_associations <span class="op">=</span> np.dot(data.T, pos_hidden_probs)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Simdi gorunen veriyi gizli veriyi baz alip tekrar uret</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>      neg_visible_activations <span class="op">=</span> np.dot(pos_hidden_states, <span class="va">self</span>.weights.T)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>      neg_visible_probs <span class="op">=</span> <span class="va">self</span>._logistic(neg_visible_activations)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>      neg_visible_probs[:,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span> <span class="co"># Fix the bias unit.</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>      neg_hidden_activations <span class="op">=</span> np.dot(neg_visible_probs, <span class="va">self</span>.weights)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>      neg_hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(neg_hidden_activations)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Yine ayni durum, aktivasyon olasiliklari kullaniliyor</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>      neg_associations <span class="op">=</span> np.dot(neg_visible_probs.T, neg_hidden_probs)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Agirliklari guncelle</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>      <span class="va">self</span>.weights <span class="op">+=</span> <span class="va">self</span>.learning_rate <span class="op">*</span> <span class="op">\</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>          ((pos_associations <span class="op">-</span> neg_associations) <span class="op">/</span> num_examples)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>      error <span class="op">=</span> np.<span class="bu">sum</span>((data <span class="op">-</span> neg_visible_probs) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> run_visible(<span class="va">self</span>, data):</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="co">    RBM&#39;in egitilmis olduguna farz ederek, gorunen veri uzerinde</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="co">    RBM&#39;i islet, ve h icin bir orneklem al</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="co">    Parametreler</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="co">    data: Her satirin gorunen veri oldugu bir matris</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="co">    hidden_states: data icindeki her satira tekabul eden gizli h verisi</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    hidden_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>    hidden_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    hidden_probs <span class="op">=</span> <span class="va">self</span>._logistic(hidden_activations)</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    hidden_states[:,:] <span class="op">=</span> hidden_probs <span class="op">&gt;</span> <span class="op">\</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>        np.random.rand(num_examples, <span class="va">self</span>.num_hidden <span class="op">+</span> <span class="dv">1</span>)  </span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>    hidden_states <span class="op">=</span> hidden_states[:,<span class="dv">1</span>:]</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hidden_states</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>          </span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> run_hidden(<span class="va">self</span>, data):</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="co">    run_visible&#39;a benzer, sadece gizli veri icin gorunen veri uret</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>    num_examples <span class="op">=</span> data.shape[<span class="dv">0</span>]</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>    visible_states <span class="op">=</span> np.ones((num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> np.insert(data, <span class="dv">0</span>, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>    visible_activations <span class="op">=</span> np.dot(data, <span class="va">self</span>.weights.T)</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>    visible_probs <span class="op">=</span> <span class="va">self</span>._logistic(visible_activations)</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>    visible_states[:,:] <span class="op">=</span> visible_probs <span class="op">&gt;</span> <span class="op">\</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>        np.random.rand(num_examples, <span class="va">self</span>.num_visible <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>    visible_states <span class="op">=</span> visible_states[:,<span class="dv">1</span>:]</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> visible_states</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> _logistic(<span class="va">self</span>, x):</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    </span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.array([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> RBM(num_hidden<span class="op">=</span><span class="dv">2</span>,learning_rate<span class="op">=</span><span class="fl">0.1</span>,max_epochs<span class="op">=</span><span class="dv">10</span>,num_visible<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>    model.fit(X)</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> model.weights</span></code></pre></div>
 <p>RBM ve Sınıflama</p>
-<p>Sınıflama (classification) işlemi yapmak için BM örneğinde bir normalizasyon sabiti hesaplamıştık. Burada değişik bir yoldan gideceğiz; ki bu yol ileride Derin Öğrenim için faydalı olacak.</p>
-<p>Eğittikten sonra bir RBM, içindeki <span class="math inline">\(W\)</span>'ye göre, herhangi bir &quot;görünür'' veri noktası <span class="math inline">\(x\)</span> için bir gizli bir <span class="math inline">\(h\)</span> üretebilir. Bunu üstteki formülasyondan zaten biliyoruz. Ayrıca, <span class="math inline">\(h\)</span> genellikle daha az boyutta olduğuna göre (hatta olmasa bile) bu <span class="math inline">\(h\)</span> üretiminin bir tür transformasyon olduğu, veri üzerinde bir &quot;özetleme'' yaptığı iddia edilebilir. O zaman teorik olarak, görünür veri yerine, görünür veriden üretilen gizli veriyi kullanırsak ve bu veriyi alıp başka bir sınıflayıcıya verirsek, mesela lojistik regresyon gibi, bu <span class="math inline">\(h\)</span>'ler ve etiketler üzerinden denetimli (supervised) bir eğitim yapabiliriz. Yani, önce RBM eğitiyoruz, tüm verinin <span class="math inline">\(h\)</span> karşılığını alıyoruz, sonra bunları lojistik regresyona veriyoruz. Alttaki kodda bunun örneğinin görebiliriz.</p>
-<p>Bu kod, ayrıca, k-Katlama (k-fold) tekniğini uyguluyor, veriyi 3 parçaya bölüp sırasıyla tüm parçaları birer kez test, diğerlerini eğitim verisi yapıyor, böylece verinin tamamı üzerinden eğitim/test yapmış olunuyor. Sonuç,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression
-<span class="im">from</span> sklearn.cross_validation <span class="im">import</span> KFold
-<span class="im">import</span> numpy <span class="im">as</span> np, rbm
-
-X <span class="op">=</span> np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/binarydigits.txt&#39;</span>)
-Y <span class="op">=</span> np.ravel(np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/bindigitlabels.txt&#39;</span>))
-<span class="bu">print</span> X.shape, Y.shape
-
-
-np.random.seed(<span class="dv">0</span>)
-
-scores <span class="op">=</span> []
-cv <span class="op">=</span> KFold(n<span class="op">=</span><span class="bu">len</span>(X),n_folds<span class="op">=</span><span class="dv">3</span>)
-<span class="cf">for</span> train, test <span class="kw">in</span> cv:
-    X_train, Y_train <span class="op">=</span> X[train], Y[train]
-    X_test, Y_test <span class="op">=</span> X[test], Y[test]    
-    r <span class="op">=</span> rbm.RBM(num_hidden<span class="op">=</span><span class="dv">40</span>, learning_rate<span class="op">=</span><span class="fl">0.3</span>,max_epochs<span class="op">=</span><span class="dv">500</span>, num_visible<span class="op">=</span><span class="dv">64</span>)
-    r.fit(X_train)
-    clf <span class="op">=</span> LogisticRegression(C<span class="op">=</span><span class="dv">1000</span>)
-    clf.fit(r.run_visible(X_train), Y_train)
-    res3 <span class="op">=</span> clf.predict(r.run_visible(X_test))
-    scores.append(np.<span class="bu">sum</span>(res3<span class="op">==</span>Y_test) <span class="op">/</span> <span class="bu">float</span>(<span class="bu">len</span>(Y_test)))        
-    
-<span class="bu">print</span> np.mean(scores)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span> python test_rbmkfold.py</code></pre></div>
+<p>Sınıflama (classification) işlemi yapmak için BM örneğinde bir
+normalizasyon sabiti hesaplamıştık. Burada değişik bir yoldan gideceğiz;
+ki bu yol ileride Derin Öğrenim için faydalı olacak.</p>
+<p>Eğittikten sonra bir RBM, içindeki <span
+class="math inline">\(W\)</span>’ye göre, herhangi bir “görünür’’ veri
+noktası <span class="math inline">\(x\)</span> için bir gizli bir <span
+class="math inline">\(h\)</span> üretebilir. Bunu üstteki formülasyondan
+zaten biliyoruz. Ayrıca, <span class="math inline">\(h\)</span>
+genellikle daha az boyutta olduğuna göre (hatta olmasa bile) bu <span
+class="math inline">\(h\)</span> üretiminin bir tür transformasyon
+olduğu, veri üzerinde bir”özetleme’’ yaptığı iddia edilebilir. O zaman
+teorik olarak, görünür veri yerine, görünür veriden üretilen gizli
+veriyi kullanırsak ve bu veriyi alıp başka bir sınıflayıcıya verirsek,
+mesela lojistik regresyon gibi, bu <span
+class="math inline">\(h\)</span>’ler ve etiketler üzerinden denetimli
+(supervised) bir eğitim yapabiliriz. Yani, önce RBM eğitiyoruz, tüm
+verinin <span class="math inline">\(h\)</span> karşılığını alıyoruz,
+sonra bunları lojistik regresyona veriyoruz. Alttaki kodda bunun
+örneğinin görebiliriz.</p>
+<p>Bu kod, ayrıca, k-Katlama (k-fold) tekniğini uyguluyor, veriyi 3
+parçaya bölüp sırasıyla tüm parçaları birer kez test, diğerlerini eğitim
+verisi yapıyor, böylece verinin tamamı üzerinden eğitim/test yapmış
+olunuyor. Sonuç,</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cross_validation <span class="im">import</span> KFold</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, rbm</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/binarydigits.txt&#39;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> np.ravel(np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/bindigitlabels.txt&#39;</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> X.shape, Y.shape</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> []</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>cv <span class="op">=</span> KFold(n<span class="op">=</span><span class="bu">len</span>(X),n_folds<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> train, test <span class="kw">in</span> cv:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    X_train, Y_train <span class="op">=</span> X[train], Y[train]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    X_test, Y_test <span class="op">=</span> X[test], Y[test]    </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> rbm.RBM(num_hidden<span class="op">=</span><span class="dv">40</span>, learning_rate<span class="op">=</span><span class="fl">0.3</span>,max_epochs<span class="op">=</span><span class="dv">500</span>, num_visible<span class="op">=</span><span class="dv">64</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    r.fit(X_train)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    clf <span class="op">=</span> LogisticRegression(C<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    clf.fit(r.run_visible(X_train), Y_train)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    res3 <span class="op">=</span> clf.predict(r.run_visible(X_test))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    scores.append(np.<span class="bu">sum</span>(res3<span class="op">==</span>Y_test) <span class="op">/</span> <span class="bu">float</span>(<span class="bu">len</span>(Y_test)))        </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.mean(scores)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span> python test_rbmkfold.py</span></code></pre></div>
 <pre><code>1.0</code></pre>
 <p>Başarı yüzde 100! Altta karşılaştırma için KNN tekniği kullandık,</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> sklearn <span class="im">import</span> neighbors
-<span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression
-<span class="im">import</span> numpy <span class="im">as</span> np
-
-X <span class="op">=</span> np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/binarydigits.txt&#39;</span>)
-Y <span class="op">=</span> np.ravel(np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/bindigitlabels.txt&#39;</span>))
-
-<span class="im">from</span> sklearn.cross_validation <span class="im">import</span> KFold
-scores <span class="op">=</span> []
-cv <span class="op">=</span> KFold(n<span class="op">=</span><span class="bu">len</span>(X),n_folds<span class="op">=</span><span class="dv">3</span>)
-<span class="cf">for</span> train, test <span class="kw">in</span> cv:
-    X_train, Y_train <span class="op">=</span> X[train], Y[train]
-    X_test, Y_test <span class="op">=</span> X[test], Y[test]
-    clf <span class="op">=</span> neighbors.KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">1</span>)
-    clf.fit(X_train, Y_train)
-    scores.append(clf.score(X_test, Y_test))
-    
-<span class="bu">print</span> np.mean(scores)
-            </code></pre></div>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">!</span> python test_knnkfold.py</code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> neighbors</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/binarydigits.txt&#39;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> np.ravel(np.loadtxt(<span class="st">&#39;../../stat/stat_mixbern/bindigitlabels.txt&#39;</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cross_validation <span class="im">import</span> KFold</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> []</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>cv <span class="op">=</span> KFold(n<span class="op">=</span><span class="bu">len</span>(X),n_folds<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> train, test <span class="kw">in</span> cv:</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    X_train, Y_train <span class="op">=</span> X[train], Y[train]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    X_test, Y_test <span class="op">=</span> X[test], Y[test]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    clf <span class="op">=</span> neighbors.KNeighborsClassifier(n_neighbors<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    clf.fit(X_train, Y_train)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    scores.append(clf.score(X_test, Y_test))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.mean(scores)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>            </span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span> python test_knnkfold.py</span></code></pre></div>
 <pre><code>0.98009506833</code></pre>
 <p>Kaynaklar</p>
-<p>[1] Hinton, G., <em>Training Products of Experts by Minimizing Contrastive Divergence</em></p>
-<p>[2] Louppe, G., <em>Collaborative filtering, Scalable approaches using restricted Boltzmann machines</em>, Master Tezi, 2010</p>
-<p>[3] [https://github.com/echen/restricted-boltzmann-machines](https://github.com/echen/restricted-boltzmann-machines)</p>
-<p>[4] Tieleman, Hinton, <em>Using Fast Weights to Improve Persistent Contrastive Divergence</em></p>
-<p>[5] Larochelle, H., <em>Neural networks [5.1] : Restricted Boltzmann machine - definition</em>, <a href="https://www.youtube.com/watch?v=p4Vh_zMw-HQ" class="uri">https://www.youtube.com/watch?v=p4Vh_zMw-HQ</a></p>
+<p>[1] Hinton, G., <em>Training Products of Experts by Minimizing
+Contrastive Divergence</em></p>
+<p>[2] Louppe, G., <em>Collaborative filtering, Scalable approaches
+using restricted Boltzmann machines</em>, Master Tezi, 2010</p>
+<p>[3] <a
+href="https://github.com/echen/restricted-boltzmann-machines">https://github.com/echen/restricted-boltzmann-machines</a></p>
+<p>[4] Tieleman, Hinton, <em>Using Fast Weights to Improve Persistent
+Contrastive Divergence</em></p>
+<p>[5] Larochelle, H., <em>Neural networks [5.1] : Restricted Boltzmann
+machine - definition</em>, <a
+href="https://www.youtube.com/watch?v=p4Vh_zMw-HQ">https://www.youtube.com/watch?v=p4Vh_zMw-HQ</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

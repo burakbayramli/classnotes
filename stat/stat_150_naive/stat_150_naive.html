@@ -16,166 +16,305 @@
   <title>Naive Bayes</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="naive-bayes">Naive Bayes</h1>
-<p>Reel sayılar arasında bağlantı kurmak için istatistikte regresyon kullanılır. Eğer reel değerleri, (mesela) iki kategorik grup arasında seçmek için kullanmak istenirse, bunun için lojistik regresyon gibi teknikler de vardır.</p>
-<p>Fakat kategoriler / gruplar ile başka kategorik gruplar arasında bağlantılar kurulmak istenirse, standart istatistik yöntemleri faydalı olamıyor. Bu gibi ihtiyaçlar için yapay öğrenim (machine learning) dünyasından Naive Bayes gibi tekniklere bakmamız lazım.</p>
-<p>Not: Daha ilerlemeden belirtelim, bu tekniğin ismi Naive Bayes ama bu tanım tam doğru değil, çünkü NB Olasılık Teorisi'nden bilinen Bayes Teorisini kullanmıyor.</p>
-<p>Öncelikle kategorik değerler ile ne demek istediğimizi belirtelim. Reel sayılar <span class="math inline">\(0.3423, 2.4334\)</span> gibi değerlerdir, kategorik değerler ile ise mesela bir belge içinde 'a','x' gibi harflerin mevcut olmasıdır. Ya da, bir evin 'beyaz', 'gri' renkli olması.. Burada öyle kategorilerden bahsediyoruz ki istesek te onları sayısal bir değere çeviremiyoruz; kıyasla mesela bir günün 'az sıcak', 'orta', 'çok sıcak' olduğu verisini kategorik bile olsa regresyon amacıyla sayıya çevirip kullanabilirdik. Az sıcak = 0, orta = 1, çok sıcak = 2 değerlerini kullanabilirdik, regresyon hala anlamlı olurdu (çünkü arka planda bu kategoriler aslında sayısal sıcaklık değerlerine tekabül ediyor olurlardı). Fakat 'beyaz', 'gri' değerlere sayı atamanın regresyon açısından bir anlamı olmazdı, hatta bunu yapmak yanlış olurdu. Eğer elimizde fazla sayıda 'gri' ev verisi olsa, bu durum regresyon sırasında beyaz evlerin beyazlığını mı azaltacaktır?</p>
-<p>İşte bu gibi durumlarda kategorileri olduğu gibi işleyebilen bir teknik gerekiyor. Bu yazıda kullanacağımız örnek, bir belgenin içindeki kelimelere göre kategorize edilmesi. Elimizde iki türlü doküman olacak. Bir tanesi Stephen Hawking adlı bilim adamının bir kitabından 3 sayfa, diğeri başkan Barack Obama'nın bir kitabından 3 sayfa. Bu sayfalar ve içindeki kelimeler NB yöntemini &quot;eğitmek&quot; için kullanılacak, sonra NB tarafından hiç görülmemiş yeni sayfaları yöntemimize kategorize ettireceğiz.</p>
+<p>Reel sayılar arasında bağlantı kurmak için istatistikte regresyon
+kullanılır. Eğer reel değerleri, (mesela) iki kategorik grup arasında
+seçmek için kullanmak istenirse, bunun için lojistik regresyon gibi
+teknikler de vardır.</p>
+<p>Fakat kategoriler / gruplar ile başka kategorik gruplar arasında
+bağlantılar kurulmak istenirse, standart istatistik yöntemleri faydalı
+olamıyor. Bu gibi ihtiyaçlar için yapay öğrenim (machine learning)
+dünyasından Naive Bayes gibi tekniklere bakmamız lazım.</p>
+<p>Not: Daha ilerlemeden belirtelim, bu tekniğin ismi Naive Bayes ama bu
+tanım tam doğru değil, çünkü NB Olasılık Teorisi’nden bilinen Bayes
+Teorisini kullanmıyor.</p>
+<p>Öncelikle kategorik değerler ile ne demek istediğimizi belirtelim.
+Reel sayılar <span class="math inline">\(0.3423, 2.4334\)</span> gibi
+değerlerdir, kategorik değerler ile ise mesela bir belge içinde ‘a’,‘x’
+gibi harflerin mevcut olmasıdır. Ya da, bir evin ‘beyaz’, ‘gri’ renkli
+olması.. Burada öyle kategorilerden bahsediyoruz ki istesek te onları
+sayısal bir değere çeviremiyoruz; kıyasla mesela bir günün ‘az sıcak’,
+‘orta’, ‘çok sıcak’ olduğu verisini kategorik bile olsa regresyon
+amacıyla sayıya çevirip kullanabilirdik. Az sıcak = 0, orta = 1, çok
+sıcak = 2 değerlerini kullanabilirdik, regresyon hala anlamlı olurdu
+(çünkü arka planda bu kategoriler aslında sayısal sıcaklık değerlerine
+tekabül ediyor olurlardı). Fakat ‘beyaz’, ‘gri’ değerlere sayı atamanın
+regresyon açısından bir anlamı olmazdı, hatta bunu yapmak yanlış olurdu.
+Eğer elimizde fazla sayıda ‘gri’ ev verisi olsa, bu durum regresyon
+sırasında beyaz evlerin beyazlığını mı azaltacaktır?</p>
+<p>İşte bu gibi durumlarda kategorileri olduğu gibi işleyebilen bir
+teknik gerekiyor. Bu yazıda kullanacağımız örnek, bir belgenin içindeki
+kelimelere göre kategorize edilmesi. Elimizde iki türlü doküman olacak.
+Bir tanesi Stephen Hawking adlı bilim adamının bir kitabından 3 sayfa,
+diğeri başkan Barack Obama’nın bir kitabından 3 sayfa. Bu sayfalar ve
+içindeki kelimeler NB yöntemini “eğitmek” için kullanılacak, sonra NB
+tarafından hiç görülmemiş yeni sayfaları yöntemimize kategorize
+ettireceğiz.</p>
 <p>Çok Boyutlu Bernoulli ve Kelimeler</p>
-<div class="figure">
-<img src="dims.png" />
-
-</div>
-<p>Bir doküman ile içindeki kelimeler arasında nasıl bağlantı kuracağız? Burada olasılık teorisinden Çok Boyutlu Bernoulli (Multivariate Bernoulli) dağılımını kullanacağız. Üstteki resimde görüldüğü gibi her doküman bir <span class="math inline">\(x^i\)</span> rasgele değişkeniyle temsil edilecek. Tek boyutlu Bernoulli değişkeni '1' ya da '0' değerine sahip olabilir, çok boyutlu olanı ise bir vektör içinde '1' ve '0' değerlerini taşıyabilir. İşte bu vektörün her hücresi, önceden tanımlı bir kelimeye tekabül edecek, ve bu kelimeden bir doküman içinde en az bir tane var ise, o hücre '1' değerini taşıyacak, yoksa '0' değerini taşıyacak. Üstteki örnekte 2. kelime &quot;hello&quot; ve 4. doküman içinde bu kelimeden en az bir tane var, o zaman <span class="math inline">\(x_2^4 = 1\)</span>. Tek bir dokümanı temsil eden dağılımı matematiksel olarak şöyle yazabiliriz:</p>
-<p><span class="math display">\[ p(x_1,...,x_{D}) = \prod_{d=1}^{D} p(x_d)=\prod_{d=1}^{D}
-\alpha_d^{x_d}(1-\alpha_d)^{1-x_d} 
+<p><img src="dims.png" /></p>
+<p>Bir doküman ile içindeki kelimeler arasında nasıl bağlantı kuracağız?
+Burada olasılık teorisinden Çok Boyutlu Bernoulli (Multivariate
+Bernoulli) dağılımını kullanacağız. Üstteki resimde görüldüğü gibi her
+doküman bir <span class="math inline">\(x^i\)</span> rasgele
+değişkeniyle temsil edilecek. Tek boyutlu Bernoulli değişkeni ‘1’ ya da
+‘0’ değerine sahip olabilir, çok boyutlu olanı ise bir vektör içinde ‘1’
+ve ‘0’ değerlerini taşıyabilir. İşte bu vektörün her hücresi, önceden
+tanımlı bir kelimeye tekabül edecek, ve bu kelimeden bir doküman içinde
+en az bir tane var ise, o hücre ‘1’ değerini taşıyacak, yoksa ‘0’
+değerini taşıyacak. Üstteki örnekte 2. kelime “hello” ve 4. doküman
+içinde bu kelimeden en az bir tane var, o zaman <span
+class="math inline">\(x_2^4 = 1\)</span>. Tek bir dokümanı temsil eden
+dağılımı matematiksel olarak şöyle yazabiliriz:</p>
+<p><span class="math display">\[ p(x_1,...,x_{D}) = \prod_{d=1}^{D}
+p(x_d)=\prod_{d=1}^{D}
+\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}
 \]</span></p>
-<p>Bu formülde her <span class="math inline">\(d\)</span> boyutu bir tek boyutlu Bernoulli, ve bir doküman için tüm bu boyutların ortak (joint) dağılımı gerekiyor, çarpımın sebebi bu. Formüldeki <span class="math inline">\(\alpha_d\)</span> bir dağılımı &quot;tanımlayan&quot; değer, <span class="math inline">\(\alpha\)</span> bir vektör, ve unutmayalım, her &quot;sınıf&quot; için NB ayrı ayrı eğitilecek, ve her sınıf için farklı <span class="math inline">\(\alpha\)</span> vektörü olacak. Yani Obama'nın kitapları için <span class="math inline">\(\alpha_2 = 0.8\)</span> olabilir, Hawking kitabı için <span class="math inline">\(\alpha_2 = 0.3\)</span> olabilir. Birinin kitabında &quot;hello&quot; kelimesi olma şansı fazla, diğerinde pek yok. O zaman NB'yi &quot;eğitmek&quot; ne demektir? Eğitmek her sınıf için yukarıdaki <span class="math inline">\(\alpha\)</span> değerlerini bulmak demektir.</p>
-<p>Bunun için istatistikteki &quot;olurluk (likelihood)&quot; kavramını kullanmak yeterli. Olurluk, bir dağılımdan geldiği farzedilen bir veri setini alır, tüm veri noktalarını teker teker olasılığa geçerek olasılık değerlerini birbirine çarpar. Sonuç ne kadar yüksek çıkarsa, bu verinin o dağılımdan gelme olasılığı o kadar yüksek demektir. Bizim problemimiz için tek bir sınıfın olurluğu, o sınıf içindeki tüm (N tane) belgeyi kapsamalıdır, tek bir &quot;veri noktası&quot; tek bir belgedir, o zaman:</p>
-<p><span class="math display">\[ L(\theta) = \prod_{i=1}^N \prod_{d=1}^{D} p(x_d^i) = 
+<p>Bu formülde her <span class="math inline">\(d\)</span> boyutu bir tek
+boyutlu Bernoulli, ve bir doküman için tüm bu boyutların ortak (joint)
+dağılımı gerekiyor, çarpımın sebebi bu. Formüldeki <span
+class="math inline">\(\alpha_d\)</span> bir dağılımı “tanımlayan” değer,
+<span class="math inline">\(\alpha\)</span> bir vektör, ve unutmayalım,
+her “sınıf” için NB ayrı ayrı eğitilecek, ve her sınıf için farklı <span
+class="math inline">\(\alpha\)</span> vektörü olacak. Yani Obama’nın
+kitapları için <span class="math inline">\(\alpha_2 = 0.8\)</span>
+olabilir, Hawking kitabı için <span class="math inline">\(\alpha_2 =
+0.3\)</span> olabilir. Birinin kitabında “hello” kelimesi olma şansı
+fazla, diğerinde pek yok. O zaman NB’yi “eğitmek” ne demektir? Eğitmek
+her sınıf için yukarıdaki <span class="math inline">\(\alpha\)</span>
+değerlerini bulmak demektir.</p>
+<p>Bunun için istatistikteki “olurluk (likelihood)” kavramını kullanmak
+yeterli. Olurluk, bir dağılımdan geldiği farzedilen bir veri setini
+alır, tüm veri noktalarını teker teker olasılığa geçerek olasılık
+değerlerini birbirine çarpar. Sonuç ne kadar yüksek çıkarsa, bu verinin
+o dağılımdan gelme olasılığı o kadar yüksek demektir. Bizim problemimiz
+için tek bir sınıfın olurluğu, o sınıf içindeki tüm (N tane) belgeyi
+kapsamalıdır, tek bir “veri noktası” tek bir belgedir, o zaman:</p>
+<p><span class="math display">\[ L(\theta) = \prod_{i=1}^N
+\prod_{d=1}^{D} p(x_d^i) =
 \prod_{i=1}^N \prod_{d=1}^{D} \alpha_d^{x_d^i}(1-\alpha_d)^{1-x_d^i}
 \]</span></p>
-<p><span class="math inline">\(\theta\)</span> bir dağılımı tanımlayan her türlü değişken anlamında kullanıldı, bu örnekte içinde sadece <span class="math inline">\(\alpha\)</span> var.</p>
-<p>Devam edelim: Eğer <span class="math inline">\(\alpha\)</span>'nin ne olduğunu bilmiyorsak (ki bilmiyoruz -eğitmek zaten bu demek-) o zaman maksimum olurluk (maximum likelihood) kavramını resme dahil etmek gerekli. Bunun için üstteki olurluk formülünün <span class="math inline">\(\alpha\)</span>'ya göre türevini alıp sıfıra eşitlersek, bu formülden bir maksimum noktasındaki <span class="math inline">\(\alpha\)</span> elimize geçecektir. İşte bu <span class="math inline">\(\alpha\)</span> bizim aradığımız değer. Veriyi en iyi temsil eden <span class="math inline">\(\alpha\)</span> değeri bu demektir. Onu bulunca eğitim tamamlanır.</p>
-<p>Türev almadan önce iki tarafın log'unu alalım, böylece çarpımlar toplamlara dönüşecek ve türevin formülün içine nüfuz etmesi daha kolay olacak.</p>
-<p><span class="math display">\[ \log(L) = \sum_{i=1}^N \sum_{d=1}^{D} {x_d^i}\ log (\alpha_d) + 
+<p><span class="math inline">\(\theta\)</span> bir dağılımı tanımlayan
+her türlü değişken anlamında kullanıldı, bu örnekte içinde sadece <span
+class="math inline">\(\alpha\)</span> var.</p>
+<p>Devam edelim: Eğer <span class="math inline">\(\alpha\)</span>’nin ne
+olduğunu bilmiyorsak (ki bilmiyoruz -eğitmek zaten bu demek-) o zaman
+maksimum olurluk (maximum likelihood) kavramını resme dahil etmek
+gerekli. Bunun için üstteki olurluk formülünün <span
+class="math inline">\(\alpha\)</span>’ya göre türevini alıp sıfıra
+eşitlersek, bu formülden bir maksimum noktasındaki <span
+class="math inline">\(\alpha\)</span> elimize geçecektir. İşte bu <span
+class="math inline">\(\alpha\)</span> bizim aradığımız değer. Veriyi en
+iyi temsil eden <span class="math inline">\(\alpha\)</span> değeri bu
+demektir. Onu bulunca eğitim tamamlanır.</p>
+<p>Türev almadan önce iki tarafın log’unu alalım, böylece çarpımlar
+toplamlara dönüşecek ve türevin formülün içine nüfuz etmesi daha kolay
+olacak.</p>
+<p><span class="math display">\[ \log(L) = \sum_{i=1}^N \sum_{d=1}^{D}
+{x_d^i}\ log (\alpha_d) +
 (1-x_d^i)\ log (1-\alpha_d) \]</span></p>
 <p>Türevi alalım:</p>
-<p><span class="math display">\[ \frac{dlog(L)}{d\alpha_d} = \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} -
+<p><span class="math display">\[ \frac{dlog(L)}{d\alpha_d} =
+\sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} -
 \frac{1-x_d^i}{1-\alpha_d} \bigg) = 0
 \]</span></p>
-<p>1- <span class="math inline">\(\alpha_d\)</span>'ye göre türev alırken <span class="math inline">\(x_d^i\)</span>'ler sabit sayı gibi muamele görürler. 2- log'un türevi alırken log içindeki değerlerin türev alınmış hali bölümün üstüne, kendisini olduğu gibi bölüm altına alınır, örnek <span class="math inline">\(dlog(-x)/dx = -1/x\)</span> olur üstteki eksi işaretinin sebebi bu.</p>
-<p>Peki <span class="math inline">\(\sum_{d=1}^{D}\)</span> nereye gitti? Türevi <span class="math inline">\(\alpha_d\)</span>'ye göre alıyoruz ve o türevi alırken tek bir <span class="math inline">\(\alpha_d\)</span> ile ilgileniyoruz, mesela <span class="math inline">\(\alpha_{22}\)</span>, bunun haricindeki diğer tüm <span class="math inline">\(\alpha_?\)</span> değerleri türev alma işlemi sırasında sabit kabul edilirler, türev sırasında sıfırlanırlar. Bu sebeple <span class="math inline">\(\sum_{d=1}^{D}\)</span> içinde sadece bizim ilgilendiğimiz <span class="math inline">\(\alpha_d\)</span> geriye kalır. Tabii ki bu aynı zamanda her <span class="math inline">\(d=1,2,..D\)</span>, <span class="math inline">\(\alpha_d\)</span> için ayrı bir türev var demektir, ama bu türevlerin hepsi birbirine benzerler, yani tek bir <span class="math inline">\(\alpha_d\)</span>'yi çözmek, hepsini çözmek anlamına gelir.</p>
+<p>1- <span class="math inline">\(\alpha_d\)</span>’ye göre türev
+alırken <span class="math inline">\(x_d^i\)</span>’ler sabit sayı gibi
+muamele görürler. 2- log’un türevi alırken log içindeki değerlerin türev
+alınmış hali bölümün üstüne, kendisini olduğu gibi bölüm altına alınır,
+örnek <span class="math inline">\(dlog(-x)/dx = -1/x\)</span> olur
+üstteki eksi işaretinin sebebi bu.</p>
+<p>Peki <span class="math inline">\(\sum_{d=1}^{D}\)</span> nereye
+gitti? Türevi <span class="math inline">\(\alpha_d\)</span>’ye göre
+alıyoruz ve o türevi alırken tek bir <span
+class="math inline">\(\alpha_d\)</span> ile ilgileniyoruz, mesela <span
+class="math inline">\(\alpha_{22}\)</span>, bunun haricindeki diğer tüm
+<span class="math inline">\(\alpha_?\)</span> değerleri türev alma
+işlemi sırasında sabit kabul edilirler, türev sırasında sıfırlanırlar.
+Bu sebeple <span class="math inline">\(\sum_{d=1}^{D}\)</span> içinde
+sadece bizim ilgilendiğimiz <span
+class="math inline">\(\alpha_d\)</span> geriye kalır. Tabii ki bu aynı
+zamanda her <span class="math inline">\(d=1,2,..D\)</span>, <span
+class="math inline">\(\alpha_d\)</span> için ayrı bir türev var
+demektir, ama bu türevlerin hepsi birbirine benzerler, yani tek bir
+<span class="math inline">\(\alpha_d\)</span>’yi çözmek, hepsini çözmek
+anlamına gelir.</p>
 <p>Devam edelim:</p>
-<p><span class="math display">\[ \sum_{i=1}^N \bigg( \frac{x_d^i}{\alpha_d} - \frac{1-x_d^i}{1-\alpha_d} \bigg) =
+<p><span class="math display">\[ \sum_{i=1}^N \bigg(
+\frac{x_d^i}{\alpha_d} - \frac{1-x_d^i}{1-\alpha_d} \bigg) =
 \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0
 \]</span></p>
-<p><span class="math inline">\(\sum_{i=1}^N x_d^i = N_d\)</span> olarak kabul ediyoruz, <span class="math inline">\(N_d\)</span> tüm veri içinde <span class="math inline">\(d\)</span> boyutu (kelimesi) '1' kaç tane hücre olduğunu bize söyler. <span class="math inline">\(x_d^i\)</span> ya '1' ya '0' olabildiğine göre bir <span class="math inline">\(d\)</span> için, tüm <span class="math inline">\(N\)</span> hücrenin toplamı otomatik olarak bize kaç tane '1' olduğunu söyler. Sonra:</p>
-<p><span class="math display">\[ \frac{N_d}{\alpha_d} - \frac{N-N_d}{1-\alpha_d} = 0  \]</span></p>
-<p><span class="math display">\[ \frac{1-\alpha_d}{\alpha_d} = \frac{N-N_d}{N_d}   \]</span></p>
-<p><span class="math display">\[ \frac{1}{\alpha_d} - 1 = \frac{N}{N_d} - 1  \]</span></p>
-<p><span class="math display">\[ \frac{1}{\alpha_d} = \frac{N}{N_d}  \]</span></p>
+<p><span class="math inline">\(\sum_{i=1}^N x_d^i = N_d\)</span> olarak
+kabul ediyoruz, <span class="math inline">\(N_d\)</span> tüm veri içinde
+<span class="math inline">\(d\)</span> boyutu (kelimesi) ‘1’ kaç tane
+hücre olduğunu bize söyler. <span class="math inline">\(x_d^i\)</span>
+ya ‘1’ ya ‘0’ olabildiğine göre bir <span
+class="math inline">\(d\)</span> için, tüm <span
+class="math inline">\(N\)</span> hücrenin toplamı otomatik olarak bize
+kaç tane ‘1’ olduğunu söyler. Sonra:</p>
+<p><span class="math display">\[ \frac{N_d}{\alpha_d} -
+\frac{N-N_d}{1-\alpha_d} = 0  \]</span></p>
+<p><span class="math display">\[ \frac{1-\alpha_d}{\alpha_d} =
+\frac{N-N_d}{N_d}   \]</span></p>
+<p><span class="math display">\[ \frac{1}{\alpha_d} - 1 = \frac{N}{N_d}
+- 1  \]</span></p>
+<p><span class="math display">\[ \frac{1}{\alpha_d} =
+\frac{N}{N_d}  \]</span></p>
 <p><span class="math display">\[ \alpha_d = \frac{N_d}{N}  \]</span></p>
 <p>Python Kodu</p>
-<p><span class="math inline">\(\alpha_d\)</span>'nin formülünü buldumuza göre artık kodu yazabiliriz. İlk önce bir dokümanı temsil eden çok boyutlu Bernoulli vektörünü ortaya çıkartmamız lazım. Bu vektörün her hücresi belli bir kelime olacak, ve o kelimelerin ne olduğunu önceden kararlaştırmamız lazım. Bunun için her sınıftaki tüm dokümanlardaki tüm kelimeleri içeren bir sözlük yaratırız:</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> re
-<span class="im">import</span> math
-
-words <span class="op">=</span> {}
-
-<span class="co"># find all words in all files, creating a </span>
-<span class="co"># global dictionary.</span>
-base <span class="op">=</span> <span class="st">&#39;./data/&#39;</span>
-<span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;a1.txt&#39;</span>,<span class="st">&#39;a2.txt&#39;</span>,<span class="st">&#39;a3.txt&#39;</span>,
-             <span class="st">&#39;b1.txt&#39;</span>,<span class="st">&#39;b2.txt&#39;</span>,<span class="st">&#39;b3.txt&#39;</span>]:
-    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)
-    s <span class="op">=</span> f.read()
-    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)
-    <span class="cf">for</span> x <span class="kw">in</span> tokens: words[x] <span class="op">=</span> <span class="fl">0.</span>
-    
-hawking_alphas <span class="op">=</span> words.copy()   
-<span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;a1.txt&#39;</span>,<span class="st">&#39;a2.txt&#39;</span>,<span class="st">&#39;a3.txt&#39;</span>]:
-    words_hawking <span class="op">=</span> <span class="bu">set</span>()
-    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)
-    s <span class="op">=</span> f.read()
-    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)
-    <span class="cf">for</span> x <span class="kw">in</span> tokens: 
-        words_hawking.add(x)
-    <span class="cf">for</span> x <span class="kw">in</span> words_hawking:
-        hawking_alphas[x] <span class="op">+=</span> <span class="fl">1.</span>
-        
-obama_alphas <span class="op">=</span> words.copy()   
-<span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;b1.txt&#39;</span>,<span class="st">&#39;b2.txt&#39;</span>,<span class="st">&#39;b3.txt&#39;</span>]:
-    words_obama <span class="op">=</span> <span class="bu">set</span>()
-    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)
-    s <span class="op">=</span> f.read()
-    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)
-    <span class="cf">for</span> x <span class="kw">in</span> tokens: 
-        words_obama.add(x)
-    <span class="cf">for</span> x <span class="kw">in</span> words_obama:
-        obama_alphas[x] <span class="op">+=</span> <span class="fl">1.</span>
-
-<span class="cf">for</span> x <span class="kw">in</span> hawking_alphas.keys():
-    hawking_alphas[x] <span class="op">=</span> hawking_alphas[x] <span class="op">/</span> <span class="fl">3.</span>        
-<span class="cf">for</span> x <span class="kw">in</span> obama_alphas.keys():
-    obama_alphas[x] <span class="op">=</span> obama_alphas[x] <span class="op">/</span> <span class="fl">3.</span>        
-
-<span class="kw">def</span> prob(xd, alpha):
-    <span class="cf">return</span> math.log(alpha<span class="op">*</span>xd <span class="op">+</span> <span class="fl">1e-10</span>) <span class="op">+</span> <span class="op">\</span>
-        math.log((<span class="fl">1.</span><span class="op">-</span>alpha)<span class="op">*</span>(<span class="fl">1.</span><span class="op">-</span>xd) <span class="op">+</span> <span class="fl">1e-10</span>)
-        
-<span class="kw">def</span> test(<span class="bu">file</span>):
-    test_vector <span class="op">=</span> words.copy()   
-    words_test <span class="op">=</span> <span class="bu">set</span>()
-    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)
-    s <span class="op">=</span> f.read()
-    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)
-    <span class="cf">for</span> x <span class="kw">in</span> tokens: 
-        words_test.add(x)
-    <span class="cf">for</span> x <span class="kw">in</span> words_test:  
-        test_vector[x] <span class="op">=</span> <span class="fl">1.</span>
-    ob <span class="op">=</span> <span class="fl">0.</span>
-    ha <span class="op">=</span> <span class="fl">0.</span>
-    <span class="cf">for</span> x <span class="kw">in</span> test_vector.keys(): 
-        <span class="cf">if</span> x <span class="kw">in</span> obama_alphas: 
-            ob <span class="op">+=</span> prob(test_vector[x], obama_alphas[x])
-        <span class="cf">if</span> x <span class="kw">in</span> hawking_alphas: 
-            ha <span class="op">+=</span> prob(test_vector[x], hawking_alphas[x])
-                
-    <span class="bu">print</span> <span class="st">&quot;obama&quot;</span>, ob, <span class="st">&quot;hawking&quot;</span>, ha, <span class="op">\</span>
-    <span class="co">&quot;obama&quot;</span>, ob <span class="op">&gt;</span> ha, <span class="st">&quot;hawking&quot;</span>, ha <span class="op">&gt;</span> ob
-
-
-<span class="bu">print</span> <span class="st">&quot;hawking test&quot;</span>    
-test(<span class="st">&#39;a4.txt&#39;</span>)
-<span class="bu">print</span> <span class="st">&quot;hawking test&quot;</span>    
-test(<span class="st">&#39;a5.txt&#39;</span>)
-<span class="bu">print</span> <span class="st">&quot;obama test&quot;</span>    
-test(<span class="st">&#39;b4.txt&#39;</span>)
-<span class="bu">print</span> <span class="st">&quot;obama test&quot;</span>    
-test(<span class="st">&#39;b5.txt&#39;</span>)</code></pre></div>
+<p><span class="math inline">\(\alpha_d\)</span>’nin formülünü buldumuza
+göre artık kodu yazabiliriz. İlk önce bir dokümanı temsil eden çok
+boyutlu Bernoulli vektörünü ortaya çıkartmamız lazım. Bu vektörün her
+hücresi belli bir kelime olacak, ve o kelimelerin ne olduğunu önceden
+kararlaştırmamız lazım. Bunun için her sınıftaki tüm dokümanlardaki tüm
+kelimeleri içeren bir sözlük yaratırız:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>words <span class="op">=</span> {}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># find all words in all files, creating a </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># global dictionary.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">&#39;./data/&#39;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;a1.txt&#39;</span>,<span class="st">&#39;a2.txt&#39;</span>,<span class="st">&#39;a3.txt&#39;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>             <span class="st">&#39;b1.txt&#39;</span>,<span class="st">&#39;b2.txt&#39;</span>,<span class="st">&#39;b3.txt&#39;</span>]:</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> f.read()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> tokens: words[x] <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>hawking_alphas <span class="op">=</span> words.copy()   </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;a1.txt&#39;</span>,<span class="st">&#39;a2.txt&#39;</span>,<span class="st">&#39;a3.txt&#39;</span>]:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    words_hawking <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> f.read()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> tokens: </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        words_hawking.add(x)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> words_hawking:</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        hawking_alphas[x] <span class="op">+=</span> <span class="fl">1.</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>obama_alphas <span class="op">=</span> words.copy()   </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">file</span> <span class="kw">in</span> [<span class="st">&#39;b1.txt&#39;</span>,<span class="st">&#39;b2.txt&#39;</span>,<span class="st">&#39;b3.txt&#39;</span>]:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    words_obama <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> f.read()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> tokens: </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        words_obama.add(x)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> words_obama:</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        obama_alphas[x] <span class="op">+=</span> <span class="fl">1.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> hawking_alphas.keys():</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    hawking_alphas[x] <span class="op">=</span> hawking_alphas[x] <span class="op">/</span> <span class="fl">3.</span>        </span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> obama_alphas.keys():</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    obama_alphas[x] <span class="op">=</span> obama_alphas[x] <span class="op">/</span> <span class="fl">3.</span>        </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prob(xd, alpha):</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> math.log(alpha<span class="op">*</span>xd <span class="op">+</span> <span class="fl">1e-10</span>) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        math.log((<span class="fl">1.</span><span class="op">-</span>alpha)<span class="op">*</span>(<span class="fl">1.</span><span class="op">-</span>xd) <span class="op">+</span> <span class="fl">1e-10</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test(<span class="bu">file</span>):</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    test_vector <span class="op">=</span> words.copy()   </span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    words_test <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    f <span class="op">=</span> <span class="bu">open</span> (base <span class="op">+</span> <span class="bu">file</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> f.read()</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> re.split(<span class="st">&#39;\W+&#39;</span>, s)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> tokens: </span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        words_test.add(x)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> words_test:  </span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        test_vector[x] <span class="op">=</span> <span class="fl">1.</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    ob <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    ha <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> test_vector.keys(): </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> x <span class="kw">in</span> obama_alphas: </span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>            ob <span class="op">+=</span> prob(test_vector[x], obama_alphas[x])</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> x <span class="kw">in</span> hawking_alphas: </span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>            ha <span class="op">+=</span> prob(test_vector[x], hawking_alphas[x])</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&quot;obama&quot;</span>, ob, <span class="st">&quot;hawking&quot;</span>, ha, <span class="op">\</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;obama&quot;</span>, ob <span class="op">&gt;</span> ha, <span class="st">&quot;hawking&quot;</span>, ha <span class="op">&gt;</span> ob</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;hawking test&quot;</span>    </span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;a4.txt&#39;</span>)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;hawking test&quot;</span>    </span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;a5.txt&#39;</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;obama test&quot;</span>    </span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;b4.txt&#39;</span>)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&quot;obama test&quot;</span>    </span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;b5.txt&#39;</span>)</span></code></pre></div>
 <pre><code>hawking test
 obama -34048.7734496 hawking -32192.3692113 obama False hawking True
 hawking test
@@ -184,12 +323,46 @@ obama test
 obama -32531.9918709 hawking -32925.037558 obama True hawking False
 obama test
 obama -32205.4710748 hawking -32549.6924713 obama True hawking False</code></pre>
-<p>Test için yeni dokümanı kelimelerine ayırıyoruz, ve her kelimeye tekabül eden alpha vektörlerini kullanarak bir yazar için toplam olasılığı hesaplıyoruz. Nasıl? Her kelimeyi <span class="math inline">\(\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}\)</span> formülüne soruyoruz, yeni dokümanı temsilen elimizde bir <span class="math inline">\([1,0,0,1,0,0,...,1]\)</span> şeklinde bir vektör olduğunu farz ediyoruz, buna göre mesela <span class="math inline">\(x_1=1\)</span>, <span class="math inline">\(x_2=0\)</span>. Eğer bir <span class="math inline">\(d\)</span> kelimesi yeni belgede &quot;var&quot; ise o kelime için <span class="math inline">\(x_d = 1\)</span> ve bu durumda <span class="math inline">\(\alpha_d^{x_d} = \alpha_d^{1} = \alpha_d\)</span> haline gelir, ama formülün öteki tarafı yokolur, <span class="math inline">\((1-\alpha_d)^{1-x_d} = (1-\alpha_d)^0 = 1\)</span>, o zaman <span class="math inline">\(\alpha_d \cdot 1 = \alpha_d\)</span>.</p>
-<p>Çarpım diyoruz ama biz aslında sınıflama sırasında <span class="math inline">\(\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}\)</span> çarpımı yerine yine log() numarasını kullandık; çünkü olasılık değerleri hep 1'e eşit ya da ondan küçük sayılardır, ve bu küçük değerlerin birbiriyle sürekli çarpımı nihai sonucu aşırı fazla küçültür. Aşırı ufak değerlerle uğraşmamak için olasılıkların log'unu alıp birbirleri ile toplamayı seçtik, yani hesapladığımız değer <span class="math inline">\(x_d \cdot log(\alpha_d) + (1-x_d) \cdot \log(1-\alpha_d)\)</span></p>
-<p>Fonksiyon <code>prob</code> içindeki <code>1e-7</code> kullanımı neden? Bu kullanım log numarasını yapabilmek için -- sıfır değerinin log değeri tanımsızdır, bir kelime olmadığı zaman log'a sıfır geleceği için hata olmaması için log içindeki değerlere her seferinde yeterince küçük bir sayı ekliyoruz, böylece pür sıfırla uğraşmak zorunda kalmıyoruz. Sıfır olmadığı zamanlarda çok eklenen çok küçük bir sayı sonuçta büyük farklar (hatalar) yaratmıyor.</p>
-<p>Toparlarsak, yeni belge <code>a4.txt</code> için iki tür alpha değerleri kullanarak iki farklı log toplamını hesaplatıyoruz. Bu iki toplamı birbiri ile karşılaştırıyoruz, hangi toplam daha büyükse, dokümanın o yazardan gelmesi daha olasıdır, ve o seçimimiz o yazar olur.</p>
+<p>Test için yeni dokümanı kelimelerine ayırıyoruz, ve her kelimeye
+tekabül eden alpha vektörlerini kullanarak bir yazar için toplam
+olasılığı hesaplıyoruz. Nasıl? Her kelimeyi <span
+class="math inline">\(\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}\)</span>
+formülüne soruyoruz, yeni dokümanı temsilen elimizde bir <span
+class="math inline">\([1,0,0,1,0,0,...,1]\)</span> şeklinde bir vektör
+olduğunu farz ediyoruz, buna göre mesela <span
+class="math inline">\(x_1=1\)</span>, <span
+class="math inline">\(x_2=0\)</span>. Eğer bir <span
+class="math inline">\(d\)</span> kelimesi yeni belgede “var” ise o
+kelime için <span class="math inline">\(x_d = 1\)</span> ve bu durumda
+<span class="math inline">\(\alpha_d^{x_d} = \alpha_d^{1} =
+\alpha_d\)</span> haline gelir, ama formülün öteki tarafı yokolur, <span
+class="math inline">\((1-\alpha_d)^{1-x_d} = (1-\alpha_d)^0 =
+1\)</span>, o zaman <span class="math inline">\(\alpha_d \cdot 1 =
+\alpha_d\)</span>.</p>
+<p>Çarpım diyoruz ama biz aslında sınıflama sırasında <span
+class="math inline">\(\alpha_d^{x_d}(1-\alpha_d)^{1-x_d}\)</span>
+çarpımı yerine yine log() numarasını kullandık; çünkü olasılık değerleri
+hep 1’e eşit ya da ondan küçük sayılardır, ve bu küçük değerlerin
+birbiriyle sürekli çarpımı nihai sonucu aşırı fazla küçültür. Aşırı ufak
+değerlerle uğraşmamak için olasılıkların log’unu alıp birbirleri ile
+toplamayı seçtik, yani hesapladığımız değer <span
+class="math inline">\(x_d \cdot log(\alpha_d) + (1-x_d) \cdot
+\log(1-\alpha_d)\)</span></p>
+<p>Fonksiyon <code>prob</code> içindeki <code>1e-7</code> kullanımı
+neden? Bu kullanım log numarasını yapabilmek için – sıfır değerinin log
+değeri tanımsızdır, bir kelime olmadığı zaman log’a sıfır geleceği için
+hata olmaması için log içindeki değerlere her seferinde yeterince küçük
+bir sayı ekliyoruz, böylece pür sıfırla uğraşmak zorunda kalmıyoruz.
+Sıfır olmadığı zamanlarda çok eklenen çok küçük bir sayı sonuçta büyük
+farklar (hatalar) yaratmıyor.</p>
+<p>Toparlarsak, yeni belge <code>a4.txt</code> için iki tür alpha
+değerleri kullanarak iki farklı log toplamını hesaplatıyoruz. Bu iki
+toplamı birbiri ile karşılaştırıyoruz, hangi toplam daha büyükse,
+dokümanın o yazardan gelmesi daha olasıdır, ve o seçimimiz o yazar
+olur.</p>
 <p>Kaynaklar</p>
-<p>[1] Jebara, T., <em>Columbia U. COMS 4771 Machine Learning Lecture Notes, Lecture 7</em></p>
+<p>[1] Jebara, T., <em>Columbia U. COMS 4771 Machine Learning Lecture
+Notes, Lecture 7</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

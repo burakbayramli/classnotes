@@ -8,11 +8,12 @@ veri çok boyutta veri noktaları ve o noktaların 0 ya da 1 olarak bir
 
 ```python
 from pandas import *
+import random
 df = read_csv("testSet.txt",sep='\t',names=['x','y','labels'],header=None)
 df['intercept']=1.0
 data = df[['intercept','x','y']]
 labels = df['labels']
-print df[['x','y','labels']][:10]
+print (df[['x','y','labels']][:10])
 ```
 
 ```
@@ -57,9 +58,9 @@ arasına eşlediği / indirgediği (map)" ifadesi de litaratürde mevcuttur.
 
 ```python
 def sigmoid(arr):
-    return 1.0/(1+exp(-arr))
+    return 1.0/(1+np.exp(-arr))
 
-x = np.array(arange(-10.0, 10.0, 0.1))
+x = np.linspace(-10.0, 10.0, 20)
 plt.plot(x,sigmoid(x))
 plt.savefig('stat_logit_02.png')
 ```
@@ -82,7 +83,7 @@ sonucun 1 çıkması gerekli,
 ```python
 import sympy
 x = sympy.Symbol('x')
-print sympy.integrate('1/(1+exp(-x))')
+print (sympy.integrate('1/(1+exp(-x))'))
 ```
 
 ```
@@ -106,8 +107,8 @@ $$ \ln (e^{x}\cdot 1 + e^{x}e^{-x})  $$
 $$ \ln (e^{x} + 1)  = \ln (1 + e^{x} )  $$
 
 ```python
-print log (1+exp(-inf))
-print log(1+exp(inf))
+print (np.log (1+np.exp(-np.inf)))
+print (np.log(1+np.exp(np.inf)))
 ```
 
 ```
@@ -356,15 +357,15 @@ def grad_ascent(data_mat, label_mat):
     label_mat=label_mat.reshape((m,1))
     alpha = 0.001
     iter = 500
-    theta = ones((n,1))
+    theta = np.ones((n,1))
     for k in range(iter):   
-        h = sigmoid(dot(data_mat,theta))
+        h = sigmoid(np.dot(data_mat,theta))
         error = label_mat - h
-        theta = theta + alpha * dot(data_mat.T,error) 
+        theta = theta + alpha * np.dot(data_mat.T,error) 
     return theta
 
-theta = np.array(grad_ascent(array(data),array(labels).T ))
-print theta.T
+theta = np.array(grad_ascent(np.array(data),np.array(labels).T ))
+print (theta.T)
 ```
 
 ```
@@ -374,16 +375,13 @@ print theta.T
 
 ```python
 def plot_theta(theta):
-     x = np.array(arange(-3.0, 3.0, 0.1))
+     x = np.linspace(-3.0, 3.0, 60)
      y = np.array((-theta[0]-theta[1]*x)/theta[2])
      plt.plot(x, y)
-     plt.hold(True)
      class0 = data[labels==0]
      class1 = data[labels==1]
      plt.plot(class0['x'],class0['y'],'b.')
-     plt.hold(True)
      plt.plot(class1['x'],class1['y'],'r.')
-     plt.hold(True)
 
 plot_theta(theta)
 plt.savefig('stat_logit_03.png')
@@ -414,16 +412,16 @@ def stoc_grad_ascent0(data_mat, label_mat):
     m,n = data_mat.shape
     label_mat=label_mat.reshape((m,1))
     alpha = 0.01
-    theta = ones((n,1))
+    theta = np.ones((n,1))
     for i in range(m):
-        h = sigmoid(sum(dot(data_mat[i],theta)))
+        h = sigmoid(sum(np.dot(data_mat[i],theta)))
         error = label_mat[i] - h
         theta = theta + alpha * data_mat[i].reshape((n,1)) * error
         theta = theta.reshape((n,1))
     return theta
 
-theta = np.array(stoc_grad_ascent0(array(data),array(labels).T ))
-print theta.T
+theta = np.array(stoc_grad_ascent0(np.array(data),np.array(labels).T ))
+print (theta.T)
 ```
 
 ```
@@ -453,20 +451,20 @@ def stoc_grad_ascent1(data_mat, label_mat):
     iter = 150
     label_mat=label_mat.reshape((m,1))
     alpha = 0.01
-    theta = ones((n,1))
+    theta = np.ones((n,1))
     for j in range(iter):
         data_index = range(m)
         for i in range(m):
             alpha = 4/(1.0+j+i)+0.0001  
             rand_index = int(random.uniform(0,len(data_index)))
-	    h = sigmoid(sum(dot(data_mat[rand_index],theta)))
+            h = sigmoid(sum(np.dot(data_mat[rand_index],theta)))
             error = label_mat[rand_index] - h
             theta = theta + alpha * data_mat[rand_index].reshape((n,1)) * error
             theta = theta.reshape((n,1))
     return theta
 
-theta = np.array(stoc_grad_ascent1(array(data),array(labels).T ))
-print theta.T
+theta = np.array(stoc_grad_ascent1(np.array(data),np.array(labels).T ))
+print (theta.T)
 ```
 
 ```
@@ -491,9 +489,9 @@ etiketi olma olasılığını" hesaplamış olacağız. Örnek (diyelim ki mevcu
 noktası içinden bir veriyi, -mesela 15. nokta- sanki yeniymiş gibi seçtik)
 
 ```python
-pt = df.ix[15,['intercept','x','y']]
-print sigmoid(dot(array(pt), theta)), 
-print 'label =',labels[15]
+pt = df.loc[15,['intercept','x','y']]
+print (sigmoid(np.dot(np.array(pt), theta)), )
+print ('label =',labels[15])
 ```
 
 ```
@@ -524,10 +522,10 @@ olmama oranını.
 
 ```python
 def logit(p): return np.log(p/(1-p))
-p = 0.1; print logit(p)
-p = 0.5; print logit(p)
-p = 0.7; print logit(p)
-p = 0.99999; print logit(p)
+p = 0.1; print (logit(p))
+p = 0.5; print (logit(p))
+p = 0.7; print (logit(p))
+p = 0.99999; print (logit(p))
 ```
 
 ```
@@ -580,7 +578,7 @@ df = df.dropna()
 df['presvote2'] = df['presvote'].map(lambda x: x-1) 
 df = df.drop('presvote',axis=1)
 df2 = df[df['year'] == 1992]
-print df2[:4]
+print (df2[:4])
 ```
 
 ```
@@ -683,22 +681,22 @@ olarak önemsiz, ama pratikte önemlidir.
 Siyahi oyların bazı yıllara göre analizini yapalım,
 
 ```python
-print 'coefs','error'
+print ('coefs','error')
 
 df2 = df[df['year'] == 1960]
 mdlm = smf.logit("presvote2 ~ female + black + income", df2)
 mdlmf = mdlm.fit()
-print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+print (np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T)
 
 df2 = df[df['year'] == 1964]
 mdlm = smf.logit("presvote2 ~ female + black + income", df2)
 mdlmf = mdlm.fit()
-print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+print (np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T)
 
 df2 = df[df['year'] == 1968]
 mdlm = smf.logit("presvote2 ~ female + black + income", df2)
 mdlmf = mdlm.fit()
-print np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T
+print (np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T)
 ```
 
 ```
@@ -759,7 +757,7 @@ Veriye bakalım.
 from pandas import *
 from statsmodels.formula.api import logit
 df = read_csv('wells.dat', sep = ' ', header = 0, index_col = 0)
-print df.head()
+print (df.head())
 ```
 
 ```
@@ -777,7 +775,7 @@ Model 1: Güvenli su kuyusuna uzaklık
 
 ```python
 model1 = logit("switch ~ dist", df).fit()
-print model1.summary()
+print (model1.summary())
 ```
 
 ```
@@ -818,7 +816,7 @@ onu ver" diyoruz .
 
 ```python
 model1 = logit('switch ~I(dist/100.)', df).fit()
-print model1.summary()
+print (model1.summary())
 ```
 
 ```
@@ -896,7 +894,7 @@ arsenik miktarı olan kimselerin kuyu değiştirmesi daha çok beklenen bir şey
 
 ```python
 model2 = logit('switch ~ I(dist / 100.) + arsenic', df).fit()
-print model2.summary()
+print (model2.summary())
 ```
 
 ```
@@ -931,7 +929,7 @@ Tüm bu değişkenlerin değişim olasılığı üzerindeki etkilerini görmek i
 ortalama noktasında bir kısmi olasılık hesabı yapalım.
 
 ```python
-print model2.get_margeff(at = 'mean').summary()
+print (model2.get_margeff(at = 'mean').summary())
 ```
 
 ```
@@ -1005,7 +1003,7 @@ arasında `:` operatörünü kullanmak ile olur.
 
 ```python
 model3 = logit('switch ~ I(dist / 100.) + arsenic + I(dist / 100.):arsenic', df).fit()
-print model3.summary()
+print (model3.summary())
 ```
 
 ```
@@ -1059,7 +1057,7 @@ model_form = ('switch ~ center(I(dist / 100.)) + center(arsenic) + ' +
               'center(arsenic) : center(I(educ / 4.))'
              )
 model4 = logit(model_form, df).fit()
-print model4.summary()
+print (model4.summary())
 ```
 
 ```
@@ -1119,13 +1117,13 @@ def bin_residuals(resid, var, bins):
     resid_df = DataFrame({'var': var, 'resid': resid})
     resid_df['bins'] = qcut(var, bins)
     bin_group = resid_df.groupby('bins')
-    bin_df = bin_group['var', 'resid'].mean()
+    bin_df = bin_group[['var', 'resid']].mean()
     bin_df['count'] = bin_group['resid'].count()
     bin_df['lower_ci'] = -2 * (bin_group['resid'].std() / 
                                np.sqrt(bin_group['resid'].count()))
     bin_df['upper_ci'] =  2 * (bin_group['resid'].std() / 
                                np.sqrt(bin_df['count']))
-    bin_df = bin_df.sort('var')
+    bin_df = bin_df.sort_values('var')
     return(bin_df)
 
 def plot_binned_residuals(bin_df):
@@ -1137,8 +1135,8 @@ def plot_binned_residuals(bin_df):
     plt.plot(bin_df['var'], bin_df['upper_ci'], '-r')
     plt.axhline(0, color = 'gray', lw = .5)
     
-arsenic_resids = bin_residuals(model4.resid, df['arsenic'], 40)
-dist_resids = bin_residuals(model4.resid, df['dist'], 40)
+arsenic_resids = bin_residuals(model4.resid_generalized, df['arsenic'], 40)
+dist_resids = bin_residuals(model4.resid_generalized, df['dist'], 40)
 plt.figure(figsize = (12, 5))
 plt.subplot(121)
 plt.ylabel('Residual (bin avg.)')
@@ -1176,7 +1174,7 @@ model_form = ('switch ~ center(I(dist / 100.)) + center(np.log(arsenic)) + ' +
              )
 
 model5 = logit(model_form, df).fit()
-print model5.summary()
+print (model5.summary())
 ```
 
 ```
@@ -1208,8 +1206,8 @@ center(np.log(arsenic)):center(I(educ / 4.))       0.0601      0.070      0.855 
 Şimdi arsenik için kutulanmış kalıntı grafikleri daha iyi gözüküyor.
 
 ```python
-arsenic_resids = bin_residuals(model5.resid, df['arsenic'], 40)
-dist_resids = bin_residuals(model5.resid, df['dist'], 40)
+arsenic_resids = bin_residuals(model5.resid_generalized, df['arsenic'], 40)
+dist_resids = bin_residuals(model5.resid_generalized, df['dist'], 40)
 plt.figure(figsize = (12, 5))
 plt.subplot(121)
 plot_binned_residuals(arsenic_resids)
@@ -1242,11 +1240,11 @@ değiştiriyor" diye modeller, ve bu basit modelin hata payı 42\% olur. Bizim
 model bu modelden daha iyi bir sonuç verecek midir? Sonuç altta.
 
 ```python
-print model5.pred_table()
-print 'Model Error rate: {0: 3.0%}'.format(
-    1 - np.diag(model5.pred_table()).sum() / model5.pred_table().sum())
-print 'Null Error Rate: {0: 3.0%}'.format(
-    1 - df['switch'].mean())
+print (model5.pred_table())
+print ('Model Error rate: {0: 3.0%}'.format(
+    1 - np.diag(model5.pred_table()).sum() / model5.pred_table().sum()))
+print ('Null Error Rate: {0: 3.0%}'.format(
+    1 - df['switch'].mean()))
 ```
 
 ```
@@ -1264,7 +1262,7 @@ yaratalım,
 
 ```python
 resid_df = DataFrame({'var': df['arsenic'], 'resid': model4.df_resid})
-print resid_df[:10]
+print (resid_df[:10])
 ```
 
 ```
@@ -1284,7 +1282,7 @@ print resid_df[:10]
 Şimdi 40 tane dağılım bölgesi yaratalım
 
 ```python
-print qcut(df['arsenic'], 40)
+print (qcut(df['arsenic'], 40))
 ```
 
 ```
@@ -1329,7 +1327,7 @@ Görüldüğü gibi bölgeler bir obje aslında ve içinde levels diye bir deği
 var. Ayrıca labels diye bir değişken de var,
 
 ```python
-print qcut(df['arsenic'], 40).labels
+print (qcut(df['arsenic'], 40).index)
 ```
 
 ```
@@ -1340,7 +1338,7 @@ ki bu değişken içinde hangi noktanın hangi olasılık bölgesine ait olduğu
 ataması var. Mesela 2. nokta 6. bölgeye aitmiş, bu bölge hangisi?
 
 ```python
-print qcut(df['arsenic'], 40).levels[6]
+print (qcut(df['arsenic'], 40)[6])
 ```
 
 ```
@@ -1354,7 +1352,7 @@ için doğru olan `qcut` sonucu atanmış olacaktır!
 
 ```python
 resid_df['bins'] = qcut(df['arsenic'], 40)
-print resid_df[:10]
+print (resid_df[:10])
 ```
 
 ```
@@ -1444,9 +1442,9 @@ df[col].hist(ax=ax)
 
 col='months';ax=axes[2,0];ax.set_title(col)
 df[col].hist(ax=ax)
-col='log(share)';ax=axes[2,1];ax.set_title(col)
+col='log_share';ax=axes[2,1];ax.set_title(col)
 df[col].hist(ax=ax)
-col='log(reports+1)';ax=axes[2,2];ax.set_title(col)
+col='log_reports1';ax=axes[2,2];ax.set_title(col)
 df[col].hist(ax=ax)
 
 plt.savefig('stat_logit_01.png')
@@ -1471,8 +1469,8 @@ model = "card ~ log_reports1 + income + log_share + age + " + \
         "owner + dependents + months "
 model=smf.glm(model, data=df, family=sm.families.Binomial()).fit()
 print(model.summary())
-print 'BIC', model.bic
-print 'AIC', model.aic
+print ('BIC', model.bic)
+print ('AIC', model.aic)
 ```
 
 ```
@@ -1511,8 +1509,8 @@ reg2 = "card ~ reports + income + share + age + " + \
        "owner + dependents + months "
 model2=smf.glm(reg2, data=df, family=sm.families.Binomial()).fit()
 print(model2.summary())
-print 'BIC', model2.bic
-print 'AIC', model2.aic
+print ('BIC', model2.bic)
+print ('AIC', model2.aic)
 ```
 
 ```
