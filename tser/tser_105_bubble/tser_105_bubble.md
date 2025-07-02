@@ -144,7 +144,7 @@ edebiliriz. Bunun için ADF testimiz var,
 
 ```python
 res = list(st.adfuller(out.residual,maxlag=1))
-print res[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print (res[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
@@ -178,7 +178,7 @@ y2 = np.log(dfj2['Adj Close'])
 t2 = dfj2['DecDate']
 out2 = minimize(residual, fit_params2, args=(y2,t2,))
 res2 = list(st.adfuller(out2.residual,maxlag=1))
-print res2[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print (res2[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
@@ -186,7 +186,7 @@ print res2[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
 ```
 
 ```python
-print fit_params2['tc'].value 
+print (fit_params2['tc'].value )
 ```
 
 ```
@@ -247,7 +247,7 @@ Cevap kabaca Kara Pazartesi anını yakaladı! Artıkları kontrol edelim,
 
 ```python
 res3 = list(st.adfuller(out3.residual,maxlag=1))
-print res3[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print (res3[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
@@ -285,7 +285,7 @@ fit_params4 = init_fit(2012.,2018.,2017.)
 y4 = np.log(dfi['Adj Close'])
 t4 = dfi['DecDate']
 out4 = minimize(residual, fit_params4, args=(y4,t4,))
-print fit_params4['tc'].value 
+print (fit_params4['tc'].value )
 ```
 
 ```
@@ -296,7 +296,7 @@ Sonuç olarak 2015 ortası verildi. Uyum nasıl?
 
 ```python
 res4 = list(st.adfuller(out4.residual,maxlag=1))
-print res4[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print (res4[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
@@ -435,7 +435,7 @@ t = np.array(dfpop.Year.astype(float))
 out = minimize(residual, fit_params, args=(y,t,))
 report_fit(fit_params)
 res = list(st.adfuller(out.residual,maxlag=1))
-print 'ADF testi', res[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print ('ADF testi', res[0], '%1,%5,%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
@@ -477,7 +477,7 @@ t = np.array(dfgdp.Year.astype(float))
 out = minimize(residual, fit_params, args=(y,t,))
 report_fit(fit_params)
 res = list(st.adfuller(out.residual,maxlag=1))
-print 'ADF testi', res[0], '%1-%10', res[4]['1%'], res[4]['5%'], res[4]['10%']
+print ('ADF testi', res[0], '%1-%10', res[4]['1%'], res[4]['5%'], res[4]['10%'])
 ```
 
 ```
