@@ -20,25 +20,19 @@ sonuç evriştirilmiş özellik (convolved feature) içinde,
 
 ![](conv-0.png)
 
-
 ![](conv-1.png)
-
 
 ![](conv-2.png)
 
 ![](conv-3.png)
 
-
 ![](conv-4.png)
-
 
 ![](conv-5.png)
 
 ![](conv-6.png)
 
-
 ![](conv-7.png)
-
 
 ![](conv-8.png)
 
@@ -83,25 +77,31 @@ TensorFlow ile Evrişim
 Şimdi TF kullanarak evrişim yapalım, iki resim üzerinde örneği görelim,
 
 ```python
-import numpy as np
 import tensorflow as tf
+
+print(tf.__version__)
 from sklearn.datasets import load_sample_images
+
+# Disable TensorFlow 2.x eager execution
+tf.compat.v1.disable_eager_execution()
 
 # Load sample images
 dataset = np.array(load_sample_images().images, dtype=np.float32)
 batch_size, height, width, channels = dataset.shape
-print 'veri tensor boyutu', dataset.shape
-plt.imshow(dataset[0,:,:,:] / 255.) 
+print('veri tensor boyutu', dataset.shape)
+plt.imshow(dataset[0, :, :, :] / 255.)
 plt.savefig('conv-9.png')
-plt.imshow(dataset[1,:,:,:] / 255.) 
+plt.imshow(dataset[1, :, :, :] / 255.)
 plt.savefig('conv-10.png')
 ```
 
-```
+```text
+2.19.0
 veri tensor boyutu (2, 427, 640, 3)
 ```
 
 ![](conv-9.png)
+
 ![](conv-10.png)
 
 Bu iki resmi bir "tensor'' yani çok boyutlu matris içine koyduk, resmin
@@ -123,20 +123,33 @@ başlayabilirler.
 ```python
 in_channels = channels
 out_channels = 4
-W = np.zeros(shape=(7, 7, in_channels, out_channels), dtype=np.float32)
-W[:, 3, :, 0] = 1  # yatay cizgi
-W[3, :, :, 1] = 1  # dikey cizgi
-W[5, :, :, 2] = 1  
-W[2, :, :, 3] = 1  
+W_np = np.zeros(shape=(7, 7, in_channels, out_channels), dtype=np.float32)
+W_np[:, 3, :, 0] = 1  # yatay cizgi
+W_np[3, :, :, 1] = 1  # dikey cizgi
+W_np[5, :, :, 2] = 1
+W_np[2, :, :, 3] = 1
 
-X = tf.placeholder(tf.float32, shape=(None, height, width, channels))
-convolution = tf.nn.conv2d(X, W, strides=[1,2,2,1], padding="SAME")
-with tf.Session() as sess:
+# Define a new graph
+graph = tf.Graph()
+with graph.as_default():
+    # Use tf.compat.v1.placeholder for the input X within the graph context
+    X = tf.compat.v1.placeholder(tf.float32, shape=(None, height, width, channels))
+    
+    # Define W as a tf.constant or tf.Variable within the graph context
+    # If W is meant to be a constant filter, tf.constant is appropriate.
+    W = tf.constant(W_np, dtype=tf.float32) # Using the numpy array W_np
+    
+    convolution = tf.nn.conv2d(X, W, strides=[1, 2, 2, 1], padding="SAME")
+
+# Create a session to run the operations in the defined graph
+with tf.compat.v1.Session(graph=graph) as sess:
+    # Initialize variables if you had any tf.Variable in the graph (not strictly needed for tf.constant)
+    # sess.run(tf.compat.v1.global_variables_initializer())
     output = sess.run(convolution, feed_dict={X: dataset})
-    print u'evrişimden gelen tensor', output.shape
+    print(u'evrişimden gelen tensor', output.shape)
 ```
 
-```
+```text
 evrişimden gelen tensor (2, 214, 320, 4)
 ```
 
@@ -168,6 +181,7 @@ plt.savefig('conv-out-%d-%d.png' % (image_index,feature_map_index))
 ```
 
 ![](conv-out-0-2.png)
+
 ![](conv-out-1-1.png)
 
 Cok kanallı durum için açık olmadıysa bir daha vurgulayalım, evrişim
@@ -188,16 +202,19 @@ yani). Şimdi girdi üzerinde 16 tane filtre gezdiriyoruz, ve 20x30x16
 boyutlu çıktı elde ediyoruz.
 
 ```python
-import tensorflow as tf
-tf.reset_default_graph()
-input = tf.placeholder(tf.float32, [None, 20, 30, 3])
-conv_layer = tf.layers.conv2d(inputs=input, filters=16, 
-                              kernel_size=(2,2), padding='same')
-print conv_layer
+graph = tf.Graph()
+with graph.as_default():
+    input = tf.compat.v1.placeholder(tf.float32, shape=([None, 20, 30, 3]))
+    conv_layer_instance = tf.keras.layers.Conv2D(
+        filters=16,
+        kernel_size=(2, 2),
+        padding='same'
+    )
+    print (conv_layer_instance)
 ```
 
-```
-Tensor("conv2d/BiasAdd:0", shape=(?, 20, 30, 16), dtype=float32)
+```text
+<Conv2D name=conv2d, built=False>
 ```
 
 MNIST
@@ -209,8 +226,6 @@ verilen mimarisi. Veri [5]'ten indirilebilir.
 ```python
 """Convolutional neural net on MNIST, modeled on 'LeNet-5',
 http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf"""
-from __future__ import absolute_import
-from __future__ import print_function
 
 import autograd.numpy as np
 import autograd.numpy.random as npr
@@ -368,7 +383,7 @@ def mnist():
             return np.array(array.array("B", fh.read()),
                             dtype=np.uint8).reshape(num_data, rows, cols)
 
-    base_dir = '/home/burak/Documents/Dropbox/Public/data'
+    base_dir = '/opt/Downloads/mnist'
     train_images = parse_images(base_dir + '/train-images-idx3-ubyte.gz')
     train_labels = parse_labels(base_dir + '/train-labels-idx1-ubyte.gz')
     test_images  = parse_images(base_dir + '/t10k-images-idx3-ubyte.gz')
@@ -459,56 +474,57 @@ Loading training data...
 KNN
 0.82
     Epoch      |    Train err  |   Test error  
-              0|           0.92|           0.93
+              0|          0.895|           0.89
               1|           0.89|            0.9
-              2|          0.798|           0.82
-              3|          0.767|           0.74
-              4|          0.727|           0.67
-              5|          0.678|           0.71
-              6|          0.627|           0.65
-              7|          0.563|           0.56
-              8|          0.503|           0.53
-              9|          0.445|           0.49
-             10|          0.418|           0.45
-             11|          0.357|           0.41
-             12|           0.34|           0.39
-             13|          0.322|           0.36
-             14|          0.287|           0.32
-             15|          0.258|           0.29
-             16|          0.261|           0.33
-             17|          0.232|           0.27
-             18|          0.216|           0.25
-             19|          0.206|           0.25
-             20|          0.188|           0.22
-             21|          0.171|           0.23
-             22|          0.164|           0.23
-             23|          0.175|           0.25
-             24|          0.121|           0.21
-             25|          0.152|           0.19
-             26|          0.169|           0.21
-             27|          0.145|           0.18
-             28|          0.119|           0.22
-             29|          0.099|           0.18
-             30|          0.073|           0.16
-             31|          0.083|            0.2
-             32|          0.066|           0.17
-             33|           0.06|           0.18
-             34|          0.052|           0.18
-             35|          0.042|           0.18
-             36|          0.034|           0.16
-             37|          0.034|           0.18
-             38|          0.027|           0.17
-             39|          0.023|           0.15
-             40|          0.026|           0.18
-             41|          0.017|           0.16
-             42|          0.012|           0.16
-             43|          0.011|           0.14
-             44|          0.011|           0.12
-             45|          0.008|           0.14
-             46|          0.009|           0.13
-             47|          0.007|           0.15
-             48|          0.006|           0.12
-             49|          0.005|           0.15
+              2|          0.892|           0.91
+              3|          0.891|            0.9
+              4|          0.874|           0.88
+              5|          0.871|           0.86
+              6|          0.874|           0.86
+              7|          0.872|           0.86
+              8|           0.87|           0.85
+              9|          0.851|           0.84
+             10|           0.82|           0.75
+             11|          0.787|           0.73
+             12|          0.757|           0.71
+             13|          0.677|           0.71
+             14|          0.641|           0.69
+             15|          0.621|           0.68
+             16|          0.611|           0.64
+             17|          0.598|           0.64
+             18|          0.567|           0.58
+             19|          0.546|           0.59
+             20|          0.509|           0.55
+             21|          0.467|           0.53
+             22|          0.443|            0.5
+             23|          0.411|           0.46
+             24|          0.403|           0.43
+             25|          0.381|           0.41
+             26|          0.348|           0.41
+             27|          0.348|           0.42
+             28|          0.347|           0.42
+             29|          0.338|            0.4
+             30|          0.289|            0.4
+             31|           0.33|           0.39
+             32|          0.287|           0.31
+             33|          0.292|           0.37
+             34|          0.252|           0.28
+             35|          0.224|           0.31
+             36|           0.22|           0.31
+             37|          0.201|           0.29
+             38|          0.192|           0.27
+             39|          0.165|           0.27
+             40|          0.146|           0.24
+             41|          0.144|           0.21
+             42|          0.139|            0.2
+             43|          0.126|           0.19
+             44|          0.116|           0.21
+             45|          0.107|           0.16
+             46|          0.098|           0.16
+             47|          0.095|           0.15
+             48|           0.09|           0.19
+             49|          0.081|           0.17
+
 ```
 
 Tarih
@@ -570,11 +586,6 @@ Kaynaklar
 
 [4] LeCun, *Who is Afraid of Non-Convex Loss Functions?*, [https://youtu.be/8zdo6cnCW2w](https://youtu.be/8zdo6cnCW2w)
 
-[5] LeCun, *MNIST Verisi*, [http://yann.lecun.com/exdb/mnist](http://yann.lecun.com/exdb/mnist)
-
-
-
-
-
+[5] *MNIST Verisi*, [Github](https://github.com/fgnt/mnist)
 
 
