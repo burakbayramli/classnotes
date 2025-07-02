@@ -157,6 +157,14 @@ kelimesini ararsak ikonumuzu bulabiliriz, ve bulunca sağ tıklama ve
 "Pin to Dash" ile programı sol taraftaki erişim bölgesine
 yapıştırabiliriz.
 
+Internet Servisi
+
+Bu servisi bazen tekrar başlatmak gerekebilir, yeni komut
+
+```
+sudo systemctl restart NetworkManager.service
+```
+
 Kaynaklar
 
 [1] https://www.youtube.com/watch?v=eMHr9jsbJG4
