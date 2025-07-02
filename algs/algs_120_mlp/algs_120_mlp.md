@@ -375,7 +375,7 @@ class mlp:
             validout = self.mlpfwd(valid)
             new_val_error = 0.5*sum((validtargets-validout)**2)
             
-        print "Stopped", new_val_error,old_val_error1, old_val_error2
+        print ("Stopped", new_val_error,old_val_error1, old_val_error2)
         return new_val_error
     	
     def mlptrain(self,inputs,targets,eta,niterations):
@@ -386,7 +386,7 @@ class mlp:
         for n in range(niterations):    
             self.outputs = self.mlpfwd(inputs)
             error = 0.5*sum((targets-self.outputs)**2)
-            #if (n % 100) ==0 : print "Iteration: ",n, " Error: ",error    
+            #if (n % 100) ==0 : print ("Iteration: ",n, " Error: ",error)
             deltao = (targets-self.outputs)/self.ndata            
             deltah = self.hidden*(1.0-self.hidden)*\
                      (dot(deltao,transpose(self.weights2)))
@@ -412,7 +412,7 @@ class mlp:
 ```
 
 ```python
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn import datasets
 import mlp
 
@@ -425,12 +425,12 @@ one_hot = lambda x, K : np.array(x[:,None] == np.arange(K)[None, :], dtype=int)
 
 X, y = generate_data()
 y2 = one_hot(y, 2)
-print X.shape, y2.shape
+print (X.shape, y2.shape)
 X_train, X_test, y_train, y_test = train_test_split(X, y2, test_size=0.2,random_state=0)
-print X_train.shape, y_train.shape
-print X_test.shape, y_test.shape
+print (X_train.shape, y_train.shape)
+print (X_test.shape, y_test.shape)
 net = mlp.mlp(X_train,y_train,2)
-print net.earlystopping(X_train,y_train,X_test,y_test,0.1)
+print (net.earlystopping(X_train,y_train,X_test,y_test,0.1))
 ```
 
 ```
@@ -464,7 +464,6 @@ def plot_decision_boundary(XX, yyy):
     yyy = yyy.argmax(axis=1)
     XX1 = XX[yyy==0]; XX2 = XX[yyy==1]
     plt.scatter(XX1[:, 0], XX1[:, 1], color='blue')
-    plt.hold(True)
     plt.scatter(XX2[:, 0], XX2[:, 1], color='red')
 
 plot_decision_boundary(X, y2)

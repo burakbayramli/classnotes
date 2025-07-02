@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import datasets, linear_model
+import matplotlib.pyplot as plt
 
 class Config:
     nn_input_dim = 2  # input layer dimensionality

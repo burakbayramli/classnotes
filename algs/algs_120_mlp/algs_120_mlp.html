@@ -437,7 +437,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            validout <span class="op">=</span> <span class="va">self</span>.mlpfwd(valid)</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            new_val_error <span class="op">=</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">sum</span>((validtargets<span class="op">-</span>validout)<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> <span class="st">&quot;Stopped&quot;</span>, new_val_error,old_val_error1, old_val_error2</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> (<span class="st">&quot;Stopped&quot;</span>, new_val_error,old_val_error1, old_val_error2)</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> new_val_error</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> mlptrain(<span class="va">self</span>,inputs,targets,eta,niterations):</span>
@@ -448,7 +448,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(niterations):    </span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.outputs <span class="op">=</span> <span class="va">self</span>.mlpfwd(inputs)</span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>            error <span class="op">=</span> <span class="fl">0.5</span><span class="op">*</span><span class="bu">sum</span>((targets<span class="op">-</span><span class="va">self</span>.outputs)<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="co">#if (n % 100) ==0 : print &quot;Iteration: &quot;,n, &quot; Error: &quot;,error    </span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="co">#if (n % 100) ==0 : print (&quot;Iteration: &quot;,n, &quot; Error: &quot;,error)</span></span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>            deltao <span class="op">=</span> (targets<span class="op">-</span><span class="va">self</span>.outputs)<span class="op">/</span><span class="va">self</span>.ndata            </span>
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            deltah <span class="op">=</span> <span class="va">self</span>.hidden<span class="op">*</span>(<span class="fl">1.0</span><span class="op">-</span><span class="va">self</span>.hidden)<span class="op">*\</span></span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                     (dot(deltao,transpose(<span class="va">self</span>.weights2)))</span>
@@ -471,7 +471,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        normalisers <span class="op">=</span> <span class="bu">sum</span>(exp(outputs),axis<span class="op">=</span><span class="dv">1</span>)<span class="op">*</span>ones((<span class="dv">1</span>,shape(outputs)[<span class="dv">0</span>]))</span>
 <span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> transpose(transpose(exp(outputs))<span class="op">/</span>normalisers)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cross_validation <span class="im">import</span> train_test_split</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> datasets</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mlp</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -484,12 +484,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> generate_data()</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> one_hot(y, <span class="dv">2</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> X.shape, y2.shape</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (X.shape, y2.shape)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y2, test_size<span class="op">=</span><span class="fl">0.2</span>,random_state<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> X_train.shape, y_train.shape</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> X_test.shape, y_test.shape</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (X_train.shape, y_train.shape)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (X_test.shape, y_test.shape)</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>net <span class="op">=</span> mlp.mlp(X_train,y_train,<span class="dv">2</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> net.earlystopping(X_train,y_train,X_test,y_test,<span class="fl">0.1</span>)</span></code></pre></div>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (net.earlystopping(X_train,y_train,X_test,y_test,<span class="fl">0.1</span>))</span></code></pre></div>
 <pre><code>(200, 2) (200, 2)
 (160, 2) (160, 2)
 (40, 2) (40, 2)
@@ -518,11 +518,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    yyy <span class="op">=</span> yyy.argmax(axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    XX1 <span class="op">=</span> XX[yyy<span class="op">==</span><span class="dv">0</span>]<span class="op">;</span> XX2 <span class="op">=</span> XX[yyy<span class="op">==</span><span class="dv">1</span>]</span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    plt.scatter(XX1[:, <span class="dv">0</span>], XX1[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    plt.hold(<span class="va">True</span>)</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    plt.scatter(XX2[:, <span class="dv">0</span>], XX2[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>plot_decision_boundary(X, y2)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mlp_06.png&#39;</span>)</span></code></pre></div>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    plt.scatter(XX2[:, <span class="dv">0</span>], XX2[:, <span class="dv">1</span>], color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>plot_decision_boundary(X, y2)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;mlp_06.png&#39;</span>)</span></code></pre></div>
 <p><img src="mlp_06.png" /></p>
 <p>Alttaki alternatif bir kod, bu kod [2]’yi baz alıyor, YSA ile 0/1
 regresyonu yapacak, gizli katman aktivasyonu için <span

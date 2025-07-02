@@ -29,12 +29,12 @@ class mlp:
             validout = self.mlpfwd(valid)
             new_val_error = 0.5*sum((validtargets-validout)**2)
             
-        print "Stopped", new_val_error,old_val_error1, old_val_error2
+        print ("Stopped", new_val_error,old_val_error1, old_val_error2)
         return new_val_error
     	
     def mlptrain(self,inputs,targets,eta,niterations):
         inputs = concatenate((inputs,-ones((self.ndata,1))),axis=1)
-        change = range(self.ndata)    
+        change = list(range(self.ndata)) # Convert range to a list
         updatew1 = zeros((shape(self.weights1)))
         updatew2 = zeros((shape(self.weights2)))
         for n in range(niterations):    
