@@ -37,8 +37,8 @@ $\exp$ alınmış olmasının sebebi ise sadece artı sayılar ile çalışmak
 istememiz, çünkü $\exp$ alınınca eksi sayılar bile sıfırdan büyük olur,
 
 ```python
-print np.exp(-2)
-print np.exp(1./6)
+print (np.exp(-2))
+print (np.exp(1./6))
 ```
 
 ```
@@ -78,7 +78,7 @@ Medyan kazancı 59 ile 61 arasında olan kişilere bakalım,
 burg_59_61 = burg[(burg['median_income'] > 59) & (burg['median_income'] < 61)]
 m = burg_59_61['burglaries'].mean()
 v = burg_59_61['burglaries'].std()**2
-print m, v, v/m
+print (m, v, v/m)
 ```
 
 ```
@@ -93,7 +93,7 @@ olasılığı düşük. Verinin başka bir bölgesine bakarsak,
 burg_59_61 = burg[(burg['median_income'] > 39) & (burg['median_income'] < 41)]
 m = burg_59_61['burglaries'].mean()
 v = burg_59_61['burglaries'].std()**2
-print m, v, v/m
+print (m, v, v/m)
 ```
 
 ```
@@ -167,8 +167,8 @@ etki edip etmediği görülebilir. Ham verinin birkaç satırına bakalım,
 
 ```python
 import pandas as pd
-tmp = pd.read_csv("titanic.csv",sep=',',index_col=0)
-print tmp.head(5)
+tmp = pd.read_csv("titanicgrp.csv",sep=',',index_col=0)
+print (tmp.head(5))
 ```
 
 ```
@@ -189,7 +189,7 @@ olur. Toplamlara bakalım (ayrı bir dosyada),
 ```python
 import pandas as pd
 df = pd.read_csv("titanicgrp.csv",sep=',',index_col=0)
-print df
+print (df)
 ```
 
 ```
@@ -212,9 +212,9 @@ Poisson ile ilerlemeden önce, bir soru soralım: niye 1. sınıfta kurtulan
 çocuk sayısı 2. ve 3. sınıftakinden daha az?
 
 ```python
-print df[(df['age']==0) & (df['whichclass']==1) ].sum()['survive']
-print df[(df['age']==0) & (df['whichclass']==2) ].sum()['survive']
-print df[(df['age']==0) & (df['whichclass']==3) ].sum()['survive']
+print (df[(df['age']==0) & (df['whichclass']==1) ].sum()['survive'])
+print (df[(df['age']==0) & (df['whichclass']==2) ].sum()['survive'])
+print (df[(df['age']==0) & (df['whichclass']==3) ].sum()['survive'])
 ```
 
 ```
@@ -228,11 +228,11 @@ bekleriz. Fakat sebep başka, sebep 1. sınıfta seyahat eden toplam çocuk
 sayısının zaten az olması. Toplamlara bakarsak,
 
 ```python
-print '1. sinif cocuk sayisi,', 
+print ('1. sinif cocuk sayisi,', )
 df[(df['age']==0) & (df['whichclass']==1) ].sum()['cases']
-print '2. sinif cocuk sayisi,', 
+print ('2. sinif cocuk sayisi,', )
 df[(df['age']==0) & (df['whichclass']==2) ].sum()['cases']
-print '3. sinif cocuk sayisi,', 
+print ('3. sinif cocuk sayisi,', )
 df[(df['age']==0) & (df['whichclass']==3) ].sum()['cases']
 ```
 
@@ -392,8 +392,8 @@ kalır. Yani İRR'i hesaplamak bir katsayının $\exp$'sini almaktan
 ibarettir. Biz altta tüm katsayıların $\exp$'sini aldık,
 
 ```python
-print 'exp katsayilar'
-print np.exp(modelnb.params)
+print ('exp katsayilar')
+print (np.exp(modelnb.params))
 ```
 
 ```
@@ -419,7 +419,7 @@ adults = np.array(df[(df['age']==1)].sum()[['survive','cases']])
 ratea = adults[0] / float(adults[1])
 children =  np.array(df[(df['age']==0)].sum()[['survive','cases']])
 ratec = children[0] / float(children[1])
-print ratea, ratec, 'nihai sonuc', ratea/ratec
+print (ratea, ratec, 'nihai sonuc', ratea/ratec)
 ```
 
 ```
@@ -439,8 +439,8 @@ uygularız. Bu bize $\theta_i/u_i$ oranını verecektir.
 ```python
 p = model.params
 arr = np.array(df[ (df['whichclass']==3) & (df['sex']==1) & (df['age']==0) ])
-print 'veri', arr[0][0] / arr[0][1]
-print 'tahmin', np.exp(p[0] + p[2] + p[4])
+print ('veri', arr[0][0] / arr[0][1])
+print ('tahmin', np.exp(p[0] + p[2] + p[4]))
 ```
 
 ```
@@ -453,8 +453,8 @@ Acaba 2. sınıftaki yetişkin erkeklerin hayatta kalma oranı nedir?
 ```python
 p = model.params
 arr = np.array(df[ (df['whichclass']==2) & (df['sex']==1) & (df['age']==1) ])
-print 'veri', arr[0][0] / arr[0][1]
-print 'tahmin', np.exp(p[0] + p[1] + p[4] + p[4])
+print ('veri', arr[0][0] / arr[0][1])
+print ('tahmin', np.exp(p[0] + p[1] + p[4] + p[4]))
 ```
 
 ```
@@ -466,7 +466,7 @@ Eğer üretilen tahminler için bir güven aralığı tanımlamak istiyorsak,
 `conf_int()` ile tüm katsayılar için \%95 güven aralığını alabiliriz,
 
 ```python
-print model.conf_int()
+print (model.conf_int())
 ```
 
 ```

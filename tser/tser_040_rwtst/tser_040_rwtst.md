@@ -194,7 +194,7 @@ Kontrol için aynı hesabı `urca` paketi üzerinden işletelim, ki kritik
 değerleri de görebilelim. Not: kritik değerler için de F dağılımı
 kullanamıyoruz, çünkü artıklarda (residuals) normallik farz edemiyoruz, ki
 onların karesi ve toplamı chi kare olsun, ve chi kare bölümler F
-ölsün. Kalıntılarda normallik niye farz edilemiyor? Çünkü regresyonda bir
+olsun. Kalıntılarda normallik niye farz edilemiyor? Çünkü regresyonda bir
 önkabul değişkenlerin de $N(0,\sigma)$ olarak dağıldığıdır, fakat sıfır
 hipotezine bakarsak regresyona sokulan değişken zaman serisinin ta kendisi,
 ve zaman serisi sıfır hipotezi altında normal dağılmaz ({\d değişimi}
@@ -521,5 +521,7 @@ Kaynaklar
 
 [5] Dickey D., Fuller W., {\em Likelihood Ratio Statistics for Autoregressive
 Time Series with Unit Root}, 1981
+
+
 
 

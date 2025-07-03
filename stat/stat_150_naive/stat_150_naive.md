@@ -211,17 +211,16 @@ def test(file):
         if x in hawking_alphas: 
             ha += prob(test_vector[x], hawking_alphas[x])
                 
-    print "obama", ob, "hawking", ha, \
-    "obama", ob > ha, "hawking", ha > ob
+    print ("obama", ob, "hawking", ha, "obama", ob > ha, "hawking", ha > ob)
 
 
-print "hawking test"    
+print ("hawking test")
 test('a4.txt')
-print "hawking test"    
+print ("hawking test")
 test('a5.txt')
-print "obama test"    
+print ("obama test")
 test('b4.txt')
-print "obama test"    
+print ("obama test")
 test('b5.txt')
 ```
 

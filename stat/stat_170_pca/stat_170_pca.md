@@ -16,7 +16,7 @@ data = read_csv("testSet.txt",sep="\t",header=None)
 print (data[:10])
 ```
 
-```
+```text
            0          1
 0  10.235186  11.321997
 1  10.122339  11.810993
@@ -31,9 +31,9 @@ print (data[:10])
 ```
 
 ```python
-plt.scatter(data.ix[:,0],data.ix[:,1])
-plt.plot(data.ix[1,0],data.ix[1,1],'rd')
-plt.plot(data.ix[4,0],data.ix[4,1],'rd')
+plt.scatter(data.iloc[:,0],data.iloc[:,1])
+plt.plot(data.iloc[1,0],data.iloc[1,1],'rd')
+plt.plot(data.iloc[4,0],data.iloc[4,1],'rd')
 plt.savefig('pca_1.png')
 ```
 
@@ -173,7 +173,7 @@ eig_ind = np.argsort(eigs)
 print (eig_ind)
 ```
 
-```
+```text
 (1000, 2)
            0          1
 0  10.235186  11.321997
@@ -195,16 +195,16 @@ print (eigs[1],eigv[:,1].T)
 print (eigs[0],eigv[:,0].T)
 ```
 
-```
-2.8971349561751887 [-0.52045195 -0.85389096]
-0.36651370866931066 [-0.85389096  0.52045195]
+```text
+2.8971349561751865 [-0.52045195 -0.85389096]
+0.366513708669308 [-0.85389096  0.52045195]
 ```
 
 En büyük olan yönü quiver komutunu kullanarak orijinal veri seti
 üzerinde gösterelim,
 
 ```python
-plt.scatter(data.ix[:,0],data.ix[:,1]) 
+plt.scatter(data.iloc[:,0],data.iloc[:,1]) 
 # merkez 9,9, tahminen secildi
 plt.quiver(9,9,eigv[1,1],eigv[0,1],scale=10,color='r') 
 plt.savefig('pca_2.png')
@@ -217,7 +217,7 @@ yayılmış olduğu yön. Demek ki PCA yöntemi doğru sonucu buldu. Her iki
 yönü de çizersek,
 
 ```python
-plt.scatter(data.ix[:,0],data.ix[:,1]) 
+plt.scatter(data.iloc[:,0],data.iloc[:,1]) 
 plt.quiver(9,9,eigv[1,0],eigv[0,0],scale=10,color='r') 
 plt.quiver(9,9,eigv[1,1],eigv[0,1],scale=10,color='r')
 plt.savefig('pca_3.png')
@@ -257,7 +257,7 @@ class CCIPCA:
         self.iteration = 0
         self.mean_ = None
         self.components_ = None
-        self.mean_ = np.zeros([self.n_features], np.float)
+        self.mean_ = np.zeros([self.n_features], float)
         self.components_ = np.ones((self.n_components,self.n_features)) / \
                            (self.n_features*self.n_components)
       
@@ -314,7 +314,7 @@ class CCIPCA:
 ```python
 import pandas as pd, ccipca
 
-df = pd.read_csv('../../stat/stat_cov_corr/iris.csv')
+df = pd.read_csv('../stat_010_cov_corr/iris.csv')
 df = np.array(df)[:,:4].astype(float)
 pca = ccipca.CCIPCA(n_components=2,n_features=4)
 S  = 10
@@ -325,7 +325,7 @@ print ('varyans orani',pca.explained_variance_ratio_)
 print ('sonuc', pca.components_.T)
 ```
 
-```
+```text
 [5.1 3.5 1.4 0.2]
 varyans orani [0.99758595 0.00241405]
 sonuc [[ 0.80321426  0.21317031]
@@ -411,22 +411,23 @@ $A^T$'nin SVD'si alınmalı (altta görüyoruz).
 hesaplatalım. 
 
 ```python
-U,s,Vt = svd(meanless_data.T,full_matrices=False)
-print U
+import numpy.linalg as lin
+U,s,Vt = lin.svd(meanless_data.T,full_matrices=False)
+print (U)
 ```
 
-```
+```text
 [[-0.52045195 -0.85389096]
  [-0.85389096  0.52045195]]
 ```
 
 ```python
-print np.dot(U.T,U)
+print (np.dot(U.T,U))
 ```
 
-```
-[[  1.00000000e+00   3.70255042e-17]
- [  3.70255042e-17   1.00000000e+00]]
+```text
+[[ 1.00000000e+00 -2.72770824e-19]
+ [-2.72770824e-19  1.00000000e+00]]
 ```
 
 Görüldüğü gibi aynı özvektörleri bulduk.
@@ -458,10 +459,10 @@ from pandas import *
 import numpy.linalg as lin
 nyt = read_csv ("nytimes.csv")
 labels = nyt['class.labels']
-print nyt.ix[:8,102:107]
+print (nyt.iloc[:8,102:107])
 ```
 
-```
+```text
    after  afternoon  afterward  again  against
 0      1          0          0      0        0
 1      1          1          0      0        0
@@ -471,7 +472,6 @@ print nyt.ix[:8,102:107]
 5      0          0          0      1        2
 6      7          0          0      0        1
 7      0          0          0      0        0
-8      0          0          0      0        0
 ```
 
 Yüklemeyi yapıp sadece etiketleri aldık ve onları bir kenara
@@ -501,21 +501,20 @@ freq = freq.replace(0,1)
 w = np.log(float(nyt2.shape[0])/freq)
 nyt2 = nyt2.apply(lambda x: x*w,axis=1)
 nyt2 = nyt2.apply(lambda x: x / np.sqrt(np.sum(np.square(x))+1e-16), axis=1)
-nyt2=nyt2.ix[:,1:] # ilk kolonu atladik
-print nyt2.ix[:8,102:107]
+nyt2=nyt2.iloc[:,1:] # ilk kolonu atladik
+print (nyt2.iloc[:8,102:107])
 ```
 
-```
+```text
    afterward     again   against       age  agent
-0          0  0.000000  0.000000  0.051085      0
-1          0  0.000000  0.000000  0.000000      0
-2          0  0.021393  0.045869  0.000000      0
-3          0  0.000000  0.000000  0.000000      0
-4          0  0.000000  0.000000  0.000000      0
-5          0  0.024476  0.052480  0.000000      0
-6          0  0.000000  0.008536  0.000000      0
-7          0  0.000000  0.000000  0.000000      0
-8          0  0.000000  0.000000  0.000000      0
+0        0.0  0.000000  0.000000  0.051085    0.0
+1        0.0  0.000000  0.000000  0.000000    0.0
+2        0.0  0.021393  0.045869  0.000000    0.0
+3        0.0  0.000000  0.000000  0.000000    0.0
+4        0.0  0.000000  0.000000  0.000000    0.0
+5        0.0  0.024476  0.052480  0.000000    0.0
+6        0.0  0.000000  0.008536  0.000000    0.0
+7        0.0  0.000000  0.000000  0.000000    0.0
 ```
 
 Not: Bir diğer normalizasyon metotu
@@ -526,15 +525,15 @@ import pandas as pd
 df = pd.DataFrame([[1.,1.,np.nan],
                    [1.,2.,0.],
                    [1.,3.,np.nan]])
-print df
-print df.div(df.sum(axis=0), axis=1)
+print (df)
+print (df.div(df.sum(axis=0), axis=1))
 ```
 
-```
-   0  1   2
-0  1  1 NaN
-1  1  2   0
-2  1  3 NaN
+```text
+     0    1    2
+0  1.0  1.0  NaN
+1  1.0  2.0  0.0
+2  1.0  3.0  NaN
           0         1   2
 0  0.333333  0.166667 NaN
 1  0.333333  0.333333 NaN
@@ -546,19 +545,19 @@ SVD yapalım
 ```python
 nyt3 = nyt2 - nyt2.mean(0)
 u,s,v = lin.svd(nyt3.T,full_matrices=False)
-print s[:10]
+print (s[:10])
 ```
 
-```
-[ 1.41676764  1.37161893  1.31840061  1.24567955  1.20596873  1.18624932
-  1.15118771  1.13820504  1.1138296   1.10424634]
+```text
+[1.41676764 1.37161893 1.31840061 1.24567955 1.20596873 1.18624932
+ 1.15118771 1.13820504 1.1138296  1.10424634]
 ```
 
 ```python
-print u.shape
+print (u.shape)
 ```
 
-```
+```text
 (4430, 102)
 ```
 
@@ -567,7 +566,7 @@ SVD'nin verdiği $u$ içinden iki özvektörü seçiyoruz (en baştakiler,
 ve veriyi bu yeni kordinata izdüşümlüyoruz.
 
 ```python
-proj = np.dot(nyt, u[:,:2])
+proj = np.dot(nyt3, u[:,:2])
 proj.shape
 plt.plot(proj[:,0],proj[:,1],'.')
 plt.savefig('pca_4.png')

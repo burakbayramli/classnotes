@@ -46,10 +46,10 @@ döndüğü'' ya da ondan ne kadar etkilendiği incelenmektedir.
 ```python
 import pandas as pd
 df = pd.read_csv('galton.csv',sep=',')
-print df.head(4)
+print (df.head(4))
 ```
 
-```
+```text
    child  parent
 0   61.7    70.5
 1   61.7    68.5
@@ -63,26 +63,26 @@ boyu `parent`, hedef değişken ise çocuk `child` içinde.
 ```python
 import statsmodels.formula.api as smf
 results = smf.ols('child ~ parent', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                  child   R-squared:                       0.210
 Model:                            OLS   Adj. R-squared:                  0.210
 Method:                 Least Squares   F-statistic:                     246.8
-Date:                Thu, 03 Nov 2016   Prob (F-statistic):           1.73e-49
-Time:                        09:11:04   Log-Likelihood:                -2063.6
+Date:                Thu, 03 Jul 2025   Prob (F-statistic):           1.73e-49
+Time:                        12:11:57   Log-Likelihood:                -2063.6
 No. Observations:                 928   AIC:                             4131.
 Df Residuals:                     926   BIC:                             4141.
 Df Model:                           1                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
-                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                 coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept     23.9415      2.811      8.517      0.000        18.425    29.458
-parent         0.6463      0.041     15.711      0.000         0.566     0.727
+Intercept     23.9415      2.811      8.517      0.000      18.425      29.458
+parent         0.6463      0.041     15.711      0.000       0.566       0.727
 ==============================================================================
 Omnibus:                       11.057   Durbin-Watson:                   0.046
 Prob(Omnibus):                  0.004   Jarque-Bera (JB):               10.944
@@ -90,19 +90,15 @@ Skew:                          -0.241   Prob(JB):                      0.00420
 Kurtosis:                       2.775   Cond. No.                     2.61e+03
 ==============================================================================
 
-Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-[2] The condition number is large, 2.61e+03. This might indicate that there are
-strong multicollinearity or other numerical problems.
 ```
 
 ```python
-print pd.Series(results.resid).describe()
+print (pd.Series(results.resid).describe())
 ```
 
-```
+```text
 count    9.280000e+02
-mean     4.484995e-13
+mean    -8.412581e-13
 std      2.237339e+00
 min     -7.805016e+00
 25%     -1.366144e+00
@@ -204,10 +200,10 @@ olan değerler iyi değildir. Galton örneğinde $\hat{\beta_0}$ için,
 
 ```python
 from scipy.stats import t
-print 2*(1-t(927).cdf(np.abs(8.517)))
+print (2*(1-t(927).cdf(np.abs(8.517))))
 ```
 
-```
+```text
 0.0
 ```
 
@@ -244,7 +240,7 @@ irdeler. Eğer modelde sıfır olmayan en az bir katsayı var ise model önemlid
 (herhangi bir $i$ için $\beta_i \ne 0$). Eğer tüm katsayılar sıfır ise model
 önemsizdir ($\beta_0=\beta_1,\dots,\beta_n=0$). Örnekte
 
-```python
+```text
 ... F-statistic:                     246.8
 ... Prob (F-statistic):           1.73e-49
 ```
@@ -296,7 +292,7 @@ keşfedecek mi? Şimdi tüm değişkenlerle bir OLS yapalım,
 %R -i df
 %R fullmodel <- lm(y~x1+x2+x3+x4,data=df)
 %R -o res res = summary(fullmodel)
-print res
+print (res)
 ```
 
 ```
@@ -336,7 +332,7 @@ erişmeye uğraşırsınız. İlk önce eliminasyonu görelim,
 ```python
 %R reducedmodel <- step(fullmodel, direction="backward")
 %R -o resred resred<-summary(reducedmodel)
-print resred
+print (resred)
 ```
 
 ```
@@ -372,7 +368,7 @@ gerekir, bunu `scope` ile yaparız,
 %R minmodel <- lm(y ~ 1,data=df)
 %R fwd <- step(minmodel, direction="forward", scope = ( ~ x1 + x2 + x3 + x4))
 %R -o fwdres fwdres <- summary(fwd)
-print fwdres
+print (fwdres)
 ```
 
 ```
@@ -477,35 +473,36 @@ birden bire önemsiz olan ($>0.05$) bir değişken, önemli hale gelebilir. Altt
 ```python
 import statsmodels.formula.api as smf
 results = smf.ols('y~x1+x2+x3+x4', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       1.000
 Model:                            OLS   Adj. R-squared:                  1.000
 Method:                 Least Squares   F-statistic:                 4.230e+05
-Date:                Sat, 14 Mar 2015   Prob (F-statistic):          5.97e-201
-Time:                        15:56:03   Log-Likelihood:                -131.99
+Date:                Thu, 03 Jul 2025   Prob (F-statistic):          5.97e-201
+Time:                        12:12:50   Log-Likelihood:                -131.99
 No. Observations:                 100   AIC:                             274.0
 Df Residuals:                      95   BIC:                             287.0
 Df Model:                           4                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
-                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                 coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept      9.9495      0.094    106.098      0.000         9.763    10.136
-x1           -99.9533      0.097  -1031.975      0.000      -100.146   -99.761
-x2            -0.0410      0.095     -0.432      0.667        -0.230     0.148
-x3            75.1472      0.102    733.851      0.000        74.944    75.350
-x4             0.0486      0.100      0.486      0.628        -0.150     0.247
+Intercept      9.9495      0.094    106.098      0.000       9.763      10.136
+x1           -99.9533      0.097  -1031.975      0.000    -100.146     -99.761
+x2            -0.0410      0.095     -0.432      0.667      -0.230       0.148
+x3            75.1472      0.102    733.851      0.000      74.944      75.350
+x4             0.0486      0.100      0.486      0.628      -0.150       0.247
 ==============================================================================
 Omnibus:                        3.126   Durbin-Watson:                   2.267
 Prob(Omnibus):                  0.210   Jarque-Bera (JB):                2.795
 Skew:                          -0.191   Prob(JB):                        0.247
 Kurtosis:                       3.724   Cond. No.                         1.26
 ==============================================================================
+
 ```
 
 Veriyi ikiye katlayıp bir daha OLS,
@@ -513,34 +510,38 @@ Veriyi ikiye katlayıp bir daha OLS,
 ```python
 df2 = pd.concat((df,df))
 results = smf.ols('y~x1+x2+x3+x4', data=df2).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       1.000
 Model:                            OLS   Adj. R-squared:                  1.000
 Method:                 Least Squares   F-statistic:                 8.683e+05
-Date:                Sat, 14 Mar 2015   Prob (F-statistic):               0.00
-Time:                        15:56:41   Log-Likelihood:                -263.98
+Date:                Thu, 03 Jul 2025   Prob (F-statistic):               0.00
+Time:                        12:13:04   Log-Likelihood:                -263.98
 No. Observations:                 200   AIC:                             538.0
 Df Residuals:                     195   BIC:                             554.4
 Df Model:                           4                                         
 Covariance Type:            nonrobust                                         
 ==============================================================================
-                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
-Intercept      9.9495      0.065    152.006      0.000         9.820    10.079
-x1           -99.9533      0.068  -1478.512      0.000      -100.087   -99.820
-x2            -0.0410      0.066     -0.619      0.537        -0.172     0.090
-x3            75.1472      0.071   1051.389      0.000        75.006    75.288
-x4             0.0486      0.070      0.696      0.487        -0.089     0.186
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      9.9495      0.065    152.006      0.000       9.820      10.079
+x1           -99.9533      0.068  -1478.512      0.000    -100.087     -99.820
+x2            -0.0410      0.066     -0.619      0.537      -0.172       0.090
+x3            75.1472      0.071   1051.389      0.000      75.006      75.288
+x4             0.0486      0.070      0.696      0.487      -0.089       0.186
 ==============================================================================
 Omnibus:                        4.922   Durbin-Watson:                   2.274
 Prob(Omnibus):                  0.085   Jarque-Bera (JB):                5.589
 Skew:                          -0.191   Prob(JB):                       0.0611
 Kurtosis:                       3.724   Cond. No.                         1.26
 ==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 ```
 
 Görüldüğü gibi `x4` artık $<0.05$ altında! 
@@ -577,44 +578,45 @@ alakalı. Bu regresyonu işlettiğimizde, sonuçlar şöyle,
 import statsmodels.formula.api as smf
 import pandas as pd
 df = pd.read_csv('prez.csv')
-print df.head() , '\n'
+print (df.head() , '\n')
 regr = 'incumbent_vote ~ gdp_growth + net_approval + two_terms'
 results = smf.ols(regr, data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
-```
+```text
    year  gdp_growth  net_approval  two_terms  incumbent_vote
-0  2012         1.3          -0.8          0            52.0
-1  2008         1.3         -37.0          1            46.3
-2  2004         2.6          -0.5          0            51.2
-3  2000         8.0          19.5          1            50.3
-4  1996         7.1          15.5          0            54.7 
+0  2016         1.2           0.0       48.6             NaN
+1  2012         1.3          -0.8        0.0            52.0
+2  2008         1.3         -37.0        1.0            46.3
+3  2004         2.6          -0.5        0.0            51.2
+4  2000         8.0          19.5        1.0            50.3 
 
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:         incumbent_vote   R-squared:                       0.901
 Model:                            OLS   Adj. R-squared:                  0.878
 Method:                 Least Squares   F-statistic:                     39.52
-Date:                Fri, 11 Sep 2015   Prob (F-statistic):           8.50e-07
-Time:                        21:57:48   Log-Likelihood:                -32.747
+Date:                Thu, 03 Jul 2025   Prob (F-statistic):           8.50e-07
+Time:                        12:13:14   Log-Likelihood:                -32.747
 No. Observations:                  17   AIC:                             73.49
 Df Residuals:                      13   BIC:                             76.83
 Df Model:                           3                                         
 Covariance Type:            nonrobust                                         
 ================================================================================
-                   coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                   coef    std err          t      P>|t|      [0.025      0.975]
 --------------------------------------------------------------------------------
-Intercept       51.4363      0.811     63.409      0.000        49.684    53.189
-gdp_growth       0.5799      0.118      4.903      0.000         0.324     0.835
-net_approval     0.0987      0.021      4.764      0.000         0.054     0.143
-two_terms       -4.2983      1.032     -4.164      0.001        -6.528    -2.069
+Intercept       51.4363      0.811     63.409      0.000      49.684      53.189
+gdp_growth       0.5799      0.118      4.903      0.000       0.324       0.835
+net_approval     0.0987      0.021      4.764      0.000       0.054       0.143
+two_terms       -4.2983      1.032     -4.164      0.001      -6.528      -2.069
 ==============================================================================
 Omnibus:                        0.333   Durbin-Watson:                   1.545
 Prob(Omnibus):                  0.847   Jarque-Bera (JB):                0.484
 Skew:                          -0.169   Prob(JB):                        0.785
 Kurtosis:                       2.246   Cond. No.                         71.4
 ==============================================================================
+
 ```
 
 İnanılmaz bir başarı, `Prob (F-statistic)` değeri neredeyse sıfır,
@@ -634,24 +636,24 @@ def out_of_sample_pred(year):
     pred = np.array(df[df['year'] == year])[0][:-1]; pred[0] = 1.
     return np.dot(pred, conf)
 # o senenin verisinin disarida birakarak gecmisi tahmin et
-print 'bush/clinton'; print out_of_sample_pred(1992)
-print 'gore/bush'; print out_of_sample_pred(2000)
-print 'bush/kerry'; print out_of_sample_pred(2004)
-print 'mccain/obama'; print out_of_sample_pred(2008)
-print 'obama/romney'; print out_of_sample_pred(2012)
+print ('bush/clinton'); print (out_of_sample_pred(1992))
+print ('gore/bush'); print (out_of_sample_pred(2000))
+print ('bush/kerry'); print (out_of_sample_pred(2004))
+print ('mccain/obama'); print (out_of_sample_pred(2008))
+print ('obama/romney'); print (out_of_sample_pred(2012))
 ```
 
-```
+```text
 bush/clinton
-[ 43.68758927  52.47911415]
+[43.68758927 52.47911415]
 gore/bush
-[ 48.31291287  60.68132985]
+[48.31291287 60.68132985]
 bush/kerry
-[ 50.66667848  55.79188333]
+[50.66667848 55.79188333]
 mccain/obama
-[ 41.05409775  46.15966954]
+[41.05409775 46.15966954]
 obama/romney
-[ 49.81182614  54.45584122]
+[49.81182614 54.45584122]
 ```
 
 Tahmin hesabında değişken katsayılarının \%95 güven aralıklarını veren
@@ -689,11 +691,11 @@ olduğuna o tarihte tekrar bakılmalı),
 ```python
 conf = results.conf_int()
 pred = [1., 2.0, 0.0, 1]
-print np.dot(pred, conf), np.dot(pred, results.params)
+print (np.dot(pred, conf), np.dot(pred, results.params))
 ```
 
-```
-[ 43.80446415  52.79105137] 48.2977577583
+```text
+[43.80446415 52.79105137] 48.297757758277356
 ```
 
 Yani Demokrat adayın kaybetme şansı daha fazla, her ne kadar kesin bir şey
@@ -745,11 +747,11 @@ import pandas as pd
 df = pd.read_csv('prez_incumb.csv')
 regr = 'incumbent_vote ~ gdp_growth + net_approval + incumb_prez'
 results = smf.ols(regr, data=df).fit()
-print results.aic
+print (results.aic)
 ```
 
-```
-84.6742088339
+```text
+91.79663654753915
 ```
 
 AIC sonucu arttı, bu modelin daha kötüleştiği anlamına gelir. 
@@ -786,9 +788,4 @@ Very Close Election}, [http://www.centerforpolitics.org/crystalball/articles/abr
 [11] Bayramlı, Istatistik, *Güven Aralıkları, Hipotez Testleri*
 
 [12] Bayramlı, Istatistik, *Tahmin Aralıkları (Prediction Interval)*
-
-
-
-
-
 

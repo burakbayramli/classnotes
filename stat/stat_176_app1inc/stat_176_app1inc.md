@@ -442,13 +442,13 @@ def incremental_mean_and_var(x, last_sum, last_var, j):
 
 N = 10
 arr = np.array(range(N)) # basit veri, 0..N-1 arasi sayilar
-print arr
+print (arr)
 last_sum = arr[0]; last_var = 0.
 for j in range(2,N+1):
     last_sum,last_var = incremental_mean_and_var(arr[j-1], last_sum, last_var, j)
 
-print 'YC =', last_var / N, 'Standart = ', arr.var()
-print last_sum, arr.sum()
+print ('YC =', last_var / N, 'Standart = ', arr.var())
+print (last_sum, arr.sum())
 ```
 
 ```

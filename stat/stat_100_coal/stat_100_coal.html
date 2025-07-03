@@ -138,29 +138,23 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> minimize(residual, fit_params, args<span class="op">=</span>(coal,coal,))</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>report_fit(fit_params)</span></code></pre></div>
-<pre><code>[[Variables]]
-    m1:     0.51428096 +/- 0.406949 (79.13%) (init= 0.5)
-    lam1:   1.00000004 +/- 0.557045 (55.70%) (init= 1)
-    lam2:   3.35150806 +/- 1.791094 (53.44%) (init= 2)
-[[Correlations]] (unreported correlations are &lt;  0.100)
-    C(m1, lam1)                  =  0.905 
-    C(m1, lam2)                  =  0.878 
-    C(lam1, lam2)                =  0.772 </code></pre>
+<pre class="text"><code>[[Variables]]
+    m1:    0.50000000 (init = 0.5)
+    lam1:  1.00000000 (init = 1)
+    lam2:  2.00000000 (init = 2)</code></pre>
 <p>Sonuçlar yaklaşık <span
 class="math inline">\(\lambda_1=1,\lambda_2=3\)</span> (tam sayıya
 yuvarladık, çünkü olay sayısı tam sayı olmalı). Bu iki dağılımı verinini
 normalize edilmiş histogramı üzerinde gösterirsek,</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats.distributions <span class="im">import</span> poisson</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>coal.hist(bins<span class="op">=</span><span class="dv">7</span>,normed<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> poisson(<span class="fl">1.0</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="dv">1</span>,<span class="dv">10</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.plot(x, p.pmf(x))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> poisson(<span class="fl">3.0</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.plot(x, p.pmf(x))</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_coal_03.png&#39;</span>)</span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>coal.hist(bins<span class="op">=</span><span class="dv">7</span>,density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> poisson(<span class="fl">1.0</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="dv">1</span>,<span class="dv">10</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.plot(x, p.pmf(x))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> poisson(<span class="fl">3.0</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.plot(x, p.pmf(x))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_coal_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_coal_03.png" /></p>
 <p>Peki bu bulguyu şimdi değişim noktası keşfine nasıl çevireceğiz?
 Dikkat, üstteki iki dağılımın ayrıldığı <span
@@ -217,8 +211,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>     chi <span class="op">=</span> z1<span class="op">**</span><span class="dv">2</span><span class="op">+</span>z2<span class="op">**</span><span class="dv">2</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>     res.append(<span class="bu">float</span>(<span class="dv">1</span><span class="op">-</span>chi2.cdf(chi,dof)))</span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="dv">1851</span> <span class="op">+</span> cutoffs[np.array(res).argmax()]</span></code></pre></div>
-<pre><code>1885</code></pre>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="dv">1851</span> <span class="op">+</span> cutoffs[np.array(res).argmax()])</span></code></pre></div>
+<pre class="text"><code>1885</code></pre>
 <p>Tarihten biliyoruz ki değişimin sebebi büyük ihtimalle İngiltere’de
 1887 yılında kanunlaşan <em>Kömür Madenleri Yasası</em>’dır [3].
 Yakınlık fena değil.</p>
@@ -459,11 +453,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sample</span></span>
 <span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        zz <span class="op">=</span> z <span class="op">/</span> <span class="bu">sum</span>(z)</span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> w_choice(zz)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="bu">float</span>(theta), <span class="bu">float</span>(lam), <span class="bu">float</span>(k)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="bu">float</span>(theta), <span class="bu">float</span>(lam), <span class="bu">float</span>(k))</span>
 <span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>                </span>
 <span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&quot;coal.txt&quot;</span>)</span>
 <span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>coal(<span class="dv">1100</span>, data, init<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">30</span>], a1<span class="op">=</span><span class="dv">1</span>,a2<span class="op">=</span><span class="dv">1</span>,b1<span class="op">=</span><span class="dv">1</span>,b2<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
-<pre><code>3.32561369453 0.931821137936 42.0</code></pre>
+<pre class="text"><code>3.3256136945319414 0.9318211379358856 42.0</code></pre>
 <p>Kodları işletince elimize k = 42 değeri geçecek, yani değişim anı
 1851+42 = 1893 senesidir. Kaynaklar:</p>
 <p>[1] Ioana A. Cosma, Ludger Evers, <em>Markov Chain Monte Carlo

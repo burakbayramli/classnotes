@@ -16,7 +16,7 @@ class CCIPCA:
         self.iteration = 0
         self.mean_ = None
         self.components_ = None
-        self.mean_ = np.zeros([self.n_features], np.float)
+        self.mean_ = np.zeros([self.n_features], float)
         self.components_ = np.ones((self.n_components,self.n_features)) / \
                            (self.n_features*self.n_components)
       

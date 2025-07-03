@@ -5,7 +5,6 @@ uydurabildiğimiz gibi birden fazla çizgilerin karışımını da veriye
 uydurabiliriz. Alttaki veriye bakalım,
 
 ```python
-#lines = [[1,4,10,50],[-1,30,5,50],[4,10,20,40],[0.4,0,80,100]]
 lines = [[1,4,10,50],[-1,30,5,50],[4,10,20,40]]
 xs = []; ys = []
 for a,b,x1,x2 in lines:
@@ -16,7 +15,6 @@ for a,b,x1,x2 in lines:
 xs = np.array(xs).T.flatten()
 ys = np.array(ys).T.flatten()
 plt.scatter(xs,ys)
-plt.hold(True)
 plt.savefig('stat_lmm_01.png')
 ```
 
@@ -117,7 +115,6 @@ def em_line(x,y,n_components):
             bhat = np.sum((y-a[k]*x)*eta[:,k]) / etasum
             sigma2hat = np.sum(  (y - (a[k]*x+b[k]))**2  * eta[:,k] ) / etasum 
             pihat = (1./len(x)) * etasum
-            #print ahat, bhat, sigma2hat, pihat
             a[k] = ahat
             b[k] = bhat
             sigma2[k] = sigma2hat
@@ -133,15 +130,13 @@ def em_line(x,y,n_components):
     return a,b,eta
 
 a,b,eta = em_line(xs,ys,n_components=3)
-print a
-print b
+print (a)
+print (b)
 
 plt.scatter(xs,ys)
-plt.hold(True)
 for k in range(3):
     tmp = np.linspace(0,60,100)
     plt.plot(tmp,tmp*a[k]+b[k])
-    plt.hold(True)
 plt.savefig('stat_lmm_02.png')
 ```
 
@@ -157,7 +152,6 @@ labels =  np.argmax(eta, axis=1)
 colors = ['r','b','g','c']
 for k in range(3):    
     plt.plot(xs[labels==k],ys[labels==k],'.'+colors[k])
-    plt.hold(True)    
 plt.savefig('stat_lmm_03.png')
 ```
 

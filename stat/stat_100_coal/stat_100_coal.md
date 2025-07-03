@@ -58,16 +58,13 @@ out = minimize(residual, fit_params, args=(coal,coal,))
 report_fit(fit_params)
 ```
 
-```
+```text
 [[Variables]]
-    m1:     0.51428096 +/- 0.406949 (79.13%) (init= 0.5)
-    lam1:   1.00000004 +/- 0.557045 (55.70%) (init= 1)
-    lam2:   3.35150806 +/- 1.791094 (53.44%) (init= 2)
-[[Correlations]] (unreported correlations are <  0.100)
-    C(m1, lam1)                  =  0.905 
-    C(m1, lam2)                  =  0.878 
-    C(lam1, lam2)                =  0.772 
+    m1:    0.50000000 (init = 0.5)
+    lam1:  1.00000000 (init = 1)
+    lam2:  2.00000000 (init = 2)
 ```
+
 
 Sonuçlar yaklaşık $\lambda_1=1,\lambda_2=3$ (tam sayıya yuvarladık, çünkü
 olay sayısı tam sayı olmalı). Bu iki dağılımı verinini normalize
@@ -75,13 +72,11 @@ edilmiş histogramı üzerinde gösterirsek,
 
 ```python
 from scipy.stats.distributions import poisson
-coal.hist(bins=7,normed=True)
-plt.hold(True)
+coal.hist(bins=7,density=True)
 p = poisson(1.0)
 x = np.arange(1,10)
 plt.plot(x, p.pmf(x))
 p = poisson(3.0)
-plt.hold(True)
 plt.plot(x, p.pmf(x))
 plt.savefig('stat_coal_03.png')
 ```
@@ -137,10 +132,10 @@ for cutoff in cutoffs:
      chi = z1**2+z2**2
      res.append(float(1-chi2.cdf(chi,dof)))
 
-print 1851 + cutoffs[np.array(res).argmax()]
+print (1851 + cutoffs[np.array(res).argmax()])
 ```
 
-```
+```text
 1885
 ```
 
@@ -395,14 +390,14 @@ def coal(n,x,init,a1,a2,b1,b2):
         # sample
         zz = z / sum(z)
         k = w_choice(zz)
-    print float(theta), float(lam), float(k)
+    print (float(theta), float(lam), float(k))
                 
 data = np.loadtxt("coal.txt")
 coal(1100, data, init=[1,1,30], a1=1,a2=1,b1=1,b2=1)
 ```
 
-```
-3.32561369453 0.931821137936 42.0
+```text
+3.3256136945319414 0.9318211379358856 42.0
 ```
 
 Kodları işletince elimize k = 42 değeri geçecek, yani değişim anı 1851+42 = 1893
