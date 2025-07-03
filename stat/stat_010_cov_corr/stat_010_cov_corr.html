@@ -717,10 +717,13 @@ olduğu sonucuna böylece kolayca erişebiliriz.</p>
 <p>Tanım</p>
 <p><span class="math display">\[ S = \frac{1}{n} (X-E(X))^T(X-E(X)))
 \]</span></p>
-<p>Pandas ile <code>çov</code> çağrısı bu hesabı hızlı bir şekilde
+<p>Pandas ile <code>cov</code> çağrısı bu hesabı hızlı bir şekilde
 yapar,</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df.cov()</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;iris.csv&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">&#39;Sepal Length&#39;</span>,  <span class="st">&#39;Sepal Width&#39;</span>,  <span class="st">&#39;Petal Length&#39;</span>,  <span class="st">&#39;Petal Width&#39;</span>]]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.cov())</span></code></pre></div>
 <pre><code>              Sepal Length  Sepal Width  Petal Length  Petal Width
 Sepal Length      0.685694    -0.039268      1.273682     0.516904
 Sepal Width      -0.039268     0.188004     -0.321713    -0.117981
@@ -731,7 +734,7 @@ Petal Width       0.516904    -0.117981      1.296387     0.582414</code></pre>
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>means <span class="op">=</span> df.mean()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> df.shape[<span class="dv">0</span>]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: x <span class="op">-</span> means, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.dot(df2.T,df2) <span class="op">/</span> n</span></code></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.dot(df2.T,df2) <span class="op">/</span> n)</span></code></pre></div>
 <pre><code>[[ 0.68112222 -0.03900667  1.26519111  0.51345778]
  [-0.03900667  0.18675067 -0.319568   -0.11719467]
  [ 1.26519111 -0.319568    3.09242489  1.28774489]
@@ -744,11 +747,9 @@ veri seti üzerinde görelim, her boyut hem y-ekseni hem x-ekseninde
 verilmiş, ilişkiyi görmek için eksende o boyutu bulup kesişme
 noktalarındaki grafiğe bakmak lazım.</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;iris.csv&#39;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.ix[:,<span class="dv">0</span>:<span class="dv">4</span>]</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>pd.scatter_matrix(df)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_summary_01.png&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df = df.iloc[:,0:4]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pd.plotting.scatter_matrix(df)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_summary_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_cov_corr_01.png" /></p>
 <p>İlişki olduğu zaman o ilişkiye tekabül eden grafikte “düz çizgiye
 benzer’’ bir görüntü olur, demek ki değişkenlerden biri artınca öteki de
@@ -834,7 +835,7 @@ hala optimal olarak çalıştığı [4] bulunmuştur.</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> matthews_corrcoef</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> [<span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> [<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (matthews_corrcoef(y_true, y_pred)  )</span></code></pre></div>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> ((matthews_corrcoef(y_true, y_pred)  ))</span></code></pre></div>
 <pre><code>-0.333333333333</code></pre>
 <p>Ya da</p>
 <div class="sourceCode" id="cb8"><pre
@@ -844,7 +845,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">1</span>], [<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],<span class="op">\</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>]]</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array(a)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (matthews_corrcoef(a[:,<span class="dv">0</span>], a[:,<span class="dv">1</span>]))</span></code></pre></div>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> ((matthews_corrcoef(a[:,<span class="dv">0</span>], a[:,<span class="dv">1</span>])))</span></code></pre></div>
 <pre><code>0.541553390893</code></pre>
 <p>Medyan ve Yüzdelikler (Percentile)</p>
 <p>Üstteki hesapların çoğu sayıları toplayıp, bölmek üzerinden yapıldı.
@@ -864,19 +865,20 @@ kolay, ve veri setleri her zaman tek tepeli, simetrik olmayabiliyor.
 Örnek veri seti olarak ünlü <code>dellstore2</code> tabanındaki satış
 miktarları kullanırsak,</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.mean(data)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&quot;glass.data&quot;</span>,delimiter<span class="op">=</span><span class="st">&quot;,&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.mean(data))</span></code></pre></div>
 <pre><code>213.948899167</code></pre>
 <div class="sourceCode" id="cb12"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.median(data)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.median(data))</span></code></pre></div>
 <pre><code>214.06</code></pre>
 <div class="sourceCode" id="cb14"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.std(data)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.std(data))</span></code></pre></div>
 <pre><code>125.118481954</code></pre>
 <div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span> np.mean(data)<span class="op">+</span><span class="dv">2</span><span class="op">*</span>np.std(data)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.mean(data)<span class="op">+</span><span class="dv">2</span><span class="op">*</span>np.std(data))</span></code></pre></div>
 <pre><code>464.185863074</code></pre>
 <div class="sourceCode" id="cb18"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.percentile(data, <span class="dv">95</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.percentile(data, <span class="dv">95</span>))</span></code></pre></div>
 <pre><code>410.4115</code></pre>
 <p>Görüldüğü gibi üç nokta hesabı için ortalamadan iki sapma ötesini
 kullanırsak, 464.18, fakat 95. yüzdeliği kullanırsak 410.41 elde
@@ -1096,29 +1098,28 @@ işleme girmişlerdir, fakat basit bir BW grafiği iki setin farklılığını
 hemen gösterir.</p>
 <p>Python üzerinde basit bir BW grafiği</p>
 <div class="sourceCode" id="cb22"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spread<span class="op">=</span> rand(<span class="dv">50</span>) <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>center <span class="op">=</span> ones(<span class="dv">25</span>) <span class="op">*</span> <span class="dv">50</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>flier_high <span class="op">=</span> rand(<span class="dv">10</span>) <span class="op">*</span> <span class="dv">100</span> <span class="op">+</span> <span class="dv">100</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>flier_low <span class="op">=</span> rand(<span class="dv">10</span>) <span class="op">*</span> <span class="op">-</span><span class="dv">100</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span>concatenate((spread, center, flier_high, flier_low), <span class="dv">0</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spread<span class="op">=</span> np.random.rand(<span class="dv">50</span>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>center <span class="op">=</span> np.ones(<span class="dv">25</span>) <span class="op">*</span> <span class="dv">50</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>flier_high <span class="op">=</span> np.random.rand(<span class="dv">10</span>) <span class="op">*</span> <span class="dv">100</span> <span class="op">+</span> <span class="dv">100</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>flier_low <span class="op">=</span> np.random.rand(<span class="dv">10</span>) <span class="op">*</span> <span class="op">-</span><span class="dv">100</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>data2 <span class="op">=</span>np.concatenate((spread, center, flier_high, flier_low), <span class="dv">0</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data2)</span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_feat_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_feat_01.png" /></p>
 <p>Bir diğer örnek Glass veri seti üzerinde</p>
 <div class="sourceCode" id="cb23"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> loadtxt(<span class="st">&quot;glass.data&quot;</span>,delimiter<span class="op">=</span><span class="st">&quot;,&quot;</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>head <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">7</span>]</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tableware <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">6</span>]</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>containers <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">5</span>]</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> head[:,<span class="dv">1</span>]</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span>(containers[:,<span class="dv">1</span>], tableware[:,<span class="dv">1</span>], head[:,<span class="dv">1</span>])</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>plt.yticks([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="st">&#39;containers&#39;</span>, <span class="st">&#39;tableware&#39;</span>, <span class="st">&#39;head&#39;</span>])</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data,<span class="dv">0</span>,<span class="st">&#39;rs&#39;</span>,<span class="dv">0</span>,<span class="fl">0.75</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_feat_02.png&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>head <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">7</span>]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>tableware <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">6</span>]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>containers <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">5</span>]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (head[:,<span class="dv">1</span>])</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span>(containers[:,<span class="dv">1</span>], tableware[:,<span class="dv">1</span>], head[:,<span class="dv">1</span>])</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plt.yticks([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="st">&#39;containers&#39;</span>, <span class="st">&#39;tableware&#39;</span>, <span class="st">&#39;head&#39;</span>])</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data,<span class="dv">0</span>,<span class="st">&#39;rs&#39;</span>,<span class="dv">0</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_feat_02.png&#39;</span>)</span></code></pre></div>
 <pre><code>[ 1.51131  1.51838  1.52315  1.52247  1.52365  1.51613  1.51602  1.51623
   1.51719  1.51683  1.51545  1.51556  1.51727  1.51531  1.51609  1.51508
   1.51653  1.51514  1.51658  1.51617  1.51732  1.51645  1.51831  1.5164

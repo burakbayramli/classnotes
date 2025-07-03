@@ -698,10 +698,13 @@ Tanım
 
 $$ S = \frac{1}{n} (X-E(X))^T(X-E(X))) $$
 
-Pandas ile `çov` çağrısı bu hesabı hızlı bir şekilde yapar,
+Pandas ile `cov` çağrısı bu hesabı hızlı bir şekilde yapar,
 
 ```python
-print df.cov()
+import pandas as pd
+df = pd.read_csv('iris.csv')
+df = df[['Sepal Length',  'Sepal Width',  'Petal Length',  'Petal Width']]
+print (df.cov())
 ```
 
 ```
@@ -718,7 +721,7 @@ Eger kendimiz bu hesabi yapmak istersek,
 means = df.mean()
 n = df.shape[0]
 df2 = df.apply(lambda x: x - means, axis=1)
-print np.dot(df2.T,df2) / n
+print (np.dot(df2.T,df2) / n)
 ```
 
 ```
@@ -737,10 +740,8 @@ görmek için eksende o boyutu bulup kesişme noktalarındaki grafiğe bakmak
 lazım.
 
 ```python
-import pandas as pd
-df = pd.read_csv('iris.csv')
-df = df.ix[:,0:4]
-pd.scatter_matrix(df)
+#df = df.iloc[:,0:4]
+pd.plotting.scatter_matrix(df)
 plt.savefig('stat_summary_01.png')
 ```
 
@@ -837,7 +838,7 @@ Bazı örnekler,
 from sklearn.metrics import matthews_corrcoef
 y_true = [+1, +1, +1, -1]
 y_pred = [+1, -1, +1, +1]
-print (matthews_corrcoef(y_true, y_pred)  )
+print ((matthews_corrcoef(y_true, y_pred)  ))
 ```
 
 ```
@@ -853,7 +854,7 @@ a = [[0,  0],[0,  0],[0,  0],[0,  0],[0,  0],[1,  0],\
 [1,  1], [1,  1],[1,  1],[1,  1],[1,  1],[1,  1],\
 [1,  1],[1,  1],[1,  1]]
 a = np.array(a)
-print (matthews_corrcoef(a[:,0], a[:,1]))
+print ((matthews_corrcoef(a[:,0], a[:,1])))
 ```
 
 ```
@@ -880,7 +881,8 @@ her zaman tek tepeli, simetrik olmayabiliyor. Örnek veri seti olarak ünlü
 `dellstore2` tabanındaki satış miktarları kullanırsak,
 
 ```python
-print np.mean(data)
+data = np.loadtxt("glass.data",delimiter=",")
+print (np.mean(data))
 ```
 
 ```
@@ -888,7 +890,7 @@ print np.mean(data)
 ```
 
 ```python
-print np.median(data)
+print (np.median(data))
 ```
 
 ```
@@ -896,7 +898,7 @@ print np.median(data)
 ```
 
 ```python
-print np.std(data)
+print (np.std(data))
 ```
 
 ```
@@ -904,7 +906,7 @@ print np.std(data)
 ```
 
 ```python
-  print np.mean(data)+2*np.std(data)
+print (np.mean(data)+2*np.std(data))
 ```
 
 ```
@@ -912,7 +914,7 @@ print np.std(data)
 ```
 
 ```python
-print np.percentile(data, 95)
+print (np.percentile(data, 95))
 ```
 
 ```
@@ -1168,12 +1170,12 @@ hemen gösterir.
 Python üzerinde basit bir BW grafiği 
 
 ```python
-spread= rand(50) * 100
-center = ones(25) * 50
-flier_high = rand(10) * 100 + 100
-flier_low = rand(10) * -100
-data =concatenate((spread, center, flier_high, flier_low), 0)
-plt.boxplot(data)
+spread= np.random.rand(50) * 100
+center = np.ones(25) * 50
+flier_high = np.random.rand(10) * 100 + 100
+flier_low = np.random.rand(10) * -100
+data2 =np.concatenate((spread, center, flier_high, flier_low), 0)
+plt.boxplot(data2)
 plt.savefig('stat_feat_01.png')
 ```
 
@@ -1182,18 +1184,17 @@ plt.savefig('stat_feat_01.png')
 Bir diğer örnek Glass veri seti üzerinde
 
 ```python
-data = loadtxt("glass.data",delimiter=",")
 head = data[data[:,10]==7]
 tableware = data[data[:,10]==6]
 containers = data[data[:,10]==5]
 
-print head[:,1]
+print (head[:,1])
 
 data =(containers[:,1], tableware[:,1], head[:,1])
 
 plt.yticks([1, 2, 3], ['containers', 'tableware', 'head'])
 
-plt.boxplot(data,0,'rs',0,0.75)
+plt.boxplot(data,0,'rs',0)
 plt.savefig('stat_feat_02.png')
 ```
 

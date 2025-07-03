@@ -127,11 +127,11 @@ def do_unif(ix):
     return u
 
 u = do_unif(1e7)
-print u
+print (u)
 u = do_unif(u)
-print u
+print (u)
 u = do_unif(u)
-print u
+print (u)
 ```
 
 ```
@@ -151,11 +151,11 @@ def do_unif(ix):
     return ix, u
 
 ix, u = do_unif(1e7)
-print u
+print (u)
 ix, u = do_unif(ix)
-print u
+print (u)
 ix, u = do_unif(ix)
-print u
+print (u)
 ```
 
 ```
@@ -173,7 +173,7 @@ def unif(size,seed=1e7):
        tmp,u=do_unif(tmp)
        res.append(u)
     return np.array(res)
-print unif(size=10)
+print (unif(size=10))
 ```
 
 ```
@@ -380,7 +380,7 @@ def test(x,d=5,cdf=norm.cdf):
     hs = [c*np.cos(2*np.pi*i*x) for i in range(1,d+1)]
     res = [xx.mean() for xx in hs]
     res = [xx**2 for xx in res]
-    print len(x)*np.sum(res)
+    print (len(x)*np.sum(res))
 
 test(xstudent)
 test(xnorm)
@@ -388,7 +388,7 @@ test(xexp)
 
 from scipy.stats import chi2
 dof = 5
-print 'chi kare', chi2.ppf(0.95,dof)
+print ('chi kare', chi2.ppf(0.95,dof))
 ```
 
 ```
