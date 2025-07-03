@@ -1,5 +1,5 @@
 import scipy, matplotlib.pyplot as plt
-import numpy as np
+import numpy as np, pandas as pd
 
 def hamming(window_size):
     N = window_size;
@@ -62,8 +62,9 @@ def plotSpectrum(y,Fs):
     k = np.arange(n)
     T = n/Fs
     frq = k/T # frekansin her iki kismi
-    frq = frq[range(n/2)] # frekansin tek tarafi
-    Y = scipy.fft(y)/n # fft hesaplamak ve normalizasyon
-    Y = Y[range(n/2)] 
+    frq = frq[range(int(n/2))] # frekansin tek tarafi
+    print (y)
+    Y = scipy.fft.fft(y)/n # fft hesaplamak ve normalizasyon
+    Y = Y[range(int(n/2))] 
     plt.plot(frq,np.abs(Y),'r') # spektrumu grafiklemek
     

@@ -12,8 +12,8 @@ uygulamayı kullanarak alınan ölçümlere bakalım,
 
 ```python
 import pandas as pd
-dfacc = pd.read_csv('acc.txt',header=None,sep='\s+')
-print dfacc.head()
+dfacc = pd.read_csv('acc.txt',header=None,sep='\\s+',engine='python')
+print (dfacc.head())
 ```
 
 ```
@@ -54,7 +54,7 @@ göre yerçekimi çıkartılmış verinin ilgilendiğimiz frekansları daha net
 gösterdiği belli oluyor.
 
 ```python
-import sys; sys.path.append('../compscieng_1_32')
+import sys; sys.path.append('../../compscieng/compscieng_1_24')
 import filt
 f=plt.figure()
 filt.plotSpectrum(steps1, 6)
@@ -76,9 +76,10 @@ belli eşik, minimum mesafe değerlerini belirleyerek bir zaman serisindeki
 uç noktaları bulabiliyoruz.
 
 ```python
+sys.path.append('../../compscieng/compscieng_1_30')
 import peakutils
 idx = peakutils.indexes(steps2, thres=0.1, min_dist=3)
-print len(idx), u'tepe noktası var'
+print (len(idx), u'tepe noktası var')
 plt.plot(steps2)
 plt.plot(idx,steps2[idx],'rd')
 plt.savefig('compscieng_app40walk_03.png')
@@ -228,7 +229,7 @@ import pandas as pd, health
 import scipy.linalg as lin
 
 dir = './data/pots1/'
-dfacc = pd.read_csv(dir + 'lacc.txt',header=None,sep='\s+')
+dfacc = pd.read_csv(dir + 'lacc.txt',header=None,sep='\\s+',engine='python')
 fr=100; to=250
 dfacc = np.array(dfacc)[fr:to]
 t = dfacc[:,0] / 1e9
@@ -285,7 +286,7 @@ plt.savefig('compscieng_app40walk_10.png')
 # Tepe noktalari arasinda kac veri noktasi oldugunu FFT'nin reel kismini 
 # kullanarak hesapla
 interpeak = health.compute_interpeak(data, sample_rate)
-decel = np.int(interpeak / 2)
+decel = int(interpeak / 2)
 
 # Puruzlestirilmis verinin maksimum noktalarina yakin olan maksimum
 # noktalarini bul
@@ -310,7 +311,7 @@ plt.savefig('compscieng_app40walk_11.png')
 ![](compscieng_app40walk_11.png)
 
 ```python
-decel = np.int(np.round(stride_fraction * interpeak))
+decel = int(np.round(stride_fraction * interpeak))
 
 # ters ivmenin oldugu bolgede ortalama al, sonuc uc boyutlu vektor
 vectors = []
@@ -325,7 +326,7 @@ direction = -1 * np.mean(vectors, axis=0)
 # Birim vektor haline getir / normalize et
 direction /= np.sqrt(direction.dot(direction))
 
-print u'yürüyüş yönü', direction
+print (u'yürüyüş yönü', direction)
 ```
 
 ```
@@ -383,27 +384,27 @@ $$ \theta = \arccos \frac{u \cdot v}{||u||||v|||}$$
 def proj(u, n):
     return u - (np.dot(u,n) / np.dot(n,n)) * n
 
-dfmag = pd.read_csv(dir + 'mags.txt',header=None,sep='\s+')
+dfmag = pd.read_csv(dir + 'mags.txt',header=None,sep='\\s+',engine='python')
 dfmag = np.array(dfmag)
 dfmag = dfmag[fr:to,1:].mean(axis=0)
-print u'kuzey yönü', dfmag
+print (u'kuzey yönü', dfmag)
 
-dfg = pd.read_csv(dir + 'grav.txt',header=None,sep='\s+')
+dfg = pd.read_csv(dir + 'grav.txt',header=None,sep='\\s+',engine='python')
 dfg = np.array(dfg)
 dfg = dfg[fr:to,1:].mean(axis=0)
-print u'yerçekim vektörü', dfg
+print (u'yerçekim vektörü', dfg)
 
 pmag = proj(dfmag, dfg)
-print u'kuzey vektörü yeryüzeyinde yansıtma sonrası'
-print pmag
+print (u'kuzey vektörü yeryüzeyinde yansıtma sonrası')
+print (pmag)
 
 pwdir = proj(direction, dfg)
 pwdir = pwdir / lin.norm(pwdir)
-print u'yürüyüş yönü yansıtma sonrası'
-print pwdir
+print (u'yürüyüş yönü yansıtma sonrası')
+print (pwdir)
 a = np.arccos(np.dot(pwdir, pmag) / (lin.norm(pwdir)*lin.norm(pmag)))
-print u'Açı', np.rad2deg(a)
-print u'Açı 180 den az mi?', np.dot(dfg, np.cross(pmag, pwdir)) > 0
+print (u'Açı', np.rad2deg(a))
+print (u'Açı 180 den az mi?', np.dot(dfg, np.cross(pmag, pwdir)) > 0)
 ```
 
 ```
@@ -450,7 +451,7 @@ def compute_interpeak(data, sample_rate):
     imax_freq = np.argsort(f_signal)[-2]
     freq = np.abs(freqs[imax_freq])
     # tepe noktalari arasindaki veri nokta sayisi
-    interpeak = np.int(np.round(sample_rate / freq))
+    interpeak = int(np.round(sample_rate / freq))
 
     return interpeak
 

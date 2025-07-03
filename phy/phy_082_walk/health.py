@@ -24,7 +24,7 @@ def compute_interpeak(data, sample_rate):
     imax_freq = np.argsort(f_signal)[-2]
     freq = np.abs(freqs[imax_freq])
     # tepe noktalari arasindaki veri nokta sayisi
-    interpeak = np.int(np.round(sample_rate / freq))
+    interpeak = int(np.round(sample_rate / freq))
 
     return interpeak
 

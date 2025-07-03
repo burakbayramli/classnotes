@@ -4,7 +4,7 @@
 #
 import numpy as np
 from scipy import optimize
-from scipy.integrate import simps
+from scipy.integrate import simpson
 
 def indexes(y, thres=0.3, min_dist=1):
     '''Peak detection routine.
@@ -91,9 +91,9 @@ def centroid2(y, x=None, dx=1.):
     if x is None:
         x = np.arange(yt.size, dtype='float') * dx
 
-    normaliser = simps(yt, x)
-    centroid = simps(x * yt, x) / normaliser
-    var = simps((x - centroid) ** 2 * yt, x) / normaliser
+    normaliser = simpson(yt, x)
+    centroid = simpson(x * yt, x) / normaliser
+    var = simpson((x - centroid) ** 2 * yt, x) / normaliser
     return centroid, np.sqrt(var)
 
 def gaussian(x, ampl, center, dev):
@@ -184,4 +184,4 @@ if __name__ == "__main__":
     x = np.linspace(0, 120, 121)
     y = gaussian(x, 5, centers[0], 3) + gaussian(x, 7, centers[1], 10) + np.random.rand(x.size)
     indexes = indexes(y, thres=0.5, min_dist=30)
-    print indexes
+    print (indexes)
