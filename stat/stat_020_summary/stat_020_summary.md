@@ -425,8 +425,8 @@ versiyonu daha iyi)
 ```python
 import pandas as pd
 arr = np.array([1,2,3])
-print 'numpy', np.std(arr)
-print 'pandas', float(pd.DataFrame(arr).std())
+print ('numpy', np.std(arr))
+print ('pandas', pd.DataFrame(arr).std().iloc[0])
 ```
 
 ```
@@ -441,9 +441,3 @@ Kaynaklar
 [2] *Introduction to Probability and Statistics Using R*
 
 [3] Bayramlı, Istatistik, *Monte Carlo, Entegraller, MCMC*
-
-
-
-
-
-

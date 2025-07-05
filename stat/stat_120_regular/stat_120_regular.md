@@ -41,13 +41,13 @@ x_tmp = diabetes_x_train.copy()
 x_tmp['intercept'] = 1
 xTx = np.dot(x_tmp.T,x_tmp )
 ws = np.dot(la.inv(xTx),np.dot(x_tmp.T,diabetes_y_train))
-print ws
+print (ws)
 ```
 
-```
-[  3.03499452e-01  -2.37639315e+02   5.10530605e+02   3.27736981e+02
-  -8.14131711e+02   4.92814589e+02   1.02848453e+02   1.84606489e+02
-   7.43519617e+02   7.60951724e+01   1.52764307e+02]
+```text
+[ 3.03499452e-01 -2.37639315e+02  5.10530605e+02  3.27736981e+02
+ -8.14131711e+02  4.92814589e+02  1.02848453e+02  1.84606489e+02
+  7.43519617e+02  7.60951724e+01  1.52764307e+02]
 ```
 
 Aynı hesabı bir de `scikit-learn` paketini kullanarak yapalım. Bu
@@ -56,18 +56,18 @@ hallediyor, eğer kesi olmasın isteseydik, `fit_intercept=False`
 diyecektik.
 
 ```python
-from sklearn import linear_model, cross_validation
+from sklearn import linear_model, model_selection
 lin = linear_model.LinearRegression()
 lin.fit(diabetes_x_train, diabetes_y_train)
-print lin.coef_
-print "score", lin.score(diabetes_x_test, diabetes_y_test), 
+print (lin.coef_)
+print ("score", lin.score(diabetes_x_test, diabetes_y_test), )
 ```
 
-```
-[  3.03499452e-01  -2.37639315e+02   5.10530605e+02   3.27736981e+02
-  -8.14131711e+02   4.92814589e+02   1.02848453e+02   1.84606489e+02
-   7.43519617e+02   7.60951724e+01]
-score 0.585075302278
+```text
+[ 3.03499452e-01 -2.37639315e+02  5.10530605e+02  3.27736981e+02
+ -8.14131711e+02  4.92814589e+02  1.02848453e+02  1.84606489e+02
+  7.43519617e+02  7.60951724e+01]
+score 0.5850753022781172
 ```
 
 Sonuçlar birbirine oldukça yakın. Şimdi diğer tekniklere gelelim.
@@ -152,10 +152,10 @@ Kontrol edelim
 lam = 0.2
 wridge = np.dot(la.inv(xTx+lam*np.eye(xTx.shape[0])),\
                 np.dot(x_tmp.T,diabetes_y_train))
-print wridge
+print (wridge)
 ```
 
-```
+```text
 [  16.70807829 -179.42288145  447.64999897  285.41866481  -51.7991733
   -75.09876191 -192.46341288  123.61066573  387.91385823  105.53294479
   152.7637018 ]
@@ -166,11 +166,11 @@ print wridge
 ```python
 ridge = linear_model.Ridge(alpha=0.2)
 ridge.fit(diabetes_x_train, diabetes_y_train) 
-print ridge.score(diabetes_x_test, diabetes_y_test), ridge.coef_
+print (ridge.score(diabetes_x_test, diabetes_y_test), ridge.coef_)
 ```
 
-```
-0.553680030106 [  16.69330211 -179.414259    447.63706059  285.40960442  -51.79094255
+```text
+0.5536800301058324 [  16.69330211 -179.414259    447.63706059  285.40960442  -51.79094255
   -75.08327488 -192.45037659  123.60400024  387.91106403  105.55514774]
 ```
 
@@ -186,12 +186,12 @@ inmeyeceğiz.
 ```python
 lasso = linear_model.Lasso(alpha=0.3)
 lasso.fit(diabetes_x_train, diabetes_y_train)
-print lasso.coef_
+print (lasso.coef_)
 ```
 
-```
-[   0.           -0.          497.3407568   199.17441037   -0.           -0.
- -118.89291549    0.          430.93795945    0.        ]
+```text
+[   0.           -0.          497.3407568   199.17441037   -0.
+   -0.         -118.89291549    0.          430.93795945    0.        ]
 ```
 
 Lasso bazı katsayıları sıfıra indirdi! Bu katsayıların ağırlık verdiği
@@ -237,7 +237,7 @@ fonksiyonlar vardır, önce katları tanımlarız, sonra bu değiştirilmiş
 regresyon fonksiyonlarına katlama usulünü geçeriz.
 
 ```python
-k_fold = cross_validation.KFold(n=420, n_folds=7)
+k_fold = model_selection.KFold(n_splits=7)
 ```
 
 Katları üstteki gibi tanımladık. 420 tane veri noktasını 7 kata bol dedik.
@@ -246,10 +246,10 @@ Katları üstteki gibi tanımladık. 420 tane veri noktasını 7 kata bol dedik.
 ```python
 ridge_cv = linear_model.RidgeCV(cv=k_fold)
 ridge_cv.fit(np.array(diabetes_x), np.array(diabetes_y))
-print ridge_cv.alpha_
+print (ridge_cv.alpha_)
 ```
 
-```
+```text
 0.1
 ```
 
@@ -258,30 +258,27 @@ demek ki. Lasso için benzer şekilde
 
 ```python
 lasso_cv = linear_model.LassoCV(cv=k_fold)
-print lasso_cv.fit(diabetes_x, diabetes_y)
+print (lasso_cv.fit(diabetes_x, diabetes_y))
 ```
 
-```
-LassoCV(alphas=None, copy_X=True,
-    cv=sklearn.cross_validation.KFold(n=420, n_folds=7), eps=0.001,
-    fit_intercept=True, max_iter=1000, n_alphas=100, normalize=False,
-    precompute=auto, tol=0.0001, verbose=False)
+```text
+LassoCV(cv=KFold(n_splits=7, random_state=None, shuffle=False))
 ```
 
 ```python
-print lasso_cv.alpha_
+print (lasso_cv.alpha_)
 ```
 
-```
-0.00283958719118
+```text
+0.05705392298174187
 ```
 
 ```python
-print lasso_cv.score(diabetes_x_test, diabetes_y_test) 
+print (lasso_cv.score(diabetes_x_test, diabetes_y_test) )
 ```
 
-```
-0.597090337358
+```text
+0.596945426794025
 ```
 
 Şimdi veri setinin bir kısmı üzerinde teker teker hangi algoritmanın
@@ -291,9 +288,9 @@ daha başarılı olduğunu görelim.
 def predict(row):
     j = row; i = row-1
     new_data = diabetes_x[i:j]
-    print diabetes_y[i:j], "lasso",lasso_cv.predict(new_data), \
+    print (diabetes_y[i:j], "lasso",lasso_cv.predict(new_data), \
     	    "ridge",ridge_cv.predict(new_data), \
-      	    "linear",lin.predict(new_data)	    
+      	    "linear",lin.predict(new_data))
 
 predict(-2) # sondan ikinci veri satiri
 predict(-3)
@@ -302,17 +299,17 @@ predict(-5)
 predict(-8)
 ```
 
-```
+```text
 439    132
-Name: response, dtype: int64 lasso [ 122.2361344] ridge [ 127.1821212] linear [ 123.56604986]
+Name: response, dtype: int64 lasso [125.28690776] ridge [127.1821212] linear [123.56604986]
 438    104
-Name: response, dtype: int64 lasso [ 101.85154189] ridge [ 108.89678818] linear [ 102.5713971]
+Name: response, dtype: int64 lasso [109.2916004] ridge [108.89678818] linear [102.5713971]
 437    178
-Name: response, dtype: int64 lasso [ 192.95670241] ridge [ 189.58095011] linear [ 194.03798086]
+Name: response, dtype: int64 lasso [193.36557007] ridge [189.58095011] linear [194.03798086]
 436    48
-Name: response, dtype: int64 lasso [ 52.8903924] ridge [ 57.66611598] linear [ 52.5445869]
+Name: response, dtype: int64 lasso [55.56982967] ridge [57.66611598] linear [52.5445869]
 433    72
-Name: response, dtype: int64 lasso [ 60.42852107] ridge [ 66.3661042] linear [ 61.19831285]
+Name: response, dtype: int64 lasso [62.60106436] ridge [66.3661042] linear [61.19831285]
 ```
 
 Üstteki sonuçlara göre gerçek değeri 132 olan 439. satırda lasso 122.2,

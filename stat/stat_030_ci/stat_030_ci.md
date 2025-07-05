@@ -49,7 +49,7 @@ değer 1.96.
 
 ```python
 from scipy.stats.distributions import norm
-print norm.ppf(0.975)
+print (norm.ppf(0.975))
 ```
 
 ```
@@ -198,8 +198,8 @@ $t_{\alpha,n}$ notasyonundan hareketle $t_{0.01,3}$ değerini arıyoruz yani.
 ```python
 from scipy.stats.distributions import t
 df = 3
-print t.ppf(0.99,df)
-print 1-t.cdf(4.541,df)
+print (t.ppf(0.99,df))
+print (1-t.cdf(4.541,df))
 ```
 
 ```
@@ -282,10 +282,10 @@ n = len(data)
 dof = len(data)-1
 m = np.mean(data)
 s = np.std(data)
-print 'ortalama',m
-print 'sapma',s
-print m + t.ppf(0.025,dof) * s / np.sqrt(n),\
-      m - t.ppf(0.025,dof) * s / np.sqrt(n)
+print ('ortalama',m)
+print ('sapma',s)
+print (m + t.ppf(0.025,dof) * s / np.sqrt(n),\
+      m - t.ppf(0.025,dof) * s / np.sqrt(n))
 ```
 
 ```
@@ -313,8 +313,8 @@ Chi karenin yüzdelik kısımları altta görülebilir,
 
 ```python
 from scipy.stats.distributions import chi2
-print chi2.ppf(0.05,5)
-print chi2.ppf(0.99,5)
+print (chi2.ppf(0.05,5))
+print (chi2.ppf(0.99,5))
 ```
 
 ```
@@ -393,7 +393,7 @@ $$
 
 ```python
 from scipy.stats.distributions import chi2
-print chi2.ppf(0.05,19)
+print (chi2.ppf(0.05,19))
 ```
 
 ```
@@ -504,7 +504,7 @@ mb = np.mean(b); sb = np.std(b,ddof=1)
 from scipy.stats.distributions import norm
 sw = np.sqrt(sa**2/len(a) - sb**2/len(b))
 
-print (mb-ma) + np.array([-1,1]) * norm.ppf(0.975)*sw
+print ((mb-ma) + np.array([-1,1]) * norm.ppf(0.975)*sw)
 ```
 
 ```
