@@ -184,13 +184,13 @@ Basit bir örnek üzerinde görelim ([1, sf 620]'den alındı),
 import pandas as pd
 import numpy as np
 df = pd.read_csv('11.1.csv',sep=' ')
-print df.head()
+print (df.head())
 import statsmodels.formula.api as smf
 results = smf.ols('y ~ x', data=df).fit()
 mse = np.sum(results.resid**2) / (len(df)-2)
 s = np.sqrt(mse)
-print 'mse', mse, 's', s
-print results.summary()
+print ('mse', mse, 's', s)
+print (results.summary())
 ```
 
 ```
@@ -232,7 +232,7 @@ A = df[['x']]
 A['intercept'] = 1.
 A = A[['intercept','x']]
 ATA_inv = lin.inv(np.dot(A.T,A))
-print ATA_inv
+print (ATA_inv)
 beta_hat = np.array(results.params)
 a = np.array([[1,1]]).T
 ```
@@ -245,7 +245,7 @@ a = np.array([[1,1]]).T
 ```python
 pm = np.dot(np.dot(a.T, ATA_inv),a)[0][0]
 pred = np.dot(a.T,beta_hat)[0]
-print pm, pred
+print (pm, pred)
 ```
 
 ```
@@ -255,10 +255,10 @@ print pm, pred
 ```python
 from scipy.stats.distributions import t
 t95_val = t.ppf(0.95,len(df)-2)
-print 'tval', t95_val
-print t95_val*s*pm
-print 'Yuzde 90 guven araligi', \
-      (pred - np.array([1,-1])*t95_val*s*np.sqrt(pm))
+print ('tval', t95_val)
+print (t95_val*s*pm)
+print ('Yuzde 90 guven araligi', \
+      (pred - np.array([1,-1])*t95_val*s*np.sqrt(pm)))
 ```
 
 ```
@@ -277,7 +277,7 @@ yeni yöntemimizi kullanarak yapalım.
 ```python
 import statsmodels.formula.api as smf
 import pandas as pd
-df1 = pd.read_csv('../stat_linreg/prez.csv',sep=',')
+df1 = pd.read_csv('../stat_055_linreg/prez.csv',sep=',')
 regr = 'incumbent_vote ~ gdp_growth + net_approval + two_terms'
 results1 = smf.ols(regr, data=df1).fit()
 A1 = df1.copy()
@@ -296,8 +296,8 @@ pm1 = np.dot(np.dot(a1.T, ATA_inv1),a1)[0][0]
 pred1 = np.dot(a1.T,beta_hat1)[0]
 mse1 = np.sum(results1.resid**2) / (len(df1)-2)
 s1 = np.sqrt(mse1)
-print 'Yuzde 95 Guven Araligi', \
-      (pred1 - np.array([1,-1])*t975_val1*s1*np.sqrt(pm1))
+print ('Yuzde 95 Guven Araligi', \
+      (pred1 - np.array([1,-1])*t975_val1*s1*np.sqrt(pm1)))
 ```
 
 ```

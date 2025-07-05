@@ -187,7 +187,6 @@ import pandas as pd
 df = pd.read_csv('boy68.csv')
 df.hist()
 plt.savefig('stat_intro_04.png')
-plt.hold(False)
 ```
 
 ![](stat_intro_04.png)
@@ -413,8 +412,8 @@ alıyoruz.
 ```python
 mu=10;sigma=0.1
 data = np.random.normal(mu,sigma,100)
-hst = plt.hist(data, normed=True,bins=6)
-print hst[0]
+hst = plt.hist(data,bins=6,density=True)
+print (hst[0])
 ```
 
 ```
@@ -426,7 +425,7 @@ kutuda. Olasılık yoğunluk hesabını formülsel yapsak, mesela 10 noktasını
 ağırlığı nedir desek, 
 
 ```python
-print norm.pdf(10,mu,sigma)
+print (scipy.stats.norm.pdf(10,mu,sigma))
 ```
 
 ```
@@ -724,8 +723,8 @@ yukarıdaki form ortaya çıktı. Python ile
 
 ```python
 from scipy.stats.distributions import norm
-print norm.cdf(-0.8944)
-print 1-norm.cdf(-0.8944)
+print (norm.cdf(-0.8944))
+print (1-norm.cdf(-0.8944))
 ```
 
 ```
@@ -1184,13 +1183,13 @@ def gauss(m,v,x):
     n,d = x.shape
     S = lin.inv(v)
     x = x-m
-    y = exp(-0.5*np.diag(dot(x,np.dot(S,x.T))))
-    return y * (2*pi)**(-d/2.0) / ( np.sqrt(lin.det(v)) + 1e-6)
+    y = np.exp(-0.5*np.diag(np.dot(x,np.dot(S,x.T))))
+    return y * (2*np.pi)**(-d/2.0) / ( np.sqrt(lin.det(v)) + 1e-6)
 
 x = np.array( [[1.,1.]] )
 v = np.array( [[2.,0],[0,2.]] )
 m = np.array([1.,1.])
-print gauss(m, v, x)
+print (gauss(m, v, x))
 ```
 
 ```
@@ -1224,7 +1223,7 @@ hesaplar için görmesi kolay olsun diye $z_{0.05}$ olarak yazılıyor.
 
 ```python
 from scipy.stats.distributions import norm
-print norm.cdf(-1.64)
+print (norm.cdf(-1.64))
 ```
 
 ```

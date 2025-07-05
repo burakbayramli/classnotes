@@ -745,6 +745,8 @@ pd.plotting.scatter_matrix(df)
 plt.savefig('stat_summary_01.png')
 ```
 
+![](stat_summary_01.png)
+
 ![](stat_cov_corr_01.png)
 
 İlişki olduğu zaman o ilişkiye tekabül eden grafikte "düz çizgiye benzer''
