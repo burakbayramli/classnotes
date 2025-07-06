@@ -20,15 +20,15 @@ def do_EMmixtureBernoulli(Y,K,iter,tol):
     L = []
     for i in range(iter):
         # lPi log Mixture params Kx1
-	lPi=np.tile(-1 * np.log(N),(K,1))+logsumexp(lR).T.reshape((K,1))
+        lPi=np.tile(-1 * np.log(N),(K,1))+logsumexp(lR).T.reshape((K,1))
         const=np.tile(logsumexp(lR).T.reshape((K,1)),(1,D))
         # lP log Bernoulli params KxD
         lP=loginnerprodexp(Y.T,lR).T - const
         # lOMP log(1-P), also KxD
         lOMP=loginnerprodexp(OMY.T,lR).T-const
-	
-	# *** E-step        
-	lR=np.tile(lPi.T,(N,1))+np.dot(Y,lP.T) + np.dot(OMY,lOMP.T) # + const
+        
+        # *** E-step        
+        lR=np.tile(lPi.T,(N,1))+np.dot(Y,lP.T) + np.dot(OMY,lOMP.T) # + const
         Z=logsumexp(lR.T)
 
         lR=lR-np.tile(Z.T.reshape((N,1)),(1,K))
