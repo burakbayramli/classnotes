@@ -85,7 +85,7 @@ alıyoruz, sonra $L^{-1}y$ çözdürüyoruz. Elde edilen değerin noktasal
 import numpy.linalg as lin
 Sigma = np.array([[10., 2.],[2., 5.]])
 y = np.array([[1.],[2.]])
-print np.dot(np.dot(y.T,lin.inv(Sigma)),y)
+print (np.dot(np.dot(y.T,lin.inv(Sigma)),y))
 ```
 
 ```
@@ -98,7 +98,7 @@ print np.dot(np.dot(y.T,lin.inv(Sigma)),y)
 import scipy.linalg as slin
 L = lin.cholesky(Sigma)
 x = slin.solve_triangular(L,y,lower=True)
-print np.dot(x.T,x)
+print (np.dot(x.T,x))
 ```
 
 ```
@@ -584,7 +584,7 @@ uygulamalarda pek çok kez karşımıza çıkan değerler bunlar. Her neyse, eğ
 üstteki ifadeyi kodla hesaplarsak, 
 
 ```python
-print np.log(np.exp(-1000) + np.exp(-1001))
+print (np.log(np.exp(-1000) + np.exp(-1001)))
 ```
 
 ```
@@ -601,7 +601,7 @@ $$ -1000 + \log(1 + e^{-1})$$
 Bunu hesaplarsak, 
 
 ```python
-print -1000 + np.log(1+np.exp(-1))
+print (-1000 + np.log(1+np.exp(-1)))
 ```
 
 ```
