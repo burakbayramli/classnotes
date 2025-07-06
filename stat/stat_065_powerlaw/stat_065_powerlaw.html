@@ -167,7 +167,7 @@ grafik rutinine skalayı log bazında ayarlamasını söylememiz yeterli,
 <code>xscale,yscale</code> çağrıları ile bunu yapabiliriz.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_power(data):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    hst <span class="op">=</span> plt.hist(data, normed<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    hst <span class="op">=</span> plt.hist(data, density<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    f<span class="op">=</span>plt.figure() <span class="co"># histogram halinden cik</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> hst[<span class="dv">1</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span> y <span class="op">=</span> hst[<span class="dv">0</span>]</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    plt.plot(x, y,<span class="st">&#39;o&#39;</span>)</span>
@@ -233,17 +233,17 @@ class="math inline">\(\alpha\)</span> için kullanırım.</li>
 </ol>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hst <span class="op">=</span> plt.hist(visits, normed<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hst <span class="op">=</span> plt.hist(visits, density<span class="op">=</span><span class="va">True</span>,bins<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>visitx <span class="op">=</span> hst[<span class="dv">1</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span>visity <span class="op">=</span> hst[<span class="dv">0</span>]</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>yy <span class="op">=</span> np.log(visity)<span class="op">;</span>xx <span class="op">=</span> np.log(visitx)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>yy <span class="op">=</span> yy[visity<span class="op">&gt;</span><span class="dv">0</span>]<span class="op">;</span>xx <span class="op">=</span> xx[visity<span class="op">&gt;</span><span class="dv">0</span>]</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame([yy,xx]).T</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [[<span class="st">&#39;y&#39;</span>,<span class="st">&#39;x&#39;</span>]]</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y ~ x&#39;</span>, data<span class="op">=</span>df).fit()</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;alpha&#39;</span>, <span class="op">-</span><span class="dv">1</span> <span class="op">*</span> results.params[<span class="dv">1</span>]</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;kesi&#39;</span>, np.exp(results.params[<span class="dv">0</span>])</span></code></pre></div>
-<pre><code>alpha 0.540551473071
-kesi 0.00241514844497</code></pre>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;alpha&#39;</span>, <span class="op">-</span><span class="dv">1</span> <span class="op">*</span> results.params[<span class="dv">1</span>])</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;kesi&#39;</span>, np.exp(results.params[<span class="dv">0</span>]))</span></code></pre></div>
+<pre class="text"><code>alpha 0.5405514730706359
+kesi 0.002415148444971534</code></pre>
 <p>Bu basit yöntemin, ne yazık ki, çok ciddi problemleri var. Bu metotun
 niye kullanılmaması gerektiği [3, sf. 31]’de bulunabilir.</p>
 <p>Alternatif yöntem şöyle; önce <span
@@ -270,8 +270,8 @@ arada,</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> sympy.symbols(<span class="st">&#39;alpha&#39;</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> sympy.diff(sympy.log(alpha<span class="op">-</span><span class="dv">1</span>))</span></code></pre></div>
-<pre><code>1/(alpha - 1)</code></pre>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sympy.diff(sympy.log(alpha<span class="op">-</span><span class="dv">1</span>)))</span></code></pre></div>
+<pre class="text"><code>1/(alpha - 1)</code></pre>
 <p><span class="math display">\[ =  \frac{n}{(\alpha - 1)} -
 \sum_{i=1}^{n}  \ln \frac{x_i}{x_{min}}  = 0 \]</span></p>
 <p><span class="math display">\[  \frac{n}{(\alpha - 1)} =
@@ -305,8 +305,8 @@ parametreler olarak seçeriz. Altta örneği gösterilen
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> powerlaw</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fitvis <span class="op">=</span> powerlaw.Fit(visits, discrete<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;xmin&#39;</span>, fitvis.xmin, <span class="st">&#39;alpha&#39;</span>, fitvis.alpha</span></code></pre></div>
-<pre><code>xmin 34.0 alpha 1.57060706124</code></pre>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;xmin&#39;</span>, fitvis.xmin, <span class="st">&#39;alpha&#39;</span>, fitvis.alpha)</span></code></pre></div>
+<pre class="text"><code>xmin 34.0 alpha 1.5706070612437522</code></pre>
 <p>Hesaplanan <span class="math inline">\(\alpha\)</span> değerinin
 lineer regresyondan gelen hesaptan ne kadar farklı olduğuna dikkat!</p>
 <p><code>powerlaw</code> paketine, biraz önce yaptığı tahminler
@@ -315,18 +315,18 @@ lineer regresyondan gelen hesaptan ne kadar farklı olduğuna dikkat!</p>
 sorabiliriz, daha doğrusu her iki dağılım için Kolmogorov-Şmirnov
 testini işletiriz,</p>
 <div class="sourceCode" id="cb11"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> fitvis.exponential.KS()</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> fitvis.power_law.KS()</span></code></pre></div>
-<pre><code>0.487151691713
-0.0312634791749</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (fitvis.exponential.KS())</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (fitvis.power_law.KS())</span></code></pre></div>
+<pre class="text"><code>0.4871516917125692
+0.03126347917486605</code></pre>
 <p>Üstel kanun görüldüğü gibi daha olası (p-değer 0.05 altında). Bir
 olasılık hesabını da elle yapalım,</p>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> <span class="fl">1e2</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> x0<span class="op">**-</span>fitvis.alpha</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> (fitvis.alpha<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span> fitvis.xmin<span class="op">**</span>(fitvis.alpha<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> p<span class="op">*</span>C</span></code></pre></div>
-<pre><code>0.00308315744794</code></pre>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (p<span class="op">*</span>C)</span></code></pre></div>
+<pre class="text"><code>0.003083157447941901</code></pre>
 <p>Bazı farklı veriler üzerinde aynı hesapları görelim. Mesela 2003
 senesindeki en zengin 300 Amerikalının net varlıklarının dağılımı.</p>
 <div class="sourceCode" id="cb15"><pre
@@ -334,14 +334,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dfwl<span class="op">=</span>pd.read_csv(<span class="st">&#39;wealth.dat&#39;</span>,header<span class="op">=</span><span class="va">None</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>wealth<span class="op">=</span>np.array(dfwl)[:,<span class="dv">0</span>]</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>fitwl <span class="op">=</span> powerlaw.Fit(wealth, discrete<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;xmin&#39;</span>, fitwl.xmin, <span class="st">&#39;alpha&#39;</span>, fitwl.alpha</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;K-S testi&#39;</span>, fitwl.power_law.KS()</span></code></pre></div>
-<pre><code>xmin 1100000000.0 alpha 2.40575306524
-K-S testi 0.0432807151071</code></pre>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;xmin&#39;</span>, fitwl.xmin, <span class="st">&#39;alpha&#39;</span>, fitwl.alpha)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;K-S testi&#39;</span>, fitwl.power_law.KS())</span></code></pre></div>
+<pre class="text"><code>xmin 1100000000.0 alpha 2.4057530652382013
+K-S testi 0.043280715107065104</code></pre>
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plot_power(wealth)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_powerlaw_03.png&#39;</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_powerlaw_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_powerlaw_03.png" /></p>
 <p>Dikkat, çoğunlukla bu konularda araştırma yapanlar zengin, fakir
 herkesi kapsayan bir ölçüm üzerinden (bu konulara ilk bakan Pareto öyle
@@ -370,18 +369,17 @@ class="math inline">\(-\alpha\)</span> (düz çizgi olarak), üstel dağılım
 <div class="sourceCode" id="cb20"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> plt.figure()</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fitw.power_law.plot_pdf(linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, color<span class="op">=</span><span class="st">&#39;g&#39;</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fitw.exponential.plot_pdf(linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, color<span class="op">=</span><span class="st">&#39;r&#39;</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>fitw.plot_pdf(color<span class="op">=</span><span class="st">&#39;b&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">1e2</span>,<span class="fl">1e4</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="fl">1e-8</span>,<span class="fl">1e-4</span>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_powerlaw_01.png&#39;</span>)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>fitw.exponential.plot_pdf(linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, color<span class="op">=</span><span class="st">&#39;r&#39;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fitw.plot_pdf(color<span class="op">=</span><span class="st">&#39;b&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">1e2</span>,<span class="fl">1e4</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="fl">1e-8</span>,<span class="fl">1e-4</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_powerlaw_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_powerlaw_01.png" /></p>
 <div class="sourceCode" id="cb21"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Kolmogorov-Smirnov testi&#39;</span>, fitw.power_law.KS()</span></code></pre></div>
-<pre><code>Kolmogorov-Smirnov testi 0.00922886388026</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Kolmogorov-Smirnov testi&#39;</span>, fitw.power_law.KS())</span></code></pre></div>
+<pre class="text"><code>Kolmogorov-Smirnov testi 0.009228863880260563</code></pre>
+<p>Kodlar</p>
+<p><a href="powerlaw.py">powerlaw.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] Janert, <em>Data Analysis with Open Source Tools</em></p>
 <p>[2] Shalizi, <em>Advanced Data Analysis from an Elementary Point of

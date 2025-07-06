@@ -86,7 +86,7 @@ yeterli, `xscale,yscale` çağrıları ile bunu yapabiliriz.
 
 ```python
 def plot_power(data):
-    hst = plt.hist(data, normed=True,bins=1000)
+    hst = plt.hist(data, density=True,bins=1000)
     f=plt.figure() # histogram halinden cik
     x = hst[1][:-1]; y = hst[0]
     plt.plot(x, y,'o')
@@ -160,20 +160,20 @@ $\alpha$ için kullanırım.
 
 ```python
 import statsmodels.formula.api as smf
-hst = plt.hist(visits, normed=True,bins=1000)
+hst = plt.hist(visits, density=True,bins=1000)
 visitx = hst[1][:-1];visity = hst[0]
 yy = np.log(visity);xx = np.log(visitx)
 yy = yy[visity>0];xx = xx[visity>0]
 df = pd.DataFrame([yy,xx]).T
 df.columns = [['y','x']]
 results = smf.ols('y ~ x', data=df).fit()
-print 'alpha', -1 * results.params[1]
-print 'kesi', np.exp(results.params[0])
+print ('alpha', -1 * results.params[1])
+print ('kesi', np.exp(results.params[0]))
 ```
 
-```
-alpha 0.540551473071
-kesi 0.00241514844497
+```text
+alpha 0.5405514730706359
+kesi 0.002415148444971534
 ```
 
 Bu basit yöntemin, ne yazık ki, çok ciddi problemleri var. Bu metotun niye
@@ -200,10 +200,10 @@ Maksimum değer için $\alpha$'ya göre türevi alıp sıfıra eşitleriz ve
 ```python
 import sympy
 alpha = sympy.symbols('alpha')
-print sympy.diff(sympy.log(alpha-1))
+print (sympy.diff(sympy.log(alpha-1)))
 ```
 
-```
+```text
 1/(alpha - 1)
 ```
 
@@ -234,11 +234,11 @@ verisi üzerinde işletelim,
 ```python
 import powerlaw
 fitvis = powerlaw.Fit(visits, discrete=False)
-print 'xmin', fitvis.xmin, 'alpha', fitvis.alpha
+print ('xmin', fitvis.xmin, 'alpha', fitvis.alpha)
 ```
 
-```
-xmin 34.0 alpha 1.57060706124
+```text
+xmin 34.0 alpha 1.5706070612437522
 ```
 
 Hesaplanan $\alpha$ değerinin lineer regresyondan gelen hesaptan ne kadar
@@ -250,13 +250,13 @@ farklı olduğuna dikkat!
 doğrusu her iki dağılım için Kolmogorov-Şmirnov testini işletiriz,
 
 ```python
-print fitvis.exponential.KS()
-print fitvis.power_law.KS()
+print (fitvis.exponential.KS())
+print (fitvis.power_law.KS())
 ```
 
-```
-0.487151691713
-0.0312634791749
+```text
+0.4871516917125692
+0.03126347917486605
 ```
 
 Üstel kanun görüldüğü gibi daha olası (p-değer 0.05 altında). Bir olasılık
@@ -266,11 +266,11 @@ hesabını da elle yapalım,
 x0 = 1e2
 p = x0**-fitvis.alpha
 C = (fitvis.alpha-1) * fitvis.xmin**(fitvis.alpha-1)
-print p*C
+print (p*C)
 ```
 
-```
-0.00308315744794
+```text
+0.003083157447941901
 ```
 
 Bazı farklı veriler üzerinde aynı hesapları görelim. Mesela 2003
@@ -281,19 +281,18 @@ import powerlaw
 dfwl=pd.read_csv('wealth.dat',header=None)
 wealth=np.array(dfwl)[:,0]
 fitwl = powerlaw.Fit(wealth, discrete=True)
-print 'xmin', fitwl.xmin, 'alpha', fitwl.alpha
-print 'K-S testi', fitwl.power_law.KS()
+print ('xmin', fitwl.xmin, 'alpha', fitwl.alpha)
+print ('K-S testi', fitwl.power_law.KS())
 ```
 
-```
-xmin 1100000000.0 alpha 2.40575306524
-K-S testi 0.0432807151071
+```text
+xmin 1100000000.0 alpha 2.4057530652382013
+K-S testi 0.043280715107065104
 ```
 
 ```python
 plot_power(wealth)
 plt.savefig('stat_powerlaw_03.png')
-plt.hold(False)
 ```
 
 ![](stat_powerlaw_03.png)
@@ -332,25 +331,26 @@ dağılım (kırmızı çizgi) ve üstel kanun uyumunu aynı grafikte gösterebi
 ```python
 f = plt.figure()
 fitw.power_law.plot_pdf(linestyle='--', color='g')
-plt.hold(True)
 fitw.exponential.plot_pdf(linestyle='--', color='r')
-plt.hold(True)
 fitw.plot_pdf(color='b', linewidth=2)
 plt.xlim(1e2,1e4)
 plt.ylim(1e-8,1e-4)
 plt.savefig('stat_powerlaw_01.png')
-plt.hold(False)
 ```
 
 ![](stat_powerlaw_01.png)
 
 ```python
-print 'Kolmogorov-Smirnov testi', fitw.power_law.KS()
+print ('Kolmogorov-Smirnov testi', fitw.power_law.KS())
 ```
 
+```text
+Kolmogorov-Smirnov testi 0.009228863880260563
 ```
-Kolmogorov-Smirnov testi 0.00922886388026
-```
+
+Kodlar
+
+[powerlaw.py](powerlaw.py)
 
 Kaynaklar
 
