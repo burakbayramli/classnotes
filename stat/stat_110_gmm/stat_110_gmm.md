@@ -34,7 +34,6 @@ men = data[data[:,0] == 2]
 plt.xlim(55,80)
 plt.ylim(80,280)
 plt.plot (women[:,1],women[:,2], 'b.')
-plt.hold(True)
 plt.plot (men[:,1],men[:,2], 'r.')
 plt.xlabel('boy (inch)')
 plt.ylabel('agirlik (pound)')
@@ -66,11 +65,9 @@ men = data[data[:,0] == 2]
 plt.xlim(55,80)
 plt.ylim(80,280)
 plt.plot (women[:,1],women[:,2], 'b.')
-plt.hold(True)
 plt.plot (men[:,1],men[:,2], 'r.')
 plt.xlabel('boy (inch)')
 plt.ylabel('agirlik (pound)')
-plt.hold(True)
 
 x = np.arange(55., 80., 1)
 y = np.arange(80., 280., 1)
@@ -81,22 +78,21 @@ nx, ny = X.shape
 mu1 = np.array([  72.89350086,  193.21741426])
 sigma1 = np.matrix([[    7.84711283,    25.03111826],
                     [   25.03111826,  1339.70289046]])
-for i in xrange(nx):
-    for j in xrange(ny):
+for i in range(nx):
+    for j in range(ny):
         Z[i,j] = em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu1,sigma1)
         
 levels = np.linspace(Z.min(), Z.max(), 4)
 
 plt.contour(X, Y, Z, colors='b', levels=levels)
-plt.hold(True)
 
 Z = np.zeros(X.shape)
 nx, ny = X.shape
 mu2 = np.array([  66.15903841,  135.308125  ])
 sigma2 = np.matrix([[  14.28189396,   51.48931033],
                     [  51.48931033,  403.09566456]])
-for i in xrange(nx):
-    for j in xrange(ny):
+for i in range(nx):
+    for j in range(ny):
         Z[i,j] = em.norm_pdf(np.array([X[i,j], Y[i,j]]),mu2,sigma2)
         
 levels = np.linspace(Z.min(), Z.max(), 4)
@@ -482,7 +478,7 @@ def gm_assign_to_cluster(X, center_list, cov_list, p_k):
 
 def logmulnormpdf(X, MU, SIGMA):
     if MU.ndim != 1:
-        raise ValueError, "MU must be a 1 dimensional array"
+        raise ValueError("MU must be a 1 dimensional array")
     mu = MU
     x = X.T
     if x.ndim == 1:
@@ -502,12 +498,12 @@ def gmm_init(X, K, verbose = False,
                     cov_init = 'var'):
     samples, dim = np.shape(X)
     if cluster_init == 'sample':
-        if verbose: print "Using sample GMM initalization."
+        if verbose: print ("Using sample GMM initalization.")
         center_list = []
         for i in range(K):
             center_list.append(X[np.random.randint(samples), :])
     elif cluster_init == 'box':
-        if verbose: print "Using box GMM initalization."
+        if verbose: print ("Using box GMM initalization.")
         center_list = []
         X_max = np.max(X, axis=0)
         X_min = np.min(X, axis=0)
@@ -515,7 +511,7 @@ def gmm_init(X, K, verbose = False,
             init_point = ((X_max-X_min)*np.random.rand(1,dim)) + X_min
             center_list.append(init_point.flatten())            
     elif cluster_init == 'kmeans':
-        if verbose: print "Using K-means GMM initalization."
+        if verbose: print ("Using K-means GMM initalization.")
         # Normalize data (K-means is isotropic)
         normalizerX = preproc.Normalizer(X)
         nX = normalizerX.transform(X)
@@ -531,7 +527,7 @@ def gmm_init(X, K, verbose = False,
         cc = normalizerX.invtransform(cc)
         for i in range(cc.shape[0]):
             center_list.append(cc[i,:])
-        print cc
+        print (cc)
     else:
         raise "Unknown initialization of EM of MoG centers."
 
@@ -575,7 +571,7 @@ def em_gm(X, K, max_iter = 50, verbose = False, \
             clusters_found = True
         except Cov_problem:
             if verbose:
-                print "Problems with the co-variance matrix, tries left ", max_tries
+                print ("Problems with the co-variance matrix, tries left ", max_tries)
 
     if clusters_found:
         return center_list, cov_list, p_k, logL
@@ -599,7 +595,7 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
         diag_add_vec = diag_add * feature_var
     old_logL = np.NaN
     logL = np.NaN
-    for i in xrange(max_iter):
+    for i in range(max_iter):
         try:
             center_list, cov_list, p_k, logL = __em_gm_step(X, center_list,\
                 cov_list, p_k, K, diag_add_vec)
@@ -610,16 +606,16 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
         # Check if we have problems with cluster sizes
         for i2 in range(len(center_list)):
             if np.any(np.isnan(cov_list[i2])):
-                print "problem"
+                print ("problem")
                 raise Cov_problem()
 
         if old_logL != np.NaN:
             if verbose:
-                print "iteration=", i, " delta log likelihood=", \
-                    old_logL - logL
+                print ("iteration=", i, " delta log likelihood=", \
+                    old_logL - logL)
             if np.abs(logL - old_logL) < delta_stop: #* samples:
                 delta_stop_count += 1
-                if verbose: print "gmm_em_continue: delta_stop_count =", delta_stop_count
+                if verbose: print ("gmm_em_continue: delta_stop_count =", delta_stop_count)
             else:
                 delta_stop_count = 0
             if delta_stop_count>=delta_stop_count_end:
@@ -666,8 +662,8 @@ mc = [0.4, 0.4, 0.2]
 centroids = [ np.array([0,0]), np.array([3,3]), np.array([0,4]) ]
 ccov = [ np.array([[1,0.4],[0.4,1]]), np.diag((1,2)), np.diag((0.4,0.1)) ]
 cen_lst, cov_lst, p_k, logL = em.em_gm(data, K = 2, max_iter = 400)
-for cen in cen_lst: print cen
-for cov in cov_lst: print cov
+for cen in cen_lst: print (cen)
+for cov in cov_lst: print (cov)
 ```
 
 ```
@@ -691,15 +687,15 @@ ve en iyi AIC vereni seçeriz.
 
 ```python
 import pandas as pd
-ff = '../../app_math/kmeans/synthetic.txt'
-df = pd.read_csv(ff,comment='#',names=['a','b'],sep="   ")
+ff = '../../algs/algs_080_kmeans/synthetic.txt'
+df = pd.read_csv(ff,comment='#',names=['a','b'],sep="\\s\\s\\s",engine='python')
 ```
 
 ```python
-from sklearn.mixture import GMM
+from sklearn.mixture import GaussianMixture
 for i in range(10,30):
-   g = GMM(n_components=i).fit(df)
-   print i, 'clusters', g.aic(df)
+   g = GaussianMixture(n_components=i).fit(df)
+   print (i, 'clusters', g.aic(df))
 ```
 
 ```
@@ -731,13 +727,12 @@ ilgilendiren uzun süreli düşüşten sonraki bu ilk çıkış. O nokta optimal
 değerini verecektir, ki bu sayı 20.
 
 ```python
-from sklearn.mixture import GMM
-g = GMM(n_components=20).fit(df)
+from sklearn.mixture import GaussianMixture
+g = GaussianMixture(n_components=20).fit(df)
 ```
 
 ```python
 plt.scatter(df.a,df.b)
-plt.hold(True)
 plt.plot(g.means_[:,0], g.means_[:,1],'ro')
 plt.savefig('stat_gmm_03.png')
 ```
@@ -765,7 +760,7 @@ görelim.
 import pandas as pd, zipfile
 with zipfile.ZipFile('skin.zip', 'r') as z:
     d =  pd.read_csv(z.open('skin.csv'),sep=',')
-print d[:3]
+print (d[:3])
 ```
 
 ```
@@ -787,7 +782,6 @@ kodlama yöntemini temsil ediyorlar. Grafikleyelim,
 nd = d[d['skin'] == False]
 sd = d[d['skin'] == True]
 plt.plot(nd['r'],nd['g'],'.')
-plt.hold(True)
 plt.plot(sd['r'],sd['g'],'rx')
 plt.savefig('stat_gmm_01.png')
 ```
@@ -800,7 +794,6 @@ Ya da H,S üzerinden
 nd = d[d['skin'] == False]
 sd = d[d['skin'] == True]
 plt.plot(nd['h'],nd['s'],'.')
-plt.hold(True)
 plt.plot(sd['h'],sd['s'],'rx')
 plt.savefig('stat_gmm_02.png')
 ```
@@ -835,80 +828,6 @@ aynı ağırlıkta olan bir Gaussian her türlü veriyi temsil edemez, en esneğ
 kullanmaktır. Scikit Learn ile bu seçim GMM için `full` ile yapılır,
 sadece çaprazı kullan anlamına gelen `diag` da olabilirdi.
 
-```python
-import zipfile
-from sklearn.cross_validation import train_test_split
-from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import roc_auc_score
-from sklearn.mixture import GMM
-import pandas as pd
-
-class GMMClassifier():
-   def __init__(self,k,var):
-       self.clfs = [GMM(n_components=k,
-                    covariance_type=var,thresh=0.1, 
-                    min_covar=0.0001,n_iter=100) for i in range(2)]
-
-   def fit(self,X,y):
-       self.clfs[0].fit(X[y==0])
-       self.clfs[1].fit(X[y==1])
-
-   def predict(self,X):
-       res0 = self.clfs[0].score(X)
-       res1 = self.clfs[1].score(X)
-       res = (res1 > res0)
-       return res.astype(float)
-
-if __name__ == "__main__": 
- 
-   with zipfile.ZipFile('skin.zip', 'r') as z:
-      df =  pd.read_csv(z.open('skin.csv'),sep=',')
-   y = (df['skin'] == True).astype(float)
-   X = df[['h','s','v','r','g']]
-   
-   res = []   
-   for i in range(5):
-      clf = GMMClassifier(k=10,var='full')
-      x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=2000)
-      clf.fit(x_train,y_train)
-      preds = clf.predict(x_test)
-
-      fpr, tpr, thresholds = roc_curve(y_test, preds)
-      roc_auc = auc(fpr, tpr)
-      res.append(roc_auc)
-
-   print 'deneyler'
-   print res
-   print 'nihai ortalama', np.array(res).mean()
-```
-
-```
-deneyler 
-[0.99075081610446136, 0.98417442945172173, 0.98641291695170819,
- 0.98779826464208242, 0.99239130434782608] 
-nihai ortalama 0.9883055463
-```
-
-Başarı oranı yüzde 98.8! Bu problem üzerinde pek çok diğer yöntem denedik,
-mesela KNN sınıflayıcı, Lojistik Regresyon, vs. gibi, bu yöntem tüm
-diğerlerini geçti. 
-
-İlginç bir yan bir soru, "hangi kolonların kullanılacağı''. Bu bağlamda
-projede arkadaşlardan "ama HSV değerleri RGB değerlerinden
-türetilebiliyor, ya birini ya ötekini kullanmak yeterli olmaz mı?'' yorumu
-yapanlar oldu. Evet, bu verinin diğerinden "türetilmiş'' olduğu doğru, ve
-beklenir ki ideal bir dünyada mükemmel bir yapay öğrenim algoritmasının bu
-tür bir yardıma ihtiyacı olmaz, algoritma o kadar iyidir ki ona sanki aynı
-veriyi tekrar vermiş gibi oluruz, en iyi ihtimalle ek külfet
-yaratırız. Fakat pratikte bu ek veri algoritmaya ek bazı sinyaller
-verebilir. Mesela eğer müşterilerin kilosu üzerinden bir öğrenim yapıyor
-olsaydık, 80 kilodan daha az ya da daha fazla olmayı (problem alanına göre)
-ayrı bir kolon olarak kodlamak avantaj getirebilirdi. Tabii ki kilo verisi
-sayısal değer olarak azıyla fazlasıyla oradadır, fakat önem verdiğimiz
-noktaları türetilmiş veri olarak öğrenim algoritmasına vermenin zararı
-yoktur. Üstteki örnekte GB değerlerinin HSV ile beraber kullanılmasının
-başarı şansını biraz daha arttırdığını görebiliriz.
-
 Kaynaklar
 
 [1] Alpaydin, E., *Introduction to Machine Learning*
@@ -923,13 +842,5 @@ Mixture Of Gaussians}, [http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf](ht
 [5] Zaki, *Data Mining and Analysis: Fundamental Concepts and Algorithms*
 
 [6] Bayramlı, Istatistik, *Çok Değişkenli Bernoulli Karışımı*
-
-
-
-
-
-
-
-
 
 

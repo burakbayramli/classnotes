@@ -56,7 +56,7 @@ def gm_assign_to_cluster(X, center_list, cov_list, p_k):
 
 def logmulnormpdf(X, MU, SIGMA):
     if MU.ndim != 1:
-        raise ValueError, "MU must be a 1 dimensional array"
+        raise ValueError("MU must be a 1 dimensional array")
     mu = MU
     x = X.T
     if x.ndim == 1:
@@ -76,12 +76,12 @@ def gmm_init(X, K, verbose = False,
                     cov_init = 'var'):
     samples, dim = np.shape(X)
     if cluster_init == 'sample':
-        if verbose: print "Using sample GMM initalization."
+        if verbose: print ("Using sample GMM initalization.")
         center_list = []
         for i in range(K):
             center_list.append(X[np.random.randint(samples), :])
     elif cluster_init == 'box':
-        if verbose: print "Using box GMM initalization."
+        if verbose: print ("Using box GMM initalization.")
         center_list = []
         X_max = np.max(X, axis=0)
         X_min = np.min(X, axis=0)
@@ -89,7 +89,7 @@ def gmm_init(X, K, verbose = False,
             init_point = ((X_max-X_min)*np.random.rand(1,dim)) + X_min
             center_list.append(init_point.flatten())            
     elif cluster_init == 'kmeans':
-        if verbose: print "Using K-means GMM initalization."
+        if verbose: print ("Using K-means GMM initalization.")
         # Normalize data (K-means is isotropic)
         normalizerX = preproc.Normalizer(X)
         nX = normalizerX.transform(X)
@@ -105,7 +105,7 @@ def gmm_init(X, K, verbose = False,
         cc = normalizerX.invtransform(cc)
         for i in range(cc.shape[0]):
             center_list.append(cc[i,:])
-        print cc
+        print (cc)
     else:
         raise "Unknown initialization of EM of MoG centers."
 
@@ -149,7 +149,7 @@ def em_gm(X, K, max_iter = 50, verbose = False, \
             clusters_found = True
         except Cov_problem:
             if verbose:
-                print "Problems with the co-variance matrix, tries left ", max_tries
+                print ("Problems with the co-variance matrix, tries left ", max_tries)
 
     if clusters_found:
         return center_list, cov_list, p_k, logL
@@ -171,9 +171,9 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
     if diag_add!=0:
         feature_var = np.var(X, axis=0)
         diag_add_vec = diag_add * feature_var
-    old_logL = np.NaN
-    logL = np.NaN
-    for i in xrange(max_iter):
+    old_logL = np.nan
+    logL = np.nan
+    for i in range(max_iter):
         try:
             center_list, cov_list, p_k, logL = __em_gm_step(X, center_list,\
                 cov_list, p_k, K, diag_add_vec)
@@ -184,16 +184,16 @@ def gmm_em_continue(X, center_list, cov_list, p_k,
         # Check if we have problems with cluster sizes
         for i2 in range(len(center_list)):
             if np.any(np.isnan(cov_list[i2])):
-                print "problem"
+                print ("problem")
                 raise Cov_problem()
 
-        if old_logL != np.NaN:
+        if old_logL != np.nan:
             if verbose:
-                print "iteration=", i, " delta log likelihood=", \
-                    old_logL - logL
+                print ("iteration=", i, " delta log likelihood=", \
+                    old_logL - logL)
             if np.abs(logL - old_logL) < delta_stop: #* samples:
                 delta_stop_count += 1
-                if verbose: print "gmm_em_continue: delta_stop_count =", delta_stop_count
+                if verbose: print ("gmm_em_continue: delta_stop_count =", delta_stop_count)
             else:
                 delta_stop_count = 0
             if delta_stop_count>=delta_stop_count_end:

@@ -10,7 +10,7 @@ class node:
         self.count += numOccur
         
     def disp(self, ind=1):
-        print '  '*ind, self.name, ' ', self.count
+        print ('  '*ind, self.name, ' ', self.count)
         for child in self.children.values():
             child.disp(ind+1)
 
@@ -20,9 +20,17 @@ def create_tree(dataSet, minSup=1):
     for trans in dataSet: # ilk gecis veri ogelerinin ne kadar oldugunu / frekansini sayiyor
         for item in trans:
             header_table[item] = header_table.get(item, 0) + dataSet[trans]
-    for k in header_table.keys():  #remove items not meeting minSup
+    
+    # Create a list of keys to remove
+    keys_to_remove = []
+    for k in header_table.keys():  # Collect items not meeting minSup
         if header_table[k] < minSup: 
-            del(header_table[k])
+            keys_to_remove.append(k)
+            
+    # Remove items after iteration
+    for k in keys_to_remove:
+        del(header_table[k])
+
     freqItemSet = set(header_table.keys())
     # alt min destektek uzerinde hic oge yoksa disari cik
     if len(freqItemSet) == 0: return None, None  
@@ -78,7 +86,7 @@ def find_pre_path(basePat, node): #node comes from header table
 
 def mine_tree(inTree, header_table, minSup, preFix, freqItemList):
     #(sort header table)
-    bigL = [v[0] for v in sorted(header_table.items(), key=lambda p: p[1])]
+    bigL = [v[0] for v in sorted(header_table.items(), key=lambda p: p[1][0])] # Changed from p[1] to p[1][0]
     for base_pattern in bigL:  #start from bottom of header table
         newFreqSet = preFix.copy()
         newFreqSet.add(base_pattern)
@@ -96,16 +104,11 @@ def create_init_set(dataSet):
         retDict[frozenset(trans)] = 1
     return retDict
 
-def create_init_set(dataSet):
-    retDict = {}
-    for trans in dataSet:
-        retDict[frozenset(trans)] = 1
-    return retDict
 
 def fpgrowth(data, minsup):
     init_set = create_init_set(data)
     tree, header_tab = create_tree(init_set, minsup)
-    print tree
+    print (tree)
     tree.disp(); items = []
     mine_tree(tree, header_tab, minsup, set([]), items)
     return items
@@ -122,5 +125,5 @@ if __name__ == "__main__":
         ]
 
     items = fpgrowth(data, minsup=3)
-    for x in items: if len(x) > 1: print x
-
+    for x in items:
+        if len(x) > 1: print (x)

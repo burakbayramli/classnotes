@@ -20,7 +20,7 @@ teknik. İstatistiki bir teknik olan Çok Boyutlu Bernoulli Karışımları da b
 alanda kullanılan bir yaklaşım.
 
 Bir diğer alternatif ikisel matris ayrıştırması (binary matrix
-factorızation -BMF-) kullanmaktır [3]. Aynen SVD'de olduğu gibi BMF de bir
+factorization -BMF-) kullanmaktır [3]. Aynen SVD'de olduğu gibi BMF de bir
 matrisi ayrıştırır, fakat üç matris yerine iki matrise ayrıştırır ve hem
 sonuç matrisi hem de ayrıştırılan matrisler sadece 0 ya da 1 değerini
 taşıyabilirler. Yani bu ayrıştırma sonuç matrislerinin ikisel olmasını
@@ -62,7 +62,7 @@ a = np.array([[1,  0],
 b = np.array([[1,  1,  0],
                [0,  1,  1]], dtype=bool)
 
-print np.dot(a,b)
+print (np.dot(a,b))
 ```
 
 ```
@@ -74,7 +74,7 @@ print np.dot(a,b)
 0 ve 1 değerleri görmek için 1 ile çarpmak yeterli
 
 ```python
-print 1*np.dot(a,b)
+print (1*np.dot(a,b))
 ```
 
 ```
@@ -114,34 +114,25 @@ import nimfa
 import pandas as pd
 import scipy.sparse as sp
 
-def __fact_factor(X):
-    return X.todense() if sp.isspmatrix(X) else X
+threshold = 0.1
 
 A = np.array([[1., 1., 0],
               [1., 1., 1.],
               [0, 1., 1.]])
 
-fctr = nimfa.mf(A,
-              seed = "nndsvd", 
-              rank = 2, 
-              method = "bmf", 
-              max_iter = 40, 
-              initialize_only = True,
-              lambda_w = 1.1,
-              lambda_h = 1.1)
-
-res = nimfa.mf_run(fctr)
-
-threshold = 0.2
-res1 = __fact_factor(res.basis())
-res2 = __fact_factor(res.coef())
+nmf_model = nimfa.Bmf(A, rank=2, seed='nndsvd', max_iter=40, lambda_w=1.1, lambda_h=1.1)
+nmf = nmf_model()
+res1 = nmf.basis()
+res2 = nmf.coef()
+	      
+print (res1)
 res1 = np.abs(np.round(res1 - 0.5 + threshold))
 res2 = np.abs(np.round(res2 - 0.5 + threshold))
 res1 = pd.DataFrame(res1, index=['long-haired','well-known','male'])
 res2 = pd.DataFrame(res2, columns=['A','B','C'])
-print res1
-print '\n'
-print res2
+print (res1)
+print ('\n')
+print (res2)
 ```
 
 ```
@@ -217,7 +208,7 @@ veride bir kalıp olup olmadığına bakacağız. [2]'deki kodu [1]'den aldığ�
 import fp
 items = fp.fpgrowth(data, minsup=6)
 for x in items:
-    if len(x) > 1: print x
+    if len(x) > 1: print (x)
 ```
 
 ```
@@ -267,7 +258,7 @@ def one_hot_dataframe(data, cols, replace=False):
     mkdict = lambda row: dict((col, row[col]) for col in cols)
     tmp = data[cols].apply(mkdict, axis=1)
     vecData = pd.DataFrame(vec.fit_transform(tmp).toarray())
-    vecData.columns = vec.get_feature_names()
+    vecData.columns = vec.get_feature_names_out()
     vecData.index = data.index
     if replace is True:
         data = data.drop(cols, axis=1)
@@ -278,10 +269,10 @@ cols = ['outlook','temparature','humidity','windy','play']
 df = pd.DataFrame(data,columns=cols)
 # kolon ismini veriden cikart, cunku tekrar geri koyulacak
 # fpgrowth icin veri icinde olmasi lazim
-df = df.applymap(lambda x: re.sub('.*?=','',x))
+df = df.map(lambda x: re.sub('.*?=','',x))
 df2, _, _ = one_hot_dataframe(df, cols, replace=True)
 # tek ornek ekrana bas
-print df2.ix[0]
+print (df2.iloc[0])
 ```
 
 ```
@@ -306,23 +297,14 @@ Name: 0, dtype: float64
 import nimfa
 import scipy.sparse as sp
 
-def __fact_factor(X):
-    return X.todense() if sp.isspmatrix(X) else X
-
-fctr = nimfa.mf(np.array(df2).T, seed = "nndsvd", 
-              rank = 4, method = "bmf", 
-              max_iter = 40, initialize_only = True,
-              lambda_w = 1.1, lambda_h = 1.1)
-
-res = nimfa.mf_run(fctr)
-
-threshold = 0.2
-res1 = __fact_factor(res.basis())
-res2 = __fact_factor(res.coef())
+nmf_model = nimfa.Bmf(np.array(df2).T, rank=4, seed='nndsvd', max_iter=40, lambda_w=1.1, lambda_h=1.1)
+nmf = nmf_model()
+res1 = nmf.basis()
+res2 = nmf.coef()
 res1 = np.abs(np.round(res1 - 0.5 + threshold))
 res2=  np.abs(np.round(res2 - 0.5 + threshold))
 res1 = pd.DataFrame(res1,index=df2.columns)
-print res1
+print (res1)
 ```
 
 ```
@@ -345,7 +327,7 @@ Bu sonuçları kategoriksel hale çevirip tekrar ekrana basalım,
 
 ```python
 for i in range(4):
-    print np.array(df2.columns)[res1.ix[:,i] == 1]
+    print (np.array(df2.columns)[res1.iloc[:,i] == 1])
 ```
 
 ```
@@ -394,240 +376,6 @@ BMF için kerte $k$ kullanıcı tarafından seçilmeli, ama bu durum SVD, ya da
 GMM ile kümeleme gibi diğer yapay öğrenim metotlarından farklı değildir. Bu
 oynanması gereken, keşfedilmesi gereken bir değer.
 
-Çok Değişkenli Bernoulli Karışımı Kümelemesi ile İlişkisel Madencilik
-
-Bir diger yaklasim kümeleme üzerinden kural çıkartmak. Örnek veri olarak
-[7] yazısındanki Movielens 1M verisini kullanacağız. Ayrıca bu verideki
-posta kodu (zip) ve meslek (occupation) verisine README'ye ve bir Internet
-sitesine [4] danışarak sözel açıklamalarını koyduk. Böylece sonuçları
-yorumlamak çok daha kolay olacak.
-
-İlişkilerin keşfi için çok değişkenli Bernoulli modelini kullanacağız, ki
-[8] yazısında bu kümeleme yöntemi işlendi. CDBK kullanmak için veriyi 0/1
-bazına indirgeyeceğiz (ki verinin büyük bir kısmı zaten bu durumda)
-ardından CDBK'yı veriye uyduracağız, ve karışım öğeleri $\theta_k$'lerin
-bir nevi "şablon'' oluşturması sebebiyle ilişki keşfini bu şablonlar
-üzerinden yapmaya uğraşacağız.
-
-```python
-import pandas as pd, zipfile
-import sys; sys.path.append('../stat_mixbern')
-import mixbern
-
-unames = ['user_id', 'gender', 'age', 'occupation', 'zip']
-rnames = ['user_id', 'movie_id', 'rating', 'timestamp']
-mnames = ['movie_id', 'title', 'genres']
-with zipfile.ZipFile('../stat_ratings/ml1m.zip', 'r') as z:
-    users = pd.read_table(z.open('users.dat'), sep='::', header=None,names=unames)
-    ratings = pd.read_table(z.open('ratings.dat'), sep='::', header=None,names=rnames)
-    movies = pd.read_table(z.open('movies.dat'), sep='::', header=None,names=mnames)
-```
-
-```python
-occup_map = \
-{ 0:  "other" or not specified,1:  "academic/educator",
-  2:  "artist",3:  "clerical/admin",
-  4:  "college/grad student",5:  "customer service",
-  6:  "doctor/health care",7:  "executive/managerial",
-  8:  "farmer",9:  "homemaker",
-  10:  "K-12 student", 11:  "lawyer",
-  12:  "programmer",13:  "retired",
-  14:  "sales/marketing",15:  "scientist",
-  16:  "self-employed",17:  "technician/engineer",
-  18:  "tradesman/craftsman",19:  "unemployed",
-  20:  "writer"}
-
-zip_map = \
-{ 0: 'Northeast', 1: 'NY Area', 2: 'DC', 3: 'Florida', 4: 'Michigan/Ohio', 
-  5: 'North', 6: 'Illinois', 7: 'Texas / Arkansas', 8: 'Nevada / Utah', 
-  9: 'California / Alaska'}
-
-from sklearn.feature_extraction import DictVectorizer
-def one_hot_dataframe(data, cols):
-    vec = DictVectorizer()
-    mkdict = lambda row: dict((col, row[col]) for col in cols)
-    tmp = vec.fit_transform(data[cols].to_dict(outtype='records')).toarray()
-    vecData = pd.DataFrame(tmp)
-    vecData.columns = vec.get_feature_names()
-    vecData.index = data.index
-    data = data.drop(cols, axis=1)
-    data = data.join(vecData)
-    return data
-
-df = users.copy()
-df['occupation'] = df.apply(lambda x: occup_map[x['occupation']], axis=1)
-df['zip2'] = users['zip'].map(lambda x: int(str(x)[0]))
-df['zip2'] = df.apply(lambda x: zip_map[x['zip2']], axis=1)
-df['age2'] = pd.qcut(df['age'],5)
-df = one_hot_dataframe(df,['occupation','gender','zip2','age2'])
-df = df.drop(['zip','age'],axis=1)
-df = df.set_index('user_id')
-```
-
-ZIP kodları altta gösteriliyor
-
-![](zip_code_zones.png)
-
-Şimdi hangi film genre'sinin (türünün) kullanıcı tarafından kaç kez alınmış
-olduğunu özetleyip kullanıcı verisine bitişik olarak ekleyeceğiz. 
-
-```python
-genre_iter = (set(x.split('|')) for x in movies.genres)
-genres = sorted(set.union(*genre_iter))
-dummies = pd.DataFrame(np.zeros((len(movies), len(genres))), columns=genres)
-for i, gen in enumerate(movies.genres):
-   dummies.ix[i, gen.split('|')] = 1
-movies_windic = movies.join(dummies.add_prefix('Genre_'))
-movies_windic = movies_windic.drop(['title','genres'],axis=1)
-joined = ratings.merge(movies_windic, left_on='movie_id',right_on='movie_id')
-genres = joined.groupby('user_id').sum()
-genres = genres.drop(['movie_id','rating','timestamp'],axis=1)
-X = pd.merge(df, genres, left_index=True, right_index=True,how='left')
-print X.shape
-```
-
-```
-(6040, 56)
-```
-
-En iyi küme sayısı nedir? Bunun için mümkün tüm küme sayılarını deneriz,
-AIC sonuçlarına bakarız, sonuçlar arasından düşüş ardından ilk çıkış olduğu
-anı en iyi küme sayısı olarak kullanırız. 
-
-```python
-iter=40; eps=1e-15; attempts=5
-for K in range(5,16):
-    lR,lPi,lP,lbest,aic = mixbern.EMmixtureBernoulli(X,K,iter,eps,attempts)
-    print K,aic
-```
-
-```
-5,173126.633281
-6,172007.606772
-7,170285.383519
-8,169043.301004
-9,168457.12051
-10,167463.532805
-11,167253.486012
-12,166290.598818
-13,165764.506989
-14,164964.964083
-15,164989.85056
-16,164321.25051
-```
-
-Sonuçlara göre $K=14$ bu çıkış anını yakalar. Bu sayıyla tekrar kümelemeyi
-işletelim,
-
-```python
-iter=40; eps=1e-15; attempts=5; K=14
-lR,lPi,lP,lbest,aic = mixbern.EMmixtureBernoulli(X,K,iter,eps,attempts)
-rules = np.exp(lP)
-```
-
-```python
-def print_rule(j):
-    for i,r in enumerate(rules[j]): 
-         if r > 0.5: print X.columns[i], r
-```
-
-Şimdi bazı kuralları ekrana basalım,
-
-```python
-print_rule(0)
-```
-
-```
-age2=(25, 35] 1.0
-gender=M 1.0
-Genre_Action 0.997646429789
-Genre_Adventure 0.976908591072
-Genre_Animation 0.73312197406
-Genre_Children's 0.815806962254
-Genre_Comedy 1.0
-Genre_Crime 0.888200034236
-Genre_Drama 1.0
-Genre_Fantasy 0.759168898223
-Genre_Film-Noir 0.535819148049
-Genre_Horror 0.859145011653
-Genre_Musical 0.704293299334
-Genre_Mystery 0.735085517947
-Genre_Romance 0.999999999621
-Genre_Sci-Fi 0.98865549819
-Genre_Thriller 1.0
-Genre_War 0.948000910806
-Genre_Western 0.590038323721
-```
-
-25 ila 35 yaş arasındaki erkekler komedi ve aksiyon çok seviyorlar, en çok
-beğendiklerinin arasında en alt sırada Western var. İlginç.
-
-```python
-print_rule(1)
-```
-
-```
-age2=(18, 25] 1.0
-gender=M 1.0
-Genre_Action 0.999999916342
-Genre_Adventure 0.968035357641
-Genre_Animation 0.618607301467
-Genre_Children's 0.733114850427
-Genre_Comedy 1.0
-Genre_Crime 0.895303009556
-Genre_Drama 1.0
-Genre_Fantasy 0.621607330213
-Genre_Horror 0.826409070694
-Genre_Mystery 0.667105230382
-Genre_Romance 0.962487486107
-Genre_Sci-Fi 0.981703990034
-Genre_Thriller 0.999998477836
-Genre_War 0.884260074733
-```
-
-Daha dar bir yaş aralığı 18-25 yaş grubu, komedi, dram, aksiyon, gerilim
-var, en az sevilen filmler bu sefer animasyon.
-
-```python
-print_rule(2)
-```
-
-```
-gender=F 1.0
-Genre_Action 1.0
-Genre_Adventure 0.997753376918
-Genre_Animation 0.925605697933
-Genre_Children's 0.989223061984
-Genre_Comedy 0.999411653044
-Genre_Crime 0.978893423529
-Genre_Drama 1.0
-Genre_Fantasy 0.890898944372
-Genre_Film-Noir 0.810452619282
-Genre_Horror 0.901607018088
-Genre_Musical 0.93690169152
-Genre_Mystery 0.949990841295
-Genre_Romance 1.0
-Genre_Sci-Fi 0.999467975234
-Genre_Thriller 0.997148167548
-Genre_War 0.987837234705
-Genre_Western 0.801075654907
-```
-
-Bayanlar için (yaş grubu yok dikkat), üstte aksiyon var, ama romantik
-filmler de en üstte. 
-
-Şu da ilginç bir bulgu; meslek kolları ve adres verilerini analize dahil
-etmiş olmamıza rağmen kümelerin şablonu içinde hiçbiri yok! Demek ki
-meslekler, adresler film beğenisinde fark yaratmıyor.
-
-Üstteki analiz müşteri bilgisine müşteri seviyesinde baktı. Eğer işlemsel
-(transactional) bir analiz yapıyor olsaydık, yaklaşım benzer olacaktı,
-sadece veri odağı biraz farklı olurdu; müşterilerin her alışveriş
-sepetlerine bakılacaktı mesela, bir sepete koyulan mesela ekmek, çikolata,
-su, bir diğerine koyulan ekmek, su, biberon gibi alımlar bir satırda 1 ile
-işaretli, diğerleri 0 ile işaretli olacaktı, ve kümeleme algoritması bu çok
-boyutlu Bernoulli veriye bir uyum yapıp şablonları raporlayacaktı.
-
 İlginçlik - İstatistiki Ölçüt
 
 Kümeleri uydurduktan sonra bile bu kümelerin içinde hangisinin "daha iyi''
@@ -660,8 +408,8 @@ data = [[1,1,0,0,1],
 data = np.array(data)
 sums = data.sum(axis=0)
 means = data.mean(axis=0)
-print 'toplam', sums
-print 'ortalama', means
+print ('toplam', sums)
+print ('ortalama', means)
 ```
 
 ```
@@ -691,15 +439,15 @@ from scipy.stats.distributions import chi2
 def interesting(rule): 
      idx = (sums*rule).argmax()
      subset = data[data[:,idx] == 1]
-     print subset
-     print subset[:,rule==1]
+     print (subset)
+     print (subset[:,rule==1])
      obs = subset[:,rule==1].sum(axis=0)
      exp = len(subset)*means[rule==1]
-     print 'gorunen (observed)', obs
-     print 'beklenen (expected)', exp
+     print ('gorunen (observed)', obs)
+     print ('beklenen (expected)', exp)
      chi = np.sum((obs-exp)**2 / exp)
      dof = rule.sum()-1
-     print 1-chi2.cdf(chi,dof)
+     print (1-chi2.cdf(chi,dof))
 
 rule = np.array([1,1,0,0,1])
 interesting(rule)
