@@ -26,8 +26,8 @@ talep fiyatsal-elastiktir.
 
 ```python
 import pandas as pd
-df = pd.read_csv('andy.dat',sep='\s*',names=['sales','price','advert'])
-print df.head(3)
+df = pd.read_csv('andy.dat',sep='\\s+',names=['sales','price','advert'],engine='python')
+print (df.head(3))
 ```
 
 ```
@@ -44,7 +44,7 @@ $$ SALES = \beta_1 + \beta_2 PRICE + \beta_3 ADVERT $$
 ```python
 import statsmodels.formula.api as smf
 results = smf.ols('sales ~ price + advert', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
 ```
@@ -92,7 +92,7 @@ değişken sayesinde mümkün olur.
 import statsmodels.formula.api as smf
 df['advert2'] = df.advert**2 # kare aldik
 results2 = smf.ols('sales ~ price + advert + advert2', data=df).fit()
-print results2.summary()
+print (results2.summary())
 ```
 
 ```
@@ -201,12 +201,12 @@ import statsmodels.formula.api as smf
 results3 = smf.ols('sales ~ price ', data=df).fit()
 SSE_u = np.sum(results2.resid**2)
 SSE_r = np.sum(results3.resid**2)
-print 'SSE_u', SSE_u
-print 'SSE_r', SSE_r
+print ('SSE_u', SSE_u)
+print ('SSE_r', SSE_r)
 J = 2; N=len(df); K = len(results2.params)
 F = (SSE_r - SSE_u)/J / SSE_u*(N-K)
-print 'j,n-k',J,N-K
-print 'F =', F
+print ('j,n-k',J,N-K)
+print ('F =', F)
 ```
 
 ```
@@ -223,7 +223,7 @@ $1-P(F_{j,n-k}<8.44)$,
 ```python
 import scipy.stats as st
 f = st.f(J,N-K)
-print 1-f.cdf(F)
+print (1-f.cdf(F))
 ```
 
 ```
@@ -235,7 +235,7 @@ reddedilmiştir. Direk p değeri hesabı yerine yüzde 95 güven için bir eşik
 değeri de hesaplayabilirdik,
 
 ```python
-print f.ppf(0.95)
+print (f.ppf(0.95))
 ```
 
 ```
@@ -273,8 +273,8 @@ import pandas as pd
 m1 = np.array(method_1); m2 = np.array(method_2)
 df = pd.DataFrame([m1,m2]).T
 ss = df.std()
-F = ss.ix[0]**2/ss.ix[1]**2
-print F
+F = ss.iloc[0]**2/ss.iloc[1]**2
+print (F)
 ```
 
 ```
@@ -284,7 +284,7 @@ print F
 ```python
 import scipy.stats as st
 f = st.f(len(m1)-1,len(m2)-1)
-print 1-f.cdf(F)
+print (1-f.cdf(F))
 ```
 
 ```
@@ -400,7 +400,7 @@ def p_corr(df1, df2):
 
 df = pd.read_csv('fossum.csv')
 c,tval, pval = p_corr(df.totlngth,df.hdlngth)
-print c, pval
+print (c, pval)
 ```
 
 ```
@@ -621,11 +621,11 @@ verisi daha dolu olanlara aktarabilmek için kutucuk noktalarını tekrar
 tanımlıyoruz,
 
 ```python
-bins = [0] + range(5,15) + [100]
+bins = [0] + list(range(5,15)) + [100]
 kt2 = plt.hist(np.array(df),bins=bins)
 kt2 = pd.DataFrame([kt2[1],kt2[0]]).T
 kt2.columns = ['int_low','n_i']
-print kt2
+print (kt2)
 ```
 
 ```
@@ -669,8 +669,8 @@ kt2['p_i'] = kt2.apply(f,axis=1)
 kt2['np_i'] = len(df) * kt2['p_i']
 kt2['chi'] = (kt2['n_i']-kt2['np_i'])**2 / kt2['np_i']
 kt2 = kt2[:-1]
-print kt2
-print '\nchi kare istatistigi', kt2.chi.sum()
+print (kt2)
+print ('\nchi kare istatistigi', kt2.chi.sum())
 ```
 
 ```
@@ -695,7 +695,7 @@ sıra. Eşik değerimiz $\chi^2_{9,0.05}$ olacak. Peki niye serbestlik
 derecesi 9 alındı? Elde kaç tane kutucuk var? 
 
 ```python
-print len(kt2), 'kutucuk'
+print (len(kt2), 'kutucuk')
 ```
 
 ```
@@ -712,8 +712,8 @@ gerekli olduğunu ispatladı.
 ```python
 from scipy.stats import chi2
 dof = len(kt2)-1-1 # lambda tahmini 1 derece kaybettirdi
-print 'serbestlik derecesi', dof
-print 'chi kare', chi2.ppf(0.95,dof)
+print ('serbestlik derecesi', dof)
+print ('chi kare', chi2.ppf(0.95,dof))
 ```
 
 ```
