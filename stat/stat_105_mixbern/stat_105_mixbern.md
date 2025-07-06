@@ -489,6 +489,8 @@ plt.savefig('mixbern_03.png')
 
 Hakikaten de şeklen benziyorlar!
 
+Kodlar [mixbern.py](mixbern.py)
+
 Kaynaklar
 
 [1] Zaki, *Data Mining and Analysis: Fundamental Concepts and Algorithms*
