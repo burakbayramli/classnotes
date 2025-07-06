@@ -122,55 +122,56 @@ bulacaktır.</p>
 zamanı,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> StringIO <span class="im">import</span> StringIO</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="st">&quot;&quot;&quot;customer_id;order_date</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">  299;2012-07-20 19:44:55.661000+01:00</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">  421;2012-02-17 21:54:15.013000+01:00</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">  437;2012-02-20 22:18:12.021000+01:00</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">  463;2012-02-20 23:46:21.587000+01:00</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">  482;2012-05-21 09:50:02.739000+01:00</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">  607;2012-02-21 11:57:12.462000+01:00</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">  641;2012-02-21 13:40:28.088000+01:00</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">  674;2012-08-21 14:53:15.851000+01:00</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">  780;2012-02-23 10:31:05.571000+01:00</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">  &quot;&quot;&quot;</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(StringIO(s),sep<span class="op">=</span><span class="st">&#39;;&#39;</span>, parse_dates<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(x):</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  tmp <span class="op">=</span> pd.to_datetime(x[<span class="st">&#39;order_date&#39;</span>])</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  tpl <span class="op">=</span> tmp.timetuple()<span class="op">;</span> yymm <span class="op">=</span> <span class="bu">int</span>(tmp.strftime(<span class="st">&#39;%m</span><span class="sc">%d</span><span class="st">&#39;</span>))</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  spring <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">321</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">621</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  summer <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">621</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">921</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  fall <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">921</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">1221</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  winter <span class="op">=</span> <span class="bu">int</span>( spring<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> summer<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> fall<span class="op">==</span><span class="dv">0</span> )</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  warm_season <span class="op">=</span> <span class="bu">float</span>(tpl.tm_mon <span class="op">&gt;=</span> <span class="dv">4</span> <span class="kw">and</span> tpl.tm_mon <span class="op">&lt;=</span> <span class="dv">9</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  work_hours <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;</span> <span class="dv">9</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;</span> <span class="dv">17</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  morning <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">7</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">11</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  noon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">12</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">14</span>)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  afternoon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">15</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">19</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  night <span class="op">=</span> <span class="bu">int</span> (morning<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> noon<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> afternoon<span class="op">==</span><span class="dv">0</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> pd.Series([tpl.tm_hour, tpl.tm_mon,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                    tpl.tm_wday, warm_season,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                    work_hours, morning, noon, afternoon, night,</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                    spring, summer, fall, winter])</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;ts_hour&#39;</span>,<span class="st">&#39;ts_mon&#39;</span>,<span class="st">&#39;ts_wday&#39;</span>,<span class="st">&#39;ts_warm_season&#39;</span>,<span class="op">\</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ts_work_hours&#39;</span>,<span class="st">&#39;ts_morning&#39;</span>,<span class="st">&#39;ts_noon&#39;</span>,<span class="st">&#39;ts_afternoon&#39;</span>,<span class="op">\</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ts_night&#39;</span>, <span class="st">&#39;ts_spring&#39;</span>, <span class="st">&#39;ts_summer&#39;</span>, <span class="st">&#39;ts_fall&#39;</span>, <span class="st">&#39;ts_winter&#39;</span>]</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>df[cols] <span class="op">=</span> df.<span class="bu">apply</span>(f, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df[cols]</span></code></pre></div>
-<pre><code>   ts_hour  ts_mon  ts_wday  ts_warm_season  ts_work_hours  ts_morning  \
-0     18.0     7.0      4.0             1.0            0.0         0.0   
-1     20.0     2.0      4.0             0.0            0.0         0.0   
-2     21.0     2.0      0.0             0.0            0.0         0.0   
-3     22.0     2.0      0.0             0.0            0.0         0.0   
-4      8.0     5.0      0.0             1.0            0.0         1.0   
-5     10.0     2.0      1.0             0.0            1.0         1.0   
-6     12.0     2.0      1.0             0.0            1.0         0.0   
-7     13.0     8.0      1.0             1.0            1.0         0.0   
-8      9.0     2.0      3.0             0.0            0.0         1.0   
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">&#39;display.max_columns&#39;</span>, <span class="va">None</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> StringIO</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> <span class="st">&quot;&quot;&quot;customer_id;order_date</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">  299;2012-07-20 19:44:55.661000+01:00</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">  421;2012-02-17 21:54:15.013000+01:00</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">  437;2012-02-20 22:18:12.021000+01:00</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">  463;2012-02-20 23:46:21.587000+01:00</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">  482;2012-05-21 09:50:02.739000+01:00</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">  607;2012-02-21 11:57:12.462000+01:00</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">  641;2012-02-21 13:40:28.088000+01:00</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">  674;2012-08-21 14:53:15.851000+01:00</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">  780;2012-02-23 10:31:05.571000+01:00</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">  &quot;&quot;&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(StringIO(s),sep<span class="op">=</span><span class="st">&#39;;&#39;</span>, parse_dates<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> f(x):</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  tmp <span class="op">=</span> pd.to_datetime(x[<span class="st">&#39;order_date&#39;</span>])</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  tpl <span class="op">=</span> tmp.timetuple()<span class="op">;</span> yymm <span class="op">=</span> <span class="bu">int</span>(tmp.strftime(<span class="st">&#39;%m</span><span class="sc">%d</span><span class="st">&#39;</span>))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  spring <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">321</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">621</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  summer <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">621</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">921</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  fall <span class="op">=</span> <span class="bu">int</span>(yymm <span class="op">&gt;=</span> <span class="dv">921</span> <span class="kw">and</span> yymm <span class="op">&lt;</span> <span class="dv">1221</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  winter <span class="op">=</span> <span class="bu">int</span>( spring<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> summer<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> fall<span class="op">==</span><span class="dv">0</span> )</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  warm_season <span class="op">=</span> <span class="bu">float</span>(tpl.tm_mon <span class="op">&gt;=</span> <span class="dv">4</span> <span class="kw">and</span> tpl.tm_mon <span class="op">&lt;=</span> <span class="dv">9</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  work_hours <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;</span> <span class="dv">9</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;</span> <span class="dv">17</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  morning <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">7</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">11</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  noon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">12</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">14</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  afternoon <span class="op">=</span> <span class="bu">float</span>(tpl.tm_hour <span class="op">&gt;=</span> <span class="dv">15</span> <span class="kw">and</span> tpl.tm_hour <span class="op">&lt;=</span> <span class="dv">19</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  night <span class="op">=</span> <span class="bu">int</span> (morning<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> noon<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> afternoon<span class="op">==</span><span class="dv">0</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> pd.Series([tpl.tm_hour, tpl.tm_mon,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                    tpl.tm_wday, warm_season,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                    work_hours, morning, noon, afternoon, night,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>                    spring, summer, fall, winter])</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;ts_hour&#39;</span>,<span class="st">&#39;ts_mon&#39;</span>,<span class="st">&#39;ts_wday&#39;</span>,<span class="st">&#39;ts_warm_season&#39;</span>,<span class="op">\</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ts_work_hours&#39;</span>,<span class="st">&#39;ts_morning&#39;</span>,<span class="st">&#39;ts_noon&#39;</span>,<span class="st">&#39;ts_afternoon&#39;</span>,<span class="op">\</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ts_night&#39;</span>, <span class="st">&#39;ts_spring&#39;</span>, <span class="st">&#39;ts_summer&#39;</span>, <span class="st">&#39;ts_fall&#39;</span>, <span class="st">&#39;ts_winter&#39;</span>]</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>df[cols] <span class="op">=</span> df.<span class="bu">apply</span>(f, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df[cols])</span></code></pre></div>
+<pre class="text"><code>   ts_hour  ts_mon  ts_wday  ts_warm_season  ts_work_hours  ts_morning  \
+0     19.0     7.0      4.0             1.0            0.0         0.0   
+1     21.0     2.0      4.0             0.0            0.0         0.0   
+2     22.0     2.0      0.0             0.0            0.0         0.0   
+3     23.0     2.0      0.0             0.0            0.0         0.0   
+4      9.0     5.0      0.0             1.0            0.0         1.0   
+5     11.0     2.0      1.0             0.0            1.0         1.0   
+6     13.0     2.0      1.0             0.0            1.0         0.0   
+7     14.0     8.0      1.0             1.0            1.0         0.0   
+8     10.0     2.0      3.0             0.0            1.0         1.0   
 
    ts_noon  ts_afternoon  ts_night  ts_spring  ts_summer  ts_fall  ts_winter  
 0      0.0           1.0       0.0        0.0        1.0      0.0        0.0  
@@ -207,8 +208,7 @@ class="math inline">\(x&lt;7\)</span>) yapabilirdik). Temiz kod için
 gece haricinde diğer tüm seçenekleri kontrol ediyoruz, ve gece “sabah,
 öğlen, akşamüstü olmayan şey” haline geliyor. Aynı durum mevsimler için
 de geçerli. Onun için</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>night <span class="op">=</span> <span class="bu">int</span> (morning<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> noon<span class="op">==</span><span class="dv">0</span> <span class="kw">and</span> afternoon<span class="op">==</span><span class="dv">0</span>)</span></code></pre></div>
+<pre><code>night = int (morning==0 and noon==0 and afternoon==0)</code></pre>
 <p>kullanıldı.</p>
 <p>Kategorileri İkileştirme</p>
 <p>Yapay öğrenim algoritmalarının çoğu zaman hem kategorik hem sayısal
@@ -233,7 +233,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    vec <span class="op">=</span> DictVectorizer()</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    mkdict <span class="op">=</span> <span class="kw">lambda</span> row: <span class="bu">dict</span>((col, row[col]) <span class="cf">for</span> col <span class="kw">in</span> cols)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    vecData <span class="op">=</span> pd.DataFrame(vec.fit_transform(data[cols].<span class="bu">apply</span>(mkdict, axis<span class="op">=</span><span class="dv">1</span>)).toarray())</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    vecData.columns <span class="op">=</span> vec.get_feature_names()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    vecData.columns <span class="op">=</span> vec.get_feature_names_out()</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    vecData.index <span class="op">=</span> data.index</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> replace <span class="kw">is</span> <span class="va">True</span>:</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> data.drop(cols, axis<span class="op">=</span><span class="dv">1</span>)</span>
@@ -247,13 +247,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>df2, _, _ <span class="op">=</span> one_hot_dataframe(df, [<span class="st">&#39;state&#39;</span>], replace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df2</span></code></pre></div>
-<pre><code>   pop  year  state=Nevada  state=Ohio
-0  1.5  2000           0.0         1.0
-1  1.7  2001           0.0         1.0
-2  3.6  2002           0.0         1.0
-3  2.4  2001           1.0         0.0
-4  2.9  2002           1.0         0.0</code></pre>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df2)</span></code></pre></div>
+<pre class="text"><code>   year  pop  state=Nevada  state=Ohio
+0  2000  1.5           0.0         1.0
+1  2001  1.7           0.0         1.0
+2  2002  3.6           0.0         1.0
+3  2001  2.4           1.0         0.0
+4  2002  2.9           1.0         0.0</code></pre>
 <p>Unutmayalım, kategorik değerler bazen binleri bulabilir (hatta sayfa
 tıklama tahmini durumunda mesela milyonlar, hatta milyarlar), bu da
 binlerce yeni kolon demektir. Yani 1/0 kodlaması, yani 1-hot işleminden
@@ -300,12 +300,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  d_input[hashed_token] <span class="op">=</span> d_input.setdefault(hashed_token, <span class="dv">0</span>) <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>add_word(<span class="st">&quot;obama&quot;</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> d_input</span></code></pre></div>
-<pre><code>{48: 1}</code></pre>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (d_input)</span></code></pre></div>
+<pre class="text"><code>{50: 1}</code></pre>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>add_word(<span class="st">&quot;politics&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> d_input</span></code></pre></div>
-<pre><code>{48: 1, 91: 1}</code></pre>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (d_input)</span></code></pre></div>
+<pre class="text"><code>{50: 1, 78: 1}</code></pre>
 <p>Üstteki kodda bunun örneğini görüyoruz. Hash sonrası mod uyguladık
 (yüzde işareti ile) ve hash sonucunu en fazla 127 olacak şekilde
 sınırladık. Potansiyel problemler ne olabilir? Hashing mükemmel
@@ -323,32 +323,35 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a h
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;pop&#39;</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>]}</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame(data)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> data</span></code></pre></div>
-<pre><code>   pop   state  year
-0  1.5    Ohio  2000
-1  1.7    Ohio  2001
-2  3.6    Ohio  2002
-3  2.4  Nevada  2001
-4  2.9  Nevada  2002</code></pre>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (data)</span></code></pre></div>
+<pre class="text"><code>    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2    Ohio  2002  3.6
+3  Nevada  2001  2.4
+4  Nevada  2002  2.9</code></pre>
 <p>Şimdi bu veri üzerinde sadece eyalet (state) için bir anahtarlama
 numarası yapalım</p>
 <div class="sourceCode" id="cb12"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hash_col(df,col,N):</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N): df[col <span class="op">+</span> <span class="st">&#39;_&#39;</span> <span class="op">+</span> <span class="bu">str</span>(i)] <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">hash</span>(x[col]) <span class="op">%</span> N,axis<span class="op">=</span><span class="dv">1</span>)    </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      idx <span class="op">=</span> df[df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">==</span> i].index</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  df.ix[idx,<span class="st">&#39;</span><span class="sc">%s</span><span class="st">_</span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> (col,i)] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> df.drop([col, col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> df</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    df[col <span class="op">+</span> <span class="st">&#39;_&#39;</span> <span class="op">+</span> <span class="bu">str</span>(i)] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">hash</span>(x[col]) <span class="op">%</span> N,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      df.loc[df[col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>] <span class="op">==</span> i, <span class="st">&#39;</span><span class="sc">%s</span><span class="st">_</span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> (col,i)] <span class="op">=</span> <span class="fl">1.0</span> <span class="co"># Changed .iloc to .loc and direct boolean indexing</span></span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> hash_col(data,<span class="st">&#39;state&#39;</span>,<span class="dv">4</span>)</span></code></pre></div>
-<pre><code>   pop  year  state_0  state_1  state_2  state_3
-0  1.5  2000      0.0      0.0      0.0      0.0
-1  1.7  2001      0.0      0.0      0.0      0.0
-2  3.6  2002      0.0      0.0      0.0      0.0
-3  2.4  2001      0.0      0.0      0.0      1.0
-4  2.9  2002      0.0      0.0      0.0      1.0</code></pre>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> df.drop([col, col <span class="op">+</span> <span class="st">&#39;_hash&#39;</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> df</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (hash_col(data,<span class="st">&#39;state&#39;</span>,<span class="dv">4</span>))</span></code></pre></div>
+<pre class="text"><code>   year  pop  state_0  state_1  state_2  state_3
+0  2000  1.5      1.0      0.0      0.0      0.0
+1  2001  1.7      1.0      0.0      0.0      0.0
+2  2002  3.6      1.0      0.0      0.0      0.0
+3  2001  2.4      0.0      0.0      0.0      1.0
+4  2002  2.9      0.0      0.0      0.0      1.0</code></pre>
 <p>Baştan Seyrek Matris ile Çalışmak</p>
 <p>Büyük Veri ortamında, eğer kategorik değerler milyonları buluyorsa, o
 zaman üstteki gibi normal Numpy matrisinden seyreğe geçiş yapmak bile
@@ -377,29 +380,29 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&#39;pop&#39;</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>]}</span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df)</span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>vocabs <span class="op">=</span> []</span>
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> [<span class="st">&#39;Ohio&#39;</span>,<span class="st">&#39;Nevada&#39;</span>]</span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>vocabs.append(<span class="bu">dict</span>(itertools.izip(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>vocabs.append(<span class="bu">dict</span>(<span class="bu">zip</span>(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))</span>
 <span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> [<span class="st">&#39;2000&#39;</span>,<span class="st">&#39;2001&#39;</span>,<span class="st">&#39;2002&#39;</span>]</span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>vocabs.append(<span class="bu">dict</span>(itertools.izip(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>vocabs.append(<span class="bu">dict</span>(<span class="bu">zip</span>(vals,<span class="bu">range</span>(<span class="bu">len</span>(vals)))))</span>
 <span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> vocabs</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (vocabs)</span>
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> one_hot_column(df, [<span class="st">&#39;state&#39;</span>,<span class="st">&#39;year&#39;</span>], vocabs).todense()</span></code></pre></div>
-<pre><code>   pop   state  year
-0  1.5    Ohio  2000
-1  1.7    Ohio  2001
-2  3.6    Ohio  2002
-3  2.4  Nevada  2001
-4  2.9  Nevada  2002
-[{&#39;Ohio&#39;: 0, &#39;Nevada&#39;: 1}, {&#39;2002&#39;: 2, &#39;2000&#39;: 0, &#39;2001&#39;: 1}]
-[[ 1.5  1.   0.   1.   0.   0. ]
- [ 1.7  1.   0.   0.   1.   0. ]
- [ 3.6  1.   0.   0.   0.   1. ]
- [ 2.4  0.   1.   0.   1.   0. ]
- [ 2.9  0.   1.   0.   0.   1. ]]</code></pre>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (one_hot_column(df, [<span class="st">&#39;state&#39;</span>,<span class="st">&#39;year&#39;</span>], vocabs).todense())</span></code></pre></div>
+<pre class="text"><code>    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2    Ohio  2002  3.6
+3  Nevada  2001  2.4
+4  Nevada  2002  2.9
+[{&#39;Ohio&#39;: 0, &#39;Nevada&#39;: 1}, {&#39;2000&#39;: 0, &#39;2001&#39;: 1, &#39;2002&#39;: 2}]
+[[1.5 1.  0.  1.  0.  0. ]
+ [1.7 1.  0.  0.  1.  0. ]
+ [3.6 1.  0.  0.  0.  1. ]
+ [2.4 0.  1.  0.  1.  0. ]
+ [2.9 0.  1.  0.  0.  1. ]]</code></pre>
 <p><code>one_hot_column</code> çağrısına bir “sözlükler listesi” verdik,
 sözlük her kolon için o kolonlardaki mümkün tüm değerleri bir sıra
 sayısı ile eşliyor. Sözlük listesinin sırası kolon sırasına uyuyor
@@ -443,7 +446,7 @@ biz analizimizde bahsedilen kategorilerin bu kişilerin kazancıyla
 bağlantılı olup olmadığına bakacağız. Veriyi oluşturalım,</p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../stat_logit/nes.dat&#39;</span>,sep<span class="op">=</span><span class="vs">r&#39;\s+&#39;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../stat_075_logit/nes.dat&#39;</span>,sep<span class="op">=</span><span class="vs">r&#39;\s+&#39;</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">&#39;presvote&#39;</span>,<span class="st">&#39;year&#39;</span>,<span class="st">&#39;gender&#39;</span>,<span class="st">&#39;income&#39;</span>,<span class="st">&#39;race&#39;</span>,<span class="st">&#39;occup1&#39;</span>]]</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna()</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">&#39;nes2.csv&#39;</span>,index<span class="op">=</span><span class="va">None</span>)</span></code></pre></div>
@@ -451,16 +454,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;nes2.csv&#39;</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">u&#39;tüm veri&#39;</span>, <span class="bu">len</span>(df)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;cinsiyet&#39;</span>, np.array(df[<span class="st">&#39;gender&#39;</span>].value_counts())</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">u&#39;ırk&#39;</span>, np.array(df[<span class="st">&#39;race&#39;</span>].value_counts())</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;parti&#39;</span>, np.array(df[<span class="st">&#39;presvote&#39;</span>].value_counts())</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">u&#39;kazanç&#39;</span>, df[<span class="st">&#39;income&#39;</span>].mean()</span></code></pre></div>
-<pre><code>tüm veri 13804
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">u&#39;tüm veri&#39;</span>, <span class="bu">len</span>(df))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;cinsiyet&#39;</span>, np.array(df[<span class="st">&#39;gender&#39;</span>].value_counts()))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">u&#39;ırk&#39;</span>, np.array(df[<span class="st">&#39;race&#39;</span>].value_counts()))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;parti&#39;</span>, np.array(df[<span class="st">&#39;presvote&#39;</span>].value_counts()))</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">u&#39;kazanç&#39;</span>, df[<span class="st">&#39;income&#39;</span>].mean())</span></code></pre></div>
+<pre class="text"><code>tüm veri 13804
 cinsiyet [7461 6343]
 ırk [12075  1148   299   180    85    17]
 parti [6998 6535  271]
-kazanç 3.07649956534</code></pre>
+kazanç 3.076499565343379</code></pre>
 <p>Mesela son sonuçtaki her hücre belli bir partiye verilen oyların
 sayısı; veriye göre üç farklı kategori varmış demek ki, veri ABD için
 olduğuna göre bunlardan ilk ikisi bilinen iki büyük parti, üçüncü hücre
@@ -489,8 +492,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a h
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>vect <span class="op">=</span> HashingVectorizer(n_features<span class="op">=</span><span class="dv">20</span>)</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [<span class="st">&#39;aa&#39;</span>,<span class="st">&#39;bb&#39;</span>,<span class="st">&#39;cc&#39;</span>]</span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> vect.transform(a)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res</span></code></pre></div>
-<pre><code>  (0, 5)    1.0
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span></code></pre></div>
+<pre class="text"><code>&lt;Compressed Sparse Row sparse matrix of dtype &#39;float64&#39;
+    with 3 stored elements and shape (3, 20)&gt;
+  Coords    Values
+  (0, 5)    1.0
   (1, 19)   1.0
   (2, 18)   -1.0</code></pre>
 <p>Sonuçlar seyrek matris olarak, ve üç değer için üç ayrı satır olarak
@@ -528,7 +534,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a h
 <span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> sps.lil_matrix((size,HASH))</span>
 <span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    y_train <span class="op">=</span> []</span>
 <span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(size):</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>        cx,y <span class="op">=</span> row_getter.<span class="bu">next</span>()</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>        cx,y <span class="op">=</span> <span class="bu">next</span>(row_getter)</span>
 <span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> dummy,j,val <span class="kw">in</span> <span class="bu">zip</span>(cx.row, cx.col, cx.data): X_train[i,j] <span class="op">=</span> val</span>
 <span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>        y_train.append(y)</span>
 <span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X_train, y_train</span>
@@ -537,8 +543,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a h
 <span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;gender&#39;</span>,<span class="st">&#39;income&#39;</span>,<span class="st">&#39;race&#39;</span>,<span class="st">&#39;occup1&#39;</span>]</span>
 <span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>row_getter <span class="op">=</span> get_row(cols)</span>
 <span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> y, X.todense()</span></code></pre></div>
-<pre><code>[4.0] [[ 0.  0.  0. -1.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (y, X.todense())</span></code></pre></div>
+<pre class="text"><code>[4.0] [[ 0.  0.  0. -1.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
    0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.]]</code></pre>
 <p>İlgilendiğimiz kolon listesini <code>get_row</code>’a verip bir
 gezici fonksiyon yarattık. Bu geziciyi <code>get_minibatch</code>’e
@@ -547,8 +553,8 @@ satırı arka planda geziciye sorarak seyrek matris olarak veriyor. 10
 tane daha isteyelim,</p>
 <div class="sourceCode" id="cb23"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>X,y <span class="op">=</span> get_minibatch(row_getter,size<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="bu">len</span>(y), X.shape, <span class="bu">type</span>(X)</span></code></pre></div>
-<pre><code>10 (10, 30) &lt;class &#39;scipy.sparse.lil.lil_matrix&#39;&gt;</code></pre>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(y), X.shape, <span class="bu">type</span>(X))</span></code></pre></div>
+<pre class="text"><code>10 (10, 30) &lt;class &#39;scipy.sparse._lil.lil_matrix&#39;&gt;</code></pre>
 <p>PCA</p>
 <p>Lineer Cebir’in temel bileşen analizi (PCA) tekniğini kullanarak
 boyut azaltması yapabiliriz. Veriyi yine satır satır işleyerek PCA
@@ -565,11 +571,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a h
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    pca.partial_fit(X)</span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>pca.post_process()</span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;varyans orani&#39;</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> pca.explained_variance_ratio_</span></code></pre></div>
-<pre><code>varyans orani
-[ 0.36086926  0.16186391  0.13377998  0.09440711  0.0702763   0.05113956
-  0.04768294  0.0343724   0.02336052  0.02224802]</code></pre>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;varyans orani&#39;</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (pca.explained_variance_ratio_)</span></code></pre></div>
+<pre class="text"><code>varyans orani
+[0.36085857 0.16186335 0.13378078 0.0944093  0.07027158 0.05112654
+ 0.04767845 0.03433509 0.02341634 0.02225999]</code></pre>
 <p>Her bileşenin verideki varyansın ne kadarını açıkladığı
 görülüyor.</p>
 <p>Peki 30 kolonu 10 kolona indirdik, acaba veri temsilinde, tahmin
@@ -578,13 +584,13 @@ yansıtıp bu boyutu azaltılmış veriyi regresyonda kullansak ne olur
 acaba? Yansıtma ve regresyon,</p>
 <div class="sourceCode" id="cb27"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> SGDRegressor</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, n_iter<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_iter<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>row_getter <span class="op">=</span> get_row(cols)</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> pca.components_.T</span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):</span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    X_train, y_train <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1</span>)</span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    Xp <span class="op">=</span> np.dot((X_train<span class="op">-</span>pca.mean_),P)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    clf.partial_fit(Xp, y_train)</span></code></pre></div>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    clf.partial_fit(np.asarray(Xp), y_train)</span></code></pre></div>
 <p>Şimdi sonraki 1000 satırı test için kullanalım,</p>
 <div class="sourceCode" id="cb28"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>y_predict <span class="op">=</span> []</span>
@@ -592,15 +598,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a h
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    X_test,y_test <span class="op">=</span> get_minibatch(row_getter,<span class="dv">1</span>)</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    Xp <span class="op">=</span> np.dot((X_test<span class="op">-</span>pca.mean_),P)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    y_predict.append(clf.predict(Xp)[<span class="dv">0</span>])</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    y_predict.append(clf.predict(np.asarray(Xp))[<span class="dv">0</span>])</span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    y_real.append(y_test[<span class="dv">0</span>])</span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>y_predict <span class="op">=</span> np.array(y_predict)</span>
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>y_real <span class="op">=</span> np.array(y_real)</span>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.sqrt(((y_predict<span class="op">-</span>y_real)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>()) <span class="op">/</span> <span class="bu">len</span>(y_predict)</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;ortalama tahmin hatasi&#39;</span>, err</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;maksimum deger&#39;</span>, np.<span class="bu">max</span>(y_real)</span></code></pre></div>
-<pre><code>ortalama tahmin hatasi 0.0105872845541
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;ortalama tahmin hatasi&#39;</span>, err)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;maksimum deger&#39;</span>, np.<span class="bu">max</span>(y_real))</span></code></pre></div>
+<pre class="text"><code>ortalama tahmin hatasi 0.010598462941579465
 maksimum deger 5.0</code></pre>
 <p>1 ile 5 arasında gidip gelen değerlerin tahmininde 0.01 civarı
 ortalama hata var. Fena değil. Peki verinin kendisini olduğu gibi alıp
@@ -612,7 +618,7 @@ kullanılacak. Geri kalanlar test verisi olacak.</p>
 parçaları ile eğitilebiliyor,</p>
 <div class="sourceCode" id="cb30"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> SGDRegressor</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, n_iter<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>clf <span class="op">=</span> SGDRegressor(random_state<span class="op">=</span><span class="dv">1</span>, max_iter<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>row_getter <span class="op">=</span> get_row(cols)</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>y_predict <span class="op">=</span> []<span class="op">;</span> y_real <span class="op">=</span> []</span>
@@ -625,8 +631,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a h
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>y_predict <span class="op">=</span> clf.predict(X_test) </span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>err <span class="op">=</span> np.sqrt(((y_predict<span class="op">-</span>y_test)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>()) <span class="op">/</span> <span class="bu">len</span>(y_predict)</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;ortalama tahmin hatasi&#39;</span>, </span></code></pre></div>
-<pre><code>ortalama tahmin hatasi 0.0208096951078</code></pre>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;ortalama tahmin hatasi&#39;</span>, err)</span></code></pre></div>
+<pre class="text"><code>ortalama tahmin hatasi 0.021197482640542296</code></pre>
 <p>Bu sonuç ta hiç fena değil. Sonuç olarak veri içinde bazı kalıplar
 olduğunu gördük, tahmin yapabiliyoruz. Hangi kolonların daha önemli
 olduğunu bulmak için her kolonu teker teker atıp hatanın yukarı mı aşağı
@@ -675,13 +681,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a h
 <span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%f</span><span class="st"> </span><span class="sc">%f</span><span class="st">&quot;</span> <span class="op">%</span> d2)</span>
 <span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%f</span><span class="st"> </span><span class="sc">%f</span><span class="st">&quot;</span> <span class="op">%</span> d3)</span>
 <span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">u&#39;uzaklık 1-2 =&#39;</span>, lin.norm(np.array(d1)<span class="op">-</span>np.array(d2))</span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">u&#39;uzaklık 2-3 =&#39;</span>, lin.norm(np.array(d2)<span class="op">-</span>np.array(d3))</span></code></pre></div>
-<pre><code>0.728969 0.684547
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">u&#39;uzaklık 1-2 =&#39;</span>, lin.norm(np.array(d1)<span class="op">-</span>np.array(d2)))</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">u&#39;uzaklık 2-3 =&#39;</span>, lin.norm(np.array(d2)<span class="op">-</span>np.array(d3)))</span></code></pre></div>
+<pre class="text"><code>0.728969 0.684547
 0.982287 -0.187381
 0.982287 0.187381
-uzaklık 1-2 = 0.907980999479
-uzaklık 2-3 = 0.374762629171</code></pre>
+uzaklık 1-2 = 0.9079809994790936
+uzaklık 2-3 = 0.3747626291714493</code></pre>
 <p>Kaynaklar</p>
 <p>[1] Teetor, <em>R Cookbook</em></p>
 <p>[2] Scikit-Learn Documentation, <em>4.2. Feature extraction</em>, <a

@@ -37,7 +37,8 @@ Python + Pandas ile bir zaman kolonu şöyle parçalanabilir, örnek veri
 
 ```python
 import pandas as pd
-from StringIO import StringIO
+pd.set_option('display.max_columns', None)
+from io import StringIO
 s = """customer_id;order_date
   299;2012-07-20 19:44:55.661000+01:00
   421;2012-02-17 21:54:15.013000+01:00
@@ -75,20 +76,20 @@ cols = ['ts_hour','ts_mon','ts_wday','ts_warm_season',\
   'ts_night', 'ts_spring', 'ts_summer', 'ts_fall', 'ts_winter']
 
 df[cols] = df.apply(f, axis=1)
-print df[cols]
+print (df[cols])
 ```
 
-```
+```text
    ts_hour  ts_mon  ts_wday  ts_warm_season  ts_work_hours  ts_morning  \
-0     18.0     7.0      4.0             1.0            0.0         0.0   
-1     20.0     2.0      4.0             0.0            0.0         0.0   
-2     21.0     2.0      0.0             0.0            0.0         0.0   
-3     22.0     2.0      0.0             0.0            0.0         0.0   
-4      8.0     5.0      0.0             1.0            0.0         1.0   
-5     10.0     2.0      1.0             0.0            1.0         1.0   
-6     12.0     2.0      1.0             0.0            1.0         0.0   
-7     13.0     8.0      1.0             1.0            1.0         0.0   
-8      9.0     2.0      3.0             0.0            0.0         1.0   
+0     19.0     7.0      4.0             1.0            0.0         0.0   
+1     21.0     2.0      4.0             0.0            0.0         0.0   
+2     22.0     2.0      0.0             0.0            0.0         0.0   
+3     23.0     2.0      0.0             0.0            0.0         0.0   
+4      9.0     5.0      0.0             1.0            0.0         1.0   
+5     11.0     2.0      1.0             0.0            1.0         1.0   
+6     13.0     2.0      1.0             0.0            1.0         0.0   
+7     14.0     8.0      1.0             1.0            1.0         0.0   
+8     10.0     2.0      3.0             0.0            1.0         1.0   
 
    ts_noon  ts_afternoon  ts_night  ts_spring  ts_summer  ts_fall  ts_winter  
 0      0.0           1.0       0.0        0.0        1.0      0.0        0.0  
@@ -125,7 +126,7 @@ haricinde diğer tüm seçenekleri kontrol ediyoruz, ve gece "sabah, öğlen,
 akşamüstü olmayan şey" haline geliyor. Aynı durum mevsimler için de
 geçerli. Onun için 
 
-```python
+```
 night = int (morning==0 and noon==0 and afternoon==0)
 ```
 
@@ -157,7 +158,7 @@ def one_hot_dataframe(data, cols, replace=False):
     vec = DictVectorizer()
     mkdict = lambda row: dict((col, row[col]) for col in cols)
     vecData = pd.DataFrame(vec.fit_transform(data[cols].apply(mkdict, axis=1)).toarray())
-    vecData.columns = vec.get_feature_names()
+    vecData.columns = vec.get_feature_names_out()
     vecData.index = data.index
     if replace is True:
         data = data.drop(cols, axis=1)
@@ -171,16 +172,16 @@ data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
 df = pd.DataFrame(data)
 
 df2, _, _ = one_hot_dataframe(df, ['state'], replace=True)
-print df2
+print (df2)
 ```
 
-```
-   pop  year  state=Nevada  state=Ohio
-0  1.5  2000           0.0         1.0
-1  1.7  2001           0.0         1.0
-2  3.6  2002           0.0         1.0
-3  2.4  2001           1.0         0.0
-4  2.9  2002           1.0         0.0
+```text
+   year  pop  state=Nevada  state=Ohio
+0  2000  1.5           0.0         1.0
+1  2001  1.7           0.0         1.0
+2  2002  3.6           0.0         1.0
+3  2001  2.4           1.0         0.0
+4  2002  2.9           1.0         0.0
 ```
 
 Unutmayalım, kategorik değerler bazen binleri bulabilir (hatta sayfa
@@ -234,20 +235,20 @@ def add_word(word):
   d_input[hashed_token] = d_input.setdefault(hashed_token, 0) + 1
 
 add_word("obama")
-print d_input
+print (d_input)
 ```
 
-```
-{48: 1}
+```text
+{50: 1}
 ```
 
 ```python
 add_word("politics")
-print d_input
+print (d_input)
 ```
 
-```
-{48: 1, 91: 1}
+```text
+{50: 1, 78: 1}
 ```
 
 Üstteki kodda bunun örneğini görüyoruz. Hash sonrası mod uyguladık (yüzde
@@ -267,16 +268,16 @@ data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
   'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
 
 data = pd.DataFrame(data)
-print data
+print (data)
 ```
 
-```
-   pop   state  year
-0  1.5    Ohio  2000
-1  1.7    Ohio  2001
-2  3.6    Ohio  2002
-3  2.4  Nevada  2001
-4  2.9  Nevada  2002
+```text
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2    Ohio  2002  3.6
+3  Nevada  2001  2.4
+4  Nevada  2002  2.9
 ```
 
 Şimdi bu veri üzerinde sadece eyalet (state) için bir anahtarlama numarası
@@ -284,24 +285,27 @@ yapalım
 
 ```python
 def hash_col(df,col,N):
-  for i in range(N): df[col + '_' + str(i)] = 0.0
-  df[col + '_hash'] = df.apply(lambda x: hash(x[col]) % N,axis=1)    
   for i in range(N):
-      idx = df[df[col + '_hash'] == i].index
-  df.ix[idx,'%s_%d' % (col,i)] = 1.0
+    df[col + '_' + str(i)] = 0.0
+
+  df[col + '_hash'] = df.apply(lambda x: hash(x[col]) % N,axis=1)
+
+  for i in range(N):
+      df.loc[df[col + '_hash'] == i, '%s_%d' % (col,i)] = 1.0 # Changed .iloc to .loc and direct boolean indexing
+
   df = df.drop([col, col + '_hash'], axis=1)
   return df
 
-print hash_col(data,'state',4)
+print (hash_col(data,'state',4))
 ```
 
-```
-   pop  year  state_0  state_1  state_2  state_3
-0  1.5  2000      0.0      0.0      0.0      0.0
-1  1.7  2001      0.0      0.0      0.0      0.0
-2  3.6  2002      0.0      0.0      0.0      0.0
-3  2.4  2001      0.0      0.0      0.0      1.0
-4  2.9  2002      0.0      0.0      0.0      1.0
+```text
+   year  pop  state_0  state_1  state_2  state_3
+0  2000  1.5      1.0      0.0      0.0      0.0
+1  2001  1.7      1.0      0.0      0.0      0.0
+2  2002  3.6      1.0      0.0      0.0      0.0
+3  2001  2.4      0.0      0.0      0.0      1.0
+4  2002  2.9      0.0      0.0      0.0      1.0
 ```
 
 Baştan Seyrek Matris ile Çalışmak
@@ -334,32 +338,32 @@ data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
         'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
 
 df = pd.DataFrame(data)
-print df
+print (df)
 
 vocabs = []
 vals = ['Ohio','Nevada']
-vocabs.append(dict(itertools.izip(vals,range(len(vals)))))
+vocabs.append(dict(zip(vals,range(len(vals)))))
 vals = ['2000','2001','2002']
-vocabs.append(dict(itertools.izip(vals,range(len(vals)))))
+vocabs.append(dict(zip(vals,range(len(vals)))))
 
-print vocabs
+print (vocabs)
 
-print one_hot_column(df, ['state','year'], vocabs).todense()
+print (one_hot_column(df, ['state','year'], vocabs).todense())
 ```
 
-```
-   pop   state  year
-0  1.5    Ohio  2000
-1  1.7    Ohio  2001
-2  3.6    Ohio  2002
-3  2.4  Nevada  2001
-4  2.9  Nevada  2002
-[{'Ohio': 0, 'Nevada': 1}, {'2002': 2, '2000': 0, '2001': 1}]
-[[ 1.5  1.   0.   1.   0.   0. ]
- [ 1.7  1.   0.   0.   1.   0. ]
- [ 3.6  1.   0.   0.   0.   1. ]
- [ 2.4  0.   1.   0.   1.   0. ]
- [ 2.9  0.   1.   0.   0.   1. ]]
+```text
+    state  year  pop
+0    Ohio  2000  1.5
+1    Ohio  2001  1.7
+2    Ohio  2002  3.6
+3  Nevada  2001  2.4
+4  Nevada  2002  2.9
+[{'Ohio': 0, 'Nevada': 1}, {'2000': 0, '2001': 1, '2002': 2}]
+[[1.5 1.  0.  1.  0.  0. ]
+ [1.7 1.  0.  0.  1.  0. ]
+ [3.6 1.  0.  0.  0.  1. ]
+ [2.4 0.  1.  0.  1.  0. ]
+ [2.9 0.  1.  0.  0.  1. ]]
 ```
 
 `one_hot_column` çağrısına bir "sözlükler listesi" verdik, sözlük her
@@ -408,7 +412,7 @@ bağlantılı olup olmadığına bakacağız. Veriyi oluşturalım,
 
 ```python
 import pandas as pd
-df = pd.read_csv('../stat_logit/nes.dat',sep=r'\s+')
+df = pd.read_csv('../stat_075_logit/nes.dat',sep=r'\s+')
 df = df[['presvote','year','gender','income','race','occup1']]
 df = df.dropna()
 df.to_csv('nes2.csv',index=None)
@@ -419,19 +423,19 @@ df.to_csv('nes2.csv',index=None)
 ```python
 import pandas as pd
 df = pd.read_csv('nes2.csv')
-print u'tüm veri', len(df)
-print 'cinsiyet', np.array(df['gender'].value_counts())
-print u'ırk', np.array(df['race'].value_counts())
-print 'parti', np.array(df['presvote'].value_counts())
-print u'kazanç', df['income'].mean()
+print (u'tüm veri', len(df))
+print ('cinsiyet', np.array(df['gender'].value_counts()))
+print (u'ırk', np.array(df['race'].value_counts()))
+print ('parti', np.array(df['presvote'].value_counts()))
+print (u'kazanç', df['income'].mean())
 ```
 
-```
+```text
 tüm veri 13804
 cinsiyet [7461 6343]
 ırk [12075  1148   299   180    85    17]
 parti [6998 6535  271]
-kazanç 3.07649956534
+kazanç 3.076499565343379
 ```
 
 Mesela son sonuçtaki her hücre belli bir partiye verilen oyların sayısı;
@@ -465,10 +469,13 @@ import numpy as np
 vect = HashingVectorizer(n_features=20)
 a = ['aa','bb','cc']
 res = vect.transform(a)
-print res
+print (res)
 ```
 
-```
+```text
+<Compressed Sparse Row sparse matrix of dtype 'float64'
+	with 3 stored elements and shape (3, 20)>
+  Coords	Values
   (0, 5)	1.0
   (1, 19)	1.0
   (2, 18)	-1.0
@@ -511,7 +518,7 @@ def get_minibatch(row_getter,size=10):
     X_train = sps.lil_matrix((size,HASH))
     y_train = []
     for i in range(size):
-        cx,y = row_getter.next()
+        cx,y = next(row_getter)
         for dummy,j,val in zip(cx.row, cx.col, cx.data): X_train[i,j] = val
         y_train.append(y)
     return X_train, y_train
@@ -520,10 +527,10 @@ def get_minibatch(row_getter,size=10):
 cols = ['gender','income','race','occup1']
 row_getter = get_row(cols)
 X,y = get_minibatch(row_getter,size=1)
-print y, X.todense()
+print (y, X.todense())
 ```
 
-```
+```text
 [4.0] [[ 0.  0.  0. -1.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
    0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.]]
 ```
@@ -535,11 +542,11 @@ geziciye sorarak seyrek matris olarak veriyor. 10 tane daha isteyelim,
 
 ```python
 X,y = get_minibatch(row_getter,size=10)
-print len(y), X.shape, type(X)
+print (len(y), X.shape, type(X))
 ```
 
-```
-10 (10, 30) <class 'scipy.sparse.lil.lil_matrix'>
+```text
+10 (10, 30) <class 'scipy.sparse._lil.lil_matrix'>
 ```
 
 PCA
@@ -560,14 +567,14 @@ for i in range(10000):
     pca.partial_fit(X)
 pca.post_process()
 
-print 'varyans orani'
-print pca.explained_variance_ratio_
+print ('varyans orani')
+print (pca.explained_variance_ratio_)
 ```
 
-```
+```text
 varyans orani
-[ 0.36086926  0.16186391  0.13377998  0.09440711  0.0702763   0.05113956
-  0.04768294  0.0343724   0.02336052  0.02224802]
+[0.36085857 0.16186335 0.13378078 0.0944093  0.07027158 0.05112654
+ 0.04767845 0.03433509 0.02341634 0.02225999]
 ```
 
 Her bileşenin verideki varyansın ne kadarını açıkladığı görülüyor. 
@@ -579,13 +586,13 @@ regresyon,
 
 ```python
 from sklearn.linear_model import SGDRegressor
-clf = SGDRegressor(random_state=1, n_iter=1)
+clf = SGDRegressor(random_state=1, max_iter=1)
 row_getter = get_row(cols)
 P = pca.components_.T
 for i in range(10000):
     X_train, y_train = get_minibatch(row_getter,1)
     Xp = np.dot((X_train-pca.mean_),P)
-    clf.partial_fit(Xp, y_train)
+    clf.partial_fit(np.asarray(Xp), y_train)
 ```
 
 Şimdi sonraki 1000 satırı test için kullanalım,
@@ -596,18 +603,18 @@ y_real = []
 for i in range(1000):
     X_test,y_test = get_minibatch(row_getter,1)
     Xp = np.dot((X_test-pca.mean_),P)
-    y_predict.append(clf.predict(Xp)[0])
+    y_predict.append(clf.predict(np.asarray(Xp))[0])
     y_real.append(y_test[0])
 y_predict = np.array(y_predict)
 y_real = np.array(y_real)
 
 err = np.sqrt(((y_predict-y_real)**2).sum()) / len(y_predict)
-print 'ortalama tahmin hatasi', err
-print 'maksimum deger', np.max(y_real)
+print ('ortalama tahmin hatasi', err)
+print ('maksimum deger', np.max(y_real))
 ```
 
-```
-ortalama tahmin hatasi 0.0105872845541
+```text
+ortalama tahmin hatasi 0.010598462941579465
 maksimum deger 5.0
 ```
 
@@ -623,7 +630,7 @@ eğitilebiliyor,
 
 ```python
 from sklearn.linear_model import SGDRegressor
-clf = SGDRegressor(random_state=1, n_iter=1)
+clf = SGDRegressor(random_state=1, max_iter=1)
 row_getter = get_row(cols)
 
 y_predict = []; y_real = []
@@ -638,11 +645,11 @@ X_test,y_test = get_minibatch(row_getter,1000)
 y_predict = clf.predict(X_test) 
 
 err = np.sqrt(((y_predict-y_test)**2).sum()) / len(y_predict)
-print 'ortalama tahmin hatasi', 
+print ('ortalama tahmin hatasi', err)
 ```
 
-```
-ortalama tahmin hatasi 0.0208096951078
+```text
+ortalama tahmin hatasi 0.021197482640542296
 ```
 
 Bu sonuç ta hiç fena değil.  Sonuç olarak veri içinde bazı kalıplar
@@ -695,16 +702,16 @@ print ("%f %f" % d1)
 print ("%f %f" % d2)
 print ("%f %f" % d3)
 
-print u'uzaklık 1-2 =', lin.norm(np.array(d1)-np.array(d2))
-print u'uzaklık 2-3 =', lin.norm(np.array(d2)-np.array(d3))
+print (u'uzaklık 1-2 =', lin.norm(np.array(d1)-np.array(d2)))
+print (u'uzaklık 2-3 =', lin.norm(np.array(d2)-np.array(d3)))
 ```
 
-```
+```text
 0.728969 0.684547
 0.982287 -0.187381
 0.982287 0.187381
-uzaklık 1-2 = 0.907980999479
-uzaklık 2-3 = 0.374762629171
+uzaklık 1-2 = 0.9079809994790936
+uzaklık 2-3 = 0.3747626291714493
 ```
 
 Kaynaklar 
