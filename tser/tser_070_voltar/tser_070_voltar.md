@@ -114,8 +114,8 @@ yıllık standart sapma haline getirmek için 506 * 16 = 8096 Eur.  2 * 8 /8096 
 0.002 SO ünitesi. Yani bu değer artık SO'dan çıkartabileceğimiz bir sayıdır.
 
 ```python
-import pandas as pd
-from StringIO import StringIO
+import pandas as pd, zipfile
+from io import StringIO
 
 COSTS=u"""
 instrument,currency,point_value,slippage
@@ -138,20 +138,21 @@ daily_vol_target = capital * vol_target / 16
 def calc_cost(ins,dt = '2014-10-14'):
     with zipfile.ZipFile('legacycsv.zip', 'r') as z:
         dfi = pd.read_csv(z.open('%s_price.csv' % ins), index_col=0,parse_dates=True )
-        vol = pd.rolling_std(dfi.pct_change()*100., window=25)    
+        vol = (dfi.pct_change()*100.).rolling(25).std()    
     res = []
-    price = float(dfi.ix[dt])
-    v = float(vol.ix[dt])
-    point_val = price * costs.ix[ins].point_value / 100.
+    price = float(dfi.loc[dt])
+    v = float(vol.loc[dt])
+    point_val = price * costs.loc[ins].point_value / 100.
+    block_val = point_val * price  
     block_vol = block_val*v
-    inst_value_vol =  block_vol*exchange[my_curr][costs.ix[ins].currency]
+    inst_value_vol =  block_vol*exchange[my_curr][costs.loc[ins].currency]
     units = daily_vol_target / inst_value_vol
-    exec_cost = (costs.ix[ins].slippage / price) * 100 * block_val
+    exec_cost = (costs.loc[ins].slippage / price) * 100 * block_val
     so_cost =  (exec_cost * 2.) / (16. * block_vol)
     return price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost
 
 price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost = calc_cost('EUROSTX')
-print so_cost
+print (so_cost)
 ```
 
 ```
@@ -173,7 +174,7 @@ for inst in instruments:
     price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost = calc_cost(inst)
     res.append([inst,price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost])
     
-print pd.DataFrame(res,columns=cols)         
+print (pd.DataFrame(res,columns=cols)         )
 ```
 
 ```
@@ -275,7 +276,7 @@ farklar 10,-10,.. bu durumu hemen gösteriyor. Üstteki tahmin serisi için [1,
 
 ```python
 avg =  (pred_scaled / 10).diff().abs().mean()
-print 'devir', avg * 256
+print ('devir', avg * 256)
 ```
 
 ```
@@ -311,8 +312,8 @@ np.random.seed(0)
 
 def ewmac(price,slow,fast):
     vol = util.robust_vol_calc(price.diff())
-    fast_ewma = pd.ewma(price, span=slow)
-    slow_ewma = pd.ewma(price, span=fast)
+    fast_ewma = price.ewm(span=slow).mean()
+    slow_ewma = price.ewm(span=fast).mean()
     raw_ewmac = fast_ewma - slow_ewma
     return raw_ewmac /  vol 
 
@@ -350,10 +351,10 @@ df = df[['US20','SP500']]
 
 
 ```python
-import sys; sys.path.append('../tser_port')
+import sys; sys.path.append('../tser_060_port')
 import boot
 weights=boot.optimise_over_periods(df,rollyears=20, monte_carlo=20,monte_length=250)
-print np.array(weights.tail(1))
+print (np.array(weights.tail(1)))
 ```
 
 ```
@@ -388,11 +389,11 @@ olacaktır. Dikkat edersek bu formül (2)'nin tam tersi.
 ```python
 H = df.corr()
 H = H.clip(lower=0)
-print 'Korelasyon'
-print H
+print ('Korelasyon')
+print (H)
 W = np.array([[0.34,  0.66]]) # ustteki sonuc
 idm=1.0 / (float(np.dot(np.dot(W, H), W.transpose()))) **.5
-print '\nIDM', idm
+print ('\nIDM', idm)
 ```
 
 ```
@@ -430,7 +431,7 @@ for (fast,slow) in ewmacs:
     target_abs_forecast = 10.
     tmp=tmp.abs().iloc[:,0]
     avg_abs_value=tmp.mean()    
-    print 'ewma', slow,fast,'=', target_abs_forecast/avg_abs_value
+    print ('ewma', slow,fast,'=', target_abs_forecast/avg_abs_value)
 ```
 
 ```
@@ -467,7 +468,7 @@ with zipfile.ZipFile('legacycsv.zip', 'r') as z:
     tmp.columns = ['forecast']
     tmp=tmp.abs().iloc[:,0]
     avg_abs_value=tmp.mean()
-    print 10./avg_abs_value 
+    print (10./avg_abs_value )
 ```
 
 ```
@@ -584,7 +585,7 @@ df = pd.DataFrame(index=p.index)
 for (fast,slow) in ewmacs:
      fs = util.ewma(p.PRICE, fast, slow)
      df['%d-%d' % (fast,slow)] = util.ccy_returns(p.PRICE, fs)
-print df.corr()
+print (df.corr())
 ```
 
 ```
@@ -613,8 +614,8 @@ import util
 returns = [2.,1.] # bund,schatz
 volatilies = [8.,2.] # bund,schatz
 returns,vols = util.vol_equaliser(returns,volatilies)
-print 'getiriler', returns
-print 'oynaklik', vols
+print ('getiriler', returns)
+print ('oynaklik', vols)
 ```
 
 ```

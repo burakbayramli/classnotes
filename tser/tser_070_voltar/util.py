@@ -72,7 +72,7 @@ def which_contract(contract_list, cycle, offset, expday, expmon):
     df = df.fillna(method='bfill')
     df['effcont'] = df.effcont.shift(-int(offset*2/3 + 3))
 
-    return df.fillna(method='ffill')
+    return df.ffill(inplace=True)
 
 def create_carry(df, offset, contract_list):
     df2 = df.copy()
@@ -114,8 +114,8 @@ def sharpe(price, forecast):
     return mean_return / vol, tval, pval
 
 def ewma(price, slow, fast):
-    fast_ewma = pd.ewma(price, span=slow)
-    slow_ewma = pd.ewma(price, span=fast)
+    fast_ewma = price.ewm(span=slow).mean()
+    slow_ewma = price.ewm(span=fast).mean()
     raw_ewmac = fast_ewma - slow_ewma
     vol = robust_vol_calc(price.diff())
     return raw_ewmac /  vol 
@@ -130,7 +130,7 @@ def bollinger(df,col,lev):
     df['bottom'] = middle-2*std
     signals['signal'] = np.where(df[col] > middle+2*std, -1, np.nan) 
     signals['signal'] = np.where(df[col] < middle-2*std, 1, np.nan)
-    signals['signal'] = signals['signal'].fillna(method='ffill')
+    signals['signal'] = signals['signal'].ffill(inplace=True)
     df['ret'] = df[col].pct_change() * signals['signal'].shift(1)
     ret = df.ret.dropna() * lev
     return ret
@@ -149,8 +149,8 @@ def crossover(df,col,lev):
 def carry(daily_ann_roll, vol, diff_in_years, smooth_days=90):
     ann_stdev = vol * ROOT_BDAYS_INYEAR
     raw_carry = daily_ann_roll / ann_stdev
-    smooth_carry = pd.ewma(raw_carry, smooth_days) / diff_in_years
-    return smooth_carry.fillna(method='ffill')
+    smooth_carry = raw_carry.ewm(smooth_days).mean() / diff_in_years
+    return smooth_carry.ffill()
 
 def estimate_forecast_scalar(x, window=250000, min_periods=500):
     target_abs_forecast = 10.

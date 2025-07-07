@@ -195,8 +195,8 @@ oynaklığı günlük yüzde 1.5, her yüzde 1’lik hareket 370 Eur ediyor, 370
 haline getirmek için 506 * 16 = 8096 Eur. 2 * 8 /8096 = 0.002 SO
 ünitesi. Yani bu değer artık SO’dan çıkartabileceğimiz bir sayıdır.</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> StringIO <span class="im">import</span> StringIO</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> StringIO</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>COSTS<span class="op">=</span><span class="st">u&quot;&quot;&quot;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">instrument,currency,point_value,slippage</span></span>
@@ -219,20 +219,21 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_cost(ins,dt <span class="op">=</span> <span class="st">&#39;2014-10-14&#39;</span>):</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        dfi <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;</span><span class="sc">%s</span><span class="st">_price.csv&#39;</span> <span class="op">%</span> ins), index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span> )</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        vol <span class="op">=</span> pd.rolling_std(dfi.pct_change()<span class="op">*</span><span class="fl">100.</span>, window<span class="op">=</span><span class="dv">25</span>)    </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        vol <span class="op">=</span> (dfi.pct_change()<span class="op">*</span><span class="fl">100.</span>).rolling(<span class="dv">25</span>).std()    </span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> []</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> <span class="bu">float</span>(dfi.ix[dt])</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> <span class="bu">float</span>(vol.ix[dt])</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    point_val <span class="op">=</span> price <span class="op">*</span> costs.ix[ins].point_value <span class="op">/</span> <span class="fl">100.</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    block_vol <span class="op">=</span> block_val<span class="op">*</span>v</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    inst_value_vol <span class="op">=</span>  block_vol<span class="op">*</span>exchange[my_curr][costs.ix[ins].currency]</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    units <span class="op">=</span> daily_vol_target <span class="op">/</span> inst_value_vol</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    exec_cost <span class="op">=</span> (costs.ix[ins].slippage <span class="op">/</span> price) <span class="op">*</span> <span class="dv">100</span> <span class="op">*</span> block_val</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    so_cost <span class="op">=</span>  (exec_cost <span class="op">*</span> <span class="fl">2.</span>) <span class="op">/</span> (<span class="fl">16.</span> <span class="op">*</span> block_vol)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost <span class="op">=</span> calc_cost(<span class="st">&#39;EUROSTX&#39;</span>)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> so_cost</span></code></pre></div>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> <span class="bu">float</span>(dfi.loc[dt])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> <span class="bu">float</span>(vol.loc[dt])</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    point_val <span class="op">=</span> price <span class="op">*</span> costs.loc[ins].point_value <span class="op">/</span> <span class="fl">100.</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    block_val <span class="op">=</span> point_val <span class="op">*</span> price  </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    block_vol <span class="op">=</span> block_val<span class="op">*</span>v</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    inst_value_vol <span class="op">=</span>  block_vol<span class="op">*</span>exchange[my_curr][costs.loc[ins].currency]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    units <span class="op">=</span> daily_vol_target <span class="op">/</span> inst_value_vol</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    exec_cost <span class="op">=</span> (costs.loc[ins].slippage <span class="op">/</span> price) <span class="op">*</span> <span class="dv">100</span> <span class="op">*</span> block_val</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    so_cost <span class="op">=</span>  (exec_cost <span class="op">*</span> <span class="fl">2.</span>) <span class="op">/</span> (<span class="fl">16.</span> <span class="op">*</span> block_vol)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost <span class="op">=</span> calc_cost(<span class="st">&#39;EUROSTX&#39;</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (so_cost)</span></code></pre></div>
 <pre><code>0.001862369503</code></pre>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
@@ -248,7 +249,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost <span class="op">=</span> calc_cost(inst)</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    res.append([inst,price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost])</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> pd.DataFrame(res,columns<span class="op">=</span>cols)         </span></code></pre></div>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (pd.DataFrame(res,columns<span class="op">=</span>cols)         )</span></code></pre></div>
 <pre><code>      inst     price      v  block_val  block_vol  inst_value_vol   units  \
 0  CRUDE_W   85.3000 1.2678   853.0000  1081.4529       1081.4529  2.8896   
 1  EDOLLAR   97.0550 0.0563  2426.3750   136.7107        136.7107 22.8585   
@@ -339,7 +340,7 @@ mesela bu bir alım, bir satım demektir, farklar 10,-10,.. bu durumu
 hemen gösteriyor. Üstteki tahmin serisi için [1, sf. 276],</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>avg <span class="op">=</span>  (pred_scaled <span class="op">/</span> <span class="dv">10</span>).diff().<span class="bu">abs</span>().mean()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;devir&#39;</span>, avg <span class="op">*</span> <span class="dv">256</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;devir&#39;</span>, avg <span class="op">*</span> <span class="dv">256</span>)</span></code></pre></div>
 <pre><code>devir 8.72554168599</code></pre>
 <p>Alt Sistemlerin Ağırlıkları</p>
 <p>Daha önce üç tane VİS’i sadece alıp elde tutmak üzerinden ağırlık
@@ -367,8 +368,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ewmac(price,slow,fast):</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    vol <span class="op">=</span> util.robust_vol_calc(price.diff())</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    fast_ewma <span class="op">=</span> pd.ewma(price, span<span class="op">=</span>slow)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    slow_ewma <span class="op">=</span> pd.ewma(price, span<span class="op">=</span>fast)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    fast_ewma <span class="op">=</span> price.ewm(span<span class="op">=</span>slow).mean()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    slow_ewma <span class="op">=</span> price.ewm(span<span class="op">=</span>fast).mean()</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    raw_ewmac <span class="op">=</span> fast_ewma <span class="op">-</span> slow_ewma</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> raw_ewmac <span class="op">/</span>  vol </span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
@@ -403,10 +404,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;SP500&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;SP500&#39;</span>].pct_change() <span class="op">*</span> forecast.shift(<span class="dv">1</span>).SP500 <span class="op">/</span> <span class="fl">10.</span></span>
 <span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">&#39;US20&#39;</span>,<span class="st">&#39;SP500&#39;</span>]]</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_port&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_060_port&#39;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> boot</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>weights<span class="op">=</span>boot.optimise_over_periods(df,rollyears<span class="op">=</span><span class="dv">20</span>, monte_carlo<span class="op">=</span><span class="dv">20</span>,monte_length<span class="op">=</span><span class="dv">250</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> np.array(weights.tail(<span class="dv">1</span>))</span></code></pre></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.array(weights.tail(<span class="dv">1</span>)))</span></code></pre></div>
 <pre><code>[[ 0.34008769  0.65991231]]</code></pre>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>weights.plot()</span>
@@ -435,11 +436,11 @@ tersi.</p>
 <div class="sourceCode" id="cb12"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> df.corr()</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>H <span class="op">=</span> H.clip(lower<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Korelasyon&#39;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> H</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Korelasyon&#39;</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (H)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>W <span class="op">=</span> np.array([[<span class="fl">0.34</span>,  <span class="fl">0.66</span>]]) <span class="co"># ustteki sonuc</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>idm<span class="op">=</span><span class="fl">1.0</span> <span class="op">/</span> (<span class="bu">float</span>(np.dot(np.dot(W, H), W.transpose()))) <span class="op">**</span><span class="fl">.5</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;</span><span class="ch">\n</span><span class="st">IDM&#39;</span>, idm</span></code></pre></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;</span><span class="ch">\n</span><span class="st">IDM&#39;</span>, idm)</span></code></pre></div>
 <pre><code>Korelasyon
            US20     SP500
 US20   1.000000  0.096425
@@ -471,7 +472,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    target_abs_forecast <span class="op">=</span> <span class="fl">10.</span></span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    tmp<span class="op">=</span>tmp.<span class="bu">abs</span>().iloc[:,<span class="dv">0</span>]</span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    avg_abs_value<span class="op">=</span>tmp.mean()    </span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&#39;ewma&#39;</span>, slow,fast,<span class="st">&#39;=&#39;</span>, target_abs_forecast<span class="op">/</span>avg_abs_value</span></code></pre></div>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;ewma&#39;</span>, slow,fast,<span class="st">&#39;=&#39;</span>, target_abs_forecast<span class="op">/</span>avg_abs_value)</span></code></pre></div>
 <pre><code>ewma 2 8 = 12.8587606411
 ewma 4 16 = 8.91499507015
 ewma 8 32 = 6.09843054736
@@ -503,7 +504,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    tmp.columns <span class="op">=</span> [<span class="st">&#39;forecast&#39;</span>]</span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    tmp<span class="op">=</span>tmp.<span class="bu">abs</span>().iloc[:,<span class="dv">0</span>]</span>
 <span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    avg_abs_value<span class="op">=</span>tmp.mean()</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="fl">10.</span><span class="op">/</span>avg_abs_value </span></code></pre></div>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="fl">10.</span><span class="op">/</span>avg_abs_value )</span></code></pre></div>
 <pre><code>21.44</code></pre>
 <p>Bu değerler [1, sf. 309] ile uyumlu.</p>
 <p>Strateji Ağırlıklarını Hesaplamak (Forecast Weight Estimation)</p>
@@ -605,7 +606,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a h
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (fast,slow) <span class="kw">in</span> ewmacs:</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>     fs <span class="op">=</span> util.ewma(p.PRICE, fast, slow)</span>
 <span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>     df[<span class="st">&#39;</span><span class="sc">%d</span><span class="st">-</span><span class="sc">%d</span><span class="st">&#39;</span> <span class="op">%</span> (fast,slow)] <span class="op">=</span> util.ccy_returns(p.PRICE, fs)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df.corr()</span></code></pre></div>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.corr())</span></code></pre></div>
 <pre><code>             2-8      4-16      8-32     16-64    32-128    64-256
 2-8     1.000000  0.869692  0.624934  0.402105  0.233632  0.143689
 4-16    0.869692  1.000000  0.898819  0.673206  0.433222  0.270579
@@ -627,8 +628,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a h
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>returns <span class="op">=</span> [<span class="fl">2.</span>,<span class="fl">1.</span>] <span class="co"># bund,schatz</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>volatilies <span class="op">=</span> [<span class="fl">8.</span>,<span class="fl">2.</span>] <span class="co"># bund,schatz</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>returns,vols <span class="op">=</span> util.vol_equaliser(returns,volatilies)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;getiriler&#39;</span>, returns</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;oynaklik&#39;</span>, vols</span></code></pre></div>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;getiriler&#39;</span>, returns)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;oynaklik&#39;</span>, vols)</span></code></pre></div>
 <pre><code>getiriler [1.25, 2.5]
 oynaklik [5.0, 5.0]</code></pre>
 <p>Oynaklık standardizasyonu hesabı oynaklıklar için bir ortalama

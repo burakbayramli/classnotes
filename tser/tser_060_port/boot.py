@@ -3,7 +3,7 @@ import numpy as np, random, datetime
 from scipy.optimize import minimize
 
 def create_dull_pd_matrix(dullvalue=0.0, dullname="A",
-                          startdate=pd.datetime(1970,1,1).date(),
+                          startdate=datetime.date(1970,1,1),
                           enddate=datetime.datetime.now().date(), index=None):
     if index is None:
         index=pd.date_range(startdate, enddate)    
@@ -24,17 +24,22 @@ def neg_SR(weights, sigma, mus):
 
 def equalise_vols(returns, default_vol):    
     factors=(default_vol/16.0)/returns.std(axis=0)
-    facmat=create_dull_pd_matrix(dullvalue=factors,
-                                 dullname=returns.columns,
-                                 index=returns.index)
+    # The fix is here: create facmat directly as a DataFrame with factors as values
+    # and returns.columns as its columns.
+    facmat = pd.DataFrame([factors.values]*len(returns.index), # Repeat factors for each row
+                          index=returns.index,
+                          columns=returns.columns)
+    
     norm_returns=returns*facmat
-    norm_returns.columns=returns.columns
+    # The line below is no longer strictly necessary if facmat is created correctly,
+    # but it doesn't hurt to keep for clarity if you prefer.
+    norm_returns.columns=returns.columns 
     return norm_returns
 
 def markosolver(returns, default_vol, default_SR):        
     use_returns=equalise_vols(returns, default_vol)    
     sigma=use_returns.cov().values
-    mus = use_returns[asset_name].mean() for asset_name in use_returns.columns
+    mus = [use_returns[asset_name].mean() for asset_name in use_returns.columns]
     mus=np.array([mus], ndmin=2)
     mus=mus.transpose()
     number_assets=use_returns.shape[1]
