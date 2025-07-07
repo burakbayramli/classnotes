@@ -174,7 +174,7 @@ fs = 8000.; ts = 1/fs
 def x(n):
     return np.sin(2*np.pi*1000*n*ts) + 0.5*np.sin(2*np.pi*2000*n*ts + 3*np.pi / 4)
 
-for n in range(8): print np.round(x(n),4),
+for n in range(8): print (np.round(x(n),4),)
 ```
 
 ```
@@ -197,7 +197,7 @@ def X(m):
         imag -= x(n)*np.sin(2*np.pi*m*n/8.)
     return np.round(real,4), imag
 
-print X(1)
+print (X(1))
 ```
 
 ```
@@ -207,7 +207,7 @@ print X(1)
 2 kHz için ne olur?
 
 ```python
-print X(2)
+print (X(2))
 ```
 
 ```
@@ -225,7 +225,7 @@ olarak yapılıyor. `numpy.abs` çağrısı bu hesabı hayali sayılar
 
 ```python
 r,i = X(2)
-print res, u'büyüklük', np.abs(complex(r,i))
+print (r,i, u'büyüklük', np.abs(complex(r,i)))
 ```
 
 ```
@@ -237,7 +237,7 @@ frekans sinyal içinde var / önemli. 3 Khz'e bakalım,
 
 ```python
 r,i = X(3)
-print res, u'büyüklük', np.abs(complex(r,i))
+print (r,i, u'büyüklük', np.abs(complex(r,i)))
 ```
 
 ```
@@ -259,19 +259,24 @@ Bir örnek üzerinde daha görelim [3, sf. 152], bu sefer kütüphane çağrıs�
 
 ```python
 import scipy
-
+plt.figure()
 N = 64; n = np.arange(N) - 1; T = 0.05;
+w1 = 5; w2 = 10
 t = n*T; xbn = np.sin(w1*t)+ 0.5*np.sin(w2*t);
 plt.stem(t,xbn)
 plt.savefig('compscieng_1_30_08.png')
-k = np.arange(N) - 1
-Xb = scipy.fft(xbn);
+```
+
+```python
 plt.figure()
+k = np.arange(N) - 1
+Xb = scipy.fft.fft(xbn);
 plt.stem(k,abs(Xb))
 plt.savefig('compscieng_1_30_09.png')
 ```
 
 ![](compscieng_1_30_08.png)
+
 ![](compscieng_1_30_09.png)
 
 Üst sağdaki frekans analizine göre $k=2$ ve $5$'te büyüklük var, bu
@@ -377,9 +382,11 @@ Güneşte periyodik olarak olan benekler, aşağı yukarı 11 senede bir ortaya
 
 ```python
 tempdata = np.loadtxt('sunspots.dat')
-year=tempdata[:,0]; sunspots=tempdata[:,1]
-year=year[year<2001]; sunspots=sunspots[year<2001]
-plt.plot(year,sunspots)
+year=tempdata[:,0]
+sunspots=tempdata[:,1]
+#year=year[year<2001]
+sunspots=sunspots[year<2001]
+plt.plot(year[year<2001],sunspots)
 plt.title(u'Güneş Benekleri')
 plt.savefig('compscieng_1_30_03.png')
 ```
@@ -417,11 +424,11 @@ C = np.dot(np.linalg.inv(W), Y)
 Periyotların grafiği,
 
 ```python
-n=len(Y); print 'n=',n
+n=len(Y); print ('n=',n)
 power = np.abs(C[0:int(n/2)])**2
 nyquist = 1./2
-freq = np.array(map(float, np.array(arange(0,int(n/2))))) / (n/2)*nyquist
-print 'len(freq)=',len(freq)
+freq = np.array(list(map(float, np.array(range(0,int(n/2)))))) / (n/2)*nyquist
+print ('len(freq)=',len(freq))
 period=1./freq;
 plt.plot(period,power)
 plt.xlim(0,30)
@@ -446,12 +453,12 @@ DFT'nin karmaşıklığı $O(N^2)$'dir. Bu iyi bir hızdır.
 
 FFT algoritması üstteki çarpımın bazı özelliklerini kullanarak DFT'yi daha
 da hızlandırır ve $O(\frac{1}{2}Nlog_2N)$ hızına getirir. FFT'den bu
-makalede bahsetmeyeceğiz, aklımızda olsun, `scipy.fft` çağrısı bu
+makalede bahsetmeyeceğiz, aklımızda olsun, `scipy.fft.fft` çağrısı bu
 algoritmayı kullanır, örnek:
 
 ```python
-C = scipy.fft(Y)
-print C[:3]
+C = scipy.fft.fft(Y)
+print (C[:3])
 ```
 
 ```
@@ -483,8 +490,9 @@ benekleri,
 ```python
 tempdata = np.loadtxt('sunspots.dat')
 year=tempdata[:,0]; sunspots=tempdata[:,1]
-year=year[year<2001]; sunspots=sunspots[year<2001]
-plt.plot(year,sunspots)
+#year=year[year<2001]
+sunspots=sunspots[year<2001]
+plt.plot(year[year<2001],sunspots)
 plt.title(u'Güneş Benekleri')
 plt.savefig('tser_ar_06.png')
 ```
@@ -497,16 +505,14 @@ omega = np.linspace(1, 40, 200)
 
 dy = 0.5 + 0.5 * np.random.random(len(sunspots))
 sig = np.array([0.1, 0.01, 0.001])
-PS, z = lomb_scargle(year, sunspots, dy, omega, generalized=True, significance=sig)
+PS, z = lomb_scargle(year[year<2001], sunspots, dy, omega, generalized=True, significance=sig)
 
 plt.plot(omega,PS)
-plt.hold(True)
 
 xlim = (omega[0], omega[-1])
 for zi, pi in zip(z, sig):
     plt.plot(xlim, (zi, zi), ':k', lw=1)
     plt.text(xlim[-1] - 0.001, zi - 0.02, "$%.1g$" % pi, ha='right', va='top')
-    plt.hold(True)
 plt.title(u'Güneş Benekleri Periyotları')
 plt.savefig('tser_ar_07.png')
 ```
@@ -523,7 +529,7 @@ oldu. Bu olay grafikte açık bir şekilde görülüyor.
 
 ```python
 import pandas as pd
-ext = pd.DataFrame(pd.read_csv('extinct.csv',header=None))
+ext = pd.DataFrame(pd.read_csv('../../tser/tser_020_ar/extinct.csv',header=None))
 ext2 = ext.set_index(np.linspace(542,1,len(ext)))
 ext2[0].plot()
 ext = ext[0]
@@ -543,13 +549,11 @@ sig = np.array([0.1, 0.01, 0.001])
 PS, z = lomb_scargle(ext.index, ext, dy, omega, generalized=True, significance=sig)
 
 plt.plot(omega,PS)
-plt.hold(True)
 
 xlim = (omega[0], omega[-1])
 for zi, pi in zip(z, sig):
     plt.plot(xlim, (zi, zi), ':k', lw=1)
     plt.text(xlim[-1] - 0.001, zi - 0.02, "$%.1g$" % pi, ha='right', va='top')
-    plt.hold(True)
 plt.title(u'Canlıların Tükenme Periyotları')
 plt.savefig('tser_ar_08.png')
 ```
