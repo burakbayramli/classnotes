@@ -55,7 +55,7 @@ lin.det(np.vstack((pts[0],pts[1]))) + \
 lin.det(np .vstack((pts[1],pts[2]))) + \
 lin.det(np.vstack((pts[2],pts[3]))) + \
 lin.det(np.vstack((pts[3],pts[0])))
-print (np.abs(s) / 2)
+print ((np.abs(s) / 2))
 ```
 
 ```
@@ -92,16 +92,17 @@ algoritmanın tamamı çok hızlı çalışacaktır. Algoritmanın karmaşıklı
 $O(N)$.
 
 ```python
-xmin = np.min(points[:,0])
-xmax = np.max(points[:,1])
-print xmin, xmax
+pts = np.array(pts)
+xmin = np.min(pts[:,0])
+xmax = np.max(pts[:,1])
+print (xmin, xmax)
 bins = np.linspace(xmin,xmax,10)
-bidx = np.digitize(points[:,0], bins)
+bidx = np.digitize(pts[:,0], bins)
 mins = []; maxs = []
 for idx in np.unique(bidx):
-    tmp=points[bidx==idx]
-    mins.append(tmp[np.argmin(points[bidx==idx,1])])
-    maxs.append(tmp[np.argmax(points[bidx==idx,1])])
+    tmp=pts[bidx==idx]
+    mins.append(tmp[np.argmin(pts[bidx==idx,1])])
+    maxs.append(tmp[np.argmax(pts[bidx==idx,1])])
 mins=np.array(mins)
 maxs=np.array(maxs)
 ```
@@ -111,7 +112,7 @@ maxs=np.array(maxs)
 ```
 
 ```python
-plt.plot(points[:,0], points[:,1], 'o')
+plt.plot(pts[:,0], pts[:,1], 'o')
 plt.plot(mins[:,0], mins[:,1], 'dr')
 plt.plot(maxs[:,0], maxs[:,1], 'dr')
 plt.xlim(6,12); plt.ylim(8,15)
@@ -121,6 +122,7 @@ plt.savefig('enc_02.png')
 ![](enc_02.png)
 
 ```python
+from scipy.spatial import ConvexHull
 approx = np.vstack((mins,maxs))
 hull = ConvexHull(approx)
 plt.plot(approx[:,0], approx[:,1], 'o')
@@ -220,8 +222,8 @@ def inside_quad(rect, pt):
     res = np.cross(a,d)
     return same_sign(res), res
 
-print inside_quad(rect1, pt1)
-print inside_quad(rect1, pt2)
+print (inside_quad(rect1, pt1))
+print (inside_quad(rect1, pt2))
 ```
 
 ```
@@ -326,19 +328,19 @@ plt.plot(approx[:,0], approx[:,1], 'o')
 
 rect1 = [[6,8],[12,10],[13,15],[6,14]]
 plot_quad(rect1,'b')
-r1total = np.array([score_quad_fit(rect1,p) for p in points]).sum()
+r1total = np.array([score_quad_fit(rect1,p) for p in pts]).sum()
 
 rect2 = [[7,9],[12,10],[11,14],[6,12]]
 plot_quad(rect2,'r')
-r2total = np.array([score_quad_fit(rect2,p) for p in points]).sum()
+r2total = np.array([score_quad_fit(rect2,p) for p in pts]).sum()
 
 rect3 = [[7,9],[11,10],[10,14],[6,12]]
 plot_quad(rect3,'k')
-r3total = np.array([score_quad_fit(rect3,p) for p in points]).sum()
+r3total = np.array([score_quad_fit(rect3,p) for p in pts]).sum()
 
-print 'mavi',r1total
-print 'kirmizi',r2total
-print 'siyah',r3total
+print ('mavi',r1total)
+print ('kirmizi',r2total)
+print ('siyah',r3total)
 
 plt.xlim(4,14); plt.ylim(6,17)
 plt.savefig('enc_11.png')
