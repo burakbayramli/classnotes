@@ -40,7 +40,7 @@ P = [[1./4, 2./4, 0, 0, 1./4],
      [0, 1./2, 0, 1./2, 0]]
 
 P = np.array(P)
-print P
+print (P)
 ```
 
 ```
@@ -59,7 +59,7 @@ import numpy.linalg as lin
 x=np.array([.5, .3, .1, .1, 0]) # herhangi bir vektor
 for i in range(20): 
     x = np.dot(x,P)
-print 'pi = ', x
+print ('pi = ', x)
 ```
 
 ```
@@ -78,7 +78,7 @@ Neyse, eğer özvektör hesabını kendimiz elle yapmak yerine direk kütüphane
 import numpy.linalg as lin
 evals,evec = lin.eig(P.T)
 pi =  evec[:,0] / np.sum(evec[:,0])
-print np.abs(pi)
+print (np.abs(pi))
 ```
 
 ```
@@ -155,7 +155,7 @@ M = d*N + (1-d)*Nf
 x=np.array([.5, .3, .1, .1, 0]) # herhangi bir vektor
 for i in range(20): 
     x = np.dot(x,M)
-print 'result = ', x 
+print ('result = ', x )
 ```
 
 ```
@@ -254,7 +254,7 @@ ek işlemlerimiz sonrası [3].
 
 ```python
 import pandas as pd, zipfile
-with zipfile.ZipFile('/home/burak/Documents/Dropbox/Public/data/hidalgo.zip', 'r') as z:
+with zipfile.ZipFile('/opt/Downloads/hidalgo.zip', 'r') as z:
       df =  pd.read_csv(z.open('hidalgo.csv'),sep='\t')
       gdp =  pd.read_csv(z.open('gdp1416.csv'),sep=',',index_col=0)
       hs =  pd.read_csv(z.open('hs.csv'),sep='|')
@@ -262,8 +262,8 @@ with zipfile.ZipFile('/home/burak/Documents/Dropbox/Public/data/hidalgo.zip', 'r
 ```
 
 ```python
-print len(df)
-print df.tail(10)
+print (len(df))
+print (df.tail(10))
 ```
 
 ```
@@ -285,8 +285,8 @@ print df.tail(10)
 
 ```python
 cp = df.pivot_table('export_val', index='origin', columns='hs92')
-print cp.shape
-print len(np.unique(df.hs92)), 'urun'
+print (cp.shape)
+print (len(np.unique(df.hs92)), 'urun')
 ```
 
 ```
@@ -305,7 +305,7 @@ cp2[cp2 != 1.0] = 0.0
 cp3 = cp2
 cp4 = cp3.div(cp3.sum(axis=1),axis=0)
 cp5 = cp3.div(cp3.sum(axis=0),axis=1)
-print cp4.shape, cp5.shape
+print (cp4.shape, cp5.shape)
 ```
 
 ```
@@ -318,14 +318,14 @@ indisi-),
 
 ```python
 import scipy.linalg as lin
-print cp4.shape
+print (cp4.shape)
 uc,vc = lin.eig(np.dot(cp4,cp5.T))
-print vc.shape
+print (vc.shape)
 eci = np.array(vc)[:,1]
-print len(eci)
-print np.argmax(eci)
+print (len(eci))
+print (np.argmax(eci))
 top_countries = cp.index[np.argsort(eci)[:10]]
-print top_countries
+print (top_countries)
 ```
 
 ```
@@ -352,7 +352,7 @@ A = scp4.T.dot(scp5)
 up,vp = lin.eigs(A,k=2)
 pci = np.array(vp)[:,1]
 top_prods = cp.columns[np.argsort(pci)[-10:]]
-print top_prods
+print (top_prods)
 ```
 
 ```
@@ -366,8 +366,14 @@ Bu ürünler hangileri?
 ```python
 pd.set_option('expand_frame_repr', False)
 top_prods2 = [str(x) for x in list(top_prods)]
-print len(top_prods2)
-print hs2.ix[top_prods2][['Product Description_y','Product Description_x']]
+hs2_index_str = hs2.index.astype(str) # Ensure hs2 index is string type for comparison
+valid_top_prods = [p for p in top_prods2 if p in hs2_index_str]
+
+print (len(valid_top_prods))
+if valid_top_prods: # Check if there are any valid products to avoid error on empty list
+    print (hs2.loc[valid_top_prods][['Product Description_y','Product Description_x']])
+else:
+    print("No matching product codes found in hs2 for the top products.")
 ```
 
 ```
@@ -386,25 +392,23 @@ ProductCode_x
 848590         (-2006) Machinery parts not specified or inclu...                                    (-2006) - Other
 ```
 
-İş makinaları, radar ürünleri, araba şanzımanı, kimya, metalurji ürünleri
-ağırlıkta. Üstteki ürünlerin teknik olarak çetrefil olduklarını
-görebiliyoruz. Acaba ECI'yi 2014 yılında ülkelerin kişi başına gayrısafi
-yurtiçi hasılasını tahmin etmek için kullanabilir miyiz?
+Acaba ECI'yi 2014 yılında ülkelerin kişi başına gayrısafi yurtiçi
+hasılasını tahmin etmek için kullanabilir miyiz?
 
 ```python
 cindex = [x.upper() for x in cp.index]
 ecigdp = pd.DataFrame(eci,index=cindex)
 ecigdp = ecigdp.join(gdp)
-print ecigdp.shape
+print (ecigdp.shape)
 ecigdp.columns = ['eci', u'gdp2014', u'gdp2016']
 ecigdp['prods'] = np.array(cp3.sum(axis=1))
 ecigdp = ecigdp.dropna()
-print ecigdp.tail()
+print (ecigdp.tail())
 import statsmodels.formula.api as smf
 results = smf.ols('np.log(gdp2014) ~ prods', data=ecigdp).fit()
-print results.rsquared_adj
+print (results.rsquared_adj)
 results = smf.ols('np.log(gdp2014) ~ eci', data=ecigdp).fit()
-print results.rsquared_adj
+print (results.rsquared_adj)
 ```
 
 ```
@@ -447,7 +451,7 @@ Kaynaklar
 
 [2] Hidalgo, *Veri*, [http://atlas.media.mit.edu/en/resources/data/](http://atlas.media.mit.edu/en/resources/data/)
 
-[3] Bayramlı, *Urun Verisi*, [https://drive.google.com/uc?export=view&id=1G4awodEWjQ2MgnDZ2OcK7O7GvjoigOcy](https://drive.google.com/uc?export=view&id=1G4awodEWjQ2MgnDZ2OcK7O7GvjoigOcy)
+[3] Bayramlı, *Urun Verisi*, [Data](https://www.dropbox.com/scl/fi/cqqoyqyfpfwkkbiwl4u1z/hidalgo.zip?rlkey=ov8wvd31gncwe3qtt6n8j3uox&st=lfnl4pmi&raw=1)
 
 [4] Hidalgo, *The Atlas of Economic Complexity*, [http://atlas.cid.harvard.edu](http://atlas.cid.harvard.edu)
 
