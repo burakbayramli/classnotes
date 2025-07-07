@@ -98,7 +98,7 @@ def ktbc(n):
 
 K,T,B,C = ktbc(4)
 
-print lin.inv(K) 
+print (lin.inv(K) )
 ```
 
 ```
@@ -217,12 +217,12 @@ $n=3$ ve $n=5$ için çözün.
 import scipy.linalg as lin
 
 DB = lin.toeplitz([1, -1, 0], [1, 0, 0])
-print DB; print lin.inv(DB)
+print (DB); print (lin.inv(DB))
 
 DF = lin.toeplitz([-1, 0, 0], [-1, 1, 0])
 
 D_0 = (DF + DB) / 2
-print D_0
+print (D_0)
 ```
 
 ```
@@ -252,14 +252,14 @@ iyi: $\Delta_+$ için `DF` ve $\Delta_-$ yerine `DB` kullanıp,
 import scipy.linalg as lin
 
 DB = lin.toeplitz([1, -1, 0], [1, 0, 0])
-print "backward"
-print DB
+print ("backward")
+print (DB)
 
 DF = lin.toeplitz([-1, 0, 0], [-1, 1, 0])
-print "forward"
-print DF
-print 'product'
-print np.dot(DF, DB)
+print ("forward")
+print (DF)
+print ('product')
+print (np.dot(DF, DB))
 ```
 
 ```
@@ -356,19 +356,19 @@ $$ u(x) = x - \frac{1}{1-e} + \frac{1}{1-e}e^x $$
 ```python
 import scipy.linalg as lin
 
-K,T,B,C = ktbc(4); print K
+K,T,B,C = ktbc(4); print (K)
 
-C = lin.toeplitz([0, -1, 0, 0], [0, 1, 0, 0]); print C
+C = lin.toeplitz([0, -1, 0, 0], [0, 1, 0, 0]); print (C)
 
-print "ortalanmis",  lin.solve((25*K + 2.5*C), [1.,1.,1.,1.])
+print ("ortalanmis",  lin.solve((25*K + 2.5*C), [1.,1.,1.,1.]))
 
-F = lin.toeplitz([-1, 0, 0, 0], [-1, 1, 0, 0]); print F
+F = lin.toeplitz([-1, 0, 0, 0], [-1, 1, 0, 0]); print (F)
 
-print "ileri farklilik", lin.solve((25*K + 2.5*F), [1.,1.,1.,1.])
+print ("ileri farklilik", lin.solve((25*K + 2.5*F), [1.,1.,1.,1.]))
 
 def ux(x): return x - 1/(1-np.e) + np.e**x/(1-np.e)
 
-print ux(0.2), ux(0.4), ux(0.6), ux(0.8)
+print (ux(0.2), ux(0.4), ux(0.6), ux(0.8))
 ```
 
 ```
