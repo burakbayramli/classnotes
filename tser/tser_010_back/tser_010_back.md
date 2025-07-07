@@ -24,6 +24,7 @@ veri bunu doğruluyorsa, getirilerin Gaussian olduğu faraziyesi de
 yapılabilir. IGE verisi için
 
 ```python
+import pandas as pd
 ige = pd.read_csv('IGE.csv',index_col='Date')
 ige = ige.sort_index()
 ige['Returns'] = ige['Adj Close'].pct_change()
@@ -108,17 +109,17 @@ $$ = \sqrt{q}SR $$
 Altta IGE üzerindeki Sharpe oranı,
 
 ```python
-print len(ige)
+print (len(ige))
 n = 252 # bir yil, bu kadar ticari gun
 Rf = 0.04 # risksiz getiri yuzde 4
 ige['excessRet'] = ige['Returns'] - Rf/n
 sharpeRatio = np.sqrt(n)*ige['excessRet'].mean() / ige['excessRet'].std()
-print sharpeRatio
+print (sharpeRatio)
 ```
 
-```
+```text
 1504
-0.789317538345
+0.7893175383448513
 ```
 
 Averajı hesaplarken 252'den fazla veri noktası kullandık, niye hala 252'nın
@@ -135,17 +136,17 @@ görebiliriz. Üstteki değer alttaki değerlerin herhangi birinden yüksek mi?
 
 ```python
 from scipy.stats.distributions import norm
-alpha=0.10; print norm.ppf(1-alpha), alpha
-alpha=0.05; print norm.ppf(1-alpha), alpha
-alpha=0.01; print norm.ppf(1-alpha), alpha
-alpha=0.001; print norm.ppf(1-alpha), alpha
+alpha=0.10; print (norm.ppf(1-alpha), alpha)
+alpha=0.05; print (norm.ppf(1-alpha), alpha)
+alpha=0.01; print (norm.ppf(1-alpha), alpha)
+alpha=0.001; print (norm.ppf(1-alpha), alpha)
 ```
 
-```
-1.28155156554 0.1
-1.64485362695 0.05
-2.32634787404 0.01
-3.09023230617 0.001
+```text
+1.2815515655446004 0.1
+1.6448536269514722 0.05
+2.3263478740408408 0.01
+3.090232306167813 0.001
 ```
 
 Değil. Demek ki istatistiki olarak önemli / büyük bir Sharpe oranı elde
@@ -182,9 +183,9 @@ print (sharpe(df1['Adj Close']))
 print (sharpe(df2['Adj Close']))
 ```
 
-```
--0.04718388850111191
-0.5100019269309098
+```text
+-0.04718388850111181
+0.5100019269309106
 ```
 
 Sonuca gore tahviller kriz zamaninda daha iyi getiri veriyor.
@@ -245,12 +246,12 @@ spy['cumret']=(1+spy['netRet']).cumprod()-1.0
 n = 252 
 sharpeRatio = np.sqrt(n)*spy['netRet'].mean() / spy['netRet'].std()
 print ('SR', sharpeRatio)
-print 'Dusus', dd.calculateMaxDD(spy['cumret'])
+print ('Dusus', dd.calculateMaxDD(spy['cumret']))
 ```
 
-```
-SR 0.783681100181
-Dusus (-0.095292680472086833, 497.0)
+```text
+SR 0.7836811001811907
+Dusus (np.float64(-0.09529268047208683), np.float64(497.0))
 ```
 
 Bu stratejinin Sharpe oranı 0.78 çıktı. Maksimum düşüş \%10 civarı,
@@ -287,22 +288,22 @@ px = px[px.index < '27-01-2016']
 signals = pd.DataFrame(index=px.index) 
 signals['signal'] = 0 
 
-short_ma = pd.rolling_mean(px['Adj Close'], 40, min_periods=1) 
-long_ma = pd.rolling_mean(px['Adj Close'], 100, min_periods=1) 
+short_ma = px['Adj Close'].rolling(40).mean() 
+long_ma = px['Adj Close'].rolling(100).mean() 
 signals['signal'] = np.where(short_ma > long_ma, 1, 0) 
 px['signal'] = signals['signal'].shift(1) 
 px['ret'] = px['Adj Close'].pct_change() * px['signal']
 ret = px.ret.dropna()
 cumret=np.cumprod(1+ret)-1
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-print 'Dusus', dd.calculateMaxDD(cumret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+print ('Dusus', dd.calculateMaxDD(cumret))
 ```
 
-```
-APR 0.150911691294
-Sharpe 0.646084214921
-Dusus (-0.26067046806090866, 374.0)
+```text
+APR 0.16334805397252006
+Sharpe 0.6956729145174568
+Dusus (np.float64(-0.26067046806090854), np.float64(374.0))
 ```
 
 ```python
@@ -321,8 +322,8 @@ edilir. Şimdi, günlük bazda, eğer fiyat serisi ortalamanın iki standart sap
 df_yhoo = pd.read_csv('yhoo.csv',parse_dates=True,index_col=0)
 signals = pd.DataFrame(index=df_yhoo.index) 
 signals['signal'] = np.nan
-middle = pd.rolling_mean(df_yhoo['Adj Close'], 40, min_periods=1) 
-std = pd.rolling_std(df_yhoo['Adj Close'], 40, min_periods=1)
+middle = df_yhoo['Adj Close'].rolling(40).mean()
+std = df_yhoo['Adj Close'].rolling(40).std()
 
 df_yhoo['Middle'] = middle
 df_yhoo['Top'] = middle+2*std
@@ -336,18 +337,16 @@ signals['signal'] = signals['signal'].fillna(method='ffill')
 df_yhoo['ret'] = df_yhoo['Adj Close'].pct_change() * signals['signal'].shift(1)
 ret = df_yhoo.ret.dropna()
 cumret=np.cumprod(1+ret)-1
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-print 'Dusus', dd.calculateMaxDD(cumret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+print ('Dusus', dd.calculateMaxDD(cumret))
 ```
 
+```text
+APR 0.3095225267832369
+Sharpe 1.0125144264860084
+Dusus (np.float64(-0.2067238912732473), np.float64(254.0))
 ```
-APR 0.120315754795
-Sharpe 0.515472721337
-Dusus (-0.40536193029490575, 390.0)
-```
-
-![](tser_back_04.png)
 
 Üstte `ffill` ile her sinyali bir sonraki diğer sinyale kadar "uzatmak''
 zorunda kaldık, yani her iki sinyal arasındaki boşluğu önceki sinyali
@@ -379,7 +378,7 @@ bilinen bir yaklaşım, evet işliyor.
 Alttaki örnekte bir momentum stratejisi üzerinden bu hesabı görebiliriz. 
 
 ```python
-import sys; sys.path.append('../tser_voltar')
+import sys; sys.path.append('../tser_070_voltar')
 import util, zipfile, pandas as pd
 
 DEFAULT_CAPITAL = 1.0
@@ -402,19 +401,19 @@ def sharpe(price, forecast):
     vol = instr_ccy_returns.std() * util.ROOT_BDAYS_INYEAR
     return mean_return / vol
       
-with zipfile.ZipFile('../tser_voltar/legacycsv.zip', 'r') as z:
+with zipfile.ZipFile('../tser_070_voltar/legacycsv.zip', 'r') as z:
      df = pd.read_csv(z.open('EDOLLAR_price.csv'), index_col=0,parse_dates=True )
 
-fast_ewma = pd.ewma(df.PRICE, span=32)
-slow_ewma = pd.ewma(df.PRICE, span=128)
+fast_ewma = df.PRICE.ewm(span=32).mean()
+slow_ewma = df.PRICE.ewm(span=128).mean()
 raw_ewmac = fast_ewma - slow_ewma
 vol = util.robust_vol_calc(df.PRICE.diff())
 forecast = raw_ewmac /  vol 
-print sharpe(df.PRICE, forecast)
+print (sharpe(df.PRICE, forecast))
 ```
 
-```
-0.508384873452
+```text
+0.5075708849681675
 ```
 
 Sharpe Oranı İstatistiki Önemi (Significance)
@@ -430,11 +429,11 @@ demektir.
 import scipy.stats
 ret = util.ccy_returns(df.PRICE, forecast)
 tval,pval = scipy.stats.ttest_1samp(ret.dropna(), 0)
-print tval,pval
+print (tval,pval)
 ```
 
-```
-2.92942308888 0.00340494600657
+```text
+2.9247327119946966 0.0034566335026228797
 ```
 
 P-değeri 0.05'ten küçük olduğuna göre bu SO önemli.
@@ -455,17 +454,18 @@ kayıpların ne seviyede olacağını görebiliriz. Diyelim ki hiç yamukluğu o
 yüzde 50 oynaklık hedefi ile yıllık SÖ=0.5 üzerinden kayıplar ne olacaktır?
 
 ```python
+sys.path.append("../tser_005_intro")
 from commonrandom import arbitrary_timeindex, skew_returns_annualised
 from common import account_curve
 import pandas as pd
 
 want_skew = 0.0
 annualSR = 0.5
-days = 256*10. # 10 senelik
+days = 256*10 # 10 senelik
 res = skew_returns_annualised(annualSR=annualSR, want_skew=want_skew, \
                               voltarget=0.50, size=days) 
 df = pd.DataFrame(res)
-df = df.set_index(pd.to_datetime(df.index, unit='d'))
+df = df.set_index(pd.to_datetime(df.index))
 df['cum'] = (1+df).cumprod() # kumulatif - zaman serisinin kendisi burada
 ```
 
@@ -473,11 +473,11 @@ Her ayın en kötü günlük kaybı, 100,000 Eur'lik sermaye üzerinden diyelim,
 
 ```python
 K = 1000; capital = 100*K
-print capital * df[0].quantile(q=0.05)
+print (capital * df[0].quantile(q=0.05))
 ```
 
-```
--5144.01215594
+```text
+-5064.373512286693
 ```
 
 0.05 yüzdelik dilimine (quantile) baktık, çünkü 100 gün içinde 5 gün 20 gün
@@ -491,32 +491,6 @@ dilime bakmak, analitik durumda ters kumulatif yoğunluk fonksiyonu (inverse cdf
 hesabı yapmak ile eşdeğerdir, yani "olasılığı (olasılık yoğunluk alanı, ya da
 cdf) vesaire olan şey hangi değere tekabül eder?'' sorusunun cevabını sayısal
 olarak buluyoruz.
-
-Her sene en kötü haftalık kayıp için elimizdeki günlük getirileri haftalık
-getiriye çevirmemiz lazım. Bunun için getirilerin kumulatifi (yani zaman
-serisinin gerçek hali) alıp, ondan haftasal örneklem alıp, bu yeni zaman serisi
-üzerinde getirileri tekrar hesaplamak lazım, ve bakacağımız yüzdelik dilimi
-yüzde 1/52 noktası çünkü bir yıl içinde 52 hafta var.
-
-```python
-weekly_returns = df.cum.resample('W').pct_change()
-print capital * weekly_returns.quantile(q=1/52.)
-```
-
-```
--12480.850705
-```
-
-Her 10 sene en kötü aylık kayıp,
-
-```python
-weekly_returns = df.cum.resample('M').pct_change()
-print capital * weekly_returns.quantile(q=1/120.)
-```
-
-```
--26703.5859597
-```
 
 Kaynaklar
 

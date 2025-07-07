@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd, datetime
 import numpy as np
 import scipy.stats as st
 DAYS_IN_YEAR=256.0
@@ -150,7 +150,7 @@ def sharpe(total_rets):
     
     return sharpe
 
-def stack_ts(tslist, start_date=pd.datetime(1970,1,1)):
+def stack_ts(tslist, start_date=datetime.date(1970,1,1)):
     
     """
     Take a list of time series, and stack them, generating a new time series
@@ -295,7 +295,7 @@ def cum_perc(pd_timeseries):
     return cum_datalist.cumprod()
 
 
-def arbitrary_timeindex(Nperiods, index_start=pd.datetime(2000,1,1)):
+def arbitrary_timeindex(Nperiods, index_start=datetime.date(2000,1,1)):
     """
     For nice plotting, convert a list of prices or returns into an arbitrary pandas time series
     """    
@@ -305,7 +305,7 @@ def arbitrary_timeindex(Nperiods, index_start=pd.datetime(2000,1,1)):
     return ans
 
 
-def arbitrary_timeseries(datalist, index_start=pd.datetime(2000,1,1)):
+def arbitrary_timeseries(datalist, index_start=datetime.date(2000,1,1)):
     """
     For nice plotting, convert a list of prices or returns into an arbitrary pandas time series
     """    

@@ -11,7 +11,7 @@ WEEKS_IN_YEAR = CALENDAR_DAYS_IN_YEAR / 7.0
 ROOT_WEEKS_IN_YEAR = WEEKS_IN_YEAR**.5
 MONTHS_IN_YEAR = 12.0
 ROOT_MONTHS_IN_YEAR = MONTHS_IN_YEAR**.5
-ARBITRARY_START=pd.datetime(1900,1,1)
+ARBITRARY_START=datetime.date(1900,1,1)
 
 DEFAULT_CAPITAL = 1.0
 DEFAULT_ANN_RISK_TARGET = 0.16
@@ -54,20 +54,20 @@ def which_contract(contract_list, cycle, offset, expday, expmon):
     delta = end_date - start_date
     dates = []
     for i in range(delta.days + 1):
-    	day = start_date + datetime.timedelta(days=i)
-	if day.weekday() < 5: dates.append(day)
+        day = start_date + datetime.timedelta(days=i)
+        if day.weekday() < 5: dates.append(day)
     df = pd.DataFrame(index=dates)    
     def closest_biz(d): # get closest biz day
-    	diffs = np.abs((d - df.index).days)
-    	return df.index[np.argmin(diffs)]
+        diffs = np.abs((d - df.index).days)
+        return df.index[np.argmin(diffs)]
     cycle_d = [contract_month_dict[x] for x in cycle]
     df['effcont'] = np.nan
     for year in np.unique(df.index.year):
-    	for c in cycle_d:
-	    v = "%d%02d" % (year,c)
-	    exp_d = datetime.datetime(year, c, expday)
+        for c in cycle_d:
+            v = "%d%02d" % (year,c)
+            exp_d = datetime.datetime(year, c, expday)
             if expmon=="prev": exp_d = exp_d - datetime.timedelta(days=30)
-	    df.loc[closest_biz(exp_d),'effcont'] = v
+            df.loc[closest_biz(exp_d),'effcont'] = v
             
     df = df.fillna(method='bfill')
     df['effcont'] = df.effcont.shift(-int(offset*2/3 + 3))
@@ -370,17 +370,18 @@ def robust_vol_calc(x, days=35, min_periods=10, vol_abs_min=0.0000000001, vol_fl
     """
 
     # Standard deviation will be nan for first 10 non nan values
-    vol = pd.ewmstd(x, span=days, min_periods=min_periods)
+    vol = x.ewm(span=days, min_periods=min_periods).std()
 
     vol[vol < vol_abs_min] = vol_abs_min
 
     if vol_floor:
         # Find the rolling 5% quantile point to set as a minimum
-        vol_min = pd.rolling_quantile(
-            vol, floor_days, floor_min_quant, floor_min_periods)
+        #vol_min = pd.rolling_quantile(
+        #    vol, floor_days, floor_min_quant, floor_min_periods)
+        vol_min = vol.rolling(window=floor_days, min_periods=floor_min_periods).quantile(floor_min_quant)
         # set this to zero for the first value then propogate forward, ensures
         # we always have a value
-        vol_min.set_value(vol_min.index[0], 0.0)
+        vol_min._set_value(vol_min.index[0], 0.0)
         vol_min = vol_min.ffill()
 
         # apply the vol floor
