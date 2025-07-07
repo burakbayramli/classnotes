@@ -51,25 +51,25 @@ data = np.genfromtxt("synthetic_control.data", dtype=float)
 # before norm, and take only 10 data points
 data = data[:,0:10]
 
-print data.shape
+print (data.shape)
 
 # show the mean, and std of the first time series
-print data[0,:]
-print np.mean(data[0,:], axis=0)
-print np.std(data[0,:], axis=0)
+print (data[0,:])
+print (np.mean(data[0,:], axis=0))
+print (np.std(data[0,:], axis=0))
 
 # normalize
 data -= np.mean(data, axis=0)
 data /= np.std(data, axis=0)
 
 # after norm
-print data[0,:]
+print (data[0,:])
 
 u,s,v = lin.svd(data, full_matrices=False)
-print 'svd'
-print u.shape
-print s
-print v.shape
+print ('svd')
+print (u.shape)
+print (s)
+print (v.shape)
 
 plt.plot(u[:,0], u[:,1], '.')
 plt.savefig('svd_3.png')
@@ -118,20 +118,20 @@ data = np.genfromtxt("synthetic_control.data", dtype=float)
 
 data = data[:,0:10]
 
-print data.shape
+print (data.shape)
 
 data -= np.mean(data, axis=0)
 data /= np.std(data, axis=0)
 
 u,s,v = lin.svd(data)
-print 'svd'
-print u.shape
-print s
-print v.shape
+print ('svd')
+print (u.shape)
+print (s)
+print (v.shape)
 
 fig = plt.figure()
-ax = Axes3D(fig)
-ax.plot(u[:,0], u[:,1], u[:,2],',', zs=0, zdir='z', label='zs=0, zdir=z')
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(u[:,0], u[:,1], u[:,2], '.')
 plt.savefig('svd_4.png')
 ```
 
@@ -182,10 +182,11 @@ X = np.array([[0,2,1,0,0,0,0,0],
               [0,0,0,0,1,1,1,0]])
 
 U, s, Vh = lin.svd(X, full_matrices=False)
-print U.shape, s.shape, Vh.shape
+print (U.shape, s.shape, Vh.shape)
 
-for i in xrange(len(words)):
-    plt.text(U[i,0], U[i,1], words[i])
+ax = fig.add_subplot(111)
+for i in range(len(words)):
+    ax.text(U[i,0], U[i,1], words[i])
 
 plt.ylim(-0.8,0.8)
 plt.xlim(-0.8,0.2)              
@@ -280,12 +281,12 @@ import leven
 s1 = "pizza"
 s2 = "pioazza"   
 distance = leven.levenshtein(s1, s2)       
-print 'The Levenshtein-Distance of ',s1, ' and ', s2, ' is ', distance
+print ('The Levenshtein-Distance of ',s1, ' and ', s2, ' is ', distance)
 
 s1 = "hamburger"
 s2 = "haemmurger"   
 distance = leven.levenshtein(s1, s2)       
-print 'The Levenshtein-Distance of ',s1, ' and ', s2, ' is ', distance
+print ('The Levenshtein-Distance of ',s1, ' and ', s2, ' is ', distance)
 ```
 
 ```
@@ -313,51 +314,47 @@ words = np.array(
      'way', 'even', 'new', 'want', 'because', 'any', 'these',
      'give', 'day', 'most', 'us'])
 
-print "calculating distances..."
+print ("calculating distances...")
 
 (dim,) = words.shape
 
-f = lambda (x,y): leven.levenshtein(x,y)
-
-res=np.fromiter(itertools.imap(f, itertools.product(words, words)),
-                dtype=np.uint8)
+f = lambda xy: leven.levenshtein(xy[0], xy[1])
+res=np.fromiter(map(f, itertools.product(words, words)),dtype=np.uint8)
 A = np.reshape(res,(dim,dim))
 
-print "svd..."
+print ("svd...")
 
 u,s,v = lin.svd(A, full_matrices=False)
 
-print u.shape
-print s.shape
-print s[:10]
-print v.shape
+print (u.shape)
+print (s.shape)
+print (s[:10])
+print (v.shape)
 
 data = u[:,0:8]
 k=KMeans(init='k-means++', n_clusters=25, n_init=10)
 k.fit(data)
 centroids = k.cluster_centers_
 labels = k.labels_
-print labels[:10]
+print (labels[:10])
 
 def dist(x,y):   
     return np.sqrt(np.sum((x-y)**2, axis=1))
     
-print "clusters, centroid points.."
+print ("clusters, centroid points..")
 for i,c in enumerate(centroids):
     idx = np.argmin(dist(c,data[labels==i]))
-    print words[labels==i][idx]
-    print words[labels==i]
+    print (words[labels==i][idx])
+    print (words[labels==i])
     
 plt.plot(centroids[:,0],centroids[:,1],'x')
-plt.hold(True)
 plt.plot(u[:,0], u[:,1], '.')
 plt.savefig('svd_5.png')
 
 from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
-ax = Axes3D(fig)
-ax.plot(u[:,0], u[:,1], u[:,2],'.', zs=0,
-        zdir='z', label='zs=0, zdir=z')
+ax = fig.add_subplot(111)
+ax.plot(u[:,0], u[:,1], u[:,2],'.')
 plt.savefig('svd_6.png')
 ```
 
