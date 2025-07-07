@@ -18,10 +18,10 @@ d =  np.array(
 data = DataFrame (d.T,
     columns=['S1','S2','S3','S4','S5','S6'],
     index=['Ben','Tom','John','Fred'])
-print data
+print (data)
 ```
 
-```
+```text
       S1  S2  S3  S4  S5  S6
 Ben    5   5   3   0   5   5
 Tom    5   0   4   0   4   4
@@ -97,29 +97,29 @@ def cos_sim(inA,inB):
 ```
 
 ```python
-print np.array(data.ix['Fred'])
-print np.array(data.ix['John'])
-print np.array(data.ix['Ben'])
-print pearson(data.ix['Fred'],data.ix['John'])
-print pearson(data.ix['Fred'],data.ix['Ben'])
+print (np.array(data.loc['Fred']))
+print (np.array(data.loc['John']))
+print (np.array(data.loc['Ben']))
+print (pearson(data.loc['Fred'],data.loc['John']))
+print (pearson(data.loc['Fred'],data.loc['Ben']))
 ```
 
-```
+```text
 [5 4 3 3 5 5]
 [0 3 0 5 4 5]
 [5 5 3 0 5 5]
-0.551221949943
-0.906922851283
+0.5512219499425982
+0.9069228512833258
 ```
 
 ```python
-print cos_sim(data.ix['Fred'],data.ix['John'])
-print cos_sim(data.ix['Fred'],data.ix['Ben'])
+print (cos_sim(data.loc['Fred'],data.loc['John']))
+print (cos_sim(data.loc['Fred'],data.loc['Ben']))
 ```
 
-```
-0.898160909799
-0.977064220183
+```text
+0.8981609097987183
+0.9770642201834862
 ```
 
 Şimdi tavsiye mekaniğine gelelim. En basit tavsiye yöntemi, mesela
@@ -136,13 +136,13 @@ olduğu altta raporlandı,
 
 ```python
 import pandas as pd
-base_dir = "/tmp/ml-latest"
+base_dir = "/opt/Downloads/ml-32m"
 ratings = pd.read_csv(base_dir + "/ratings.csv")
-print (ratings.userId.nunique(), ratings.movieId.nunique())
+print ((ratings.userId.nunique(), ratings.movieId.nunique()))
 ```
 
-```
-283228 53889
+```text
+(200948, 84432)
 ```
 
 Büyük bir veri dosyası bu. Şimdi beğenilerden kullanıcı-film şeklinde olacak
@@ -161,8 +161,8 @@ var. Mesela 1'inci kullanıcının 307'üncü film beğenisi için
 print (sps[1,307])
 ```
 
-```
-3.5
+```text
+5.0
 ```
 
 Şimdi kendi beğenilerimi bir vektör üzerine kodlamanın zamanı geldi, böylece bu
@@ -186,8 +186,8 @@ similarities = cosine_similarity(sps, tst)
 print (similarities.shape)
 ```
 
-```
-(283229, 1)
+```text
+(200949, 1)
 ```
 
 Bu vektörün büyüklüğü verideki kullanıcı sayısı kadar, bu mantıklı.
@@ -204,24 +204,73 @@ m = np.argsort(similarities[:,0])
 print (sps[m[-10],:])
 ```
 
-```
-  (0, 145)	3.5
-  (0, 805)	4.0
-  (0, 1061)	4.0
-  (0, 2013)	3.0
-  (0, 3173)	4.0
-  (0, 4344)	4.0
+```text
+<Compressed Sparse Row sparse matrix of dtype 'float64'
+	with 57 stored elements and shape (1, 292758)>
+  Coords	Values
+  (0, 318)	4.0
+  (0, 480)	5.0
+  (0, 733)	4.5
+  (0, 1610)	5.0
+  (0, 2571)	4.5
+  (0, 3578)	5.0
+  (0, 3755)	5.0
+  (0, 3882)	4.0
+  (0, 3897)	5.0
+  (0, 4022)	4.5
+  (0, 4344)	5.0
+  (0, 4351)	4.0
+  (0, 4638)	3.0
+  (0, 4776)	4.5
+  (0, 4995)	5.0
+  (0, 5010)	5.0
+  (0, 5219)	5.0
+  (0, 5528)	4.0
+  (0, 5989)	5.0
+  (0, 6188)	5.0
+  (0, 6377)	4.5
+  (0, 6502)	5.0
+  (0, 6947)	4.5
+  (0, 8917)	5.0
+  (0, 8949)	4.5
+  :	:
+  (0, 58559)	5.0
+  (0, 64614)	5.0
+  (0, 68157)	5.0
+  (0, 71535)	4.0
+  (0, 74458)	4.5
+  (0, 79132)	5.0
+  (0, 81591)	4.0
+  (0, 84156)	5.0
+  (0, 88129)	5.0
+  (0, 91500)	5.0
+  (0, 93510)	4.5
+  (0, 93840)	5.0
+  (0, 103228)	5.0
+  (0, 103249)	4.5
+  (0, 106782)	4.0
+  (0, 109487)	5.0
+  (0, 115149)	4.5
+  (0, 117529)	4.5
+  (0, 122904)	5.0
+  (0, 134130)	4.5
+  (0, 139644)	5.0
+  (0, 168248)	4.0
+  (0, 193950)	5.0
+  (0, 197203)	5.0
+  (0, 200818)	3.5
 ```
 
-Üstte en yakın 10'uncu kullanıcının beğenilerini görüyoruz. Kodları film ismine 
-çevirmek için alttakini işletelim, ve filmlerden birine bakalım,
+Üstte en yakın kullanıcının beğenilerini görüyoruz. Kodları film
+ismine çevirmek için alttakini işletelim, ve filmlerden birine
+bakalım,
 
 ```python
 movi = pd.read_csv(base_dir + "/movies.csv",index_col="movieId")['title'].to_dict()
 print (movi[145])
 ```
 
-```
+```text
 Bad Boys (1995)
 ```
 
@@ -259,28 +308,28 @@ O zaman beğeni matrisi üzerinde SVD uygulayalım,
 ```python
 from numpy.linalg import linalg as la
 U,Sigma,V=la.svd(data, full_matrices=False)
-print data.shape
-print U.shape, Sigma.shape, V.shape
+print (data.shape)
+print (U.shape, Sigma.shape, V.shape)
 u = U[:,:2]
 vt=V[:2,:].T
-print 'u', u
-print 'vt', vt
-print u.shape, vt.shape
+print ('u', u)
+print ('vt', vt)
+print (u.shape, vt.shape)
 ```
 
-```
+```text
 (4, 6)
 (4, 4) (4,) (4, 6)
-u [[-0.57098887 -0.22279713]
- [-0.4274751  -0.51723555]
- [-0.38459931  0.82462029]
- [-0.58593526  0.05319973]]
-vt [[-0.44721867 -0.53728743]
- [-0.35861531  0.24605053]
- [-0.29246336 -0.40329582]
- [-0.20779151  0.67004393]
- [-0.50993331  0.05969518]
- [-0.53164501  0.18870999]]
+u [[ 0.57098887  0.22279713]
+ [ 0.4274751   0.51723555]
+ [ 0.38459931 -0.82462029]
+ [ 0.58593526 -0.05319973]]
+vt [[ 0.44721867  0.53728743]
+ [ 0.35861531 -0.24605053]
+ [ 0.29246336  0.40329582]
+ [ 0.20779151 -0.67004393]
+ [ 0.50993331 -0.05969518]
+ [ 0.53164501 -0.18870999]]
 (4, 2) (6, 2)
 ```
 
@@ -359,12 +408,12 @@ $$ S^{-1} V_k A^T = U_k^T $$
 Bazı kod ispatları, $u$'nun birimdik olması:
 
 ```python
-print np.dot(u.T,u)
+print (np.dot(u.T,u))
 ```
 
-```
-[[  1.00000000e+00   4.83147593e-18]
- [  4.83147593e-18   1.00000000e+00]]
+```text
+[[ 1.00000000e+00 -1.78519194e-17]
+ [-1.78519194e-17  1.00000000e+00]]
 ```
 
 Doğal olarak `1e-17` gibi bir sayı sıfıra çok yakın, yani sıfır kabul
@@ -373,10 +422,10 @@ edilebilir. Devrik ve tersin aynı olduğunu gösterelim: İki matrisi birbirind
 içinde bir tane bile True olup olmadığını kontrol edelim,
 
 ```python
-print not any(U.T-la.inv(U) > 1e-15)
+print (not np.any(U.T-la.inv(U) > 1e-15))
 ```
 
-```
+```text
 True
 ```
 
@@ -389,17 +438,17 @@ bob = np.array([5,5,0,0,0,5])
 O zaman 
 
 ```python
-print bob.T.shape
-print u.shape
+print (bob.T.shape)
+print (u.shape)
 S_k = np.eye(2)*Sigma[:2]
 bob_2d = np.dot(np.dot(la.inv(S_k),vt.T),bob.T)
-print bob_2d
+print (bob_2d)
 ```
 
-```
+```text
 (6,)
 (4, 2)
-[-0.37752201 -0.08020351]
+[0.37752201 0.08020351]
 ```
 
 Not: `bob.T` üstteki formüldeki $A^T$ yerine geçecek; formülü tekrar
@@ -418,14 +467,14 @@ vektörün hangi diğer vektörlere benzediğini bulalım.
 
 ```python
 for i,user in enumerate(u):
-   print data.index[i],cos_sim(user,bob_2d)
+   print (data.index[i],cos_sim(user,bob_2d))
 ```
 
-```
-Ben 0.993397525045
-Tom 0.891664622942
-John 0.612561691287
-Fred 0.977685793579
+```text
+Ben 0.993397525045281
+Tom 0.8916646229417298
+John 0.6125616912874889
+Fred 0.9776857935794478
 ```
 
 Sonuca göre yeni kullanıcı Bob, en çok Ben ve Fred'e benziyor. Sonuca
@@ -451,28 +500,28 @@ d =  np.array(
 users = ['Ben','Tom','John','Fred','Bob']
 seasons = ['0','1','2','3','4','5']
 data = pd.DataFrame (d, columns=seasons,index=users)
-print data
+print (data)
 avg_movies_data = data.mean(axis=0)
-print avg_movies_data
+print (avg_movies_data)
 data_user_offset = data.apply(lambda x: x-avg_movies_data, axis=1)
 A = sps.coo_matrix(np.nan_to_num(np.array(data_user_offset)))
 U,S,VT = lin.svds(A,k=3)
 def predict(u,i):
     offset = np.dot(U[u,:],VT[:,i]) 
-    r_ui_hat = offset + avg_movies_data.ix[i] 
+    r_ui_hat = offset + avg_movies_data.iloc[i] 
     return r_ui_hat, offset
 
-print 'Bob', predict(users.index('Bob'),2)
-print 'Tom', predict(users.index('Tom'),1)
+print ('Bob', predict(users.index('Bob'),2))
+print ('Tom', predict(users.index('Tom'),1))
 ```
 
-```
-       0   1   2   3   4  5
-Ben    5   5   3 NaN   5  5
-Tom    5 NaN   4 NaN   4  4
-John NaN   3 NaN   5   4  5
-Fred   5   4   3   3   5  5
-Bob    5   5 NaN NaN NaN  5
+```text
+        0    1    2    3    4    5
+Ben   5.0  5.0  3.0  NaN  5.0  5.0
+Tom   5.0  NaN  4.0  NaN  4.0  4.0
+John  NaN  3.0  NaN  5.0  4.0  5.0
+Fred  5.0  4.0  3.0  3.0  5.0  5.0
+Bob   5.0  5.0  NaN  NaN  NaN  5.0
 0    5.000000
 1    4.250000
 2    3.333333
@@ -480,8 +529,8 @@ Bob    5   5 NaN NaN NaN  5
 4    4.500000
 5    4.800000
 dtype: float64
-Bob (3.3115641365499888, -0.021769196783344661)
-Tom (4.295419370813935, 0.045419370813934629)
+Bob (np.float64(3.311564136549989), np.float64(-0.021769196783344616))
+Tom (np.float64(4.295419370813934), np.float64(0.045419370813933685))
 ```
 
 Alternatif Yöntem
@@ -507,34 +556,36 @@ tahminlerle "doldurulmuş'' oluyor.
 
 ```python
 from numpy.linalg import linalg as la
-U,Sigma,V=la.svd(data, full_matrices=False)
-print data.shape
-print U.shape, Sigma.shape, V.shape
+data_imp = data.fillna(0)
+U,Sigma,V=la.svd(data_imp, full_matrices=False)
+print (data_imp.shape)
+print (U.shape, Sigma.shape, V.shape)
 u = U[:,:2]
 vt=V[:2,:].T
-print data
-print 'bob', bob
+print (data_imp)
+print ('bob', bob)
 y = bob
 for i in range(3):
     z = np.dot(vt,np.dot(vt.T,y))
-    print z
+    print (z)
     z[y>0] = y[y>0]
-print z
+print (z)
 ```
 
-```
-(4, 6)
-(4, 4) (4,) (4, 6)
-      S1  S2  S3  S4  S5  S6
-Ben    5   5   3   0   5   5
-Tom    5   0   4   0   4   4
-John   0   3   0   5   4   5
-Fred   5   4   3   3   5   5
+```text
+(5, 6)
+(5, 5) (5,) (5, 6)
+        0    1    2    3    4    5
+Ben   5.0  5.0  3.0  0.0  5.0  5.0
+Tom   5.0  0.0  4.0  0.0  4.0  4.0
+John  0.0  3.0  0.0  5.0  4.0  5.0
+Fred  5.0  4.0  3.0  3.0  5.0  5.0
+Bob   5.0  5.0  0.0  0.0  0.0  5.0
 bob [5 5 0 0 0 5]
-[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
-[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
-[ 3.26615993  2.27206826  2.16256132  1.04609626  3.37952362  3.45858088]
-[ 5.          5.          2.16256132  1.04609626  3.37952362  5.        ]
+[4.30969046 2.78931852 2.24870061 0.30308962 2.91489994 3.82142189]
+[4.30969046 2.78931852 2.24870061 0.30308962 2.91489994 3.82142189]
+[4.30969046 2.78931852 2.24870061 0.30308962 2.91489994 3.82142189]
+[5.         5.         2.24870061 0.30308962 2.91489994 5.        ]
 ```
 
 Sonuca göre Bob büyük ihtimalle S5'i sevecektir, not tahminleri arasında en
@@ -563,7 +614,7 @@ verilen not / derece (rating) verisini içeriyor, 1 milyon tane not
 verilmiş, yani 4000 * 6000 = 24 milyon olasılık içinde sadece 1 milyon
 veri noktası dolu. Bu oldukça seyrek bir matris demektir.
 
-Verinin ham hali diğer ders notlarımızı içeren üst dizinlerde var, veriyi
+Verinin ham hali diğer ders notlarımızı içeren üst dizinlerde var [8], veriyi
 SVD ile kullanılır hale getirmek için bu dizindeki `movielens_prep.py`
 adlı script kullanılır. İşlem bitince `movielens.csv` adlı bir dosya
 script'te görülen yere yazılacak. Bu dosyada olmayan derecelendirmeler,
@@ -609,12 +660,12 @@ merkezleme işlemi eğitim verisi üzerinde uygulanıyor.
 ```python
 import pandas as pd, os
 import scipy.sparse as sps
-df = pd.read_csv("%s/Downloads/movielens.csv" % os.environ['HOME'] ,sep=';')
-print df.shape
-df = df.ix[:,1:] # id kolonunu atla
-df = df.ix[:,:3700] # sadece filmleri al
-df_train = df.copy().ix[:5000,:]
-df_test = df.copy().ix[5001:,:]
+df = pd.read_csv("/opt/Downloads/ml1m/movielens.csv" ,sep=';')
+print (df.shape)
+df = df.iloc[:,1:] # id kolonunu atla
+df = df.iloc[:,:3700] # sadece filmleri al
+df_train = df.copy().iloc[:5000,:]
+df_test = df.copy().iloc[5001:,:]
 df_train[np.isnan(df_train)] = 0.0
 movie_avg_rating = np.array(df_train.mean(axis=0))
 df_train = df_train - movie_avg_rating
@@ -623,14 +674,14 @@ dfs_train = sps.coo_matrix(df_train)
 df_train = np.array(df_train)
 df_test = np.array(df_test)
 
-print df_train.shape
-print df_test.shape
+print (df_train.shape)
+print (df_test.shape)
 
 __top_k__ = 10
 import scipy.sparse.linalg as slin
 import scipy.linalg as la
 U,Sigma,V=slin.svds(dfs_train,k=__top_k__)
-print U.shape, Sigma.shape, V.shape
+print (U.shape, Sigma.shape, V.shape)
 Sigma = np.diag(Sigma)
 ```
 
@@ -664,36 +715,36 @@ rmse = 0; n = 0
 for i,test_row in enumerate(df_test):
     for j, test_val in enumerate(test_row):
         # nan olmayan bir not buluncaya kadar ara
-        if np.isnan(test_val): continue	
+        if np.isnan(test_val): continue 
         # bulduk, test satirini tamamen kopyala ve bulunan notu silerek
         # onu nan / sifir haline getir cunku yansitma (projection) oncesi
         # o notu 'bilmiyormus gibi' yapmamiz lazim. 
-	curr = test_row.copy()
+        curr = test_row.copy()
         curr[j] = np.nan
         curr[np.isnan(curr)] = 0.
 
-	proj_row = np.dot(np.dot(la.inv(Sigma),V),curr)
+        proj_row = np.dot(np.dot(la.inv(Sigma),V),curr)
 
-	sims = np.array(map(lambda x: euclid(x, proj_row), U[:,:__top_k__]))
-	isim = np.argmax(sims)
+        sims = np.array(map(lambda x: euclid(x, proj_row), U[:,:__top_k__]))
+        isim = np.argmax(sims)
 
-	# eger bulunan kullanici o filme not vermemisse atla
-	if np.isnan(df.ix[isim, j]): continue
+        # eger bulunan kullanici o filme not vermemisse atla
+        if np.isnan(df.iloc[isim, j]): continue
 
-	# egitim verisinde notlar sifir etrafinda ortalanmis, tekrar
-	# normal haline dondur
-	est = df_train[isim, j]+movie_avg_rating[j]
+        # egitim verisinde notlar sifir etrafinda ortalanmis, tekrar
+        # normal haline dondur
+        est = df_train[isim, j]+movie_avg_rating[j]
 
-	# gercek not
-	real = df_test[i, j]
+        # gercek not
+        real = df_test[i, j]
 
-	print i, 'icin en yakin', isim, 'urun',j, 'icin oy', est, 'gercek', real
+        print (i, 'icin en yakin', isim, 'urun',j, 'icin oy', est, 'gercek', real)
         rmse += (real-est)**2
         n += 1
-	break # her kullanici icin tek film test et
+        break # her kullanici icin tek film test et
     if i == 20: break # 20 kullanici test et
 
-print "rmse", np.sqrt(rmse / n)
+print ("rmse", np.sqrt(rmse / n))
 ```
 
 ```
@@ -744,8 +795,5 @@ Kaynaklar
 
 [8] Bayramlı, Netflix / Movielens Film Verisi,
     [https://burakbayramli.github.io/dersblog/sk/2015/04/pandas-movielens-netflix-ratings.html](https://burakbayramli.github.io/dersblog/sk/2015/04/pandas-movielens-netflix-ratings.html)
-
-
-    
 
 
