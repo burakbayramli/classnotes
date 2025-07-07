@@ -201,7 +201,7 @@ Bu standart bir karesel denklem, köklerini bulalım,
 ```python
 res = np.roots([1, -2, 1-(phi1/(alpha+phi0))   ])
 lambda1 = res[1]
-print res
+print (res)
 ```
 
 ```
@@ -231,7 +231,7 @@ $$ \kappa^{-1} = \frac{1}{\kappa_2} \log \bigg( \frac{\kappa(x) - \kappa_0 }{\ka
 ```python
 tmp = v*(alpha+beta+delta) - k0
 pi1 = 1.0/k2 * np.log(np.abs(tmp/k1))
-print 'pi1', pi1
+print ('pi1', pi1)
 ```
 
 ```
@@ -282,7 +282,7 @@ $$
 c1 = r-alpha-beta
 c2 = v*(alpha+beta+delta)
 omega1 = (c1 - c1*pi1+r*c2-r) / (c1-r)
-print omega1
+print (omega1)
 ```
 
 ```
@@ -297,7 +297,7 @@ d = (1-\overline{\omega}_1 -\overline{\pi}_1) / r $$
 
 ```python
 d1 =  (1-omega1-pi1) / r
-print d1
+print (d1)
 ```
 
 ```
@@ -307,7 +307,7 @@ print d1
 
 ```python
 fp1 = (lambda1,omega1,d1)
-print 'sabit nokta', np.round(fp1,4)
+print ('sabit nokta', np.round(fp1,4))
 ```
 
 ```
@@ -324,7 +324,7 @@ gerektiği gösterilmiş.
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def rhs(u,t,alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1):
     omega, lam, d, a, N = u
@@ -347,7 +347,7 @@ d0 = 0.1
 a0 = 0.5
 N0 = 300.
 
-t=np.linspace(0.0,300.0,10000.0)
+t=np.linspace(0.0, 300.0, 10000)
 args = (alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1)
 res=odeint(rhs,[omega0, lam0, d0, a0, N0],t,args=args)
 omega1, lam1, d1, a1, N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
@@ -384,7 +384,7 @@ d0 = 0.1
 a0 = 0.5
 N0 = 300.
 
-t=np.linspace(0.0,300.0,1000.0)
+t=np.linspace(0.0,300.0,1000)
 args = (alpha,beta,delta,r,k0,k1,k2,v,phi0,phi1)
 res=odeint(rhs,[omega0, lam0, d0, a0, N0],t,args=args)
 omega2, lam2, d2, a2, N2=res[:, 0],res[:, 1],res[:, 2],res[:, 3],res[:, 4]
@@ -444,7 +444,7 @@ df.loc[:,'corp_debt'] = df['corp_debt'] / 1000000.
 df.loc[:,'house_debt'] = df['house_debt'] / 1000.
 df['wage_share'] = df.W / df.GDP
 df['debt_share'] = (df.corp_debt + df.house_debt) / df.GDP
-print df[['emp','wage_share','debt_share']].tail(1)
+print (df[['emp','wage_share','debt_share']].tail(1))
 ```
 
 ```
