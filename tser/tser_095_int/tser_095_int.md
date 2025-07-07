@@ -90,7 +90,7 @@ $$ r_{eff} = (1+r/4)^4 -1  $$
 
 ```python
 eff = (1+0.08/4)**4 - 1 
-print eff * 100.
+print (eff * 100.)
 ```
 
 ```
@@ -101,7 +101,7 @@ print eff * 100.
 
 ```python
 eff = (1+0.18/12)**12 - 1 
-print eff * 100.
+print (eff * 100.)
 ```
 
 ```
@@ -237,10 +237,10 @@ def pv(x,r):
         res += x[i]*(1+r)**(-(i+1))
     return res
 
-print '      A                 B           C'
-r = 0.1; print r, pv(a,r), pv(b,r), pv(c,r)
-r = 0.2; print r, pv(a,r), pv(b,r), pv(c,r)
-r = 0.3; print r, pv(a,r), pv(b,r), pv(c,r)
+print ('      A                 B           C')
+r = 0.1; print (r, pv(a,r), pv(b,r), pv(c,r))
+r = 0.2; print (r, pv(a,r), pv(b,r), pv(c,r))
+r = 0.3; print (r, pv(a,r), pv(b,r), pv(c,r))
 ```
 
 ```
@@ -386,7 +386,7 @@ n = 15 * 12
 alpha = 1/1.006
 P1 = 100000
 A1 =  P1*(1-alpha) / (alpha*(1-alpha**n))
-print 'A=',A1
+print ('A=',A1)
 ```
 
 ```
@@ -396,7 +396,7 @@ A= 910.046739324
 Efektif yıllık faiz yüzde
 
 ```python
-print 100 * ((1+0.006)**12 - 1)
+print (100 * ((1+0.006)**12 - 1))
 ```
 
 ```
@@ -411,7 +411,7 @@ elimize geçen 100,000-2,000 = 98,000 liradır. Aynı hesabı
 ```python
 P2 = P1 - 2000
 A2 =  P2*(1-alpha) / (alpha*(1-alpha**n))
-print 'Yeni A=', A2
+print ('Yeni A=', A2)
 ```
 
 ```
@@ -437,12 +437,12 @@ nasıl olsa $r > 0.006$ olduğunu biliyoruz, ve biraz deneme yanılma ile hedef
 sayıya erişince eldeki $r$'ye bakarız, ve sonucu bulmuş oluruz. 
 
 ```python
-print 'Hedef', P2 / A1, '\n'
+print ('Hedef', P2 / A1, '\n')
 func = lambda r : (1 - (1/(1+r))**180 ) / r
-r = 0.006; print func(r)
-r = 0.0062; print func(r)
-r = 0.00625; print func(r)
-r = 0.00628; print func(r)
+r = 0.006; print (func(r))
+r = 0.0062; print (func(r))
+r = 0.00625; print (func(r))
+r = 0.00628; print (func(r))
 ```
 
 ```
@@ -457,7 +457,7 @@ Hedef 107.686776695
 Bu $r$ için efektik yıllık faiz
 
 ```python
-print 100 * ((1+r)**12 - 1)
+print (100 * ((1+r)**12 - 1))
 ```
 
 ```
@@ -525,9 +525,9 @@ s="""sene;fiyat;enflasyon
 2;110;10   
 3;121;10   
 4;133.1;10"""
-from StringIO import StringIO
+from io import StringIO
 df = pd.read_csv(StringIO(s),sep=';').fillna(0)
-print df
+print (df)
 ```
 
 ```
@@ -548,7 +548,7 @@ Etkiyi çıkartmak için
 
 ```python
 df['reel']  = df['fiyat'] / df['enfkumulatif']
-print df
+print (df)
 ```
 
 ```
@@ -596,7 +596,7 @@ $$
 ```python
 d = 3.2 / 100.
 r = (((1+d)**(1/365.))-1.0)
-print ("%0.6f" % (r * 100))
+print (("%0.6f" % (r * 100)))
 ```
 
 ```

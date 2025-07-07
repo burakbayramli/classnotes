@@ -17,7 +17,7 @@ df = pd.DataFrame(data,columns=['dice'])
 df.loc[df.dice==0,'dice'] = -1
 ret = 0.05*df.dice
 cumret1 = 100.*np.cumprod(1+ret)
-print float(cumret1.tail(1))
+print (float(cumret1.tail(1)))
 ```
 
 ```
@@ -28,7 +28,7 @@ Diğeri ise her elde sadece sabit 5 lira koysun,
 
 ```python
 cumret2 = 100 + (5*df.dice).cumsum()
-print float(cumret2.tail(1))
+print (float(cumret2.tail(1)))
 ```
 
 ```
@@ -40,7 +40,6 @@ Arada müthiş fark var. Her ikisinin grafiğini basalım,
 ```python
 cumret1.plot(title="Her Elde Sermayenin Yuzde 5'i")
 plt.savefig('tser_kelly_01.png')
-plt.hold(False)
 cumret2.plot(title='Her Elde 5 Lira')
 plt.savefig('tser_kelly_02.png')
 ```
@@ -124,7 +123,7 @@ Optimal Kelly oranı bu $f$ değeridir. İlk baştaki örneğimiz için optimal 
 
 ```python
 p=0.55;q=1-p;w=1
-print p-q / w
+print (p-q / w)
 ```
 
 ```
@@ -156,7 +155,7 @@ Burada Kelly degeri
 
 ```python
 p=0.45;q=1-p;w=2
-print p-q / w
+print (p-q / w)
 ```
 
 ```
@@ -319,13 +318,13 @@ comp_unlevered_g = r + m -s**2/2
 # aslinda ustte m+r yerine direk ret kullanabilirdik, 
 # ama dokumantasyon amacli boyle daha temiz oldu
 
-print 'r', r
-print 's', s
-print 'artik getiri', m
-print 'sharpe orani', sharpe
-print 'kelly orani', kelly
-print 'biriken (kaldiracli) buyume orani', comp_levered_g
-print 'biriken (kaldiracsiz) buyume orani', comp_unlevered_g
+print ('r', r)
+print ('s', s)
+print ('artik getiri', m)
+print ('sharpe orani', sharpe)
+print ('kelly orani', kelly)
+print ('biriken (kaldiracli) buyume orani', comp_levered_g)
+print ('biriken (kaldiracsiz) buyume orani', comp_unlevered_g)
 ```
 
 ```
@@ -363,10 +362,10 @@ df['rthxret'] = df['Adj Close_rth'].pct_change() - 0.04/252
 
 M = 252*df[['oihxret','rkhxret','rthxret']].mean()
 C = 252*df[['oihxret','rkhxret','rthxret']].cov()
-print 'Yila Uyarlanmis Ortalama Artik Getiriler, M'
-print M
-print 'Yila Uyarlanmis Kovaryans Matrisi, C'
-print C
+print ('Yila Uyarlanmis Ortalama Artik Getiriler, M')
+print (M)
+print ('Yila Uyarlanmis Kovaryans Matrisi, C')
+print (C)
 ```
 
 ```
@@ -385,8 +384,8 @@ rthxret  0.018255  0.026893  0.041967
 ```python
 import numpy.linalg as lin
 F = np.dot(lin.inv(C),M)
-print 'oih, rkh, rth'
-print F
+print ('oih, rkh, rth')
+print (F)
 ```
 
 ```
@@ -401,7 +400,7 @@ değil.
 ```python
 F = F.reshape((3,1))
 g = 0.04+np.dot(np.dot(F.T,C),F/2)
-print float(g)
+print (float(g))
 ```
 
 ```
@@ -410,7 +409,7 @@ print float(g)
 
 ```python
 S = np.sqrt(np.dot(np.dot(F.T,C),F))
-print float(S)
+print (float(S))
 ```
 
 ```
@@ -474,8 +473,8 @@ bakalım. Diyelim ki üstteki SPY için tavsiye edilen kaldıraçı kullandık,
 kapıya dayandı, yüzde 10'lük düşüş yaşadık. 
 
 ```python
-print 'portfoy', 252000 * 0.90
-print 'anapara', 100000 * (1. - 0.10*2.52)
+print ('portfoy', 252000 * 0.90)
+print ('anapara', 100000 * (1. - 0.10*2.52))
 ```
 
 ```
@@ -489,7 +488,7 @@ Kelly ne der? Formüle göre portföyü küçültmemiz gerekir, çünkü anapara
 küçüldü,
 
 ```python
-print 74800*2.82
+print (74800*2.82)
 ```
 
 ```
