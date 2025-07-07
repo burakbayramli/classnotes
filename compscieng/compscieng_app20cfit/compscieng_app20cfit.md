@@ -25,7 +25,7 @@ $c_1=1,c_2-20,c_3=1,c_4=-4$ sabitlerinden alttaki görüntü çıkar,
 ```python
 x2 = np.linspace(0,10,1000)
 c_1 = 2.; c_2 = -20.; c_3 = 1.; c_4 = -4
-y2 = c_1*x**3 + c_2*x**2 + c_3*x + c_4
+y2 = c_1*x2**3 + c_2*x2**2 + c_3*x2 + c_4
 plt.plot(x2,y2)
 plt.savefig('compscieng_1_21_02.png')
 ```
@@ -70,7 +70,7 @@ Az Kareler yöntemi ile $Ax=b$'yi, ya da üstteki notasyona göre $Ac=y$
 import scipy.linalg as lin
 A = np.array([x**3, x**2, x, np.ones(len(x))]).T
 res = np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),y)
-print A, '\n\n', res
+print (A, '\n\n', res)
 ```
 
 ```
@@ -87,7 +87,7 @@ print A, '\n\n', res
 Kütüphane çağrısı `polyfit` kullanırsak,
 
 ```python
-print np.polyfit(x,y,3)
+print (np.polyfit(x,y,3))
 ```
 
 ```
@@ -103,7 +103,6 @@ plt.ylim(-2,12)
 plt.xlim(0,7)
 yy = res[0]*x**3 + res[1]*x**2 + res[2]*x + res[3]
 plt.plot(x,y,'.')
-plt.hold(True)
 plt.plot(x,yy)
 plt.savefig('compscieng_1_21_03.png')
 ```
@@ -380,9 +379,9 @@ Bilinen tek ilmik üzerinden en basit örneği görelim,
 import statsmodels.formula.api as smf
 import pandas as pd
 
-df = pd.read_csv('../../tser/tser_chgpt/2inclines.csv')
+df = pd.read_csv('2inclines.csv')
 reslin = smf.ols('y ~ 1 + x + I((x-55)*(x>55))', data=df).fit()
-print reslin.summary()
+print (reslin.summary())
 ```
 
 ```
@@ -437,7 +436,7 @@ veride denedik,
 
 ```python
 import pandas as pd
-df = pd.read_csv('../../tser/tser_chgpt/cave.csv')
+df = pd.read_csv('cave.csv')
 df.C.plot()
 plt.savefig('compscieng_app20_06.png')
 ```
@@ -452,7 +451,12 @@ f = "C ~ 1 + Temp + I((Temp > 10)*(Temp-10)) + I((Temp > 15)*(Temp-15)) +" + \
     "I((Temp > 40)*(Temp-40)) + I((Temp > 45)*(Temp-45)) +" + \
     "I((Temp > 50)*(Temp-50)) + I((Temp > 55)*(Temp-55)) " 
 model = sm.ols(formula=f, data=df).fit_regularized(L1_wt=0.0)
-print model.summary()
+y_true = df['C']
+y_pred = model.predict(df)
+ss_total = np.sum((y_true - np.mean(y_true))**2)
+ss_residual = np.sum((y_true - y_pred)**2)
+r_squared = 1 - (ss_residual / ss_total)
+print(f"\nR-squared: {r_squared:.4f}")
 ```
 
 ```
@@ -646,7 +650,7 @@ dfcube = dfcube.fillna(0)
 X = dfcube[['1','x','x2','x3','k1','k2']]
 y = dfcube.y
 f = sm.OLS(y,X).fit()
-print f.params
+print (f.params)
 ```
 
 ```
@@ -666,9 +670,7 @@ dfcube['yy'] = f.params[0]*dfcube['1'] + f.params[1]*dfcube.x + \
 dfcube['y'] = y
 df2 = dfcube.set_index('x')
 df2[['y','yy']].plot()
-plt.hold(True)
 plt.axvline(x=8,color='c')
-plt.hold(True)
 plt.axvline(x=13,color='c')
 plt.savefig('compscieng_app20_08.png')
 ```
@@ -695,13 +697,13 @@ def rcs(x,y,knots):
     myX=np.zeros((n,len(knots)-2))
 
     for j in range(q-1):
-    	tmp1 = (x-k[j])**3 * (x>k[j])
-	tmp2 = (x-k[q-1])**3 * (x>k[q-1])*(k[q]-k[j])
-	XX= tmp1-tmp2/(k[q]-k[q-1])
+        tmp1 = (x-k[j])**3 * (x>k[j])
+        tmp2 = (x-k[q-1])**3 * (x>k[q-1])*(k[q]-k[j])
+        XX= tmp1-tmp2/(k[q]-k[q-1])
         tmp1 = (x-k[q])**3 * (x>k[q])
         tmp2 = (k[q-1]-k[j])
-	XX = XX+tmp1*tmp2/(k[q]-k[q-1])
-	myX[:,j]=XX
+        XX = XX+tmp1*tmp2/(k[q]-k[q-1])
+        myX[:,j]=XX
 
     X = np.hstack( (np.ones((n,1)),np.reshape(X1,(n,1)),myX) )
     bhat = np.linalg.lstsq(X,y)[0]
@@ -729,15 +731,14 @@ e = np.random.randn(300)*np.sqrt(0.5)
 y = np.sin(x)+e
 df = pd.DataFrame([x,y]).T
 df.columns = ['x','y']
-df = df.sort_index(by='x')
-print df.head()
+df = df.sort_values(by='x')
+print (df.head())
 knots=np.array([-5.5938, -3.7732, -1.9526, -0.1320, 1.6886, 3.5092, 5.3298]);
 bhat = rcs(df.x,df.y,knots)
-print bhat
+print (bhat)
 df['spline'] = speval(df.x, bhat, knots)
 df2 = df.set_index('x')
 df2[['y','spline']].plot()
-plt.hold(True)
 for k in knots: plt.plot(k,speval(k,bhat,knots),'rd')
 plt.savefig('compscieng_app20_01.png')
 ```
@@ -758,14 +759,13 @@ plt.savefig('compscieng_app20_01.png')
 ```python
 import pandas as pd
 dfcube = pd.read_csv('cube.csv')
-dfcube = dfcube.sort_index(by='x')
+dfcube = dfcube.sort_values(by='x')
 knots=np.array([3,5,8,14,14.5]);
 bhat = rcs(dfcube.x,dfcube.y,knots)
-print bhat
+print (bhat)
 dfcube['spline'] = speval(dfcube.x, bhat, knots)
 df2 = dfcube.set_index('x')
 df2[['y','spline']].plot()
-plt.hold(True)
 for k in knots: plt.plot(k,speval(k,bhat,knots),'rd')
 plt.savefig('compscieng_app20_03.png')
 ```
@@ -1109,7 +1109,7 @@ Ly = np.array([[7.,8.,2.,-3.]])
 y = lin.solve(l,Ly.T)
 
 x = lin.solve(u,y)
-print x
+print (x)
 ```
 
 ```
@@ -1147,7 +1147,7 @@ p,l,u = lin.lu(a)
 y = lin.solve(l,s3.T)
 
 c = lin.solve(u,y)
-print c
+print (c)
 ```
 
 ```
@@ -1191,26 +1191,26 @@ def Splines(data):
     a = Y[:]
     b = [0.0]*(n)
     d = [0.0]*(n)
-    h = [X[i+1]-X[i] for i in xrange(n)]
+    h = [X[i+1]-X[i] for i in range(n)]
     alpha = [0.0]*n
-    for i in xrange(1,n):
+    for i in range(1,n):
         alpha[i] = 3/h[i]*(a[i+1]-a[i]) - 3/h[i-1]*(a[i]-a[i-1])
     c = [0.0]*np1
     L = [0.0]*np1
     u = [0.0]*np1
     z = [0.0]*np1
     L[0] = 1.0; u[0] = z[0] = 0.0
-    for i in xrange(1,n):
+    for i in range(1,n):
         L[i] = 2*(X[i+1]-X[i-1]) - h[i-1]*u[i-1]
         u[i] = h[i]/L[i]
         z[i] = (alpha[i]-h[i-1]*z[i-1])/L[i]
     L[n] = 1.0; z[n] = c[n] = 0.0
-    for j in xrange(n-1, -1, -1):
+    for j in range(n-1, -1, -1):
         c[j] = z[j] - u[j]*c[j+1]
         b[j] = (a[j+1]-a[j])/h[j] - (h[j]*(c[j+1]+2*c[j]))/3
         d[j] = (c[j+1]-c[j])/(3*h[j])
     splines = []
-    for i in xrange(n):
+    for i in range(n):
         splines.append((a[i],b[i],c[i],d[i],X[i]))
     return splines,X[n]
 
@@ -1220,7 +1220,7 @@ def splinesToPlot(splines,xn,res):
     if perSpline < 3: perSpline = 3
     X=[]
     Y=[]
-    for i in xrange(n-1):
+    for i in range(n-1):
         S = splines[i]
         x0 = S[4]
         x1 = splines[i+1][4]
@@ -1245,7 +1245,7 @@ x = lambda n: np.linspace(-1,1,n)
 f = lambda x: np.cos(np.sin(np.pi*x))
 n = 5
 E=200
-data = zip(x(n),f(x(n)))
+data = list(zip(x(n),f(x(n))))
 splines,xn = Spline.Splines(data)
 X,Y = Spline.splinesToPlot(splines,xn,E)
 plt.plot(X,Y,'r--')
@@ -1280,13 +1280,13 @@ def curvatures(xData,yData):
 
 def evalSpline(xData,yData,k,x):
     def findSegment(xData,x):
-        iLeft = 0
-        iRight = len(xData)- 1
-        while 1:
-            if (iRight-iLeft) <= 1: return iLeft
-            i =(iLeft + iRight)/2
-            if x < xData[i]: iRight = i
-            else: iLeft = i
+    	iLeft = 0
+    	iRight = len(xData)- 1
+    	while 1:
+              if (iRight-iLeft) <= 1: return iLeft
+              i =(iLeft + iRight)//2 # Changed / to // for integer division
+              if x < xData[i]: iRight = i
+              else: iLeft = i
             
     i = findSegment(xData,x)
     h = xData[i] - xData[i+1]
@@ -1309,13 +1309,17 @@ if __name__ == "__main__":
 import pandas as pd, cubicSpline
 df = pd.read_csv('in.csv')
 res = cubicSpline.curvatures(np.array(df.x), np.array(df.y))
-print res
+print (res)
 ```
 
 ```
 [ 0.         -2.27960615  0.5983445  -2.14369027 -0.5421918  -0.9485407
   4.83823742  1.40244849 -0.82589911 -1.3439826   2.52298704  0.        ]
 ```
+
+Kodlar
+
+[LUdecomp3.py](LUdecomp3.py), [cubicSpline.py](cubicSpline.py), [Spline.py](Spline.py)
 
 Kaynaklar
 

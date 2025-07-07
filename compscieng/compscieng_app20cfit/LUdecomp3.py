@@ -1,8 +1,8 @@
 def LUdecomp3(c,d,e):
     n = len(d)
     for k in range(1,n):
-	if d[k-1] == 0.0:
-	    raise Exception("Divide by zero")
+        if d[k-1] == 0.0:
+            raise Exception("Divide by zero")
         lam = c[k-1]/d[k-1]
         d[k] = d[k] - lam*e[k-1]
         c[k-1] = lam
