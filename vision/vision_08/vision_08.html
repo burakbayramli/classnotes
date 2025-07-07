@@ -15,144 +15,427 @@
    
   <title>Ders 8</title>
   <style type="text/css">code{white-space: pre;}</style>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="ders-8">Ders 8</h1>
 <p>İki Görüntüden Tekrar Oluşturma (Reconstruction from Two Views)</p>
-<p>Problemi formüle edelim. İki faraziyemiz olacak. Faraziyeler şart, çünkü zor problemler ile uğraşıyoruz, ve bazı faraziyeler ile işimizi kolaylaştırmamız gerekli. Araştırmacılara tavsiyem yeni bir problem üzerinde uğraşıyorlarsa ise güçlü faraziyeler ile başlayıp çözüm alanını kısıtlamaları ki bu şekilde çözüm daha rahat bulunabilsin; ve yer geldiğinde kısıtlamalar gevşetilebilir. Bunu vurguladım çünkü bazı öğrencileri görüyorum, herşeyi tek seferde yapmaya uğraşıyorlar, sonra o koca problem için bir program alelacele kodlanıyor, ve program işlemeyince moralleri bozuluyor, vs. Önce kısıtlı başlayın, sonra genelleştirirsiniz.</p>
+<p>Problemi formüle edelim. İki faraziyemiz olacak. Faraziyeler şart,
+çünkü zor problemler ile uğraşıyoruz, ve bazı faraziyeler ile işimizi
+kolaylaştırmamız gerekli. Araştırmacılara tavsiyem yeni bir problem
+üzerinde uğraşıyorlarsa ise güçlü faraziyeler ile başlayıp çözüm alanını
+kısıtlamaları ki bu şekilde çözüm daha rahat bulunabilsin; ve yer
+geldiğinde kısıtlamalar gevşetilebilir. Bunu vurguladım çünkü bazı
+öğrencileri görüyorum, herşeyi tek seferde yapmaya uğraşıyorlar, sonra o
+koca problem için bir program alelacele kodlanıyor, ve program
+işlemeyince moralleri bozuluyor, vs. Önce kısıtlı başlayın, sonra
+genelleştirirsiniz.</p>
 <p>Faraziyeler şunlar;</p>
-<ol style="list-style-type: decimal">
-<li><p>İki imajdaki aynı objelerin her iki görüntüdeki ilginç noktalarını ve o aynı noktaların birbirleri ile nasıl eşleştiğini biliyoruz.</p></li>
-<li><p>İki imaj statik bir dünyayı resmediyor, yani 1. ve 2. görüntü arasında resimdeki objeler hareket etmiyorlar.</p></li>
+<ol type="1">
+<li><p>İki imajdaki aynı objelerin her iki görüntüdeki ilginç
+noktalarını ve o aynı noktaların birbirleri ile nasıl eşleştiğini
+biliyoruz.</p></li>
+<li><p>İki imaj statik bir dünyayı resmediyor, yani 1. ve 2. görüntü
+arasında resimdeki objeler hareket etmiyorlar.</p></li>
 <li><p>Kameranın iç parametreleri sabit ve biliniyor.</p></li>
 </ol>
-<p>Bu bilgilere ve faraziyelere dayanarak ve eğer kameranın izafi yerini ve duruşunu biliyorsak 3D yer bilgisini üçgenleme (triangulation) ile hesaplayabiliriz.</p>
-<p>Çözmeye uğraşacağımız bir kameranın dış parametreleri ve görüntüdeki objenin 3D yeri. Elimizde iki resim var, resimdeki ilginç noktaların eşleşmesi var, kameranın katı gövde hareketini, ve <span class="math inline">\(X\)</span>'i bulacağız.</p>
-<div class="figure">
-<img src="twoview.png" />
-
-</div>
-<p>Üstteki aslında çetin bir tavuk-yumurta problemi. Eğer kamera hareketini biliyor olsaydım iki görüntüdeki eşlemesini bildiğim noktalar üzerinden hemen 3D yer hesaplayabilirdim. Mesela cep telefonlarında artık hareket algılayıcıları oluyor, bu bilgi yeterince kesin olsa <span class="math inline">\(R,T\)</span>'yi hemen bulmuş olurdum, imajlara bakmak gerekmezdi. O zaman üstteki resimde gösterilen iki çizginin kesiştiği noktayı üçgenleme ile bulurdum, ve 3D noktası <span class="math inline">\(X\)</span> bulunmuş olurdu. Bu hesap çok basittir. Ya da tam ters yönden, <span class="math inline">\(X\)</span>'i bir şekilde biliyorsak kamera hareketi hesaplanabilir. Eğer elimizde yeterince nokta var ise çözüm tek olacaktır. 3D tekrar oluşturma hesaplarının zorluğu bu iki bilgiyi de aynı anda kestirmemiz gerektiğidir.</p>
-<p>Bu derste takip edeceğimiz yöntem önce kamera hareketini, sonra obje yerini bulmak. Dediğimiz gibi bu problem yumurta-tavuk problemi, fakat bu iki problemin birbiriyle ilişkisini kesmek (decouple) mümkün.</p>
+<p>Bu bilgilere ve faraziyelere dayanarak ve eğer kameranın izafi yerini
+ve duruşunu biliyorsak 3D yer bilgisini üçgenleme (triangulation) ile
+hesaplayabiliriz.</p>
+<p>Çözmeye uğraşacağımız bir kameranın dış parametreleri ve görüntüdeki
+objenin 3D yeri. Elimizde iki resim var, resimdeki ilginç noktaların
+eşleşmesi var, kameranın katı gövde hareketini, ve <span
+class="math inline">\(X\)</span>’i bulacağız.</p>
+<p><img src="twoview.png" /></p>
+<p>Üstteki aslında çetin bir tavuk-yumurta problemi. Eğer kamera
+hareketini biliyor olsaydım iki görüntüdeki eşlemesini bildiğim noktalar
+üzerinden hemen 3D yer hesaplayabilirdim. Mesela cep telefonlarında
+artık hareket algılayıcıları oluyor, bu bilgi yeterince kesin olsa <span
+class="math inline">\(R,T\)</span>’yi hemen bulmuş olurdum, imajlara
+bakmak gerekmezdi. O zaman üstteki resimde gösterilen iki çizginin
+kesiştiği noktayı üçgenleme ile bulurdum, ve 3D noktası <span
+class="math inline">\(X\)</span> bulunmuş olurdu. Bu hesap çok basittir.
+Ya da tam ters yönden, <span class="math inline">\(X\)</span>’i bir
+şekilde biliyorsak kamera hareketi hesaplanabilir. Eğer elimizde
+yeterince nokta var ise çözüm tek olacaktır. 3D tekrar oluşturma
+hesaplarının zorluğu bu iki bilgiyi de aynı anda kestirmemiz
+gerektiğidir.</p>
+<p>Bu derste takip edeceğimiz yöntem önce kamera hareketini, sonra obje
+yerini bulmak. Dediğimiz gibi bu problem yumurta-tavuk problemi, fakat
+bu iki problemin birbiriyle ilişkisini kesmek (decouple) mümkün.</p>
 <p>Tipik bir resim üzerinde görelim,</p>
-<div class="figure">
-<img src="scene.png" />
-
-</div>
-<p>Manzara iki farklı yönden görüntülenmiş. Birinde olan bazı noktalar diğerinde olmayabilir ama çoğu nokta iki tarafta da var. Mesela bir 3D noktası <span class="math inline">\(P\)</span>'yi düşünelim, bu nokta bir bakış açısında 2D <span class="math inline">\(x_1\)</span> noktasına, diğerinde <span class="math inline">\(x_2\)</span> noktasına düşüyor. Kamera merkezleri <span class="math inline">\(o_1\)</span> ve <span class="math inline">\(o_2\)</span>. İki bakış açılı örnek böyle. Bu derste üstteki gibi, yani iki bakış açı üzerinden hesaplarla oldukça çok uğraşacağız, fakat çoklu bakış açısından da bu hesapları nasıl genelleştirebileceğimizi göreceğiz [dersimizin adına sadık kalmak lazım!].</p>
+<p><img src="scene.png" /></p>
+<p>Manzara iki farklı yönden görüntülenmiş. Birinde olan bazı noktalar
+diğerinde olmayabilir ama çoğu nokta iki tarafta da var. Mesela bir 3D
+noktası <span class="math inline">\(P\)</span>’yi düşünelim, bu nokta
+bir bakış açısında 2D <span class="math inline">\(x_1\)</span>
+noktasına, diğerinde <span class="math inline">\(x_2\)</span> noktasına
+düşüyor. Kamera merkezleri <span class="math inline">\(o_1\)</span> ve
+<span class="math inline">\(o_2\)</span>. İki bakış açılı örnek böyle.
+Bu derste üstteki gibi, yani iki bakış açı üzerinden hesaplarla oldukça
+çok uğraşacağız, fakat çoklu bakış açısından da bu hesapları nasıl
+genelleştirebileceğimizi göreceğiz [dersimizin adına sadık kalmak
+lazım!].</p>
 <p>Notasyonu netleştirelim (üstteki gibi bir resim daha)</p>
-<div class="figure">
-<img src="epi.png" />
-
-</div>
-<p>Kamera orijin noktaları <span class="math inline">\(o_1,o_2\)</span> görülüyor. Bu iki orijini bir düz çizgi ile birleştirelim, bu çizginin her iki görüntü düzlemini kestiği noktalar <span class="math inline">\(e_1,e_2\)</span> eş kutuplar (epipoles) olarak isimlendirilir. <span class="math inline">\(X,e_1,e_2\)</span> noktalarının üzerinde olduğu düzlem ise eş kutupsal düzlemdir (epipolar plane).</p>
-<p>Notasyon böyle. Peki o zaman tekrar oluşturma (reconsruction) problemini nasıl tanımlarız? Aslında bu problemi bir maliyet (cost) fonksiyonu üzerinden formülize etmek oldukça basit. Bilimde pek çok problem belli bazı parametrelerin hesapsal tahminiyle alakalıdır, ve bu tahmini yapabilmek için tipik olarak bir maliyet tanımlanır, ki bu maliyet fonksiyonu verilen belli parametre değerleri için bu değerlerin iyi mi kötü mü olduğunu cevaplar. Tabii bir sonraki adım o maliyeti minimize etmeye uğraşmak, ve bu minimizasyonu sağlayan &quot;optimal'' parametreleri bulmaya uğraşmaktır.</p>
-<p>Diyelim ki elimizde iki değişik açıdan alınmış görüntüde eşleşmesi yapılmış 100 tane nokta var, <span class="math inline">\(x_1^j,x_2^j\)</span>, <span class="math inline">\(j \in \{1,..,100\}\)</span>, yani <span class="math inline">\(j\)</span> bir indis. Bu noktalar 3D <span class="math inline">\(X_j\)</span> noktalarından geliyorlar, tahmin etmeye çalıştığımız onlar - bilinmeyen değişkenler. Ayrıca <span class="math inline">\(R,T\)</span> de bilinmiyor tabii, 6 tane bilinmeyen değişken de buradan geliyor. Yani bilinmeyen parametreler çok, 100 x 3 (çünkü <span class="math inline">\(X_1\)</span>'in 3 tane öğesi var) artı 6 tane bilinmeyen var. Optimizasyon bağlamında bu 306 boyutlu bir uzayda iş yapmaya çalışacağız demektir, ve bu pek iyi bir şey değil!</p>
-<p>Problemi çözmek için yansıtma hatasını minimize etmeye uğraşabiliriz,</p>
-<p><span class="math display">\[ E(R,T,X_1,..,X_{100}) = 
+<p><img src="epi.png" /></p>
+<p>Kamera orijin noktaları <span class="math inline">\(o_1,o_2\)</span>
+görülüyor. Bu iki orijini bir düz çizgi ile birleştirelim, bu çizginin
+her iki görüntü düzlemini kestiği noktalar <span
+class="math inline">\(e_1,e_2\)</span> eş kutuplar (epipoles) olarak
+isimlendirilir. <span class="math inline">\(X,e_1,e_2\)</span>
+noktalarının üzerinde olduğu düzlem ise eş kutupsal düzlemdir (epipolar
+plane).</p>
+<p>Notasyon böyle. Peki o zaman tekrar oluşturma (reconsruction)
+problemini nasıl tanımlarız? Aslında bu problemi bir maliyet (cost)
+fonksiyonu üzerinden formülize etmek oldukça basit. Bilimde pek çok
+problem belli bazı parametrelerin hesapsal tahminiyle alakalıdır, ve bu
+tahmini yapabilmek için tipik olarak bir maliyet tanımlanır, ki bu
+maliyet fonksiyonu verilen belli parametre değerleri için bu değerlerin
+iyi mi kötü mü olduğunu cevaplar. Tabii bir sonraki adım o maliyeti
+minimize etmeye uğraşmak, ve bu minimizasyonu sağlayan “optimal’’
+parametreleri bulmaya uğraşmaktır.</p>
+<p>Diyelim ki elimizde iki değişik açıdan alınmış görüntüde eşleşmesi
+yapılmış 100 tane nokta var, <span
+class="math inline">\(x_1^j,x_2^j\)</span>, <span
+class="math inline">\(j \in \{1,..,100\}\)</span>, yani <span
+class="math inline">\(j\)</span> bir indis. Bu noktalar 3D <span
+class="math inline">\(X_j\)</span> noktalarından geliyorlar, tahmin
+etmeye çalıştığımız onlar - bilinmeyen değişkenler. Ayrıca <span
+class="math inline">\(R,T\)</span> de bilinmiyor tabii, 6 tane
+bilinmeyen değişken de buradan geliyor. Yani bilinmeyen parametreler
+çok, 100 x 3 (çünkü <span class="math inline">\(X_1\)</span>’in 3 tane
+öğesi var) artı 6 tane bilinmeyen var. Optimizasyon bağlamında bu 306
+boyutlu bir uzayda iş yapmaya çalışacağız demektir, ve bu pek iyi bir
+şey değil!</p>
+<p>Problemi çözmek için yansıtma hatasını minimize etmeye
+uğraşabiliriz,</p>
+<p><span class="math display">\[ E(R,T,X_1,..,X_{100}) =
 \sum_{j} || x_1^j - \pi(X_j)||^2 + || x_2^j - \pi(R,T,X_j)||^2
 \]</span></p>
-<p>Üstteki formülün eşitliğin sağ tarafının ilk teriminde kendimizi 1. kameranın kordinat dünyasına alıyoruz; 3D <span class="math inline">\(X\)</span> noktalarını kameraya yansıtıyoruz, ve aradaki hatayı hesaplıyoruz. İkinci terimde 2. kamera kordinat dünyasındayız, aynı <span class="math inline">\(X\)</span> noktalarını bu sefer rotasyon, yer değiştirme sonrası 2. kameraya yansıttıktan sonra o kameradaki yansıtma hatasını hesaplıyoruz. Minimizasyonun amacı <span class="math inline">\(E()\)</span> içindeki parametrelerin en optimal olanlarını bulmak ki <span class="math inline">\(E\)</span> hatası en az olsun.</p>
-<p>Üstteki yaklaşıma demet ayarlaması (bundle adjustment) ismi veriliyor; demet çünkü pek çok parametreyi aynı anda vererek optimize etmeye uğraşıyoruz. Tek problem maliyet fonksiyonu içbükey (convex) değil. Optimizasyon dersinden hatırlayabileceğimiz üzere eğer elimizde çok boyutlu ve içbükey olmayan bir problem var ise, bu kötü haber, bu çözümü büyük ihtimalle bulamayacağız demektir. Bilim dalımız aslında hala bu problemi nihai olarak çözmek için yoğun araştırma yapıyor, çünkü çözüm bulunabildiği zaman bile çözüm özgün değil, vs.</p>
-<p>Üstteki problemin çözümü için iki değişik yaklaşım var. Birisi problem tanımını olduğu gibi almak, ve bir şekilde &quot;becerikli'' bir algoritma ile minimizasyonu iyi becermeye uğraşmak. Mesela bir yaklaşıma göre birkaç nokta ile işe başlanır, minimize edilir, sonra ötekiler eklenir ve rafine ede ede nihai sonuca erişilmeye uğraşılır. Eğer varılan sonuçtan memnun olunmadıysa, optimizasyon başlangıç noktası rasgele olarak tekrar seçilir, ve rutin tekrar işletilir, böylece iyi başlangıç noktası ile daha iyi sonuca varılmaya uğraşılır, fakat tahmin edileceği üzere bu kolay bir iş değil.</p>
-<p>Bu derste takip edeceğimiz yöntem farklı maliyet fonksiyonlarıyla çalışmak; bu fonksiyonlar orijinal maliyete benzeyecekler, fakat biraz daha basit oldukları için minimize edilmeleri daha kolay olacak. Mesela <span class="math inline">\(R,T\)</span> ile <span class="math inline">\(X\)</span> noktalarının arasındaki ilişki kesilecek, bu parametreler ayrı ayrı optimize edilecek. Bu ilişki kesimi nasıl oluyor? Biraz sihirli bir yaklaşım gibi geliyor kulağa, kullanacağımız numara eş kutupsal kısıtlama (epipolar constraint) kavramını devreye sokmak, böylece 8-nokta algoritmasını (8-point algorithm) elde etmiş olacağız.</p>
-<p>Kamera matrisi <span class="math inline">\(K\)</span>'nin bilindiğini varsayıyoruz. Ayrıca <span class="math inline">\(K = 1\)</span> alacağız, yani her şeyin kameranın odak uzaklığının birimi üzerinden tanımlı olduğunu farzedeceğiz. Birinci kamera için sadece bilinmeyen derinlik bilgisi bilinmeyen bir yansıtma var. İkinci kamera için rotasyon ve yer değiştirme sonrası ardından bir yansıtma var. Yani,</p>
-<p><span class="math display">\[ \lambda_1 x_1 = X, \qquad \lambda_2 x_2 = RS + T 
+<p>Üstteki formülün eşitliğin sağ tarafının ilk teriminde kendimizi 1.
+kameranın kordinat dünyasına alıyoruz; 3D <span
+class="math inline">\(X\)</span> noktalarını kameraya yansıtıyoruz, ve
+aradaki hatayı hesaplıyoruz. İkinci terimde 2. kamera kordinat
+dünyasındayız, aynı <span class="math inline">\(X\)</span> noktalarını
+bu sefer rotasyon, yer değiştirme sonrası 2. kameraya yansıttıktan sonra
+o kameradaki yansıtma hatasını hesaplıyoruz. Minimizasyonun amacı <span
+class="math inline">\(E()\)</span> içindeki parametrelerin en optimal
+olanlarını bulmak ki <span class="math inline">\(E\)</span> hatası en az
+olsun.</p>
+<p>Üstteki yaklaşıma demet ayarlaması (bundle adjustment) ismi
+veriliyor; demet çünkü pek çok parametreyi aynı anda vererek optimize
+etmeye uğraşıyoruz. Tek problem maliyet fonksiyonu içbükey (convex)
+değil. Optimizasyon dersinden hatırlayabileceğimiz üzere eğer elimizde
+çok boyutlu ve içbükey olmayan bir problem var ise, bu kötü haber, bu
+çözümü büyük ihtimalle bulamayacağız demektir. Bilim dalımız aslında
+hala bu problemi nihai olarak çözmek için yoğun araştırma yapıyor, çünkü
+çözüm bulunabildiği zaman bile çözüm özgün değil, vs.</p>
+<p>Üstteki problemin çözümü için iki değişik yaklaşım var. Birisi
+problem tanımını olduğu gibi almak, ve bir şekilde “becerikli’’ bir
+algoritma ile minimizasyonu iyi becermeye uğraşmak. Mesela bir yaklaşıma
+göre birkaç nokta ile işe başlanır, minimize edilir, sonra ötekiler
+eklenir ve rafine ede ede nihai sonuca erişilmeye uğraşılır. Eğer
+varılan sonuçtan memnun olunmadıysa, optimizasyon başlangıç noktası
+rasgele olarak tekrar seçilir, ve rutin tekrar işletilir, böylece iyi
+başlangıç noktası ile daha iyi sonuca varılmaya uğraşılır, fakat tahmin
+edileceği üzere bu kolay bir iş değil.</p>
+<p>Bu derste takip edeceğimiz yöntem farklı maliyet fonksiyonlarıyla
+çalışmak; bu fonksiyonlar orijinal maliyete benzeyecekler, fakat biraz
+daha basit oldukları için minimize edilmeleri daha kolay olacak. Mesela
+<span class="math inline">\(R,T\)</span> ile <span
+class="math inline">\(X\)</span> noktalarının arasındaki ilişki
+kesilecek, bu parametreler ayrı ayrı optimize edilecek. Bu ilişki kesimi
+nasıl oluyor? Biraz sihirli bir yaklaşım gibi geliyor kulağa,
+kullanacağımız numara eş kutupsal kısıtlama (epipolar constraint)
+kavramını devreye sokmak, böylece 8-nokta algoritmasını (8-point
+algorithm) elde etmiş olacağız.</p>
+<p>Kamera matrisi <span class="math inline">\(K\)</span>’nin bilindiğini
+varsayıyoruz. Ayrıca <span class="math inline">\(K = 1\)</span>
+alacağız, yani her şeyin kameranın odak uzaklığının birimi üzerinden
+tanımlı olduğunu farzedeceğiz. Birinci kamera için sadece bilinmeyen
+derinlik bilgisi bilinmeyen bir yansıtma var. İkinci kamera için
+rotasyon ve yer değiştirme sonrası ardından bir yansıtma var. Yani,</p>
+<p><span class="math display">\[ \lambda_1 x_1 = X, \qquad \lambda_2 x_2
+= RS + T
 \qquad (1)
 \]</span></p>
 <p>Resim üzerinde</p>
-<div class="figure">
-<img src="epi2.png" />
-
-</div>
-<p>Yani <span class="math inline">\(X\)</span>'den <span class="math inline">\(x_1\)</span>'e gelmek demek sadece <span class="math inline">\(\lambda_1\)</span> ile ölçeklemektir. Aynı durum dönme ve yer değişim sonrası <span class="math inline">\(x_2\)</span> için de geçerli. Tatmin etmemiz gereken iki denklem bunlar. Bu iki denklemi birleştirerek ve diğer noktaları ekleyerek yavaş yavaş <span class="math inline">\(X\)</span>'i dışarı atmaya uğraşacağız. İlişki kesmeyi bu şekilde yapacağız. 1. denklemi 2. denklem içine koyalım,</p>
-<p><span class="math display">\[ \lambda_2 x_2 = R(\lambda_1x_1) + T \]</span></p>
-<p>İki tarafı soldan <span class="math inline">\(T\)</span>'nin eksi bakışımlı hali <span class="math inline">\(\hat{T}\)</span> ile çarpalım (<span class="math inline">\(\hat{T}v \equiv T \times v\)</span>). Niye? Çünkü biliyoruz ki bir vektörün kendi eksi bakışımlı matrisi ile çarpımı sıfırdır (ya da vektörün kendisi ile çapraz çarpımı sıfır verir), böylece eşitliğin sağındaki <span class="math inline">\(T\)</span>'den kurtulmaya uğraşıyoruz. O zaman</p>
-<p><span class="math display">\[ \lambda_2 \hat{T} x_2 = \lambda_1 \hat{T} R x_1  \]</span></p>
-<p>Böylece <span class="math inline">\(T\)</span>'den kurtulmuş olduk, aynı zamanda <span class="math inline">\(X\)</span>'den de kurtulmuş olduk. Dolaylı olarak <span class="math inline">\(X\)</span> hala formülde tabii, çünkü <span class="math inline">\(\lambda_1\)</span> ve <span class="math inline">\(\lambda_2\)</span> 3D noktaya olan uzaklıklar, ve <span class="math inline">\(\lambda_1 x_1\)</span> mesela bize 3D noktasını verir.</p>
-<p>Devam edelim, üstteki ifadeyi <span class="math inline">\(x_2\)</span>'ye yansıtalım. Niye? Çünkü üstteki eşitliğin sol tarafındaki <span class="math inline">\(\hat{T}x_2\)</span> bir çapraz çarpım, ve bu çapraz çarpım bize <span class="math inline">\(x_2\)</span>'ye dikgen bir vektör verir, ve eğer bu vektörü <span class="math inline">\(x_2\)</span>'ye yansıtırsam sıfır elde ederim, yani sol taraf yokolur. Ayrıca <span class="math inline">\(\lambda_1\)</span> ile bölerim. Geri kalanlar,</p>
+<p><img src="epi2.png" /></p>
+<p>Yani <span class="math inline">\(X\)</span>’den <span
+class="math inline">\(x_1\)</span>’e gelmek demek sadece <span
+class="math inline">\(\lambda_1\)</span> ile ölçeklemektir. Aynı durum
+dönme ve yer değişim sonrası <span class="math inline">\(x_2\)</span>
+için de geçerli. Tatmin etmemiz gereken iki denklem bunlar. Bu iki
+denklemi birleştirerek ve diğer noktaları ekleyerek yavaş yavaş <span
+class="math inline">\(X\)</span>’i dışarı atmaya uğraşacağız. İlişki
+kesmeyi bu şekilde yapacağız. 1. denklemi 2. denklem içine koyalım,</p>
+<p><span class="math display">\[ \lambda_2 x_2 = R(\lambda_1x_1) + T
+\]</span></p>
+<p>İki tarafı soldan <span class="math inline">\(T\)</span>’nin eksi
+bakışımlı hali <span class="math inline">\(\hat{T}\)</span> ile çarpalım
+(<span class="math inline">\(\hat{T}v \equiv T \times v\)</span>). Niye?
+Çünkü biliyoruz ki bir vektörün kendi eksi bakışımlı matrisi ile çarpımı
+sıfırdır (ya da vektörün kendisi ile çapraz çarpımı sıfır verir),
+böylece eşitliğin sağındaki <span class="math inline">\(T\)</span>’den
+kurtulmaya uğraşıyoruz. O zaman</p>
+<p><span class="math display">\[ \lambda_2 \hat{T} x_2 = \lambda_1
+\hat{T} R x_1  \]</span></p>
+<p>Böylece <span class="math inline">\(T\)</span>’den kurtulmuş olduk,
+aynı zamanda <span class="math inline">\(X\)</span>’den de kurtulmuş
+olduk. Dolaylı olarak <span class="math inline">\(X\)</span> hala
+formülde tabii, çünkü <span class="math inline">\(\lambda_1\)</span> ve
+<span class="math inline">\(\lambda_2\)</span> 3D noktaya olan
+uzaklıklar, ve <span class="math inline">\(\lambda_1 x_1\)</span> mesela
+bize 3D noktasını verir.</p>
+<p>Devam edelim, üstteki ifadeyi <span
+class="math inline">\(x_2\)</span>’ye yansıtalım. Niye? Çünkü üstteki
+eşitliğin sol tarafındaki <span
+class="math inline">\(\hat{T}x_2\)</span> bir çapraz çarpım, ve bu
+çapraz çarpım bize <span class="math inline">\(x_2\)</span>’ye dikgen
+bir vektör verir, ve eğer bu vektörü <span
+class="math inline">\(x_2\)</span>’ye yansıtırsam sıfır elde ederim,
+yani sol taraf yokolur. Ayrıca <span
+class="math inline">\(\lambda_1\)</span> ile bölerim. Geri kalanlar,</p>
 <p><span class="math display">\[ x_2^T \hat{T} R x_1 = 0 \]</span></p>
-<p>olur. Buna eş kutupsal kısıtlama ismi veriliyor. Formül ilginç çünkü iki 2D noktası <span class="math inline">\(x_1,x_2\)</span> ve döndürme, yer değiştirme arasında bir ilişki kuruyor, 3D nokta bilgisi ortada yok. Bu bize bir kabiliyet kazandırdı, buradan hareketle diğer bilinen 2D nokta eşlerini alarak, ve üstteki sınırlamayı kullanarak bilinmeyen <span class="math inline">\(R,T\)</span>'yi hesapsal tahmin etmeye uğraşabilirim.</p>
-<p>(1)'den üstteki formüle gelmek için bazı transformasyonlar yaptık, bunlardan bazılarının tersi alınabilir olmadığına dikkat; mesela son adımda <span class="math inline">\(x_2\)</span>'ye yansıtma yaptık, bu durumda <span class="math inline">\(x_2\)</span>'e dikgen olan bilgi yokolmuş oldu. Ya da <span class="math inline">\(\hat{T}\)</span> ile çarpım işlemi - <span class="math inline">\(\hat{T}\)</span> tersi alınabilir bir matris olmadığı için bu işlemi de geriye almak mümkün değil. Yani son iki adımın ikisinde de bir şeyler kaybetmiş oluyoruz aslında. Tabii kaybettiklerimiz yanında kazandıklarımız var, daha önce belirttiğimiz gibi, 3D bilgisi ile uğraşmak zorunda değiliz artık. Belli kısıtlamalarla işe başladık, bazı transformasyonlar sonunda daha zayıf bir kısıtlama elde ettik, ama bir avantaj elde ettik.</p>
-<p>Üstteki önemli bir formül, biraz daha üzerinde durmak iyi olur. Formüle bazen gerekli kısıtlama (essential constraint) ya da iki lineerli kısıtlama (bilinear contraint) deniyor. Ayrıca formülün ortasındaki <span class="math inline">\(\hat{T} R\)</span> çarpımına, ki bir <span class="math inline">\(3 \times 3\)</span> matristir, gerekli matris (essential matrix) ismi veriliyor.</p>
-<p>Genel kural olarak bir kavrama bir isim verilmişse, hatta birden fazla isim verilmişse, o konunun önemli olduğunu ve çoğu zaman pek çok kişi tarafından araştırılmış olduğu sonucuna varabiliriz.</p>
-<p>Kolaylaştırmalar ardından buraya geldik, fakat <span class="math inline">\(R,\hat{T}\)</span> çözümü hala zor; <span class="math inline">\(E = \hat{T}R\)</span> bilindiği durumda bu çarpımdan <span class="math inline">\(\hat{T}\)</span> ve <span class="math inline">\(R\)</span>'yi nasıl çıkartacağız?</p>
-<p>O hesaba gelmeden önce eş kutupsal kısıtlamanın geometrik anlamına yakından bakalım. Amacımız bir düzlem tanımlamak, ve düzlemin olma şartını eş kutupsal sınırlamaya bağlamak.</p>
-<div class="figure">
-<img src="epi3.png" />
-
-</div>
-<p>Eğer 1. kamera orijin kabul edilirse <span class="math inline">\(x_1\)</span>'e giden vektör <span class="math inline">\(\vec{o_1x_1}\)</span> olur, ya da sadece <span class="math inline">\(x_1\)</span>. Bu vektörü 2. kamerayı orijin olacak şekilde transforme edersek <span class="math inline">\(Rx_1\)</span>. Bir diğer vektör 2. kamera orijinli <span class="math inline">\(x_2\)</span> noktası / vektörü. Ayrıca <span class="math inline">\(o_2\)</span> çıkışlı ve <span class="math inline">\(T\)</span>'ye oranlı (proportional, <span class="math inline">\(\propto\)</span> işareti oradan geliyor), bir vektör daha var. Bu üç vektör üzerinden (üçlü çarpımla -triple product-) bir paralelepipe hacmi hesaplanabilir, ve eş kutupsal kısıtlama formülünün söylediği bu hacmin sıfır olmasıdır, yani bir düzlem olmasıdır (sıfır hacimli obje düz demektir)</p>
-<p><span class="math display">\[ hacim = x_2^T (T \times Rx_1) = 0 \]</span></p>
-<p>ki o da dolaylı olarak <span class="math inline">\(o_1,o_2\)</span>'den çıkan ve <span class="math inline">\(x_1,x_2\)</span>'den geçen huzmelerin bir yerde birleşiyor olmaları anlamına gelir. Artık 3D noktadan bahsetmeye gerek yok, sadece iki huzmenin kesişiyor olması yeterli. Kesişiyorlarsa bir düzlem vardır, kısıtlamanın söylediği de budur.</p>
-<p>Gerekli matris <span class="math inline">\(E = \hat{T}R\)</span> demiştik, tüm gerekli matrislerinin uzayı gerekli uzay olarak adlandırılır,</p>
-<p><span class="math display">\[ \varepsilon \equiv \bigg\{ 
+<p>olur. Buna eş kutupsal kısıtlama ismi veriliyor. Formül ilginç çünkü
+iki 2D noktası <span class="math inline">\(x_1,x_2\)</span> ve döndürme,
+yer değiştirme arasında bir ilişki kuruyor, 3D nokta bilgisi ortada yok.
+Bu bize bir kabiliyet kazandırdı, buradan hareketle diğer bilinen 2D
+nokta eşlerini alarak, ve üstteki sınırlamayı kullanarak bilinmeyen
+<span class="math inline">\(R,T\)</span>’yi hesapsal tahmin etmeye
+uğraşabilirim.</p>
+<p>(1)’den üstteki formüle gelmek için bazı transformasyonlar yaptık,
+bunlardan bazılarının tersi alınabilir olmadığına dikkat; mesela son
+adımda <span class="math inline">\(x_2\)</span>’ye yansıtma yaptık, bu
+durumda <span class="math inline">\(x_2\)</span>’e dikgen olan bilgi
+yokolmuş oldu. Ya da <span class="math inline">\(\hat{T}\)</span> ile
+çarpım işlemi - <span class="math inline">\(\hat{T}\)</span> tersi
+alınabilir bir matris olmadığı için bu işlemi de geriye almak mümkün
+değil. Yani son iki adımın ikisinde de bir şeyler kaybetmiş oluyoruz
+aslında. Tabii kaybettiklerimiz yanında kazandıklarımız var, daha önce
+belirttiğimiz gibi, 3D bilgisi ile uğraşmak zorunda değiliz artık. Belli
+kısıtlamalarla işe başladık, bazı transformasyonlar sonunda daha zayıf
+bir kısıtlama elde ettik, ama bir avantaj elde ettik.</p>
+<p>Üstteki önemli bir formül, biraz daha üzerinde durmak iyi olur.
+Formüle bazen gerekli kısıtlama (essential constraint) ya da iki
+lineerli kısıtlama (bilinear contraint) deniyor. Ayrıca formülün
+ortasındaki <span class="math inline">\(\hat{T} R\)</span> çarpımına, ki
+bir <span class="math inline">\(3 \times 3\)</span> matristir, gerekli
+matris (essential matrix) ismi veriliyor.</p>
+<p>Genel kural olarak bir kavrama bir isim verilmişse, hatta birden
+fazla isim verilmişse, o konunun önemli olduğunu ve çoğu zaman pek çok
+kişi tarafından araştırılmış olduğu sonucuna varabiliriz.</p>
+<p>Kolaylaştırmalar ardından buraya geldik, fakat <span
+class="math inline">\(R,\hat{T}\)</span> çözümü hala zor; <span
+class="math inline">\(E = \hat{T}R\)</span> bilindiği durumda bu
+çarpımdan <span class="math inline">\(\hat{T}\)</span> ve <span
+class="math inline">\(R\)</span>’yi nasıl çıkartacağız?</p>
+<p>O hesaba gelmeden önce eş kutupsal kısıtlamanın geometrik anlamına
+yakından bakalım. Amacımız bir düzlem tanımlamak, ve düzlemin olma
+şartını eş kutupsal sınırlamaya bağlamak.</p>
+<p><img src="epi3.png" /></p>
+<p>Eğer 1. kamera orijin kabul edilirse <span
+class="math inline">\(x_1\)</span>’e giden vektör <span
+class="math inline">\(\vec{o_1x_1}\)</span> olur, ya da sadece <span
+class="math inline">\(x_1\)</span>. Bu vektörü 2. kamerayı orijin olacak
+şekilde transforme edersek <span class="math inline">\(Rx_1\)</span>.
+Bir diğer vektör 2. kamera orijinli <span
+class="math inline">\(x_2\)</span> noktası / vektörü. Ayrıca <span
+class="math inline">\(o_2\)</span> çıkışlı ve <span
+class="math inline">\(T\)</span>’ye oranlı (proportional, <span
+class="math inline">\(\propto\)</span> işareti oradan geliyor), bir
+vektör daha var. Bu üç vektör üzerinden (üçlü çarpımla -triple product-)
+bir paralelepipe hacmi hesaplanabilir, ve eş kutupsal kısıtlama
+formülünün söylediği bu hacmin sıfır olmasıdır, yani bir düzlem
+olmasıdır (sıfır hacimli obje düz demektir)</p>
+<p><span class="math display">\[ hacim = x_2^T (T \times Rx_1) = 0
+\]</span></p>
+<p>ki o da dolaylı olarak <span
+class="math inline">\(o_1,o_2\)</span>’den çıkan ve <span
+class="math inline">\(x_1,x_2\)</span>’den geçen huzmelerin bir yerde
+birleşiyor olmaları anlamına gelir. Artık 3D noktadan bahsetmeye gerek
+yok, sadece iki huzmenin kesişiyor olması yeterli. Kesişiyorlarsa bir
+düzlem vardır, kısıtlamanın söylediği de budur.</p>
+<p>Gerekli matris <span class="math inline">\(E = \hat{T}R\)</span>
+demiştik, tüm gerekli matrislerinin uzayı gerekli uzay olarak
+adlandırılır,</p>
+<p><span class="math display">\[ \varepsilon \equiv \bigg\{
 \hat{T}R \mid R \in SO(3), T \in \mathbb{R}^3
 \bigg\}
 \]</span></p>
-<p><span class="math inline">\(E\)</span>'den <span class="math inline">\(\hat{T},R\)</span> çıkartmak matris ayrıştırması çağrışımları yapıyor olabilir; ve hakikaten de Huang ve Faugeras'ın 1989 tarihinde ispatladığı bir teoriye göre sıfır olmayan bir <span class="math inline">\(E \in \mathbb{R}^3\)</span> matrisi bir gerekli matristir sadece ve sadece <span class="math inline">\(E = U \Sigma V^T\)</span> şeklinde bir Eşsiz Değer Ayrıştırması (Singular Value Decomposition -SVD-) var ise, ve bu ayrıştırma <span class="math inline">\(\Sigma = diag\{\sigma,\sigma,0\}\)</span> olmalı, <span class="math inline">\(\sigma &gt; 0\)</span> için, <span class="math inline">\(U,V \in SO(3)\)</span>.</p>
-<p>Bu teori gerekli matrisler ve SVD arasında bir eşdeğerlik (equivalence) tanımlamış oluyor, gerekli matrislerin SVD'si olmalı, ve bu SVD'nin iki eşsiz değeri olmalı, en küçüğü sıfır, en büyüğü <span class="math inline">\(\sigma\)</span> olacak şekilde ve ondan iki tane var. Bu çok faydalı çünkü sonuç itibariyle olabilecek mümkün matris seçeneklerini daraltmış oluyor, ki bu iyi. Gerekli matrisi hesaplayan optimizasyonumuz bu bilgiyi kullanabilir.</p>
-<p>Bir sonraki adım eldeki bir gerekli matristen rotasyon ve yer değişimi çıkartmak. Ufak bir problem - bu sonuç özgün değil, pratikte 2 tane mümkün çözüm olabilir. Ama iyi haber <span class="math inline">\(E = U\Sigma V^T\)</span> sonrası alttaki çözümlerden sadece biri anlamlı pozitif derinlik bilgisi verir.</p>
-<p><span class="math display">\[ 
+<p><span class="math inline">\(E\)</span>’den <span
+class="math inline">\(\hat{T},R\)</span> çıkartmak matris ayrıştırması
+çağrışımları yapıyor olabilir; ve hakikaten de Huang ve Faugeras’ın 1989
+tarihinde ispatladığı bir teoriye göre sıfır olmayan bir <span
+class="math inline">\(E \in \mathbb{R}^3\)</span> matrisi bir gerekli
+matristir sadece ve sadece <span class="math inline">\(E = U \Sigma
+V^T\)</span> şeklinde bir Eşsiz Değer Ayrıştırması (Singular Value
+Decomposition -SVD-) var ise, ve bu ayrıştırma <span
+class="math inline">\(\Sigma = diag\{\sigma,\sigma,0\}\)</span> olmalı,
+<span class="math inline">\(\sigma &gt; 0\)</span> için, <span
+class="math inline">\(U,V \in SO(3)\)</span>.</p>
+<p>Bu teori gerekli matrisler ve SVD arasında bir eşdeğerlik
+(equivalence) tanımlamış oluyor, gerekli matrislerin SVD’si olmalı, ve
+bu SVD’nin iki eşsiz değeri olmalı, en küçüğü sıfır, en büyüğü <span
+class="math inline">\(\sigma\)</span> olacak şekilde ve ondan iki tane
+var. Bu çok faydalı çünkü sonuç itibariyle olabilecek mümkün matris
+seçeneklerini daraltmış oluyor, ki bu iyi. Gerekli matrisi hesaplayan
+optimizasyonumuz bu bilgiyi kullanabilir.</p>
+<p>Bir sonraki adım eldeki bir gerekli matristen rotasyon ve yer
+değişimi çıkartmak. Ufak bir problem - bu sonuç özgün değil, pratikte 2
+tane mümkün çözüm olabilir. Ama iyi haber <span class="math inline">\(E
+= U\Sigma V^T\)</span> sonrası alttaki çözümlerden sadece biri anlamlı
+pozitif derinlik bilgisi verir.</p>
+<p><span class="math display">\[
 (\hat{T}_1,R_1) = (UR_Z(+\pi/2)\Sigma U^T, UR_Z(+\pi/2)V^T)
 \]</span></p>
-<p><span class="math display">\[ 
+<p><span class="math display">\[
 (\hat{T}_2,R_2) = (UR_Z(-\pi/2)\Sigma U^T, UR_Z(-\pi/2)V^T)
 \]</span></p>
-<p>Formüller biraz çetrefil gözüküyor, evet. İspat için [1, sf. 116]. Yani eğer gerekli matrisi tahminsel hesaplayabiliyorsak, onu kullanarak rotasyon ve yer değişimini üstteki formüllerle hesaplayabiliriz.</p>
+<p>Formüller biraz çetrefil gözüküyor, evet. İspat için [1, sf. 116].
+Yani eğer gerekli matrisi tahminsel hesaplayabiliyorsak, onu kullanarak
+rotasyon ve yer değişimini üstteki formüllerle hesaplayabiliriz.</p>
 <p>Algoritma</p>
-<p>Bir 3D tekrar oluşturma algoritması şöyle olabilir; iki görüntüdeki birbiriyle bağlantılı 2D noktalar birbirleriyle eş kutupsal kısıtlama üzerinden ilişkideler. O zaman</p>
-<ol style="list-style-type: decimal">
-<li><p>Belli sayıda eşlenmiş noktayı kullanarak eş kutupsal kısıtlama üzerinden <span class="math inline">\(E\)</span>'yi hesapla.</p></li>
-<li><p><span class="math inline">\(E\)</span>'den <span class="math inline">\(R,T\)</span>'yi hesapla.</p></li>
+<p>Bir 3D tekrar oluşturma algoritması şöyle olabilir; iki görüntüdeki
+birbiriyle bağlantılı 2D noktalar birbirleriyle eş kutupsal kısıtlama
+üzerinden ilişkideler. O zaman</p>
+<ol type="1">
+<li><p>Belli sayıda eşlenmiş noktayı kullanarak eş kutupsal kısıtlama
+üzerinden <span class="math inline">\(E\)</span>’yi hesapla.</p></li>
+<li><p><span class="math inline">\(E\)</span>’den <span
+class="math inline">\(R,T\)</span>’yi hesapla.</p></li>
 </ol>
-<p>Adım #2 için iki seçenek var. Birincisi direk <span class="math inline">\(E\)</span>'yi hesaplamak, ama bu matrisin gerekli (essential) uzayda olma zorunlulu olduğu için onu gerekli uzaya yansıt. Yine bir pürüz; Biliniyor ki bu yöntem optimal altı (suboptimal). Diğer seçenek eş kutupsal kısıtlamalardan <span class="math inline">\(E\)</span>'yi hesaplarken o optimizasyon içinde ek bir kısıtlamayla çözümü gerekli uzayda olmaya zorlamak.</p>
-<p>Pratikte ikinci seçeneği kodlamak külfetlidir, çünkü bu bir gayrı lineer, dertli kısıtlı optimizasyon, ayrıca ek kısıtlamalar SVD'nin her üç eşsiz değeri üzerinde olmalıdır... Biz lineer, lineer cebirsel bir yaklaşım tercih ediyoruz.</p>
+<p>Adım #2 için iki seçenek var. Birincisi direk <span
+class="math inline">\(E\)</span>’yi hesaplamak, ama bu matrisin gerekli
+(essential) uzayda olma zorunlulu olduğu için onu gerekli uzaya yansıt.
+Yine bir pürüz; Biliniyor ki bu yöntem optimal altı (suboptimal). Diğer
+seçenek eş kutupsal kısıtlamalardan <span
+class="math inline">\(E\)</span>’yi hesaplarken o optimizasyon içinde ek
+bir kısıtlamayla çözümü gerekli uzayda olmaya zorlamak.</p>
+<p>Pratikte ikinci seçeneği kodlamak külfetlidir, çünkü bu bir gayrı
+lineer, dertli kısıtlı optimizasyon, ayrıca ek kısıtlamalar SVD’nin her
+üç eşsiz değeri üzerinde olmalıdır… Biz lineer, lineer cebirsel bir
+yaklaşım tercih ediyoruz.</p>
 <p>8-Nokta Algoritması</p>
-<p>Algoritmanın ismi en az 8 noktaya ihtiyaç duymasından geliyor. Bu algoritma için <span class="math inline">\(x_2^TEx_1 = 0\)</span> kısıtlamasını farklı bir şekilde tanımlamaya çalışacağız.</p>
-<p>Bu kısıtlama <span class="math inline">\(E\)</span> merkezli bir ikili lineerlik (bilinear) içeriyor. Bu ne demektir? Bir tekrar düzenleme ile bu kısıtlama ifadesini &quot;<span class="math inline">\(E\)</span>'nin öğeleri çarpı <span class="math inline">\(x_1,x_2\)</span> öğeleri'' şeklinde ifade edebiliriz demektir. Bunun için önce <span class="math inline">\(E\)</span> matrisinin öğelerini &quot;açarak''' düz bir vektör içine dizelim. Üstsimge <span class="math inline">\(s\)</span> hatırlarsak yığma (stacking) operatörüydü,</p>
+<p>Algoritmanın ismi en az 8 noktaya ihtiyaç duymasından geliyor. Bu
+algoritma için <span class="math inline">\(x_2^TEx_1 = 0\)</span>
+kısıtlamasını farklı bir şekilde tanımlamaya çalışacağız.</p>
+<p>Bu kısıtlama <span class="math inline">\(E\)</span> merkezli bir
+ikili lineerlik (bilinear) içeriyor. Bu ne demektir? Bir tekrar
+düzenleme ile bu kısıtlama ifadesini “<span
+class="math inline">\(E\)</span>’nin öğeleri çarpı <span
+class="math inline">\(x_1,x_2\)</span> öğeleri’’ şeklinde ifade
+edebiliriz demektir. Bunun için önce <span
+class="math inline">\(E\)</span> matrisinin öğelerini”açarak’’’ düz bir
+vektör içine dizelim. Üstsimge <span class="math inline">\(s\)</span>
+hatırlarsak yığma (stacking) operatörüydü,</p>
 <p><span class="math display">\[
 E^s =\left[\begin{array}{ccccccccc}
-e_{11} &amp; e_{21} &amp; e_{31} &amp; e_{12} &amp; e_{22} &amp; e_{23} &amp; e_{31} &amp; e_{32} &amp;
+e_{11} &amp; e_{21} &amp; e_{31} &amp; e_{12} &amp; e_{22} &amp; e_{23}
+&amp; e_{31} &amp; e_{32} &amp;
 e_{33} \end{array}\right]^T \in \mathbb{R}^9
 \]</span></p>
 <p>olacak. Şimdi</p>
 <p><span class="math display">\[ a \equiv x_1 \otimes x_2 \]</span></p>
-<p>tanımlayalım, ki <span class="math inline">\(\otimes\)</span> Kronecker çarpımı. <span class="math inline">\(x_i = \left[\begin{array}{ccc}  x_i &amp; y_i &amp; z_i \end{array}\right]^T\)</span> üzerinden üstteki çarpımın açılımı</p>
-<p><span class="math display">\[ a = \left[\begin{array}{ccccccccc} 
-x_1x_2 &amp; 
-x_1y_2 &amp; 
-x_1z_2 &amp; 
-y_1x_2 &amp; 
-y_1y_2 &amp; 
-y_1z_2 &amp; 
-z_1x_2 &amp; 
-z_1y_2 &amp; 
-z_1z_2 
+<p>tanımlayalım, ki <span class="math inline">\(\otimes\)</span>
+Kronecker çarpımı. <span class="math inline">\(x_i =
+\left[\begin{array}{ccc}  x_i &amp; y_i &amp; z_i
+\end{array}\right]^T\)</span> üzerinden üstteki çarpımın açılımı</p>
+<p><span class="math display">\[ a = \left[\begin{array}{ccccccccc}
+x_1x_2 &amp;
+x_1y_2 &amp;
+x_1z_2 &amp;
+y_1x_2 &amp;
+y_1y_2 &amp;
+y_1z_2 &amp;
+z_1x_2 &amp;
+z_1y_2 &amp;
+z_1z_2
 \end{array}\right]^T \in \mathbb{R}^9 \]</span></p>
 <p>Bu tanımlar sayesinde eş kutupsal kısıtlama</p>
 <p><span class="math display">\[ x_2^TEx_1 = a^TE^s = 0 \]</span></p>
-<p>olarak yazılabilir. Böylece bilinen değişkenleri bilinmeyenlerden net bir şekilde ayırmış olduk, bilinen her şey <span class="math inline">\(a^T\)</span> içinde, bilinmeyenler <span class="math inline">\(E^s\)</span> içinde. Ayrıca kısıtlama bir skalar çarpım haline geldi, ve bu çarpımın söylediği bir şey var, sonuç sıfır olduğu için <span class="math inline">\(a,E^s\)</span> birbirine dikgen (orthogonal) vektörler. Eşlenmiş bir çift 2D nokta için yapılanlar bunlar. Tüm <span class="math inline">\(n\)</span> nokta çiftleri için üstteki denklemi bir lineer sistem haline getirebiliriz,</p>
+<p>olarak yazılabilir. Böylece bilinen değişkenleri bilinmeyenlerden net
+bir şekilde ayırmış olduk, bilinen her şey <span
+class="math inline">\(a^T\)</span> içinde, bilinmeyenler <span
+class="math inline">\(E^s\)</span> içinde. Ayrıca kısıtlama bir skalar
+çarpım haline geldi, ve bu çarpımın söylediği bir şey var, sonuç sıfır
+olduğu için <span class="math inline">\(a,E^s\)</span> birbirine dikgen
+(orthogonal) vektörler. Eşlenmiş bir çift 2D nokta için yapılanlar
+bunlar. Tüm <span class="math inline">\(n\)</span> nokta çiftleri için
+üstteki denklemi bir lineer sistem haline getirebiliriz,</p>
 <p><span class="math display">\[
 \chi E^s = 0, \qquad \chi =
-\left[\begin{array}{cccc} a^1 &amp; a^2 &amp; \dots &amp; a^n \end{array}\right]^T
+\left[\begin{array}{cccc} a^1 &amp; a^2 &amp; \dots &amp; a^n
+\end{array}\right]^T
 \]</span></p>
-<p>Yani <span class="math inline">\(\chi\)</span> içinde <span class="math inline">\(a\)</span> vektörleri bir kolon olarak yanyana diziliyorlar. Lineer Cebir dilinde &quot;<span class="math inline">\(E\)</span>'nin ne olduğunu bilmiyoruz ama biliyoruz ki o <span class="math inline">\(\chi\)</span>'in sıfır uzayında yaşıyor'' diyebiliriz. Bir pürüz bu sıfır uzayından gelen çözümün özgün olmaması. <span class="math inline">\(\chi E^s = 0\)</span>'i tatmin eden herhangi bir çözüm vektörünün katları da çözümdür, yani sonsuz tane çözüm vardır.</p>
-<p>Bunun negatif sonucu ölçek bilgisini, 8 ya da kaç tane nokta daha olursa olsun hiçbir zaman gerçek ölçekte tahmin edemiyor olacağımız. İki ev resmine bakıyoruz mesela, fakat belki maket bir evin resimleri bunlar! Robot kodlamasına bu problem çok ortaya çıkar, mesela biz görsel kamera ile yol bulan bir quadcopter kodu geliştirdik, ek olarak sonar algılayıcısı eklememiz gerekti ki bu eksik olan ölçek bilgisini elde edebilelim.</p>
-<p>Pratikte hesapları kolaylaştırmak için <span class="math inline">\(o_1o_2\)</span> uzaklığı 1'e eşitlenir, yani birim <span class="math inline">\(o_1o_2\)</span> uzaklığı haline gelir; hesapların sonucu bu birim üzerinden raporlanmış olur.</p>
-<p>Fakat pozitif yönde şu da var; sıfır uzayının <em>tek boyutlu</em> olmasını garantileyebilirsek, evet oradaki çözümün katları da çözümdür ama en azından ölçekleme problemi tamir edilince elimize tek çözüm geçer. Bunu garantileyebiliriz; en az 8 nokta gerekliliği (ve algoritmanın ismi) buradan geliyor. Bunun için <span class="math inline">\(\chi\)</span>'nin kertesi tamı tamına 8 olmalıdır. Eğer 8'den daha fazla eşli nokta var ise bunun zararı yok. Ama daha az var ise, mesela 7, o zaman sıfır uzayı iki boyutlu olurdu, ve özgün çözüm elde edilemezdi.</p>
-<p>Patajolik durumlarda 8'den daha fazla nokta çifti bile özgün nokta bulmaya yetmez; mesela tüm noktaların 3D dünyada aynı düzlem üzerinde olduğu durumda. O zaman çözüm dejenere çözümdür, çünkü <span class="math inline">\(a^i\)</span> vektörleri birbirinden bağımsız değildir. Örnek olarak mesela ev resminde 2D nokta çiftlerinin hepsi evin ön duvar üzerinden alınmış ise, bu problem çıkartır. Ama bazı noktalar evin ön duvarı, diğerleri yoldan, diğerleri evin arkasındaki ağaçtan, vs. geliyor ise 8-nokta algoritması düzgün işler.</p>
-<p><span class="math inline">\(E\)</span>'nin artı ya da eksi işareti tekrar oluşturulamıyor. Her <span class="math inline">\(E\)</span> için iki <span class="math inline">\(R\)</span> iki de <span class="math inline">\(T\)</span> mümkündür, yani mümkün <span class="math inline">\(R,T\)</span> çiftleri 4'tür. Ama pratikte <span class="math inline">\(E\)</span>'nin işaretini bulmak kolaydır.</p>
-<p>Ayrıca, daha önce söylediğimiz gibi, çoğunlukle hesaplanan <span class="math inline">\(E^s\)</span> öğeleri bir gerekli matrise tekabül etmez, bir gerekli matrisi bulmak için <span class="math inline">\(E^s\)</span>'i gerekli uzaya yansıtmamız gerekir, yani en yakın gerekli matrisi hesaplamamız gerekir.</p>
-<p><span class="math inline">\(\chi E^s = 0\)</span> hususunda bir nokta daha, eşlemelerde hata olabileceği için bu ifade tam olarak çözülemeyebilir. O zaman, ona en yakın olabilecek çözüme erişmeye uğraşırız; yani <span class="math inline">\(||\chi E^s||^2\)</span>'yi en az kareler bağlamında minimize edecek <span class="math inline">\(E^s\)</span>'i hesaplarız. Bu minimizasyon <span class="math inline">\(E^s\)</span>'i <span class="math inline">\(\chi^T\chi\)</span>'nin en ufak özdeğerine tekabül eden özvektörü olarak seçmek ile mümkün olabilir. Tabii <span class="math inline">\(\chi^T\chi\)</span> özvektör hesabı ile <span class="math inline">\(\chi\)</span> eşsiz değer ayrıştırmasının ilişkisi var, bkz [2], ve [3].</p>
-<div class="figure">
-<img src="eproj.png" />
-
-</div>
-<p>Yansıtma için kullanacağımız teorinin ispatı [1, sf. 119]'da. Herhangi bir <span class="math inline">\(F\)</span> matrisini alalım, ki bu matrisin SVD'si</p>
+<p>Yani <span class="math inline">\(\chi\)</span> içinde <span
+class="math inline">\(a\)</span> vektörleri bir kolon olarak yanyana
+diziliyorlar. Lineer Cebir dilinde “<span
+class="math inline">\(E\)</span>’nin ne olduğunu bilmiyoruz ama
+biliyoruz ki o <span class="math inline">\(\chi\)</span>’in sıfır
+uzayında yaşıyor’’ diyebiliriz. Bir pürüz bu sıfır uzayından gelen
+çözümün özgün olmaması. <span class="math inline">\(\chi E^s =
+0\)</span>’i tatmin eden herhangi bir çözüm vektörünün katları da
+çözümdür, yani sonsuz tane çözüm vardır.</p>
+<p>Bunun negatif sonucu ölçek bilgisini, 8 ya da kaç tane nokta daha
+olursa olsun hiçbir zaman gerçek ölçekte tahmin edemiyor olacağımız. İki
+ev resmine bakıyoruz mesela, fakat belki maket bir evin resimleri
+bunlar! Robot kodlamasına bu problem çok ortaya çıkar, mesela biz görsel
+kamera ile yol bulan bir quadcopter kodu geliştirdik, ek olarak sonar
+algılayıcısı eklememiz gerekti ki bu eksik olan ölçek bilgisini elde
+edebilelim.</p>
+<p>Pratikte hesapları kolaylaştırmak için <span
+class="math inline">\(o_1o_2\)</span> uzaklığı 1’e eşitlenir, yani birim
+<span class="math inline">\(o_1o_2\)</span> uzaklığı haline gelir;
+hesapların sonucu bu birim üzerinden raporlanmış olur.</p>
+<p>Fakat pozitif yönde şu da var; sıfır uzayının <em>tek boyutlu</em>
+olmasını garantileyebilirsek, evet oradaki çözümün katları da çözümdür
+ama en azından ölçekleme problemi tamir edilince elimize tek çözüm
+geçer. Bunu garantileyebiliriz; en az 8 nokta gerekliliği (ve
+algoritmanın ismi) buradan geliyor. Bunun için <span
+class="math inline">\(\chi\)</span>’nin kertesi tamı tamına 8 olmalıdır.
+Eğer 8’den daha fazla eşli nokta var ise bunun zararı yok. Ama daha az
+var ise, mesela 7, o zaman sıfır uzayı iki boyutlu olurdu, ve özgün
+çözüm elde edilemezdi.</p>
+<p>Patajolik durumlarda 8’den daha fazla nokta çifti bile özgün nokta
+bulmaya yetmez; mesela tüm noktaların 3D dünyada aynı düzlem üzerinde
+olduğu durumda. O zaman çözüm dejenere çözümdür, çünkü <span
+class="math inline">\(a^i\)</span> vektörleri birbirinden bağımsız
+değildir. Örnek olarak mesela ev resminde 2D nokta çiftlerinin hepsi
+evin ön duvar üzerinden alınmış ise, bu problem çıkartır. Ama bazı
+noktalar evin ön duvarı, diğerleri yoldan, diğerleri evin arkasındaki
+ağaçtan, vs. geliyor ise 8-nokta algoritması düzgün işler.</p>
+<p><span class="math inline">\(E\)</span>’nin artı ya da eksi işareti
+tekrar oluşturulamıyor. Her <span class="math inline">\(E\)</span> için
+iki <span class="math inline">\(R\)</span> iki de <span
+class="math inline">\(T\)</span> mümkündür, yani mümkün <span
+class="math inline">\(R,T\)</span> çiftleri 4’tür. Ama pratikte <span
+class="math inline">\(E\)</span>’nin işaretini bulmak kolaydır.</p>
+<p>Ayrıca, daha önce söylediğimiz gibi, çoğunlukle hesaplanan <span
+class="math inline">\(E^s\)</span> öğeleri bir gerekli matrise tekabül
+etmez, bir gerekli matrisi bulmak için <span
+class="math inline">\(E^s\)</span>’i gerekli uzaya yansıtmamız gerekir,
+yani en yakın gerekli matrisi hesaplamamız gerekir.</p>
+<p><span class="math inline">\(\chi E^s = 0\)</span> hususunda bir nokta
+daha, eşlemelerde hata olabileceği için bu ifade tam olarak
+çözülemeyebilir. O zaman, ona en yakın olabilecek çözüme erişmeye
+uğraşırız; yani <span class="math inline">\(||\chi E^s||^2\)</span>’yi
+en az kareler bağlamında minimize edecek <span
+class="math inline">\(E^s\)</span>’i hesaplarız. Bu minimizasyon <span
+class="math inline">\(E^s\)</span>’i <span
+class="math inline">\(\chi^T\chi\)</span>’nin en ufak özdeğerine tekabül
+eden özvektörü olarak seçmek ile mümkün olabilir. Tabii <span
+class="math inline">\(\chi^T\chi\)</span> özvektör hesabı ile <span
+class="math inline">\(\chi\)</span> eşsiz değer ayrıştırmasının ilişkisi
+var, bkz [2], ve [3].</p>
+<p><img src="eproj.png" /></p>
+<p>Yansıtma için kullanacağımız teorinin ispatı [1, sf. 119]’da.
+Herhangi bir <span class="math inline">\(F\)</span> matrisini alalım, ki
+bu matrisin SVD’si</p>
 <p><span class="math display">\[
 F = U \textrm{diag}
 \{ \lambda_1,\lambda_2,\lambda_3\} V^T
@@ -161,24 +444,57 @@ F = U \textrm{diag}
 <p><span class="math display">\[
 \lambda_1 &gt; \lambda_2 &gt; \lambda_3
 \]</span></p>
-<p>olmak üzere. O zaman Frobenius normu <span class="math inline">\(|| F - E||_f^2\)</span>'i minimize eden matris <span class="math inline">\(E\)</span></p>
+<p>olmak üzere. O zaman Frobenius normu <span class="math inline">\(|| F
+- E||_f^2\)</span>’i minimize eden matris <span
+class="math inline">\(E\)</span></p>
 <p><span class="math display">\[
 E = U \textrm{diag} \{ \sigma,\sigma,0 \} V^T , \qquad \sigma =
 \frac{\lambda_1+\lambda_2}{2}
 \]</span></p>
-<p>Yani <span class="math inline">\(F\)</span>'nin SVD'sini alıp buradan gelen en büyük iki eşsiz değerinin ortalamasını <span class="math inline">\(E\)</span>'nin SVD'sindeki en büyük iki eşsiz değer yapıyoruz, <span class="math inline">\(E\)</span>'nin en küçük eşsiz değerini sıfır kabul ediyoruz, bu kadar. Niye bu basit ortalamanın işlediği teorinin ispatında.</p>
-<p>Algoritma <code>8nokta</code> <span class="math inline">\(\left(x_1^i,x_2^i\right)\)</span></p>
+<p>Yani <span class="math inline">\(F\)</span>’nin SVD’sini alıp buradan
+gelen en büyük iki eşsiz değerinin ortalamasını <span
+class="math inline">\(E\)</span>’nin SVD’sindeki en büyük iki eşsiz
+değer yapıyoruz, <span class="math inline">\(E\)</span>’nin en küçük
+eşsiz değerini sıfır kabul ediyoruz, bu kadar. Niye bu basit ortalamanın
+işlediği teorinin ispatında.</p>
+<p>Algoritma <code>8nokta</code> <span
+class="math inline">\(\left(x_1^i,x_2^i\right)\)</span></p>
 <ul>
 <li>Gerekli matrisin yaklaşık halini bul.</li>
-<li><span class="math inline">\(\chi = \left[\begin{array}{cccc} a^1 &amp; a^2 &amp; \dots &amp; a^n \end{array}\right]^T\)</span>'yi hesapla, ki <span class="math inline">\(a^i = x_1^i \otimes x_2^i\)</span>.</li>
-<li><span class="math inline">\(||\chi E^s||\)</span>'i minimize edecek şekilde <span class="math inline">\(E^s \in \mathbb{R}^9\)</span>'i bul, yani <span class="math inline">\(\chi = U_\chi \Sigma_\chi V_\chi^T\)</span> ayrıştırmasında <span class="math inline">\(V_\chi\)</span>'nin 9. kolonunu al, çünkü o kolon en küçük eşsiz değere tekabül ediyor.</li>
-<li><span class="math inline">\(E^s\)</span>'i tersine yığma işlemiyle <span class="math inline">\(3 \times 3\)</span> <span class="math inline">\(E\)</span> vektörüne aç.</li>
-<li>Gerekli uzaya yansıtma yap; <span class="math inline">\(E = U diag\{\sigma_1,\sigma_2,\sigma_3\} V^T\)</span>.</li>
-<li><span class="math inline">\(E\)</span> belli bir skalara kadar tanımlı olduğu için <span class="math inline">\(E\)</span>'yi normalize edilmiş \ gerekli uzayına yansıt, <span class="math inline">\(\sigma_1,\sigma_2,\sigma_3\)</span> yerine 1,1,0 değerleri kullan.</li>
-<li><span class="math inline">\(R,\hat{T}\)</span>'yi hesapla. Dört mümkün çözüm <span class="math inline">\(R=UR_Z(\pm \pi/2)V^T\)</span>,<span class="math inline">\(\hat{T}=UR_Z(\pm\pi/2)\Sigma U^T\)</span> <code>return</code> <span class="math inline">\(R,\hat{T}\)</span></li>
+<li><span class="math inline">\(\chi = \left[\begin{array}{cccc} a^1
+&amp; a^2 &amp; \dots &amp; a^n \end{array}\right]^T\)</span>’yi
+hesapla, ki <span class="math inline">\(a^i = x_1^i \otimes
+x_2^i\)</span>.</li>
+<li><span class="math inline">\(||\chi E^s||\)</span>’i minimize edecek
+şekilde <span class="math inline">\(E^s \in \mathbb{R}^9\)</span>’i bul,
+yani <span class="math inline">\(\chi = U_\chi \Sigma_\chi
+V_\chi^T\)</span> ayrıştırmasında <span
+class="math inline">\(V_\chi\)</span>’nin 9. kolonunu al, çünkü o kolon
+en küçük eşsiz değere tekabül ediyor.</li>
+<li><span class="math inline">\(E^s\)</span>’i tersine yığma işlemiyle
+<span class="math inline">\(3 \times 3\)</span> <span
+class="math inline">\(E\)</span> vektörüne aç.</li>
+<li>Gerekli uzaya yansıtma yap; <span class="math inline">\(E = U
+diag\{\sigma_1,\sigma_2,\sigma_3\} V^T\)</span>.</li>
+<li><span class="math inline">\(E\)</span> belli bir skalara kadar
+tanımlı olduğu için <span class="math inline">\(E\)</span>’yi normalize
+edilmiş \ gerekli uzayına yansıt, <span
+class="math inline">\(\sigma_1,\sigma_2,\sigma_3\)</span> yerine 1,1,0
+değerleri kullan.</li>
+<li><span class="math inline">\(R,\hat{T}\)</span>’yi hesapla. Dört
+mümkün çözüm <span class="math inline">\(R=UR_Z(\pm
+\pi/2)V^T\)</span>,<span
+class="math inline">\(\hat{T}=UR_Z(\pm\pi/2)\Sigma U^T\)</span>
+<code>return</code> <span class="math inline">\(R,\hat{T}\)</span></li>
 </ul>
-<p>8'den daha az nokta mümkün mü? Evet. [Atlandı]</p>
-<p>Eğer sadece rotasyon var ama yer değiştirme yok ise, 8-nokta algoritması işlemez, çünkü o zaman <span class="math inline">\(\hat{T}\)</span> sıfır olacak, gerekli matris te sıfır olacak. Bu tür durumlar hiç yok değil, tatilde çekilmiş fotoğraflarda oluyor (hoca sadece kendi etrafında dönerek ardı ardına fotoğraf çeken turist taklidi yapıyor, bu durumda yer değişimi yok, rotasyon var.</p>
+<p>8’den daha az nokta mümkün mü? Evet. [Atlandı]</p>
+<p>Eğer sadece rotasyon var ama yer değiştirme yok ise, 8-nokta
+algoritması işlemez, çünkü o zaman <span
+class="math inline">\(\hat{T}\)</span> sıfır olacak, gerekli matris te
+sıfır olacak. Bu tür durumlar hiç yok değil, tatilde çekilmiş
+fotoğraflarda oluyor (hoca sadece kendi etrafında dönerek ardı ardına
+fotoğraf çeken turist taklidi yapıyor, bu durumda yer değişimi yok,
+rotasyon var.</p>
 <p>[statik olmayan manzara yorumları atlandı]</p>
 <p>Kaynaklar</p>
 <p>[1] Sastry, <em>An Invitation to 3-D Vision</em></p>

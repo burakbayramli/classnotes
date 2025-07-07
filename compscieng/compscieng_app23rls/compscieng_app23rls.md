@@ -231,7 +231,7 @@ P = np.eye(n,n)*100.
 x = np.zeros((n,1))
 for k in range(len(b)):
    x,K,P = rls.rlse_online(np.array([[k,1]]),b[k,:],x,P)
-print x
+print (x)
 ```
 
 ```
@@ -247,7 +247,7 @@ import statsmodels.api as sm
 
 y = b; x = A
 f = sm.OLS(y,x).fit()
-print f.params
+print (f.params)
 ```
 
 ```
@@ -278,12 +278,12 @@ $$ (A_k^TA_k)^{-1} = (R^TR)^{-1} = R^{-1}R^{-T} $$
 ```python
 A_k = A[:-1,:]
 b_k = b[:-1,:]
-print A.shape, A_k.shape
+print (A.shape, A_k.shape)
 q,r = lin.qr(A_k)
 Pk_r = np.dot(lin.inv(r), lin.inv(r.T))
-print Pk_r
+print (Pk_r)
 Pk = lin.inv(np.dot(A_k.T,A_k))
-print Pk
+print (Pk)
 ```
 
 ```
@@ -299,7 +299,7 @@ görüyoruz. Toptan $x_k$
 
 ```python
 x_batch = np.dot(np.dot(lin.inv(r), q.T), b_k)
-print x_batch.T[0]
+print (x_batch.T[0])
 ```
 
 ```
@@ -312,7 +312,7 @@ print x_batch.T[0]
 A_new = A[-1,:]
 b_new = b[-1,:]
 x_new,K_new,P_new = rls.rlse_online(A_new,b_new,x_batch.T[0],Pk_r)
-print x_new
+print (x_new)
 ```
 
 ```

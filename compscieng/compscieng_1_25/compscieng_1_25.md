@@ -201,7 +201,7 @@ def y(n,data):
     return sum
 
 for n in range(len(patents)):    
-    print  y(n,patents)
+    print  (y(n,patents))
 ```
 
 ```
@@ -229,7 +229,7 @@ d = 0.15
 res = lfilter((1,),(1,d-1),a) 
 k = [a[0]] 
 for inv in a[1:]: k.append((1-d)*k[-1] + inv) 
-print np.array(k) 
+print (np.array(k) )
 ```
 
 ```
@@ -386,7 +386,7 @@ $\Omega_c$
 
 ```python
 cutoff = 20 * 1/(2*np.pi) 
-print cutoff, 'Hz'
+print (cutoff, 'Hz')
 ```
 
 ```
@@ -415,7 +415,7 @@ ile bunu ayrıştırmaya uğraşalım,
 x = data # formul ile ayni olsun diye
 a = [1.0, -np.exp(-20*T)]
 b = [20*T]
-print b, a
+print (b, a)
 y = np.zeros(len(x))
 for n in range(1,len(data)):    
    y[n] = b[0]*x[n] - a[1]*y[n-1]
@@ -438,7 +438,7 @@ from scipy.signal import butter, lfilter
 nyq = 0.5 * fs
 low = 2.0 / nyq
 b, a = butter(1, low, btype='lowpass')
-print b,a
+print (b,a)
 y = lfilter(b, a, x)
 plt.plot(t,y)
 plt.savefig('compscieng_1_25_04.png')
@@ -457,8 +457,8 @@ arttırırsak, yani daha fazla katsayı ile
 
 ```python
 b, a = butter(2, low, btype='lowpass')
-print b
-print a
+print (b)
+print (a)
 y = lfilter(b, a, x)
 plt.plot(t,y)
 plt.savefig('compscieng_1_25_05.png')

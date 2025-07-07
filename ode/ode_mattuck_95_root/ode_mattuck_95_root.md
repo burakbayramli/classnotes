@@ -70,8 +70,8 @@ $a=3,b=3,c=5$,
 ```python
 a=1.0;b=3.0;c=1.0
 tmp=np.sqrt((b**2)-(4.0*a*c))
-print (-b-tmp) / (2.0 * a)
-print (-b+tmp) / (2.0 * a)
+print ((-b-tmp) / (2.0 * a))
+print ((-b+tmp) / (2.0 * a))
 ```
 
 ```
@@ -82,7 +82,7 @@ print (-b+tmp) / (2.0 * a)
 Kütüphane çağrısı ile
 
 ```python
-print np.roots([a, b, c])
+print (np.roots([a, b, c]))
 ```
 
 ```
@@ -152,13 +152,13 @@ def newton(f, x, dfdx=None, eps=1e-6):
 a=1.0;b=3.0;c=1.0
 
 def f1(x): return a*(x**2.0) + b*x + c
-print newton(f1,0.0) # baslangic 0'da
-print newton(f1,-3.0) # farkli noktadan baslatalim
+print (newton(f1,0.0)) # baslangic 0'da
+print (newton(f1,-3.0)) # farkli noktadan baslatalim
 
 # bilinen turev 
 def df1(x): return 2*a*x + b
-print '\n',newton(f1,0.0,df1)
-print newton(f1,-3.0,df1) 
+print ('\n',newton(f1,0.0,df1))
+print (newton(f1,-3.0,df1) )
 
 ```
 
@@ -254,8 +254,8 @@ def bisect(f, a, b, eps=1e-6):
              b = xmid
      return xmid
 
-print bisect(f1,-5.0,0.0) 
-print bisect(f1,-2.0,0.0) 
+print (bisect(f1,-5.0,0.0) )
+print (bisect(f1,-2.0,0.0) )
 ```
 
 ```

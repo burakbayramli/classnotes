@@ -350,7 +350,7 @@ m2 = df.q[(df.q > 2.5) & (df.q < 4.0)].mean()
 m3 = df.q[(df.q > 4.0) & (df.q < 5.5)].mean()
 m4 = df.q[(df.q > 5.5) & (df.q < 7.5)].mean()
 m5 = df.q[(df.q > 7.5) & (df.q < 8.0)].mean()
-print m1,m2,m3,m4
+print (m1,m2,m3,m4)
 ```
 
 ```
@@ -366,7 +366,7 @@ alırsak belki bir birim yükü elde ederiz.
 
 ```python
 ms = [m1,m2-m1,m3-m2,m4-m3]
-print np.mean(ms)
+print (np.mean(ms))
 ```
 
 ```
@@ -382,7 +382,7 @@ sonuçla bölersek (yani tersine çevirirsek),
 
 ```python
 e = 1.60217662081e-19
-print 1.0/e
+print (1.0/e)
 ```
 
 ```
@@ -465,7 +465,7 @@ bilimciler bu yapının ürettiği elektriği 1 Volt olarak kabul etmiştir [5,
 
 Kaynaklar
 
-[1] Millikan Yağ Damla Deney Labaratuarı (Yerel Kopya), [https://burakbayramli.github.io/dersblog/elecmag/elecmag_01/millikan.html](https://burakbayramli.github.io/dersblog/elecmag/elecmag_01/millikan.html)
+[1] Millikan Yağ Damla Deney Labaratuarı (Yerel Kopya), [https://burakbayramli.github.io/dersblog/elecmag/elecmag_01/millikan.html](https://burakbayramli.github.io/dersblog/elecmag/phy_070_elecmag_01/millikan.html)
 
 [2] Millikan Oil Drop Lab, [http://www.thephysicsaviary.com/Physics/Programs/Labs/MillikanOilDropLab/index.html](http://www.thephysicsaviary.com/Physics/Programs/Labs/MillikanOilDropLab/index.html)
 

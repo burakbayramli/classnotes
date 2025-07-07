@@ -41,7 +41,6 @@ diff = (df[['c1','c2','c3']] - colors2[18]).abs().sum(axis=1)
 df2 = df[diff < 100.]
 A3 = np.array(Image.open('t00100.jpg'))
 plt.imshow(A3)
-plt.hold(True)
 plt.plot(df2.x,df2.y,'.')
 plt.savefig('vision_50colreg_01.png')
 ```
@@ -139,15 +138,28 @@ dikdörtgen ayrı ayrı),
 ```python
 from PIL import Image, ImageDraw
 import pandas as pd
-def draw_boxes(bs,imfile):
+
+def draw_boxes(bs, imfile):
     im = Image.open(imfile).convert('L')
     draw = ImageDraw.Draw(im)
     arr = np.asarray(im)
-    colors = ['white','yellow','white','white']
-    for i,b in enumerate(bs):
-        fr = b[0]; to = b[1]
-        bnew = [(fr[0],arr.shape[0]-fr[1]),(to[0],arr.shape[0]-to[1])]
-        draw.rectangle(bnew,outline=colors[i])
+    colors = ['white', 'yellow', 'white', 'white']
+
+    for i, b in enumerate(bs):
+        fr = b[0]  # (x0, y0) original top-left
+        to = b[1]  # (x1, y1) original bottom-right
+        x0_new = fr[0]
+        y0_new = arr.shape[0] - fr[1]
+        x1_new = to[0]
+        y1_new = arr.shape[0] - to[1]
+
+        left = min(x0_new, x1_new)
+        top = min(y0_new, y1_new)
+        right = max(x0_new, x1_new)
+        bottom = max(y0_new, y1_new)
+
+        bnew = [(left, top), (right, bottom)]
+        draw.rectangle(bnew, outline=colors[i % len(colors)]) # Use modulo for colors to avoid index error
     plt.imshow(im, cmap=plt.cm.Greys_r)
 
 box1 = [(79,144),(100,282)]
@@ -178,29 +190,36 @@ def get_pixels(box, im):
 im = Image.open('t00100.jpg').convert('L')
 arr1 = get_pixels(box1, im) 
 arr2 = get_pixels(box2, im) 
-print arr1.shape, arr2.shape
+print (arr1.shape, arr2.shape)
 ```
 
-```
+```text
 (138, 21) (133, 54)
 ```
 
 Olurluk oranının log'unu alarak hesap yapınca
 
 ```python
-def likratio(arr1,arr2):
-    tarr1 = np.reshape(arr1, (arr1.shape[0]*arr1.shape[1]),1)
-    tarr2 = np.reshape(arr2, (arr2.shape[0]*arr2.shape[1]),1)
-    arr0 = np.hstack((tarr1,tarr2))
-    s0 = np.std(arr0); s1 = np.std(tarr1); s2 = np.std(tarr2)
-    L = len(arr0)*np.log(s0) - (len(tarr1)*np.log(s1) + len(tarr2)*np.log(s2))
+def likratio(arr1, arr2):
+    # Corrected reshape calls: remove the extra '1'
+    tarr1 = np.reshape(arr1, (arr1.shape[0] * arr1.shape[1], 1))
+    tarr2 = np.reshape(arr2, (arr2.shape[0] * arr2.shape[1], 1))
+
+    arr0 = np.vstack((tarr1, tarr2))
+    s0 = np.std(arr0)
+    s1 = np.std(tarr1)
+    s2 = np.std(tarr2)
+
+    # Use len(tarr1) and len(tarr2) for their respective lengths
+    L = len(arr0) * np.log(s0) - (len(tarr1) * np.log(s1) + len(tarr2) * np.log(s2))
     return L
+    
 L = likratio(arr1, arr2)
-print L
+print (L)
 ```
 
-```
-419.6536187
+```text
+419.3404055757783
 ```
 
 İkinci resimde her iki dikdörtgen aynı direğin üzerinde, yani aynı obje
@@ -210,11 +229,11 @@ print L
 arr1 = get_pixels(box1, im)
 arr2 = get_pixels(box3, im)
 L = likratio(arr1, arr2)
-print L
+print (L)
 ```
 
-```
-244.473078548
+```text
+247.8054950906153
 ```
 
 Hakikaten de öyle.
@@ -343,7 +362,7 @@ Renkli bir resme bakalım şimdi,
 
 ```python
 im = Image.open('t00100.jpg').convert('HSV')
-print np.array(im).shape
+print (np.array(im).shape)
 ```
 
 ```
@@ -352,149 +371,6 @@ print np.array(im).shape
 
 Görüldüğü gibi imaj matrisinde artık her hücrede üç öğe var.
 
-```python
-from PIL import Image, ImageDraw
-import pandas as pd
-import scipy.linalg as lin
-
-def get_pixels(box, arr):
-    (yw,xw,d) = arr.shape
-    (bx1,by1) = box[0]; (bx2,by2) = box[1]
-    by1 = yw-by1; by2 = yw-by2
-    x1 = min(bx1,bx2); x2 = max(bx1,bx2)
-    y1 = min(by1,by2); y2 = max(by1,by2)
-    arr = arr[y1:y2, x1:x2, :]
-    return arr
-
-def draw_boxes_color(bs, im):
-    arr = np.asarray(im)
-    draw = ImageDraw.Draw(im)
-    colors = ['magenta','green','white','red','yellow']
-    for i,b in enumerate(bs):
-        fr = b[0]; to = b[1]
-        bnew = [(fr[0],arr.shape[0]-fr[1]),(to[0],arr.shape[0]-to[1])]
-        draw.rectangle(bnew,outline=colors[i])
-    plt.imshow(im)
-    
-def loglikratio(box1,box2,arr):
-    arr1 = get_pixels(box1, arr)
-    arr2 = get_pixels(box2, arr)
-    tarr1 = np.reshape(arr1, (arr1.shape[0]*arr1.shape[1],3))
-    tarr2 = np.reshape(arr2, (arr2.shape[0]*arr2.shape[1],3))
-    tarr0 = np.vstack((tarr1,tarr2))
-    sd0 = lin.det(np.cov(tarr0.T))
-    sd1 = lin.det(np.cov(tarr1.T))
-    sd2 = lin.det(np.cov(tarr2.T))
-    LLR = len(tarr0)/2*np.log(sd0) - len(tarr1)/2*np.log(sd1) - len(tarr2)/2*np.log(sd2)
-    return LLR
-```
-
-```python
-box1 = [(79,144),(100,282)]
-box2 = [(63,154),(117,287)]
-box3 = [(80,63),(95,260)]
-
-im = Image.open('t00100.jpg').convert('HSV')
-draw_boxes_color([box1,box2],im)
-plt.savefig('vision_50colreg_09.png')
-im = Image.open('t00100.jpg').convert('HSV')
-draw_boxes_color([box1,box3],im)
-plt.savefig('vision_50colreg_11.png')
-```
-
-![](vision_50colreg_09.png)
-
-![](vision_50colreg_11.png)
-
-1. ve 2., sonra 1. ve 3. bölgeler arasında olurluk oranını hesaplayalım,
-
-```python
-arr = np.array(im)
-print  loglikratio(box1,box2,arr) 
-print  loglikratio(box1,box3,arr) 
-```
-
-```
-874.532775212
-635.48295072
-```
-
-Farklı bir resme bakalım, Alcatraz adasının bir fotoğrafı mesela,
-
-```python
-box1 = [(36,134),(86,201)]
-box2 = [(3,125),(37,200)]
-im = Image.open('../vision_01/alcatraz1.png').convert('HSV')
-draw_boxes_color([box1,box2],im)
-plt.savefig('vision_50colreg_05.png')
-```
-
-![](vision_50colreg_05.png)
-
-```python
-print loglikratio(box1,box2, arr)
-```
-
-```
-6599.1051811
-```
-
-```python
-box3 = [(19,89),(76,124)]
-im = Image.open('../vision_01/alcatraz1.png').convert('HSV')
-draw_boxes_color([box1,box3],im)
-plt.savefig('vision_50colreg_06.png')
-```
-
-![](vision_50colreg_06.png)
-
-```python
-print loglikratio(box1,box3,arr)
-```
-
-```
-3171.54541435
-```
-
-Daha zor bir örnek
-
-```python
-box1 = [(35,144),(87,292)]
-box2 = [(106,183),(158,287)]
-box3 = [(117,86),(132,160)]
-box4 = [(106,183),(138,287)]
-im = Image.open('castle.png').convert('HSV')
-draw_boxes_color([box1,box2],im)
-plt.savefig('vision_50colreg_07.png')
-im = Image.open('castle.png').convert('HSV')
-draw_boxes_color([box2,box3],im)
-plt.savefig('vision_50colreg_08.png')
-im = Image.open('castle.png').convert('HSV')
-draw_boxes_color([box1,box4],im)
-plt.savefig('vision_50colreg_10.png')
-```
-
-![](vision_50colreg_07.png)
-
-![](vision_50colreg_08.png)
-
-![](vision_50colreg_10.png)
-
-```python
-im = Image.open('castle.png').convert('HSV')
-arr = np.array(im)
-print loglikratio(box1,box2,arr)
-print loglikratio(box2,box3,arr)
-print loglikratio(box1,box3,arr)
-print loglikratio(box1,box4,arr)
-```
-
-```
-23886.6334257
-527.840460625
-15695.3369086
-17913.2279323
-```
 
 Kaynaklar
 
