@@ -524,7 +524,7 @@ v0 = np.array([1.,1.])
 A = np.array([[13., 5.], [2., 4.]])
 for i in range(20): 
     v0 = np.dot(A,v0)
-print 'v0 =',v0
+print ('v0 =',v0)
 ```
 
 ```
@@ -538,8 +538,8 @@ normalizasyondur),
 ```python
 v1 = v0 / np.max(v0)
 v1 = v1.reshape((2,1))
-print 'v1 ='
-print v1
+print ('v1 =')
+print (v1)
 ```
 
 ```
@@ -553,8 +553,8 @@ Kontrol edelim,
 ```python
 import numpy.linalg as lin
 U,D = lin.eig(A)
-print U
-print D
+print (U)
+print (D)
 ```
 
 ```
@@ -585,7 +585,7 @@ $$ x^TAx / x^Tx = \lambda $$
 1. özdeğeri hesaplayalım o zaman,
 
 ```python
-print np.dot(np.dot(v1.T,A),v1) / np.dot(v1.T,v1)
+print (np.dot(np.dot(v1.T,A),v1) / np.dot(v1.T,v1))
 ```
 
 ```
@@ -627,14 +627,14 @@ böyle devam eder.
 lam1 = 14.
 v0 = np.array([1.,1.])
 B = A - np.dot(v1,v1.T)*lam1
-print 'B'
-print B
+print ('B')
+print (B)
 for i in range(20): 
     v0 = np.dot(B,v0)
 v2 = v0 / np.max(v0)
 v2 = v2.reshape((2,1))
-print 'v2'
-print v2
+print ('v2')
+print (v2)
 ```
 
 ```
@@ -649,7 +649,7 @@ v2
 Rayleigh Bölümü ile ikinci özdeğeri bulalım,
 
 ```python
-print np.dot(np.dot(v2.T,B),v2) / np.dot(v2.T,v2)
+print (np.dot(np.dot(v2.T,B),v2) / np.dot(v2.T,v2))
 ```
 
 ```
