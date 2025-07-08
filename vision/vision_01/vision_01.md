@@ -171,7 +171,7 @@ yanyana, üst üste diziliyor. Bu tabii ki devasa yeni bir matris ortaya
 ```python
 A = np.array([[3,4,5],[4,3,5]])
 B = np.array([[3,4],[4,5]])
-print np.kron(A,B)
+print (np.kron(A,B))
 ```
 
 ```
@@ -188,8 +188,8 @@ her kolonu diğerinin altına gelecek şekilde koyuyoruz, ve dikey olarak çok
 büyük bir vektör ortaya çıkartıyor. Numpy ile,
 
 ```python
-print A
-print A.flatten(order='F')
+print (A)
+print (A.flatten(order='F'))
 ```
 
 ```
@@ -460,7 +460,7 @@ from PIL import Image
 
 im=Image.open("alcatraz1.pgm")
 descriptors = pd.DataFrame(surf.surf(np.array(im)))
-print descriptors.shape
+print (descriptors.shape)
 ```
 
 ```
@@ -480,7 +480,7 @@ plt.savefig('vision_02_01.png')
 öğesi)
 
 ```python
-print descriptors.ix[0][:10]
+print (descriptors.ix[0][:10])
 ```
 
 ```

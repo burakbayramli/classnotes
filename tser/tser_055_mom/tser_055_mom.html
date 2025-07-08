@@ -122,9 +122,10 @@ ikili olarak korelasyonunu alıp onların p-değerini hesaplayacağız.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_draw_sharpe&#39;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;TU.csv&#39;</span>)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">&#39;future.no_silent_downcasting&#39;</span>, <span class="va">True</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;TU.csv&#39;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_coint&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_030_coint&#39;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> corr</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> []</span>
@@ -140,40 +141,40 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>           idx <span class="op">=</span> np.array(<span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(dfc.ret_lag), holddays))</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>       <span class="cf">else</span>: </span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>           idx <span class="op">=</span> np.array(<span class="bu">range</span>(<span class="dv">0</span>,<span class="bu">len</span>(dfc.ret_lag), lookback))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>       dfc <span class="op">=</span> dfc.ix[idx]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>       dfc <span class="op">=</span> dfc.iloc[idx]</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>       t, x, p <span class="op">=</span> corr.p_corr(dfc.ret_lag, dfc.ret_fut)</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>       res.append([lookback, holddays,  t, p])</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> pd.DataFrame(res,columns<span class="op">=</span>[<span class="st">&#39;geriye bakis&#39;</span>,<span class="st">&#39;tutma gunu&#39;</span>,<span class="st">&#39;korelasyon&#39;</span>,<span class="st">&#39;p degeri&#39;</span>])</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res[res[<span class="st">&#39;geriye bakis&#39;</span>] <span class="op">&gt;=</span> <span class="dv">25</span>]</span></code></pre></div>
-<pre><code>    geriye bakis  tutma gunu  korelasyon  p degeri
-21            25           1   -0.013846  0.270625
-22            25           5    0.032196  0.263327
-23            25          10    0.151663  0.017386
-24            25          25    0.194388  0.045128
-25            25          60    0.233075  0.021371
-26            25         120    0.149209  0.102255
-27            25         250    0.261104  0.015751
-28            60           1    0.031111  0.088828
-29            60           5    0.079022  0.063314
-30            60          10    0.170948  0.009661
-31            60          25    0.182575  0.059741
-32            60          60    0.213958  0.123890
-33            60         120   -0.036387  0.424304
-34            60         250    0.318615  0.049219
-35           120           1    0.021126  0.187942
-36           120           5    0.053784  0.157502
-37           120          10    0.092116  0.112675
-38           120          25    0.152030  0.104487
-39           120          60   -0.023771  0.451293
-40           120         120    0.217406  0.227647
-41           120         250    0.403921  0.085531
-42           250           1    0.040612  0.058007
-43           250           5    0.105563  0.034167
-44           250          10    0.178648  0.014633
-45           250          25    0.273233  0.018136
-46           250          60    0.319392  0.064088
-47           250         120    0.354586  0.142317
-48           250         250    0.512954  0.188391</code></pre>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res[res[<span class="st">&#39;geriye bakis&#39;</span>] <span class="op">&gt;=</span> <span class="dv">25</span>])</span></code></pre></div>
+<pre class="text"><code>    geriye bakis  tutma gunu  korelasyon  p degeri
+21            25           1   -0.013961  0.267652
+22            25           5    0.031913  0.263821
+23            25          10    0.121855  0.044023
+24            25          25    0.195513  0.043132
+25            25          60    0.233322  0.020566
+26            25         120    0.148206  0.102227
+27            25         250    0.261972  0.014834
+28            60           1    0.031275  0.084316
+29            60           5    0.079853  0.058405
+30            60          10    0.171785  0.008452
+31            60          25    0.259159  0.011425
+32            60          60    0.216242  0.117277
+33            60         120   -0.033076  0.429897
+34            60         250    0.313743  0.048721
+35           120           1    0.022228  0.167769
+36           120           5    0.056515  0.137499
+37           120          10    0.095540  0.096678
+38           120          25    0.145591  0.106321
+39           120          60   -0.019242  0.459084
+40           120         120    0.208109  0.228351
+41           120         250    0.407212  0.074212
+42           250           1    0.041108  0.042837
+43           250           5    0.106799  0.023092
+44           250          10    0.178449  0.009239
+45           250          25    0.271855  0.011920
+46           250          60    0.424472  0.010865
+47           250         120    0.511172  0.030871
+48           250         250    0.487315  0.163445</code></pre>
 <p>Kod bir anlamda her zaman anı için o andaki tarihsel getiri ve eğer o
 noktada pozisyon alınmış olsa eldeki varlığın tutulmasından elde
 edilecek getiri hesabını yapıyor. Bu iki hesaptan iki zaman serisi
@@ -202,33 +203,34 @@ biz onu biraz değiştirdik, al/sat kararını her ay vermeye çalışmak
 yerine her gün vereceğiz, ve her gün alım/satım için sermayemizin
 1/25’ini kullanacağız.</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dd</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report(df,lookback,holddays):</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    longs <span class="op">=</span> df.Close <span class="op">&gt;</span> df.Close.shift(lookback)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    shorts <span class="op">=</span> df.Close <span class="op">&lt;</span> df.Close.shift(lookback)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="fl">0.</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> h <span class="kw">in</span> <span class="bu">range</span>(holddays):</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>       long_lag <span class="op">=</span> longs.shift(h).fillna(<span class="va">False</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>       short_lag <span class="op">=</span> shorts.shift(h).fillna(<span class="va">False</span>)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>       df.loc[long_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>       df.loc[short_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">-=</span> <span class="dv">1</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    ret<span class="op">=</span>(df.pos.shift(<span class="dv">1</span>)<span class="op">*</span> (df.Close<span class="op">-</span>df.Close.shift(<span class="dv">1</span>)) <span class="op">/</span> df.Close.shift(<span class="dv">1</span>)) <span class="op">\</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>         <span class="op">/</span> holddays <span class="co"># sermayenin holddays&#39;lik parcasini kullan</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cumret</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>report(dftu,lookback <span class="op">=</span> <span class="dv">250</span>,holddays <span class="op">=</span> <span class="dv">25</span>)</span></code></pre></div>
-<pre><code>APR 0.0167080584229
-Sharpe 1.04172346649
-Dusus Kaliciligi (-0.024847461773700896, 343.0)</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&quot;../tser_010_back&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> report(df,lookback,holddays):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    longs <span class="op">=</span> df.Close <span class="op">&gt;</span> df.Close.shift(lookback)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    shorts <span class="op">=</span> df.Close <span class="op">&lt;</span> df.Close.shift(lookback)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> h <span class="kw">in</span> <span class="bu">range</span>(holddays):</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>       long_lag <span class="op">=</span> longs.shift(h).fillna(<span class="va">False</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>       short_lag <span class="op">=</span> shorts.shift(h).fillna(<span class="va">False</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>       df.loc[long_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>       df.loc[short_lag,<span class="st">&#39;pos&#39;</span>] <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    ret<span class="op">=</span>(df.pos.shift(<span class="dv">1</span>)<span class="op">*</span> (df.Close<span class="op">-</span>df.Close.shift(<span class="dv">1</span>)) <span class="op">/</span> df.Close.shift(<span class="dv">1</span>)) <span class="op">\</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>         <span class="op">/</span> holddays <span class="co"># sermayenin holddays&#39;lik parcasini kullan</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret)))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (cumret)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>report(df,lookback <span class="op">=</span> <span class="dv">250</span>,holddays <span class="op">=</span> <span class="dv">25</span>)</span></code></pre></div>
+<pre class="text"><code>APR 0.016708058422861827
+Sharpe 1.0417234664877877
+Dusus Kaliciligi (np.float64(-0.024847461773700896), np.float64(343.0))</code></pre>
 <p>Tabii al/sat kararlaştırınca bu al ve satların 25 gün elde tutulması
 ve bunların birikmesi durumunu hesaplamak lazım, bunu da <span
 class="math inline">\(h=0,1,..,25\)</span> kadar kaydırıp bu kaydırılmış
@@ -251,9 +253,9 @@ kullanırsak,</p>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dfhg <span class="op">=</span> pd.read_csv(<span class="st">&#39;HG.csv&#39;</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>cumret <span class="op">=</span> report(dfhg,lookback <span class="op">=</span> <span class="dv">40</span>,holddays <span class="op">=</span> <span class="dv">40</span>)</span></code></pre></div>
-<pre><code>APR 0.177399755457
-Sharpe 1.04800326416
-Dusus Kaliciligi (-0.23984679762413508, 424.0)</code></pre>
+<pre class="text"><code>APR 0.17739975545700726
+Sharpe 1.0480032641572703
+Dusus Kaliciligi (np.float64(-0.23984679762413508), np.float64(424.0))</code></pre>
 <div class="sourceCode" id="cb10"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.plot(cumret)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mom_04.png&#39;</span>)</span></code></pre></div>
@@ -261,9 +263,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a h
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dfbre <span class="op">=</span> pd.read_csv(<span class="st">&#39;BRE.csv&#39;</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cumret <span class="op">=</span> report(dfbre,lookback <span class="op">=</span> <span class="dv">100</span>,holddays <span class="op">=</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>APR 0.177086083041
-Sharpe 1.08707778803
-Dusus Kaliciligi (-0.14812255240727923, 191.0)</code></pre>
+<pre class="text"><code>APR 0.1770860830414429
+Sharpe 1.0870777880323188
+Dusus Kaliciligi (np.float64(-0.14812255240727945), np.float64(191.0))</code></pre>
 <div class="sourceCode" id="cb13"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt.plot(cumret)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_mom_05.png&#39;</span>)</span></code></pre></div>
@@ -285,7 +287,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;FSTX.csv&#39;</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>entryZscore<span class="op">=</span><span class="fl">0.1</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>stdret <span class="op">=</span> pd.rolling_mean(df.cl.pct_change(), window<span class="op">=</span><span class="dv">90</span>).shift(<span class="dv">1</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>stdret <span class="op">=</span> df.cl.pct_change().rolling(window<span class="op">=</span><span class="dv">90</span>).mean().shift(<span class="dv">1</span>)</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>longs <span class="op">=</span> df.op <span class="op">&gt;=</span> df.hi.shift(<span class="dv">1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">+</span>entryZscore<span class="op">*</span>stdret)</span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>shorts <span class="op">=</span> df.op <span class="op">&lt;=</span> df.lo.shift(<span class="dv">1</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>entryZscore<span class="op">*</span>stdret)</span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;pos&#39;</span>] <span class="op">=</span> <span class="dv">0</span></span>
@@ -294,12 +296,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>df.pos <span class="op">*</span> (df.op<span class="op">-</span>df.cl) <span class="op">/</span> df.op</span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> ret.dropna()</span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))</span></code></pre></div>
-<pre><code>APR 0.140771737387
-Sharpe 1.35989260747
-Dusus Kaliciligi (-0.14880173773680128, 190.0)</code></pre>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret)))</span></code></pre></div>
+<pre class="text"><code>APR 0.14077173738690152
+Sharpe 1.3598926074743822
+Dusus Kaliciligi (np.float64(-0.14880173773680128), np.float64(190.0))</code></pre>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plt.plot(cumret)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)</span>
@@ -335,7 +337,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a h
 <div class="sourceCode" id="cb18"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>lookback<span class="op">=</span><span class="dv">90</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>retC2O<span class="op">=</span>(op<span class="op">-</span>cl.shift(<span class="dv">1</span>)) <span class="op">/</span> cl.shift(<span class="dv">1</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>stdC2O<span class="op">=</span>pd.rolling_std(retC2O, window<span class="op">=</span>lookback)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>stdC2O<span class="op">=</span>retC2O.rolling(window<span class="op">=</span>lookback).std()</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>pos <span class="op">=</span> pd.DataFrame(np.zeros(cl.shape),index<span class="op">=</span>cl.index,columns<span class="op">=</span>cl.columns)</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>longs<span class="op">=</span>(retC2O <span class="op">&gt;=</span> <span class="fl">0.5</span><span class="op">*</span>stdC2O).astype(<span class="bu">int</span>) <span class="op">*</span> earnann</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>shorts<span class="op">=</span>(retC2O <span class="op">&lt;=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>stdC2O).astype(<span class="bu">int</span>) <span class="op">*</span> earnann<span class="op">;</span></span>
@@ -343,17 +345,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a h
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>(pos<span class="op">*</span>(cl<span class="op">-</span>op)<span class="op">/</span>op).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)<span class="op">/</span><span class="fl">30.</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret))</span></code></pre></div>
-<pre><code>APR 0.0681264455203
-Sharpe 1.49474260654
-Dusus Kaliciligi (-0.026051533343801503, 109.0)</code></pre>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(np.array(cumret)))</span></code></pre></div>
+<pre class="text"><code>APR 0.06812644552025016
+Sharpe 1.4947426065381948
+Dusus Kaliciligi (np.float64(-0.026051533343801503), np.float64(109.0))</code></pre>
 <p>Üstteki hesapta 30’a böldük çünkü bir günde aşağı yukarı bu kadar kar
 açıklaması yapılıyor,</p>
 <div class="sourceCode" id="cb20"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> earnann.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">max</span>()</span></code></pre></div>
-<pre><code>41</code></pre>
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (earnann.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).<span class="bu">max</span>())</span></code></pre></div>
+<pre class="text"><code>41</code></pre>
 <div class="sourceCode" id="cb22"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>plt.plot(cumret)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">u&#39;Kümülatif Birleşik Getiri&#39;</span>)</span>
@@ -380,8 +382,8 @@ görüyoruz. İki kapsam var, 32 ve 128. EWMA’lar birbirinin üzerine
 <div class="sourceCode" id="cb23"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&quot;oil_crude_future.csv&quot;</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;hızlı&#39;</span>] <span class="op">=</span> pd.ewma(df.price, span<span class="op">=</span><span class="dv">32</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;yavaş&#39;</span>] <span class="op">=</span> pd.ewma(df.price, span<span class="op">=</span><span class="dv">128</span>)</span></code></pre></div>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;hızlı&#39;</span>] <span class="op">=</span> df.price.ewm(span<span class="op">=</span><span class="dv">32</span>).mean()</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;yavaş&#39;</span>] <span class="op">=</span> df.price.ewm(span<span class="op">=</span><span class="dv">128</span>).mean()</span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">&#39;price&#39;</span>,<span class="st">&#39;hızlı&#39;</span>,<span class="st">&#39;yavaş&#39;</span>]].plot()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.annotate(<span class="st">&#39;Sat&#39;</span>,xy<span class="op">=</span>(<span class="dv">50</span>,<span class="dv">150</span>),xytext<span class="op">=</span>(<span class="dv">100</span>,<span class="dv">160</span>),<span class="op">\</span></span>
@@ -400,14 +402,14 @@ lazım.</p>
 <p>Momentum stratejilerinin, özelde EWMA stratejilerinin pozitif
 yamukluğu olduğu hep söylenir. Böyle olup olmadığını kontrol edelim.</p>
 <div class="sourceCode" id="cb25"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_voltar&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_070_voltar&#39;</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> util, pandas <span class="im">as</span> pd, zipfile</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> <span class="st">&#39;CORN_price.csv&#39;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_070_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(f),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> util.ewma(df.PRICE,<span class="dv">2</span>,<span class="dv">8</span>)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> util.skew(df.PRICE, pred)</span></code></pre></div>
-<pre><code>1.18</code></pre>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (util.skew(df.PRICE, pred))</span></code></pre></div>
+<pre class="text"><code>1.1860020046683812</code></pre>
 <p>Daha “yavaş’’ EWMA stratejilerinde negatif yamukluk görülebilir,
 hızlı olanda görülmüyor çünkü bu strateji daha hızlı adapte oluyor,
 [2]’nin tarif ettiği gibi uzun zaman azar azar kaybedip düşüş veya çıkış

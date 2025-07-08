@@ -37,11 +37,12 @@ korelasyonunu alıp onların p-değerini hesaplayacağız.
 ```python
 import sys; sys.path.append('../tser_draw_sharpe')
 import pandas as pd
+pd.set_option('future.no_silent_downcasting', True)
 df = pd.read_csv('TU.csv')
 ```
 
 ```python
-import sys; sys.path.append('../tser_coint')
+import sys; sys.path.append('../tser_030_coint')
 import corr
 
 res = []
@@ -57,43 +58,43 @@ for lookback in [1, 5, 10, 25, 60, 120, 250]:
            idx = np.array(range(0,len(dfc.ret_lag), holddays))
        else: 
            idx = np.array(range(0,len(dfc.ret_lag), lookback))
-       dfc = dfc.ix[idx]
+       dfc = dfc.iloc[idx]
        t, x, p = corr.p_corr(dfc.ret_lag, dfc.ret_fut)
        res.append([lookback, holddays,  t, p])
 res = pd.DataFrame(res,columns=['geriye bakis','tutma gunu','korelasyon','p degeri'])
-print res[res['geriye bakis'] >= 25]
+print (res[res['geriye bakis'] >= 25])
 ```
 
-```
+```text
     geriye bakis  tutma gunu  korelasyon  p degeri
-21            25           1   -0.013846  0.270625
-22            25           5    0.032196  0.263327
-23            25          10    0.151663  0.017386
-24            25          25    0.194388  0.045128
-25            25          60    0.233075  0.021371
-26            25         120    0.149209  0.102255
-27            25         250    0.261104  0.015751
-28            60           1    0.031111  0.088828
-29            60           5    0.079022  0.063314
-30            60          10    0.170948  0.009661
-31            60          25    0.182575  0.059741
-32            60          60    0.213958  0.123890
-33            60         120   -0.036387  0.424304
-34            60         250    0.318615  0.049219
-35           120           1    0.021126  0.187942
-36           120           5    0.053784  0.157502
-37           120          10    0.092116  0.112675
-38           120          25    0.152030  0.104487
-39           120          60   -0.023771  0.451293
-40           120         120    0.217406  0.227647
-41           120         250    0.403921  0.085531
-42           250           1    0.040612  0.058007
-43           250           5    0.105563  0.034167
-44           250          10    0.178648  0.014633
-45           250          25    0.273233  0.018136
-46           250          60    0.319392  0.064088
-47           250         120    0.354586  0.142317
-48           250         250    0.512954  0.188391
+21            25           1   -0.013961  0.267652
+22            25           5    0.031913  0.263821
+23            25          10    0.121855  0.044023
+24            25          25    0.195513  0.043132
+25            25          60    0.233322  0.020566
+26            25         120    0.148206  0.102227
+27            25         250    0.261972  0.014834
+28            60           1    0.031275  0.084316
+29            60           5    0.079853  0.058405
+30            60          10    0.171785  0.008452
+31            60          25    0.259159  0.011425
+32            60          60    0.216242  0.117277
+33            60         120   -0.033076  0.429897
+34            60         250    0.313743  0.048721
+35           120           1    0.022228  0.167769
+36           120           5    0.056515  0.137499
+37           120          10    0.095540  0.096678
+38           120          25    0.145591  0.106321
+39           120          60   -0.019242  0.459084
+40           120         120    0.208109  0.228351
+41           120         250    0.407212  0.074212
+42           250           1    0.041108  0.042837
+43           250           5    0.106799  0.023092
+44           250          10    0.178449  0.009239
+45           250          25    0.271855  0.011920
+46           250          60    0.424472  0.010865
+47           250         120    0.511172  0.030871
+48           250         250    0.487315  0.163445
 ```
 
 Kod bir anlamda her zaman anı için o andaki tarihsel getiri ve eğer o
@@ -124,6 +125,7 @@ al/sat kararını her ay vermeye çalışmak yerine her gün vereceğiz, ve her
 gün alım/satım için sermayemizin 1/25'ini kullanacağız.
 
 ```python
+sys.path.append("../tser_010_back")
 import dd
 
 def report(df,lookback,holddays):
@@ -142,18 +144,18 @@ def report(df,lookback,holddays):
 
     cumret=np.cumprod(1+ret)-1
 
-    print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-    print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-    print 'Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret))
-    return cumret
+    print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+    print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+    print ('Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret)))
+    return (cumret)
 
-cumret=report(dftu,lookback = 250,holddays = 25)
+cumret=report(df,lookback = 250,holddays = 25)
 ```
 
-```
-APR 0.0167080584229
-Sharpe 1.04172346649
-Dusus Kaliciligi (-0.024847461773700896, 343.0)
+```text
+APR 0.016708058422861827
+Sharpe 1.0417234664877877
+Dusus Kaliciligi (np.float64(-0.024847461773700896), np.float64(343.0))
 ```
 
 Tabii al/sat kararlaştırınca bu al ve satların 25 gün elde tutulması ve
@@ -187,10 +189,10 @@ dfhg = pd.read_csv('HG.csv')
 cumret = report(dfhg,lookback = 40,holddays = 40)
 ```
 
-```
-APR 0.177399755457
-Sharpe 1.04800326416
-Dusus Kaliciligi (-0.23984679762413508, 424.0)
+```text
+APR 0.17739975545700726
+Sharpe 1.0480032641572703
+Dusus Kaliciligi (np.float64(-0.23984679762413508), np.float64(424.0))
 ```
 
 ```python
@@ -205,10 +207,10 @@ dfbre = pd.read_csv('BRE.csv')
 cumret = report(dfbre,lookback = 100,holddays = 10)
 ```
 
-```
-APR 0.177086083041
-Sharpe 1.08707778803
-Dusus Kaliciligi (-0.14812255240727923, 191.0)
+```text
+APR 0.1770860830414429
+Sharpe 1.0870777880323188
+Dusus Kaliciligi (np.float64(-0.14812255240727945), np.float64(191.0))
 ```
 
 ```python
@@ -237,7 +239,7 @@ import pandas as pd, dd
 df = pd.read_csv('FSTX.csv')
 entryZscore=0.1
 
-stdret = pd.rolling_mean(df.cl.pct_change(), window=90).shift(1)
+stdret = df.cl.pct_change().rolling(window=90).mean().shift(1)
 longs = df.op >= df.hi.shift(1)*(1+entryZscore*stdret)
 shorts = df.op <= df.lo.shift(1)*(1-entryZscore*stdret)
 df['pos'] = 0
@@ -246,15 +248,15 @@ df.loc[shorts,'pos'] = -1
 ret=df.pos * (df.op-df.cl) / df.op
 ret = ret.dropna()
 cumret=np.cumprod(1+ret)-1
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-print 'Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret))
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+print ('Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret)))
 ```
 
-```
-APR 0.140771737387
-Sharpe 1.35989260747
-Dusus Kaliciligi (-0.14880173773680128, 190.0)
+```text
+APR 0.14077173738690152
+Sharpe 1.3598926074743822
+Dusus Kaliciligi (np.float64(-0.14880173773680128), np.float64(190.0))
 ```
 
 ```python
@@ -299,7 +301,7 @@ with zipfile.ZipFile('earnann.zip', 'r') as z:
 ```python
 lookback=90
 retC2O=(op-cl.shift(1)) / cl.shift(1)
-stdC2O=pd.rolling_std(retC2O, window=lookback)
+stdC2O=retC2O.rolling(window=lookback).std()
 pos = pd.DataFrame(np.zeros(cl.shape),index=cl.index,columns=cl.columns)
 longs=(retC2O >= 0.5*stdC2O).astype(int) * earnann
 shorts=(retC2O <= -0.5*stdC2O).astype(int) * earnann;
@@ -307,25 +309,25 @@ pos = pos + longs - shorts
 ret=(pos*(cl-op)/op).sum(axis=1)/30.
 
 cumret=np.cumprod(1+ret)-1
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-print 'Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret))
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+print ('Dusus Kaliciligi', dd.calculateMaxDD(np.array(cumret)))
 ```
 
-```
-APR 0.0681264455203
-Sharpe 1.49474260654
-Dusus Kaliciligi (-0.026051533343801503, 109.0)
+```text
+APR 0.06812644552025016
+Sharpe 1.4947426065381948
+Dusus Kaliciligi (np.float64(-0.026051533343801503), np.float64(109.0))
 ```
 
 Üstteki hesapta 30'a böldük çünkü bir günde aşağı yukarı bu kadar kar
 açıklaması yapılıyor, 
 
 ```python
-print earnann.sum(axis=1).max()
+print (earnann.sum(axis=1).max())
 ```
 
-```
+```text
 41
 ```
 
@@ -363,8 +365,8 @@ noktalar alım, satım anları olarak kullanılabilir.
 ```python
 import pandas as pd
 df = pd.read_csv("oil_crude_future.csv")
-df['hızlı'] = pd.ewma(df.price, span=32)
-df['yavaş'] = pd.ewma(df.price, span=128)
+df['hızlı'] = df.price.ewm(span=32).mean()
+df['yavaş'] = df.price.ewm(span=128).mean()
 ```
 
 ```python
@@ -390,17 +392,17 @@ Momentum stratejilerinin, özelde EWMA stratejilerinin pozitif yamukluğu olduğ
 hep söylenir. Böyle olup olmadığını kontrol edelim.
 
 ```python
-import sys; sys.path.append('../tser_voltar')
+import sys; sys.path.append('../tser_070_voltar')
 import util, pandas as pd, zipfile
 f = 'CORN_price.csv'
-with zipfile.ZipFile('../tser_voltar/legacycsv.zip', 'r') as z:
+with zipfile.ZipFile('../tser_070_voltar/legacycsv.zip', 'r') as z:
     df =  pd.read_csv(z.open(f),sep=',',index_col=0,parse_dates=True)
 pred = util.ewma(df.PRICE,2,8)
-print util.skew(df.PRICE, pred)
+print (util.skew(df.PRICE, pred))
 ```
 
-```
-1.18
+```text
+1.1860020046683812
 ```
 
 Daha "yavaş'' EWMA stratejilerinde negatif yamukluk görülebilir, hızlı olanda
