@@ -109,7 +109,7 @@ k = 7 # izdusum uzayinin boyutlari
 df = pd.read_csv("w1.dat",sep=';',header=None)
 A = np.array(df)[:,1:]
 
-print "A",A.shape
+print ("A",A.shape)
 
 rand.seed(1000)
 
@@ -117,31 +117,29 @@ Omega = rand.randn(A.shape[1],k)
 
 Y = np.dot(A, Omega) 
 
-print "Y", Y.shape
+print ("Y", Y.shape)
 
 Q, R = lin.qr(Y) 
 
 # niye devrigi ile is yaptigimizi altta anlatiyoruz
 BT = np.dot(A.T, Q)
 
-print "Q", Q.shape
-print "BT", BT.shape
+print ("Q", Q.shape)
+print ("BT", BT.shape)
 
 x, x, V = lin.svd(BT)
 
-print 'V', V.shape
+print ('V', V.shape)
 
 Uhat = V.T # cunku B=USV', B'=VSU' U of B icin V' lazim
 
-print "Uhat", Uhat.shape
+print ("Uhat", Uhat.shape)
 
 U = np.dot(Q, Uhat) 
 
-print "U", U.shape
+print ("U", U.shape)
 
 plt.plot(U[:,0],U[:,1],'r+')
-
-plt.hold(True)
         
 # gercek SVD ile karsilastir
 
