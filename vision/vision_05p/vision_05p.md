@@ -155,7 +155,7 @@ def compute_P(x,X):
         M[3*i+1,4:8] = X[:,i]
         M[3*i+2,8:12] = X[:,i]
         M[3*i:3*i+3,i+12] = -x[:,i]
-    print M.shape
+    print (M.shape)
     U,S,V = linalg.svd(M)
     
     return V[-1,:12].reshape((3,4))
@@ -169,7 +169,7 @@ XX = np.array(X)
 XX = np.hstack((XX,np.ones((len(X),1))))
 
 P = compute_P(xx.T,XX.T)
-print P
+print (P)
 ```
 
 ```
@@ -193,17 +193,13 @@ im = Image.open('out-cam.png')
 plt.imshow(im)
 
 for xx in X3.T: 
-    plt.hold(True)
     if xx[0] > w or xx[0] < 0: continue
     if xx[1] > h or xx[1] < 0: continue
     plt.plot(xx[0],h-xx[1],'r.')
 
-plt.hold(True)
-
 X3 = np.dot(P, res2.T)
 X3 = X3 / X3[2]
 for xx in X3.T: 
-    plt.hold(True)
     if xx[0] > w or xx[0] < 0: continue
     if xx[1] > h or xx[1] < 0: continue
     plt.plot(xx[0],h-xx[1],'r.')
@@ -277,9 +273,9 @@ if linalg.det(T) < 0: T[1,1] *= -1
 K = np.dot(K,T)
 R = np.dot(T,R) 
 t = np.dot(linalg.inv(K),P[:,3])
-print K
-print R
-print t
+print (K)
+print (R)
+print (t)
 ```
 
 ```
