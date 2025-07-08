@@ -228,6 +228,7 @@ tüm pikselleri alıp hesapladığım transformasyonu onlara uygularım,
 ```python
 from scipy import ndimage
 import scipy
+import imageio
 
 fp = [ [p[1],p[0],1] for p in corners]
 fp = np.array(fp).T
@@ -240,7 +241,7 @@ def warpfcn(x):
     xt = xt/xt[2]
     return xt[0],xt[1]
 im_g = ndimage.geometric_transform(im,warpfcn,(300,300))
-scipy.misc.imsave('vision_30vstab_05.png', im_g)
+imageio.imwrite('vision_30vstab_05.png', im_g)
 ```
 
 ![](vision_30vstab_05.png)
@@ -275,15 +276,10 @@ ondan olan sapmaları kameranın istenmeyen titremesi olarak algılıyoruz, ve
 düzeltiyoruz.
 
 ```python
-#!/usr/bin/env python
-import cv2, sys
-import numpy as np
-import pandas as pd
+import cv2, numpy as np, pandas as pd
 
-if len(sys.argv) < 2:
-    print "Usage: vs.py [input file]"
-    exit()
-fin = sys.argv[1]
+fin = "/opt/Downloads/bwalk1.mp4"
+
 cap = cv2.VideoCapture(fin)
 N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -314,7 +310,7 @@ for k in range(N-1):
             cur_corner2.append(cur_corner[i])
     prev_corner2 = np.array(prev_corner2)
     cur_corner2 = np.array(cur_corner2)
-    T = cv2.estimateRigidTransform(prev_corner2, cur_corner2, False);
+    T, inliers = cv2.estimateAffine2D(prev_corner2, cur_corner2)
     last_T = T[:]
 
     dx = T[0,2];
@@ -328,15 +324,15 @@ for k in range(N-1):
 prev_to_cur_transform = np.array(prev_to_cur_transform)
 trajectory = np.cumsum(prev_to_cur_transform, axis=0)
 trajectory = pd.DataFrame(trajectory)
-smoothed_trajectory = pd.rolling_mean(trajectory,window=30)
-smoothed_trajectory = smoothed_trajectory.fillna(method='bfill')
+smoothed_trajectory = trajectory.rolling(window=30).mean()
+smoothed_trajectory = smoothed_trajectory.bfill()
 new_prev_to_cur_transform = prev_to_cur_transform + \
                             (smoothed_trajectory - trajectory)
 new_prev_to_cur_transform = np.array(new_prev_to_cur_transform)
 
 T = np.zeros((2,3))
 cap = cv2.VideoCapture(fin)
-out = cv2.VideoWriter('out.avi', cv2.VideoWriter_fourcc('P','I','M','1'),
+out = cv2.VideoWriter('/tmp/out.avi', cv2.VideoWriter_fourcc('P','I','M','1'),
                       fps, (w, h), True)
 
 for k in range(N-1):
@@ -352,11 +348,17 @@ for k in range(N-1):
     cv2.waitKey(20);
 ```
 
-`cv2.estimateRigidTransform` çağrısı katı transformasyonu hesaplayan
-bir çağrıdır, aynen `H_from_points` gibi. 
+`cv2.estimateAffine2D` çağrısı katı transformasyonu hesaplayan bir
+çağrıdır, aynen `H_from_points` gibi.
 
 Üstteki kodu [1] üzerinde uygularsak stabilizasyon yapıldığını
 göreceğiz. Sonuç [2]'de. C++ kodu `vidstab.cpp`'de bulunabilir.
+Derlemek için
+
+```
+g++ -c -O3 -Wall `pkg-config --cflags opencv` -D LINUX -fPIC vidstab.cpp
+g++ -o vs.exe vs.o `pkg-config --libs opencv`
+```
 
 Canlı Zamanda (Real-Time) Stabilizasyon
 
@@ -381,9 +383,9 @@ kod `vsonline.py` içinde bulunabilir.
 
 Kaynaklar
 
-[1] Bayramlı, Veri 1 (Video), [https://drive.google.com/uc?export=view&id=1nR4E7SYLfKhm8nO0BEfFcw0pwWmMNm19](https://drive.google.com/uc?export=view&id=1nR4E7SYLfKhm8nO0BEfFcw0pwWmMNm19)
+[1] Bayramlı, Veri 1 (Video), [File](https://www.dropbox.com/scl/fi/rrz3lgi2s8twqjori87ue/bwalk1.mp4?rlkey=a7sqkieu7nhdqvsv66tnoy1k8&st=ub0zwtig&raw=1)
 
-[2] Bayramlı, Veri 2 (Video), [https://drive.google.com/uc?export=view&id=11fPP7bxL32AhTNUFPVRqeG-PIxTQ1lqB](https://drive.google.com/uc?export=view&id=11fPP7bxL32AhTNUFPVRqeG-PIxTQ1lqB)
+[2] Bayramlı, Veri 2 (Video), [File](https://www.dropbox.com/scl/fi/ilksx914mxio9srsk6rw0/bwalk1-stab.avi?rlkey=4p0incnspt46bktcpxinhsdm0&st=sqbbebaw&raw=1)
 
 [3] Solem, *Computer Vision with Python*
 
@@ -398,6 +400,4 @@ Kaynaklar
 [7] Bayramlı, *Kalman Filters and Homography: Utilizing the Matrix A*
     [https://arxiv.org/abs/1006.4910](https://arxiv.org/abs/1006.4910)
 
-
-    
-
+  

@@ -37,7 +37,7 @@ class VS:
                 cur_corner2.append(cur_corner[i])
         prev_corner2 = np.array(prev_corner2)
         cur_corner2 = np.array(cur_corner2)
-        T = cv2.estimateRigidTransform(prev_corner2, cur_corner2, False);
+        T, inliers = cv2.estimateAffine2D(prev_corner2, cur_corner2)
         last_T = T[:]
         dx = T[0,2];
         dy = T[1,2];
@@ -62,10 +62,7 @@ class VS:
     
 vs = VS()
 
-if len(sys.argv) < 2:
-    print "Usage: vs.py [input file]"
-    exit()
-fin = sys.argv[1]
+fin = "/opt/Downloads/bwalk1.mp4"
 cap = cv2.VideoCapture(fin)
 
 while True:
