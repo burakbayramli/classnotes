@@ -80,7 +80,7 @@ from mpl_toolkits.mplot3d import axes3d
 import scipy.linalg as lin
 import cv2
 
-dir = "/home/burak/Documents/Dropbox/Public/data/pcv_data"
+dir = "/opt/Downloads"
 img1 = cv2.imread(dir + "/alcatraz1.jpg")
 img2 = cv2.imread(dir + "/alcatraz2.jpg")
 
@@ -107,7 +107,7 @@ matches = matcher.knnMatch(des1, des2, k = 2)
 matches = [m[0] for m in matches \
            if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
 
-print 'uyan noktalar', len(matches)
+print ('uyan noktalar', len(matches))
 
 pts1 = []; pts2 = []
 
@@ -138,8 +138,8 @@ pts1[:,1] = h-pts1[:,1]
 pts2[:,1] = h-pts2[:,1]
 ```
 
-```
-uyan noktalar 1298
+```text
+uyan noktalar 1289
 ```
 
 ![](vision_20recons_01.jpg)
@@ -203,13 +203,13 @@ Eğer biraz önce bulunan noktalar üzerinde uygularsak,
 ```python
 def make_homog(points):
   return np.vstack((points, np.ones((1, points.shape[1]))))
-print compute_fundamental(make_homog(pts1.T),make_homog(pts2.T))
+print (compute_fundamental(make_homog(pts1.T),make_homog(pts2.T)))
 ```
 
-```
-[[  1.30375335e-07   1.65553204e-07  -9.29038216e-04]
- [  5.01128878e-07   8.40553282e-07  -3.40774405e-03]
- [  3.28488982e-05   1.58554327e-03   1.00000000e+00]]
+```text
+[[ 9.72179429e-08  1.72737429e-06 -1.74727581e-03]
+ [-8.39498472e-07  9.04878124e-07 -2.19855069e-03]
+ [ 8.74608699e-04  2.38371775e-04  1.00000000e+00]]
 ```
 
 Dahası da var. Bu hesap fena değildir, fakat $F$ gibi kritik bir hesap için
@@ -226,32 +226,32 @@ ederiz.
 # kamera matrisi biliniyor
 K = np.array([[2394,0,932],[0,2398,628],[0,0,1]])
 
-F, mask = cv2.findFundamentalMat(pts1,pts2,method=cv2.RANSAC, param1=3., param2=0.99)
-print 'F', F
+F, mask = cv2.findFundamentalMat(pts1, pts2, cv2.FM_RANSAC, 3.0, 0.99)
+print ('F', F)
 E = K.T.dot(F).dot(K)
-print 'E', E
+print ('E', E)
 R1,R2,t = cv2.decomposeEssentialMat(E)
-print 'R1',R1
-print 'R2',R2
-print 't',t
+print ('R1',R1)
+print ('R2',R2)
+print ('t',t)
 ```
 
-```
-F [[  5.96322112e-08   5.60043096e-06  -2.04058699e-03]
- [ -5.99484026e-06   1.84659966e-07   1.51380328e-02]
- [  1.78053340e-03  -1.63463214e-02   1.00000000e+00]]
-E [[  0.34176628  32.15102128   3.66775373]
- [-34.41525089   1.0618694   23.18100597]
- [ -4.61718585 -26.40378644  -0.10739647]]
-R1 [[-0.29336175 -0.1052158   0.95019394]
- [-0.13001529 -0.98029957 -0.14869019]
- [ 0.94711927 -0.16715975  0.27390274]]
-R2 [[ 0.9950157  -0.02174197  0.09731924]
- [ 0.02293629  0.99967452 -0.01117018]
- [-0.09704471  0.01334665  0.99519053]]
-t [[ 0.63358512]
- [-0.09669105]
- [ 0.76760715]]
+```text
+F [[ 3.23525233e-08  4.38638128e-06 -1.14468511e-03]
+ [-4.85059031e-06  2.48532709e-07  1.50124300e-02]
+ [ 9.19665040e-04 -1.62050730e-02  1.00000000e+00]]
+E [[  0.18541995  25.1813903    3.92643503]
+ [-27.84632704   1.42916348  25.53332459]
+ [ -5.01866937 -28.68220729  -0.1042787 ]]
+R1 [[ 0.00756453 -0.15206339  0.9883418 ]
+ [-0.17952009 -0.9725189  -0.14825492]
+ [ 0.98372522 -0.17630573 -0.03465508]]
+R2 [[ 0.99321306 -0.02705221  0.11311937]
+ [ 0.02918137  0.99942599 -0.01720867]
+ [-0.11258891  0.02039286  0.99343237]]
+t [[ 0.74947563]
+ [-0.11258766]
+ [ 0.65238815]]
 ```
 
 Üçgenleme (Triangulation) 
@@ -349,22 +349,22 @@ x2 = np.dot(P2[:3],X)
 x1 /= x1[2]
 x2 /= x2[2]
  
-print 'X', X
-print 'x', x1
-print 'x2', x2
+print ('X', X)
+print ('x', x1)
+print ('x2', x2)
 ```
 
-```
-X [[  1.00277411   2.00859585   3.01259205   1.00350223   2.01053989]
- [  4.01217675   4.01023497   4.01743619   4.02955748   4.01893278]
- [ 11.01977032  12.02833872  13.04162674  12.0914948   13.05493008]
- [  1.           1.           1.           1.           1.        ]]
-x [[ 0.09099773  0.16698863  0.23099818  0.0829924   0.15400618]
- [ 0.36408896  0.33339891  0.30804717  0.33325553  0.3078479 ]
+```text
+X [[ 1.00277411  2.00859585  3.01259205  1.00350223  2.01053989]
+ [ 4.01217675  4.01023497  4.01743619  4.02955748  4.01893278]
+ [11.01977032 12.02833872 13.04162674 12.0914948  13.05493008]
  [ 1.          1.          1.          1.          1.        ]]
-x2 [[ 0.4200205   0.53709008  0.64501081  0.43105574  0.5379661 ]
- [ 0.38890029  0.37453124  0.36194221  0.35671322  0.34517828]
- [ 1.          1.          1.          1.          1.        ]]
+x [[0.09099773 0.16698863 0.23099818 0.0829924  0.15400618]
+ [0.36408896 0.33339891 0.30804717 0.33325553 0.3078479 ]
+ [1.         1.         1.         1.         1.        ]]
+x2 [[0.4200205  0.53709008 0.64501081 0.43105574 0.5379661 ]
+ [0.38890029 0.37453124 0.36194221 0.35671322 0.34517828]
+ [1.         1.         1.         1.         1.        ]]
 ```
 
 Ana problemimize dönelim; şimdi ikinci kamera için ayrıştırmadan elde
@@ -387,16 +387,18 @@ for i,P in enumerate(((R1,t),(R1,-t),(R2,t),(R2,-t))):
 
     X = triangulate(pts1, pts2, P0, P1)
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')    
+    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
     ax.plot(X[0], X[2], X[1], 'r.')
     ax.view_init(elev=23., azim=-67)
     plt.savefig('vision_20recons_03_%d.png' % i)
 ```
 
 ![](vision_20recons_03_0.png)
+
 ![](vision_20recons_03_1.png)
+
 ![](vision_20recons_03_2.png)
+
 ![](vision_20recons_03_3.png)
 
 Galiba alt sağdaki resim Alkatraz'a daha çok benziyor. Gerçek dünya
@@ -407,10 +409,7 @@ Kaynaklar
 
 [1] Zisserman, *Multiple View Geometry in Computer Vision 2nd Edition*
 
-[2] Bayramlı, *Resim 1*, [https://drive.google.com/uc?export=view&id=1pwzbfotghDX617znCMUd9AWet2XheiwZ](https://drive.google.com/uc?export=view&id=1pwzbfotghDX617znCMUd9AWet2XheiwZ)
+[2] Bayramlı, *Resim 1*, [https://www.dropbox.com/scl/fi/fy280cfv76a0wqhm08zf6/alcatraz1.jpg?rlkey=837qf9yvut7v0ha25q5qfm6gb&st=th3vk7f5&raw=1)
 
-[3] Bayramlı, *Resim 2*, [https://drive.google.com/uc?export=view&id=1GHbK2UpaSc7B3Ko84rEk83t0eesLFf7S](https://drive.google.com/uc?export=view&id=1GHbK2UpaSc7B3Ko84rEk83t0eesLFf7S)
-
-
-
+[3] Bayramlı, *Resim 2*, [https://www.dropbox.com/scl/fi/mtqme2tbkfogoryxhjeg5/alcatraz2.jpg?rlkey=wn153s6fjoppjizw2619p1wt6&st=c0s25ki8&raw=1)
 

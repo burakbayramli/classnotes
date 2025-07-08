@@ -186,7 +186,7 @@ düşüşün kadar zaman aldığı $t$. Mesafe metre, zaman saniye olarak.
 
 ```python
 import pandas as pd
-from StringIO import StringIO
+from io import StringIO
 s = """t;x
 0.32;0.5
 0.35;0.6
@@ -210,7 +210,7 @@ değerler arasında lineer regresyon kullanırsak $g$'yi bulabiliriz!
 import statsmodels.formula.api as smf
 df['t2'] = 1/2. * df.t**2
 results = smf.ols('x ~ 0 + t2', data=df).fit()
-print results.params['t2']
+print (results.params['t2'])
 ```
 
 ```
