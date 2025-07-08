@@ -187,7 +187,7 @@ r = R.from_euler('zyx', [90, 45, 30], degrees=True)
 print (np.round(r.as_matrix(),2))
 ```
 
-```
+```text
 [[ 0.   -0.71  0.71]
  [ 0.87 -0.35 -0.35]
  [ 0.5   0.61  0.61]]
@@ -343,14 +343,14 @@ v = np.array([3,3,3])
 n = [-1/3.,2/3.,2/3.]
    
 theta = np.deg2rad(70)
-N = skew.skew(n)
+N = skew(n)
 R = np.eye(3) + np.sin(theta) * N - (1-np.cos(theta))*N**2
-print R
+print (R)
 vr = np.dot(R,v)
-print vr
+print (vr)
 ```
 
-```
+```text
 [[ 1.         -0.91889724  0.33402626]
  [ 0.33402626  1.          0.240122  ]
  [-0.91889724 -0.38633975  1.        ]]
@@ -358,16 +358,11 @@ print vr
 ```
 
 ```python
-from mpl_toolkits.mplot3d import Axes3D
 import plot3d
-fig = plt.figure()
-ax = Axes3D(fig)
-plot3d.plot_vector(fig, o, v)
-ax.hold(True)
-plot3d.plot_vector(fig, o, vr, 'cyan')
-ax.hold(True)
-plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
-ax.hold(True)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+plot3d.plot_vector(ax, o, v)
+plot3d.plot_vector(ax, o, vr, 'cyan')
+plot3d.plot_vector(ax, o, 3*np.array(n), 'red')
 plot3d.plot_plane(ax, o, n, size=3)
 ax.view_init(elev=40., azim=10)
 plt.savefig('vision_02_01.png')
@@ -380,9 +375,11 @@ plt.savefig('vision_02_04.png')
 ```
 
 ![](vision_02_01.png)
+
 ![](vision_02_02.png)
 
 ![](vision_02_03.png)
+
 ![](vision_02_04.png)
 
 

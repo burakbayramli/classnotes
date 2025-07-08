@@ -88,32 +88,28 @@ b = np.array([[3.,3.,3.]]).T
 a = np.array([[0,5.,5.]]).T
 P = a.dot(a.T) / a.T.dot(a)
 p = P.dot(b)
-print P
-print p
+print (P)
+print (p)
 ```
 
-```
-[[ 0.   0.   0. ]
- [ 0.   0.5  0.5]
- [ 0.   0.5  0.5]]
-[[ 0.]
- [ 3.]
- [ 3.]]
+```text
+[[0.  0.  0. ]
+ [0.  0.5 0.5]
+ [0.  0.5 0.5]]
+[[0.]
+ [3.]
+ [3.]]
 ```
 
 ```python
-import sys; sys.path.append('../../vision/vision_02')
-from mpl_toolkits.mplot3d import Axes3D
-
+import sys; sys.path.append('../../phy/phy_072_rot')
 import plot3d
-fig = plt.figure(); ax = Axes3D(fig)
 
-plot3d.plot_vector(fig, o, b)
-ax.hold(True)
-plot3d.plot_vector(fig, o, a, 'cyan')
-ax.hold(True)
-plot3d.plot_vector(fig, o, p, 'yellow')
-ax.hold(True)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+
+plot3d.plot_vector(ax, o, b)
+plot3d.plot_vector(ax, o, a, 'cyan')
+plot3d.plot_vector(ax, o, p, 'yellow')
 plt.savefig('linear_15_01.png')
 ```
 
@@ -336,17 +332,15 @@ Bir örnek üzerinde görelim,
 
 ```python
 import sys; sys.path.append('../../vision/vision_02')
-from mpl_toolkits.mplot3d import Axes3D
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 import plot3d
 o = np.array([5,5,5])
 u = np.array([3,3,3])
 n = np.array([-1/3.,2/3.,2/3.])
 
-fig = plt.figure()
-ax = Axes3D(fig)
 plot3d.plot_plane(ax, o, n, size=5)
-plot3d.plot_vector(fig, o, u)
-plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plot3d.plot_vector(ax, o, u)
+plot3d.plot_vector(ax, o, 3*np.array(n), 'red')
 plt.savefig('15_8.png')
 ```
 
@@ -356,20 +350,19 @@ Mavi vektörü düzleme yansıtmak istiyoruz.
 
 ```python
 p = u - (np.dot(u,n) / np.dot(n,n)) * n
-print p
+print (p)
 ```
 
-```
-[ 4.  1.  1.]
+```text
+[4. 1. 1.]
 ```
 
 ```python
-fig = plt.figure()
-ax = Axes3D(fig)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 plot3d.plot_plane(ax, o, n, size=5)
-plot3d.plot_vector(fig, o, u)
-plot3d.plot_vector(fig, o, p, 'cyan')
-plot3d.plot_vector(fig, o, 3*np.array(n), 'red')
+plot3d.plot_vector(ax, o, u)
+plot3d.plot_vector(ax, o, p, 'cyan')
+plot3d.plot_vector(ax, o, 3*np.array(n), 'red')
 plt.savefig('15_9.png')
 ```
 
@@ -385,17 +378,16 @@ o = np.array([5,5,5])
 u1 = np.array([3,3,3])
 u2 = np.array([-3,0,3])
 
-fig = plt.figure()
-ax = Axes3D(fig)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 plot3d.plot_plane(ax, o, n, size=5)
 p1 = u1 - (np.dot(u1,n) / np.dot(n,n)) * n
 p2 = u2 - (np.dot(u2,n) / np.dot(n,n)) * n
-plot3d.plot_vector(fig, o, 3*n,'red')
-plot3d.plot_vector(fig, o, u1)
-plot3d.plot_vector(fig, o, u2)
-plot3d.plot_vector(fig, o, p1,'cyan')
-plot3d.plot_vector(fig, o, p2,'skyblue')
-plot3d.plot_vector(fig, o, 0.5*np.cross(p1,p2),'yellow')
+plot3d.plot_vector(ax, o, 3*n,'red')
+plot3d.plot_vector(ax, o, u1)
+plot3d.plot_vector(ax, o, u2)
+plot3d.plot_vector(ax, o, p1,'cyan')
+plot3d.plot_vector(ax, o, p2,'skyblue')
+plot3d.plot_vector(ax, o, 0.5*np.cross(p1,p2),'yellow')
 ax.view_init(elev=30, azim=30)
 plt.savefig('15_10.png')
 ```
@@ -432,12 +424,12 @@ eksi olacağı için 360'dan çıkartma irdelemesini bu şekilde yapabiliriz.
 import numpy.linalg as lin
 deg = np.rad2deg(np.arccos(np.dot(p1,p2) / (lin.norm(p1)*lin.norm(p2))))
 s = np.dot(n, np.cross(p1,p2))
-print 'deg', deg
-if s < 0: print '360 - deg =', 360-deg
-else: print 'deg', deg
+print ('deg', deg)
+if s < 0: print ('360 - deg =', 360-deg)
+else: print ('deg', deg)
 ```
 
-```
+```text
 deg 135.0
 360 - deg = 225.0
 ```
