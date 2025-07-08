@@ -160,26 +160,23 @@ def deriv(im1, im2):
     ft = ft[0:ft.shape[0]-1, 0:ft.shape[1]-1];
     return fx, fy, ft
 
-import warnings
-warnings.simplefilter("ignore", np.ComplexWarning)
-
 im1 = np.asarray(Image.open('flow1-bw-0.png'))
 im2 = np.asarray(Image.open("upright.png"))
 fx, fy, ft = deriv(im1, im2)
-print fx[:5]
+print (fx[:5])
 ```
 
-```
-[[ 34.37477011  45.94010835  51.877951   ...,  53.83264716  51.877951
-   45.94010835]
- [ 26.01168277  34.76327322  39.25648957 ...,  40.73562489  39.25648957
-   34.76327322]
- [ 11.72919465  15.67546405  17.70154632 ...,  18.36851839  17.70154632
-   15.67546405]
- [  3.51803959   4.70167857   5.30937909 ...,   5.50942984   5.30937909
-    4.70167857]
- [  0.6961225    0.93033183   1.05057892 ...,   1.09016341   1.05057892
-    0.93033183]]
+```text
+[[32.07763979 48.21839171 58.5675253  ... 63.94363287 62.82211772
+  58.56746171]
+ [26.32259667 39.56753942 48.05993696 ... 52.47151812 51.55121378
+  48.05988478]
+ [14.51156379 21.81345859 26.49529034 ... 28.92738099 28.42002014
+  26.49526157]
+ [ 5.34221958  8.03030516  9.75385292 ... 10.64919146 10.462414
+   9.75384233]
+ [ 1.3027865   1.95831957  2.37863452 ...  2.59697728  2.55142858
+   2.37863194]]
 ```
 
 ```python
@@ -190,12 +187,12 @@ import numpy.linalg as lin
 def lk(im1, im2, i, j, window_size) :
     fx, fy, ft = deriv(im1, im2)
     halfWindow = np.floor(window_size/2)
-    curFx = fx[i-halfWindow-1:i+halfWindow, 
-               j-halfWindow-1:j+halfWindow]
-    curFy = fy[i-halfWindow-1:i+halfWindow, 
-               j-halfWindow-1:j+halfWindow]
-    curFt = ft[i-halfWindow-1:i+halfWindow, 
-               j-halfWindow-1:j+halfWindow]
+    curFx = fx[int(i-halfWindow-1):int(i+halfWindow), 
+               int(j-halfWindow-1):int(j+halfWindow)]
+    curFy = fy[int(i-halfWindow-1):int(i+halfWindow), 
+               int(j-halfWindow-1):int(j+halfWindow)]
+    curFt = ft[int(i-halfWindow-1):int(i+halfWindow), 
+               int(j-halfWindow-1):int(j+halfWindow)]
     curFx = curFx.T
     curFy = curFy.T
     curFt = curFt.T
@@ -216,7 +213,6 @@ def test(image1,image2,output):
     im2 = np.asarray(Image.open(image2))
     u, v = lk(im1, im2, x, y, win)
     plt.imshow(im1, cmap='gray')
-    plt.hold(True)
     plt.plot(x,y,'+r');
     # 3 ile carptik cunku vektor degisimi iyi hesaplandi ama
     # grafikleme icin cok ufakti, ikinci yesil nokta iyi gozuksun
@@ -311,6 +307,10 @@ prevgray = cv2.imread('106.jpg', cv2.IMREAD_GRAYSCALE)
 gray = cv2.imread('107.jpg', cv2.IMREAD_GRAYSCALE)
 flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
 cv2.imwrite('pde_lk_01.png', draw_flow(gray, flow))
+```
+
+```text
+Out[1]: True
 ```
 
 ![](pde_lk_01.png)
