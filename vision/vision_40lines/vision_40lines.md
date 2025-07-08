@@ -8,7 +8,9 @@ noktasıdır. Birleşme noktalarının bir nokta olarak ortaya çıkmasının se
 (diijal kameraya) yansıması onlarin tek noktada birleşmesine sebep olur.
 
 ![](vision_40lines_05.png)
+
 ![](vision_40lines_07.png)
+
 ![](vision_40lines_10.png)
 
 Üstte bazı örnekler görüyoruz. Soldaki imajda birleşme noktası tren
@@ -190,11 +192,11 @@ zaman kesişim noktasının hesabı gayet basit, mesela üstteki örnek için
 
 ```python
 p = np.cross(l1,l2) 
-print p / p[2]
+print (p / p[2])
 ```
 
-```
-[-2  6  1]
+```text
+[-1.66666667  6.66666667  1.        ]
 ```
 
 Hakikaten de kesişim noktasının $x=-2,y=6$'da olduğunu görebiliyoruz. 
@@ -222,10 +224,10 @@ $$ \ell \cdot (-4,5,1) = 0$$
 denklemlerini tatmin etmelidir. O zaman çizgi 
 
 ```python
-print np.cross(np.array([3,1,1]), np.array([-4,5,1]))
+print (np.cross(np.array([3,1,1]), np.array([-4,5,1])))
 ```
 
-```
+```text
 [-4 -7 19]
 ```
 
@@ -262,7 +264,7 @@ def vanish(fin):
     for (l1,l2) in itertools.product(new_lines,new_lines):
         if np.all(l1==l2): continue
         inters = np.cross(l1,l2) 
-        inters = inters / inters[2]
+        inters = inters / (inters[2]+1e-5)
         if np.sqrt((160-inters[0])**2 + (120-inters[1])**2) < 100: 
             res.append(inters)
     res = np.array(res)
@@ -358,25 +360,25 @@ plot_sep(a2,color='blue')
 
 pt = np.array([10.,10.,1.])
 plt.plot(pt[0],pt[1],'gd')
-print np.dot(a1,pt)
-print np.dot(a2,pt)
+print (np.dot(a1,pt))
+print (np.dot(a2,pt))
 
 pt = np.array([14.,15.,1.])
 plt.plot(pt[0],pt[1],'rd')
-print np.dot(a1,pt)
-print np.dot(a2,pt)
+print (np.dot(a1,pt))
+print (np.dot(a2,pt))
 
 pt = np.array([8.,18.,1.])
 plt.plot(pt[0],pt[1],'rx')
-print np.dot(a1,pt)
-print np.dot(a2,pt)
+print (np.dot(a1,pt))
+print (np.dot(a2,pt))
 
 plt.xlim(5,15)
 plt.ylim(0,20)
 plt.savefig('14_5.png')
 ```
 
-```
+```text
 -10.0
 -4.0
 8.0

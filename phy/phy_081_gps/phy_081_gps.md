@@ -66,11 +66,11 @@ from datetime import datetime
 millis = 1493036068479
 dt = datetime.fromtimestamp(millis/1000.0)
 dtj = orbital.jdays(datetime.fromtimestamp(millis/1000.0))
-print dtj
+print (dtj)
 ```
 
-```
-2457868.09339
+```text
+2457868.1350518405
 ```
 
 Azimut, yükseklik hesapları ölçüm aldığımız an için [1]'den uyduların
@@ -81,20 +81,20 @@ altta,
 ```python
 import pandas as pd
 
-df = pd.read_csv('Waas_Sv_Status.txt',sep='\s*',index_col=0)
+df = pd.read_csv('Waas_Sv_Status.txt',sep='\\s+',index_col=0)
 sats = [11,18,16,24,31]
-df = df.ix[sats]
-print df[['Lat','Long']]
+df = df.iloc[sats]
+print (df[['Lat','Long']])
 ```
 
-```
+```text
            Lat        Long
 PRN                       
-11   30.518234 -164.259351
-18    1.027207  -57.092297
-16  -55.533692 -122.123140
-24   45.299193   17.625305
-31   13.344068 -102.581100
+12   45.643719   -8.342378
+19   52.567841   73.283874
+17   56.055924  104.638913
+25   19.295093  -39.993332
+32   54.914283  -80.553899
 ```
 
 Ölçüm alınan yerin kordinatları altta `lat,lon`  içinde. Şimdi bu
@@ -106,17 +106,17 @@ lon = 13.442383333333332
 lat = 52.483086666666665
 alt = 0
 sat_alt = 20*1000*1000
-print df.apply(lambda x: orbital.get_observer_look(x.Long, \
-               x.Lat, sat_alt, dt, lon, lat, alt),axis=1)
+print (df.apply(lambda x: orbital.get_observer_look(x.Long, \
+               x.Lat, sat_alt, dt, lon, lat, alt),axis=1))
 ```
 
-```
+```text
 PRN
-11     (358.005492414, -6.99245765159, 20007166.964)
-18        (254.95693367, 12.52250143, 20004991.9173)
-16    (245.378821316, -64.1703023622, 20012088.4789)
-24     (157.451172143, 82.3085240779, 20000057.3405)
-31    (298.723320912, -4.42938085218, 20006877.4437)
+12    (252.96756650284624, 74.24986185090287, 200002...
+19    (65.33106196118959, 54.65641812553885, 2000117...
+17    (47.3381746616714, 40.595771507717835, 2000223...
+25    (252.10771804581407, 37.17878086875334, 200025...
+32    (312.75331684644624, 38.64240556098356, 200023...
 dtype: object
 ```
 
@@ -536,16 +536,16 @@ for iter in range(20):
     x = x+deltahat
     if np.max(np.abs(deltahat))<0.001: break
 
-print 'iter', iter
-print np.reshape(x, (4,1))
+print ('iter', iter)
+print (np.reshape(x, (4,1)))
 ```
 
-```
+```text
 iter 4
-[[ 3507889.12958827]
- [  780490.02116445]
- [ 5251783.75537277]
- [   25511.14592576]]
+[[3507889.12958826]
+ [ 780490.02116445]
+ [5251783.75537276]
+ [  25511.14592576]]
 ```
 
 Döngü beş kez tekrarladı ama dünya merkezinden başlamış olmamıza rağmen
@@ -553,11 +553,11 @@ sonuca çabukça erişti. ECEF sisteminden enlem / boylam çevirimini yapalım,
 
 ```python
 import orbital
-print orbital.ecef2lla(x)
+print (orbital.ecef2lla(x))
 ```
 
-```
-(55.796250049381591, 12.543735075055356, 73.165498103015125)
+```text
+(np.float64(55.79625004938158), np.float64(12.543735075055357), np.float64(73.16549809463322))
 ```
 
 Bu kordinatları bir harita uygulamasından kontrol ettik; yazar Danimarka'da
