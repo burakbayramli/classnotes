@@ -350,6 +350,8 @@ plt.savefig('14_4.png')
 
 ![](vision_40lines_03.png)
 
+![](14_4.png)
+
 Noktaların çizginin neresine düştüğünden hareketle bazı $wx + b$ sonuçları
 
 ```python
@@ -388,6 +390,8 @@ plt.savefig('14_5.png')
 ```
 
 ![](vision_40lines_04.png)
+
+![](14_5.png)
 
 Kaynaklar 
 
