@@ -82,7 +82,7 @@ bakalım. Şimdi ham veriye en uygun olan dağılımı bulmaya çalışacağız.
 
 ```python
 import pandas as pd
-df = pd.read_csv('../stat_tests2/vehicles.csv',header=None)
+df = pd.read_csv('../stat_040_tests2/vehicles.csv',header=None)
 df.hist(bins=13)
 plt.savefig('stat_kl_02.png')
 ```
@@ -96,11 +96,11 @@ seçimi KL mesafesi üzerinden yapabilirdik. Her iki durumda da dağılım
 parametrelerini veriden tahmin ediyor olurduk,
 
 ```python
-print np.float(df.mean()), np.float(df.std())
+print (float(df.mean()), float(df.std()))
 ```
 
-```
-9.09433962264 3.54166574177
+```text
+9.09433962264151 3.5416657417682846
 ```
 
 Poisson durumunda ortalama hesabı $\hat{\lambda}$ için, Gaussian'da ise
@@ -121,33 +121,35 @@ s = 4000
 b = 15
 r1 = scipy.stats.poisson.rvs(mu=8, size=s)
 plt.hist(r1, bins=b,color='b')
-plt.title('Poisson $\lambda = 8$')
+plt.title('Poisson $\\lambda = 8$')
 plt.xlim(0,20)
 plt.savefig('stat_kl_04.png')
 plt.figure()
 r2 = scipy.stats.norm.rvs(2, 1, size=s)
 plt.hist(r2, bins=b,color='b')
-plt.title('Gaussian $\mu = 2,\sigma=1$')
+plt.title('Gaussian $\\mu = 2,\\sigma=1$')
 plt.xlim(0,20)
 plt.savefig('stat_kl_06.png')
 plt.figure()
 r3 = scipy.stats.poisson.rvs(mu=9.0943, size=s)
 plt.hist(r3, bins=b,color='b')
-plt.title('Poisson $\lambda = 9.1$')
+plt.title('Poisson $\\lambda = 9.1$')
 plt.xlim(0,20)
 plt.savefig('stat_kl_07.png')
 plt.figure()
 r4 = scipy.stats.norm.rvs(9.1, 3.54, size=s)
 plt.hist(r4, bins=b,color='b')
-plt.title('Gaussian $\mu = 9.1,\sigma=3.54$')
+plt.title('Gaussian $\\mu = 9.1,\\sigma=3.54$')
 plt.xlim(0,20)
 plt.savefig('stat_kl_08.png')
 ```
 
 ![](stat_kl_04.png)
+
 ![](stat_kl_06.png)
 
 ![](stat_kl_07.png)
+
 ![](stat_kl_08.png)
 
 Şimdi veri ve tüm müstakbel analitik yoğunluklar arasında KL mesafelerini
@@ -164,17 +166,17 @@ h1 = np.histogram(r1, bins=b, density=True)[0]+eps
 h2 = np.histogram(r2, bins=b, density=True)[0]+eps
 h3 = np.histogram(r3, bins=b, density=True)[0]+eps
 h4 = np.histogram(r4, bins=b, density=True)[0]+eps
-print 'Poisson lambda = 8', kl(h1, dh)
-print 'Gaussian mu = 2,sigma=1', kl(h2, dh)
-print 'Poisson lambda = 9.1', kl(h3, dh)
-print 'Gaussian mu = 9.1,sigma=3.54', kl(h4, dh)
+print ('Poisson lambda = 8', kl(h1, dh))
+print ('Gaussian mu = 2,sigma=1', kl(h2, dh))
+print ('Poisson lambda = 9.1', kl(h3, dh))
+print ('Gaussian mu = 9.1,sigma=3.54', kl(h4, dh))
 ```
 
-```
-Poisson lambda = 8 0.14722344735
-Gaussian mu = 2,sigma=1 6.39721632939
-Poisson lambda = 9.1 0.133099166073
-Gaussian mu = 9.1,sigma=3.54 0.200156046018
+```text
+Poisson lambda = 8 0.13363947875065815
+Gaussian mu = 2,sigma=1 6.414847292773472
+Poisson lambda = 9.1 0.11698854159411179
+Gaussian mu = 9.1,sigma=3.54 0.21584692318650542
 ```
 
 En yakın olan Poisson $\lambda=9.1$ olarak gözüküyor.
@@ -192,16 +194,29 @@ böylece görüntüsel olarak iki bölgeyi karşılaştırabiliriz.
 ```python
 from PIL import Image, ImageDraw
 
-def draw_boxes_color(bs,imfile):
-    im = Image.open(imfile).convert('HSV')
-    arr = np.asarray(im)
+def draw_boxes(bs, imfile):
+    im = Image.open(imfile).convert('L')
     draw = ImageDraw.Draw(im)
-    colors = ['magenta','green','white','red','yellow']
-    for i,b in enumerate(bs):
-        fr = b[0]; to = b[1]
-        bnew = [(fr[0],arr.shape[0]-fr[1]),(to[0],arr.shape[0]-to[1])]
-        draw.rectangle(bnew,outline=colors[i])
-    plt.imshow(im)
+    arr = np.asarray(im)
+    colors = ['white', 'yellow', 'white', 'white']
+
+    for i, b in enumerate(bs):
+        fr = b[0]  # (x0, y0) original top-left
+        to = b[1]  # (x1, y1) original bottom-right
+        x0_new = fr[0]
+        y0_new = arr.shape[0] - fr[1]
+        x1_new = to[0]
+        y1_new = arr.shape[0] - to[1]
+
+        left = min(x0_new, x1_new)
+        top = min(y0_new, y1_new)
+        right = max(x0_new, x1_new)
+        bottom = max(y0_new, y1_new)
+
+        bnew = [(left, top), (right, bottom)]
+        draw.rectangle(bnew, outline=colors[i % len(colors)]) # Use modulo for colors to avoid index error
+    plt.imshow(im, cmap=plt.cm.Greys_r)
+
 
 def get_pixels(box, im):
     arr = np.array(im)
@@ -220,13 +235,14 @@ box1 = [(35,144),(87,292)]
 box2 = [(106,183),(158,287)]
 box3 = [(117,86),(132,160)]
 f = '../../vision/vision_50colreg/castle.png'
-draw_boxes_color([box1,box2],f)
+draw_boxes([box1,box2],f)
 plt.savefig('stat_kl_03.png')
-draw_boxes_color([box2,box3],f)
+draw_boxes([box2,box3],f)
 plt.savefig('stat_kl_05.png')
 ```
 
 ![](stat_kl_03.png)
+
 ![](stat_kl_05.png)
 
 Renklerin HSV kodlamasını kullanalım, o zaman her piksel kordinatında 3
@@ -244,23 +260,23 @@ def box_kl_dist(b1,b2,im):
     r = [(0,255),(0,255),(0,255)]
 
     arr1 = np.reshape(arr1, (arr1.shape[0]*arr1.shape[1],3))
-    H1, edges = np.histogramdd(arr1, bins=(8, 8, 4), normed=True, range=r)
+    H1, edges = np.histogramdd(arr1, bins=(8, 8, 4), density=True, range=r)
     H1 = np.reshape(H1, (H1.shape[0]*H1.shape[1]*H1.shape[2], 1))
 
     arr2 = get_pixels(b2, im)
     arr2 = np.reshape(arr2, (arr2.shape[0]*arr2.shape[1],3))
-    H2, edges = np.histogramdd(arr2, bins=(8, 8, 4), normed=True, range=r)
+    H2, edges = np.histogramdd(arr2, bins=(8, 8, 4), density=True, range=r)
     H2 = np.reshape(H2, (H2.shape[0]*H2.shape[1]*H2.shape[2], 1))
 
     return kl(H1+eps, H2+eps)
 
-print box_kl_dist(box1, box2, f)
-print box_kl_dist(box2, box3, f)
+print (box_kl_dist(box1, box2, f))
+print (box_kl_dist(box2, box3, f))
 ```
 
-```
-7.55231179178e-06
-7.30926985663e-07
+```text
+7.552311791783315e-06
+7.309269856628971e-07
 ```
 
 İkinci karşılaştırmada mesafe daha yakın duruyor; hakikaten de resimlere

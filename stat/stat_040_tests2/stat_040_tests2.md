@@ -537,6 +537,7 @@ vehicle = [2, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6,\
 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15,\
 15, 16, 16, 16, 16, 18]
 df = pd.DataFrame(vehicle)
+df.to_csv('vehicles.csv',index=None,header=None)
 ```
 
 Verinin histogramına bakalım,
