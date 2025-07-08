@@ -18,10 +18,10 @@ import numpy.linalg as lin
 A = [[3,4,3],[5,5,6],[5,5,5]]
 A = np.array(A)
 [V,D] = lin.eig(A)
-print 'ozvektorler'
-print D
-print 'ozdegerler'
-print V
+print ('ozvektorler')
+print (D)
+print ('ozdegerler')
+print (V)
 ```
 
 ```
@@ -149,8 +149,8 @@ def skew(a):
 ```
 
 ```python
-A = np.array([[1,2,3]]).T
-print skew(A)
+A = np.array([1,2,3])
+print (skew(A))
 ```
 
 ```
@@ -456,6 +456,4 @@ Kaynaklar
 [5] Bayramlı, Lineer Cebir, *Ders 5*
 
 [6] Bayramlı, *Fizik - Döndürme (Rotation)*
-
-
 
