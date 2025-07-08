@@ -147,11 +147,11 @@ def create_training_test(df,collim=2,rowlim=200):
     test_data = []
     df_train = df.copy()
     for u in range(df.shape[0]):
-        row = df.ix[u]; idxs = row.index[row.notnull()]
+        row = df.iloc[u]; idxs = row.index[row.notnull()]
         if len(idxs) > collim:
-            i = random.choice(idxs); val = df.ix[u,i]
+            i = random.choice(idxs); val = df.iloc[u,i]
             test_data.append([u,i,val])
-            df_train.ix[u,i] = np.nan
+            df_train.iloc[u,i] = np.nan
         if len(test_data) > rowlim: break
     return df_train, test_data
 
@@ -165,7 +165,7 @@ def ssvd(df_train,k):
     q_i = np.random.rand(k, n)
     r_ui = np.array(df_train)
     for u in range(m):
-        row = df_train.ix[u]; idxs = row.index[row.notnull()]
+        row = df_train.iloc[u]; idxs = row.index[row.notnull()]
         for i in idxs:
             i = int(i)
             r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])
@@ -221,23 +221,23 @@ Basit bir örnek
 import pandas as pd
 import ssvd
 d =  np.array(
-[[  5.,   5.,   3.,  nan,   5.,   5.],
- [  5.,  nan,   4.,  nan,   4.,   4.],
- [ nan,   3.,  nan,   5.,   4.,   5.],
+[[  5.,   5.,   3.,  np.nan,   5.,   5.],
+ [  5.,  np.nan,   4.,  np.nan,   4.,   4.],
+ [ np.nan,   3.,  np.nan,   5.,   4.,   5.],
  [  5.,   4.,   3.,   3.,   5.,   5.],
- [  5.,   5.,  nan,  nan,  nan,   5.]
+ [  5.,   5.,  np.nan,  np.nan,  np.nan,   5.]
 ])
 data = pd.DataFrame (d, columns=['0','1','2','3','4','5'],
        index=['Ben','Tom','John','Fred','Bob'])
 avg_movies_data = data.mean(axis=0)
 data_user_offset = data.apply(lambda x: x-avg_movies_data, axis=1)
 q_i,p_u = ssvd.ssvd(data_user_offset,k=3)
-print 'q_i',q_i
-print 'p_u',p_u
+print ('q_i',q_i)
+print ('p_u',p_u)
 u = 4; i = 2 # Bob icin tahmin yapalim
-r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:]) + avg_movies_data.ix[i] + \
-           np.nan_to_num(data_user_offset.ix[u,i])
-print r_ui_hat
+r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:]) + avg_movies_data.iloc[i] + \
+           np.nan_to_num(data_user_offset.iloc[u,i])
+print (r_ui_hat)
 ```
 
 ```
@@ -273,11 +273,11 @@ gerekli eğitim dosyası üretildiğini farzederek,
 
 ```python
 import pandas as pd, os
-df = pd.read_csv("%s/Downloads/movielens.csv" % os.environ['HOME'] ,sep=';')
-print df.shape
-df = df.ix[:,1:3700] # id kolonunu atla,
+df = pd.read_csv("/opt/Downloads/ml1m/movielens.csv" ,sep=';')
+print (df.shape)
+df = df.iloc[:,1:3700] # id kolonunu atla,
 df.columns = range(3699) # kolon degerlerini tekrar indisle
-print df.shape
+print (df.shape)
 ```
 
 ```
@@ -288,7 +288,7 @@ print df.shape
 ```python
 avg_movies = df.mean(axis=0)
 df_user_offset = df.apply(lambda x: x-avg_movies, axis=1)
-print df.ix[6,5], avg_movies.ix[5], df_user_offset.ix[6,5]
+print (df.iloc[6,5], avg_movies.iloc[5], df_user_offset.iloc[6,5])
 ```
 
 ```
@@ -300,7 +300,7 @@ Eğitim ve test verisi yaratıyoruz,
 ```python
 import ssvd
 df_train, test_data = ssvd.create_training_test(df_user_offset,rowlim=500,collim=300)
-print len(test_data)
+print ( len(test_data))
 ```
 
 ```
@@ -319,7 +319,7 @@ for u,i,real in test_data:
     r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])
     rmse += (real-r_ui_hat)**2
     n += 1
-print "rmse", np.sqrt(rmse / n)
+print ("rmse", np.sqrt(rmse / n))
 ```
 
 ```
@@ -378,25 +378,25 @@ bulunabilir.
 Tavsiye
 
 ```python
-movies = pd.read_csv("../../stat/stat_pandas_ratings/movies.dat",\
-         sep='::',names=['idx','movie','type'])
+movies = pd.read_csv("/opt/Downloads/ml1m/movies.dat",engine='python',
+                     sep='::',names=['idx','movie','type'],encoding='latin-1')
 def eval_user(u):
     res = {}
     for i in range(df_user_offset.shape[1]):
         r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])
-        res[i] = float(r_ui_hat) + avg_movies.ix[i] + df_user_offset.ix[u,i]
+        res[i] = float(r_ui_hat) + avg_movies.iloc[i] + df_user_offset.iloc[u,i]
     res = sorted(res.items(), key=lambda x:x[1], reverse=True)
 
-    print "\n\nTavsiyeler\n\n"
+    print ("\n\nTavsiyeler\n\n")
     for j,(si,sm) in enumerate(res):
-        print movies[movies['idx'] == si]['movie']
+        print (movies[movies['idx'] == si]['movie'])
         if j == 10: break
 
-    print "\n\nMevcut Filmler\n\n"
-    row = df.ix[u]
+    print ("\n\nMevcut Filmler\n\n")
+    row = df.iloc[u]
     idxs = row.index[row.notnull()]
     for j,idx in enumerate(idxs):
-        print movies[movies['idx'] == idx]['movie'], row[idx]
+        print (movies[movies['idx'] == idx]['movie'], row[idx])
         if j == 10: break
 
 eval_user(300)
@@ -509,188 +509,6 @@ Name: movie, dtype: object 2.0
 Name: movie, dtype: object 3.0
 ```
 
-Numba ve Funk SVD
-
-Eğer Numba [13] kullanırsak, SVD kodunu çok daha hızlı işletebiliriz. Ayrıca
-Funk'ın kodlaması (ki alttaki kodu onu temel alacak) biraz daha ilginç, mesela
-en dış döngü özellikler (feature) geziyor, onun içindeki birkaç yüz kez yine
-kendi içinde olan tahmin/hata hesabını yapıyor, tüm veri seti üzerinde. Bunun
-için Movielens 100k verisi lazım, ardından `data_m100k.py` ile veri
-yaratılır,
-
-```python
-# Requires Movielens 100k data 
-from scipy.io import mmread, mmwrite
-import numpy as np, time, sys
-from numba import jit
-import os
-
-def create_user_feature_matrix(review_matrix, NUM_FEATURES):
-    num_users = review_matrix.shape[0]
-    user_feature_matrix = 1./NUM_FEATURES * \
-        np.random.randn(NUM_FEATURES, num_users).astype(np.float32)
-    return user_feature_matrix
-
-def create_movie_feature_matrix(review_matrix, NUM_FEATURES):
-    num_movies = review_matrix.shape[1]
-    movie_feature_matrix = 1./NUM_FEATURES * \
-        np.random.randn(NUM_FEATURES, num_movies).astype(np.float32)
-    return movie_feature_matrix
-
-@jit(nopython=True)
-def predict_rating(user_id, movie_id, user_feature_matrix, movie_feature_matrix):
-    rating = 1.
-    for f in range(user_feature_matrix.shape[0]):
-        rating += \
-            user_feature_matrix[f, user_id] * \
-            movie_feature_matrix[f, movie_id]
-    if rating > 5: rating = 5
-    elif rating < 1: rating = 1
-    return rating
-
-@jit(nopython=True)
-def sgd_inner(feature, A_row, A_col, A_data,
-              user_feature_matrix, movie_feature_matrix,
-              NUM_FEATURES):
-    K = 0.015
-    LEARNING_RATE = 0.001
-    squared_error = 0
-    for k in range(len(A_data)):
-        user_id = A_row[k]
-        movie_id = A_col[k]
-        rating = A_data[k]
-        p = predict_rating(user_id,
-                           movie_id,
-                           user_feature_matrix,
-                           movie_feature_matrix)
-        err = rating - p            
-        squared_error += err ** 2
-        user_feature_value = user_feature_matrix[feature, user_id]
-        movie_feature_value = movie_feature_matrix[feature, movie_id]
-        user_feature_matrix[feature, user_id] += \
-            LEARNING_RATE * (err * movie_feature_value - K * user_feature_value)
-        movie_feature_matrix[feature, movie_id] += \
-            LEARNING_RATE * (err * user_feature_value - K * movie_feature_value)
-
-    return squared_error
-
-def calculate_features(A_row, A_col, A_data,
-                       user_feature_matrix, movie_feature_matrix,
-                       NUM_FEATURES):
-    MIN_IMPROVEMENT = 0.0001
-    MIN_ITERATIONS = 200
-    rmse = 0
-    last_rmse = 0
-    print len(A_data)
-    num_ratings = len(A_data)
-    for feature in xrange(NUM_FEATURES):
-        iter = 0
-        while (iter < MIN_ITERATIONS) or  (rmse < last_rmse - MIN_IMPROVEMENT):
-            last_rmse = rmse
-            squared_error = sgd_inner(feature, A_row, A_col, A_data,
-                                      user_feature_matrix, movie_feature_matrix,
-                                      NUM_FEATURES)
-            rmse = (squared_error / num_ratings)
-            iter += 1
-        print ('Squared error = %f' % squared_error)
-        print ('RMSE = %f' % rmse)
-        print ('Feature = %d' % feature)
-    return last_rmse
-
-def main():
-    LAMBDA = 0.02
-    NUM_FEATURES = 30
-
-    A = mmread('%s/Downloads/A_m100k_train' % os.environ['HOME'])
-
-    user_feature_matrix = create_user_feature_matrix(A, NUM_FEATURES)
-    movie_feature_matrix = create_movie_feature_matrix(A, NUM_FEATURES)
-
-    A = A.tocoo()
-
-    rmse = calculate_features(A.row, A.col, A.data,
-                              user_feature_matrix, movie_feature_matrix,
-                              NUM_FEATURES )
-    print 'rmse', rmse
-
-    np.savetxt("/tmp/user_feature_matrix2.dat", user_feature_matrix)
-    np.savetxt("/tmp/movie_feature_matrix2.dat", movie_feature_matrix)
-
-if __name__ == "__main__": 
-    main()
-```
-
-Üstteki script'i işlettikten sonra bazı tavsiyeleri gösterebiliriz,
-
-```python
-import pandas as pd, os
-items_file = '%s/Downloads/ml-100k/u.item' % os.environ['HOME']
-item_df = pd.read_csv(items_file, sep='|',header=None)
-item_df['idx'] = item_df[0] - 1
-item_df = item_df.set_index('idx')
-
-from scipy.io import mmread, mmwrite
-import numpy as np, time, sys, os
-import funk2, pandas as pd
-
-user_feature_matrix = np.loadtxt("/tmp/user_feature_matrix2.dat")
-movie_feature_matrix = np.loadtxt("/tmp/movie_feature_matrix2.dat")
-
-preds = []
-user_id = 110
-for movie_id in range(1682):
-    pred = funk2.predict_rating(user_id, movie_id, user_feature_matrix, movie_feature_matrix)
-    preds.append([movie_id, pred])
-
-preds_df = pd.DataFrame(preds,columns=['movie','score'])
-preds_df.sort_index(by='score',ascending=False,inplace=True)
-preds_df['movie_name'] = item_df[1]
-print preds_df.head(10)
-```
-
-```
-      movie     score                                         movie_name
-1448   1448  4.600873                             Pather Panchali (1955)
-407     407  4.538450                              Close Shave, A (1995)
-168     168  4.424078                         Wrong Trousers, The (1993)
-482     482  4.406603                                  Casablanca (1942)
-99       99  4.402690                                       Fargo (1996)
-11       11  4.362673                         Usual Suspects, The (1995)
-319     319  4.323309  Paradise Lost: The Child Murders at Robin Hood...
-49       49  4.315158                                   Star Wars (1977)
-113     113  4.308009  Wallace & Gromit: The Best of Aardman Animatio...
-172     172  4.288836                         Princess Bride, The (1987)
-```
-
-Bu kişinin seyrettiği ve en çok beğendiği filmler altta
-
-```python
-A = mmread('%s/Downloads/A_m100k_train' % os.environ['HOME']).tocsc()
-movies = A[user_id,:].nonzero()[1]
-ratings = A[user_id,A[user_id,:].nonzero()[1]]
-ratings = np.ravel(ratings.todense())
-likes_df = pd.DataFrame()
-likes_df['movie'] = movies; likes_df['rating'] = ratings
-likes_df = likes_df.set_index('movie')
-likes_df.sort_index(by='rating',ascending=False,inplace=True)
-likes_df['movie_name'] = item_df[1]
-print likes_df.head(10)
-```
-
-```
-       rating                     movie_name
-movie                                       
-301         5       L.A. Confidential (1997)
-314         5               Apt Pupil (1998)
-257         4                 Contact (1997)
-285         4    English Patient, The (1996)
-303         4           Fly Away Home (1996)
-310         4  Wings of the Dove, The (1997)
-353         4     Wedding Singer, The (1998)
-302         3             Ulee's Gold (1997)
-320         3                  Mother (1996)
-304         2          Ice Storm, The (1997)
-```
 
 Kaynaklar
 
@@ -726,9 +544,6 @@ Kaynaklar
 
 [12] Gleich, *SVD on the Netflix matrix*,
      [https://dgleich.wordpress.com/2013/10/19/svd-on-the-netflix-matrix](https://dgleich.wordpress.com/2013/10/19/svd-on-the-netflix-matrix)
-
-[13] Bayramlı, *Numba, LLVM, ve SVD*, 
-     [https://burakbayramli.github.io/dersblog/sk/2014/09/numba-llvm-ve-svd.html](https://burakbayramli.github.io/dersblog/sk/2014/09/numba-llvm-ve-svd.html)
 
 [14] Bayramlı, Istatistik, *SVD, Toplu Tavsiye*
 

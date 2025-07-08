@@ -78,8 +78,8 @@ def decl(month, day):
     n = (month-1)*30. + day # yaklasik gun hesabi, her ayda 30 gun
     return -23.44 * np.cos( np.radians(360/365. * (n+10.)) )
 
-print decl(9,20) # eylul 20
-print decl(1,10) # ocak 10
+print (decl(9,20)) # eylul 20
+print (decl(1,10)) # ocak 10
 ```
 
 ```
@@ -96,7 +96,7 @@ Cevap
 
 ```python
 e = 30; d = -22
-print 'enlem', 90 - e + d, 'derece'
+print ('enlem', 90 - e + d, 'derece')
 ```
 
 ```
@@ -111,7 +111,7 @@ Cevap
 
 ```python
 e = 65; d = 1.5
-print 'enlem', 90 - e + d, 'derece'
+print ('enlem', 90 - e + d, 'derece')
 ```
 
 ```
@@ -153,7 +153,7 @@ gittiğimiz için Greenwich'ten ilerideyiz, aradaki fark 7 saat 43 dakika. Boyla
 nedir?
 
 ```python
-print ((7*60)+43) * 0.25, 'derece E (Dogu)'
+print (((7*60)+43) * 0.25, 'derece E (Dogu)')
 ```
 
 ```
@@ -166,7 +166,7 @@ Kaptan Cook bir seyahatinde vardığı bir limanda şu hesabı yaptı; öğlen v
 yanında getirdiği saat Londra için sabah 5:06 diyordu.
 
 ```python
-print ((5*60)+6) * 0.25, 'derece W (Bati)'
+print (((5*60)+6) * 0.25, 'derece W (Bati)')
 ```
 
 ```
@@ -203,8 +203,8 @@ def find_city(lat,lon):
 
 df = pd.read_csv('world_cities.csv',index_col=['city','country','province'])
 df = df.drop(['city_ascii','pop'],axis=1)
-print df[1000:1005]
-print '\n', find_city(41.0082, 28.978) # bir test
+print (df[1000:1005])
+print ('\n', find_city(41.0082, 28.978)) # bir test
 ```
 
 ```
@@ -222,7 +222,7 @@ Valenca      Brazil  Bahia    -13.359612 -39.080028   BR  BRA
 Kaptan Cook hangi şehire yakındı? 
 
 ```python
-print find_city(37.3, -76.5) # Bati, W eksi olarak gosteriliyor
+print (find_city(37.3, -76.5)) # Bati, W eksi olarak gosteriliyor
 ```
 
 ```

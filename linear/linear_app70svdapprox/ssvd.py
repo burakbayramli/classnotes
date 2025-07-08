@@ -6,11 +6,11 @@ def create_training_test(df,collim=2,rowlim=200):
     test_data = []
     df_train = df.copy()
     for u in range(df.shape[0]):
-        row = df.ix[u]; idxs = row.index[row.notnull()]
+        row = df.iloc[u]; idxs = row.index[row.notnull()]
         if len(idxs) > collim:
-            i = random.choice(idxs); val = df.ix[u,i]
+            i = random.choice(idxs); val = df.iloc[u,i]
             test_data.append([u,i,val])
-            df_train.ix[u,i] = np.nan
+            df_train.iloc[u,i] = np.nan
         if len(test_data) > rowlim: break
     return df_train, test_data
 
@@ -24,7 +24,7 @@ def ssvd(df_train,k):
     q_i = np.random.rand(k, n)
     r_ui = np.array(df_train)
     for u in range(m):
-        row = df_train.ix[u]; idxs = row.index[row.notnull()]
+        row = df_train.iloc[u]; idxs = row.index[row.notnull()]
         for i in idxs:
             i = int(i)
             r_ui_hat = np.dot(q_i[:,i].T,p_u[u,:])

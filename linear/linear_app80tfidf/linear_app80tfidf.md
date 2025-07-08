@@ -107,7 +107,7 @@ her kelime hala aynı / özgün kolona gider.
 import nltk, string, sys      
 import scipy.sparse as sps
 
-base = "../../stat/stat_naive/data/%s"
+base = "../../stat/stat_150_naive/data/%s"
 
 stemmer = nltk.stem.porter.PorterStemmer()
 
@@ -119,14 +119,14 @@ D = 10000
 docs = ['a1.txt','a2.txt','a3.txt','a4.txt','b1.txt','b2.txt','b3.txt','b4.txt']
 N = len(docs)
 A = sps.csr_matrix((N,D))
-print A.shape
+print (A.shape)
 
 for i,f in enumerate(docs):
     file = base % f
-    lowers = open(file).read().decode("ISO-8859-1").lower()
+    lowers = open(file).read().lower()
     tokens = nltk.word_tokenize(lowers)
     tokens = stem_tokens(tokens)    
-    print i, tokens[:6]
+    print (i, tokens[:6])
     # kelimeler kolonda, dokumanlar satirda
     for token in tokens: A[i,hash(token) % D] += 1 
 ```
@@ -168,7 +168,7 @@ def search(s):
     sm = sps.lil_matrix((1,D))
     tokens = nltk.word_tokenize(s.lower())
     tokens = stem_tokens(tokens)    
-    print tokens[:20]
+    print (tokens[:20])
     for token in tokens: sm[0,hash(token) % D] += 1
     tfidf_new = sm.multiply(idf)
     tfidf_new = sps.csr_matrix(tfidf_new)
@@ -182,7 +182,7 @@ def search(s):
     res['docid'] = range(N)
     res = res.sort_values(by='score',ascending=False)
     res['doc'] = res.apply(lambda x: docs[int(x['docid'])],axis=1)
-    print res
+    print (res)
 
 search("Galileo was a friend of mine")    
 ```
