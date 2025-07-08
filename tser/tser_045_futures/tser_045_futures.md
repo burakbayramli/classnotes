@@ -150,10 +150,8 @@ df3 = pd.read_csv('vixjuly.csv',index_col=0,parse_dates=True)
 
 tmp = df1[(df1.index > '2015-02-13') & (df1.index <= stitch_point1 )]
 tmp.Settle.plot(color='blue')
-plt.hold(True)
 tmp=df2[(df2.index >= stitch_point1) & (df2.index <= stitch_point2)]
 tmp.Settle.plot(color='red')
-plt.hold(True)
 tmp=df3[(df3.index >= stitch_point2) & (df3.index < '2015-05-13')]
 tmp.Settle.plot(color='yellow')
 plt.savefig('tser_futures_01.png')
@@ -169,9 +167,9 @@ kontrattaki aynı noktadaki fiyatının farkını hesaplıyoruz, ve o fark kadar
 devam ediyoruz.
 
 ```python
-diff = float(df3.ix[stitch_point2,'Settle'] - df2.ix[stitch_point2,'Settle'])
+diff = float(df3.loc[stitch_point2,'Settle'] - df2.loc[stitch_point2,'Settle'])
 df2.loc[:,'Settle'] = df2.Settle + diff
-diff = float(df2.ix[stitch_point1,'Settle'] - df1.ix[stitch_point1,'Settle'])
+diff = float(df2.loc[stitch_point1,'Settle'] - df1.loc[stitch_point1,'Settle'])
 df1.loc[:,'Settle'] = df1.Settle + diff
 ```
 
@@ -179,10 +177,8 @@ df1.loc[:,'Settle'] = df1.Settle + diff
 tmp=df1[(df1.index > '2015-02-13') & (df1.index <= stitch_point1 )]
 tmp.Settle.plot(color='blue')
 plt.ylim(15,21)
-plt.hold(True)
 tmp=df2[(df2.index >= stitch_point1) & (df2.index <= stitch_point2)]
 tmp.Settle.plot(color='red')
-plt.hold(True)
 tmp=df3[(df3.index >= stitch_point2) & (df3.index < '2015-05-13')]
 tmp.Settle.plot(color='yellow')
 plt.savefig('tser_futures_02.png')
@@ -194,7 +190,7 @@ Fiyatlar akıcı bir şekilde birleşmiş oldu. Biraz daha esnek bir kod üzerin
 birleştirmeyi yaparsak,
 
 ```python
-import sys; sys.path.append('../tser_voltar')
+import sys; sys.path.append('../tser_070_voltar')
 import util
 
 dfs = [df1,df2,df3]
@@ -341,132 +337,6 @@ genelde, ve bu ay'ı seçmek en iyisi. Dördüncü kalıp her sene tek ve en yak
 kontrat durumu, ki ABD 10-yıllık tahvil buna örnek - sadece en yakın Haziran
 likit, başka hiçbir şans yok.
 
-Örnek
-
-Ham petrol VİS'i üzerinde bu fikirleri deneyelim (kontrat kodu CL). 2007 ve 2012
-arasındaki tüm kontratları alalım, ve bir sözlük içinde tutalım,
-
-```python
-import zipfile, pandas as pd, collections
-ctd = collections.OrderedDict()
-with zipfile.ZipFile('crude.zip', 'r') as z:
-     for f in z.namelist():
-     	 df = pd.read_csv(z.open(f), index_col=0,parse_dates=True )
-	 k = f.replace(".csv","")
-	 ctd[k] = df
-         
-print 'tum kontratlar', len(ctd), '200701 kontrati', len(ctd["200701"])
-print type(ctd["200701"])
-```
-
-```
-tum kontratlar 72 200701 kontrati 583
-<class 'pandas.core.frame.DataFrame'>
-```
-
-Geçiş döngümüz Z olacak, yani sadece Aralık kontratlarını alıp satacağız.
-Bitişten önce bırakacağımız pay 50 gün olacak, yani eğer bitiş tarihine 50 gün
-var ise Z kontratından sonraki senenin Z kontratına zıplıyoruz. Farklı döngüler
-mümkün olabilirdi, mesela HMUZ, bu durumda 3., 6., 9. ve 12. aylar döngü
-içindedir, 6'da isek 9'a zıplarız. Alttaki kod gerekli tüm parametreleri alıp
-hangi günün hangi kontrata ait olduğunu hesaplar. Gerektiği zaman zıplama
-yapar. Kolon `effcont` içinde "efektif kontrat''ın hangisi olduğu
-gösterilir. 
-
-```python
-import sys; sys.path.append('../tser_voltar')
-import util
-carryoffset=-1
-rollcycle='Z'
-rolloffset=50
-expmon='prev'
-expday=25
-
-res2 = util.which_contract(contract_list=ctd, cycle=rollcycle, \
-                           offset=rolloffset, \
-                           expday=expday, expmon=expmon)
-print res2[1000:1002]
-print res2[1300:1302]
-print res2[1500:1502]
-```
-
-```
-           effcont
-2008-06-23  200812
-2008-06-24  200812
-           effcont
-2009-08-17  200912
-2009-08-18  200912
-           effcont
-2010-05-24  201012
-2010-05-25  201012
-```
-
-Üstteki `expmon` ile özel bir şart kontrolünü yapıyoruz, eğer o değişkende
-`prev` değeri görülürse bitiş tarihi kontrat ayının bir önceki kabul
-ediliyor. Bu aslında garip bir durum, ama ham petrol için her nedense bu
-şekilde, çoğu diğer VİS için böyle değil.
-
-Şimdi ek bir TK kolonu yaratmanın zamanı geldi. İlk önce TK kontratının hangisi
-olduğunu hesaplarız. Bu kolay: kaç ay öncesi, ya da sonrasındaki kontrat
-kullanılacak bu `carryoffset` içinde, -1 ise bir ay önceki +3 ise 3 ay
-sonraki. Örneğimiz için bir ay öncesi. Artık bu TK kontratında olan fiyatı,
-`carryprice` kolonu olarak yazarız, ki ileride fark hesabı için
-kullanabilelim.
-
-```python
-res3 = util.create_carry(res2[pd.isnull(res2.effcont)==False],carryoffset,ctd)
-print res3[-30:-25]
-```
-
-```
-           effcont carrycont  effprice  carryprice
-2012-10-08  201212    201211     89.73       89.33
-2012-10-09  201212    201211     92.78       92.39
-2012-10-10  201212    201211     91.64       91.25
-2012-10-11  201212    201211     92.50       92.07
-2012-10-12  201212    201211     92.28       91.86
-```
-
-Aradaki farkın bir sinyal oluşturabileceğini görmek için alttaki grafiği
-yarattık,mevcut kontrat ile TK kontratı fiyatları grafiklendi. Ufak bir suni ek
-var ama, aradaki farkı hesaplıyoruz, ve belli bir sabit ile çarpıp bu farkı
-TK'ye ekliyoruz ki aradaki fark net görülebilsin (normalde iki grafik birbirine
-çok yakın çıkıyor),
-
-```python
-res4 = res3[(res3.index > '2008-01-01') & (res3.index <'2012-01-01')]
-diff = res4.carryprice-res4.effprice # farki hesapla
-res4['carryprice2'] = res4.carryprice - 10*diff # biraz buyut ki grafikte gorulsun
-res4[['effprice','carryprice2']].plot()
-plt.savefig('tser_futures_04.png')
-```
-
-![](tser_futures_04.png)
-
-Grafik ham petrolün 2008'deki o büyük düşüş anına odaklandı. 2008 ortalarına
-yakın kontratın fiyatı elimizdeki mevcut kontratın fiyatının altına düşüyor, ve
-bu bir satış sinyali haline geliyor. Ardından çıkışta tam tersi durum, ve burada
-yakın kontrat daha yukarıda, ve alış sinyali başlıyor.  Geriye dönük test
-yaparak kazancın ne kadar olabileceğini görelim. Sinyali daha önce belirttiğimiz
-gibi hesaplarız (fiyat farkı bölü zaman farkı, ve diğer bazı ek hesaplar). 
-
-```python
-def carry(daily_ann_roll, vol, smooth_days=90):
-    ann_stdev = vol * util.ROOT_BDAYS_INYEAR
-    raw_carry = daily_ann_roll / ann_stdev
-    smooth_carry = pd.ewma(raw_carry, smooth_days)
-    return smooth_carry.fillna(method='ffill')
-
-vol = util.robust_vol_calc(res3.effprice.diff())
-raw_carry = (res3.effprice-res3.carryprice) / (carryoffset/12.)
-forecast =  carry(raw_carry, vol)
-```
-
-Bölümdeki `carryoffset`'in eksi ya da artı değerli olmasını ufak bir numara
-üzerinden kullanıyoruz; eksi değerli olduğu zamam bölünendeki çıkartma işlem
-tersine dönmüş olur, yani TK kolonu eksi efektif kolon. Eğer artı olsaydı
-efektif eksi TK olacaktı. Bu işlemin [4]'e göre yapılması gerekiyor. 
 
 Kaynaklar
 

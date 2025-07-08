@@ -35,8 +35,8 @@ def stitch_prices(dfs, price_col, dates):
     dfsr_pair = shift(dfsr,pd.DataFrame())
         
     for i,v in enumerate(datesr):
-        tmp1=float(dfsr[i].ix[v,price_col])
-        tmp2=float(dfsr_pair[i].ix[v,price_col])
+        tmp1=float(dfsr[i].loc[v,price_col])
+        tmp2=float(dfsr_pair[i].loc[v,price_col])
         dfsr_pair[i].loc[:,price_col] = dfsr_pair[i][price_col] + tmp1-tmp2
 
     dates.insert(0,'1900-01-01')
@@ -46,45 +46,6 @@ def stitch_prices(dfs, price_col, dates):
         tmp = dfs[i][(dfs[i].index > dates[i]) & (dfs[i].index <= dates_end[i])]
         res.append(tmp.Settle)
     return pd.concat(res)
-
-def which_contract(contract_list, cycle, offset, expday, expmon):
-    assert len(contract_list) > 0
-    start_date = contract_list[contract_list.keys()[0]].head(1).index[0] # first dt of first contract
-    end_date = contract_list[contract_list.keys()[-1]].tail(1).index[0] # last date of last contract
-    delta = end_date - start_date
-    dates = []
-    for i in range(delta.days + 1):
-        day = start_date + datetime.timedelta(days=i)
-        if day.weekday() < 5: dates.append(day)
-    df = pd.DataFrame(index=dates)    
-    def closest_biz(d): # get closest biz day
-        diffs = np.abs((d - df.index).days)
-        return df.index[np.argmin(diffs)]
-    cycle_d = [contract_month_dict[x] for x in cycle]
-    df['effcont'] = np.nan
-    for year in np.unique(df.index.year):
-        for c in cycle_d:
-            v = "%d%02d" % (year,c)
-            exp_d = datetime.datetime(year, c, expday)
-            if expmon=="prev": exp_d = exp_d - datetime.timedelta(days=30)
-            df.loc[closest_biz(exp_d),'effcont'] = v
-            
-    df = df.fillna(method='bfill')
-    df['effcont'] = df.effcont.shift(-int(offset*2/3 + 3))
-
-    return df.ffill(inplace=True)
-
-def create_carry(df, offset, contract_list):
-    df2 = df.copy()
-    df2['effcont'] = df2.effcont.astype(str)
-    def offset_contract(con):
-    	s = pd.to_datetime(con + "15", format='%Y%m%d')
-    	ss = s + datetime.timedelta(days=30*offset)
-    	return "%d%02d" % (int(ss.year), int(ss.month)) 
-    df2['carrycont'] = df2.effcont.map(offset_contract)
-    df2['effprice'] = df2.apply(lambda x: contract_list.get(x.effcont).s.get(x.name) if x.effcont in contract_list else np.nan,axis=1)
-    df2['carryprice'] = df2.apply(lambda x: contract_list.get(x.carrycont).s.get(x.name) if x.carrycont in contract_list else np.nan,axis=1)
-    return df2
 
 def ccy_returns(price, forecast):
     base_capital = DEFAULT_CAPITAL

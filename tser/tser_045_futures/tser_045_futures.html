@@ -232,13 +232,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> df1[(df1.index <span class="op">&gt;</span> <span class="st">&#39;2015-02-13&#39;</span>) <span class="op">&amp;</span> (df1.index <span class="op">&lt;=</span> stitch_point1 )]</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df2[(df2.index <span class="op">&gt;=</span> stitch_point1) <span class="op">&amp;</span> (df2.index <span class="op">&lt;=</span> stitch_point2)]</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df3[(df3.index <span class="op">&gt;=</span> stitch_point2) <span class="op">&amp;</span> (df3.index <span class="op">&lt;</span> <span class="st">&#39;2015-05-13&#39;</span>)]</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;yellow&#39;</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_futures_01.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df2[(df2.index <span class="op">&gt;=</span> stitch_point1) <span class="op">&amp;</span> (df2.index <span class="op">&lt;=</span> stitch_point2)]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df3[(df3.index <span class="op">&gt;=</span> stitch_point2) <span class="op">&amp;</span> (df3.index <span class="op">&lt;</span> <span class="st">&#39;2015-05-13&#39;</span>)]</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;yellow&#39;</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_futures_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_futures_01.png" /></p>
 <p>Görüldüğü gibi kesintiler var. Birleştirme için kullanılan yönteme
 Panama yöntemi deniyor, detaylar [4]’te. Aslında yöntem çok basit, en
@@ -247,26 +245,24 @@ bir önceki kontrattaki aynı noktadaki fiyatının farkını hesaplıyoruz, ve
 o fark kadar bir önceki kontrattaki tüm fiyatları üste çekiyoruz. Aynı
 şekilde bir geriye doğru devam ediyoruz.</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> <span class="bu">float</span>(df3.ix[stitch_point2,<span class="st">&#39;Settle&#39;</span>] <span class="op">-</span> df2.ix[stitch_point2,<span class="st">&#39;Settle&#39;</span>])</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> <span class="bu">float</span>(df3.loc[stitch_point2,<span class="st">&#39;Settle&#39;</span>] <span class="op">-</span> df2.loc[stitch_point2,<span class="st">&#39;Settle&#39;</span>])</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df2.loc[:,<span class="st">&#39;Settle&#39;</span>] <span class="op">=</span> df2.Settle <span class="op">+</span> diff</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> <span class="bu">float</span>(df2.ix[stitch_point1,<span class="st">&#39;Settle&#39;</span>] <span class="op">-</span> df1.ix[stitch_point1,<span class="st">&#39;Settle&#39;</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> <span class="bu">float</span>(df2.loc[stitch_point1,<span class="st">&#39;Settle&#39;</span>] <span class="op">-</span> df1.loc[stitch_point1,<span class="st">&#39;Settle&#39;</span>])</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df1.loc[:,<span class="st">&#39;Settle&#39;</span>] <span class="op">=</span> df1.Settle <span class="op">+</span> diff</span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df1[(df1.index <span class="op">&gt;</span> <span class="st">&#39;2015-02-13&#39;</span>) <span class="op">&amp;</span> (df1.index <span class="op">&lt;=</span> stitch_point1 )]</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">15</span>,<span class="dv">21</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df2[(df2.index <span class="op">&gt;=</span> stitch_point1) <span class="op">&amp;</span> (df2.index <span class="op">&lt;=</span> stitch_point2)]</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df3[(df3.index <span class="op">&gt;=</span> stitch_point2) <span class="op">&amp;</span> (df3.index <span class="op">&lt;</span> <span class="st">&#39;2015-05-13&#39;</span>)]</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;yellow&#39;</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_futures_02.png&#39;</span>)</span></code></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df2[(df2.index <span class="op">&gt;=</span> stitch_point1) <span class="op">&amp;</span> (df2.index <span class="op">&lt;=</span> stitch_point2)]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>tmp<span class="op">=</span>df3[(df3.index <span class="op">&gt;=</span> stitch_point2) <span class="op">&amp;</span> (df3.index <span class="op">&lt;</span> <span class="st">&#39;2015-05-13&#39;</span>)]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>tmp.Settle.plot(color<span class="op">=</span><span class="st">&#39;yellow&#39;</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_futures_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_futures_02.png" /></p>
 <p>Fiyatlar akıcı bir şekilde birleşmiş oldu. Biraz daha esnek bir kod
 üzerinden birleştirmeyi yaparsak,</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_voltar&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_070_voltar&#39;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> util</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> [df1,df2,df3]</span>
@@ -392,110 +388,6 @@ tür sezonsal VİS’lerde bir “favori’’ ay oluyor genelde, ve bu ay’ı
 seçmek en iyisi. Dördüncü kalıp her sene tek ve en yakın kontrat durumu,
 ki ABD 10-yıllık tahvil buna örnek - sadece en yakın Haziran likit,
 başka hiçbir şans yok.</p>
-<p>Örnek</p>
-<p>Ham petrol VİS’i üzerinde bu fikirleri deneyelim (kontrat kodu CL).
-2007 ve 2012 arasındaki tüm kontratları alalım, ve bir sözlük içinde
-tutalım,</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile, pandas <span class="im">as</span> pd, collections</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ctd <span class="op">=</span> collections.OrderedDict()</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;crude.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> f <span class="kw">in</span> z.namelist():</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         df <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(f), index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span> )</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>     k <span class="op">=</span> f.replace(<span class="st">&quot;.csv&quot;</span>,<span class="st">&quot;&quot;</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>     ctd[k] <span class="op">=</span> df</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;tum kontratlar&#39;</span>, <span class="bu">len</span>(ctd), <span class="st">&#39;200701 kontrati&#39;</span>, <span class="bu">len</span>(ctd[<span class="st">&quot;200701&quot;</span>])</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="bu">type</span>(ctd[<span class="st">&quot;200701&quot;</span>])</span></code></pre></div>
-<pre><code>tum kontratlar 72 200701 kontrati 583
-&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;</code></pre>
-<p>Geçiş döngümüz Z olacak, yani sadece Aralık kontratlarını alıp
-satacağız. Bitişten önce bırakacağımız pay 50 gün olacak, yani eğer
-bitiş tarihine 50 gün var ise Z kontratından sonraki senenin Z
-kontratına zıplıyoruz. Farklı döngüler mümkün olabilirdi, mesela HMUZ,
-bu durumda 3., 6., 9. ve 12. aylar döngü içindedir, 6’da isek 9’a
-zıplarız. Alttaki kod gerekli tüm parametreleri alıp hangi günün hangi
-kontrata ait olduğunu hesaplar. Gerektiği zaman zıplama yapar. Kolon
-<code>effcont</code> içinde “efektif kontrat’’ın hangisi olduğu
-gösterilir.</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_voltar&#39;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> util</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>carryoffset<span class="op">=-</span><span class="dv">1</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>rollcycle<span class="op">=</span><span class="st">&#39;Z&#39;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rolloffset<span class="op">=</span><span class="dv">50</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>expmon<span class="op">=</span><span class="st">&#39;prev&#39;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>expday<span class="op">=</span><span class="dv">25</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>res2 <span class="op">=</span> util.which_contract(contract_list<span class="op">=</span>ctd, cycle<span class="op">=</span>rollcycle, <span class="op">\</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                           offset<span class="op">=</span>rolloffset, <span class="op">\</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                           expday<span class="op">=</span>expday, expmon<span class="op">=</span>expmon)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res2[<span class="dv">1000</span>:<span class="dv">1002</span>]</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res2[<span class="dv">1300</span>:<span class="dv">1302</span>]</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res2[<span class="dv">1500</span>:<span class="dv">1502</span>]</span></code></pre></div>
-<pre><code>           effcont
-2008-06-23  200812
-2008-06-24  200812
-           effcont
-2009-08-17  200912
-2009-08-18  200912
-           effcont
-2010-05-24  201012
-2010-05-25  201012</code></pre>
-<p>Üstteki <code>expmon</code> ile özel bir şart kontrolünü yapıyoruz,
-eğer o değişkende <code>prev</code> değeri görülürse bitiş tarihi
-kontrat ayının bir önceki kabul ediliyor. Bu aslında garip bir durum,
-ama ham petrol için her nedense bu şekilde, çoğu diğer VİS için böyle
-değil.</p>
-<p>Şimdi ek bir TK kolonu yaratmanın zamanı geldi. İlk önce TK
-kontratının hangisi olduğunu hesaplarız. Bu kolay: kaç ay öncesi, ya da
-sonrasındaki kontrat kullanılacak bu <code>carryoffset</code> içinde, -1
-ise bir ay önceki +3 ise 3 ay sonraki. Örneğimiz için bir ay öncesi.
-Artık bu TK kontratında olan fiyatı, <code>carryprice</code> kolonu
-olarak yazarız, ki ileride fark hesabı için kullanabilelim.</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res3 <span class="op">=</span> util.create_carry(res2[pd.isnull(res2.effcont)<span class="op">==</span><span class="va">False</span>],carryoffset,ctd)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> res3[<span class="op">-</span><span class="dv">30</span>:<span class="op">-</span><span class="dv">25</span>]</span></code></pre></div>
-<pre><code>           effcont carrycont  effprice  carryprice
-2012-10-08  201212    201211     89.73       89.33
-2012-10-09  201212    201211     92.78       92.39
-2012-10-10  201212    201211     91.64       91.25
-2012-10-11  201212    201211     92.50       92.07
-2012-10-12  201212    201211     92.28       91.86</code></pre>
-<p>Aradaki farkın bir sinyal oluşturabileceğini görmek için alttaki
-grafiği yarattık,mevcut kontrat ile TK kontratı fiyatları grafiklendi.
-Ufak bir suni ek var ama, aradaki farkı hesaplıyoruz, ve belli bir sabit
-ile çarpıp bu farkı TK’ye ekliyoruz ki aradaki fark net görülebilsin
-(normalde iki grafik birbirine çok yakın çıkıyor),</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res4 <span class="op">=</span> res3[(res3.index <span class="op">&gt;</span> <span class="st">&#39;2008-01-01&#39;</span>) <span class="op">&amp;</span> (res3.index <span class="op">&lt;</span><span class="st">&#39;2012-01-01&#39;</span>)]</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> res4.carryprice<span class="op">-</span>res4.effprice <span class="co"># farki hesapla</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>res4[<span class="st">&#39;carryprice2&#39;</span>] <span class="op">=</span> res4.carryprice <span class="op">-</span> <span class="dv">10</span><span class="op">*</span>diff <span class="co"># biraz buyut ki grafikte gorulsun</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>res4[[<span class="st">&#39;effprice&#39;</span>,<span class="st">&#39;carryprice2&#39;</span>]].plot()</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_futures_04.png&#39;</span>)</span></code></pre></div>
-<p><img src="tser_futures_04.png" /></p>
-<p>Grafik ham petrolün 2008’deki o büyük düşüş anına odaklandı. 2008
-ortalarına yakın kontratın fiyatı elimizdeki mevcut kontratın fiyatının
-altına düşüyor, ve bu bir satış sinyali haline geliyor. Ardından çıkışta
-tam tersi durum, ve burada yakın kontrat daha yukarıda, ve alış sinyali
-başlıyor. Geriye dönük test yaparak kazancın ne kadar olabileceğini
-görelim. Sinyali daha önce belirttiğimiz gibi hesaplarız (fiyat farkı
-bölü zaman farkı, ve diğer bazı ek hesaplar).</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> carry(daily_ann_roll, vol, smooth_days<span class="op">=</span><span class="dv">90</span>):</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    ann_stdev <span class="op">=</span> vol <span class="op">*</span> util.ROOT_BDAYS_INYEAR</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    raw_carry <span class="op">=</span> daily_ann_roll <span class="op">/</span> ann_stdev</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    smooth_carry <span class="op">=</span> pd.ewma(raw_carry, smooth_days)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> smooth_carry.fillna(method<span class="op">=</span><span class="st">&#39;ffill&#39;</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>vol <span class="op">=</span> util.robust_vol_calc(res3.effprice.diff())</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>raw_carry <span class="op">=</span> (res3.effprice<span class="op">-</span>res3.carryprice) <span class="op">/</span> (carryoffset<span class="op">/</span><span class="fl">12.</span>)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span>  carry(raw_carry, vol)</span></code></pre></div>
-<p>Bölümdeki <code>carryoffset</code>’in eksi ya da artı değerli
-olmasını ufak bir numara üzerinden kullanıyoruz; eksi değerli olduğu
-zamam bölünendeki çıkartma işlem tersine dönmüş olur, yani TK kolonu
-eksi efektif kolon. Eğer artı olsaydı efektif eksi TK olacaktı. Bu
-işlemin [4]’e göre yapılması gerekiyor.</p>
 <p>Kaynaklar</p>
 <p>[1] Wikipedia, <em>Futures contract</em>, <a
 href="https://en.wikipedia.org/wiki/Futures_contract">https://en.wikipedia.org/wiki/Futures_contract</a></p>
