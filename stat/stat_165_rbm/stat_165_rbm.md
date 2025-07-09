@@ -422,7 +422,7 @@ if __name__ == "__main__":
     X = np.array([[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 1]])
     model = RBM(num_hidden=2,learning_rate=0.1,max_epochs=10,num_visible=3)
     model.fit(X)
-    print model.weights
+    print (model.weights)
 ```
 
 RBM ve Sınıflama 
@@ -450,21 +450,21 @@ olunuyor. Sonuç,
 
 ```python
 from sklearn.linear_model import LogisticRegression
-from sklearn.cross_validation import KFold
+from sklearn.model_selection import KFold
 import numpy as np, rbm
 
-X = np.loadtxt('../../stat/stat_mixbern/binarydigits.txt')
-Y = np.ravel(np.loadtxt('../../stat/stat_mixbern/bindigitlabels.txt'))
-print X.shape, Y.shape
+X = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+Y = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
+print (X.shape, Y.shape)
 
 
 np.random.seed(0)
 
 scores = []
-cv = KFold(n=len(X),n_folds=3)
-for train, test in cv:
-    X_train, Y_train = X[train], Y[train]
-    X_test, Y_test = X[test], Y[test]    
+cv = KFold(n_splits=3, shuffle=True, random_state=0) # Added shuffle and random_state for reproducibility
+for train_index, test_index in cv.split(X): # Use cv.split(X)
+    X_train, Y_train = X[train_index], Y[train_index]
+    X_test, Y_test = X[test_index], Y[test_index]    
     r = rbm.RBM(num_hidden=40, learning_rate=0.3,max_epochs=500, num_visible=64)
     r.fit(X_train)
     clf = LogisticRegression(C=1000)
@@ -472,11 +472,34 @@ for train, test in cv:
     res3 = clf.predict(r.run_visible(X_test))
     scores.append(np.sum(res3==Y_test) / float(len(Y_test)))        
     
-print np.mean(scores)
+print (np.mean(scores))
 ```
 
 ```python
-! python test_rbmkfold.py
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import KFold
+import numpy as np, rbm
+
+X = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+Y = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
+print (X.shape, Y.shape)
+
+
+np.random.seed(0)
+
+scores = []
+cv = KFold(n_splits=3, shuffle=True, random_state=0) # Added shuffle and random_state for reproducibility
+for train_index, test_index in cv.split(X): # Use cv.split(X)
+    X_train, Y_train = X[train_index], Y[train_index]
+    X_test, Y_test = X[test_index], Y[test_index]    
+    r = rbm.RBM(num_hidden=40, learning_rate=0.3,max_epochs=500, num_visible=64)
+    r.fit(X_train)
+    clf = LogisticRegression(C=1000)
+    clf.fit(r.run_visible(X_train), Y_train)
+    res3 = clf.predict(r.run_visible(X_test))
+    scores.append(np.sum(res3==Y_test) / float(len(Y_test)))        
+    
+print (np.mean(scores))
 ```
 
 ```
@@ -490,25 +513,42 @@ from sklearn import neighbors
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 
-X = np.loadtxt('../../stat/stat_mixbern/binarydigits.txt')
-Y = np.ravel(np.loadtxt('../../stat/stat_mixbern/bindigitlabels.txt'))
+X = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+Y = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
 
-from sklearn.cross_validation import KFold
+from sklearn.model_selection import KFold
 scores = []
-cv = KFold(n=len(X),n_folds=3)
-for train, test in cv:
-    X_train, Y_train = X[train], Y[train]
-    X_test, Y_test = X[test], Y[test]
+cv = KFold(n_splits=3, shuffle=True, random_state=0) # Added shuffle and random_state for reproducibility
+for train_index, test_index in cv.split(X): # Use cv.split(X)
+    X_train, Y_train = X[train_index], Y[train_index]
+    X_test, Y_test = X[test_index], Y[test_index]    
     clf = neighbors.KNeighborsClassifier(n_neighbors=1)
     clf.fit(X_train, Y_train)
     scores.append(clf.score(X_test, Y_test))
     
-print np.mean(scores)
+print (np.mean(scores))
             
 ```
 
 ```python
-! python test_knnkfold.py
+from sklearn import neighbors
+from sklearn.linear_model import LogisticRegression
+import numpy as np
+
+X = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+Y = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
+
+from sklearn.model_selection import KFold
+scores = []
+cv = KFold(n_splits=3, shuffle=True, random_state=0) # Added shuffle and random_state for reproducibility
+for train_index, test_index in cv.split(X): # Use cv.split(X)
+    X_train, Y_train = X[train_index], Y[train_index]
+    X_test, Y_test = X[test_index], Y[test_index]    
+    clf = neighbors.KNeighborsClassifier(n_neighbors=1)
+    clf.fit(X_train, Y_train)
+    scores.append(clf.score(X_test, Y_test))
+    
+print (np.mean(scores)            )
 ```
 
 ```

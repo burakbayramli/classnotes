@@ -267,7 +267,7 @@ for i in range(N):
 df = pd.DataFrame(vals)
 df.columns = ['t','euler', 'analitik']
 df = df.set_index('t')
-print df
+print (df)
 df.plot()
 plt.savefig('2_6.png')
 ```
@@ -298,7 +298,7 @@ for i in range(N):
 df = pd.DataFrame(vals)
 df.columns = ['t','taylor', 'analitik']
 df = df.set_index('t')
-print df
+print (df)
 df.plot()
 plt.savefig('2_7.png')
 ```

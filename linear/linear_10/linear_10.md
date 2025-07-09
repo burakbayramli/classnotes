@@ -228,7 +228,7 @@ $$
 ```python
 E = np.array([[-1,2,0],[1,-1,0],[-1,0,1]])
 A = np.array([[1,2,3,1],[1,1,2,1],[1,2,3,1]])
-print np.dot(E,A)
+print (np.dot(E,A))
 ```
 
 ```

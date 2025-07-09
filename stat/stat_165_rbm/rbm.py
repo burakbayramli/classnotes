@@ -117,4 +117,4 @@ if __name__ == "__main__":
     X = np.array([[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 1]])
     model = RBM(num_hidden=2,learning_rate=0.1,max_epochs=10,num_visible=3)
     model.fit(X)
-    print model.weights
+    print (model.weights)
