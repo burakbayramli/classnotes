@@ -8,7 +8,7 @@
 
 [Tensorflow](../../2022/10/tensorflow.html)
 
-[Keras](../../2018/06/keras.html)3
+[Keras](../../2018/06/keras.html)
 
 [TensorFlow.js, Javascript ile TensorFlow, Keras Modelleri](../../2018/11/tensorflowjs-javascript-ile-tensorflow.html)
 
@@ -18,15 +18,11 @@
 
 [Yapay Sinir Ağları Video](../../2023/03/yapay-sinir-aglari-neural-network-video.html)
 
-[Optik Karakter Tanıma, Yazı Tanıma (Optical Character Recognition -OCR-)](../../../algs/algs_175_ocr/optik_karakter_tanima_yazi_tanima__optical_character_recognition_ocr_.html)
-
 [Derin Öğrenim ile Text Üretmek, RNN, LSTM](../../2017/01/derin-ogrenim-ile-text-uretmek-rnn-lstm.html)
 
 [Evrişimsel Çizit Ağları (Graph Convolutional Networks)](../../../algs/algs_185_graphconv/evrisimsel_cizit_aglari__graph_convolutional_networks_.html)
 
 [Tensorflow ile Regresyon, YSA](../../../algs/algs_130_tensorflow/tensorflow_ile_regresyon_ysa.html)
-
-[Özkodlama (Autoencoding)](../../../algs/algs_150_autoenc/ozkodlama__autoencoding_.html)
 
 [Uzun Kısa-Vade Hafıza Ağları (Long Short-Term Memory Networks, LSTM)](../../../algs/algs_145_lstm/uzun_kisavade_hafiza_aglari__long_shortterm_memory_networks_lstm_.html)
 

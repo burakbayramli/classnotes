@@ -3,6 +3,8 @@
 
 ## En Son
 
+9/7 - [Keras OCR, Hazır YSA Ağırlıkları, Tensorflow](https://burakbayramli.github.io/dersblog/sk/2025/07/tensorflow-keras-ocr.html)
+
 2/7 - [Markdown ile PDF ve HTML Üretmek, Pandoc](https://burakbayramli.github.io/dersblog/sk/2025/06/markdown-pandoc-html-pdf.html)
 
 24/6 - [Ubuntu 24, Acer Swift 3](https://burakbayramli.github.io/dersblog/sk/2025/06/ubuntu-24-acer.html)
@@ -10,8 +12,6 @@
 19/6 - [Diferansiyel Denklemler - Ders 2 - Ekler, Runge-Kutta](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_02/ders_2.html)
 
 3/6 - [Döndürme (Rotation) - 2, Dörtlü Gruplar (Quaternions)](https://burakbayramli.github.io/dersblog/phy/phy_073_rot/dondurme__rotation___2.html)
-
-22/5 - [AABB, Üçgen Kesişmesi, Hızlı Çarpışma Saptaması](https://burakbayramli.github.io/dersblog/sk/2025/04/aabb_ucgen_kesismesi_carpisma_saptamasi.html)
 
 ## Konular, Referans
 
@@ -26,6 +26,8 @@
 [Proje İdaresi](2020/07/proje-idaresi.html)
 
 [Web, HTML](2023/04/web-html.html)
+
+[Yapay Zeka](2023/03/yapay-zeka.html), [YSA](2023/03/neural-net.html)
 
 [Network, TCP/IP, Internet](2000/10/network.html)
 
