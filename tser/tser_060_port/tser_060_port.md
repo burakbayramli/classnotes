@@ -124,7 +124,7 @@ görebiliriz.
 ```python
 import pandas as pd
 df = pd.read_csv("companies.csv",index_col=0,parse_dates=True)
-print df.head()
+print (df.head())
 ```
 
 ```
@@ -160,14 +160,14 @@ def sharpe_ratio(returns, weights, risk_free_rate = 0.015):
     return (means.dot(weights) - risk_free_rate)/np.sqrt(var)
 
 def negative_sharpe_ratio_n_minus_1_stock(weights,returns,risk_free_rate):
-    weights2 = sp.append(weights, 1-np.sum(weights))
+    weights2 = np.append(weights, 1-np.sum(weights))
     return -sharpe_ratio(returns, weights2, risk_free_rate)
 
 def optimize_portfolio(returns, risk_free_rate):
     w0 = np.ones(returns.columns.size-1,dtype=float) * 1.0 / returns.columns.size
     w1 = scopt.fmin(negative_sharpe_ratio_n_minus_1_stock,
                     w0, args=(returns, risk_free_rate))
-    final_w = sp.append(w1, 1 - np.sum(w1))
+    final_w = np.append(w1, 1 - np.sum(w1))
     final_sharpe = sharpe_ratio(returns, final_w, risk_free_rate)
     return (final_w, final_sharpe)
 
@@ -191,18 +191,18 @@ def calc_efficient_frontier(returns):
     nstocks = returns.columns.size
 
     for r in np.linspace(min_mean, max_mean, 100):
-    	weights = np.ones(nstocks)/nstocks
-	bounds = [(0,1) for i in np.arange(nstocks)]
-	constraints = ({'type': 'eq','fun': lambda W: np.sum(W) - 1})
-	results = scopt.minimize(objfun, weights, (returns, r),
+        weights = np.ones(nstocks)/nstocks
+        bounds = [(0,1) for i in np.arange(nstocks)]
+        constraints = ({'type': 'eq','fun': lambda W: np.sum(W) - 1})
+        results = scopt.minimize(objfun, weights, (returns, r),
                                  method='SLSQP',constraints = constraints,
                                  bounds = bounds)
-	if not results.success: raise Exception(result.message)
-	result_means.append(np.round(r,4)) # 4 decimal places
-	std_=np.round(np.std(np.sum(returns*results.x,axis=1)),6)
-	result_stds.append(std_)
-	result_weights.append(np.round(results.x, 5))
-	
+        if not results.success: raise Exception(result.message)
+        result_means.append(np.round(r,4)) # 4 decimal places
+        std_=np.round(np.std(np.sum(returns*results.x,axis=1)),6)
+        result_stds.append(std_)
+        result_weights.append(np.round(results.x, 5))
+        
     return {'Means': result_means, 'Stds': result_stds, 'Weights': result_weights}
 
 def calc_port_perf(w, ret, covs):
@@ -232,7 +232,7 @@ Günlük getiriler,
 
 ```python
 daily_returns = calc_daily_returns(df)
-print daily_returns.head()
+print (daily_returns.head())
 ```
 
 ```
@@ -249,7 +249,7 @@ Yıllık getiri,
 
 ```python
 annual_returns = calc_annual_returns(daily_returns)
-print annual_returns.head()
+print (annual_returns.head())
 ```
 
 ```
@@ -265,7 +265,7 @@ Eşit ağırlıklar üzerinden oluşturulmuş portföyün varyansı,
 
 ```python
 eq_weights = np.array([1/3.,1/3.,1/3.])
-print calc_portfolio_var(annual_returns,weights=eq_weights)
+print (calc_portfolio_var(annual_returns,weights=eq_weights))
 ```
 
 ```
@@ -275,7 +275,7 @@ print calc_portfolio_var(annual_returns,weights=eq_weights)
 Sharpe Oranı
 
 ```python
-print sharpe_ratio(annual_returns,eq_weights)
+print (sharpe_ratio(annual_returns,eq_weights))
 ```
 
 ```
@@ -295,7 +295,7 @@ plt.savefig('tser_port_04.png')
 Şimdi optimizasyon ile global bir optimal nokta bulalım,
 
 ```python
-print optimize_portfolio(annual_returns, 0.0003)
+print (optimize_portfolio(annual_returns, 0.0003))
 ```
 
 ```
@@ -313,9 +313,9 @@ frontier_data = calc_efficient_frontier(annual_returns)
 ```
 
 ```python
-print frontier_data['Stds'][:5]
-print frontier_data['Means'][:5]
-for x in frontier_data['Weights'][:5]: print x
+print (frontier_data['Stds'][:5])
+print (frontier_data['Means'][:5])
+for x in frontier_data['Weights'][:5]: print (x)
 ```
 
 ```
@@ -332,7 +332,6 @@ for x in frontier_data['Weights'][:5]: print x
 ```python
 vw = plot_all_possible_portfolios(annual_returns)
 vw.plot(x='sigma',y='return',kind='scatter')
-plt.hold(True)
 plot_efficient_frontier(frontier_data)
 plt.savefig('tser_port_03.png')
 ```
@@ -357,12 +356,12 @@ olsun olmasın verinin rasgele noktalarından örneklem toplamak. Alttaki ikinci
 yöntemi takip ediyor,
 
 ```python
-import zipfile, pandas as pd, util
+import zipfile, pandas as pd
 import numpy as np, random, datetime
 from scipy.optimize import minimize
 
 def create_dull_pd_matrix(dullvalue=0.0, dullname="A",
-                          startdate=pd.datetime(1970,1,1).date(),
+                          startdate=datetime.date(1970,1,1),
                           enddate=datetime.datetime.now().date(), index=None):
     if index is None:
         index=pd.date_range(startdate, enddate)    
@@ -393,7 +392,7 @@ def equalise_vols(returns, default_vol):
 def markosolver(returns, default_vol, default_SR):        
     use_returns=equalise_vols(returns, default_vol)    
     sigma=use_returns.cov().values
-    mus = use_returns[asset_name].mean() for asset_name in use_returns.columns
+    mus = [use_returns[asset_name].mean() for asset_name in use_returns.columns]
     mus=np.array([mus], ndmin=2)
     mus=mus.transpose()
     number_assets=use_returns.shape[1]
@@ -460,10 +459,11 @@ def optimise_over_periods(data,rollyears, monte_carlo,monte_length):
 ```
 
 ```python
-import zipfile, pandas as pd, random
+import zipfile, pandas as pd, random, boot
+
 symbols = ['SP500','NASDAQ','US20']
 df = pd.DataFrame()
-with zipfile.ZipFile('../tser_voltar/legacycsv.zip', 'r') as z:
+with zipfile.ZipFile('../tser_070_voltar/legacycsv.zip', 'r') as z:
     for symbol in symbols:
         f = '%s_price.csv' % symbol
         df[symbol] = pd.read_csv(z.open(f),sep=',',
@@ -478,7 +478,7 @@ df = df[(df.index >= '1999-08-02') & (df.index <= '2015-04-22')]
     
 random.seed(0)
 
-w=boot.optimise_over_periods(df)
+w=boot.optimise_over_periods(df,rollyears=20, monte_carlo=20,monte_length=250)
 ```
 
 

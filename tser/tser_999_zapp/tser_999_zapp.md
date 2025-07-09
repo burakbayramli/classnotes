@@ -50,7 +50,7 @@ mesela her hücrede 2 değeri olsa
 import pandas as pd
 df = pd.DataFrame(np.ones((10,1))*2,columns=['x'])
 df['kumulatif carpim'] = df.x.cumprod()
-print df
+print (df)
 ```
 
 ```
@@ -75,7 +75,7 @@ uzatabiliriz. Baştaki örnek için
 ```python
 df2 = pd.DataFrame(np.ones((10,1))*0.05,columns=['f'])
 df2['s'] = 100. * (1+df2.f).cumprod()
-print df2
+print (df2)
 ```
 
 ```
@@ -118,7 +118,7 @@ data = np.random.binomial(n=1,p=0.55,size=1000)
 df3 = pd.DataFrame(data,columns=['dice'])
 df3.loc[df3.dice==0,'dice'] = -1
 cumret = 100.*(1+0.05*df3.dice).cumprod()
-print cumret.tail(1)
+print (cumret.tail(1))
 ```
 
 ```
@@ -147,13 +147,13 @@ dfs  = [pd.read_csv('%s.csv' % t, index_col=0,parse_dates=True) for t in ts]
 # verileri getmat.py ile indirdik
 #
 dt = '2000-08-21'
-res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res = pd.DataFrame([df.loc[dt,'VALUE'] for df in dfs],columns=[dt])
 res.plot(); plt.savefig('tser_z001_05.png')
 dt = '1988-11-16'
-res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res = pd.DataFrame([df.loc[dt,'VALUE'] for df in dfs],columns=[dt])
 res.plot(); plt.savefig('tser_z001_06.png')
 dt = '1981-09-01'
-res = pd.DataFrame([df.ix[dt,'VALUE'] for df in dfs],columns=[dt])
+res = pd.DataFrame([df.loc[dt,'VALUE'] for df in dfs],columns=[dt])
 res.plot(); plt.savefig('tser_z001_07.png')
 ```
 
@@ -192,7 +192,12 @@ FED'in ne yaptığı, Taylor ise formülün taviyesi,
 import pandas as pd
 df = pd.read_csv('taylorfred.csv', parse_dates=True,\
                   index_col=0,comment='#')
-df = df.resample('AS');longrun = 2.0
+
+df_resampled = df.resample('YS').first() 
+df_resampled['GDPC1'] = df_resampled['GDPC1'].interpolate(method='spline', order=1) 
+df = df_resampled 
+
+longrun = 2.0
 df['GDPC1'] = df.GDPC1.interpolate(method='spline',order=1)
 df['Gap'] =  100. * (df.GDPC1/df.GDPPOT-1)
 df['Curr'] = df.PCEPI.pct_change()*100.
@@ -252,7 +257,7 @@ Ve nihai tahmin edici
 $$ S = \frac{2 (e^{\alpha} - 1 )}{1 + e^{\alpha}} $$
 
 ```python
-df = pd.read_csv('20day.csv',sep='\s*')
+df = pd.read_csv('20day.csv',sep='\\s+')
 df['Lt1'] = df.Lt.shift(-1)
 df['Ht1'] = df.Ht.shift(-1)
 
@@ -268,7 +273,7 @@ def f(x):
 df['S'] = df.apply(f, axis=1)
 df = df.fillna(0)
 df.loc[df.S<0,'S'] = 0
-print df.head()
+print (df.head())
 ```
 
 ```
@@ -327,7 +332,7 @@ df['lxjpus'] = np.log(df.xjpus)
 df = df.dropna(axis=0)
 import statsmodels.formula.api as smf
 results = smf.ols('lxjpus ~ lm1 + lm2 + ly1 + ly2', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
 ```

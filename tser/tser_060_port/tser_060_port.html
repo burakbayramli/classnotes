@@ -202,7 +202,7 @@ görebiliriz.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&quot;companies.csv&quot;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> df.head()</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.head())</span></code></pre></div>
 <pre><code>                 MSFT       AAPL         KO
 Date                                       
 2010-01-04  26.045432  28.141855  23.509276
@@ -232,14 +232,14 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (means.dot(weights) <span class="op">-</span> risk_free_rate)<span class="op">/</span>np.sqrt(var)</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> negative_sharpe_ratio_n_minus_1_stock(weights,returns,risk_free_rate):</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    weights2 <span class="op">=</span> sp.append(weights, <span class="dv">1</span><span class="op">-</span>np.<span class="bu">sum</span>(weights))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    weights2 <span class="op">=</span> np.append(weights, <span class="dv">1</span><span class="op">-</span>np.<span class="bu">sum</span>(weights))</span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>sharpe_ratio(returns, weights2, risk_free_rate)</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optimize_portfolio(returns, risk_free_rate):</span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    w0 <span class="op">=</span> np.ones(returns.columns.size<span class="op">-</span><span class="dv">1</span>,dtype<span class="op">=</span><span class="bu">float</span>) <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> returns.columns.size</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    w1 <span class="op">=</span> scopt.fmin(negative_sharpe_ratio_n_minus_1_stock,</span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                    w0, args<span class="op">=</span>(returns, risk_free_rate))</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    final_w <span class="op">=</span> sp.append(w1, <span class="dv">1</span> <span class="op">-</span> np.<span class="bu">sum</span>(w1))</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    final_w <span class="op">=</span> np.append(w1, <span class="dv">1</span> <span class="op">-</span> np.<span class="bu">sum</span>(w1))</span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    final_sharpe <span class="op">=</span> sharpe_ratio(returns, final_w, risk_free_rate)</span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (final_w, final_sharpe)</span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
@@ -264,17 +264,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> r <span class="kw">in</span> np.linspace(min_mean, max_mean, <span class="dv">100</span>):</span>
 <span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones(nstocks)<span class="op">/</span>nstocks</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    bounds <span class="op">=</span> [(<span class="dv">0</span>,<span class="dv">1</span>) <span class="cf">for</span> i <span class="kw">in</span> np.arange(nstocks)]</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    constraints <span class="op">=</span> ({<span class="st">&#39;type&#39;</span>: <span class="st">&#39;eq&#39;</span>,<span class="st">&#39;fun&#39;</span>: <span class="kw">lambda</span> W: np.<span class="bu">sum</span>(W) <span class="op">-</span> <span class="dv">1</span>})</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> scopt.minimize(objfun, weights, (returns, r),</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        bounds <span class="op">=</span> [(<span class="dv">0</span>,<span class="dv">1</span>) <span class="cf">for</span> i <span class="kw">in</span> np.arange(nstocks)]</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        constraints <span class="op">=</span> ({<span class="st">&#39;type&#39;</span>: <span class="st">&#39;eq&#39;</span>,<span class="st">&#39;fun&#39;</span>: <span class="kw">lambda</span> W: np.<span class="bu">sum</span>(W) <span class="op">-</span> <span class="dv">1</span>})</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        results <span class="op">=</span> scopt.minimize(objfun, weights, (returns, r),</span>
 <span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>                                 method<span class="op">=</span><span class="st">&#39;SLSQP&#39;</span>,constraints <span class="op">=</span> constraints,</span>
 <span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                                 bounds <span class="op">=</span> bounds)</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> results.success: <span class="cf">raise</span> <span class="pp">Exception</span>(result.message)</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    result_means.append(np.<span class="bu">round</span>(r,<span class="dv">4</span>)) <span class="co"># 4 decimal places</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    std_<span class="op">=</span>np.<span class="bu">round</span>(np.std(np.<span class="bu">sum</span>(returns<span class="op">*</span>results.x,axis<span class="op">=</span><span class="dv">1</span>)),<span class="dv">6</span>)</span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    result_stds.append(std_)</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    result_weights.append(np.<span class="bu">round</span>(results.x, <span class="dv">5</span>))</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> results.success: <span class="cf">raise</span> <span class="pp">Exception</span>(result.message)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>        result_means.append(np.<span class="bu">round</span>(r,<span class="dv">4</span>)) <span class="co"># 4 decimal places</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>        std_<span class="op">=</span>np.<span class="bu">round</span>(np.std(np.<span class="bu">sum</span>(returns<span class="op">*</span>results.x,axis<span class="op">=</span><span class="dv">1</span>)),<span class="dv">6</span>)</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>        result_stds.append(std_)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>        result_weights.append(np.<span class="bu">round</span>(results.x, <span class="dv">5</span>))</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&#39;Means&#39;</span>: result_means, <span class="st">&#39;Stds&#39;</span>: result_stds, <span class="st">&#39;Weights&#39;</span>: result_weights}</span>
 <span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_port_perf(w, ret, covs):</span>
@@ -301,7 +301,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <p>Günlük getiriler,</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>daily_returns <span class="op">=</span> calc_daily_returns(df)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> daily_returns.head()</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (daily_returns.head())</span></code></pre></div>
 <pre><code>                MSFT      AAPL        KO
 Date                                    
 2010-01-04       NaN       NaN       NaN
@@ -312,7 +312,7 @@ Date
 <p>Yıllık getiri,</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>annual_returns <span class="op">=</span> calc_annual_returns(daily_returns)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> annual_returns.head()</span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (annual_returns.head())</span></code></pre></div>
 <pre><code>          MSFT      AAPL        KO
 2010 -0.079441  0.507219  0.189366
 2011 -0.045157  0.255580  0.094586
@@ -322,11 +322,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <p>Eşit ağırlıklar üzerinden oluşturulmuş portföyün varyansı,</p>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>eq_weights <span class="op">=</span> np.array([<span class="dv">1</span><span class="op">/</span><span class="fl">3.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">3.</span>,<span class="dv">1</span><span class="op">/</span><span class="fl">3.</span>])</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> calc_portfolio_var(annual_returns,weights<span class="op">=</span>eq_weights)</span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (calc_portfolio_var(annual_returns,weights<span class="op">=</span>eq_weights))</span></code></pre></div>
 <pre><code>0.00287954016535</code></pre>
 <p>Sharpe Oranı</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> sharpe_ratio(annual_returns,eq_weights)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sharpe_ratio(annual_returns,eq_weights))</span></code></pre></div>
 <pre><code>3.20109292169</code></pre>
 <p>Farklı (rasgele) portföy ağırlıklarının oluşturacağı risk / getiri
 grafiği,</p>
@@ -337,7 +337,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a h
 <p><img src="tser_port_04.png" /></p>
 <p>Şimdi optimizasyon ile global bir optimal nokta bulalım,</p>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> optimize_portfolio(annual_returns, <span class="fl">0.0003</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (optimize_portfolio(annual_returns, <span class="fl">0.0003</span>))</span></code></pre></div>
 <pre><code>Optimization terminated successfully.
          Current function value: -7.829867
          Iterations: 38
@@ -347,9 +347,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>frontier_data <span class="op">=</span> calc_efficient_frontier(annual_returns)</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> frontier_data[<span class="st">&#39;Stds&#39;</span>][:<span class="dv">5</span>]</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> frontier_data[<span class="st">&#39;Means&#39;</span>][:<span class="dv">5</span>]</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> frontier_data[<span class="st">&#39;Weights&#39;</span>][:<span class="dv">5</span>]: <span class="bu">print</span> x</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (frontier_data[<span class="st">&#39;Stds&#39;</span>][:<span class="dv">5</span>])</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (frontier_data[<span class="st">&#39;Means&#39;</span>][:<span class="dv">5</span>])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> frontier_data[<span class="st">&#39;Weights&#39;</span>][:<span class="dv">5</span>]: <span class="bu">print</span> (x)</span></code></pre></div>
 <pre><code>[0.055842999999999997, 0.053446, 0.052564, 0.051706000000000002, 0.050871]
 [0.1148, 0.1169, 0.11890000000000001, 0.12089999999999999, 0.1229]
 [ 0.  0.  1.]
@@ -360,9 +360,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <div class="sourceCode" id="cb18"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>vw <span class="op">=</span> plot_all_possible_portfolios(annual_returns)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>vw.plot(x<span class="op">=</span><span class="st">&#39;sigma&#39;</span>,y<span class="op">=</span><span class="st">&#39;return&#39;</span>,kind<span class="op">=</span><span class="st">&#39;scatter&#39;</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plt.hold(<span class="va">True</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plot_efficient_frontier(frontier_data)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_port_03.png&#39;</span>)</span></code></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plot_efficient_frontier(frontier_data)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_port_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_port_03.png" /></p>
 <p>Bootstrap</p>
 <p>Dikkat: üstteki optimizasyonu olduğu gibi kullanmak sayısal olarak
@@ -381,12 +380,12 @@ blok örneklem yöntemi, kesintisiz zaman seri parçaları almak. Bir diğeri
 noktalar ardı ardına olsun olmasın verinin rasgele noktalarından
 örneklem toplamak. Alttaki ikinci yöntemi takip ediyor,</p>
 <div class="sourceCode" id="cb19"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile, pandas <span class="im">as</span> pd, util</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile, pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, random, datetime</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_dull_pd_matrix(dullvalue<span class="op">=</span><span class="fl">0.0</span>, dullname<span class="op">=</span><span class="st">&quot;A&quot;</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                          startdate<span class="op">=</span>pd.datetime(<span class="dv">1970</span>,<span class="dv">1</span>,<span class="dv">1</span>).date(),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                          startdate<span class="op">=</span>datetime.date(<span class="dv">1970</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                          enddate<span class="op">=</span>datetime.datetime.now().date(), index<span class="op">=</span><span class="va">None</span>):</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> index <span class="kw">is</span> <span class="va">None</span>:</span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        index<span class="op">=</span>pd.date_range(startdate, enddate)    </span>
@@ -417,7 +416,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a h
 <span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> markosolver(returns, default_vol, default_SR):        </span>
 <span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>    use_returns<span class="op">=</span>equalise_vols(returns, default_vol)    </span>
 <span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>    sigma<span class="op">=</span>use_returns.cov().values</span>
-<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>    mus <span class="op">=</span> use_returns[asset_name].mean() <span class="cf">for</span> asset_name <span class="kw">in</span> use_returns.columns</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a>    mus <span class="op">=</span> [use_returns[asset_name].mean() <span class="cf">for</span> asset_name <span class="kw">in</span> use_returns.columns]</span>
 <span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>    mus<span class="op">=</span>np.array([mus], ndmin<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>    mus<span class="op">=</span>mus.transpose()</span>
 <span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>    number_assets<span class="op">=</span>use_returns.shape[<span class="dv">1</span>]</span>
@@ -481,25 +480,26 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a h
 <span id="cb19-98"><a href="#cb19-98" aria-hidden="true" tabindex="-1"></a>    weight_df<span class="op">=</span>pd.concat(weight_list, axis<span class="op">=</span><span class="dv">0</span>)    </span>
 <span id="cb19-99"><a href="#cb19-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> weight_df</span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile, pandas <span class="im">as</span> pd, random</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>symbols <span class="op">=</span> [<span class="st">&#39;SP500&#39;</span>,<span class="st">&#39;NASDAQ&#39;</span>,<span class="st">&#39;US20&#39;</span>]</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        f <span class="op">=</span> <span class="st">&#39;</span><span class="sc">%s</span><span class="st">_price.csv&#39;</span> <span class="op">%</span> symbol</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        df[symbol] <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(f),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                                 index_col<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                                 parse_dates<span class="op">=</span><span class="va">True</span>)[<span class="st">&#39;PRICE&#39;</span>]</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;SP500&#39;</span>] <span class="op">=</span> df.SP500.pct_change()</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;NASDAQ&#39;</span>] <span class="op">=</span> df.NASDAQ.pct_change()</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;US20&#39;</span>] <span class="op">=</span> df.US20.pct_change()</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[(df.index <span class="op">&gt;=</span> <span class="st">&#39;1999-08-02&#39;</span>) <span class="op">&amp;</span> (df.index <span class="op">&lt;=</span> <span class="st">&#39;2015-04-22&#39;</span>)]</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>random.seed(<span class="dv">0</span>)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>w<span class="op">=</span>boot.optimise_over_periods(df)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile, pandas <span class="im">as</span> pd, random, boot</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>symbols <span class="op">=</span> [<span class="st">&#39;SP500&#39;</span>,<span class="st">&#39;NASDAQ&#39;</span>,<span class="st">&#39;US20&#39;</span>]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;../tser_070_voltar/legacycsv.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> symbol <span class="kw">in</span> symbols:</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        f <span class="op">=</span> <span class="st">&#39;</span><span class="sc">%s</span><span class="st">_price.csv&#39;</span> <span class="op">%</span> symbol</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        df[symbol] <span class="op">=</span> pd.read_csv(z.<span class="bu">open</span>(f),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                                 index_col<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                                 parse_dates<span class="op">=</span><span class="va">True</span>)[<span class="st">&#39;PRICE&#39;</span>]</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;SP500&#39;</span>] <span class="op">=</span> df.SP500.pct_change()</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;NASDAQ&#39;</span>] <span class="op">=</span> df.NASDAQ.pct_change()</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;US20&#39;</span>] <span class="op">=</span> df.US20.pct_change()</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[(df.index <span class="op">&gt;=</span> <span class="st">&#39;1999-08-02&#39;</span>) <span class="op">&amp;</span> (df.index <span class="op">&lt;=</span> <span class="st">&#39;2015-04-22&#39;</span>)]</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>random.seed(<span class="dv">0</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>w<span class="op">=</span>boot.optimise_over_periods(df,rollyears<span class="op">=</span><span class="dv">20</span>, monte_carlo<span class="op">=</span><span class="dv">20</span>,monte_length<span class="op">=</span><span class="dv">250</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb21"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>w.plot()</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_port_01.png&#39;</span>)</span></code></pre></div>

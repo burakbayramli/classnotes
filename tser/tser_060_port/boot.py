@@ -1,4 +1,4 @@
-import zipfile, pandas as pd, util
+import zipfile, pandas as pd
 import numpy as np, random, datetime
 from scipy.optimize import minimize
 

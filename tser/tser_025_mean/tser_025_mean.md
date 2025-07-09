@@ -135,7 +135,7 @@ raporluyorlar.
 Veri üzerinde görelim, önce Nil Nehri verisi
 
 ```python
-print st.adfuller(nile[1],maxlag=1)
+print (st.adfuller(nile[1],maxlag=1))
 ```
 
 ```
@@ -151,7 +151,7 @@ durağan olmadığı.
 Döviz kuru verisi üzerinde, 
 
 ```python
-print st.adfuller(df_caus.y,maxlag=1)
+print (st.adfuller(df_caus.y,maxlag=1))
 ```
 
 ```
@@ -173,8 +173,8 @@ yayınımı ölçmenin yolu var,
 
 ```python
 import hurst as h
-print 'H doviz kuru', h.hurst(np.log(df_caus.y))
-print 'H Nil Nehri', h.hurst(nile[1])
+print ('H doviz kuru', h.hurst(np.log(df_caus.y)))
+print ('H Nil Nehri', h.hurst(nile[1]))
 ```
 
 ```
@@ -278,7 +278,7 @@ azalışın hayat yarılama zamanı $-\log(2)/\lambda$ olarak bilinir.
 
 ```python
 lam = results.params['ylag']
-print lam
+print (lam)
 ```
 
 ```
@@ -293,7 +293,7 @@ yapılamaz.
 
 ```python
 halflife=-np.log(2)/lam
-print halflife, 'days'
+print (halflife, 'days')
 ```
 
 ```
@@ -325,8 +325,8 @@ olduğunda pozisyonu kapattığımızda aradaki fark cepte kar kalacaktır.
 
 ```python
 halflife = 117
-data_mean = pd.rolling_mean(df_caus['y'], window=int(halflife))
-data_std = pd.rolling_std(df_caus['y'], window=int(halflife))
+data_mean = df_caus['y'].rolling(window=int(halflife)).mean()
+data_std = df_caus['y'].rolling(window=int(halflife)).std()
 df_caus['mktVal'] = -1*(df_caus['y']-data_mean) / data_std
 pnl = df_caus['mktVal'].shift(1) * df_caus.y.pct_change()
 pnl = pnl.fillna(0).cumsum()
