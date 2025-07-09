@@ -374,7 +374,7 @@ class Boltzmann:
         W=np.zeros((X.shape[1],X.shape[1]))
         W_data=np.dot(X.T,X)/X.shape[1];
         for i in range(self.n_iter):
-            if i % 10 == 0: print 'Iteration', i
+            if i % 10 == 0: print ('Iteration', i)
             S = self.sample(W)
             S = (S*2)-1
             W_guess=np.dot(S.T,S)/S.shape[1];
@@ -431,7 +431,72 @@ olasılığı sadece bir kere toplanacak.
 Şimdi ufak bir örnek üzerinde BM'i işletelim. 
 
 ```python
-import boltz
+class Boltzmann:
+
+    def __init__(self,n_iter=100,eta=0.1,sample_size=100,init_sample_size=10):
+        self.n_iter = n_iter
+        self.eta = eta
+        self.sample_size = sample_size
+        self.init_sample_size = init_sample_size
+    
+    def sigmoid(self, u):
+        return 1./(1.+np.exp(-u));
+
+    def draw(self, Sin,T):
+        """
+        Bir Gibbs gecisi yaparak dagilimdan bir orneklem al
+        """
+        D=Sin.shape[0]
+        S=Sin.copy()
+        rand = np.random.rand(D,1)
+        for i in range(D):
+            h=np.dot(T[i,:],S)
+            S[i]=rand[i]<self.sigmoid(h);
+        return S
+
+    def sample(self, T):
+        N=T.shape[0]        
+        # sigmoid(0) her zaman 0.5 olacak
+        s=np.random.rand(N)<self.sigmoid(0)
+        # alttaki dongu atlama / gozonune alinmayacak degerler icin        
+        for k in range(self.init_sample_size):
+            s=self.draw(s,T)
+        S=np.zeros((N,self.sample_size))
+        S[:,0]=s
+        # simdi degerleri toplamaya basla
+        for i in range(1,self.sample_size):
+            S[:,i]=self.draw(S[:,i-1],T)
+        return S.T
+
+    def normc(self, X):
+        """
+        normalizasyon sabitini dondur
+        """
+        def f(x): return np.exp(0.5 * np.dot(np.dot(x,self.W), x))
+        S = 2*self.sample(self.W)-1
+        # sozluk icinde anahtar tek x degeri boylece bir
+        # olasilik degeri sadece bir kere toplanir
+        res = dict((tuple(s),f(s)) for s in S)
+        return np.sum(list(res.values())) 
+    
+    def fit(self, X):
+        W=np.zeros((X.shape[1],X.shape[1]))
+        W_data=np.dot(X.T,X)/X.shape[1];
+        for i in range(self.n_iter):
+            if i % 10 == 0: print ('Iteration', i)
+            S = self.sample(W)
+            S = (S*2)-1
+            W_guess=np.dot(S.T,S)/S.shape[1];
+            W += self.eta * (W_data - W_guess)
+            np.fill_diagonal(W, 0)
+        self.W = W
+        self.C = self.normc(X)
+
+    def predict_proba(self, X):
+        return np.diag(np.exp(0.5 * np.dot(np.dot(X, self.W), X.T))) / self.C
+```
+
+```python
 A = np.array([\
 [0.,1.,1.,1],
 [1.,0.,0,0],
@@ -441,11 +506,11 @@ A = np.array([\
 ])
 A[A==0]=-1
 
-clf = boltz.Boltzmann(n_iter=50,eta=0.01,sample_size=200,init_sample_size=50)
+clf = Boltzmann(n_iter=50,eta=0.01,sample_size=200,init_sample_size=50)
 clf.fit(A)
-print 'W'
-print clf.W
-print 'normalizasyon sabiti', clf.C
+print ('W')
+print (clf.W)
+print ('normalizasyon sabiti', clf.C)
 ```
 
 ```
@@ -476,7 +541,7 @@ test = np.array([\
 [1.,1.,0,0],
 [0.,1.,1.,1]
 ])    
-print clf.predict_proba(test)
+print (clf.predict_proba(test))
 ```
 
 ```
@@ -490,8 +555,8 @@ Veride 0,5,7 harflerinin görüntüleri var. Mesela 5 için bazı örnek
 görüntüler,
 
 ```python
-Y = np.loadtxt('../../stat/stat_mixbern/binarydigits.txt')
-label = np.ravel(np.loadtxt('../../stat/stat_mixbern/bindigitlabels.txt'))
+Y = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+label = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
 Y5 = Y[label==5]
 plt.imshow(Y5[0,:].reshape((8,8),order='C'), cmap=plt.cm.gray)
 plt.savefig('boltzmann_01.png')
@@ -517,11 +582,11 @@ benden gelme olasılığı yüksek'' diyor demektir, ve etiket o olmalıdır.
 
 ```python
 from sklearn import neighbors
-import numpy as np, boltz
-from sklearn.cross_validation import train_test_split
+import numpy as np
+from sklearn.model_selection import train_test_split
 
-Y = np.loadtxt('../../stat/stat_mixbern/binarydigits.txt')
-labels = np.ravel(np.loadtxt('../../stat/stat_mixbern/bindigitlabels.txt'))
+Y = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+labels = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
 X_train, X_test, y_train, y_test = train_test_split(Y, labels, test_size=0.4,random_state=0)
 X_train[X_train==0]=-1
 X_test[X_test==0]=-1
@@ -529,7 +594,7 @@ X_test[X_test==0]=-1
 clfs = {}
 for label in [0,5,7]:
     x = X_train[y_train==label]
-    clf = boltz.Boltzmann(n_iter=30,eta=0.05,sample_size=500,init_sample_size=100)
+    clf = Boltzmann(n_iter=30,eta=0.05,sample_size=500,init_sample_size=100)
     clf.fit(x)
     clfs[label] = clf
     
@@ -540,16 +605,45 @@ for label in [0,5,7]:
 res3 = np.argmax(np.array(res).T,axis=1)
 res3[res3==1] = 5
 res3[res3==2] = 7
-print 'Boltzmann Makinasi', np.sum(res3==y_test) / float(len(y_test))
+print ('Boltzmann Makinasi', np.sum(res3==y_test) / float(len(y_test)))
 
 clf = neighbors.KNeighborsClassifier()
 clf.fit(X_train,y_train)
 res3 = clf.predict(X_test)    
-print 'KNN', np.sum(res3==y_test) / float(len(y_test))
+print ('KNN', np.sum(res3==y_test) / float(len(y_test)))
 ```
 
 ```python
-!python testbm.py
+from sklearn import neighbors
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+Y = np.loadtxt('../../stat/stat_105_mixbern/binarydigits.txt')
+labels = np.ravel(np.loadtxt('../../stat/stat_105_mixbern/bindigitlabels.txt'))
+X_train, X_test, y_train, y_test = train_test_split(Y, labels, test_size=0.4,random_state=0)
+X_train[X_train==0]=-1
+X_test[X_test==0]=-1
+
+clfs = {}
+for label in [0,5,7]:
+    x = X_train[y_train==label]
+    clf = Boltzmann(n_iter=30,eta=0.05,sample_size=500,init_sample_size=100)
+    clf.fit(x)
+    clfs[label] = clf
+    
+res = []
+for label in [0,5,7]:
+    res.append(clfs[label].predict_proba(X_test))
+    
+res3 = np.argmax(np.array(res).T,axis=1)
+res3[res3==1] = 5
+res3[res3==2] = 7
+print ('Boltzmann Makinasi', np.sum(res3==y_test) / float(len(y_test)))
+
+clf = neighbors.KNeighborsClassifier()
+clf.fit(X_train,y_train)
+res3 = clf.predict(X_test)    
+print ('KNN', np.sum(res3==y_test) / float(len(y_test)))
 ```
 
 ```
@@ -587,7 +681,7 @@ A = np.array([\
 [0, 0, 1.,0]
 ])
 c = A.T.dot(A).astype(float)
-print c 
+print (c)
 ```
 
 ```
@@ -606,7 +700,7 @@ için
 
 ```python
 x = np.array([0,1,1,0])
-print np.dot(np.dot(x.T,c), x) / 2
+print (np.dot(np.dot(x.T,c), x) / 2)
 ```
 
 ```

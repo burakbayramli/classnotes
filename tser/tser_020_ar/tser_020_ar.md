@@ -48,7 +48,7 @@ Daha odaklı bir örnek olarak Lynx verisine bakalım [2, sf. 727],
 ```python
 import pandas as pd
 import statsmodels.api as sm
-df = pd.read_csv('../tser_stoc/lynx.csv')
+df = pd.read_csv('../tser_015_stoc/lynx.csv')
 ```
 
 ```python
@@ -124,9 +124,9 @@ aic 1907.7277269856995
 Şimdi bir ARIMA paketi ile aynısını yapalım,
 
 ```python
-from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.arima.model import ARIMA
 model10 = ARIMA(df.x, order=(1,0,0))
-model_fit = model10.fit(disp=0)
+model_fit = model10.fit()
 print(model_fit.summary())
 ```
 
@@ -164,12 +164,12 @@ sırf AR deneyelim,
 
 ```python
 res = []
-res.append(ARIMA(df.x, order=(1,0,0)).fit(disp=0))
-res.append(ARIMA(df.x, order=(2,0,0)).fit(disp=0))
-res.append(ARIMA(df.x, order=(3,0,0)).fit(disp=0))
-res.append(ARIMA(df.x, order=(4,0,0)).fit(disp=0))
-res.append(ARIMA(df.x, order=(5,0,0)).fit(disp=0))
-res.append(ARIMA(df.x, order=(6,0,0)).fit(disp=0))
+res.append(ARIMA(df.x, order=(1,0,0)).fit())
+res.append(ARIMA(df.x, order=(2,0,0)).fit())
+res.append(ARIMA(df.x, order=(3,0,0)).fit())
+res.append(ARIMA(df.x, order=(4,0,0)).fit())
+res.append(ARIMA(df.x, order=(5,0,0)).fit())
+res.append(ARIMA(df.x, order=(6,0,0)).fit())
 for x in res: print (x.df_model+1, x.aic)
 ```
 
@@ -194,7 +194,7 @@ lynx = df.x
 %R model05<-arima(lynx,order=c(0,0,5))
 %R model06<-arima(lynx,order=c(0,0,6))
 %R -o res res <- AIC(model01,model02,model03,model04,model05,model06)
-print res
+print (res)
 ```
 
 ```
@@ -219,7 +219,7 @@ lynx = df.x
 %R model42<-arima(lynx,order=c(4,0,2))
 %R model43<-arima(lynx,order=c(4,0,3))
 %R -o res res<-AIC(model40,model41,model42,model43)
-print res
+print (res)
 ```
 
 ```
@@ -242,7 +242,7 @@ lynx = df.x
 %R model402<-arima(lynx,order=c(4,2,0))
 %R model403<-arima(lynx,order=c(4,3,0))
 %R -o res res<-AIC(model400,model401,model402,model403)
-print res
+print (res)
 ```
 
 ```
@@ -396,6 +396,7 @@ import statsmodels.api as sm
 import scipy as sp
 
 def breusch_pagan_test(y,x):
+     x = np.asarray(x)
      results=sm.OLS(y,x).fit()
      resid=results.resid
      n=len(resid)
@@ -405,7 +406,7 @@ def breusch_pagan_test(y,x):
      fv=results2.fittedvalues
      bp=0.5 * sum(fv**2)
      df=results2.df_model
-     p_value=1-sp.stats.chi.cdf(bp,df)
+     p_value=1-sp.stats.chi2.cdf(bp,df) 
      return round(bp,6), df, round(p_value,7)
 
 ```
@@ -415,8 +416,8 @@ Lynx verisi üzerinde uygulayalım,
 ```python
 import pandas as pd
 import breusch
-dflynx = pd.read_csv('../tser_stoc/lynx.csv');
-print breusch.breusch_pagan_test(dflynx.x, range(len(dflynx)))
+dflynx = pd.read_csv('../tser_015_stoc/lynx.csv');
+print (breusch.breusch_pagan_test(dflynx.x, np.array(range(len(dflynx)))))
 ```
 
 ```
@@ -530,7 +531,7 @@ Bir diger test Ljung-Box testi,
 
 ```python
 import statsmodels.tsa.stattools as tsa
-acf,ci,q,pvalues = tsa.acf(results.resid, nlags=4, alpha=95,qstat=True, unbiased=True)
+acf,ci,q,pvalues = tsa.acf(results.resid, nlags=4, alpha=95,qstat=True, adjusted=True)
 print (acf)
 print (pvalues)
 ```

@@ -10,9 +10,9 @@ def agz_to_gnu(action):
     return (y+1,9-x)
 
 
-print gnu_to_agz((4,3))
-print agz_to_gnu((6,3))
-print agz_to_gnu((5,7))
+print (gnu_to_agz((4,3)))
+print (agz_to_gnu((6,3)))
+print (agz_to_gnu((5,7)))
 ```
 
 ```text
@@ -78,7 +78,7 @@ got: =
 
 ```python
 res = gnugo.genmove(gtp.WHITE)
-print 'res',res
+print ('res',res)
 gnugo.showboard()
 ```
 
