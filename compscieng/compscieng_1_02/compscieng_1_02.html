@@ -499,54 +499,41 @@ Problemin başındaki matris 3x3 boyutundaydı, bu 4x4 boyutunda, ayrıca
 class="math inline">\(1/4\)</span> değerinde.</p>
 <p>Problem 1-2-A</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ktbc(n):</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    vec <span class="op">=</span> np.zeros((<span class="dv">1</span>,n))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    vec[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    vec[<span class="dv">0</span>,<span class="dv">1</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> lin.toeplitz(vec)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> np.copy(K)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    T[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> np.copy(K)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    B[<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    B[n<span class="op">-</span><span class="dv">1</span>,n<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> np.copy(K)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    C[n<span class="op">-</span><span class="dv">1</span>,n<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> K, T, B, C</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>K,T,B,C <span class="op">=</span> ktbc(<span class="dv">3</span>)<span class="op">;</span> <span class="bu">print</span> T</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span><span class="fl">4.</span></span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin, sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&quot;../compscieng_1_01&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ktbc</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>K,T,B,C <span class="op">=</span> ktbc.ktbc(<span class="dv">3</span>)<span class="op">;</span> <span class="bu">print</span> (T)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">1.</span><span class="op">/</span><span class="fl">4.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> T, [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> np.insert(discrete, <span class="dv">0</span>, discrete[<span class="dv">0</span>]) </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> np.append(discrete, <span class="fl">0.</span>) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>K,T,B,C <span class="op">=</span> ktbc.ktbc(<span class="dv">4</span>)<span class="op">;</span> <span class="bu">print</span> (T)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>T, [<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># add little diff for plotting</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># grafik ust uste binmesin diye azicik fark ekledik</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> discrete_2 <span class="op">+</span> <span class="fl">0.01</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> np.append(discrete_2, <span class="fl">0.</span>) </span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> T, [<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> u(x): <span class="cf">return</span> (<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>)<span class="op">*</span>(<span class="fl">1.</span> <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> np.insert(discrete, <span class="dv">0</span>, discrete[<span class="dv">0</span>]) </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>discrete <span class="op">=</span> np.append(discrete, <span class="fl">0.</span>) </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>K,T,B,C <span class="op">=</span> ktbc(<span class="dv">4</span>)<span class="op">;</span> <span class="bu">print</span> T</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> lin.solve( (<span class="fl">1.</span><span class="op">/</span>h<span class="op">**</span><span class="dv">2</span>)<span class="op">*</span>T, [<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>,<span class="fl">1.</span>] )</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># add little diff for plotting</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># grafik ust uste binmesin diye azicik fark ekledik</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> discrete_2 <span class="op">+</span> <span class="fl">0.01</span> </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>discrete_2 <span class="op">=</span> np.append(discrete_2, <span class="fl">0.</span>) </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>p1, <span class="op">=</span> plt.plot([u(<span class="fl">0.0</span>), u(<span class="fl">0.25</span>), u(<span class="fl">0.5</span>), u(<span class="fl">0.75</span>), u(<span class="fl">1.</span>)])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>p2, <span class="op">=</span> plt.plot(discrete)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>p3, <span class="op">=</span> plt.plot(discrete_2)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>plt.legend([p1,p2,p3], [<span class="st">&quot;analytical solution (analitik cozum)&quot;</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;discrete solution 1 (ayriksal cozum 1)&quot;</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;discrete solution 2 (ayriksal cozum 2)&quot;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                        ])</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> u(x): <span class="cf">return</span> (<span class="fl">1.</span><span class="op">/</span><span class="fl">2.</span>)<span class="op">*</span>(<span class="fl">1.</span> <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>p1 <span class="op">=</span> plt.plot([u(<span class="fl">0.0</span>), u(<span class="fl">0.25</span>), u(<span class="fl">0.5</span>), u(<span class="fl">0.75</span>), u(<span class="fl">1.</span>)])</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>p2 <span class="op">=</span> plt.plot(discrete)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>p3 <span class="op">=</span> plt.plot(discrete_2)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>plt.legend([p1,p2,p3], [<span class="st">&quot;analytical solution (analitik cozum)&quot;</span>,</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;discrete solution 1 (ayriksal cozum 1)&quot;</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;discrete solution 2 (ayriksal cozum 2)&quot;</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                        ])</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;1-2-A.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;1-2-A.png&#39;</span>)</span></code></pre></div>
 <pre><code>[[ 1. -1.  0.]
  [-1.  2. -1.]
  [ 0. -1.  2.]]

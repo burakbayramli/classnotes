@@ -554,7 +554,7 @@ K = [[6., -3., 0],
 
 f = [1./3., 1./3., 1./6.]
 
-print np.linalg.solve(K,f)
+print (np.linalg.solve(K,f))
 ```
 
 ```
@@ -562,7 +562,7 @@ print np.linalg.solve(K,f)
 ```
 
 ```python
-print 5./18., 4./9., 1./2.
+print (5./18., 4./9., 1./2.)
 ```
 
 ```

@@ -204,15 +204,15 @@ from sympy import integrate, sqrt, Symbol, pprint
 from sympy import simplify
 y = Symbol('y')
 x = Symbol('x')
-print 'entegral', (integrate('1/ ((x**2+y**2)**(3/2))',y))
+print ('entegral', (integrate('1/ ((x**2+y**2)**(3/2))',y)))
 L = Symbol('L')
 x = Symbol('x')
 rs = simplify(
              ((L/2)/(x**3*sqrt(1 + (L/2)**2/(x**2)))) - \
              ((-L/2)/(x**3*sqrt(1 + (-L/2)**2/(x**2)))))
-print u'sınır değerlerini verip basitleştirince'
-print(rs)
-print u'güzel görünümlü\n'
+print (u'sınır değerlerini verip basitleştirince')
+print (rs)
+print (u'güzel görünümlü\n')
 pprint(rs)
 ```
 
