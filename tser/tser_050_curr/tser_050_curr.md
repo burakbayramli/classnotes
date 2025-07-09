@@ -24,7 +24,7 @@ satmak gerekir, ki burada B başka bir baz döviz olacaktır. B çoğunlukla
 likiditesi yüksek olan rahatça alınıp satılabilecek bir dövizden seçilir,
 mesela USD (dolar) ya da EUR (avro) gibi. 
 
-Alttaki dosyaları almak için [1]'e bakınız. 
+Altta gereken veri dosyaları almak için [3]'e bakınız. 
 
 ```python
 import pandas as pd, os, sys
@@ -105,3 +105,8 @@ Kaynaklar
 
 [2] Chan, *Algorithmic Trading*
 
+[3] Veri,
+    [Dosya 1](https://www.dropbox.com/scl/fi/m25gcicwcywm7n8rufkh0/inputData_AUDCAD_20120426.mat?rlkey=d37ajwf0zy7oora7ndu9wsd0w&st=j710nmdk&raw=1),
+    [Dosya 2](https://www.dropbox.com/scl/fi/wmyd44e5mkk4xotpmpmhh/inputData_AUDUSD_20120426.mat?rlkey=crehyhngbxy41ymob8tsa3xhu&st=d29vclgb&raw=1),
+    [Dosya 3](https://www.dropbox.com/scl/fi/dxd48gy0ini8456ud17od/inputData_USDCAD_20120426.mat?rlkey=t8npmimclmtnsvy1o2rgepx9a&st=jedosb3x&raw=1),
+    [Dosya 4](https://www.dropbox.com/scl/fi/0c6tsutbgpyq0tsi0j6mo/inputDataOHLCDaily_stocks_20120424.mat?rlkey=0hkkj2efe6l0xf9lzhs7veqdw&st=aa7ck5u4&raw=1)
