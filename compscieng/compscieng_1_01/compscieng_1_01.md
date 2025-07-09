@@ -354,6 +354,16 @@ def ktbc(n):
     return K, T, B, C
 ```
 
+```python
+# ustteki kodu diske yazalim diger sayfalardan erisebilmek icin
+import inspect
+fout = open('ktbc.py','w')
+fout.write('import scipy.linalg as lin\nimport numpy as np\n\n')
+code = inspect.getsourcelines(ktbc)
+for line in code[0]: fout.write(line)
+fout.close()
+```
+
 Kapatırken şu özellikleri de ekleyelim. 
 
 K, T pozitif kesin (positive definite) matrislerdir. 

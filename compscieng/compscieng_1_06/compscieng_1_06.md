@@ -354,18 +354,19 @@ def ktbc(n):
     
     return K, T, B, C
 
-import scipy.linalg as lin
+import scipy.linalg as lin, sys
+sys.path.append("../compscieng_1_01")
 import ktbc
 
 K,T,B,C =  ktbc.ktbc(5)
 
 u,v=lin.eig(K)
 
-print u
+print (u)
 
-print 2-np.sqrt(3), 2-1, 2-0, 2+1, 2+np.sqrt(3)
+print (2-np.sqrt(3), 2-1, 2-0, 2+1, 2+np.sqrt(3))
 
-print 2*np.ones((5,1)).T - 2*np.cos((np.arange(5)+1) * np.pi/6)
+print (2*np.ones((5,1)).T - 2*np.cos((np.arange(5)+1) * np.pi/6))
 ```
 
 ```

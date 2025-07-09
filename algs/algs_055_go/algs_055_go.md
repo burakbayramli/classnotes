@@ -610,6 +610,11 @@ evrişim filtresi ekleyerek), ya da `resnet.py` ile, ve `n_play`'i
 arttırarak daha fazla simülasyonla sonuçları daha da iyileştirmeye
 uğraşabilirler.
 
+Kodlar
+
+[resnet.py](resnet.py), [train.py](train.py), [gnugo_play.py](gnugo_play.py),
+[mcts.py](mcts.py)
+
 Kaynaklar
 
 [1] Bayramlı, 

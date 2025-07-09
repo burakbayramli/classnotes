@@ -202,7 +202,7 @@ görürdüm. Bu teorinin ispatı için [1, sf 300].
 import numpy.linalg as lin
 A = np.random.randn(10,10)
 evals,evecs = lin.eig(A)
-print evals
+print (evals)
 ```
 
 ```
@@ -223,9 +223,9 @@ taşıyan tüm vektörler).
 import numpy.linalg as lin
 A = np.eye(10,10)
 evals,evecs = lin.eig(A)
-print 'ozdegerler', evals
-print 'ozvektor 1', evecs[0]
-print 'ozvektor 2', evecs[1]
+print ('ozdegerler', evals)
+print ('ozvektor 1', evecs[0])
+print ('ozvektor 2', evecs[1])
 ```
 
 ```

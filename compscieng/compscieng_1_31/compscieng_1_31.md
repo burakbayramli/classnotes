@@ -67,10 +67,10 @@ $t-\tau$ yerine $t+\tau$ kullanılırsa çapraz korelasyon elde ediliyor.
 import scipy.signal
 f = [1,2,3,4,5,6]
 g = [5,4,3,2,1]
-print scipy.signal.convolve(a,b)
+print (scipy.signal.convolve(f,g))
 ```
 
-```
+```text
 [ 5 14 26 40 55 70 50 32 17  6]
 ```
 
@@ -120,14 +120,14 @@ türlü toplamının hesabı bir evrişim, $p * p$,
 ```python
 import scipy.signal
 d = 1/6. * np.array([1.0,1.0,1.0,1.0,1.0,1.0])
-print scipy.signal.convolve(d,d) 
-print scipy.signal.convolve(d,d) * 36.
+print (scipy.signal.convolve(d,d) )
+print (scipy.signal.convolve(d,d) * 36.)
 ```
 
-```
-[ 0.02777778  0.05555556  0.08333333  0.11111111  0.13888889  0.16666667
-  0.13888889  0.11111111  0.08333333  0.05555556  0.02777778]
-[ 1.  2.  3.  4.  5.  6.  5.  4.  3.  2.  1.]
+```text
+[0.02777778 0.05555556 0.08333333 0.11111111 0.13888889 0.16666667
+ 0.13888889 0.11111111 0.08333333 0.05555556 0.02777778]
+[1. 2. 3. 4. 5. 6. 5. 4. 3. 2. 1.]
 ```
 
 Sonuca göre toplam 12 gelme ihtimali 1/36 (en baştaki), 11 gelme ihtimali
