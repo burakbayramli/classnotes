@@ -77,8 +77,8 @@ dengesi var. Bu verilerin ham hali 2000 senesine bakalım.
 
 ```python
 import pandas as pd, csv
-df = pd.read_csv('greece_acct.csv',sep='\s+',index_col=0)
-print (df.T[[2000]])
+df = pd.read_csv('greece_acct.csv',sep='\\s+',index_col=0)
+print ((df.T[[2000]]))
 ```
 
 ```
@@ -141,7 +141,7 @@ df['Financial Account'] = df['Direct Investment'] + \
 df['Balancing Item'] = -1*(df['Current Account'] + \
                            df['Capital Transfers'] + \
                            df['Financial Account'])
-print (df.T[[2000,2001,2002,2003]])
+print ((df.T[[2000,2001,2002,2003]]))
 ```
 
 ```
@@ -170,7 +170,7 @@ Balancing Item                          -533.8   1234.5  -1739.3    141.0
 ```
 
 ```python
-print (df.T[[2004,2005,2006,2007]])
+print ((df.T[[2004,2005,2006,2007]]))
 ```
 
 ```
@@ -199,7 +199,7 @@ Balancing Item                           233.1     88.4    263.1    699.7
 ```
 
 ```python
-print (df.T[[2008,2009,2010]])
+print ((df.T[[2008,2009,2010]]))
 ```
 
 ```
@@ -293,7 +293,7 @@ df2['All_Accounts'] = df2["CURRENT_ACCOUNT"] + \
 
 df2['Sum'] = df2['All_Accounts'] - df2["RESERVE_ASSETS"]
 
-print df2[['All_Accounts','Sum']]
+print (df2[['All_Accounts','Sum']])
 ```
 
 ```

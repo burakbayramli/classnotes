@@ -182,8 +182,8 @@ import pandas as pd
 df = pd.read_csv('money.csv',parse_dates=['DATE'])
 df = df.set_index('DATE')
 df = df[['m2cd','gdp']]
-df = df.ix[df.index > '1960-01-01']
-df = df.ix[df.index < '2010-01-01']
+df = df.iloc[df.index > '1960-01-01']
+df = df.iloc[df.index < '2010-01-01']
 df = df.dropna(axis=0)
 df['vel1'] = df.gdp / df.m2cd
 df.vel1.plot(ylim=[0.0,3.0])
@@ -223,10 +223,10 @@ kredileri alıp, ondan emlak kredilerini çıkartırsak, ve bu "iyi'' $M$
 ```python
 df3 = pd.read_csv('money.csv',parse_dates=['DATE'])
 df3 = df3.set_index('DATE')
-df3 = df3.ix[df3.index > '1960-01-01']
-df3 = df3.ix[df3.index < '2010-01-01']
+df3 = df3.iloc[df3.index > '1960-01-01']
+df3 = df3.iloc[df3.index < '2010-01-01']
 df3 = df3[['m2cd','gdp','nonfincred','realest']]
-df3 = df3.resample("A", how='sum') 
+df3 = df3.resample("A").sum()
 df3['vel2'] = df3.gdp / (df3.nonfincred-df3.realest)
 df3.vel2.plot(ylim=[0.0,3.0])
 plt.savefig('tser_macro_05.png')
@@ -314,7 +314,7 @@ değil. Altta etkinin korelasyonuna bakıyoruz,
 import scipy.stats as stats
 df['gdpinc1'] = df.gdpinc.shift(1)
 df2 = df.dropna(axis=0)
-print stats.pearsonr(df2.shortrate, df2.gdpinc1)
+print (stats.pearsonr(df2.shortrate, df2.gdpinc1))
 ```
 
 ```
@@ -479,7 +479,7 @@ df = df.dropna(axis=0)
 
 import statsmodels.formula.api as smf
 results = smf.ols('lhs ~ dgt +  dgdpt1 + dcrt1  + dcrt2 ', data=df).fit()
-print results.summary()
+print (results.summary())
 ```
 
 ```
