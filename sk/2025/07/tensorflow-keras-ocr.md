@@ -50,7 +50,7 @@ import tensorflow as tf
 yapılabiliyor. Fakat bilindiği gibi modern derin YSA'ların eğitimi
 çoğunlukla çok veri gerektirir, bu sebeple eğitim zamanlar saatlar,
 hatta bazen günler sürebiliyor. Fakat eğitimi bitmiş bir YSA'nın
-kullanımı, yani tahmin fazi daha hızlıdır. YSA eğitmek demek onun iç
+kullanımı, yani tahmin fazı daha hızlıdır. YSA eğitmek demek onun iç
 ağırlık değerlerini bulmaktan ibarettir, o zaman bir YSA hazır
 ağırlıklarla yüklenebilirse, eğitim fazını kendimiz yapmaktan
 kurtuluruz.
@@ -60,7 +60,7 @@ mesela Keras OCR [2]. Bu paket üstteki `pip` komutu ile kuruldu, ve
 gerekli hazır pişmiş YSA ağırlıklarını ilk işlediğinde otomatik olarak
 indirecektir.
 
-Mesela alttaki resmi işleyelim,
+Şimdi alttaki resmi işleyelim,
 
 ![](street1.jpg)
 
@@ -104,6 +104,3 @@ Kaynaklar
 [1] [Virtualenv](../../2018/08/virtualenv-python-izole-sanal-calsma.html)
 
 [2] [Keras OCR](https://keras-ocr.readthedocs.io/en/latest/examples/using_pretrained_models.html)
-
-
-

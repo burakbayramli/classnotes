@@ -87,15 +87,19 @@ cümleyi 0, bozulmamış olanını 1 etiketiyle eğitmek. Cümleler nasıl olsa 
 var, onları bozmak kolay, bu şekilde iki kategorili bir sınıflama problemi
 elde ediyoruz. Örnek boyutlarla [3],
 
-$x \in \mathbb{R}^{20 \times 1}, 
+$$
+x \in \mathbb{R}^{20 \times 1}, 
 W \in \mathbb{R}^{8 \times 20}, 
-U \in \mathbb{R}^{8 \times 1}$ 
+U \in \mathbb{R}^{8 \times 1}
+$$ 
 
 olsa, örnek girdi,
 
-$$ x = \left[\begin{array}{rrrrr}
+$$
+x = \left[\begin{array}{rrrrr}
 x_{cat} & x_{chills} & x_{on} & x_{a} & x_{mat}
-\end{array}\right]$$
+\end{array}\right]
+$$
 
 olacak şekilde, 
 
