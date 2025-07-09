@@ -487,18 +487,18 @@ V = np.array(V)
 
 # sadece eklerle isvd
 Up,Sp,Vp = isvd.addblock_svd_update(U, S, V, A, True)
-print 'isvd'
-print Up
-print Sp
-print Vp
+print ('isvd')
+print (Up)
+print (Sp)
+print (Vp)
 
 # eklenmis matris uzerinde pur svd
 print
-print 'pur svd'
+print ('pur svd')
 U2,S2,V2 = np.linalg.svd(X2, full_matrices=False)
-print U2
-print S2
-print V2
+print (U2)
+print (S2)
+print (V2)
 ```
 
 ```

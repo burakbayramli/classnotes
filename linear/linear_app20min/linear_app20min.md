@@ -75,8 +75,8 @@ olarak çözmek lazım.
 import numpy.linalg as lin
 A = np.array([[1,2],[3,5.5]])
 eval,evec = lin.eig(np.dot(A.T,A))
-print eval
-print evec
+print (eval)
+print (evec)
 ```
 
 ```
@@ -88,7 +88,7 @@ print evec
 En küçük özdeğer birincisi,
 
 ```python
-print evec[:,0]
+print (evec[:,0])
 ```
 
 ```

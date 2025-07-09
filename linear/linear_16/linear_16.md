@@ -372,11 +372,11 @@ import numpy.linalg as lin
 A = np.array([[1,1],[1,2],[1,3]])
 b = np.array([[1],[2],[2]])
 q,r = lin.qr(A)
-print q.shape, '\n', r
-print 'qr'
-print np.dot( np.dot(lin.inv(r),q.T), b )
-print 'kutuphane cagrisi lstsq'
-print lin.lstsq(A,b)[0]
+print (q.shape, '\n', r)
+print ('qr')
+print (np.dot( np.dot(lin.inv(r),q.T), b ))
+print ('kutuphane cagrisi lstsq')
+print (lin.lstsq(A,b)[0])
 ```
 
 ```
