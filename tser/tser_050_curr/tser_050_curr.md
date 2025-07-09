@@ -31,7 +31,7 @@ import pandas as pd, os, sys
 from scipy import io as spio
 
 cols = ['tday','cl','lo','hi','hhmm','op']
-base = '%s/Dropbox/Public/data' % os.environ['HOME']
+base = "/opt/Downloads"
 a = spio.loadmat(base + '/inputData_USDCAD_20120426.mat')
 usdcad = pd.concat([pd.DataFrame(a[x]) for x in cols], axis=1)
 usdcad.columns = cols
@@ -49,8 +49,8 @@ y = pd.concat([aud, cad],axis=1)
 ```
 
 ```python
-sys.path.append('../tser_coint')
-sys.path.append('../tser_draw_sharpe')
+sys.path.append('../tser_030_coint')
+sys.path.append('../tser_010_back')
 from johansen import coint_johansen
 import dd
 trainlen=250
@@ -77,10 +77,11 @@ pnl = positions.shift(1) * (y - y.shift(1))  / y.shift(1)
 pnl = pnl.sum(axis=1)
 ret=pnl / np.sum(np.abs(positions.shift(1)),axis=1)
 ret = ret[trainlen:-1] # trainlen kadar ilk bolumu disarida birak
+ret = ret.reset_index(drop=True)
 cumret=np.cumprod(1+ret)-1
-print 'APR', ((np.prod(1.+ret))**(252./len(ret)))-1
-print 'Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret)
-print 'Dusus Kaliciligi', dd.calculateMaxDD(cumret)
+print ('APR', ((np.prod(1.+ret))**(252./len(ret)))-1)
+print ('Sharpe', np.sqrt(252.)*np.mean(ret)/np.std(ret))
+print ('Dusus Kaliciligi', dd.calculateMaxDD(cumret))
 ```
 
 ```
@@ -103,6 +104,4 @@ Kaynaklar
 [1] Chan, *Book Code*, [https://github.com/burakbayramli/books/tree/master/Algorithmic_Trading_Chan](https://github.com/burakbayramli/books/tree/master/Algorithmic_Trading_Chan)
 
 [2] Chan, *Algorithmic Trading*
-
-
 

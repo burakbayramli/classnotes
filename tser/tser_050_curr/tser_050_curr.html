@@ -112,7 +112,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> io <span class="im">as</span> spio</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;tday&#39;</span>,<span class="st">&#39;cl&#39;</span>,<span class="st">&#39;lo&#39;</span>,<span class="st">&#39;hi&#39;</span>,<span class="st">&#39;hhmm&#39;</span>,<span class="st">&#39;op&#39;</span>]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">&#39;</span><span class="sc">%s</span><span class="st">/Dropbox/Public/data&#39;</span> <span class="op">%</span> os.environ[<span class="st">&#39;HOME&#39;</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">&quot;/opt/Downloads&quot;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> spio.loadmat(base <span class="op">+</span> <span class="st">&#39;/inputData_USDCAD_20120426.mat&#39;</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>usdcad <span class="op">=</span> pd.concat([pd.DataFrame(a[x]) <span class="cf">for</span> x <span class="kw">in</span> cols], axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>usdcad.columns <span class="op">=</span> cols</span>
@@ -128,8 +128,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>aud<span class="op">=</span>audusd2.cl</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.concat([aud, cad],axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../tser_coint&#39;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../tser_draw_sharpe&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../tser_030_coint&#39;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;../tser_010_back&#39;</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> johansen <span class="im">import</span> coint_johansen</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dd</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>trainlen<span class="op">=</span><span class="dv">250</span></span>
@@ -156,10 +156,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>pnl <span class="op">=</span> pnl.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>ret<span class="op">=</span>pnl <span class="op">/</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(positions.shift(<span class="dv">1</span>)),axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> ret[trainlen:<span class="op">-</span><span class="dv">1</span>] <span class="co"># trainlen kadar ilk bolumu disarida birak</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> <span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(cumret)</span></code></pre></div>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>ret <span class="op">=</span> ret.reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>cumret<span class="op">=</span>np.cumprod(<span class="dv">1</span><span class="op">+</span>ret)<span class="op">-</span><span class="dv">1</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;APR&#39;</span>, ((np.prod(<span class="fl">1.</span><span class="op">+</span>ret))<span class="op">**</span>(<span class="fl">252.</span><span class="op">/</span><span class="bu">len</span>(ret)))<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Sharpe&#39;</span>, np.sqrt(<span class="fl">252.</span>)<span class="op">*</span>np.mean(ret)<span class="op">/</span>np.std(ret))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Dusus Kaliciligi&#39;</span>, dd.calculateMaxDD(cumret))</span></code></pre></div>
 <pre><code>APR 0.100221828618
 Sharpe 1.44796592471
 Dusus Kaliciligi (-0.050369126045008095, 158.0)</code></pre>
