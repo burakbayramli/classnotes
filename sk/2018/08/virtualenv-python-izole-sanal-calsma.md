@@ -117,7 +117,13 @@ var, ama illa ki 2.7.7 lazım. Olur mu? Olur. Öyle bir paket vardır ki
 belli bir Python versiyonunda desteklenmektedir sadece, vs. Bu gibi
 durumlarda Python'u kaynaklarından derlemek gerekebilir, ve sonra
 virtualenv ile sanal ortam yaratılırken o derlenen Python
-kullanılır. Derlemek için 
+kullanılır. Önce sistem bazında,
+
+```
+sudo apt install libssl-dev libffi-dev zlib1g-dev
+```
+
+yapalım. Derlemek için 
 
 ```
 wget http://www.python.org/ftp/python/2.7.7/Python-2.7.7.tgz
