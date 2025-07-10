@@ -1,6 +1,5 @@
 import pandas as pd
 from pathlib import Path
-import matplotlib.pyplot as plt
 import numpy as np
 from zipfile import ZipFile
 
@@ -106,6 +105,8 @@ model.compile(
     optimizer=keras.optimizers.Adam(learning_rate=0.001),
 )
 
+model.save("/opt/Downloads/recom2.h5")
+
 """
 ## Train the model based on the data split
 """
@@ -117,21 +118,6 @@ history = model.fit(
     verbose=1,
     validation_data=(x_val, y_val),
 )
-
-"""
-## Plot training and validation loss
-"""
-plt.plot(history.history["loss"])
-plt.plot(history.history["val_loss"])
-plt.title("model loss")
-plt.ylabel("loss")
-plt.xlabel("epoch")
-plt.legend(["train", "test"], loc="upper left")
-plt.show()
-
-"""
-## Show top 10 movie recommendations to a user
-"""
 
 movie_df = pd.read_csv(movielens_dir / "movies.csv")
 
