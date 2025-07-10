@@ -59,7 +59,7 @@ import statsmodels.formula.api as smf
 df = pd.read_csv('respiratory.csv',index_col=0)
 baseline = df[df['month'] == 0][['subject','status']].set_index('subject')
 df['status'] = (df['status'] == 'good').astype(int)
-df['baseline'] = df.apply(lambda x: baseline.ix[x['subject']],axis=1)
+df['baseline'] = df.apply(lambda x: baseline.loc[x['subject']],axis=1)
 df['centre'] = df['centre'].astype(str)
 df = df[df['month'] > 0]
 print (df.head(4).to_string())
@@ -146,8 +146,8 @@ taşınmadı. Daha fazla detay için [3]'e bakılabilir.
 %R resp_lmer <- glmer(as.formula(params), family = binomial(), data = df)
 %R -o res res = summary(resp_lmer)
 %R -o exp_res exp_res = exp(fixef(resp_lmer))
-print res
-print exp_res
+print (res)
+print (exp_res)
 ```
 
 ```

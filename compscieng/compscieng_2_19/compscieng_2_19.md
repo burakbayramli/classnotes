@@ -429,7 +429,7 @@ A = np.array([[6.,1.,1.],
 
 b = np.array([1.,1.,1.])
 
-xreal = lin.solve(A, b); print "solution", xreal
+xreal = lin.solve(A, b); print ("solution", xreal)
 
 p = b
 r = b
@@ -444,7 +444,7 @@ for i in range(5):
     r2 = np.dot(r.T,r)
     beta = r2 / r2old
     p = r + np.dot(beta,p)
-    print x             
+    print (x)
 ```
 
 ```
