@@ -37,10 +37,11 @@ TF kodlaması nasıl olur? Üstteki örnek için
 
 ```python
 import tensorflow as tf
+print (tf.__version__)
 
-x = tf.Variable(3, name="x")
-y = tf.Variable(4, name="y")
-f = x*x*y + y + 2
+x = tf.Variable(3., name="x")
+y = tf.Variable(4., name="y")
+f = x * x * y + y + 2
 ```
 
 İçinde x,y,f düğümleri (node) olan bir çizit yaratıldı. Bu kadar!
@@ -52,32 +53,8 @@ başlangıç değerlerlerine eşitlenir, ve sonra f hesabı
 tetiklenir. Esas hesap bu şekilde ortaya çıkar.
 
 ```python
-sess = tf.Session()
-sess.run(x.initializer)
-sess.run(y.initializer)
-result = sess.run(f)
-print(result)
-```
-
-```
-42
-```
-
-Eğer işimiz bitti ise ve kaynakların (bellek, işlemci gibi) geri
-dönüşümünü, serbest bırakılmasını istiyorsak oturumu kapatırız,
-
-```python
-sess.close()
-```
-
-Kodlama açısından biraz daha temiz bir yol, 
-
-```python
-with tf.Session() as sess:
-    x.initializer.run()
-    y.initializer.run()
-    result = f.eval()
-print result
+result_f = f.numpy() 
+print(f"Result of f: {result_f}")
 ```
 
 ```
@@ -93,13 +70,12 @@ bakarak çizitte önce o düğümlerin hesabını yapacaktır, ve o çıktılar�
 
 ```python
 w = tf.constant(3)
-x = w + 2
-y = x + 5
-z = x * 3
+x_const = w + 2
+y_const = x_const + 5
+z_const = x_const * 3
 
-with tf.Session() as sess:
-    print 'y =', y.eval()
-    print 'z =', z.eval()
+print(f"y_const = {y_const.numpy()}")
+print(f"z_const = {z_const.numpy()}")
 ```
 
 ```
@@ -119,13 +95,13 @@ yapılabilir. Mesela bir matrisin tümü, herhangi bir ekseni bazındaki toplam
 alttaki gibi alınabiliyor,
 
 ```python
-x = tf.constant([[1., 1., 1.], [1., 1.,1.]])
-c1 = tf.reduce_sum(x)
-print tf.Session().run(c1)
-c1 = tf.reduce_sum(x, 0) # y ekseni uzerinden toplam
-print tf.Session().run(c1)
-c2 = tf.reduce_sum(x, 1) # x ekseni uzerinden toplam
-print tf.Session().run(c2)
+x_sum = tf.constant([[1., 1., 1.], [1., 1., 1.]])
+c1_total = tf.reduce_sum(x_sum)
+print(f"Total sum (c1_total): {c1_total.numpy()}")
+c1_axis0 = tf.reduce_sum(x_sum, 0) 
+print(f"Toplam, eksen 0 (c1_axis0): {c1_axis0.numpy()}")
+c2_axis1 = tf.reduce_sum(x_sum, 1) 
+print(f"Toplam eksen 1 (c2_axis1): {c2_axis1.numpy()}")
 ```
 
 ```
@@ -140,17 +116,16 @@ tane `-1` kullanılabilir, ve bu durumda o boyutta "ne olduğu önemli
 değil" mesajı verilmiş olur.
 
 ```python
-x1 = tf.constant([1, 2, 3, 4, 5, 6, 7, 8, 9])
+x1_reshape = tf.constant([1, 2, 3, 4, 5, 6, 7, 8, 9])
+x2_reshape = tf.constant([[[1, 1, 1], [2, 2, 2]],
+                          [[3, 3, 3], [4, 4, 4]],
+                          [[5, 5, 5], [6, 6, 6]]])
 
-x2 = tf.constant([[[1, 1, 1],[2, 2, 2]],
-                 [[3, 3, 3],[4, 4, 4]],
-                 [[5, 5, 5],[6, 6, 6]]])
+res1 = tf.reshape(x1_reshape, [3, 3])
+print(f"Reshaped x1 to [3, 3]:\n{res1.numpy()}")
 
-with tf.Session() as sess:
-    res1 = tf.reshape(x1, [3, 3])
-    print tf.Session().run(res1)
-    res2 = tf.reshape(x2, [2, -1])
-    print tf.Session().run(res2)
+res2 = tf.reshape(x2_reshape, [2, -1])
+print(f"Reshaped x2 to [2, -1]:\n{res2.numpy()}")
 ```
 
 ```
@@ -176,41 +151,38 @@ olsun, sonra `B` değerini hesaplamak için `eval` çağrırken yer
 tutucunun içini o anda dolduralım, ve sonuca bakalım,
 
 ```python
-A = tf.placeholder(tf.float32, shape=(None, 3))
-B = A + 5
-with tf.Session() as sess:
-    print  B.eval(feed_dict={A: [[1, 2, 3]]})
+A_input = tf.constant([[1., 2., 3.]], dtype=tf.float32)
+B_output = A_input + 5
+print(f"Result of A_input + 5: {B_output.numpy()}")
 ```
 
 ```
 [[ 6.  7.  8.]]
 ```
 
-Yer tutucular tipik olarak gradyan inişi ile optimizasyon sırasında
-eğitim verisini ufak toptan parçalar olarak mesela X,y uzerinden
-çizite vermek için kullanılır.
+```python
+# If you need a function that takes input, you'd use tf.function
+@tf.function
+def add_five(input_tensor):
+    return input_tensor + 5
 
-### Tensorflow 2
-
-Yeni versiyonda bazı değişiklikler var, mesela sürekli `Session`
-kullanımı gerekli değil,
-
-```
-import tensorflow as tf
-print("TensorFlow version:", tf.__version__)
-```
-
-```
-TensorFlow version: 2.9.2
+A_dynamic_input = tf.constant([[10., 20., 30.]], dtype=tf.float32)
+B_dynamic_output = add_five(A_dynamic_input)
+print(f"Result of add_five function with new input: {B_dynamic_output.numpy()}")
 ```
 
 Basit bir çarpma örneği,
 
-```
-a = tf.constant([1, 2, 3, 4, 5, 6], shape=[2, 3])
-b = tf.constant([7, 8, 9, 10, 11, 12], shape=[3, 2])
+```python
+a = tf.constant([1, 2, 3, 4], dtype=tf.float32)  # Changed to 4 elements
+a = tf.reshape(a, [2, 2])
+b = tf.constant([7, 8, 9, 10], dtype=tf.float32) # Changed to 4 elements
+b = tf.reshape(b, [2, 2])
 c = tf.matmul(a, b)
-print (c)
+
+print("a:\n", a.numpy())
+print("b:\n", b.numpy())
+print("c (a @ b):\n", c.numpy())
 ```
 
 ```
@@ -223,7 +195,7 @@ Hız Kontrolü
 
 Tensorflow basit matris çarpımlarını ne kadar hızlandırıyor? Kontrol edelim,
 
-```
+```python
 import numpy as np
 N = 3000
 A = np.random.randn(N,N)
@@ -284,6 +256,3 @@ Kaynaklar
 [2] [Google Collab](../../2018/11/gpu-tpu-saglayan-not-defter-ortami.html).
 
 [3] [Jetson Nano](../../2020/12/nvidia-jetson-nano-2GB-wifi.html)
-
-
-

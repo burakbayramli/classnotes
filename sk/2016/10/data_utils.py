@@ -2,12 +2,8 @@
 
 import sys
 import re
-import cPickle
+import pickle
 import numpy as np
-
-# For special characters
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 _PAD = b"_PAD"
 _GO = b"_GO"
@@ -97,6 +93,7 @@ def process_data(datafile, max_vocab_size, target_lang):
     Read the sentences from our datafiles.
     """
     tokenized = []
+    print ('opening', datafile)
     fin = open(datafile)
     for line in fin.readlines():
         tokenized.append(basic_tokenizer(line))
@@ -142,8 +139,8 @@ def split_data(en_token_ids, sp_token_ids,
     valid_en_seq_lens = en_seq_lens[last_train_index:]
     valid_sp_seq_len = sp_seq_len[last_train_index:]
 
-    print "%i training samples and %i validations samples" % (
-        len(train_encoder_inputs), len(valid_encoder_inputs))
+    print ("%i training samples and %i validations samples" % (
+        len(train_encoder_inputs), len(valid_encoder_inputs)))
 
     return train_encoder_inputs, train_decoder_inputs, train_targets, \
         train_en_seq_lens, train_sp_seq_len, \
