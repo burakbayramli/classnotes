@@ -1,6 +1,10 @@
 # Ses Komut Tanıma, Dikkat (Attention) Modeli
 
-Ses tanıma için hazır pişirilmiş bir model.
+Ses tanıma için hazır pişirilmiş bir YSA modeli, [1] bağlantısından
+alınabilir. Kodlar eğitilmiş bir YSA ağırlıklarını içerir, ağırlıklar
+`model-attRNN.h5` dosyası içinde. Github projesinin `HOME//Documents/repos/SpeechCmdRecognition`
+altında olduğunu, ve [3] dosyasının `/opt/Downloads/voice_cmd` dizininde
+olduğunu farzedelim.
 
 ```python
 import numpy as np, tensorflow as tf, sys, os
@@ -9,7 +13,6 @@ proj_src = os.environ['HOME'] + "/Documents/repos/SpeechCmdRecognition"
 sys.path.append(proj_src)
 import librosa, SpeechModels, zipfile, io
 
-# --- Model Loading (from your provided code) ---
 sr = 16000
 nCategs = 36
 model = SpeechModels.AttRNNSpeechModel(nCategs,
@@ -23,9 +26,6 @@ model.summary()
 model.load_weights(proj_src + '/model-attRNN.h5')
 print("Model loaded successfully and weights loaded.")
 
-# --- 🎤 Audio File Preprocessing and Prediction ---
-
-# Define the path to your sample audio file
 audio_file_path = "/opt/Downloads/voice_cmd/wav/dog/fcb25a78_nohash_0.wav"
 print(f"\nProcessing audio file: {audio_file_path}")
 
@@ -66,16 +66,85 @@ if predicted_class_index < len(category_labels):
     print(f"Predicted command: '{predicted_label}' with confidence: {confidence:.4f}")
 ```
 
+```
+________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input (InputLayer)          [(None, None)]               0         []                            
+                                                                                                  
+ normalized_spectrogram_mod  (None, None, 80)             0         ['input[0][0]']               
+ el (Functional)                                                                                  
+                                                                                                  
+ tf.expand_dims (TFOpLambda  (None, None, 80, 1)          0         ['normalized_spectrogram_model
+ )                                                                  [0][0]']                      
+                                                                                                  
+ conv2d (Conv2D)             (None, None, 80, 10)         60        ['tf.expand_dims[0][0]']      
+                                                                                                  
+ batch_normalization (Batch  (None, None, 80, 10)         40        ['conv2d[0][0]']              
+ Normalization)                                                                                   
+                                                                                                  
+ conv2d_1 (Conv2D)           (None, None, 80, 1)          51        ['batch_normalization[0][0]'] 
+                                                                                                  
+ batch_normalization_1 (Bat  (None, None, 80, 1)          4         ['conv2d_1[0][0]']            
+ chNormalization)                                                                                 
+                                                                                                  
+ squeeze_last_dim (Lambda)   (None, None, 80)             0         ['batch_normalization_1[0][0]'
+                                                                    ]                             
+                                                                                                  
+ bidirectional (Bidirection  (None, None, 128)            74240     ['squeeze_last_dim[0][0]']    
+ al)                                                                                              
+                                                                                                  
+ bidirectional_1 (Bidirecti  (None, None, 128)            98816     ['bidirectional[0][0]']       
+ onal)                                                                                            
+                                                                                                  
+ lambda (Lambda)             (None, 128)                  0         ['bidirectional_1[0][0]']     
+                                                                                                  
+ dense (Dense)               (None, 128)                  16512     ['lambda[0][0]']              
+                                                                                                  
+ dot (Dot)                   (None, None)                 0         ['dense[0][0]',               
+                                                                     'bidirectional_1[0][0]']     
+                                                                                                  
+ attSoftmax (Softmax)        (None, None)                 0         ['dot[0][0]']                 
+                                                                                                  
+ dot_1 (Dot)                 (None, 128)                  0         ['attSoftmax[0][0]',          
+                                                                     'bidirectional_1[0][0]']     
+                                                                                                  
+ dense_1 (Dense)             (None, 64)                   8256      ['dot_1[0][0]']               
+                                                                                                  
+ dense_2 (Dense)             (None, 32)                   2080      ['dense_1[0][0]']             
+                                                                                                  
+ output (Dense)              (None, 36)                   1188      ['dense_2[0][0]']             
+                                                                                                  
+==================================================================================================
+Total params: 201247 (786.12 KB)
+Trainable params: 201225 (786.04 KB)
+Non-trainable params: 22 (88.00 Byte)
+__________________________________________________________________________________________________
+Model loaded successfully and weights loaded.
+
+Processing audio file: /opt/Downloads/voice_cmd/wav/dog/fcb25a78_nohash_0.wav
+   Original sampling rate of audio: 16000 Hz
+   Processed audio shape for prediction: (1, 16000)
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1752147986.896920  100346 op_level_cost_estimator.cc:699] Error in PredictCost() for the op: op: "Softmax" attr { key: "T" value { type: DT_FLOAT } } inputs { dtype: DT_FLOAT shape { unknown_rank: true } } device { type: "CPU" vendor: "AuthenticAMD" model: "248" frequency: 2096 num_cores: 12 environment { key: "cpu_instruction_set" value: "AVX SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2" } environment { key: "eigen" value: "3.4.90" } l1_cache_size: 32768 l2_cache_size: 524288 l3_cache_size: 8388608 memory_size: 268435456 } outputs { dtype: DT_FLOAT shape { unknown_rank: true } }
+1/1 [==============================] - 2s 2s/step
+Predicted command: 'dog' with confidence: 1.0000
+```
+
+Doğru sonuç bulundu. [3] verisindeki tüm wav dosyalarının test
+edilmesi için gerekli kod `voice1.py` içinde. 500 kusur dosya
+üzerinden 90% başarı elde edildi.
+
 Kodlar
 
 [voice1.py](voice1.py)
 
 Kaynaklar
 
-[1] https://github.com/douglas125/SpeechCmdRecognition
+[1] [Github](https://github.com/douglas125/SpeechCmdRecognition)
 
 [2] de Andrade, *A neural attention model for speech command recognition*,
     [ArXiv](https://arxiv.org/abs/1808.08929)
 
-[3] https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ehyr58nt&raw=1
+[3] [Veri](https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ehyr58nt&raw=1)
 

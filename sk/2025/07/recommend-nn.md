@@ -346,6 +346,13 @@ kadar iyi olur, kullandığımız veri Movielens 100K verisi, 100,000 tane not
 var. MovieLens 1M (1 milyon not) ile daha iyi sonuçlar alınabilir (bu veri
 *İstatistik, Pivotlama* yazısının dizininde). Okur için ödev olsun.
 
+Ekler
+
+Alttaki kod Keras sitesindeki kodun 2.15 icin guncellenmis hali, su
+anda test ediliyor.
+
+[recom2.py](recom2.py)
+
 Kaynaklar
 
 [1] Grisel, *Deep Learning, course @ Télécom ParisTech*, [https://github.com/petermartigny/Deep-Learning](https://github.com/petermartigny/Deep-Learning)
