@@ -1,33 +1,32 @@
 # Ses Komut Tanıma, Dikkat (Attention) Modeli
 
-Ses tanima icin hazir pisirilmis bir model.
+Ses tanıma için hazır pişirilmiş bir model.
 
 ```python
-import numpy as np
-import tensorflow as tf
+import numpy as np, tensorflow as tf, sys, os
 from tensorflow.keras.models import Model, load_model
-import librosa
-import SpeechModels # Assuming this is in your Python path or current directory
+proj_src = os.environ['HOME'] + "/Documents/repos/SpeechCmdRecognition"
+sys.path.append(proj_src)
+import librosa, SpeechModels, zipfile, io
 
 # --- Model Loading (from your provided code) ---
 sr = 16000
 nCategs = 36
 model = SpeechModels.AttRNNSpeechModel(nCategs,
                                         samplingrate = sr,
-                                        inputLength = None) # Keep inputLength=None for now
+                                        inputLength = None) 
 
 model.compile(optimizer='adam',
               loss=['sparse_categorical_crossentropy'],
               metrics=['sparse_categorical_accuracy'])
 model.summary()
-model.load_weights('model-attRNN.h5')
+model.load_weights(proj_src + '/model-attRNN.h5')
 print("Model loaded successfully and weights loaded.")
 
 # --- 🎤 Audio File Preprocessing and Prediction ---
 
 # Define the path to your sample audio file
-audio_file_path = "/opt/Downloads/gvoice/voice_cmd/wav/dog/fcb25a78_nohash_0.wav"
-#audio_file_path = "/opt/Downloads/gvoice/voice_cmd/wav/five/fde2dee7_nohash_0.wav"
+audio_file_path = "/opt/Downloads/voice_cmd/wav/dog/fcb25a78_nohash_0.wav"
 print(f"\nProcessing audio file: {audio_file_path}")
 
 audio, current_sr = librosa.load(audio_file_path, sr=sr)
@@ -65,8 +64,11 @@ category_labels = ['nine', 'yes', 'no', 'up', 'down', 'left',
 if predicted_class_index < len(category_labels):
     predicted_label = category_labels[predicted_class_index-1]
     print(f"Predicted command: '{predicted_label}' with confidence: {confidence:.4f}")
-
 ```
+
+Kodlar
+
+[voice1.py](voice1.py)
 
 Kaynaklar
 
