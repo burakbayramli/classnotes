@@ -216,14 +216,15 @@ elapsed time 0:00:01.292723
 
 Şimdi TF ile çarpım,
 
-```
+```python
 TA = tf.random.normal([N,N], 0, 1, tf.float32)
 TB = tf.random.normal([N,N], 0, 1, tf.float32)
 
 start = timer()
 TC = tf.matmul(TA, TB)
+print("b:\n", TC.numpy())
 end = timer()
-print('elapsed time', timedelta(seconds=end-start))
+print('random matmul elapsed time', timedelta(seconds=end-start))
 ```
 
 ```

@@ -23,7 +23,7 @@ wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
 Derlemeden önce dikkat, alttakiler lazım, yoksa SSL işlemiyor,
 
 ```
-sudo apt install libssl-dev libffi-dev zlib1g-dev
+sudo apt install libssl-dev libffi-dev zlib1g-dev libbz2-dev liblzma-dev
 ```
 
 [1]'i takip ederek derlemeyi yapalım, sanal ortamı kuralım. Bitince
