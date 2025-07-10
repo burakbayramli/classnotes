@@ -74,7 +74,7 @@ sonucunu verir. O zaman L1 norm bize ikisel iki vektör arasında kabaca bir
 benzerlik fikri verebilir.
 
 ```python
-print np.dot(a,b)
+print (np.dot(a,b))
 ```
 
 ```

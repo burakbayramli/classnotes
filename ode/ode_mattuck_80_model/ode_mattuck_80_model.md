@@ -345,10 +345,9 @@ A0,k0,K0 = 1, 1, 1
 
 [A,k,K], flag  = optimize.leastsq(resid, [A0,k0,K0], args=(x1, t))
 
-print flag, A, k, K
+print (flag, A, k, K)
     
 plt.plot(t, x1, 'ro')
-plt.hold(True)            
 t = np.linspace(0,20,len(t))    
 plt.plot(t, f(t,A,k,K), 'go')    
 plt.savefig('us.png')

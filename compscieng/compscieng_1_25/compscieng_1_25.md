@@ -201,7 +201,7 @@ def y(n,data):
     return sum
 
 for n in range(len(patents)):    
-    print  (y(n,patents))
+    print (y(n,patents))
 ```
 
 ```

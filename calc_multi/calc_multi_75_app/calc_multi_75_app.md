@@ -360,7 +360,7 @@ N = -np.dot(n,w);
 D = np.dot(n,u)
 sI = N / D
 I = P0+ sI*u
-print I
+print (I)
 ```
 
 ```

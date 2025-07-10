@@ -130,7 +130,7 @@ $$ x = x_{max} (1-e^{-t/\tau}) $$
 $t=\tau,x_{max}=1$ yapalım, $1-e^{-1}$ elde ederiz,
 
 ```python
-print 1-np.exp(-1)
+print (1-np.exp(-1))
 ```
 
 ```

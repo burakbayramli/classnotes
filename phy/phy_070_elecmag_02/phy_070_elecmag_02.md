@@ -86,7 +86,7 @@ olacağı için sadece 10'un katları üzerinden toplama çıkartma ile bir sonu
 erisebilirdik,
 
 ```python
-print -11-27-31-(-22)
+print (-11-27-31-(-22))
 ```
 
 ```
@@ -136,7 +136,7 @@ tek parçacıgin yükü bu sayıdır. Ve sonuç boyut sırası olarak $-7$. Kaba
 hesap,
 
 ```python
-print 9 + (-19*2) - (-11*2) 
+print (9 + (-19*2) - (-11*2) )
 ```
 
 ```

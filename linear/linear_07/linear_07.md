@@ -252,7 +252,7 @@ import sympy
 A = sympy.Matrix([[1., 2., 2., 2. ],
                  [2., 4., 6., 8. ],
                  [3., 6., 8., 10.]] )
-print A.rref()[0]
+print (A.rref()[0])
 ```
 
 ```

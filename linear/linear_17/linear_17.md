@@ -402,7 +402,7 @@ for j in range(n):
         v=v-np.dot(R[i,j],Q[:,i])
     R[j,j] = lin.norm(v)
     Q[:,j] = v/R[j,j]
-print Q, R
+print (Q, R)
 ```
 
 ```

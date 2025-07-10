@@ -151,7 +151,7 @@ Python `scipy` ile bu ODE sistemini sayısal olarak çözelim [4].
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def rhs(u,t,alpha,beta,c,d,gamma,nu):
     L,w,a,N = u
@@ -176,11 +176,11 @@ w0=0.95;         # baslangic isci ucreti
 a0=1.0;          # baslangic teknoloji seviyesi (uretkenlik)
 N0=300;          # baslangic nufusu
 
-t=np.linspace(0.0,T,10000.0)
+t=np.linspace(0.0,T,10000)
 res=odeint(rhs,[L0,w0,a0,N0],t,args=(alpha,beta,c,d,gamma,nu))
 L1,w1,a1,N1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
 
-print a1.shape, L1.shape
+print (a1.shape, L1.shape)
 Y = a1 * L1
 plt.plot(Y,t)
 plt.xlabel('Zaman (Sene Olarak)')
@@ -188,7 +188,7 @@ plt.ylabel(u'Üretim')
 plt.savefig('chaos_app02_01.png')
 ```
 
-```
+```text
 (10000,) (10000,)
 ```
 
@@ -278,7 +278,7 @@ $$ \dot{N} = \beta N$$
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def rhs(u,t,alpha,beta,gamma,nu,r,x_p,y_p,s_p,m_p,x_l,y_l,s_l,m_l):
     Y, w, D, a, N = u
@@ -317,7 +317,7 @@ y_l=0.0;
 s_l=0.5;
 m_l=-0.01;
 T = 120.0
-t=np.linspace(0.0,T,10000.0)
+t=np.linspace(0.0,T,10000)
 Y0=300;          # baslangic uretimi
 w0=0.95;         # baslangic iscu ucreti
 D0=0;            # baslangic borc
@@ -347,9 +347,8 @@ debt_ratio=D1/Y1;
 x1=wage_share; x2=employment_rate; x3=debt_ratio; 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-fig = plt.figure()
-ax = Axes3D(fig)
-ax.plot(x1,x2,x3,'.', zs=0,zdir='z', label='zs=0, zdir=z')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+ax.plot(x1,x2,x3,'.')
 ax.set_xlabel(u'Üretimde İşçi Ücret Payı')
 ax.set_ylabel(u'İstihdam Oranı')
 ax.set_zlabel(u'Borç Oranı')
@@ -357,6 +356,7 @@ plt.savefig('chaos_app02_06.png')
 ```
 
 ![](chaos_app02_05.png)
+
 ![](chaos_app02_06.png)
 
 ```python
@@ -378,6 +378,7 @@ plt.savefig('chaos_app02_04.png')
 ```
 
 ![](chaos_app02_03.png)
+
 ![](chaos_app02_04.png)
 
 ```python
