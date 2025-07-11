@@ -107,7 +107,7 @@ print (C.flatten())
 ```python
 b = [1, 1, 1, 1, 1, 1]
 
-from scipy.optimize import linprog
+from scipy.optimize import linprog, linear_sum_assignment
 res = linprog(C.flatten(), A_eq=X, b_eq=b)
 res = np.round(res.x)
 print (res)

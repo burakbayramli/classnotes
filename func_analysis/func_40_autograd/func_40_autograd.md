@@ -30,7 +30,7 @@ res = g(np.array([x, y, z]))
 print (res)
 ```
 
-```
+```text
 [[2. 0. 0.]
  [0. 2. 0.]
  [0. 0. 2.]]
@@ -66,7 +66,7 @@ h = autograd.hessian(f)
 print (h(xx))
 ```
 
-```
+```text
 [[8. 4.]
  [4. 8.]]
 ```
@@ -192,7 +192,6 @@ def grad_desc(x, fun, alpha=0.1, max_iter=100):
         x = x - alpha * grad(x)
         xs[step + 1] = x
         
-![](func_40_autograd_02.png)
     return xs
 
 alpha = 0.1
@@ -210,9 +209,8 @@ plt.plot(x_opt, y_opt, 'o-', c='red')
 for i, (x, y) in enumerate(zip(x_opt, y_opt), 1):
       plt.text(x - 0.1, y + 0.1, i, fontsize=15)
 
-plt.show()
+plt.savefig("func_40_autograd_02.png")
 ```
-
 
 ![](func_40_autograd_02.png)
 
@@ -237,25 +235,25 @@ def objective(X): # hedef
     x, y, z = X
     return x**2 + y**2 + z**2
 
-def cons(X): # kisitlama
+def cons2(X): # kisitlama
     x, y, z = X
     return 2 * x - y + z - 3
 
 x0 = [1, 1, 1]
-sol = minimize(objective, x0, constraints={'type': 'eq', 'fun': cons})
+sol = minimize(objective, x0, constraints={'type': 'eq', 'fun': cons2})
 print (sol)
 ```
 
-```
-     fun: 1.5000000035790053
-     jac: array([ 1.99997392, -1.00010441,  0.99994774])
- message: 'Optimization terminated successfully.'
-    nfev: 22
-     nit: 4
-    njev: 4
-  status: 0
+```text
+ message: Optimization terminated successfully
  success: True
-       x: array([ 0.99998696, -0.50005221,  0.49997386])
+  status: 0
+     fun: 1.5000000035790053
+       x: [ 1.000e+00 -5.001e-01  5.000e-01]
+     nit: 4
+     jac: [ 2.000e+00 -1.000e+00  9.999e-01]
+    nfev: 18
+    njev: 4
 ```
 
 Fonksiyon `minimize` için kısıtlamalar `eq` ile sıfıra eşit olma
@@ -270,19 +268,19 @@ sol = minimize(objective, x0, method = 'SLSQP', constraints=cons)
 print (sol)
 ```
 
-Not: `SLSQP` metotu gradyana ihtiyaç duymuyor. 
-
-```
-     fun: 1.1090612774580318e-16
-     jac: array([7.79817877e-12, 1.49011612e-08, 7.79860898e-12])
- message: 'Optimization terminated successfully.'
-    nfev: 20
-     nit: 4
-    njev: 4
-  status: 0
+```text
+ message: Optimization terminated successfully
  success: True
-       x: array([-7.44668151e-09,  2.73897702e-24, -7.44668129e-09])
+  status: 0
+     fun: 1.1090612774580318e-16
+       x: [-7.447e-09  2.739e-24 -7.447e-09]
+     nit: 4
+     jac: [ 7.798e-12  1.490e-08  7.799e-12]
+    nfev: 16
+    njev: 4
 ```
+
+Not: `SLSQP` metotu gradyana ihtiyaç duymuyor. 
 
 Bazen her şeyi kendimiz yaparak tüm adımların ne yaptığından emin olmak
 isteyebiliriz. Mesela kısıtlama şartlarını kendimiz bir Lagrange çarpanı
@@ -297,7 +295,7 @@ from autograd import grad
 
 def F(L):
     x, y, z, _lambda = L
-    return objective([x, y, z]) - _lambda * eq([x, y, z])
+    return objective([x, y, z]) - _lambda * cons2([x, y, z])
 
 dfdL = grad(F, 0)
 
@@ -305,14 +303,14 @@ dfdL = grad(F, 0)
 def obj(L):
     x, y, z, _lambda = L
     dFdx, dFdy, dFdz, dFdlam = dfdL(L)
-    return [dFdx, dFdy, dFdz, eq([x, y, z])]
+    return [dFdx, dFdy, dFdz, cons2([x, y, z])]
 
 from scipy.optimize import fsolve
 x, y, z, _lam = fsolve(obj, [0.0, 0.0, 0.0, 1.0])
 print (x,y,z)
 ```
 
-```
+```text
 1.0 -0.5 0.5
 ```
 
@@ -327,7 +325,7 @@ res = h(np.array([x,y,z]))
 print (res)
 ```
 
-```
+```text
 [[2. 0. 0.]
  [0. 2. 0.]
  [0. 0. 2.]]
@@ -340,7 +338,7 @@ pozitif olup olmadığına bakabiliriz,
 print (np.linalg.eig(h(np.array([x, y, z])))[0])
 ```
 
-```
+```text
 [2. 2. 2.]
 ```
 
@@ -368,8 +366,7 @@ x = np.linspace(-4,4,20)
 y = np.linspace(-4,4,20)
 xx,yy = np.meshgrid(x,y)
 zz = g(xx,yy)
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm)
 plt.savefig('func_40_autograd_03.png')
 ```
@@ -402,8 +399,8 @@ gradg = [dgdw1(1.0,2.0), dgdw2(1.0,2.0)]
 print (gradg)
 ```
 
-```
-[0.14130164970632894, 0.07065082485316447]
+```text
+[np.float64(0.14130164970632894), np.float64(0.07065082485316447)]
 ```
 
 Tabii çok boyutlu ortamda yazının başındaki teknikleri kullanmak daha iyi,

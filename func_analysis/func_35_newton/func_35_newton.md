@@ -539,7 +539,6 @@ pd.set_option('display.notebook_repr_html', False)
 pd.set_option('display.max_columns', 20)
 pd.set_option('display.max_rows', 30) 
 pd.set_option('display.width', 82) 
-pd.set_option('precision', 6)
 ```
 
 ```python
@@ -818,8 +817,7 @@ plt.plot(h[:,0],h[:,1],'rd')
 plt.plot(h[:,0],h[:,1])
 plt.savefig('boyd-1092.png')
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, zz)
 plt.savefig('boyd-1091.png')
 ```
