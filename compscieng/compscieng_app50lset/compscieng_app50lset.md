@@ -186,7 +186,6 @@ def default_phi(x):
     return phi
 
 img = io.imread('twoObj.bmp')
-img = color.rgb2gray(img) # grilestir
 img = img - np.mean(img) # ortalamayi cikart
 # puruzsuzlestirme uygula yanyana pikseller daha benzer olsun
 img_smooth = scipy.ndimage.filters.gaussian_filter(img, sigma=2)
@@ -211,7 +210,9 @@ for i in range(n_iter):
 İşlemden seçilmiş üç kare alttadır,
 
 ![](img2/out-000.png)
+
 ![](img2/out-020.png)
+
 ![](img2/out-090.png)
 
 Kesit seviyeleri tekniğinin faydalarını görmek zor değil; üç boyutlu fonksiyonu
@@ -522,6 +523,7 @@ while iter<150:
 ```
 
 ![](img1/level_2_040.png)
+
 ![](img1/level_2_100.png)
 
 Ortalama Eğim (Mean Curvature) Kullanmak
@@ -798,7 +800,6 @@ while iter < 50:
     phi = phi + ( dt * dPhiBydT )
     if iter % 10 == 0: 
         CS = plt.contour(phi,0,colors='r')
-        plt.hold(False)
         plt.savefig('img1/level_1_'+ str(iter) + '.png')
         #plot_phi(phi)
         plt.savefig('img1/phi_1_'+ str(iter) + '.png')
@@ -806,9 +807,13 @@ while iter < 50:
 ```
 
 ![](img1/level_1_0.png)
+
 ![](img1/level_1_10.png)
+
 ![](img1/level_1_20.png)
+
 ![](img1/level_1_30.png)
+
 ![](img1/level_1_40.png)
 
 
