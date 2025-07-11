@@ -124,8 +124,7 @@ def plot_tri3d(corners, axx):
    axx.set_zlim(-5,8)
 
 def plot_line(p0,p1,axx):
-   axx.plot([p0[0],p1[0]],[p0[1],p1[1]],[p0[2],p1[2]])
-   
+   axx.plot([p0[0],p1[0]],[p0[1],p1[1]],[p0[2],p1[2]])   
 ```
 
 Bir çizgi parçası ve bir üçgen yaratalım,
@@ -133,7 +132,9 @@ Bir çizgi parçası ve bir üçgen yaratalım,
 ```python
 vtx1 = np.array([[0,5,0],[8,4,0 ],[0,0,0]])
 
-ax = a3.Axes3D(pl.figure())
+import mpl_toolkits.mplot3d as a3
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d') 
 plot_tri3d(vtx1,ax)
 s = np.array([2,3,-2])
 t = np.array([5,3,2])
@@ -160,7 +161,7 @@ res = np.dot(lin.inv(A),(s-vtx1[0,:]))
 lam,mu1,mu2 = list(res)
 ```
 
-```
+```text
 A [[-3.  8.  0.]
  [ 0. -1. -5.]
  [-4.  0.  0.]]
@@ -173,13 +174,14 @@ xintersect = s + lam * (t-s)
 print (u'kesişme noktası',xintersect)
 ```
 
-```
+```text
 0.4375 0.3125 0.75
 kesişme noktası [3.5 3.  0. ]
 ```
 
 ```python
-ax = a3.Axes3D(pl.figure())
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d') 
 plot_tri3d(vtx1,ax)
 plot_line(s,t,ax)
 ax.plot(xintersect[0],xintersect[1],xintersect[2],'rd')
@@ -193,7 +195,8 @@ plt.savefig('calc_multi_75_app_15.jpg')
 Kesişmenin olmadığı bir örneğe bakalım,
 
 ```python
-ax = a3.Axes3D(pl.figure())
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d') 
 plot_tri3d(vtx1,ax)
 s = np.array([-3,4,3])
 t = np.array([0,0,3])
@@ -208,7 +211,7 @@ plot_line(s,t,ax)
 plt.savefig('calc_multi_75_app_16.jpg')
 ```
 
-```
+```text
 A [[-3.  8.  0.]
  [ 4. -1. -5.]
  [ 0.  0.  0.]]
@@ -259,8 +262,8 @@ paylaşılan çizgi / üçgen kesişme yaklaşımı gibi.
 ```python
 vtx1 = np.array([[0,5,0],[8,0,0 ],[0,0,0]])
 vtx2 = np.array([[6,8,3],[6,8,-2],[6,-4,-2]])
-
-ax = a3.Axes3D(pl.figure())
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d') 
 plot_tri3d(vtx1,ax)
 plot_tri3d(vtx2,ax)
 plt.savefig('calc_multi_75_app_12.jpg')
@@ -275,7 +278,7 @@ d2 = -np.dot(n2,vtx2[0,:])
 print (n2,d2)
 ```
 
-```
+```text
 [-60   0   0] 360
 ```
 
@@ -285,7 +288,7 @@ for i in range(3):
     print ('%d. noktaya uzaklik = %d' % (i,sdi))
 ```
 
-```
+```text
 0. noktaya uzaklik = 360
 1. noktaya uzaklik = -120
 2. noktaya uzaklik = 360
@@ -294,7 +297,8 @@ for i in range(3):
 Örnek
 
 ```python
-ax = a3.Axes3D(pl.figure())
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d') 
 vtx3 = vtx2 + 3
 plot_tri3d(vtx1,ax)
 plot_tri3d(vtx3,ax)
@@ -310,7 +314,7 @@ d3 = -np.dot(n3,vtx3[0,:])
 print (n3,d3)
 ```
 
-```
+```text
 [-60   0   0] 540
 ```
 
@@ -320,7 +324,7 @@ for i in range(3):
     print ('%d. noktaya uzaklik = %d' % (i,sdi))
 ```
 
-```
+```text
 0. noktaya uzaklik = 540
 1. noktaya uzaklik = 60
 2. noktaya uzaklik = 540
@@ -363,18 +367,17 @@ I = P0+ sI*u
 print (I)
 ```
 
-```
+```text
 [-3.90909091  1.18181818 -0.27272727]
 ```
 
 Grafiklersek
 
 ```python
-import sys; sys.path.append('../../vision/vision_02')
+import sys; sys.path.append('../../phy/phy_072_rot')
 import plot3d
 
-f = plt.figure()
-ax = f.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 w = 10
 ax.set_xlim(-w,w);ax.set_ylim(-w,w);ax.set_zlim(-w,w)
 ax.set_xlabel("X")
@@ -577,7 +580,7 @@ t_v = sympy.Matrix([[0,2*v,1]])
 print (t_u.cross(t_v))
 ```
 
-```
+```text
 Matrix([[-2*v - 1, -1, 2*v]])
 ```
 
@@ -644,7 +647,7 @@ fu = -y; fv = x; fw = z*0
 xx,yy,zz = np.meshgrid(x,y,z)
 ax.quiver(xx, yy, zz, fu, fv, fw, length=0.2, color = 'red')
 ax.view_init(elev=18, azim=-46)
-plt.savefig('calc_multi_75_app_03.jpg',quality=30)
+plt.savefig('calc_multi_75_app_03.jpg')
 ```
 
 ![](calc_multi_75_app_03.jpg)
@@ -736,8 +739,8 @@ Daha önce [6]'da görülen spline tekniğinin parametrik hali de
 olabilir. Mesela 
 
 ```python
-a1,b1,c1,d1 = (1, -1.4, 2, 2.5)
-a2,b2,c2,d2 = (1, 1.4, 1, 2.5)
+ax, bx, cx, dx = (1, -1.4, 2, 2.5)
+ay, by, cy, dy = (1, 1.4, 1, 2.5) 
 def f(t):
     x = ax + \
         bx*np.max([0,t-2]) + \
