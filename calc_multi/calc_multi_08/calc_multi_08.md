@@ -255,17 +255,17 @@ $$ \frac{\partial f}{\partial y} = x^3 + 2y$$
 Python Matplotlib ile kesit seviyeleri çizmek için örnek bir program
 
 ```python
-x=linspace(-3,3,40)
-y=linspace(-3,3,40)
-x,y=meshgrid(x,y)
-z=sqrt(x**2+y**2)
+x=np.linspace(-3,3,40)
+y=np.linspace(-3,3,40)
+x,y=np.meshgrid(x,y)
+z=np.sqrt(x**2+y**2)
 z=x**2+y**2
-cs=contour(x,y,z,15)
-grid(True)
-axis('scaled')
-xlabel('x-axis')
-ylabel('y-axis')
-clabel(cs,inline=1,fontsize=9)
+cs=plt.contour(x,y,z,15)
+plt.grid(True)
+plt.axis('scaled')
+plt.xlabel('x-axis')
+plt.ylabel('y-axis')
+plt.clabel(cs,inline=1,fontsize=9)
 plt.savefig('levels.png')
 ```
 
@@ -361,8 +361,6 @@ Not: $w$ ile $z/c$'nin aldığı $\cos, \sin$ değerleri ters şekilde de olabil
 sonuç farketmiyor, yine ellipsoid grafikleniyor. 
 
 ```python
-from __future__ import division
-
 from mpl_toolkits.mplot3d import Axes3D
 
 fig = plt.figure(figsize=plt.figaspect(1))  # Square figure
