@@ -43,8 +43,7 @@ olsun,
 
 ```python
 from mpl_toolkits.mplot3d import Axes3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 xx = np.linspace(-5.0,5.0,20)
 yy = np.linspace(-5.0,5.0,20)
 x,y = np.meshgrid(xx,yy);
@@ -326,8 +325,8 @@ Ayrıksal Laplasyanı grafiklersek,
 ```python
 from del2 import del2
 L = 4*del2(U);
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+
 ax.plot_surface(x,y,L)
 plt.savefig('calc_multi_70_div_curl_lap_02.png')
 ```
@@ -352,27 +351,30 @@ cx = sympy.diff(Fz, y) - sympy.diff(Fy, z)
 cy = sympy.diff(Fx, z) - sympy.diff(Fz, x)
 cz = sympy.diff(Fy, x) - sympy.diff(Fx, y)
 
+xx_1d = np.linspace(-5.0, 5.0, 20)
+yy_1d = np.linspace(-5.0, 5.0, 20)
+zz_1d = np.linspace(-5.0, 5.0, 20) # Define a 1D array for z
+x_grid, y_grid, z_grid = np.meshgrid(xx_1d, yy_1d, zz_1d, indexing='ij')
+
 i,j,k=2,2,1
-x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
+x0,y0,z0 = x_grid[i,j,k], y_grid[i,j,k], z_grid[i,j,k]
 
 i,j,k=1,3,1
-x0,y0,z0 = xx[i,j,k], yy[i,j,k], zz[i,j,k]
+x0,y0,z0 = x_grid[i,j,k], y_grid[i,j,k], z_grid[i,j,k]
 c1,c2,c3 = cx.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
            cy.subs([(x, x0), (y, y0), (z, z0)]).evalf(),\
            cz.subs([(x, x0), (y, y0), (z, z0)]).evalf()
 print ( c1,c2,c3  )
-
 ```
 
-```
-0 0 3.51240736552037
+```text
+0.455274319076588 0.140555584590781 -0.501266364998131
 ```
 
 ```python
 from mpl_toolkits.mplot3d import axes3d
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.view_init(elev=21, azim=-44)
 xx, yy, zz = np.meshgrid(np.arange(-0.8, 1, 0.2),
                          np.arange(-0.8, 1, 0.2),
@@ -448,8 +450,8 @@ u1 = u[i-S:i+S, j-S:j+S, k-S:k+S];
 v1 = v[i-S:i+S, j-S:j+S, k-S:k+S]; 
 w1 = w[i-S:i+S, j-S:j+S, k-S:k+S];
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+
 ax.view_init(elev=36, azim=167)
 
 ax.quiver(x1, y1, z1, u1, v1, w1, length=0.05, color = 'black')

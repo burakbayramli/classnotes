@@ -160,6 +160,7 @@ if __name__ == "__main__":
     to = os.environ['HOME'] + "/Documents/dersblog"
     
     if sys.argv[1] == "test":
+        if sys.argv[2] != "all": dirs = [sys.argv[2]]
         tmpto = "/tmp/cltest"
         if os.path.exists(tmpto) == False:            
             os.mkdir(tmpto)            
