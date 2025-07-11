@@ -68,7 +68,7 @@ res = _approx_fprime_helper(x, rosen, eps)
 print ('analitik', res, 'sayisal', rosen_d(x))
 ```
 
-```
+```text
 analitik [-50.99999928  50.00000149] sayisal [-51.  50.]
 analitik [47.00000072 50.00000143] sayisal [47. 50.]
 ```
@@ -117,12 +117,12 @@ Rutin `trapz` ile bunu yapabiliriz,
 
 ```python
 x = np.linspace(0.5,5.0,1000)
-y = 3.0*x*np.exp(-0.7*xval)
+y = 3.0*x*np.exp(-0.7*x)
 W = np.trapz(y,x=x)
 print (W)
 ```
 
-```
+```text
 4.99249134896902
 ```
 
@@ -173,7 +173,7 @@ T = np.trapz(y,x=x)
 print (T)
 ```
 
-```
+```text
 2.351851851851852
 ```
 
@@ -189,13 +189,9 @@ $$
 print (7./3)
 ```
 
-```
+```text
 2.3333333333333335
 ```
-
-
-
-
 
 Kaynaklar
 
