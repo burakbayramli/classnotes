@@ -873,7 +873,7 @@ Aynı kodu LİSP ile görelim,
 (print "Tamam. Birim Testler Isledi.")
 ```
 
-```python
+```
 !clisp id3.lisp
 ```
 

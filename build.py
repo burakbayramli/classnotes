@@ -161,10 +161,10 @@ if __name__ == "__main__":
     
     if sys.argv[1] == "test":
         tmpto = "/tmp/cltest"
-        py_ignore_list = ['algs_045_probsolve']
-        frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
         if os.path.exists(tmpto) == False:            
             os.mkdir(tmpto)            
+        py_ignore_list = ['algs_045_probsolve']
+        frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
         os.chdir(tmpto)
         for topdir in dirs:
             print (topdir)
