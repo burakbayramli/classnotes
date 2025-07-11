@@ -133,8 +133,8 @@ $t=\tau,x_{max}=1$ yapalım, $1-e^{-1}$ elde ederiz,
 print (1-np.exp(-1))
 ```
 
-```
-0.632120558829
+```text
+0.6321205588285577
 ```
 
 İşte $\tau$ değeri ulaşılmaya çalışan değerin kabaca yüzde 63'üne gelmek
@@ -170,7 +170,7 @@ Farkettiysek nüfus, üretkenlik için $N,a$ değişkenleri bu sistemde yok,
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def rhs(u,t,alpha, beta, delta, nu, r_b, s, tau_p, tau_i, x_i, y_i, s_i, m_i, x_w, y_w, s_w, m_w):
     lam, omega, d, i = u
@@ -212,7 +212,7 @@ i0=0.1; # enflasyon orani
 arg0 = (alpha, beta, delta, nu, r_b, s, tau_p, tau_i, x_i, y_i, s_i, m_i, x_w, y_w, s_w, m_w)
 
 T=80.0
-t=np.linspace(0.0,T,1000.0)
+t=np.linspace(0.0,T,1000)
 
 res=odeint(rhs,[lambda0, omega0, d0, i0],t,args=arg0)
 lambda1,omega1,d1,i1=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
@@ -232,8 +232,8 @@ plt.ylabel(u'Özel Borcun GSYH İçinde Oranı')
 plt.savefig('chaos_app04_02.png')
 ```
 
-
 ![](chaos_app04_01.png)
+
 ![](chaos_app04_02.png)
 
 ```python
@@ -244,9 +244,8 @@ x3=100.0*d1[:last];
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-fig = plt.figure()
-ax = Axes3D(fig)
-ax.plot(x1,x2,x3,'.', zs=0,zdir='z', label='zs=0, zdir=z')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+ax.plot(x1,x2,x3,'.')
 ax.set_xlabel(u'İşsizlik Oranı')
 ax.set_ylabel(u'Enflasyon')
 ax.set_zlabel(u'Borç Oranı')

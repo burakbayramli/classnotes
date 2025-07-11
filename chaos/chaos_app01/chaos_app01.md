@@ -82,8 +82,7 @@ t = np.arange(0.0,100.0, 0.01)
 state = odeint(twobody, state0, t)
 
 from mpl_toolkits.mplot3d import Axes3D
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.plot(state[:,6]-state[:,0], state[:,7]-state[:,1], state[:,8]-state[:,2])
 ax.set_xlabel('x')
 ax.set_ylabel('y')
@@ -269,7 +268,7 @@ Alttaki kod [3]'u baz almıştır,
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def rhs(u,t):
     y1,y2,y3,y4 = u
@@ -284,14 +283,15 @@ def rhs(u,t):
 
     return res
 
-t=np.linspace(0.0,17.06521656015796,10000.0)
+t=np.linspace(0.0,17.06521656015796,10000)
 res=odeint(rhs,[0.994,0.0,0.0,-2.00158510637908],t)
 y1r,y2r,y3r,y4r=res[:, 0],res[:, 1],res[:, 2],res[:, 3]
+plt.figure()
 plt.plot(y1r,y2r)
 plt.plot(0,0,'o')
 plt.plot(1,0,'o')
-plt.text(0.1,0.1, u'Dünya')
-plt.text(1.0,0.1, u'Ay')
+plt.text(0.1,0.1,u'Dünya')
+plt.text(1.0,0.1,'Ay')
 plt.savefig('chaos_app01_02.png')
 ```
 
