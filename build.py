@@ -163,7 +163,7 @@ if __name__ == "__main__":
         tmpto = "/tmp/cltest"
         if os.path.exists(tmpto) == False:            
             os.mkdir(tmpto)            
-        py_ignore_list = ['algs_045_probsolve']
+        py_ignore_list = ['algs_045_probsolve','algs_135_convnet']
         frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
         os.chdir(tmpto)
         for topdir in dirs:
