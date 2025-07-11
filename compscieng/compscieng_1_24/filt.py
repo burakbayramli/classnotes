@@ -16,7 +16,7 @@ def hamming(window_size):
     return np.hstack((tmp1,tmp2))
     
 def sinc_filter_low(order, fc1, fs):
-    Fc1 = fc1 / np.float(fs) 
+    Fc1 = fc1 / float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
     window = hamming(M+1)
@@ -31,7 +31,7 @@ def sinc_filter_low(order, fc1, fs):
     return B / np.sum(B)
  
 def sinc_filter_high(order, fc1, fs):
-    Fc1 = fc1 / np.float(fs) 
+    Fc1 = fc1 / float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
     window = hamming(M+1)
@@ -45,7 +45,7 @@ def sinc_filter_high(order, fc1, fs):
         B[i] = B[i] * window[i]
     B = B / np.sum(B)
     B = -B
-    B[(M/2)] = B[(M/2)] + 1
+    B[int(M/2)] = B[int(M/2)] + 1
     return B
     
 def sinc_filter_band(order, fc1, fc2, fs):
@@ -54,7 +54,7 @@ def sinc_filter_band(order, fc1, fc2, fs):
     B = sinc_filter_high(order, fc2, fs).T[0]
     output = A+B
     output = -output
-    output[(M/2)] = output[(M/2)] + 1.
+    output[int(M/2)] = output[int(M/2)] + 1.
     return output
 
 def plotSpectrum(y,Fs):
@@ -63,7 +63,6 @@ def plotSpectrum(y,Fs):
     T = n/Fs
     frq = k/T # frekansin her iki kismi
     frq = frq[range(int(n/2))] # frekansin tek tarafi
-    print (y)
     Y = scipy.fft.fft(y)/n # fft hesaplamak ve normalizasyon
     Y = Y[range(int(n/2))] 
     plt.plot(frq,np.abs(Y),'r') # spektrumu grafiklemek

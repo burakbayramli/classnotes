@@ -106,6 +106,7 @@ plt.savefig('compscieng_1_24_01.png')
 ```
 
 ![](compscieng_1_24_02.png)
+
 ![](compscieng_1_24_01.png)
 
 İspat
@@ -202,7 +203,7 @@ def hamming(window_size):
     return np.hstack((tmp1,tmp2))
     
 def sinc_filter_low(order, fc1, fs):
-    Fc1 = fc1 / np.float(fs) 
+    Fc1 = fc1 / float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
     window = hamming(M+1)
@@ -217,7 +218,7 @@ def sinc_filter_low(order, fc1, fs):
     return B / np.sum(B)
  
 def sinc_filter_high(order, fc1, fs):
-    Fc1 = fc1 / np.float(fs) 
+    Fc1 = fc1 / float(fs) 
     M  = order
     B = np.zeros((M+1, 1))
     window = hamming(M+1)
@@ -271,7 +272,7 @@ wy=2*np.pi*fy; # radyan / saniye ile sinyal frekansi
 fs=50; # Hz ile orneklem frekansi
 tiv=1./fs; # orneklemler arasinda zaman
 tend = 5 # saniye
-t=np.linspace(0,tend,tend/tiv); # gecen zaman (5 saniye)
+t=np.linspace(0,tend,int(tend/tiv)); # gecen zaman (5 saniye)
 
 y=0.6*np.sin(wy*t)+0.3*np.sin(3*wy*t)+0.2*np.sin(5*wy*t); 
 f=plt.figure()
