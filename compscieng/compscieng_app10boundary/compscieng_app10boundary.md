@@ -615,7 +615,3 @@ Kaynaklar
 [9] Shampine, *Solving ODEs in Matlab*
 
 [10] Bayramlı, Diferansiyel Denklemler, *Kök Bulmak*
-
-
-    
-

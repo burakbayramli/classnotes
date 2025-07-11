@@ -428,14 +428,16 @@ for j in range(100):
 ```
 
 ![](string-00.png)
+
 ![](string-25.png)
 
 ![](string-55.png)
+
 ![](string-85.png)
 
-
 ```python
-! convert -loop 0 -delay 100 /tmp/string*.png string.gif
+import os
+os.system("convert -loop 0 -delay 100 /tmp/string*.png string.gif")
 ```
 
 Animasyonlu sonucu [5]'te bulabiliriz.
@@ -512,14 +514,13 @@ c = 1
 Başlangıç şartlarını tanımlamak lazım, başlangıç hızı $u_0$ aralık
 $0.5 \leq x \leq 1$ içinde $u = 2$, diğer her yerde $u = 1$.
 
-
 ```python
 u = np.ones(nx)
 u[int(.5 / dx):int(1 / dx + 1)] = 2  
 print(u)
 ```
 
-```
+```text
 [1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 2. 1. 1. 1.
  1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]
 ```
@@ -864,8 +865,7 @@ un = np.ones((ny, nx)) ##
 
 u[int(.5 / dy):int(1 / dy + 1),int(.5 / dx):int(1 / dx + 1)] = 2 
 
-fig = plt.figure(figsize=(11, 7), dpi=100)
-ax = fig.gca(projection='3d')                      
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 X, Y = np.meshgrid(x, y)                            
 surf = ax.plot_surface(X, Y, u[:], cmap=cm.viridis)
 plt.savefig('compscieng_app45cfd3_01.png')
@@ -896,8 +896,7 @@ for n in range(nt + 1):
             u[:, 0] = 1
             u[:, -1] = 1
 
-fig = plt.figure(figsize=(11, 7), dpi=100)
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf2 = ax.plot_surface(X, Y, u[:], cmap=cm.viridis)
 plt.savefig('compscieng_app45cfd3_02.png')
 ```
@@ -977,10 +976,9 @@ ufunc = lambdify((t, x, nu), u)
 print(ufunc(1, 4, 3))
 ```
 
-```
+```text
 3.49170664206445
 ```
-
 
 ```python
 nx = 101
@@ -1003,7 +1001,6 @@ plt.xlim([0, 2 * np.pi])
 plt.ylim([0, 10]);
 plt.savefig('compscieng_app45cfd2_02.png')
 ```
-
 
 ![](compscieng_app45cfd2_02.png)
 
@@ -1029,7 +1026,6 @@ plt.ylim([0, 10])
 plt.legend();
 plt.savefig('compscieng_app45cfd2_03.png')
 ```
-
 
 ![](compscieng_app45cfd2_03.png)
 

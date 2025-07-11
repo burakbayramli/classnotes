@@ -202,7 +202,7 @@ x = np.linspace(0,1,N+2)
 x = x[1:-1]
 
 # Initial Conditions
-u = np.transpose(np.mat(10*np.sin(np.pi*x)))
+u = np.transpose(np.asmatrix(10*np.sin(np.pi*x)))
  
 # Second-Derivative Matrix
 data = np.ones((3, N))
@@ -217,18 +217,17 @@ I = sparse.identity(N)
 data = []
  
 for i in range(NumOfTimeSteps):
-	# Solve the System: 
-	#
-	# (I - k/2*D2) u_new = (I + k/2*D2)*u_old
-	#
-	A = (I -k/2*D2)
-	b = ( I + k/2*D2 )*u
-	u = np.transpose(np.mat(sparse.linalg.spsolve(A, b)))
+        # Solve the System: 
+        #
+        # (I - k/2*D2) u_new = (I + k/2*D2)*u_old
+        #
+        A = (I -k/2*D2)
+        b = ( I + k/2*D2 )*u
+        u = np.transpose(np.asmatrix(sparse.linalg.spsolve(A, b)))
         if i % 20 == 0:
             plt.plot(x, u)
             plt.axis((0,1,0,10.1))
             plt.savefig("heat-" + str(i))
-            plt.hold(False)
 ```
 
 ![](heat-0.png)
@@ -260,7 +259,7 @@ x = np.linspace(0,1,N+2)
 x = x[1:-1] # get rid of the '0' and '1' at each end
 
 # Initial Conditions
-u = np.transpose(np.mat(10*np.sin(np.pi*x)))
+u = np.transpose(np.asmatrix(10*np.sin(np.pi*x)))
 
 # second derivative matrix
 I2 = -2*np.eye(N)
@@ -282,7 +281,6 @@ for i in range(NumOfTimeSteps):
         plt.plot(x, u)
         plt.axis((0,1,0,10.1))
         plt.savefig("heat-2-" + str(i))
-        plt.hold(False)
 ```
 
 ![](heat-2-0.png)

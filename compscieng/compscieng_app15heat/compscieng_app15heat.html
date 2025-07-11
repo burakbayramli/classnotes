@@ -297,7 +297,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial Conditions</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.transpose(np.mat(<span class="dv">10</span><span class="op">*</span>np.sin(np.pi<span class="op">*</span>x)))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.transpose(np.asmatrix(<span class="dv">10</span><span class="op">*</span>np.sin(np.pi<span class="op">*</span>x)))</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Second-Derivative Matrix</span></span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.ones((<span class="dv">3</span>, N))</span>
@@ -312,18 +312,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> []</span>
 <span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(NumOfTimeSteps):</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Solve the System: </span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (I - k/2*D2) u_new = (I + k/2*D2)*u_old</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> (I <span class="op">-</span>k<span class="op">/</span><span class="dv">2</span><span class="op">*</span>D2)</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> ( I <span class="op">+</span> k<span class="op">/</span><span class="dv">2</span><span class="op">*</span>D2 )<span class="op">*</span>u</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> np.transpose(np.mat(sparse.linalg.spsolve(A, b)))</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Solve the System: </span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        <span class="co">#</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="co"># (I - k/2*D2) u_new = (I + k/2*D2)*u_old</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        <span class="co">#</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        A <span class="op">=</span> (I <span class="op">-</span>k<span class="op">/</span><span class="dv">2</span><span class="op">*</span>D2)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        b <span class="op">=</span> ( I <span class="op">+</span> k<span class="op">/</span><span class="dv">2</span><span class="op">*</span>D2 )<span class="op">*</span>u</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        u <span class="op">=</span> np.transpose(np.asmatrix(sparse.linalg.spsolve(A, b)))</span>
 <span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">%</span> <span class="dv">20</span> <span class="op">==</span> <span class="dv">0</span>:</span>
 <span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            plt.plot(x, u)</span>
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>            plt.axis((<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="fl">10.1</span>))</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>            plt.savefig(<span class="st">&quot;heat-&quot;</span> <span class="op">+</span> <span class="bu">str</span>(i))</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>            plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>            plt.savefig(<span class="st">&quot;heat-&quot;</span> <span class="op">+</span> <span class="bu">str</span>(i))</span></code></pre></div>
 <p><img src="heat-0.png" /></p>
 <p><img src="heat-20.png" /></p>
 <p><img src="heat-40.png" /></p>
@@ -347,7 +346,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>] <span class="co"># get rid of the &#39;0&#39; and &#39;1&#39; at each end</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial Conditions</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.transpose(np.mat(<span class="dv">10</span><span class="op">*</span>np.sin(np.pi<span class="op">*</span>x)))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.transpose(np.asmatrix(<span class="dv">10</span><span class="op">*</span>np.sin(np.pi<span class="op">*</span>x)))</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># second derivative matrix</span></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>I2 <span class="op">=</span> <span class="op">-</span><span class="dv">2</span><span class="op">*</span>np.eye(N)</span>
@@ -368,8 +367,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">20</span> <span class="op">==</span> <span class="dv">0</span>:</span>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        plt.plot(x, u)</span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        plt.axis((<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>,<span class="fl">10.1</span>))</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        plt.savefig(<span class="st">&quot;heat-2-&quot;</span> <span class="op">+</span> <span class="bu">str</span>(i))</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        plt.hold(<span class="va">False</span>)</span></code></pre></div>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        plt.savefig(<span class="st">&quot;heat-2-&quot;</span> <span class="op">+</span> <span class="bu">str</span>(i))</span></code></pre></div>
 <p><img src="heat-2-0.png" /></p>
 <p><img src="heat-2-20.png" /></p>
 <p><img src="heat-2-40.png" /></p>
