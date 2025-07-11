@@ -537,7 +537,7 @@ for i in range(100):
     Z[M] = Z[M] * Z[M] + C[M]
     M[np.abs(Z) > 2] = 0
 
-plt.imshow(M,cmap=cmap,origin='lower')
+plt.imshow(M,origin='lower')
 plt.savefig("mandel.png")
 ```
 
