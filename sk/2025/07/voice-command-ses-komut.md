@@ -1,10 +1,30 @@
 # Ses Komut Tanıma, Dikkat (Attention) Modeli
 
-Ses tanıma için hazır pişirilmiş bir YSA modeli, [1] bağlantısından
-alınabilir. Kodlar eğitilmiş bir YSA ağırlıklarını içerir, ağırlıklar
-`model-attRNN.h5` dosyası içinde. Github projesinin `HOME//Documents/repos/SpeechCmdRecognition`
-altında olduğunu, ve [3] dosyasının `/opt/Downloads/voice_cmd` dizininde
-olduğunu farzedelim.
+Ses komut tanıma için ünlü bir veri Kaggle'da paylaşılmıştır [4], bir
+saniyelik ses komutları wav dosyalarında var, ve farklı arka plan
+gürültüleri, kişiler tarafından kaydedilmiş. Bu veri bir Kaggle yarışması
+için de kullanılmıştı.
+
+Ses tanıma temel bir yapay zeka alanı. Amazon, Google, MS gibi
+şirketlerin ses tanıma servisleri var, fakat [2] araştırmasına göre bu
+yazılımlar çok yer tutuyor, çok fazla kaynağa ihtiyaç duyuyor. Bu
+sebeple onların kullandığı türden ses tanıma mekanizması küçük
+bilgisayarlarda kullanılamaz. Halbuki bu tür bir yazılım çok faydalı
+olacaktır, İnternet bağlantısı olmadan ses komut tanıma
+yapabilmeliyiz.
+
+Bu tür bir Keras / Tensorflow modeli [1]'de var. Araştırmacılar en son
+dil işleme mimarilerinde ilerleme sağlayan "dikkat bölgeleri
+(attention)" mekanizmasını kullanarak ses tanımayı daha verimli
+işletebilmeyi başarmışlar.
+
+YSA'yı kullanmak için tekrar eğitim yapmaya gerek yok, hazır
+pişirilmiş YSA modellerinin ağırlıkları kullanılabilir, 2.7 MB civarı
+yer tutuyor ve bir .h5 dosyasından hızlı bir şekilde yüklenebiliyor.
+Kodlar eğitilmiş bir ses tanıma YSA ağını içerir, `model-attRNN.h5` dosyasında.
+Github projesinin `HOME/Documents/repos/SpeechCmdRecognition` altında olduğunu,
+ve [3] dosyasının `/opt/Downloads/voice_cmd` dizininde olduğunu farzedersek,
+alttaki kodu işletebiliriz.
 
 ```python
 import numpy as np, tensorflow as tf, sys, os
@@ -131,9 +151,10 @@ W0000 00:00:1752147986.896920  100346 op_level_cost_estimator.cc:699] Error in P
 Predicted command: 'dog' with confidence: 1.0000
 ```
 
-Doğru sonuç bulundu. [3] verisindeki tüm wav dosyalarının test
-edilmesi için gerekli kod `voice1.py` içinde. 500 kusur dosya
-üzerinden 90% başarı elde edildi.
+Test için bir örnek wav kullandık, içinde `dog` kelimesi söyleniyordu,
+ve üstteki test doğru sonuç bulundu. [3] verisindeki tüm wav
+dosyalarının test edilmesi için gerekli kod `voice1.py` içinde. 500
+kusur dosya üzerinden 90% başarı elde ediyor.
 
 Kodlar
 
@@ -148,3 +169,4 @@ Kaynaklar
 
 [3] [Veri](https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ehyr58nt&raw=1)
 
+[4] [Kaggle](https://www.kaggle.com/datasets/neehakurelli/google-speech-commands)

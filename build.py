@@ -1,5 +1,5 @@
 import codecs, re, os, sys, shutil, json
-import util, markdown2, glob
+import util, markdown2, glob, subprocess, numpy as np
 
 dirs = ['algs','calc_multi','chaos','compscieng',
         'func_analysis','linear','ode', 'stat',
@@ -153,12 +153,45 @@ def remove_sci_md(to):
             print ('removing', mdfile)
             if os.path.exists(mdfile): os.remove(mdfile)
     
-    
+            
 if __name__ == "__main__": 
 
     fr = os.getcwd()
     to = os.environ['HOME'] + "/Documents/dersblog"
     
+    if sys.argv[1] == "test":
+        tmpto = "/tmp/cltest"
+        py_ignore_list = ['algs_045_probsolve']
+        frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
+        if os.path.exists(tmpto) == False:            
+            os.mkdir(tmpto)            
+        os.chdir(tmpto)
+        for topdir in dirs:
+            print (topdir)
+            for subdir in sorted(os.listdir(to + "/" + topdir)):
+                if not os.path.isdir(to + "/" + topdir + "/" + subdir): continue
+                if "cover" in subdir or "000" in subdir : continue
+                mdfile = tmpto + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
+                print (mdfile)
+                foutname = tmpto + "/" + topdir + "/" + subdir + "/pout1111.py"
+                print (foutname)
+                fout = open(foutname,"w")
+                fout.write("import numpy as np\nimport matplotlib.pyplot as plt\n")
+                fname = sys.argv[1]
+                content = open(mdfile).read()
+                res = re.findall("```python(.*?)```", content, re.DOTALL)
+                for x in res: fout.write(x)
+                fout.close()
+                os.chdir(tmpto + "/" + topdir + "/" + subdir)
+                ignores = [x in subdir for x in py_ignore_list]
+                if np.any(ignores):
+                    print ("ignoring", subdir)
+                    continue
+                result = subprocess.run(['/home/burak/Documents/env3/bin/python', 'pout1111.py'], capture_output=True)
+                if result.returncode != 0:
+                    print (result)
+                    exit()
+                
     if sys.argv[1] == "doc":
         if len(sys.argv) < 3:
             # for single file, command run inside working dir

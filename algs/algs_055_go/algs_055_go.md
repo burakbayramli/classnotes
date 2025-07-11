@@ -363,7 +363,7 @@ def self_play_and_save(player, opp_player):
         step += 1
 
     winner = state.get_winner()
-    print ('winner', winner)
+    print (('winner', winner))
     # oyun bitti kimin kazandigini biliyoruz, mesela siyah kazandiysa
     # odulleri hamle bazinda +1,-1,+1,.. olacak sekilde ata, beyaz
     # kazandiysa -1,+1,-1 seklinde. Siyah olunca +1 cunku oyuna hep siyah
@@ -426,7 +426,7 @@ def self_play_and_train(cmd_line_args=None):
                 idxs = [np.random.choice(range(10,len(state_list)),replace=False) \
                         for i in range(n_pick)]
                 
-                print ('picked results', idxs)
+                print ()
                 
                 for idx in idxs:
                     state_list2.append(state_list[idx])

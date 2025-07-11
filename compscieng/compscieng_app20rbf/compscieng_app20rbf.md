@@ -156,8 +156,7 @@ d = np.exp(-gamma * d)
 dd = np.dot(w.T,d)
 znew = dd.reshape(D,D)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_04.png')
 ```
@@ -192,7 +191,7 @@ y_new = w1*np.exp(-gamma * d1) + w2*np.exp(-gamma * d2)
 print (y_new)
 ```
 
-```
+```text
 [0.6637959]
 ```
 
@@ -222,8 +221,7 @@ y = np.linspace(32,33,D)
 xx,yy = np.meshgrid(x,y)
 zz = func(xx,yy)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_01.png')
 ```
@@ -259,8 +257,7 @@ d = np.exp(-gamma * d)
 dd = np.dot(w.T,d)
 znew = dd.reshape(D,D)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_02.png')
 ```
@@ -280,8 +277,8 @@ xnew = np.array([[36.5,32.5]])
 print (np.multiply(w.T,np.exp(-gamma*lin.norm(X-xnew,axis=1))).sum())
 ```
 
-```
-0.6423871447150892
+```text
+0.6423871447150906
 ```
 
 Bu yaklaşımı tüm dünyanın yeryüzü dağ, tepe veri tabanını oluşturmak için
@@ -317,8 +314,7 @@ xx = xx.reshape(D,D)
 yy = yy.reshape(D,D)
 znew = znew.reshape(D,D)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 surf = ax.plot_surface(xx, yy, znew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_05.png')
 ```
@@ -371,8 +367,7 @@ xx = xx.reshape(D,D)
 yy = yy.reshape(D,D)
 zz = func(xx,yy)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.view_init(elev=29, azim=29)
 surf = ax.plot_surface(xx, yy, zz, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_03.png')
@@ -421,7 +416,7 @@ print (test_1_dist.shape)
 print (test_1_dist[0][:10])
 ```
 
-```
+```text
 (1, 50)
 [0.4229176  1.08927112 0.72276945 0.76827462 0.96299239 1.21064725
  0.85578867 0.94970984 0.80965755 0.76794254]
@@ -439,7 +434,7 @@ print (rbfi.xi.shape)
 print (rbfi.nodes.shape)
 ```
 
-```
+```text
 0.15
 0.0
 (2, 50)
@@ -463,7 +458,7 @@ test_2 = np.array([[36.0,32.0],[36.1,31.9]])
 print (f_interp(test_2,rbfi))
 ```
 
-```
+```text
 [[-0.00387063]
  [-0.00337065]]
 ```
@@ -474,8 +469,7 @@ print (f_interp(test_2,rbfi))
 test_3 = np.column_stack((xx.ravel(), yy.ravel()))
 znewnew = f_interp(test_3,rbfi).reshape(xx.shape)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.view_init(elev=29, azim=29)
 surf = ax.plot_surface(xx, yy, znewnew, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 plt.savefig('linear_app88rbf_06.png')
@@ -711,7 +705,7 @@ print ('gradyan',grbf(test_1))
 print ('hessian',hrbf(test_1))
 ```
 
-```
+```text
 f [[-0.00387063]]
 gradyan [0.02331737 0.08191414]
 hessian [[[[0.6466522  0.74921925]
@@ -732,7 +726,7 @@ import hammer
 print (hammer.hammersley([2,3],10))
 ```
 
-```
+```text
 [[0.     0.    ]
  [0.1    0.    ]
  [0.2    0.5   ]
@@ -778,9 +772,9 @@ f(x_1,x_2) = 3 (1 - x_1)^2 e^{-x_1^2-(-x_2^2 + 1)^2} -
 \frac{1}{3} e^{-(x_1 + 1)^2 - x_2^2}
 $$
 
-ama Hammersley tekniği ile kritik noktalarından örneklem
-alınabiliyor. [5]'te bu teknik ile üretilen yeni fonsiyonun gerçeğine çok
-yakın olacağını görüyoruz, 20 tane nokta ile!
+Ama Hammersley tekniği ile kritik noktalarından örneklem
+alınabiliyor. [5]'te bu teknik ile üretilen yeni fonsiyonun gerçeğine
+çok yakın olacağını görüyoruz, 20 tane nokta ile!
 
 
 Kaynaklar

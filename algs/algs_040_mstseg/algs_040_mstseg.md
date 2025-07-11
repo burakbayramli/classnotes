@@ -271,8 +271,7 @@ non-zero items 87010
 ```
 
 ```python
-import felz
-clf = felz.Felzenswalb(min_size=20,c=800)
+clf = Felzenswalb(min_size=20,c=800)
 clf.fit(X4)
 ```
 
@@ -345,8 +344,7 @@ print (A.shape)
 Kümelemeyi yapalım, `min_size=2` seçtik çünkü ufak kümeler de mümkün.
 
 ```python
-import felz
-clf = felz.Felzenswalb(min_size=1.5,c=0.2)
+clf = Felzenswalb(min_size=1.5,c=0.2)
 clf.fit(A)
 labels = np.array(clf.labels_)
 c = len(np.unique(labels))

@@ -400,6 +400,8 @@ dağılımın iyi performans verdiği doğruymuş. Ayrıca dikkat edersek bahsed
 oran her iki varlığın tek başına olan performansından daha iyi.
 
 ```python
+import pandas as pd
+ge_df = pd.read_csv('eqbnd.csv')
 ret = ge_df.SPY.pct_change()
 print ('Senet',np.round(np.prod(1.0+ret),2))
 ret = ge_df.AGG.pct_change()
