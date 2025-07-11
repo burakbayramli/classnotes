@@ -278,14 +278,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> Rosenbrock(X, Y)</span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">4</span>))</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>ax.plot3D(res[:,<span class="dv">0</span>],res[:,<span class="dv">1</span>],res[:,<span class="dv">2</span>],<span class="st">&#39;r.&#39;</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X,Y,Z,rstride <span class="op">=</span> <span class="dv">5</span>, cstride <span class="op">=</span> <span class="dv">5</span>, cmap <span class="op">=</span> <span class="st">&#39;jet&#39;</span>, alpha <span class="op">=</span> <span class="fl">.4</span>, edgecolor <span class="op">=</span> <span class="st">&#39;none&#39;</span> )</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">21</span>, <span class="op">-</span><span class="dv">133</span>)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_70_dfo_01.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, subplot_kw<span class="op">=</span>{<span class="st">&#39;projection&#39;</span>: <span class="st">&#39;3d&#39;</span>})</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ax.plot3D(res[:,<span class="dv">0</span>],res[:,<span class="dv">1</span>],res[:,<span class="dv">2</span>],<span class="st">&#39;r.&#39;</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X,Y,Z,rstride <span class="op">=</span> <span class="dv">5</span>, cstride <span class="op">=</span> <span class="dv">5</span>, cmap <span class="op">=</span> <span class="st">&#39;jet&#39;</span>, alpha <span class="op">=</span> <span class="fl">.4</span>, edgecolor <span class="op">=</span> <span class="st">&#39;none&#39;</span> )</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">21</span>, <span class="op">-</span><span class="dv">133</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_70_dfo_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="func_70_dfo_01.png" /></p>
 <p>Şimdi üstteki örneklem noktalarını kullanarak ona en yakın karesel
 fonksiyonu bulalım,</p>
@@ -295,81 +294,85 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> quad_interpolate(xi, yi):</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    xi <span class="op">=</span> np.hstack((xi, np.ones((<span class="dv">1</span>,<span class="bu">len</span>(xi))).T  ))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">#print (xi)</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> xi.shape[<span class="dv">1</span>]</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (D)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> []</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> xi:</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        X_train.append([row[i]<span class="op">*</span>row[j] <span class="cf">for</span> i,j <span class="kw">in</span> itertools.product(<span class="bu">range</span>(D),<span class="bu">range</span>(D)) ])</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> np.array(X_train)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (X_train.shape)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (yi.shape)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    coef,_,_,_ <span class="op">=</span> lin.lstsq(X_train, yi)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> coef</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>xi <span class="op">=</span> res[:,[<span class="dv">0</span>,<span class="dv">1</span>]]</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>yi <span class="op">=</span> res[:,[<span class="dv">2</span>]]</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>coef <span class="op">=</span> quad_interpolate(xi,yi)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (coefs)</span></code></pre></div>
-<pre><code>3
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> xi.shape[<span class="dv">1</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (D)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> []</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> xi:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        X_train.append([row[i]<span class="op">*</span>row[j] <span class="cf">for</span> i,j <span class="kw">in</span> itertools.product(<span class="bu">range</span>(D),<span class="bu">range</span>(D)) ])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    X_train <span class="op">=</span> np.array(X_train)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (X_train.shape)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (yi.shape)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    coef,_,_,_ <span class="op">=</span> lin.lstsq(X_train, yi)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> coef</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>xi <span class="op">=</span> res[:,[<span class="dv">0</span>,<span class="dv">1</span>]]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>yi <span class="op">=</span> res[:,[<span class="dv">2</span>]]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>coef <span class="op">=</span> quad_interpolate(xi,yi)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (coef)</span></code></pre></div>
+<pre class="text"><code>3
 (20, 9)
 (20, 1)
-[[ 1549.94077306  -331.73935453 -1646.09015508]
- [ -331.73935453   108.66378197   273.04187866]
- [-1646.09015508   273.04187866  1960.85629284]]</code></pre>
+[[ 1549.94077306]
+ [ -331.73935453]
+ [-1646.09015508]
+ [ -331.73935453]
+ [  108.66378197]
+ [  273.04187866]
+ [-1646.09015508]
+ [  273.04187866]
+ [ 1960.85629284]]</code></pre>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">250</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">250</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> Rosenbrock(X, Y)</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">4</span>))</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax.plot3D(res[:,<span class="dv">0</span>],res[:,<span class="dv">1</span>],res[:,<span class="dv">2</span>],<span class="st">&#39;r.&#39;</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X,Y,Z,rstride <span class="op">=</span> <span class="dv">5</span>, cstride <span class="op">=</span> <span class="dv">5</span>, cmap <span class="op">=</span> <span class="st">&#39;jet&#39;</span>, alpha <span class="op">=</span> <span class="fl">.4</span>, edgecolor <span class="op">=</span> <span class="st">&#39;none&#39;</span> )</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> q_interp(x1,x2):</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([[x1,x2,<span class="dv">1</span>]])</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> coef.reshape(<span class="dv">3</span>,<span class="dv">3</span>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> np.dot(np.dot(x,A),x.T)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">float</span>(res)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>Zi <span class="op">=</span> np.array([q_interp(xx,yy) <span class="cf">for</span> xx,yy <span class="kw">in</span> <span class="bu">zip</span>(X.flatten(),Y.flatten())])</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>Zi <span class="op">=</span> Zi.reshape(X.shape)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>ax.plot_wireframe(X,Y,Zi)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>coefs <span class="op">=</span> coef.reshape(<span class="dv">3</span>,<span class="dv">3</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> np.dot(coefs[:<span class="dv">2</span>,:<span class="dv">2</span>],np.array(x0).reshape(<span class="dv">2</span>,<span class="dv">1</span>)))</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>gnorm <span class="op">=</span> g <span class="op">/</span> np.<span class="bu">sum</span>(g)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>ax.set_zlim(<span class="dv">0</span>,<span class="dv">2500</span>)</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>ax.quiver(x0[<span class="dv">0</span>], x0[<span class="dv">1</span>], <span class="dv">0</span>, <span class="op">-</span>gnorm[<span class="dv">0</span>], <span class="op">-</span>gnorm[<span class="dv">1</span>], <span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>hess <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>coefs[:<span class="dv">2</span>,:<span class="dv">2</span>]</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (hess)</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>newton_dir <span class="op">=</span> <span class="op">-</span>np.dot(lin.inv(hess),g)</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (newton_dir)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> newton_dir</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (d)</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>ax.quiver(x0[<span class="dv">0</span>], x0[<span class="dv">1</span>], <span class="dv">0</span>, d[<span class="dv">0</span>], d[<span class="dv">1</span>], <span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;green&#39;</span>)</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>ax.plot3D([x0[<span class="dv">0</span>]], [x0[<span class="dv">1</span>]], [<span class="fl">0.0</span>], <span class="st">&#39;b.&#39;</span>)</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">21</span>, <span class="op">-</span><span class="dv">133</span>)</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_70_dfo_02.png&#39;</span>)</span></code></pre></div>
-<pre><code>[[3099.88154613 -663.47870906]
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, subplot_kw<span class="op">=</span>{<span class="st">&#39;projection&#39;</span>: <span class="st">&#39;3d&#39;</span>})</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax.plot3D(res[:,<span class="dv">0</span>],res[:,<span class="dv">1</span>],res[:,<span class="dv">2</span>],<span class="st">&#39;r.&#39;</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X,Y,Z,rstride <span class="op">=</span> <span class="dv">5</span>, cstride <span class="op">=</span> <span class="dv">5</span>, cmap <span class="op">=</span> <span class="st">&#39;jet&#39;</span>, alpha <span class="op">=</span> <span class="fl">.4</span>, edgecolor <span class="op">=</span> <span class="st">&#39;none&#39;</span> )</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> q_interp(x1,x2):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array([[x1,x2,<span class="dv">1</span>]])</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> coef.reshape(<span class="dv">3</span>,<span class="dv">3</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> np.dot(np.dot(x,A),x.T)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">float</span>(res)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>Zi <span class="op">=</span> np.array([q_interp(xx,yy) <span class="cf">for</span> xx,yy <span class="kw">in</span> <span class="bu">zip</span>(X.flatten(),Y.flatten())])</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>Zi <span class="op">=</span> Zi.reshape(X.shape)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>ax.plot_wireframe(X,Y,Zi)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>coefs <span class="op">=</span> coef.reshape(<span class="dv">3</span>,<span class="dv">3</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> np.dot(coefs[:<span class="dv">2</span>,:<span class="dv">2</span>],np.array(x0).reshape(<span class="dv">2</span>,<span class="dv">1</span>)))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>gnorm <span class="op">=</span> g <span class="op">/</span> np.<span class="bu">sum</span>(g)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>ax.set_zlim(<span class="dv">0</span>,<span class="dv">2500</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>ax.quiver(x0[<span class="dv">0</span>], x0[<span class="dv">1</span>], <span class="dv">0</span>, <span class="op">-</span>gnorm[<span class="dv">0</span>], <span class="op">-</span>gnorm[<span class="dv">1</span>], <span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>hess <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>coefs[:<span class="dv">2</span>,:<span class="dv">2</span>]</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (hess)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>newton_dir <span class="op">=</span> <span class="op">-</span>np.dot(lin.inv(hess),g)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (newton_dir)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> newton_dir</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (d)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>ax.quiver(x0[<span class="dv">0</span>], x0[<span class="dv">1</span>], <span class="dv">0</span>, d[<span class="dv">0</span>], d[<span class="dv">1</span>], <span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;green&#39;</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>ax.plot3D([x0[<span class="dv">0</span>]], [x0[<span class="dv">1</span>]], [<span class="fl">0.0</span>], <span class="st">&#39;b.&#39;</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">21</span>, <span class="op">-</span><span class="dv">133</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_70_dfo_02.png&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>[[3099.88154613 -663.47870906]
  [-663.47870906  217.32756394]]
-[[-1.50000000e+00]
- [ 1.77635684e-15]]
-[[-1.50000000e+00]
- [ 1.77635684e-15]]</code></pre>
+[[-1.5000000e+00]
+ [ 1.6435158e-15]]
+[[-1.5000000e+00]
+ [ 1.6435158e-15]]</code></pre>
 <p><img src="func_70_dfo_02.png" /></p>
 <p>Görüldüğü gibi en az karelerle hesaplanan <span
 class="math inline">\(A\)</span> üzerinden Hessian ve Jacobian hesabı

@@ -198,8 +198,7 @@ y = np.linspace(-1,3,250)
 X, Y = np.meshgrid(x, y)
 Z = Rosenbrock(X, Y)
 
-fig = plt.figure(figsize = (8,4))
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
 ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .4, edgecolor = 'none' )
 
@@ -219,7 +218,6 @@ import numpy.linalg as lin
 
 def quad_interpolate(xi, yi):
     xi = np.hstack((xi, np.ones((1,len(xi))).T  ))
-    #print (xi)
     D = xi.shape[1]
     print (D)
     X_train = []
@@ -235,18 +233,23 @@ xi = res[:,[0,1]]
 yi = res[:,[2]]
 coef = quad_interpolate(xi,yi)
 
-print (coefs)
+print (coef)
 ```
 
-```
+```text
 3
 (20, 9)
 (20, 1)
-[[ 1549.94077306  -331.73935453 -1646.09015508]
- [ -331.73935453   108.66378197   273.04187866]
- [-1646.09015508   273.04187866  1960.85629284]]
+[[ 1549.94077306]
+ [ -331.73935453]
+ [-1646.09015508]
+ [ -331.73935453]
+ [  108.66378197]
+ [  273.04187866]
+ [-1646.09015508]
+ [  273.04187866]
+ [ 1960.85629284]]
 ```
-
 
 ```python
 x = np.linspace(-2,2,250)
@@ -254,8 +257,7 @@ y = np.linspace(-1,3,250)
 X, Y = np.meshgrid(x, y)
 Z = Rosenbrock(X, Y)
 
-fig = plt.figure(figsize = (8,4))
-ax = fig.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.plot3D(res[:,0],res[:,1],res[:,2],'r.')
 ax.plot_surface(X,Y,Z,rstride = 5, cstride = 5, cmap = 'jet', alpha = .4, edgecolor = 'none' )
 
@@ -263,7 +265,7 @@ def q_interp(x1,x2):
     x = np.array([[x1,x2,1]])
     A = coef.reshape(3,3)
     res = np.dot(np.dot(x,A),x.T)
-    return np.float(res)
+    return float(res)
 
 Zi = np.array([q_interp(xx,yy) for xx,yy in zip(X.flatten(),Y.flatten())])
 Zi = Zi.reshape(X.shape)
@@ -296,13 +298,13 @@ ax.view_init(21, -133)
 plt.savefig('func_70_dfo_02.png')
 ```
 
-```
+```text
 [[3099.88154613 -663.47870906]
  [-663.47870906  217.32756394]]
-[[-1.50000000e+00]
- [ 1.77635684e-15]]
-[[-1.50000000e+00]
- [ 1.77635684e-15]]
+[[-1.5000000e+00]
+ [ 1.6435158e-15]]
+[[-1.5000000e+00]
+ [ 1.6435158e-15]]
 ```
 
 ![](func_70_dfo_02.png)

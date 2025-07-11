@@ -168,7 +168,6 @@ Bu kadar! Sağ tarafta gözüken serilerin hesabını, bir Python programı
 ile yaptık.
 
 ```python
-
 def taylor_ile_log(bolum, bolen, taylor_ile_acilim_buyuklugu):
     sum = 0
     for i in range(1,taylor_ile_acilim_buyuklugu):
@@ -176,7 +175,7 @@ def taylor_ile_log(bolum, bolen, taylor_ile_acilim_buyuklugu):
 
     return sum
         
-print taylor_ile_log(-39.0, 40.0, 160)
+print (taylor_ile_log(-39.0, 40.0, 160))
 ```
 
 ```
@@ -184,7 +183,7 @@ print taylor_ile_log(-39.0, 40.0, 160)
 ```
 LISP
 
-```python
+```lisp
 ;;
 ;; Not: (/ 1 2) yazilirsa, Common Lisp 0 cevabi veriyor.
 ;; Bunun sebebi, 1 2 deyince, parametrelerin integer 
