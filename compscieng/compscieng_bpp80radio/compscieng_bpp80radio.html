@@ -91,7 +91,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.signal <span class="im">as</span> signal</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">dir</span> <span class="op">=</span> <span class="st">&quot;/home/burak/Documents/Dropbox/Public/data&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">dir</span> <span class="op">=</span> <span class="st">&quot;/opt/Downloads&quot;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>extract_data <span class="op">=</span> np.fromfile(<span class="bu">dir</span> <span class="op">+</span> <span class="st">&quot;/fm1.dat&quot;</span>,dtype<span class="op">=</span><span class="st">&quot;uint8&quot;</span>)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>interleavedData <span class="op">=</span> extract_data[<span class="dv">0</span>::<span class="dv">2</span>] <span class="op">+</span> <span class="ot">1j</span><span class="op">*</span>extract_data[<span class="dv">1</span>::<span class="dv">2</span>]</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
@@ -128,7 +128,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>f_bw<span class="op">=</span><span class="dv">200000</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>Fs<span class="op">=</span><span class="dv">1140000</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>n_taps<span class="op">=</span><span class="dv">64</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>lpf<span class="op">=</span> signal.remez(n_taps, [<span class="dv">0</span>, f_bw, f_bw <span class="op">+</span>(Fs<span class="op">/</span><span class="dv">2</span><span class="op">-</span>f_bw)<span class="op">/</span><span class="dv">4</span>,Fs<span class="op">/</span><span class="dv">2</span>], [<span class="dv">1</span>,<span class="dv">0</span>], Hz<span class="op">=</span>Fs)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>lpf<span class="op">=</span> signal.remez(n_taps, [<span class="dv">0</span>, f_bw, f_bw <span class="op">+</span>(Fs<span class="op">/</span><span class="dv">2</span><span class="op">-</span>f_bw)<span class="op">/</span><span class="dv">4</span>,Fs<span class="op">/</span><span class="dv">2</span>], [<span class="dv">1</span>,<span class="dv">0</span>], fs<span class="op">=</span>Fs)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">&#39;log&#39;</span>)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Filter Frequency Response&#39;</span>)</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;Frequency&#39;</span>)</span>
@@ -180,15 +180,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a h
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>x7<span class="op">=</span>signal.decimate(x6,dec_rate)</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>x7<span class="op">*=</span> <span class="dv">10000</span> <span class="op">/</span> np.<span class="bu">max</span>(np.<span class="bu">abs</span>(x7))               <span class="co"># scale so it&#39;s audible</span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>x7.astype(<span class="st">&quot;int16&quot;</span>).tofile(<span class="st">&quot;radio.raw&quot;</span>)</span></code></pre></div>
-<pre><code>aplay radio.raw -r 100000.0 -f S16_LE -t raw -c 1</code></pre>
-<pre><code>aplay radio.raw -r 45600 -f S16_LE -t raw -c 1</code></pre>
+<pre><code>os.system(&quot;aplay radio.raw -r 100000.0 -f S16_LE -t raw -c 1&quot;)</code></pre>
+<pre><code>os.system(&quot;aplay radio.raw -r 45600 -f S16_LE -t raw -c 1&quot;)</code></pre>
 <p>Kaynaklar</p>
 <p>[1] <em>The Basic Facts About Radio Signals</em>, <a
 href="https://www.windows2universe.org/spaceweather/wave_modulation.html">https://www.windows2universe.org/spaceweather/wave_modulation.html</a></p>
 <p>[2] <a
-href="https://drive.google.com/uc?export=view&amp;id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk">https://drive.google.com/uc?export=view&amp;id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk</a></p>
+href="https://www.dropbox.com/scl/fi/70llfzz03cdtyouxpbqgo/fm1.dat?rlkey=11p5qvp3y7xjitdaj53jkbvef&amp;st=pp97zxq5&amp;raw=1">Veri
+1</a></p>
 <p>[3] <a
-href="https://drive.google.com/uc?export=view&amp;id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK">https://drive.google.com/uc?export=view&amp;id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK</a></p>
+href="https://www.dropbox.com/scl/fi/dcecslmf7grwle84gc3s2/fm2.dat?rlkey=y0459x5c6ytnt8qcgmbzbd8ch&amp;st=b7g6lplk&amp;raw=1">Veri
+2</a></p>
 <p>[4] Scher, <em>How to capture raw IQ data from a RTL-SDR dongle and
 FM demodulate with MATLAB</em>,<a
 href="http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html">http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html</a></p>

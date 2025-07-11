@@ -373,6 +373,8 @@ Altta Burgers denkleminin şok ve seyreltilmiş dalga formu için çözümlerini
 animasyon olarak bulabiliriz.
 
 ```python
+import os
+
 def qf(q): return 0.5*q*q
     
 def exact_riemann_solution(xi,u_l,u_r):
@@ -413,7 +415,6 @@ def shock():
 shock() 
 ```
 
-
 ![](rieout/shock-00.png)
 
 ![](rieout/shock-04.png)
@@ -443,7 +444,6 @@ def rarefaction():
 rarefaction()
 ```
 
-
 ![](rieout/rarefaction-02.png)
 
 ![](rieout/rarefaction-06.png)
@@ -451,11 +451,11 @@ rarefaction()
 Animasyon olarak
 
 ```python
-! convert -delay 20 -loop 0 rieout/shock*.png shock.gif
+os.system("convert -delay 20 -loop 0 rieout/shock*.png shock.gif")
 ```
 
 ```python
-! convert -delay 20 -loop 0 rieout/rare*.png rarefaction.gif
+os.system("convert -delay 20 -loop 0 rieout/rare*.png rarefaction.gif")
 ```
 
 Animasyon sonuç dosyaları [7] ve [8]'de bulunabilir.
@@ -769,7 +769,7 @@ Belli $t$ anlarından alınmış görüntüler altta bulunabilir.
 Animasyon [13],
 
 ```python
-! convert -delay 20 -loop 0 /tmp/out-*.png wave.gif
+os.system("convert -delay 20 -loop 0 /tmp/out-*.png wave.gif")
 ```
   
 Kaynaklar

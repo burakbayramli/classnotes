@@ -8,7 +8,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-dir = "/home/burak/Documents/Dropbox/Public/data"
+dir = "/opt/Downloads"
 extract_data = np.fromfile(dir + "/fm1.dat",dtype="uint8")
 interleavedData = extract_data[0::2] + 1j*extract_data[1::2]
 ```
@@ -59,7 +59,7 @@ x2 = x1*fc
 f_bw=200000
 Fs=1140000
 n_taps=64
-lpf= signal.remez(n_taps, [0, f_bw, f_bw +(Fs/2-f_bw)/4,Fs/2], [1,0], Hz=Fs)
+lpf= signal.remez(n_taps, [0, f_bw, f_bw +(Fs/2-f_bw)/4,Fs/2], [1,0], fs=Fs)
 plt.xscale('log')
 plt.title('Filter Frequency Response')
 plt.xlabel('Frequency')
@@ -129,22 +129,21 @@ x7*= 10000 / np.max(np.abs(x7))               # scale so it's audible
 x7.astype("int16").tofile("radio.raw")
 ```
 
+```
+os.system("aplay radio.raw -r 100000.0 -f S16_LE -t raw -c 1")
+```
 
 ```
-aplay radio.raw -r 100000.0 -f S16_LE -t raw -c 1
-```
-
-```
-aplay radio.raw -r 45600 -f S16_LE -t raw -c 1
+os.system("aplay radio.raw -r 45600 -f S16_LE -t raw -c 1")
 ```
 
 Kaynaklar
 
 [1] *The Basic Facts About Radio Signals*, [https://www.windows2universe.org/spaceweather/wave_modulation.html](https://www.windows2universe.org/spaceweather/wave_modulation.html)
 
-[2] [https://drive.google.com/uc?export=view&id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk](https://drive.google.com/uc?export=view&id=1oevS3Dxy-ksVEQrulxI57R-mHcwFI-Tk)
+[2] [Veri 1](https://www.dropbox.com/scl/fi/70llfzz03cdtyouxpbqgo/fm1.dat?rlkey=11p5qvp3y7xjitdaj53jkbvef&st=pp97zxq5&raw=1)
 
-[3] [https://drive.google.com/uc?export=view&id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK](https://drive.google.com/uc?export=view&id=1B65C4v4m8TUx4R__CQ58Jzyw7fnWYDDK)
+[3] [Veri 2](https://www.dropbox.com/scl/fi/dcecslmf7grwle84gc3s2/fm2.dat?rlkey=y0459x5c6ytnt8qcgmbzbd8ch&st=b7g6lplk&raw=1)
 
 [4] Scher, *How to capture raw IQ data from a RTL-SDR dongle and FM demodulate with MATLAB*,[http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html](http://www.aaronscher.com/wireless_com_SDR/RTL_SDR_AM_spectrum_demod.html)
 
@@ -155,7 +154,3 @@ Kaynaklar
 [7] Fund, *Lab 1: Working with IQ data in Python*, [http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html](http://witestlab.poly.edu/~ffund/el9043/labs/lab1.html)
 
 [9] Swiston, *pyFmRadio - A Stereo FM Receiver For Your PC*, [http://davidswiston.blogspot.de/2014/10/pyfmradio-stereo-fm-receiver-for-your-pc.html](http://davidswiston.blogspot.de/2014/10/pyfmradio-stereo-fm-receiver-for-your-pc.html)
-
-
-
-
