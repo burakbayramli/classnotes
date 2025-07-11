@@ -287,9 +287,9 @@ Eğer aletin nasıl işlediği hakkında bir spekülasyon yapmak gerekirse,
 vektör alanı $x$'i ele alalım (çizmek için gerekli kod ile)
 
 ```python
-x = linspace(0,10.,10)
-y = linspace(0,10.,10)
-x,y = meshgrid(x,y)
+x = np.linspace(0,10.,10)
+y = np.linspace(0,10.,10)
+x,y = np.meshgrid(x,y)
 u = x*10
 v = np.zeros(y.shape)
 q = plt.quiver(x,y,u,v,angles='xy',scale=1000,color='r')
