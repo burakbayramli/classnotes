@@ -621,24 +621,24 @@ Başlangıç şartları $\theta(0) = \pi/6$, $v(0) = 0$, ve $\alpha = -5$ olsun,
 
 ```python
 import scipy as sp
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 def f(y,t):
     alpha = -5.0
-    r = sp.array([0,0],float)
+    r = np.array([0,0],float)
     r[0] = y[1]
-    r[1] = alpha*sp.sin(y[0])
+    r[1] = alpha*np.sin(y[0])
     return r
 
 T = 10; n = 1000
-theta0 = sp.pi/6; v0 = 0
-tspan = sp.linspace(0,T,n+1)
-initc = sp.array([theta0,v0])
+theta0 = np.pi/6; v0 = 0
+tspan = np.linspace(0,T,n+1)
+initc = np.array([theta0,v0])
 y = odeint(f,initc,tspan)
 theta = y[:,0]
 v = y[:,1]
 
-plt.plot(t,v,label='velocity(t)')
+plt.plot(tspan,v,label='velocity(t)')
 
 plt.savefig('1_10.png')
 ```
