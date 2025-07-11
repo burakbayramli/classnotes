@@ -107,9 +107,7 @@ plt.ylabel("y")
 plt.savefig('compscieng_app10boundary_03.png')
 ```
 
-
 ![](compscieng_app10boundary_03.png)
-
 
 Top Atışı Metotu (Shooting Method)
 
@@ -183,8 +181,9 @@ $$
 Kod, 
 
 ```python
-import scipy as sp import numpy.linalg as lin from
-scipy.integrate.odepack import odeint
+import scipy as sp
+import numpy.linalg as lin
+from scipy.integrate import odeint
 
 def rhs(u,t):
     x1, x2,  = u
@@ -194,7 +193,7 @@ def bvp_shoot(t0,tf,x0,xf,N,tol,kmax):
     dx0 = np.zeros(kmax)
     e = np.zeros(kmax)
     dx0[0]= (xf-x0)/(tf-t0);
-    t=np.linspace(t0,tf,100.0)
+    t=np.linspace(t0,tf,100)
     for k in range(1,kmax-1):
         x=odeint(rhs,[x0, dx0[k]], t)        
         e[k]=x[-1,0]-xf
@@ -276,7 +275,7 @@ sol = solve_bvp(fun, bc, x, y, p=[6])
 print (sol.p)
 ```
 
-```
+```text
 [6.2832946]
 ```
 
@@ -385,7 +384,7 @@ sol = solve_bvp(fun, bc, x, y)
 print (sol.y[4,0])
 ```
 
-```
+```text
 -21.54910449259776
 ```
 
@@ -588,7 +587,7 @@ sol = solve_bvp(fun, bc, x, y, p=[2*np.pi])
 print (sol.p)
 ```
 
-```
+```text
 [10.71071556]
 ```
 

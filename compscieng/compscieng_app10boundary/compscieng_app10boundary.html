@@ -253,36 +253,37 @@ x_0 = 1/4 \\ x_f = 1/3
 \]</span></p>
 <p>Kod,</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy <span class="im">as</span> sp <span class="im">import</span> numpy.linalg <span class="im">as</span> lin <span class="im">from</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>scipy.integrate.odepack <span class="im">import</span> odeint</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rhs(u,t):</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    x1, x2,  <span class="op">=</span> u</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [x2, (<span class="dv">2</span><span class="op">*</span>x1 <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>t<span class="op">*</span>x2)<span class="op">*</span>x1]</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bvp_shoot(t0,tf,x0,xf,N,tol,kmax):</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    dx0 <span class="op">=</span> np.zeros(kmax)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> np.zeros(kmax)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    dx0[<span class="dv">0</span>]<span class="op">=</span> (xf<span class="op">-</span>x0)<span class="op">/</span>(tf<span class="op">-</span>t0)<span class="op">;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    t<span class="op">=</span>np.linspace(t0,tf,<span class="fl">100.0</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,kmax<span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span>odeint(rhs,[x0, dx0[k]], t)        </span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        e[k]<span class="op">=</span>x[<span class="op">-</span><span class="dv">1</span>,<span class="dv">0</span>]<span class="op">-</span>xf</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        ddx<span class="op">=</span> dx0[k]<span class="op">-</span>dx0[k<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.<span class="bu">abs</span>(e[k])<span class="op">&lt;</span>tol <span class="kw">or</span> np.<span class="bu">abs</span>(ddx)<span class="op">&lt;</span>tol: <span class="cf">break</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        deddx<span class="op">=</span> (e[k]<span class="op">-</span>e[k<span class="op">-</span><span class="dv">1</span>])<span class="op">/</span>ddx<span class="op">;</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        dx0[k<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> dx0[k]<span class="op">-</span>e[k]<span class="op">/</span>deddx<span class="op">;</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> t, x</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>t0 <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span> tf <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> x0 <span class="op">=</span> <span class="dv">1</span><span class="op">/</span><span class="fl">4.</span><span class="op">;</span> xf <span class="op">=</span> <span class="dv">1</span><span class="op">/</span><span class="fl">3.</span><span class="op">;</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">100.</span><span class="op">;</span> tol <span class="op">=</span> <span class="fl">1e-8</span><span class="op">;</span> kmax <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>t,x <span class="op">=</span> bvp_shoot(t0,tf,x0,xf,N,tol,kmax)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>xo <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span>(<span class="fl">4.0</span> <span class="op">-</span> t<span class="op">**</span><span class="dv">2</span>)<span class="op">;</span> err <span class="op">=</span> lin.norm(x[:,<span class="dv">0</span>] <span class="op">-</span> xo)<span class="op">/</span>(N <span class="op">+</span> <span class="fl">1.0</span>)</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>plt.plot(t,x[:,<span class="dv">0</span>],<span class="st">&#39;g&#39;</span>) <span class="co"># bizim hesap</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.plot(t,xo,<span class="st">&#39;--r&#39;</span>) <span class="co"># analitik bilinen</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;compscieng_app10boundary_01.png&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy <span class="im">as</span> sp</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> lin</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.integrate <span class="im">import</span> odeint</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rhs(u,t):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    x1, x2,  <span class="op">=</span> u</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [x2, (<span class="dv">2</span><span class="op">*</span>x1 <span class="op">+</span> <span class="dv">4</span><span class="op">*</span>t<span class="op">*</span>x2)<span class="op">*</span>x1]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bvp_shoot(t0,tf,x0,xf,N,tol,kmax):</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    dx0 <span class="op">=</span> np.zeros(kmax)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> np.zeros(kmax)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    dx0[<span class="dv">0</span>]<span class="op">=</span> (xf<span class="op">-</span>x0)<span class="op">/</span>(tf<span class="op">-</span>t0)<span class="op">;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    t<span class="op">=</span>np.linspace(t0,tf,<span class="dv">100</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,kmax<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span>odeint(rhs,[x0, dx0[k]], t)        </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        e[k]<span class="op">=</span>x[<span class="op">-</span><span class="dv">1</span>,<span class="dv">0</span>]<span class="op">-</span>xf</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        ddx<span class="op">=</span> dx0[k]<span class="op">-</span>dx0[k<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.<span class="bu">abs</span>(e[k])<span class="op">&lt;</span>tol <span class="kw">or</span> np.<span class="bu">abs</span>(ddx)<span class="op">&lt;</span>tol: <span class="cf">break</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        deddx<span class="op">=</span> (e[k]<span class="op">-</span>e[k<span class="op">-</span><span class="dv">1</span>])<span class="op">/</span>ddx<span class="op">;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        dx0[k<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> dx0[k]<span class="op">-</span>e[k]<span class="op">/</span>deddx<span class="op">;</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> t, x</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>t0 <span class="op">=</span> <span class="fl">0.</span><span class="op">;</span> tf <span class="op">=</span> <span class="fl">1.</span><span class="op">;</span> x0 <span class="op">=</span> <span class="dv">1</span><span class="op">/</span><span class="fl">4.</span><span class="op">;</span> xf <span class="op">=</span> <span class="dv">1</span><span class="op">/</span><span class="fl">3.</span><span class="op">;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="fl">100.</span><span class="op">;</span> tol <span class="op">=</span> <span class="fl">1e-8</span><span class="op">;</span> kmax <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>t,x <span class="op">=</span> bvp_shoot(t0,tf,x0,xf,N,tol,kmax)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>xo <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span>(<span class="fl">4.0</span> <span class="op">-</span> t<span class="op">**</span><span class="dv">2</span>)<span class="op">;</span> err <span class="op">=</span> lin.norm(x[:,<span class="dv">0</span>] <span class="op">-</span> xo)<span class="op">/</span>(N <span class="op">+</span> <span class="fl">1.0</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.plot(t,x[:,<span class="dv">0</span>],<span class="st">&#39;g&#39;</span>) <span class="co"># bizim hesap</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>plt.plot(t,xo,<span class="st">&#39;--r&#39;</span>) <span class="co"># analitik bilinen</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;compscieng_app10boundary_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="compscieng_app10boundary_01.png" /></p>
 <p>Grafikte görüldüğü gibi iki çözüm birbirinin tıpkı aynısı.</p>
 <p>Sturm-Liouville</p>
@@ -340,7 +341,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>sol <span class="op">=</span> solve_bvp(fun, bc, x, y, p<span class="op">=</span>[<span class="dv">6</span>])</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sol.p)</span></code></pre></div>
-<pre><code>[6.2832946]</code></pre>
+<pre class="text"><code>[6.2832946]</code></pre>
 <p><span class="math inline">\(k\)</span>’nin aşağı yukarı doğru değerde
 olduğunu görüyoruz. Tüm çözümü grafikleyince beklenen sinüs eğrisini de
 göreceğiz,</p>
@@ -429,7 +430,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.zeros((<span class="dv">5</span>, x.size))</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>sol <span class="op">=</span> solve_bvp(fun, bc, x, y)</span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sol.y[<span class="dv">4</span>,<span class="dv">0</span>])</span></code></pre></div>
-<pre><code>-21.54910449259776</code></pre>
+<pre class="text"><code>-21.54910449259776</code></pre>
 <p><span class="math inline">\(F\)</span> sabitinin degeri ustte
 goruluyor.</p>
 <p>Dikkat edilirse <code>fun</code> içinde <span
@@ -607,7 +608,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">1</span>] <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> x)</span>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>sol <span class="op">=</span> solve_bvp(fun, bc, x, y, p<span class="op">=</span>[<span class="dv">2</span><span class="op">*</span>np.pi])</span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sol.p)</span></code></pre></div>
-<pre><code>[10.71071556]</code></pre>
+<pre class="text"><code>[10.71071556]</code></pre>
 <p>Üstteki <span class="math inline">\(T\)</span> değeri [9]’da bulunan
 ile aynı.</p>
 <p>Kaynaklar</p>
