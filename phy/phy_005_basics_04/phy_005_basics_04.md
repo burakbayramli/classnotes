@@ -460,28 +460,22 @@ grafikleyelim, yeşil çizgiler $x,y,z$ eksenleri olmak üzere,
 
 ```python
 from mpl_toolkits import mplot3d
+import sys; sys.path.append("../phy_072_rot")
+import plot3d
 
-def plot_vector(fig, orig, v, color='blue'):
-   ax = fig.gca(projection='3d')
-   orig = np.array(orig); v=np.array(v)
-   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
-   ax = fig.gca(projection='3d')  
-   return fig
-
-fig = plt.figure()
-axes = mplot3d.Axes3D(fig)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 SCALE = 0.5
-plot_vector(fig, [0,0,0],evec [:,0]*SCALE)
-plot_vector(fig, [0,0,0],evec [:,1]*SCALE)
-plot_vector(fig, [0,0,0],evec [:,2]*SCALE)
-axes.view_init(elev=10, azim=200)
-axes.set_xlim(-1,1)
-axes.set_ylim(-1,1)
-axes.set_zlim(-1,1)
-axes.plot([0,1],[0,0],[0,0],color = 'g')
-axes.plot([0,0],[0,1],[0,0],color = 'g')
-axes.plot([0,0],[0,0],[0,1],color = 'g')
-axes.locator_params(tight=True, nbins=4)
+plot3d.plot_vector(ax, [0,0,0],evec [:,0]*SCALE)
+plot3d.plot_vector(ax, [0,0,0],evec [:,1]*SCALE)
+plot3d.plot_vector(ax, [0,0,0],evec [:,2]*SCALE)
+ax.view_init(elev=10, azim=200)
+ax.set_xlim(-1,1)
+ax.set_ylim(-1,1)
+ax.set_zlim(-1,1)
+ax.plot([0,1],[0,0],[0,0],color = 'g')
+ax.plot([0,0],[0,1],[0,0],color = 'g')
+ax.plot([0,0],[0,0],[0,1],color = 'g')
+ax.locator_params(tight=True, nbins=4)
 plt.savefig('phy_005_basics_04_02.png')
 ```
 
