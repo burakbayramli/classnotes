@@ -459,7 +459,7 @@ with zipfile.ZipFile('legacycsv.zip', 'r') as z:
             f = x.replace("__carrydata","_price")
             dfc = pd.read_csv(z.open(f),index_col=0,parse_dates=True )     
             vol = util.robust_vol_calc(dfc.PRICE.diff())
-            carryoffset = np.abs(float((df.PRICE_CONTRACT - df.CARRY_CONTRACT).tail(1)))
+            carryoffset = np.abs(((df.PRICE_CONTRACT - df.CARRY_CONTRACT).tail(1)).astype(float))
             forecast =  util.carry(df.CARRY-df.PRICE, vol,np.abs(carryoffset)/12)
             res.append(forecast)
 
