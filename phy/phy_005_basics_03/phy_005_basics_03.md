@@ -264,143 +264,154 @@ tekniği kullanılabilir [7].
 Genel grafik yöntemi şurada [1] işlendi.
 
 ```python
-# convert -scale 30% /tmp/sim/*.png /tmp/balls6.gif
+from mpl_toolkits.mplot3d import Axes3D
 from random import random
-from collections import defaultdict 
-import numpy as np, datetime
-import sys, numpy.linalg as lin
-from mayavi import mlab
+from collections import defaultdict
+import sys, numpy.linalg as lin, datetime, os
 
 G = np.array([0.0, 0.0, -0.8])
 
 m = 0.1
-B = 8 # top
+B = 10 # number of balls
+BS = 10.0 # bounding box size
 
 EPS = 0.1
 BOUND_DAMPING = -0.6
 
+if not os.path.exists("/tmp/sim"): os.mkdir("/tmp/sim")
+
 class Simulation:
     def __init__(self):
-        self.r   = 0.2
+        self.r   = 0.8
         self.rvec   = np.ones(B) * self.r
         self.dt  = 0.1
         self.balls = []
         self.cor = 0.5
-        self.mmax =  2.0-self.r
-        self.mmin = 0.0+self.r
-        
+        # Corrected self.mmax to use BS for consistency with the global bounding box size
+        self.mmax =  BS - self.r
+        self.mmin = 0.0 + self.r
+
     def init(self):
         for b in range(B):
-            v = np.array([0.0, 0.0, 0.0])
-            p = np.array([np.random.rand(), np.random.rand(), np.random.rand()])
-            f = 5*np.array([np.random.rand(), np.random.rand(), np.random.rand()])
+            # Randomize initial velocity for each ball
+            v = 5 * (np.random.rand(3) - 0.5) # Random values between -2.5 and 2.5
+            p = np.array([np.random.rand() * BS, np.random.rand() * BS, np.random.rand() * BS]) # Scale initial positions
+            f = 5 * np.array([np.random.rand(), np.random.rand(), np.random.rand()])
             self.balls.append({'x':p, 'f':f, 'v': v, 'i': b})
-                        
 
     def computeForces(self, i):
-        if (i==0):
+        if (i==0): # Only compute forces once per step
             for j,b in enumerate(self.balls):
-                b['f'] = b['f'] + (G * m)
-        else: 
-            for b in self.balls:
-                b['f'] = G * m
-                        
-    def integrate(self):
-        
-        for j,p in enumerate(self.balls):
-            p['v'] += self.dt*(p['f']/m)
-            p['x'] += self.dt*p['v']
-            
-            if p['x'][0]-EPS < 0:
-                p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = 0
-            if p['x'][0]+EPS > 2.0:
-                p['v'][0] *= BOUND_DAMPING
-                p['x'][0] = 2.0-EPS
+                b['f'] = np.array([0.0, 0.0, 0.0]) # Reset forces
 
-            if p['x'][1]-EPS < 0:
-                p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = 0
-            if p['x'][1]+EPS > 2.0:
-                p['v'][1] *= BOUND_DAMPING
-                p['x'][1] = 2.0-EPS
+            # Gravity
+            for j,b in enumerate(self.balls):
+                b['f'] += m * G
 
-            if p['x'][2]-EPS < 0:
-                p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = 0
-            if p['x'][2]+EPS > 2.0:
-                p['v'][2] *= BOUND_DAMPING
-                p['x'][2] = 2.0-EPS
+            # Ball-Ball Collisions (simplified - just adds a repulsion force)
+            for j in range(len(self.balls)):
+                for k in range(j + 1, len(self.balls)):
+                    ball_j = self.balls[j]
+                    ball_k = self.balls[k]
+                    dist_vec = ball_k['x'] - ball_j['x']
+                    distance = lin.norm(dist_vec)
+                    if distance < (self.r + self.r):
+                        overlap = (self.r + self.r) - distance
+                        direction = dist_vec / distance
+                        # Simple repulsion force
+                        # You might need to adjust the magnitude of this force (e.g., 100)
+                        # or implement a more physically accurate impulse-based collision response.
+                        repulsion_force = 10 * overlap * direction
+                        ball_j['f'] -= repulsion_force
+                        ball_k['f'] += repulsion_force
+
+    def evolve(self):
+        self.computeForces(0) # Compute forces for all balls
+
+        for b in self.balls:
+            # Update velocity
+            b['v'] += (b['f'] / m) * self.dt
+
+            # Update position
+            b['x'] += b['v'] * self.dt
+
+            # Boundary collisions
+            for i in range(3): # x, y, z dimensions
+                if b['x'][i] < self.mmin:
+                    b['x'][i] = self.mmin
+                    b['v'][i] *= BOUND_DAMPING
+                elif b['x'][i] > self.mmax:
+                    b['x'][i] = self.mmax
+                    b['v'][i] *= BOUND_DAMPING
 
 
-        vDone = {}
-        for j,b in enumerate(self.balls):
-            for other in self.balls:
-                if (other['i'] != b['i'] and b['i'] not in vDone and other['i'] not in vDone):
-                    dist = lin.norm(other['x']-b['x'])
-                    if (dist < (2*self.r)):
-                        #print ('collision')
-                        vrel = b['v']-other['v']
-                        n = (other['x']-b['x']) / dist
-                        vnorm = np.dot(vrel,n)*n
-                        #print (vnorm)
-                        b['v'] = b['v'] - vnorm
-                        other['v'] = other['v'] + vnorm                            
-                        vDone[b['i']] = 1
-                        vDone[other['i']] = 1
-                            
-            
-            
-    def update(self,i):
-        self.computeForces(i)
-        self.integrate()
-            
-    def display(self, i):
-        mlab.options.offscreen = True
-        ball_vect = [[b['x'][0],b['x'][1],b['x'][2]] for b in self.balls]
-        ball_vect = np.array(ball_vect)
+def visualize_matplotlib(sim):
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection='3d')
 
-        fig = mlab.figure(figure=None, fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1), engine=None)
-        color=(0.2, 0.4, 0.5)
-        mlab.points3d(ball_vect[:,0], ball_vect[:,1], ball_vect[:,2], self.rvec, color=color, colormap = 'gnuplot', scale_factor=1, figure=fig)
-        mlab.points3d(0, 0, 0, 0.1, color=(1,0,0), scale_factor=1.0)
-        
-        BS = 2.0
-        mlab.plot3d([0.0,0.0],[0.0, 0.0],[0.0, BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0.0,BS],[0.0, 0.0],[0.0, 0.0], color=(1,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0.0,0.0],[0.0, BS],[0.0, 0.0], color=(0,1,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0.0,0.0],[0.0, BS],[BS, BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0.0,BS],[0.0,0.0],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,BS],[0.0,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,0],[BS,BS],[BS,BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([0,0],[BS,BS],[BS,0], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,BS],[0.0,0.0],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,BS],[0.0,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,0.0],[BS,BS],[0.0,0.0], color=(0,0,0), tube_radius=None, figure=fig)
-        mlab.plot3d([BS,BS],[BS,BS],[0.0,BS], color=(0,0,0), tube_radius=None, figure=fig)
+    # Plot balls
+    x_coords = [b['x'][0] for b in sim.balls]
+    y_coords = [b['x'][1] for b in sim.balls]
+    z_coords = [b['x'][2] for b in sim.balls]
+    ax.scatter(x_coords, y_coords, z_coords, s=sim.rvec*500, c='white', edgecolors='black') # s is marker size, scaled for visibility
 
-        mlab.view(azimuth=50, elevation=80, focalpoint=[1, 1, 1], distance=8.0, figure=fig)
-        
-        mlab.savefig(filename='/tmp/sim/out-%02d.png' % i)
-        #exit()
+    # Plot bounding box
+    # Lines along x-axis
+    ax.plot([0, BS], [0, 0], [0, 0], color='red')
+    ax.plot([0, BS], [0, 0], [BS, BS], color='black')
+    ax.plot([0, BS], [BS, BS], [0, 0], color='black')
+    ax.plot([0, BS], [BS, BS], [BS, BS], color='black')
 
-if __name__ == '__main__':
-    s = Simulation()
-    s.init()
-    for i in range(40):
-        s.update(i)
-        s.display(i)
-        #exit()
+    # Lines along y-axis
+    ax.plot([0, 0], [0, BS], [0, 0], color='green')
+    ax.plot([0, 0], [0, BS], [BS, BS], color='black')
+    ax.plot([BS, BS], [0, BS], [0, 0], color='black')
+    ax.plot([BS, BS], [0, BS], [BS, BS], color='black')
+
+    # Lines along z-axis
+    ax.plot([0, 0], [0, 0], [0, BS], color='blue')
+    ax.plot([0, 0], [BS, BS], [0, BS], color='black')
+    ax.plot([BS, BS], [0, 0], [0, BS], color='black')
+    ax.plot([BS, BS], [BS, BS], [0, BS], color='black')
+
+
+    ax.set_xlim(0, BS)
+    ax.set_ylim(0, BS)
+    ax.set_zlim(0, BS)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('Ball Simulation (Matplotlib)')
+    ax.set_facecolor('black') # Set background to black
+    ax.grid(False) # Turn off grid
+
+    return fig, ax
+
+
+sim = Simulation()
+sim.init()
+
+# Initial plot
+fig, ax = visualize_matplotlib(sim)
+
+# To create an animation similar to the original Mayavi code,
+# you would typically run the simulation for multiple steps
+# and save each frame.
+# Here's an example of how you would save frames:
+#
+num_frames = 50
+for i in range(num_frames):
+    sim.evolve()
+    fig, ax = visualize_matplotlib(sim) # Recreate plot for each frame or update existing plot
+    plt.savefig(f'/tmp/sim/frame_{i:04d}.png', dpi=150)
+    plt.close(fig) # Close the figure to free memory
+
 ```
-
-
-![](glutout-140.png)
-![](glutout-390.png)
 
 Tüm resimleri birleştirirsek,
 
 ```python
-! convert -scale 30% /tmp/glutout-*.png /tmp/balls1.gif
+os.system("convert -delay 10 -loop 0 /tmp/sim/*.png /tmp/balls1.gif")
 ```
 
 Sonuç [2]'de görülebilir.

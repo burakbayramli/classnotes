@@ -389,50 +389,42 @@ hesaplarken <span class="math inline">\(e^{at} i\sin(bt)\)</span>
 formülündeki <span class="math inline">\(i\)</span> haricinde geri kalan
 terimleri hesaplıyoruz.</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># MIT OCW ODE Mathlet Complex Exponentials replacement in </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Python</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pylab <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.widgets <span class="im">import</span> Slider</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> subplot(<span class="dv">121</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>subplots_adjust(left<span class="op">=</span><span class="fl">0.1</span>, bottom<span class="op">=</span><span class="fl">0.25</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>l1, <span class="op">=</span> plot(<span class="va">None</span>,<span class="va">None</span>, lw<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>axis([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">8</span>, <span class="dv">8</span>])</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>title (<span class="st">&#39;$(a + bi)t$&#39;</span>, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>grid()</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> subplot(<span class="dv">122</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>subplots_adjust(left<span class="op">=</span><span class="fl">0.1</span>, bottom<span class="op">=</span><span class="fl">0.25</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>l2, <span class="op">=</span> plot(<span class="va">None</span>,<span class="va">None</span>, lw<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>axis([<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>])</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>title (<span class="st">&#39;$e^{(a + bi)t}$&#39;</span>, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>grid()</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>axcolor <span class="op">=</span> <span class="st">&#39;lightgoldenrodyellow&#39;</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>axa <span class="op">=</span> axes([<span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="fl">0.65</span>, <span class="fl">0.03</span>], axisbg<span class="op">=</span>axcolor)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>axb  <span class="op">=</span> axes([<span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.65</span>, <span class="fl">0.03</span>], axisbg<span class="op">=</span>axcolor)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>slidera <span class="op">=</span> Slider(axa, <span class="st">&#39;a&#39;</span>, <span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, valinit<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>sliderb <span class="op">=</span> Slider(axb, <span class="st">&#39;b&#39;</span>, <span class="op">-</span><span class="fl">8.0</span>, <span class="fl">8.0</span>, valinit<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> update(val):</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> slidera.val</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> sliderb.val</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> arange(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">0.001</span>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    l1.set_xdata(t)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    l1.set_ydata((b<span class="op">/</span>a)<span class="op">*</span>t)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the figure and a set of subplots</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(left<span class="op">=</span><span class="fl">0.1</span>, bottom<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left subplot: (a + bi)t</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>l1, <span class="op">=</span> ax1.plot([], [], lw<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>) <span class="co"># Initialize with empty lists</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ax1.set_xlim([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ax1.set_ylim([<span class="op">-</span><span class="dv">8</span>, <span class="dv">8</span>])</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">&#39;$(a + bi)t$&#39;</span>, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax1.grid(<span class="va">True</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Right subplot: e^(a + bi)t</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>l2, <span class="op">=</span> ax2.plot([], [], lw<span class="op">=</span><span class="dv">2</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>) <span class="co"># Initialize with empty lists</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ax2.set_xlim([<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>])</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax2.set_ylim([<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>])</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">&#39;$e^{(a + bi)t}$&#39;</span>, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax2.grid(<span class="va">True</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Define slider axes</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>axcolor <span class="op">=</span> <span class="st">&#39;lightgoldenrodyellow&#39;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>axa <span class="op">=</span> plt.axes([<span class="fl">0.15</span>, <span class="fl">0.1</span>, <span class="fl">0.65</span>, <span class="fl">0.03</span>], facecolor<span class="op">=</span>axcolor) <span class="co"># Use facecolor instead of axisbg</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>axb <span class="op">=</span> plt.axes([<span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="fl">0.65</span>, <span class="fl">0.03</span>], facecolor<span class="op">=</span>axcolor) <span class="co"># Use facecolor instead of axisbg</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="op">-</span><span class="dv">6</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">0.001</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>l1.set_xdata(t)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>l1.set_ydata((b<span class="op">/</span>a)<span class="op">*</span>t)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(<span class="op">-</span><span class="fl">3.0</span>, <span class="fl">3.0</span>, <span class="fl">0.001</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>l2.set_xdata(np.exp(a<span class="op">*</span>t)<span class="op">*</span>np.cos(b<span class="op">*</span>t))</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>l2.set_ydata(np.exp(a<span class="op">*</span>t)<span class="op">*</span>np.sin(b<span class="op">*</span>t))</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>fig.canvas.draw_idle() <span class="co"># Use draw_idle for efficiency</span></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> arange(<span class="op">-</span><span class="fl">3.0</span>, <span class="fl">3.0</span>, <span class="fl">0.001</span>)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    l2.set_xdata(exp(a<span class="op">*</span>t)<span class="op">*</span>cos(b<span class="op">*</span>t))</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    l2.set_ydata(exp(a<span class="op">*</span>t)<span class="op">*</span>sin(b<span class="op">*</span>t))</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    draw()</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>slidera.on_changed(update)</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>sliderb.on_changed(update)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;compexp.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;compexp.png&#39;</span>)</span></code></pre></div>
 <p><img src="compexp.png" /></p>
 <p>Problemler 2, 7b</p>
 <p><span class="math inline">\(\dot{z} + 3z = e^{2it}\)</span>

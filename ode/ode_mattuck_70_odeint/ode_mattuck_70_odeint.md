@@ -161,7 +161,8 @@ for i in range(len(x1)):
 Animasyon yaratabiliriz,
 
 ```python
-! convert -loop 0 -delay 100 frames/*.png frames/pend.gif
+import os
+os.system("convert -loop 0 -delay 100 frames/*.png frames/pend.gif")
 ```
 
 Sonuç [2]'de görülebilir.

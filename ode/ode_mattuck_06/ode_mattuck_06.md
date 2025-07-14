@@ -316,48 +316,40 @@ hesaplarken $e^{at} i\sin(bt)$ formülündeki $i$ haricinde geri kalan terimleri
 hesaplıyoruz.
 
 ```python
-#
-# MIT OCW ODE Mathlet Complex Exponentials replacement in 
-# Python
-#
-from pylab import *
-from matplotlib.widgets import Slider
+# Create the figure and a set of subplots
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+plt.subplots_adjust(left=0.1, bottom=0.25)
 
-ax = subplot(121)
-subplots_adjust(left=0.1, bottom=0.25)
-l1, = plot(None,None, lw=2, color='red')
-axis([-1, 1, -8, 8])
-title ('$(a + bi)t$', color='blue')
-grid()
+# Left subplot: (a + bi)t
+l1, = ax1.plot([], [], lw=2, color='red') # Initialize with empty lists
+ax1.set_xlim([-1, 1])
+ax1.set_ylim([-8, 8])
+ax1.set_title('$(a + bi)t$', color='blue')
+ax1.grid(True)
 
-ax = subplot(122)
-subplots_adjust(left=0.1, bottom=0.25)
-l2, = plot(None,None, lw=2, color='red')
-axis([-3, 3, -3, 3])
-title ('$e^{(a + bi)t}$', color='blue')
-grid()
+# Right subplot: e^(a + bi)t
+l2, = ax2.plot([], [], lw=2, color='red') # Initialize with empty lists
+ax2.set_xlim([-3, 3])
+ax2.set_ylim([-3, 3])
+ax2.set_title('$e^{(a + bi)t}$', color='blue')
+ax2.grid(True)
 
+# Define slider axes
 axcolor = 'lightgoldenrodyellow'
-axa = axes([0.15, 0.1, 0.65, 0.03], axisbg=axcolor)
-axb  = axes([0.15, 0.15, 0.65, 0.03], axisbg=axcolor)
+axa = plt.axes([0.15, 0.1, 0.65, 0.03], facecolor=axcolor) # Use facecolor instead of axisbg
+axb = plt.axes([0.15, 0.15, 0.65, 0.03], facecolor=axcolor) # Use facecolor instead of axisbg
 
-slidera = Slider(axa, 'a', -1.0, 1.0, valinit=0)
-sliderb = Slider(axb, 'b', -8.0, 8.0, valinit=0)
+a = -0.5
+b = -6
+t = np.arange(-1.0, 1.0, 0.001)
+l1.set_xdata(t)
+l1.set_ydata((b/a)*t)
 
-def update(val):
-    a = slidera.val
-    b = sliderb.val
-    t = arange(-1.0, 1.0, 0.001)
-    l1.set_xdata(t)
-    l1.set_ydata((b/a)*t)
+t = np.arange(-3.0, 3.0, 0.001)
+l2.set_xdata(np.exp(a*t)*np.cos(b*t))
+l2.set_ydata(np.exp(a*t)*np.sin(b*t))
 
-    t = arange(-3.0, 3.0, 0.001)
-    l2.set_xdata(exp(a*t)*cos(b*t))
-    l2.set_ydata(exp(a*t)*sin(b*t))
-    draw()
-    
-slidera.on_changed(update)
-sliderb.on_changed(update)
+fig.canvas.draw_idle() # Use draw_idle for efficiency
 
 plt.savefig('compexp.png')
 ```
@@ -515,7 +507,3 @@ Bu toplamın sol bölümündeki terimler $\cos$'un açılımı, öteki de (i har
 sin'in açılımına benzemiyor mu? Evet.
 
 O zaman ispatı tamamlamış olduk. 
-
-
-
-
