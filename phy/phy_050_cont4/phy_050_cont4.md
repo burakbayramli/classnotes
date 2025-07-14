@@ -356,7 +356,7 @@ başlayacak, ve sallanacak.
 from matplotlib.patches import Circle
 import matplotlib.pyplot as plt
 from numpy import cos, sin
-from scipy.integrate.odepack import odeint
+from scipy.integrate import odeint
 
 m1=1.0; m2=1.0; L1=1.0; L2=1.0
 g=9.8
@@ -404,17 +404,12 @@ for i in range(len(x1)):
         make_plot('frames/img{:04d}.png'.format(i),x1[i],y1[i],x2[i],y2[i])
 ```
 
-Birkac ornek, 
-
-![](frames/img0000.png)
-![](frames/img0010.png)
-![](frames/img0015.png)
-
 Sistemin belli anlarda "fotoğrafını çekip'' grafikledik, ve bu grafikleri
 animasyon olarak birleştirirsek,
 
 ```python
-! convert -loop 0 -delay 100 frames/*.png frames/dblpend.gif
+import os
+os.system("convert -loop 0 -delay 100 frames/*.png frames/dblpend.gif")
 ```
 
 Sonuçları [2]'de bulabiliriz. 
@@ -425,15 +420,10 @@ Kaynaklar
     [sophia.dtp.fmph.uniba.sk/~kovacik/doublePendulum.pdf](sophia.dtp.fmph.uniba.sk/~kovacik/doublePendulum.pdf)
 
 [2] Bayramlı, *Double Pendulum Animasyonu*,
-    [https://raw.githubusercontent.com/burakbayramli/classnotes/master/phy/phy_050_cont4/frames/dblpend.gif](https://raw.githubusercontent.com/burakbayramli/classnotes/master/phy/phy_050_cont4/frames/dblpend.gif)
+    [https://www.dropbox.com/scl/fi/113k9tdky17xel0445qk9/dblpend.gif?rlkey=17mhrvq64t0jgr3v6c4whb9je&st=92qxyh1j&raw=1)
 
 [3] Virginia Tech,
     [http://galileo.phys.virginia.edu/education/outreach/8thgradesol/EnergyPendulum.htm](http://galileo.phys.virginia.edu/education/outreach/8thgradesol/EnergyPendulum.htm)
 
 [4] Altic,
     [https://mse.redwoods.edu/darnold/math55/DEproj/sp08/jaltic/ProjectTitleOnline.pdf](https://mse.redwoods.edu/darnold/math55/DEproj/sp08/jaltic/ProjectTitleOnline.pdf)
-
-
-
-
-
