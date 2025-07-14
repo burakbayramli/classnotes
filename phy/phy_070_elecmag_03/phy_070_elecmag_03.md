@@ -375,10 +375,8 @@ plt.xlim(-1,1)
 x = r = np.linspace(-4,4,100)
 y1 = 1/np.abs(r)**2
 plt.plot(x,y1,label='$r^2$')
-plt.hold(True)
 y2 = 1/np.abs(r)**3
 plt.plot(x,y2,label='$r^3$')
-plt.hold(True)
 plt.legend()
 plt.savefig('03_17.png')
 ```
