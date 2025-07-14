@@ -445,7 +445,7 @@ def rhs(x, t):
 
     x1,x2,x3,x4 = x
     xs = np.array([1,0,0,0])
-    F = np.float(np.dot(K,(xs - np.array([x1,x2,x3,x4]))))
+    F = float(np.dot(K,(xs - np.array([x1,x2,x3,x4]))))
 
     tmp1 = (F - M*g*sin(2*x2)/2 + M*l*x4**2*sin(x2) - mu*x3) \
            / (M*sin(x2)**2 + m)
