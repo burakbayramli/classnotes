@@ -241,7 +241,7 @@ Em = 20000
 b = 500
 h = 800
 Ig = (b * h**3)/12
-EI = Em * Ig
+EI = sym.Integer(Em) * sym.Integer(Ig)
 q = -25 # Newton icin 1000 carpip mm icin 1000 ile bolduk ayni kaldi
 X1, X2 = sym.symbols('X1, X2')
 y = sym.Function('y')
@@ -337,7 +337,7 @@ u = sym.lambdify(X1, y,'numpy')
 x = np.linspace(0,L,20)
 plt.plot(x,u(x))
 plt.title(u'Yer Değişim y')
-plt.savefig('phy_020_strs_03_03.jpg',quality=30)
+plt.savefig('phy_020_strs_03_03.jpg')
 ```
 
 ![](phy_020_strs_03_03.jpg)
@@ -352,7 +352,7 @@ v = sym.lambdify(X1, V,'numpy')
 x = np.linspace(0,L,20)
 plt.plot(x,v(x))
 plt.title(u'Kesme, V')
-plt.savefig('phy_020_strs_03_04.jpg',quality=30)
+plt.savefig('phy_020_strs_03_04.jpg')
 ```
 
 ![](phy_020_strs_03_04.jpg)
@@ -362,7 +362,7 @@ m = sym.lambdify(X1, M,'numpy')
 x = np.linspace(0,L,20)
 plt.plot(x,m(x))
 plt.title('Moment, M')
-plt.savefig('phy_020_strs_03_05.jpg',quality=30)
+plt.savefig('phy_020_strs_03_05.jpg')
 ```
 
 ![](phy_020_strs_03_05.jpg)
@@ -374,7 +374,7 @@ y = np.linspace(-h/2,h/2,20)
 xg,yg = np.meshgrid(x,y)
 zg = s11f(xg,yg)
 plt.contourf(xg,yg,zg,cmap='gnuplot2')
-plt.savefig('phy_020_strs_03_06.jpg',quality=30)
+plt.savefig('phy_020_strs_03_06.jpg')
 ```
 
 ![](phy_020_strs_03_06.jpg)
