@@ -68,9 +68,9 @@ print (norm_tv(xcor))
 print (norm_atv(xcor))
 ```
 
-```
-1103.2561038302395
-1103.2571969067808
+```text
+1146.1068179914787
+1146.1098514344671
 ```
 
 Üstteki fonksiyonun iki kez türevi alınabilir. Şimdi analitik şekilde devam
@@ -81,7 +81,7 @@ direk kodlayarak ve sayısal türev üzerinden işleyebilen bir kütüphane
 ```python
 import pandas as pd
 df = pd.read_csv('xcor.csv',header=None)
-xcor = np.reshape(np.array(df[0]), (5000,1))
+xcor = np.reshape(np.array(df[0]), (5000,))
 plt.plot(range(len(xcor)), xcor)
 plt.savefig('func_60_tvd_01.png')
 ```
@@ -91,21 +91,19 @@ plt.savefig('func_60_tvd_01.png')
 Kütüphane çağrısı ile
 
 ```python
-x0 = np.zeros(len(xcor))
+x0 = np.zeros_like(xcor)
 
-from scipy.optimize import minimize, Bounds, SR1, BFGS
+from scipy.optimize import minimize
 
 def phi(x):
    return np.sum(np.power(x-xcor, 2)) + mu*norm_atv(x)
 
-opts = {'maxiter': 400, 'verbose': 2}
+opts = {'maxiter': 30, 'disp': True}
 
 res = minimize (fun=phi,
                 x0=x0,
                 options=opts,
-                jac='2-point',
-                hess=BFGS(),
-                method='trust-constr'
+                method='L-BFGS-B'
                 )
 
 plt.plot(range(5000), res.x)
@@ -215,37 +213,44 @@ data = np.array([-1*np.ones(n), np.ones(n)])
 diags = np.array([0, 1])
 D = sps.spdiags(data, diags, n-1, n)
 
-x = np.zeros((len(xcor),1))
+
+x = np.copy(xcor)
 
 for iter in range(MAXITERS):
    d = D.dot(x)
-   val1 = np.dot((x-xcor).T,(x-xcor))
-   val2 = np.sqrt(EPSILON**2 + np.power(d,2))
-   val3 = EPSILON*np.ones((n-1,1))
-   val = np.float(val1 + MU*np.sum(val2 - val3))
-   grad1 = 2*(x-xcor)
-   grad2 = MU*D.T.dot(d / np.sqrt(EPSILON**2 + d**2))
-   grad = grad1 + grad2
-   hess1 = 2*sps.eye(n)
-   hess2 = EPSILON**2*(EPSILON**2+d**2)**(-3/2)
-   hess2 = hess2.reshape((n-1))
-   hess3 = sps.spdiags(hess2, 0, n-1, n-1)
 
-   hess = hess1 + MU*hess3.dot(D).T.dot(D)
-   v = slin.spsolve(-hess, grad)
-   v = np.reshape(v, (n,1))
-   lambdasqr = np.float(np.dot(-grad.T,v))
-   if lambdasqr/2 < NTTOL: break
-   t = 1;
+   val1 = np.sum(np.power(x - xcor, 2)) 
+   val2_terms = np.sqrt(EPSILON**2 + np.power(d, 2))
+   val = val1 + MU * np.sum(val2_terms - EPSILON) 
+
+   grad1 = 2 * (x - xcor) 
+   grad2 = MU * D.T.dot(d / val2_terms) 
+   grad = grad1 + grad2 
+
+   hess1 = 2 * sps.eye(n) # (n,n)
+   hess2_diag_vals = EPSILON**2 / np.power(EPSILON**2 + d**2, 3/2) # (n-1,)
+   hess3 = sps.spdiags(hess2_diag_vals, 0, n-1, n-1) # (n-1, n-1)
+   
+   hess_second_term = MU * D.T.dot(hess3.dot(D)) 
+   hess = hess1 + hess_second_term
+
+   v = slin.spsolve(-hess, grad) 
+
+   lambdasqr = np.dot(-grad.T, v) 
+   if lambdasqr / 2 < NTTOL:
+       break
+   t = 1
    while True:
-      tmp1 = np.float(np.dot((x+t*v-xcor).T,(x+t*v-xcor)))
-      tmp2 = MU*np.sum(np.sqrt(EPSILON**2+(D*(x+t*v))**2)-EPSILON*np.ones((n-1,1)))
-      tmp3 = val - ALPHA*t*lambdasqr
-      if tmp1 + tmp2 < tmp3: break
-      t = BETA*t
+      tmp1 = np.sum(np.power(x + t * v - xcor, 2)) 
+      tmp2_terms = np.sqrt(EPSILON**2 + np.power(D.dot(x + t * v), 2))
+      tmp_val = tmp1 + MU * np.sum(tmp2_terms - EPSILON) 
+      
+      if tmp_val < val - ALPHA * t * lambdasqr:
+         break
+      t = BETA * t
 
-   x = x+t*v
-
+   x = x + t * v 
+   
 plt.plot(range(n),xcor)
 plt.plot(range(n),x,'r')
 plt.savefig('func_60_tvd_03.png')
@@ -292,7 +297,7 @@ print ('Yatay Farklilik')
 print (D.transpose().dot(X.T))
 ```
 
-```
+```text
 [[1 2 3 4]
  [5 6 7 8]
  [1 2 3 4]
@@ -315,101 +320,82 @@ Yatay Farklilik
 
 L1 norm yaklaşıksallığı için daha önceki yöntemi kullanabiliriz.  
 
-Gradyan almak için ise bu sefer `tensorflow` paketini kullanacağız
-[5]. Bir vektöre göre değil bir matrise göre türev alıyoruz, bunu sembolik
-yapmak yerine sembolik yaklaşım kadar kuvvetli olan otomatik türev ile
-gradyanı elde edebiliriz.
-
-Üstteki tüm hesapları TF ile bir hesap grafiği içinde kodlayıp,
-`tf.gradients` ile hedef fonksiyonunun gradyanını alacağız, ve
-standart gradyan inişi optimizasyonu ile bir noktadan başlayıp gradyan yönü
-tersinde adım atarak minimum noktaya varmaya uğraşacağız. 
+Yine total varyasyon kullanan ama farklı optimizasyon çözücüyle hesabı
+yapan bir yöntem allta [1], sonuç (soldaki)
 
 ```python
-from skimage import io
-import tensorflow as tf
+import matplotlib.pyplot as plt
+import pylab, skimage
+from numpy import random
+from PIL import Image
 
-MU = 50.0
-EPSILON = 0.001
-n = 225
+def nabla(I):
+    h, w = I.shape
+    G = np.zeros((h, w, 2), I.dtype)
+    G[:, :-1, 0] -= I[:, :-1]
+    G[:, :-1, 0] += I[:, 1:]
+    G[:-1, :, 1] -= I[:-1]
+    G[:-1, :, 1] += I[1:]
+    return G
 
-img = io.imread('lena.jpg', as_gray=True)
-io.imsave('lenad0.jpg', img)
-img = io.imread('lena-noise.jpg', as_gray=True)
-io.imsave('lenad1.jpg', img)
-xorig = tf.cast(tf.constant( io.imread('lena-noise.jpg', as_gray=True)),dtype=tf.float32)
-x = tf.placeholder(dtype="float",shape=[n,n],name="x")
+def nablaT(G):
+    h, w = G.shape[:2]
+    I = np.zeros((h, w), G.dtype)
+    I[:, :-1] -= G[:, :-1, 0]
+    I[:, 1: ] += G[:, :-1, 0]
+    I[:-1]    -= G[:-1, :, 1]
+    I[1: ]    += G[:-1, :, 1]
+    return I
 
-D = np.zeros((n,n))
-idx1, idx2 = [], []
-for i in range(n):
-    idx1.append([i,i])
-    if i<n-1: idx2.append([i,i+1])
-idx = idx1 + idx2
-ones = [1.0 for i in range(n)]
-ones[n-1] = 0
-negs = [-1.0 for i in range(n-1)]
-negs[n-2] = 0
-vals = ones + negs
-vals = np.array(vals).astype(np.float32)
-D = tf.SparseTensor(indices=idx, values=vals, dense_shape=[n, n])
+def anorm(x):
+    return np.sqrt((x*x).sum(-1))
 
+def calc_energy_ROF(X, observation, clambda):
+    Ereg = anorm(nabla(X)).sum()
+    Edata = 0.5 * clambda * ((X - observation)**2).sum()
+    return Ereg + Edata
 
-diff = tf.square(tf.norm(xorig-x, ord='euclidean'))
+def calc_energy_TVL1(X, observation, clambda):
+    Ereg = anorm(nabla(X)).sum()
+    Edata = clambda * np.abs(X - observation).sum()
+    return Ereg + Edata
 
-Ux = tf.sparse_tensor_dense_matmul(D, x)
-Uy = tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x))
-Uy = tf.transpose(Uy)
+lambda_ROF = 8.0
+lambda_TVL1 = 1.0
 
-fUx = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Ux)) - EPSILON)
-fUy = tf.reduce_sum(tf.sqrt(EPSILON**2 + tf.square(Uy)) - EPSILON)
-
-phi_atv = fUx + fUy
-
-psi = diff + MU*phi_atv
-g = tf.gradients(psi, x)
-g = tf.reshape(g,[n*n])
-
-init = tf.global_variables_initializer()
-
-sess = tf.Session()
-
-sess.run(init)
-
-def tv(xvec):
-    xmat = xvec.reshape(n,n)
-    p = sess.run(psi, {x: xmat} )
-    return p
-
-def tv_grad(xvec):
-    xmat = xvec.reshape(n,n)
-    gres = sess.run(g, {x: xmat} )
-    return gres
+def project_nd(P, r):
+    nP = np.maximum(1.0, anorm(P)/r)
+    return P / nP[...,np.newaxis]
     
-x0 = np.zeros(n*n)
-xcurr = x0
+def shrink_1d(X, F, step):
+    return X + np.clip(F - X, -step, step)
 
-N = 130
-for i in range(1,N):
-    gcurr = tv_grad(xcurr)
-    gcurr /= gcurr.max()/0.3
-    chg = np.sum(np.abs(xcurr))
-    xcurr = xcurr - gcurr
- 
-xcurr /= xcurr.max()/255.0
-io.imsave('lenad2.jpg', np.reshape(xcurr,(n,n)))
+def solve_TVL1(img, clambda, iter_n=101):
+    L2 = 8.0
+    tau = 0.02
+    sigma = 1.0 / (L2*tau)
+    theta = 1.0
+
+    X = img.copy()
+    P = nabla(X)
+    for i in range(iter_n):
+        P = project_nd( P + sigma*nabla(X), 1.0 )
+        X1 = shrink_1d(X - tau*nablaT(P), img, clambda*tau)
+        X = X1 + theta * (X1 - X)
+    return X
+
+from skimage import io
+img = io.imread('lena-noise.jpg', as_gray=True)
+res = solve_TVL1(img, 1.0)
+
+res_scaled = (res - res.min()) / (res.max() - res.min())
+res_uint8 = (res_scaled * 255).astype(np.uint8)
+
+io.imsave('lenad3.jpg', res_uint8)
 ```
 
-
-![](lenad0.jpg)
-![](lenad1.jpg)
-![](lenad2.jpg)
-
-Yine total varyasyon kullanan ama farklı optimizasyon çözücüyle hesabı
-yapan bir yöntem `tlv_prim_dual.py` kodunda [1], sonuç (soldaki)
-
 ![](lenad3.jpg)
-![](lenad4.jpg)
+![](lena-noise.jpg)
 
 Ayrıca `cvxpy` adlı bir paket üzerinden aynı şeyi kodlayabiliriz, yani 
 
@@ -437,12 +423,82 @@ prob = cvxpy.Problem(obj)
 prob.solve(verbose=True, solver=cvxpy.SCS)
 
 plt.imshow(U.value, cmap='gray')
-plt.imsave(lena4.jpg', U.value, cmap='gray')
+plt.imsave('lena4.jpg', U.value, cmap='gray')
 ```
 
-Üstteki sağdaki resim bu sonucu gösteriyor. Bu yaklaşımda
-`cvxpy.tv` ile tam varyasyon hesabını yapan kütüphanenin kendi iç
-çağrısını kullandık. 
+```text
+===============================================================================
+                                     CVXPY                                     
+                                     v1.6.6                                    
+===============================================================================
+-------------------------------------------------------------------------------
+                                  Compilation                                  
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+                                Numerical solver                               
+-------------------------------------------------------------------------------
+------------------------------------------------------------------
+	       SCS v3.2.7 - Splitting Conic Solver
+	(c) Brendan O'Donoghue, Stanford University, 2012
+------------------------------------------------------------------
+problem:  variables n: 151426, constraints m: 201153
+cones: 	  z: primal zero / dual free vars: 50625
+	  q: soc vars: 150528, qsize: 50176
+settings: eps_abs: 1.0e-05, eps_rel: 1.0e-05, eps_infeas: 1.0e-07
+	  alpha: 1.50, scale: 1.00e-01, adaptive_scale: 1
+	  max_iters: 100000, normalize: 1, rho_x: 1.00e-06
+	  acceleration_lookback: 10, acceleration_interval: 10
+lin-sys:  sparse-direct-amd-qdldl
+	  nnz(A): 352130, nnz(P): 50625
+------------------------------------------------------------------
+ iter | pri res | dua res |   gap   |   obj   |  scale  | time (s)
+------------------------------------------------------------------
+     0| 8.93e+02  3.50e+01  1.58e+09 -7.77e+08  1.00e-01  5.55e-01 
+   250| 1.32e+00  4.81e-02  3.99e+01  2.25e+07  1.00e-01  4.92e+00 
+   500| 5.62e-01  8.50e-02  2.80e+01  2.25e+07  3.19e-01  8.84e+00 
+   750| 2.67e-01  2.15e-02  6.38e+00  2.25e+07  3.19e-01  1.27e+01 
+  1000| 3.53e+01  8.82e+00  3.72e+02  2.25e+07  3.19e-01  1.65e+01 
+  1250| 8.25e-02  4.00e-03  1.67e+00  2.25e+07  3.19e-01  2.04e+01 
+  1500| 7.18e-02  3.42e-03  1.11e+00  2.25e+07  3.19e-01  2.42e+01 
+  1750| 4.66e-02  3.68e-03  7.96e-01  2.25e+07  3.19e-01  2.81e+01 
+  2000| 4.68e-02  7.17e-04  5.96e-01  2.25e+07  3.19e-01  3.19e+01 
+  2250| 3.26e-02  2.28e-04  4.57e-01  2.25e+07  3.19e-01  3.57e+01 
+  2500| 2.13e-02  4.08e-04  3.79e-01  2.25e+07  3.19e-01  3.96e+01 
+  2750| 2.00e-02  4.70e-04  3.20e-01  2.25e+07  3.19e-01  4.34e+01 
+  3000| 1.81e-02  6.73e-04  2.74e-01  2.25e+07  3.19e-01  4.73e+01 
+  3250| 1.25e-02  2.68e-03  5.33e-01  2.25e+07  1.01e+00  5.12e+01 
+  3500| 9.76e-03  1.93e-03  3.81e-01  2.25e+07  1.01e+00  5.50e+01 
+  3750| 8.65e-03  1.13e-03  2.78e-01  2.25e+07  1.01e+00  5.89e+01 
+  4000| 6.76e-03  5.35e-04  2.14e-01  2.25e+07  1.01e+00  6.27e+01 
+  4250| 6.32e-03  4.87e-04  1.68e-01  2.25e+07  1.01e+00  6.65e+01 
+  4500| 5.48e-03  1.47e-04  1.38e-01  2.25e+07  1.01e+00  7.04e+01 
+  4750| 5.17e-03  6.63e-05  1.15e-01  2.25e+07  1.01e+00  7.42e+01 
+  5000| 5.90e+00  4.68e+00  7.01e-01  2.25e+07  1.01e+00  7.81e+01 
+  5250| 3.65e-03  2.40e-04  8.35e-02  2.25e+07  1.01e+00  8.19e+01 
+  5500| 3.54e-03  4.04e-04  7.04e-02  2.25e+07  1.01e+00  8.57e+01 
+  5750| 3.27e-03  1.43e-04  6.08e-02  2.25e+07  1.01e+00  8.96e+01 
+  6000| 3.11e-03  4.98e-04  5.37e-02  2.25e+07  1.01e+00  9.34e+01 
+  6250| 3.00e-03  2.91e-05  4.83e-02  2.25e+07  1.01e+00  9.72e+01 
+  6500| 2.89e-03  3.28e-05  4.45e-02  2.25e+07  1.01e+00  1.01e+02 
+  6550| 2.31e-03  9.40e-04  4.27e-02  2.25e+07  1.01e+00  1.02e+02 
+------------------------------------------------------------------
+status:  solved
+timings: total: 1.02e+02s = setup: 4.84e-01s + solve: 1.01e+02s
+	 lin-sys: 6.97e+01s, cones: 1.28e+01s, accel: 4.23e+00s
+------------------------------------------------------------------
+objective = 22523308.826536
+------------------------------------------------------------------
+-------------------------------------------------------------------------------
+                                    Summary                                    
+-------------------------------------------------------------------------------
+
+```
+
+![](lena4.jpg)
+
+
+Üstteki resim bu sonucu gösteriyor. Bu yaklaşımda `cvxpy.tv` ile tam
+varyasyon hesabını yapan kütüphanenin kendi iç çağrısını kullandık.
 
 
 Kaynaklar
@@ -459,14 +515,3 @@ Kaynaklar
 [4] Boyd, 
     *Additional Exercises for Convex Optimization*
     [https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf)
-
-[5] Bayramlı, 
-    *Bilgisayar Bilim, Yapay Zeka, Tensorflow*
-
-    
-
-
-
-
-
-

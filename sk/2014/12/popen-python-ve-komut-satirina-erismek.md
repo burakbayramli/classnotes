@@ -21,7 +21,18 @@ res = p.stdout.read()
 print (res)
 ```
 
-İş biraz daha zorlaştı ama kullana kullana alışılabilir. 
+İş biraz daha zorlaştı ama kullana kullana alışılabilir.
+
+Bir yöntem daha
+
+```python
+result = subprocess.run(['ls', '/nonexistent'], capture_output=True)
+if result.returncode != 0:
+   print ('error', result)
+```
+
+Üstteki yöntem ile işlem hata / başarı durumuna rahat bir şekilde
+erisebiliriz.
 
 Bir diğer ihtiyaç komut "işlerken" onun çıktısını iterator ile
 gezebilmektir. Belki komut yavaş işleyecektir, beklerken belki o ana

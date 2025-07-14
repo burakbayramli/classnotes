@@ -30,6 +30,8 @@ tepe, ve bir rasgele yol çiziyoruz,
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
 from matplotlib import cm
+import sympy
+from scipy.optimize import minimize, Bounds
 
 def gfunc1(x, y):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
@@ -44,32 +46,29 @@ def plot_surf_path(myfunc,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):
     xx,yy = np.meshgrid(x,y)
     zz = myfunc(xx,yy)
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
     ax.set_xlim(0,5)
     ax.set_ylim(0,5)
     surf = ax.plot_wireframe(xx, yy, zz,rstride=10, cstride=10)
 
-    t = np.linspace(0,1.0,100)
+    t_plot = np.linspace(0,1.0,100)
 
-    x = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4 
-    y = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
+    x_plot = a0 + a1*t_plot + a2*t_plot**2 + a3*t_plot**3 + a4*t_plot**4
+    y_plot = b0 + b1*t_plot + b2*t_plot**2 + b3*t_plot**3 + b4*t_plot**4
 
-    ax.plot3D(x, y, myfunc(x,y),'r.')
+    ax.plot3D(x_plot, y_plot, myfunc(x_plot,y_plot),'r.')
 ```
 
 ```python
 # 1. gidis yolunun tanimi, uzun yoldan dolanarak gidiyor
-a1,a2,a3 = 1.5, 8.1, 4.0
-b1,b2,b3 = 0.3, 0.4, 23.3
-a0,b0=(1.0,1.0)
-ex,ey=(0.3,4.0)
-a4 = ex - a0 - (a1+a2+a3)
-b4 = ey - b0 - (b1+b2+b3)
-test_coefs1 = (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-
-plt.savefig('calc_multi_40_elev_01.png')
+a1_test,a2_test,a3_test = 1.5, 8.1, 4.0
+b1_test,b2_test,b3_test = 0.3, 0.4, 23.3
+a0_test,b0_test=(1.0,1.0)
+ex_test,ey_test=(0.3,4.0)
+a4_test = ex_test - a0_test - (a1_test+a2_test+a3_test)
+b4_test = ey_test - b0_test - (b1_test+b2_test+b3_test)
+test_coefs1 = (a0_test,a1_test,a2_test,a3_test,a4_test,b0_test,b1_test,b2_test,b3_test,b4_test)
+plot_surf_path(gfunc1,*test_coefs1) 
 ```
 
 ![](calc_multi_40_elev_01.png)
@@ -94,14 +93,14 @@ başlangıç, bitiş noktalarını genel formülasyon üzerinde zorlamış olduk
 Şimdi ikinci bir gidiş yoluna bakalım, 
 
 ```python
-a1,a2,a3 = 1.5, 3.0, 1.0
-b1,b2,b3 = 0.0, 1.0, 1.0
-a0,b0=(1.0,1.0)
-ex,ey=(0.3,4.0)
-a4 = ex - a0 - (a1+a2+a3)
-b4 = ey - b0 - (b1+b2+b3)
-test_coefs2 = (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
-plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)
+a1_test,a2_test,a3_test = 1.5, 3.0, 1.0
+b1_test,b2_test,b3_test = 0.0, 1.0, 1.0
+a0_test,b0_test=(1.0,1.0)
+ex_test,ey_test=(0.3,4.0)
+a4_test = ex_test - a0_test - (a1_test+a2_test+a3_test)
+b4_test = ey_test - b0_test - (b1_test+b2_test+b3_test)
+test_coefs2 = (a0_test,a1_test,a2_test,a3_test,a4_test,b0_test,b1_test,b2_test,b3_test,b4_test)
+plot_surf_path(gfunc1,*test_coefs2) # Use * to unpack the tuple
 plt.savefig('calc_multi_40_elev_03.png')
 ```
 
@@ -131,32 +130,24 @@ alçak yerlerden hem de kısa yollardan götürmeye uğraşacaktır.
 $y'(t)$ `sympy` ile hesaplanabilir,
 
 ```python
-import sympy
+vars_sym = 't a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 gamma x y'
+t, a0, a1, a2, a3, a4, b0, b1, b2, b3, b4, gamma, x, y = sympy.symbols(vars_sym)
 
-vars = 't a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 gamma x y'
-t, a0, a1, a2, a3, a4, b0, b1, b2, b3, b4, gamma, x, y = sympy.symbols(vars)
-
+# xdef and ydef still defined globally as they are consistent
 xdef = a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4
 ydef = b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 
-dxdt = sympy.diff(xdef,t)
-print (dxdt)
-dydt = sympy.diff(ydef,t)
-print (dydt)
-sqrtdef = sympy.sqrt(sympy.diff(xdef,t)**2 + sympy.diff(ydef,t))
-print (sqrtdef)
+dxdt_test = sympy.diff(xdef,t)
+dydt_test = sympy.diff(ydef,t)
+sqrtdef_test = sympy.sqrt(dxdt_test**2 + dydt_test**2)
+sqrdef_test = dxdt_test**2 + dydt_test**2
+print (xdef)
+print (ydef)
 ```
 
-```
-a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3
-b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3
-sqrt(b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3 + (a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3)**2)
-```
-
-Karekök her zaman lazım değil, karesel hesap ta yeterli olabilir,
-
-```python
-sqrdef = sympy.diff(xdef,t)**2 + sympy.diff(ydef,t)
+```text
+a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4
+b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4
 ```
 
 Şimdi sembolik olan hesaplara rasgele bazı katsayılar geçelim, ve sayısal bir
@@ -167,13 +158,13 @@ xsubs = {a0: 2, a1: 2, a2: 2, a3: 2, a4: 2, t:0.5}
 xval = xdef.subs(xsubs)
 ysubs = {b0: 3, b1: 3, b2: 3, b3: 3, b4: 3, t:0.5}
 yval = ydef.subs(ysubs)
-sqrval = sqrtdef.subs(xsubs).subs(ysubs)
-g1 = gfunc1(float(xval),float(yval))
-print (xval, yval, sqrval, g1)
+sqrval = float(sqrtdef_test.subs(xsubs).subs(ysubs).evalf()) # This line might have issues due to ysubs not having a0-a4 and vice versa
+g1_val = gfunc1(float(xval.evalf()),float(yval.evalf()))
+print (xval, yval, sqrval, g1_val)
 ```
 
-```
-3.87500000000000 5.81250000000000 7.21110255092798 0.00032302357084224476
+```text
+3.87500000000000 5.81250000000000 11.718041645257966 0.00032302357084224476
 ```
 
 Artık optimizasyonun kullanacağı bedeli kodlayabiliriz, bu üstteki bahsettiğimiz
@@ -187,6 +178,7 @@ LARGE_FLOAT = 1e6
 pa0,pb0=(1.0,1.0)
 pex,pey=(0.3,4.0)
 ts = np.linspace(0,1,20)
+
 def calcint_g1(pars):
     pa1,pa2,pa3,pb1,pb2,pb3=pars
     pa4 = pex - pa0 - (pa1+pa2+pa3)
@@ -194,45 +186,54 @@ def calcint_g1(pars):
     argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
                b1:pb1, b2:pb2, b3:pb3, b4:pb4}
     ys = []
+
+    dxdt_local = sympy.diff(xdef,t)
+    dydt_local = sympy.diff(ydef,t)
+    sqrdef_local = dxdt_local**2 + dydt_local**2
+
     for tcurr in ts:
-       sqrval = sqrdef.subs(argsubs).subs({t:tcurr})
-       xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
-       yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
-       prod1 = gfunc1(float(xval),float(yval))*sqrval
+       expr_after_subs = sqrdef_local.subs(argsubs).subs({t:tcurr})
+       sqrval_numeric = float(expr_after_subs.evalf())
+
+       if sqrval_numeric < 0:
+           sqrval_numeric = 0
+
+       xval = float(xdef.subs(argsubs).subs({a0: pa0, t:tcurr}).evalf())
+       yval = float(ydef.subs(argsubs).subs({b0: pb0, t:tcurr}).evalf())
+
+       prod1 = gfunc1(xval,yval)*sqrval_numeric
        ys.append(prod1)
-    W = np.trapz(ys,x=ts)
+    W = np.trapezoid(ys,x=ts)
     if W < 0: return LARGE_FLOAT
     return W
 ```
 
 
 ```python
-from scipy.optimize import minimize, Bounds
-
 LIM = 5.0
-pa1,pa2,pa3 = 0,0,0
-pb1,pb2,pb3 = 0,0,0
-x0 = pa1,pa2,pa3,pb1,pb2,pb3
-opts = {'maxiter': 40, 'verbose': 3}
+pa1_init,pa2_init,pa3_init = 0,0,0
+pb1_init,pb2_init,pb3_init = 0,0,0
+x0_g1 = pa1_init,pa2_init,pa3_init,pb1_init,pb2_init,pb3_init
+opts = {'maxiter': 40}
 
-res = minimize (fun=calcint_g1,x0=x0,
+res_g1 = minimize (fun=calcint_g1,x0=x0_g1,
                 method='Nelder-Mead',
                 bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
                               [LIM, LIM, LIM, LIM, LIM, LIM]),
                 options=opts)
-print (res['x'])
+print (res_g1['x'])
 ```
 
-```
-[-1.92645176  0.87238797  1.45300069  1.5909808   2.46135117  0.73187586]
+```text
+[-0.2189923   0.00336079  0.04330018  0.13224051  0.01546236  0.09420242]
 ```
 
 ```python
-a1,a2,a3,b1,b2,b3 = list(res['x'])
-a4 = ex - pa0 - (a1+a2+a3)
-b4 = ey - pb0 - (b1+b2+b3)
-test_coefs1 = (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
-plot_surf_path(gfunc1,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+a1_opt,a2_opt,a3_opt,b1_opt,b2_opt,b3_opt = list(res_g1['x'])
+a4_opt = pex - pa0 - (a1_opt+a2_opt+a3_opt)
+b4_opt = pey - pb0 - (b1_opt+b2_opt+b3_opt)
+test_coefs1_opt = (pa0,a1_opt,a2_opt,a3_opt,a4_opt,pb0,b1_opt,b2_opt,b3_opt,b4_opt)
+plot_surf_path(gfunc1,*test_coefs1_opt)
 plt.savefig('calc_multi_40_elev_07.jpg')
 ```
 
@@ -257,13 +258,11 @@ def gfunc2(x, y):
     s1 = 2.2; x1 = 2.0; y1 = 2.0
     g1 = np.exp( -4 *np.log(2) * ((x-x1)**2+(y-y1)**2) / s1**2)
     s2 = 1.2; x2 = 4.0; y2 = 1.0
-    g2 = np.exp( -4 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2)
+    g2 = np.exp( -4 *np.log(2) * ((x-x2)**2+(y-y2)**2) / s2**2) 
     return g1*10.0 + g2*10.0
 ```
 
 ```python
-from scipy.optimize import minimize, Bounds
-
 pa0,pb0=(1.0,1.0)
 pex,pey=(4.0,2.0)
 
@@ -276,41 +275,59 @@ def calcint_g2(pars):
     argsubs = {a1:pa1, a2:pa2, a3:pa3, a4:pa4, \
                b1:pb1, b2:pb2, b3:pb3, b4:pb4}
     ys = []
+
+    dxdt_local = sympy.diff(xdef,t)
+    dydt_local = sympy.diff(ydef,t)
+    sqrdef_local = dxdt_local**2 + dydt_local**2
+
     for tcurr in ts:
-       sqrval = sqrdef.subs(argsubs).subs({t:tcurr})
-       if sqrval < 0: sqrval = 0    
-       xval = xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})
-       yval = ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})
-       prod2 = gfunc2(float(xval),float(yval))*sqrval
+       expr_after_subs = sqrdef_local.subs(argsubs).subs({t:tcurr})
+       try:
+           sqrval_numeric = float(expr_after_subs.evalf())
+       except TypeError as e:
+           print(f"Error converting to float: {e}")
+           print(f"Problematic expression: {expr_after_subs}")
+           print(f"Type of problematic expression: {type(expr_after_subs)}")
+           return LARGE_FLOAT 
+
+       if sqrval_numeric < 0: sqrval_numeric = 0
+
+       xval = float(xdef.subs(argsubs).subs({a0: pa0, t:tcurr}).evalf())
+       yval = float(ydef.subs(argsubs).subs({b0: pb0, t:tcurr}).evalf())
+
+       prod2 = gfunc2(xval,yval)*sqrval_numeric
        ys.append(prod2)
-    W = np.trapz(ys,x=ts)
+    W = np.trapezoid(ys,x=ts)
     if W < 0: return LARGE_FLOAT
     return W
-    
+
 LIM = 5.0
-pa1,pa2,pa3,pb1,pb2,pb3 = 1,1,1,1,1,1
-x0 = pa1,pa2,pa3,pb1,pb2,pb3
+pa1_init_g2,pa2_init_g2,pa3_init_g2 = 1,1,1
+pb1_init_g2,pb2_init_g2,pb3_init_g2 = 1,1,1
+x0_g2 = pa1_init_g2,pa2_init_g2,pa3_init_g2,pb1_init_g2,pb2_init_g2,pb3_init_g2
 
-opts = {'maxiter': 40, 'verbose': 3}
+opts = {'maxiter': 40}
 
-res = minimize (fun=calcint_g2,x0=x0,
+res_g2 = minimize (fun=calcint_g2,x0=x0_g2,
                 method='Nelder-Mead',
                 bounds=Bounds([-LIM, -LIM, -LIM, -LIM, -LIM, -LIM],
                               [LIM, LIM, LIM, LIM, LIM, LIM]),
                 options=opts)
-print (res['x'])
+
+print(res_g2['x'])
 ```
 
-```
-[ 2.27463285  1.17233979  1.48426044 -0.08218053  1.12299169  0.40471825]
+```text
+[ 1.90740427  1.34707243  1.5945597   0.22970094 -0.05529759  1.11967817]
 ```
 
 ```python
-a1,a2,a3,b1,b2,b3  = list(res['x'])
-a4 = pex - pa0 - (a1+a2+a3)
-b4 = pey - pb0 - (b1+b2+b3)
-test_coefs2 = (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
-plot_surf_path(gfunc2,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)
+a1_opt_g2, a2_opt_g2, a3_opt_g2, b1_opt_g2, b2_opt_g2, b3_opt_g2 = list(res_g2['x'])
+a4_opt_g2 = pex - pa0 - (a1_opt_g2 + a2_opt_g2 + a3_opt_g2)
+b4_opt_g2 = pey - pb0 - (b1_opt_g2 + b2_opt_g2 + b3_opt_g2)
+test_coefs_g2_opt = (pa0, a1_opt_g2, a2_opt_g2, a3_opt_g2, a4_opt_g2,
+                      pb0, b1_opt_g2, b2_opt_g2, b3_opt_g2, b4_opt_g2)
+plot_surf_path(gfunc2, *test_coefs_g2_opt)
 plt.savefig('calc_multi_40_elev_08.jpg')
 ```
 
@@ -376,8 +393,7 @@ plt.savefig('calc_multi_40_elev_02.png')
 
 ![](calc_multi_40_elev_02.png)
 
-Bunun dikey versiyonunu da hesaplamak kolay. Üstte tarif edilen yaklaşımı
-kodlayan bir kod `pathvhlen.py` içindedir. 
+Bunun dikey versiyonunu da hesaplamak kolay. 
 
 Sigmoid Eğri Yöntemi ve Bitiş Noktası Sınırlaması
 
@@ -409,15 +425,8 @@ $$
 ve $\alpha$ büyüdükçe 0'dan 1'e geçiş sertleşir. 
 
 Bu şekilde parametrize edilmiş eğri ile pek çok farklı şekil ortaya
-çıkartılabilir. Bitiş noktasını da farklı bir şekilde optimizasyon kısıtlaması
-üzerinden zorluyoruz [3]. Bu yaklasim icin gereken kodlar `pathsig.py`
-icinde.
-
-![](calc_multi_40_elev_06.png)
-
-Sadece 3 tane ilmik noktası tanımladık, bu noktalar vektörel notasyon ile
-çoğaltılabilir. Fakat optimizasyon gayet optimal bir yolu bulabildi, bu
-örnekte iki tane tepe var, ama onların arasından geçerek sonuca ulaştı. 
+çıkartılabilir. Bitiş noktasını da farklı bir şekilde optimizasyon
+kısıtlaması üzerinden zorlanabilir [3]
 
 Bitiş noktalarını cebirsel değil `conx` ve `cony` adlı iki
 sınırlama tabiri ile zorladık.

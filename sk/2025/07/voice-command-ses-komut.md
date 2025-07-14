@@ -156,6 +156,12 @@ ve üstteki test doğru sonuç bulundu. [3] verisindeki tüm wav
 dosyalarının test edilmesi için gerekli kod `voice1.py` içinde. 500
 kusur dosya üzerinden 90% başarı elde ediyor.
 
+Not:
+
+Üstteki kodu [1] projesine eklenmesi için göndermiştik [5], ve proje
+idarecisi bu eklemeyi yapmış, projenin son halini alanlar direk wav
+dosyasını işleyen kodu projenin kendisinden de alabilir.
+
 Kodlar
 
 [voice1.py](voice1.py)
@@ -170,3 +176,5 @@ Kaynaklar
 [3] [Veri](https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ehyr58nt&raw=1)
 
 [4] [Kaggle](https://www.kaggle.com/datasets/neehakurelli/google-speech-commands)
+
+[5] Issues, https://github.com/douglas125/SpeechCmdRecognition/issues/20

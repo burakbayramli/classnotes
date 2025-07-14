@@ -118,44 +118,43 @@ rasgele tepe, ve bir rasgele yol çiziyoruz,</p>
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.spatial.distance <span class="im">import</span> cdist</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> cm</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gfunc1(x, y):</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    g1 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g1 <span class="op">*</span> <span class="fl">10.0</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_surf_path(myfunc,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gfunc1(x, y):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    g1 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g1 <span class="op">*</span> <span class="fl">10.0</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    xx,yy <span class="op">=</span> np.meshgrid(x,y)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    zz <span class="op">=</span> myfunc(xx,yy)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    fig <span class="op">=</span> plt.figure()</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> fig.gca(projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="dv">0</span>,<span class="dv">5</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>,<span class="dv">5</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    surf <span class="op">=</span> ax.plot_wireframe(xx, yy, zz,rstride<span class="op">=</span><span class="dv">10</span>, cstride<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span> </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    ax.plot3D(x, y, myfunc(x,y),<span class="st">&#39;r.&#39;</span>)</span></code></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_surf_path(myfunc,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">5</span>,D)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    xx,yy <span class="op">=</span> np.meshgrid(x,y)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    zz <span class="op">=</span> myfunc(xx,yy)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, subplot_kw<span class="op">=</span>{<span class="st">&#39;projection&#39;</span>: <span class="st">&#39;3d&#39;</span>})</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>,<span class="dv">5</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    surf <span class="op">=</span> ax.plot_wireframe(xx, yy, zz,rstride<span class="op">=</span><span class="dv">10</span>, cstride<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    t_plot <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    x_plot <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t_plot <span class="op">+</span> a2<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">4</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    y_plot <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t_plot <span class="op">+</span> b2<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t_plot<span class="op">**</span><span class="dv">4</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    ax.plot3D(x_plot, y_plot, myfunc(x_plot,y_plot),<span class="st">&#39;r.&#39;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. gidis yolunun tanimi, uzun yoldan dolanarak gidiyor</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>b1,b2,b3 <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>test_coefs1 <span class="op">=</span> (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_01.png&#39;</span>)</span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a1_test,a2_test,a3_test <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>b1_test,b2_test,b3_test <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>a0_test,b0_test<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ex_test,ey_test<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>a4_test <span class="op">=</span> ex_test <span class="op">-</span> a0_test <span class="op">-</span> (a1_test<span class="op">+</span>a2_test<span class="op">+</span>a3_test)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>b4_test <span class="op">=</span> ey_test <span class="op">-</span> b0_test <span class="op">-</span> (b1_test<span class="op">+</span>b2_test<span class="op">+</span>b3_test)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>test_coefs1 <span class="op">=</span> (a0_test,a1_test,a2_test,a3_test,a4_test,b0_test,b1_test,b2_test,b3_test,b4_test)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,<span class="op">*</span>test_coefs1) </span></code></pre></div>
 <p><img src="calc_multi_40_elev_01.png" /></p>
 <p>Başlangıç ve bitiş noktalarını nasıl formüle dahil ettiğimize dikkat,
 <span class="math inline">\(t=0\)</span> olduğu anda <span
@@ -184,14 +183,14 @@ class="math inline">\(e_y\)</span> için benzer mantığı kullanırız. Bu
 olduk.</p>
 <p>Şimdi ikinci bir gidiş yoluna bakalım,</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">3.0</span>, <span class="fl">1.0</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>b1,b2,b3 <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>test_coefs2 <span class="op">=</span> (a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,a0,a1,a2,a3,a4,b0,b1,b2,b3,b4)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a1_test,a2_test,a3_test <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">3.0</span>, <span class="fl">1.0</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>b1_test,b2_test,b3_test <span class="op">=</span> <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">1.0</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>a0_test,b0_test<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ex_test,ey_test<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>a4_test <span class="op">=</span> ex_test <span class="op">-</span> a0_test <span class="op">-</span> (a1_test<span class="op">+</span>a2_test<span class="op">+</span>a3_test)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>b4_test <span class="op">=</span> ey_test <span class="op">-</span> b0_test <span class="op">-</span> (b1_test<span class="op">+</span>b2_test<span class="op">+</span>b3_test)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>test_coefs2 <span class="op">=</span> (a0_test,a1_test,a2_test,a3_test,a4_test,b0_test,b1_test,b2_test,b3_test,b4_test)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,<span class="op">*</span>test_coefs2) <span class="co"># Use * to unpack the tuple</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="calc_multi_40_elev_03.png" /></p>
 <p>Bu yolları tabii ki rasgele parametreler üzerinden yarattık, bunlar
@@ -215,37 +214,32 @@ class="math inline">\(x&#39;(t)\)</span>, ve <span
 class="math inline">\(y&#39;(t)\)</span> <code>sympy</code> ile
 hesaplanabilir,</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">vars</span> <span class="op">=</span> <span class="st">&#39;t a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 gamma x y&#39;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>t, a0, a1, a2, a3, a4, b0, b1, b2, b3, b4, gamma, x, y <span class="op">=</span> sympy.symbols(<span class="bu">vars</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>xdef <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ydef <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dxdt <span class="op">=</span> sympy.diff(xdef,t)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (dxdt)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>dydt <span class="op">=</span> sympy.diff(ydef,t)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (dydt)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>sqrtdef <span class="op">=</span> sympy.sqrt(sympy.diff(xdef,t)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> sympy.diff(ydef,t))</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sqrtdef)</span></code></pre></div>
-<pre><code>a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3
-b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3
-sqrt(b1 + 2*b2*t + 3*b3*t**2 + 4*b4*t**3 + (a1 + 2*a2*t + 3*a3*t**2 + 4*a4*t**3)**2)</code></pre>
-<p>Karekök her zaman lazım değil, karesel hesap ta yeterli olabilir,</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sqrdef <span class="op">=</span> sympy.diff(xdef,t)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> sympy.diff(ydef,t)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>vars_sym <span class="op">=</span> <span class="st">&#39;t a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 gamma x y&#39;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>t, a0, a1, a2, a3, a4, b0, b1, b2, b3, b4, gamma, x, y <span class="op">=</span> sympy.symbols(vars_sym)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># xdef and ydef still defined globally as they are consistent</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>xdef <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ydef <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>dxdt_test <span class="op">=</span> sympy.diff(xdef,t)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dydt_test <span class="op">=</span> sympy.diff(ydef,t)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>sqrtdef_test <span class="op">=</span> sympy.sqrt(dxdt_test<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> dydt_test<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>sqrdef_test <span class="op">=</span> dxdt_test<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> dydt_test<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (xdef)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ydef)</span></code></pre></div>
+<pre class="text"><code>a0 + a1*t + a2*t**2 + a3*t**3 + a4*t**4
+b0 + b1*t + b2*t**2 + b3*t**3 + b4*t**4</code></pre>
 <p>Şimdi sembolik olan hesaplara rasgele bazı katsayılar geçelim, ve
 sayısal bir sonucu görelim,</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>xsubs <span class="op">=</span> {a0: <span class="dv">2</span>, a1: <span class="dv">2</span>, a2: <span class="dv">2</span>, a3: <span class="dv">2</span>, a4: <span class="dv">2</span>, t:<span class="fl">0.5</span>}</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>xval <span class="op">=</span> xdef.subs(xsubs)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ysubs <span class="op">=</span> {b0: <span class="dv">3</span>, b1: <span class="dv">3</span>, b2: <span class="dv">3</span>, b3: <span class="dv">3</span>, b4: <span class="dv">3</span>, t:<span class="fl">0.5</span>}</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>yval <span class="op">=</span> ydef.subs(ysubs)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>sqrval <span class="op">=</span> sqrtdef.subs(xsubs).subs(ysubs)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>g1 <span class="op">=</span> gfunc1(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (xval, yval, sqrval, g1)</span></code></pre></div>
-<pre><code>3.87500000000000 5.81250000000000 7.21110255092798 0.00032302357084224476</code></pre>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>xsubs <span class="op">=</span> {a0: <span class="dv">2</span>, a1: <span class="dv">2</span>, a2: <span class="dv">2</span>, a3: <span class="dv">2</span>, a4: <span class="dv">2</span>, t:<span class="fl">0.5</span>}</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>xval <span class="op">=</span> xdef.subs(xsubs)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ysubs <span class="op">=</span> {b0: <span class="dv">3</span>, b1: <span class="dv">3</span>, b2: <span class="dv">3</span>, b3: <span class="dv">3</span>, b4: <span class="dv">3</span>, t:<span class="fl">0.5</span>}</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>yval <span class="op">=</span> ydef.subs(ysubs)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>sqrval <span class="op">=</span> <span class="bu">float</span>(sqrtdef_test.subs(xsubs).subs(ysubs).evalf()) <span class="co"># This line might have issues due to ysubs not having a0-a4 and vice versa</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>g1_val <span class="op">=</span> gfunc1(<span class="bu">float</span>(xval.evalf()),<span class="bu">float</span>(yval.evalf()))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (xval, yval, sqrval, g1_val)</span></code></pre></div>
+<pre class="text"><code>3.87500000000000 5.81250000000000 11.718041645257966 0.00032302357084224476</code></pre>
 <p>Artık optimizasyonun kullanacağı bedeli kodlayabiliriz, bu üstteki
 bahsettiğimiz entegral olacak, <span
 class="math inline">\(t=0,t=1\)</span> arasında hesaplanacak tabii ki
@@ -253,50 +247,60 @@ class="math inline">\(t=0,t=1\)</span> arasında hesaplanacak tabii ki
 fonksiyon değişken olarak şu anda bilinmeyen katsayıları alacak,
 optimizasyon rutini ise en optimal katsayı değerlerini bu bedel
 üzerinden bulacak.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>LARGE_FLOAT <span class="op">=</span> <span class="fl">1e6</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>pex,pey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcint_g1(pars):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>               b1:pb1, b2:pb2, b3:pb3, b4:pb4}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    ys <span class="op">=</span> []</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    dxdt_local <span class="op">=</span> sympy.diff(xdef,t)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    dydt_local <span class="op">=</span> sympy.diff(ydef,t)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    sqrdef_local <span class="op">=</span> dxdt_local<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> dydt_local<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>       expr_after_subs <span class="op">=</span> sqrdef_local.subs(argsubs).subs({t:tcurr})</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>       sqrval_numeric <span class="op">=</span> <span class="bu">float</span>(expr_after_subs.evalf())</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>       <span class="cf">if</span> sqrval_numeric <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>           sqrval_numeric <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>       xval <span class="op">=</span> <span class="bu">float</span>(xdef.subs(argsubs).subs({a0: pa0, t:tcurr}).evalf())</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>       yval <span class="op">=</span> <span class="bu">float</span>(ydef.subs(argsubs).subs({b0: pb0, t:tcurr}).evalf())</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>       prod1 <span class="op">=</span> gfunc1(xval,yval)<span class="op">*</span>sqrval_numeric</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>       ys.append(prod1)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> np.trapezoid(ys,x<span class="op">=</span>ts)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>LARGE_FLOAT <span class="op">=</span> <span class="fl">1e6</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pex,pey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">20</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcint_g1(pars):</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>               b1:pb1, b2:pb2, b3:pb3, b4:pb4}</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    ys <span class="op">=</span> []</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>       sqrval <span class="op">=</span> sqrdef.subs(argsubs).subs({t:tcurr})</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>       xval <span class="op">=</span> xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>       yval <span class="op">=</span> ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>       prod1 <span class="op">=</span> gfunc1(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))<span class="op">*</span>sqrval</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>       ys.append(prod1)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> np.trapz(ys,x<span class="op">=</span>ts)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>LIM <span class="op">=</span> <span class="fl">5.0</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>pa1,pa2,pa3 <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>pb1,pb2,pb3 <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> pa1,pa2,pa3,pb1,pb2,pb3</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">3</span>}</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g1,x0<span class="op">=</span>x0,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                              [LIM, LIM, LIM, LIM, LIM, LIM]),</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                options<span class="op">=</span>opts)</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res[<span class="st">&#39;x&#39;</span>])</span></code></pre></div>
-<pre><code>[-1.92645176  0.87238797  1.45300069  1.5909808   2.46135117  0.73187586]</code></pre>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>a1,a2,a3,b1,b2,b3 <span class="op">=</span> <span class="bu">list</span>(res[<span class="st">&#39;x&#39;</span>])</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> ex <span class="op">-</span> pa0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> ey <span class="op">-</span> pb0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>test_coefs1 <span class="op">=</span> (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_07.jpg&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>LIM <span class="op">=</span> <span class="fl">5.0</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pa1_init,pa2_init,pa3_init <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pb1_init,pb2_init,pb3_init <span class="op">=</span> <span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>x0_g1 <span class="op">=</span> pa1_init,pa2_init,pa3_init,pb1_init,pb2_init,pb3_init</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>}</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>res_g1 <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g1,x0<span class="op">=</span>x0_g1,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                              [LIM, LIM, LIM, LIM, LIM, LIM]),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                options<span class="op">=</span>opts)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res_g1[<span class="st">&#39;x&#39;</span>])</span></code></pre></div>
+<pre class="text"><code>[-0.2189923   0.00336079  0.04330018  0.13224051  0.01546236  0.09420242]</code></pre>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>a1_opt,a2_opt,a3_opt,b1_opt,b2_opt,b3_opt <span class="op">=</span> <span class="bu">list</span>(res_g1[<span class="st">&#39;x&#39;</span>])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>a4_opt <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (a1_opt<span class="op">+</span>a2_opt<span class="op">+</span>a3_opt)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>b4_opt <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (b1_opt<span class="op">+</span>b2_opt<span class="op">+</span>b3_opt)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>test_coefs1_opt <span class="op">=</span> (pa0,a1_opt,a2_opt,a3_opt,a4_opt,pb0,b1_opt,b2_opt,b3_opt,b4_opt)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc1,<span class="op">*</span>test_coefs1_opt)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_07.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="calc_multi_40_elev_07.jpg" /></p>
 <p>Fena değil, optimal bir yola benziyor, tepelerden kaçınıldı mümkün
 olduğu kadar düşük yükseklikli ve kısa yoldan gidildi.</p>
@@ -309,59 +313,75 @@ olamaz, eğer öyle ise o tür sonucu veren parametrelerle
 ilgilenmiyoruz.</p>
 <p>Başka bir yükseklik fonksiyonunu kullanalım, iki tepe var şimdi, ve
 bitiş noktası farklı,</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gfunc2(x, y):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    g1 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    s2 <span class="op">=</span> <span class="fl">1.2</span><span class="op">;</span> x2 <span class="op">=</span> <span class="fl">4.0</span><span class="op">;</span> y2 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    g2 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x2)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y2)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s2<span class="op">**</span><span class="dv">2</span>) </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g1<span class="op">*</span><span class="fl">10.0</span> <span class="op">+</span> g2<span class="op">*</span><span class="fl">10.0</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gfunc2(x, y):</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    s1 <span class="op">=</span> <span class="fl">2.2</span><span class="op">;</span> x1 <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span> y1 <span class="op">=</span> <span class="fl">2.0</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    g1 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x1)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y1)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s1<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    s2 <span class="op">=</span> <span class="fl">1.2</span><span class="op">;</span> x2 <span class="op">=</span> <span class="fl">4.0</span><span class="op">;</span> y2 <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    g2 <span class="op">=</span> np.exp( <span class="op">-</span><span class="dv">4</span> <span class="op">*</span>np.log(<span class="dv">2</span>) <span class="op">*</span> ((x<span class="op">-</span>x2)<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(y<span class="op">-</span>y2)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> s2<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g1<span class="op">*</span><span class="fl">10.0</span> <span class="op">+</span> g2<span class="op">*</span><span class="fl">10.0</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>pex,pey<span class="op">=</span>(<span class="fl">4.0</span>,<span class="fl">2.0</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">50</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcint_g2(pars):</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>               b1:pb1, b2:pb2, b3:pb3, b4:pb4}</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    ys <span class="op">=</span> []</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>       sqrval <span class="op">=</span> sqrdef.subs(argsubs).subs({t:tcurr})</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>       <span class="cf">if</span> sqrval <span class="op">&lt;</span> <span class="dv">0</span>: sqrval <span class="op">=</span> <span class="dv">0</span>    </span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>       xval <span class="op">=</span> xdef.subs(argsubs).subs({a0: pa0}).subs({t:tcurr})</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>       yval <span class="op">=</span> ydef.subs(argsubs).subs({b0: pb0}).subs({t:tcurr})</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>       prod2 <span class="op">=</span> gfunc2(<span class="bu">float</span>(xval),<span class="bu">float</span>(yval))<span class="op">*</span>sqrval</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>       ys.append(prod2)</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> np.trapz(ys,x<span class="op">=</span>ts)</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>LIM <span class="op">=</span> <span class="fl">5.0</span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>pa1,pa2,pa3,pb1,pb2,pb3 <span class="op">=</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> pa1,pa2,pa3,pb1,pb2,pb3</span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">3</span>}</span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g2,x0<span class="op">=</span>x0,</span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,</span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],</span>
-<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>                              [LIM, LIM, LIM, LIM, LIM, LIM]),</span>
-<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>                options<span class="op">=</span>opts)</span>
-<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res[<span class="st">&#39;x&#39;</span>])</span></code></pre></div>
-<pre><code>[ 2.27463285  1.17233979  1.48426044 -0.08218053  1.12299169  0.40471825]</code></pre>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>a1,a2,a3,b1,b2,b3  <span class="op">=</span> <span class="bu">list</span>(res[<span class="st">&#39;x&#39;</span>])</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>test_coefs2 <span class="op">=</span> (pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc2,pa0,a1,a2,a3,a4,pb0,b1,b2,b3,b4)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_08.jpg&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pa0,pb0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>pex,pey<span class="op">=</span>(<span class="fl">4.0</span>,<span class="fl">2.0</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">50</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calcint_g2(pars):</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    pa1,pa2,pa3,pb1,pb2,pb3<span class="op">=</span>pars</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    pa4 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (pa1<span class="op">+</span>pa2<span class="op">+</span>pa3)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    pb4 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (pb1<span class="op">+</span>pb2<span class="op">+</span>pb3)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    argsubs <span class="op">=</span> {a1:pa1, a2:pa2, a3:pa3, a4:pa4, <span class="op">\</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>               b1:pb1, b2:pb2, b3:pb3, b4:pb4}</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    ys <span class="op">=</span> []</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    dxdt_local <span class="op">=</span> sympy.diff(xdef,t)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    dydt_local <span class="op">=</span> sympy.diff(ydef,t)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    sqrdef_local <span class="op">=</span> dxdt_local<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> dydt_local<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tcurr <span class="kw">in</span> ts:</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>       expr_after_subs <span class="op">=</span> sqrdef_local.subs(argsubs).subs({t:tcurr})</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>       <span class="cf">try</span>:</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>           sqrval_numeric <span class="op">=</span> <span class="bu">float</span>(expr_after_subs.evalf())</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>       <span class="cf">except</span> <span class="pp">TypeError</span> <span class="im">as</span> e:</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>           <span class="bu">print</span>(<span class="ss">f&quot;Error converting to float: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>           <span class="bu">print</span>(<span class="ss">f&quot;Problematic expression: </span><span class="sc">{</span>expr_after_subs<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>           <span class="bu">print</span>(<span class="ss">f&quot;Type of problematic expression: </span><span class="sc">{</span><span class="bu">type</span>(expr_after_subs)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>           <span class="cf">return</span> LARGE_FLOAT </span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>       <span class="cf">if</span> sqrval_numeric <span class="op">&lt;</span> <span class="dv">0</span>: sqrval_numeric <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>       xval <span class="op">=</span> <span class="bu">float</span>(xdef.subs(argsubs).subs({a0: pa0, t:tcurr}).evalf())</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>       yval <span class="op">=</span> <span class="bu">float</span>(ydef.subs(argsubs).subs({b0: pb0, t:tcurr}).evalf())</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>       prod2 <span class="op">=</span> gfunc2(xval,yval)<span class="op">*</span>sqrval_numeric</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>       ys.append(prod2)</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> np.trapezoid(ys,x<span class="op">=</span>ts)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> W <span class="op">&lt;</span> <span class="dv">0</span>: <span class="cf">return</span> LARGE_FLOAT</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>LIM <span class="op">=</span> <span class="fl">5.0</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>pa1_init_g2,pa2_init_g2,pa3_init_g2 <span class="op">=</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>pb1_init_g2,pb2_init_g2,pb3_init_g2 <span class="op">=</span> <span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>x0_g2 <span class="op">=</span> pa1_init_g2,pa2_init_g2,pa3_init_g2,pb1_init_g2,pb2_init_g2,pb3_init_g2</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">40</span>}</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>res_g2 <span class="op">=</span> minimize (fun<span class="op">=</span>calcint_g2,x0<span class="op">=</span>x0_g2,</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;Nelder-Mead&#39;</span>,</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>                bounds<span class="op">=</span>Bounds([<span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM, <span class="op">-</span>LIM],</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>                              [LIM, LIM, LIM, LIM, LIM, LIM]),</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>                options<span class="op">=</span>opts)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(res_g2[<span class="st">&#39;x&#39;</span>])</span></code></pre></div>
+<pre class="text"><code>[ 1.90740427  1.34707243  1.5945597   0.22970094 -0.05529759  1.11967817]</code></pre>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>a1_opt_g2, a2_opt_g2, a3_opt_g2, b1_opt_g2, b2_opt_g2, b3_opt_g2 <span class="op">=</span> <span class="bu">list</span>(res_g2[<span class="st">&#39;x&#39;</span>])</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>a4_opt_g2 <span class="op">=</span> pex <span class="op">-</span> pa0 <span class="op">-</span> (a1_opt_g2 <span class="op">+</span> a2_opt_g2 <span class="op">+</span> a3_opt_g2)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>b4_opt_g2 <span class="op">=</span> pey <span class="op">-</span> pb0 <span class="op">-</span> (b1_opt_g2 <span class="op">+</span> b2_opt_g2 <span class="op">+</span> b3_opt_g2)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>test_coefs_g2_opt <span class="op">=</span> (pa0, a1_opt_g2, a2_opt_g2, a3_opt_g2, a4_opt_g2,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                      pb0, b1_opt_g2, b2_opt_g2, b3_opt_g2, b4_opt_g2)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>plot_surf_path(gfunc2, <span class="op">*</span>test_coefs_g2_opt)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_08.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="calc_multi_40_elev_08.jpg" /></p>
 <p>Bu yol da iyi oldu, iki tepe ortasındaki yüksekliği düşük olan yerden
 geçildi.</p>
@@ -403,24 +423,23 @@ hesabı külfetli olabilir, çünkü <span class="math inline">\(z =
 f(x,y)\)</span> yükseklik fonksiyonundur.</p>
 <p>Mesela ilk örnekteki gidiş yoluna kuşbakışı, iki boyutlu ortamda
 bakmak istersek,</p>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>b1,b2,b3 <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span> </span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">0</span>,<span class="fl">5.0</span>)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>,<span class="fl">5.0</span>)</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>plt.plot(x,y)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_02.png&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>a1,a2,a3 <span class="op">=</span> <span class="fl">1.5</span>, <span class="fl">8.1</span>, <span class="fl">4.0</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>b1,b2,b3 <span class="op">=</span> <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">23.3</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>a0,b0<span class="op">=</span>(<span class="fl">1.0</span>,<span class="fl">1.0</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>ex,ey<span class="op">=</span>(<span class="fl">0.3</span>,<span class="fl">4.0</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>a4 <span class="op">=</span> ex <span class="op">-</span> a0 <span class="op">-</span> (a1<span class="op">+</span>a2<span class="op">+</span>a3)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> ey <span class="op">-</span> b0 <span class="op">-</span> (b1<span class="op">+</span>b2<span class="op">+</span>b3)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="fl">1.0</span>,<span class="dv">100</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> a0 <span class="op">+</span> a1<span class="op">*</span>t <span class="op">+</span> a2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> a3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> a4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span> </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> b0 <span class="op">+</span> b1<span class="op">*</span>t <span class="op">+</span> b2<span class="op">*</span>t<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b3<span class="op">*</span>t<span class="op">**</span><span class="dv">3</span> <span class="op">+</span> b4<span class="op">*</span>t<span class="op">**</span><span class="dv">4</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="dv">0</span>,<span class="fl">5.0</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>,<span class="fl">5.0</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>plt.plot(x,y)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;calc_multi_40_elev_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="calc_multi_40_elev_02.png" /></p>
-<p>Bunun dikey versiyonunu da hesaplamak kolay. Üstte tarif edilen
-yaklaşımı kodlayan bir kod <code>pathvhlen.py</code> içindedir.</p>
+<p>Bunun dikey versiyonunu da hesaplamak kolay.</p>
 <p>Sigmoid Eğri Yöntemi ve Bitiş Noktası Sınırlaması</p>
 <p>[3]’te alternatif bir eğri şekli daha gördük, lineer parçalı ya da
 sigmoid bazlı parametrize eğriler. Bir parametrize eğriyi</p>
@@ -447,13 +466,7 @@ ifadesi</p>
 geçiş sertleşir.</p>
 <p>Bu şekilde parametrize edilmiş eğri ile pek çok farklı şekil ortaya
 çıkartılabilir. Bitiş noktasını da farklı bir şekilde optimizasyon
-kısıtlaması üzerinden zorluyoruz [3]. Bu yaklasim icin gereken kodlar
-<code>pathsig.py</code> icinde.</p>
-<p><img src="calc_multi_40_elev_06.png" /></p>
-<p>Sadece 3 tane ilmik noktası tanımladık, bu noktalar vektörel notasyon
-ile çoğaltılabilir. Fakat optimizasyon gayet optimal bir yolu bulabildi,
-bu örnekte iki tane tepe var, ama onların arasından geçerek sonuca
-ulaştı.</p>
+kısıtlaması üzerinden zorlanabilir [3]</p>
 <p>Bitiş noktalarını cebirsel değil <code>conx</code> ve
 <code>cony</code> adlı iki sınırlama tabiri ile zorladık.</p>
 <p>Polinom bazlı eğride bazı türevleri sembolik olarak almıştık, burada

@@ -161,8 +161,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (norm_tv(xcor))</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (norm_atv(xcor))</span></code></pre></div>
-<pre><code>1103.2561038302395
-1103.2571969067808</code></pre>
+<pre class="text"><code>1146.1068179914787
+1146.1098514344671</code></pre>
 <p>Üstteki fonksiyonun iki kez türevi alınabilir. Şimdi analitik şekilde
 devam etmeden önce pür sayısal açıdan bir çözüme bakalım. Üstteki
 fonksiyonları direk kodlayarak ve sayısal türev üzerinden işleyebilen
@@ -170,31 +170,29 @@ bir kütüphane çağrısıyla hedefi minimize edelim, eldeki sinyal,</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;xcor.csv&#39;</span>,header<span class="op">=</span><span class="va">None</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>xcor <span class="op">=</span> np.reshape(np.array(df[<span class="dv">0</span>]), (<span class="dv">5000</span>,<span class="dv">1</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>xcor <span class="op">=</span> np.reshape(np.array(df[<span class="dv">0</span>]), (<span class="dv">5000</span>,))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="bu">len</span>(xcor)), xcor)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_60_tvd_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="func_60_tvd_01.png" /></p>
 <p>Kütüphane çağrısı ile</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> np.zeros(<span class="bu">len</span>(xcor))</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> np.zeros_like(xcor)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize, Bounds, SR1, BFGS</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> minimize</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> phi(x):</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>   <span class="cf">return</span> np.<span class="bu">sum</span>(np.power(x<span class="op">-</span>xcor, <span class="dv">2</span>)) <span class="op">+</span> mu<span class="op">*</span>norm_atv(x)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">400</span>, <span class="st">&#39;verbose&#39;</span>: <span class="dv">2</span>}</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> {<span class="st">&#39;maxiter&#39;</span>: <span class="dv">30</span>, <span class="st">&#39;disp&#39;</span>: <span class="va">True</span>}</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> minimize (fun<span class="op">=</span>phi,</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                x0<span class="op">=</span>x0,</span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                options<span class="op">=</span>opts,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                jac<span class="op">=</span><span class="st">&#39;2-point&#39;</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                hess<span class="op">=</span>BFGS(),</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;trust-constr&#39;</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">5000</span>), res.x)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_60_tvd_02.png&#39;</span>)</span></code></pre></div>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&#39;L-BFGS-B&#39;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(<span class="dv">5000</span>), res.x)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_60_tvd_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="func_60_tvd_02.png" /></p>
 <p>Sonuç fena olmadı. Fakat üstteki yaklaşımın hesabı uzun sürecektir,
 eğer eldeki problem hakkında bazı ek şeyler biliyorsak, bu bilgileri
@@ -286,40 +284,47 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>diags <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">1</span>])</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> sps.spdiags(data, diags, n<span class="op">-</span><span class="dv">1</span>, n)</span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.zeros((<span class="bu">len</span>(xcor),<span class="dv">1</span>))</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">iter</span> <span class="kw">in</span> <span class="bu">range</span>(MAXITERS):</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>   d <span class="op">=</span> D.dot(x)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>   val1 <span class="op">=</span> np.dot((x<span class="op">-</span>xcor).T,(x<span class="op">-</span>xcor))</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>   val2 <span class="op">=</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.power(d,<span class="dv">2</span>))</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>   val3 <span class="op">=</span> EPSILON<span class="op">*</span>np.ones((n<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>   val <span class="op">=</span> np.<span class="bu">float</span>(val1 <span class="op">+</span> MU<span class="op">*</span>np.<span class="bu">sum</span>(val2 <span class="op">-</span> val3))</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>   grad1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>(x<span class="op">-</span>xcor)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>   grad2 <span class="op">=</span> MU<span class="op">*</span>D.T.dot(d <span class="op">/</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> d<span class="op">**</span><span class="dv">2</span>))</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>   grad <span class="op">=</span> grad1 <span class="op">+</span> grad2</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>   hess1 <span class="op">=</span> <span class="dv">2</span><span class="op">*</span>sps.eye(n)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>   hess2 <span class="op">=</span> EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">*</span>(EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">+</span>d<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span>(<span class="op">-</span><span class="dv">3</span><span class="op">/</span><span class="dv">2</span>)</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>   hess2 <span class="op">=</span> hess2.reshape((n<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>   hess3 <span class="op">=</span> sps.spdiags(hess2, <span class="dv">0</span>, n<span class="op">-</span><span class="dv">1</span>, n<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>   hess <span class="op">=</span> hess1 <span class="op">+</span> MU<span class="op">*</span>hess3.dot(D).T.dot(D)</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>   v <span class="op">=</span> slin.spsolve(<span class="op">-</span>hess, grad)</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>   v <span class="op">=</span> np.reshape(v, (n,<span class="dv">1</span>))</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>   lambdasqr <span class="op">=</span> np.<span class="bu">float</span>(np.dot(<span class="op">-</span>grad.T,v))</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> lambdasqr<span class="op">/</span><span class="dv">2</span> <span class="op">&lt;</span> NTTOL: <span class="cf">break</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>   t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>   <span class="cf">while</span> <span class="va">True</span>:</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>      tmp1 <span class="op">=</span> np.<span class="bu">float</span>(np.dot((x<span class="op">+</span>t<span class="op">*</span>v<span class="op">-</span>xcor).T,(x<span class="op">+</span>t<span class="op">*</span>v<span class="op">-</span>xcor)))</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>      tmp2 <span class="op">=</span> MU<span class="op">*</span>np.<span class="bu">sum</span>(np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span><span class="op">+</span>(D<span class="op">*</span>(x<span class="op">+</span>t<span class="op">*</span>v))<span class="op">**</span><span class="dv">2</span>)<span class="op">-</span>EPSILON<span class="op">*</span>np.ones((n<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)))</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>      tmp3 <span class="op">=</span> val <span class="op">-</span> ALPHA<span class="op">*</span>t<span class="op">*</span>lambdasqr</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> tmp1 <span class="op">+</span> tmp2 <span class="op">&lt;</span> tmp3: <span class="cf">break</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>      t <span class="op">=</span> BETA<span class="op">*</span>t</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>   x <span class="op">=</span> x<span class="op">+</span>t<span class="op">*</span>v</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(n),xcor)</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(n),x,<span class="st">&#39;r&#39;</span>)</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_60_tvd_03.png&#39;</span>)</span></code></pre></div>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.copy(xcor)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="bu">iter</span> <span class="kw">in</span> <span class="bu">range</span>(MAXITERS):</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>   d <span class="op">=</span> D.dot(x)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>   val1 <span class="op">=</span> np.<span class="bu">sum</span>(np.power(x <span class="op">-</span> xcor, <span class="dv">2</span>)) </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>   val2_terms <span class="op">=</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.power(d, <span class="dv">2</span>))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>   val <span class="op">=</span> val1 <span class="op">+</span> MU <span class="op">*</span> np.<span class="bu">sum</span>(val2_terms <span class="op">-</span> EPSILON) </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>   grad1 <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> (x <span class="op">-</span> xcor) </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>   grad2 <span class="op">=</span> MU <span class="op">*</span> D.T.dot(d <span class="op">/</span> val2_terms) </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>   grad <span class="op">=</span> grad1 <span class="op">+</span> grad2 </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>   hess1 <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> sps.eye(n) <span class="co"># (n,n)</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>   hess2_diag_vals <span class="op">=</span> EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> np.power(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> d<span class="op">**</span><span class="dv">2</span>, <span class="dv">3</span><span class="op">/</span><span class="dv">2</span>) <span class="co"># (n-1,)</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>   hess3 <span class="op">=</span> sps.spdiags(hess2_diag_vals, <span class="dv">0</span>, n<span class="op">-</span><span class="dv">1</span>, n<span class="op">-</span><span class="dv">1</span>) <span class="co"># (n-1, n-1)</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>   hess_second_term <span class="op">=</span> MU <span class="op">*</span> D.T.dot(hess3.dot(D)) </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>   hess <span class="op">=</span> hess1 <span class="op">+</span> hess_second_term</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>   v <span class="op">=</span> slin.spsolve(<span class="op">-</span>hess, grad) </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>   lambdasqr <span class="op">=</span> np.dot(<span class="op">-</span>grad.T, v) </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span> lambdasqr <span class="op">/</span> <span class="dv">2</span> <span class="op">&lt;</span> NTTOL:</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>       <span class="cf">break</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>   t <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>   <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>      tmp1 <span class="op">=</span> np.<span class="bu">sum</span>(np.power(x <span class="op">+</span> t <span class="op">*</span> v <span class="op">-</span> xcor, <span class="dv">2</span>)) </span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>      tmp2_terms <span class="op">=</span> np.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> np.power(D.dot(x <span class="op">+</span> t <span class="op">*</span> v), <span class="dv">2</span>))</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>      tmp_val <span class="op">=</span> tmp1 <span class="op">+</span> MU <span class="op">*</span> np.<span class="bu">sum</span>(tmp2_terms <span class="op">-</span> EPSILON) </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> tmp_val <span class="op">&lt;</span> val <span class="op">-</span> ALPHA <span class="op">*</span> t <span class="op">*</span> lambdasqr:</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>         <span class="cf">break</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      t <span class="op">=</span> BETA <span class="op">*</span> t</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>   x <span class="op">=</span> x <span class="op">+</span> t <span class="op">*</span> v </span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(n),xcor)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>plt.plot(<span class="bu">range</span>(n),x,<span class="st">&#39;r&#39;</span>)</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;func_60_tvd_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="func_60_tvd_03.png" /></p>
 <p>Çok daha iyi bir gürültüsüz sonuç elde ettik, üstteki bu işlem çok
 daha hızlı.</p>
@@ -357,7 +362,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (D.dot(X))</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Yatay Farklilik&#39;</span>)</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (D.transpose().dot(X.T))</span></code></pre></div>
-<pre><code>[[1 2 3 4]
+<pre class="text"><code>[[1 2 3 4]
  [5 6 7 8]
  [1 2 3 4]
  [5 6 7 8]]
@@ -376,94 +381,78 @@ Yatay Farklilik
  [-1. -1. -1. -1.]
  [-1. -1. -1. -1.]]</code></pre>
 <p>L1 norm yaklaşıksallığı için daha önceki yöntemi kullanabiliriz.</p>
-<p>Gradyan almak için ise bu sefer <code>tensorflow</code> paketini
-kullanacağız [5]. Bir vektöre göre değil bir matrise göre türev
-alıyoruz, bunu sembolik yapmak yerine sembolik yaklaşım kadar kuvvetli
-olan otomatik türev ile gradyanı elde edebiliriz.</p>
-<p>Üstteki tüm hesapları TF ile bir hesap grafiği içinde kodlayıp,
-<code>tf.gradients</code> ile hedef fonksiyonunun gradyanını alacağız,
-ve standart gradyan inişi optimizasyonu ile bir noktadan başlayıp
-gradyan yönü tersinde adım atarak minimum noktaya varmaya
-uğraşacağız.</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage <span class="im">import</span> io</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>MU <span class="op">=</span> <span class="fl">50.0</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>EPSILON <span class="op">=</span> <span class="fl">0.001</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">225</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> io.imread(<span class="st">&#39;lena.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>io.imsave(<span class="st">&#39;lenad0.jpg&#39;</span>, img)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> io.imread(<span class="st">&#39;lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>io.imsave(<span class="st">&#39;lenad1.jpg&#39;</span>, img)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>xorig <span class="op">=</span> tf.cast(tf.constant( io.imread(<span class="st">&#39;lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)),dtype<span class="op">=</span>tf.float32)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> tf.placeholder(dtype<span class="op">=</span><span class="st">&quot;float&quot;</span>,shape<span class="op">=</span>[n,n],name<span class="op">=</span><span class="st">&quot;x&quot;</span>)</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> np.zeros((n,n))</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>idx1, idx2 <span class="op">=</span> [], []</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n):</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    idx1.append([i,i])</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i<span class="op">&lt;</span>n<span class="op">-</span><span class="dv">1</span>: idx2.append([i,i<span class="op">+</span><span class="dv">1</span>])</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> idx1 <span class="op">+</span> idx2</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>ones <span class="op">=</span> [<span class="fl">1.0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>ones[n<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>negs <span class="op">=</span> [<span class="op">-</span><span class="fl">1.0</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>)]</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>negs[n<span class="op">-</span><span class="dv">2</span>] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> ones <span class="op">+</span> negs</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>vals <span class="op">=</span> np.array(vals).astype(np.float32)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> tf.SparseTensor(indices<span class="op">=</span>idx, values<span class="op">=</span>vals, dense_shape<span class="op">=</span>[n, n])</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>diff <span class="op">=</span> tf.square(tf.norm(xorig<span class="op">-</span>x, <span class="bu">ord</span><span class="op">=</span><span class="st">&#39;euclidean&#39;</span>))</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>Ux <span class="op">=</span> tf.sparse_tensor_dense_matmul(D, x)</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>Uy <span class="op">=</span> tf.sparse_tensor_dense_matmul(tf.sparse_transpose(D), tf.transpose(x))</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>Uy <span class="op">=</span> tf.transpose(Uy)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>fUx <span class="op">=</span> tf.reduce_sum(tf.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> tf.square(Ux)) <span class="op">-</span> EPSILON)</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>fUy <span class="op">=</span> tf.reduce_sum(tf.sqrt(EPSILON<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> tf.square(Uy)) <span class="op">-</span> EPSILON)</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>phi_atv <span class="op">=</span> fUx <span class="op">+</span> fUy</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>psi <span class="op">=</span> diff <span class="op">+</span> MU<span class="op">*</span>phi_atv</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> tf.gradients(psi, x)</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> tf.reshape(g,[n<span class="op">*</span>n])</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>init <span class="op">=</span> tf.global_variables_initializer()</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>sess <span class="op">=</span> tf.Session()</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>sess.run(init)</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tv(xvec):</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>    xmat <span class="op">=</span> xvec.reshape(n,n)</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> sess.run(psi, {x: xmat} )</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> p</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tv_grad(xvec):</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>    xmat <span class="op">=</span> xvec.reshape(n,n)</span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>    gres <span class="op">=</span> sess.run(g, {x: xmat} )</span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gres</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> np.zeros(n<span class="op">*</span>n)</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>xcurr <span class="op">=</span> x0</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">130</span></span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,N):</span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>    gcurr <span class="op">=</span> tv_grad(xcurr)</span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>    gcurr <span class="op">/=</span> gcurr.<span class="bu">max</span>()<span class="op">/</span><span class="fl">0.3</span></span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>    chg <span class="op">=</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(xcurr))</span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>    xcurr <span class="op">=</span> xcurr <span class="op">-</span> gcurr</span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>xcurr <span class="op">/=</span> xcurr.<span class="bu">max</span>()<span class="op">/</span><span class="fl">255.0</span></span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>io.imsave(<span class="st">&#39;lenad2.jpg&#39;</span>, np.reshape(xcurr,(n,n)))</span></code></pre></div>
-<p><img src="lenad0.jpg" /> <img src="lenad1.jpg" /> <img
-src="lenad2.jpg" /></p>
 <p>Yine total varyasyon kullanan ama farklı optimizasyon çözücüyle
-hesabı yapan bir yöntem <code>tlv_prim_dual.py</code> kodunda [1], sonuç
-(soldaki)</p>
-<p><img src="lenad3.jpg" /> <img src="lenad4.jpg" /></p>
+hesabı yapan bir yöntem allta [1], sonuç (soldaki)</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab, skimage</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> random</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nabla(I):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    h, w <span class="op">=</span> I.shape</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    G <span class="op">=</span> np.zeros((h, w, <span class="dv">2</span>), I.dtype)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    G[:, :<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>] <span class="op">-=</span> I[:, :<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    G[:, :<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>] <span class="op">+=</span> I[:, <span class="dv">1</span>:]</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    G[:<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>] <span class="op">-=</span> I[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    G[:<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>] <span class="op">+=</span> I[<span class="dv">1</span>:]</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> G</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nablaT(G):</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    h, w <span class="op">=</span> G.shape[:<span class="dv">2</span>]</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    I <span class="op">=</span> np.zeros((h, w), G.dtype)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    I[:, :<span class="op">-</span><span class="dv">1</span>] <span class="op">-=</span> G[:, :<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    I[:, <span class="dv">1</span>: ] <span class="op">+=</span> G[:, :<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    I[:<span class="op">-</span><span class="dv">1</span>]    <span class="op">-=</span> G[:<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>]</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    I[<span class="dv">1</span>: ]    <span class="op">+=</span> G[:<span class="op">-</span><span class="dv">1</span>, :, <span class="dv">1</span>]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> I</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> anorm(x):</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.sqrt((x<span class="op">*</span>x).<span class="bu">sum</span>(<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_energy_ROF(X, observation, clambda):</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    Ereg <span class="op">=</span> anorm(nabla(X)).<span class="bu">sum</span>()</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    Edata <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> clambda <span class="op">*</span> ((X <span class="op">-</span> observation)<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>()</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Ereg <span class="op">+</span> Edata</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_energy_TVL1(X, observation, clambda):</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    Ereg <span class="op">=</span> anorm(nabla(X)).<span class="bu">sum</span>()</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    Edata <span class="op">=</span> clambda <span class="op">*</span> np.<span class="bu">abs</span>(X <span class="op">-</span> observation).<span class="bu">sum</span>()</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Ereg <span class="op">+</span> Edata</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>lambda_ROF <span class="op">=</span> <span class="fl">8.0</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>lambda_TVL1 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_nd(P, r):</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    nP <span class="op">=</span> np.maximum(<span class="fl">1.0</span>, anorm(P)<span class="op">/</span>r)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> P <span class="op">/</span> nP[...,np.newaxis]</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shrink_1d(X, F, step):</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X <span class="op">+</span> np.clip(F <span class="op">-</span> X, <span class="op">-</span>step, step)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> solve_TVL1(img, clambda, iter_n<span class="op">=</span><span class="dv">101</span>):</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>    L2 <span class="op">=</span> <span class="fl">8.0</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    tau <span class="op">=</span> <span class="fl">0.02</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (L2<span class="op">*</span>tau)</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> img.copy()</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    P <span class="op">=</span> nabla(X)</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(iter_n):</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> project_nd( P <span class="op">+</span> sigma<span class="op">*</span>nabla(X), <span class="fl">1.0</span> )</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>        X1 <span class="op">=</span> shrink_1d(X <span class="op">-</span> tau<span class="op">*</span>nablaT(P), img, clambda<span class="op">*</span>tau)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> X1 <span class="op">+</span> theta <span class="op">*</span> (X1 <span class="op">-</span> X)</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage <span class="im">import</span> io</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> io.imread(<span class="st">&#39;lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> solve_TVL1(img, <span class="fl">1.0</span>)</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>res_scaled <span class="op">=</span> (res <span class="op">-</span> res.<span class="bu">min</span>()) <span class="op">/</span> (res.<span class="bu">max</span>() <span class="op">-</span> res.<span class="bu">min</span>())</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>res_uint8 <span class="op">=</span> (res_scaled <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>io.imsave(<span class="st">&#39;lenad3.jpg&#39;</span>, res_uint8)</span></code></pre></div>
+<p><img src="lenad3.jpg" /> <img src="lena-noise.jpg" /></p>
 <p>Ayrıca <code>cvxpy</code> adlı bir paket üzerinden aynı şeyi
 kodlayabiliriz, yani</p>
 <p><span class="math display">\[
@@ -489,8 +478,74 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>prob.solve(verbose<span class="op">=</span><span class="va">True</span>, solver<span class="op">=</span>cvxpy.SCS)</span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>plt.imshow(U.value, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>plt.imsave(lena4.jpg<span class="st">&#39;, U.value, cmap=&#39;</span>gray<span class="st">&#39;)</span></span></code></pre></div>
-<p>Üstteki sağdaki resim bu sonucu gösteriyor. Bu yaklaşımda
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>plt.imsave(<span class="st">&#39;lena4.jpg&#39;</span>, U.value, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>===============================================================================
+                                     CVXPY                                     
+                                     v1.6.6                                    
+===============================================================================
+-------------------------------------------------------------------------------
+                                  Compilation                                  
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+                                Numerical solver                               
+-------------------------------------------------------------------------------
+------------------------------------------------------------------
+           SCS v3.2.7 - Splitting Conic Solver
+    (c) Brendan O&#39;Donoghue, Stanford University, 2012
+------------------------------------------------------------------
+problem:  variables n: 151426, constraints m: 201153
+cones:    z: primal zero / dual free vars: 50625
+      q: soc vars: 150528, qsize: 50176
+settings: eps_abs: 1.0e-05, eps_rel: 1.0e-05, eps_infeas: 1.0e-07
+      alpha: 1.50, scale: 1.00e-01, adaptive_scale: 1
+      max_iters: 100000, normalize: 1, rho_x: 1.00e-06
+      acceleration_lookback: 10, acceleration_interval: 10
+lin-sys:  sparse-direct-amd-qdldl
+      nnz(A): 352130, nnz(P): 50625
+------------------------------------------------------------------
+ iter | pri res | dua res |   gap   |   obj   |  scale  | time (s)
+------------------------------------------------------------------
+     0| 8.93e+02  3.50e+01  1.58e+09 -7.77e+08  1.00e-01  5.55e-01 
+   250| 1.32e+00  4.81e-02  3.99e+01  2.25e+07  1.00e-01  4.92e+00 
+   500| 5.62e-01  8.50e-02  2.80e+01  2.25e+07  3.19e-01  8.84e+00 
+   750| 2.67e-01  2.15e-02  6.38e+00  2.25e+07  3.19e-01  1.27e+01 
+  1000| 3.53e+01  8.82e+00  3.72e+02  2.25e+07  3.19e-01  1.65e+01 
+  1250| 8.25e-02  4.00e-03  1.67e+00  2.25e+07  3.19e-01  2.04e+01 
+  1500| 7.18e-02  3.42e-03  1.11e+00  2.25e+07  3.19e-01  2.42e+01 
+  1750| 4.66e-02  3.68e-03  7.96e-01  2.25e+07  3.19e-01  2.81e+01 
+  2000| 4.68e-02  7.17e-04  5.96e-01  2.25e+07  3.19e-01  3.19e+01 
+  2250| 3.26e-02  2.28e-04  4.57e-01  2.25e+07  3.19e-01  3.57e+01 
+  2500| 2.13e-02  4.08e-04  3.79e-01  2.25e+07  3.19e-01  3.96e+01 
+  2750| 2.00e-02  4.70e-04  3.20e-01  2.25e+07  3.19e-01  4.34e+01 
+  3000| 1.81e-02  6.73e-04  2.74e-01  2.25e+07  3.19e-01  4.73e+01 
+  3250| 1.25e-02  2.68e-03  5.33e-01  2.25e+07  1.01e+00  5.12e+01 
+  3500| 9.76e-03  1.93e-03  3.81e-01  2.25e+07  1.01e+00  5.50e+01 
+  3750| 8.65e-03  1.13e-03  2.78e-01  2.25e+07  1.01e+00  5.89e+01 
+  4000| 6.76e-03  5.35e-04  2.14e-01  2.25e+07  1.01e+00  6.27e+01 
+  4250| 6.32e-03  4.87e-04  1.68e-01  2.25e+07  1.01e+00  6.65e+01 
+  4500| 5.48e-03  1.47e-04  1.38e-01  2.25e+07  1.01e+00  7.04e+01 
+  4750| 5.17e-03  6.63e-05  1.15e-01  2.25e+07  1.01e+00  7.42e+01 
+  5000| 5.90e+00  4.68e+00  7.01e-01  2.25e+07  1.01e+00  7.81e+01 
+  5250| 3.65e-03  2.40e-04  8.35e-02  2.25e+07  1.01e+00  8.19e+01 
+  5500| 3.54e-03  4.04e-04  7.04e-02  2.25e+07  1.01e+00  8.57e+01 
+  5750| 3.27e-03  1.43e-04  6.08e-02  2.25e+07  1.01e+00  8.96e+01 
+  6000| 3.11e-03  4.98e-04  5.37e-02  2.25e+07  1.01e+00  9.34e+01 
+  6250| 3.00e-03  2.91e-05  4.83e-02  2.25e+07  1.01e+00  9.72e+01 
+  6500| 2.89e-03  3.28e-05  4.45e-02  2.25e+07  1.01e+00  1.01e+02 
+  6550| 2.31e-03  9.40e-04  4.27e-02  2.25e+07  1.01e+00  1.02e+02 
+------------------------------------------------------------------
+status:  solved
+timings: total: 1.02e+02s = setup: 4.84e-01s + solve: 1.01e+02s
+     lin-sys: 6.97e+01s, cones: 1.28e+01s, accel: 4.23e+00s
+------------------------------------------------------------------
+objective = 22523308.826536
+------------------------------------------------------------------
+-------------------------------------------------------------------------------
+                                    Summary                                    
+-------------------------------------------------------------------------------
+</code></pre>
+<p><img src="lena4.jpg" /></p>
+<p>Üstteki resim bu sonucu gösteriyor. Bu yaklaşımda
 <code>cvxpy.tv</code> ile tam varyasyon hesabını yapan kütüphanenin
 kendi iç çağrısını kullandık.</p>
 <p>Kaynaklar</p>
@@ -505,7 +560,6 @@ Constrained Optimization</em>, <a
 href="http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf">http://www.lx.it.pt/~mtf/Afonso_BioucasDias_Figueiredo_twocolumn_v7.pdf</a></p>
 <p>[4] Boyd, <em>Additional Exercises for Convex Optimization</em> <a
 href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf">https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook_extra_exercises.pdf</a></p>
-<p>[5] Bayramlı, <em>Bilgisayar Bilim, Yapay Zeka, Tensorflow</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
