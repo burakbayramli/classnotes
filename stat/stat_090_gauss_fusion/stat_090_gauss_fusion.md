@@ -299,31 +299,42 @@ Nihai ölçüm nedir?
 ```python
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-import matplotlib.mlab as mlab
+from scipy.stats import multivariate_normal 
 
 x = np.arange(-10.0, 10.0, 0.1)
 y = np.arange(-10.0, 10.0, 0.1)
 
 X, Y = np.meshgrid(x, y)
-Z1 = mlab.bivariate_normal(X, Y, sigmax=1.0, sigmay=4.0,mux=1., \
-     muy=1.,sigmaxy=0.0)
-Z2 = mlab.bivariate_normal(X, Y, sigmax=4.0, sigmay=1.0,mux=2., \
-     muy=-1.,sigmaxy=0.0)
+
+pos = np.dstack((X, Y))
+
+mux = 1.0; muy = 1.0; sigmax = 1.0; sigmay = 4.0
+sigmaxy = 0.0
+mean = [mux, muy]
+cov = [[sigmax**2, sigmaxy],
+       [sigmaxy, sigmay**2]]
+rv = multivariate_normal(mean, cov)
+Z1 = rv.pdf(pos)
+
+mux = 2.0; muy = -1.0; sigmax = 4.0; sigmay = 1.0
+sigmaxy = 0.0
+mean = [mux, muy]
+cov = [[sigmax**2, sigmaxy],
+       [sigmaxy, sigmay**2]]
+rv = multivariate_normal(mean, cov)
+Z2 = rv.pdf(pos)
 
 # iki yuzeyi ayni grafikte birlestirmek icin herhangi iki nokta arasinda
 # daha fazla (maksimum) olani al, cunku nihai yuzey olarak onu gormek 
 # istiyoruz zaten
 Z = np.maximum(Z1,Z2)
 
-fig = plt.figure()
-
-ax = Axes3D(fig)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.view_init(elev=50., azim=80)
 
 ax.plot_surface(X,Y,Z,cmap=cm.jet)
 plt.savefig('fusion_1.png')
 ```
-
 
 ![](fusion_1.png)
 
@@ -335,8 +346,8 @@ bir Gaussian idi. Üstte sadece veri noktalarını ekrana basıyoruz.
 Üstten bakışla kontur (contour) olarak gösterirsek 
 
 ```python
-CS = plt.contour(X, Y, Z1,rotation=70)
-CS = plt.contour(X, Y, Z2,rotation=70)
+CS = plt.contour(X, Y, Z1)
+CS = plt.contour(X, Y, Z2)
 plt.savefig('fusion_3.png')
 ```
 
@@ -394,18 +405,20 @@ Sonuç grafiklenirse suna benzer (ki yeni belirsizlik $\Sigma_x$'i de
 grafikte kullanalım),
 
 ```python
-Z3 = mlab.bivariate_normal(X, Y, sigmax=0.8, sigmay=0.8,mux=1.2, \
-     muy=-0.6,sigmaxy=0.0)
+mux = 1.2; muy = -0.6; sigmax = 0.8; sigmay = 0.8
+sigmaxy = 0.0
+mean = [mux, muy]
+cov = [[sigmax**2, sigmaxy],
+       [sigmaxy, sigmay**2]]
+rv = multivariate_normal(mean, cov)
+Z3 = rv.pdf(pos)
 
-fig = plt.figure()
-
-ax = Axes3D(fig)
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 ax.view_init(elev=40.,azim=80)
 
 ax.plot_surface(X,Y,Z3,cmap=cm.jet)
 plt.savefig('fusion_2.png')
 ```
-
 
 ![](fusion_2.png)
 

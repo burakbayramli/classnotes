@@ -163,9 +163,12 @@ if __name__ == "__main__":
         if sys.argv[2] != "all": dirs = [sys.argv[2]]
         tmpto = "/tmp/cltest"
         if os.path.exists(tmpto) == False:            
-            os.mkdir(tmpto)            
+            os.mkdir(tmpto)
+            
         py_ignore_list = ['algs_045_probsolve','algs_135_convnet','compscieng_bpp40sph',
-                          'compscieng_bpp80radio','phy_005_basics_05']
+                          'compscieng_bpp80radio','phy_005_basics_05','stat_055_linreg',
+                          'stat_085_multlev']
+        
         frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
         os.chdir(tmpto)
         for topdir in dirs:
