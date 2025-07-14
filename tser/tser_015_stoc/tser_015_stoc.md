@@ -311,7 +311,6 @@ x = np.linspace(0,10,100)
 y = y0*np.exp(lam*x) - mu/lam* (1-np.exp(lam*x))
 plt.scatter(x,y)
 plt.savefig('tser_stoc_11.png')
-plt.hold(False)
 ```
 
 ![](tser_stoc_11.png)

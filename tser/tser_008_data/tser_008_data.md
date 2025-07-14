@@ -52,9 +52,9 @@ for key, value in test_results[4].items():
     print(f"\t{key}: {value}")
 ```
 
-```
-ADF test statistic: -8.11493066831561
-p-value: 1.1980457313375998e-12
+```text
+ADF test statistic: -8.114930668315607
+p-value: 1.1980457313376217e-12
 Critical thresholds:
 	1%: -3.430471308341908
 	5%: -2.8615936158814588
@@ -81,8 +81,8 @@ plt.savefig('tser_008_data_04.png')
 adfuller(df)[1]
 ```
 
-```
-Out[1]: 0.9069640607490215
+```text
+Out[1]: np.float64(0.9069640607490215)
 ```
 
 Sıfırdan çok uzak bir p-değeri bu, demek ki seri durağan değil.
@@ -105,8 +105,8 @@ from statsmodels.tsa.stattools import adfuller
 adfuller(d1)[1]
 ```
 
-```
-Out[1]: 9.132206809895503e-19
+```text
+Out[1]: np.float64(9.132206809895174e-19)
 ```
 
 p-değeri çok küçük, demek ki farkı alınmış seri durağan hale geldi.
@@ -138,7 +138,7 @@ df['diff_3'] = df.AAPL.diff(periods=3)
 print (df[['diff_1','diff_2','diff_3']])
 ```
 
-```
+```text
               diff_1    diff_2    diff_3
 Date                                    
 2003-12-31       NaN       NaN       NaN
@@ -245,8 +245,8 @@ from statsmodels.tsa.stattools import adfuller
 adfuller(drugs.logdiff.dropna())[1]
 ```
 
-```
-Out[1]: 8.209874468611596e-06
+```text
+Out[1]: np.float64(8.209874468611811e-06)
 ```
 
 Bu çok ufak bir değer demek ki seri durağan hale geldi, transformasyonlar

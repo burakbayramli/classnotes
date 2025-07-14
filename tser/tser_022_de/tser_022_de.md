@@ -61,11 +61,11 @@ gidiyor (kırmızı noktalar) ama sonrasında işler karışıyor (mavi noktalar
 
 ```python
 import pandas as pd
-df = pd.read_csv('gasoline.csv',sep='\s+')
+dfg = pd.read_csv('gasoline.csv',sep='\\s+')
 
-plt.plot(df[df.Year<=1973].G,df[df.Year<=1973].Pg,'r.')
+plt.plot(dfg[dfg['Year']<=1973].G,dfg[dfg['Year']<=1973].Pg,'r.')
 plt.xlabel('G'); plt.ylabel('PG')
-plt.plot(df[df.Year>1973].G,df[df.Year>1973].Pg,'b.')
+plt.plot(dfg[dfg['Year']>1973].G,dfg[dfg['Year']>1973].Pg,'b.')
 plt.savefig('stat_tests2_02.png')
 ```
 
@@ -89,15 +89,15 @@ demek. `Income` ülke geliri, o da `Pop` ile bölünüyor ve log'u
 alınıyor.
 
 ```python
-df['Ln_G_Pop'] = np.log(df.G/df.Pop)
-df['Ln_Income_Pop'] = np.log(df.Y/df.Pop)
-df['Ln_Pg'] = np.log(df.Pg)
-df['Ln_Pnc'] = np.log(df.Pnc)
-df['Ln_Puc'] = np.log(df.Puc)
+dfg['Ln_G_Pop'] = np.log(dfg.G/dfg.Pop)
+dfg['Ln_Income_Pop'] = np.log(dfg.Y/dfg.Pop)
+dfg['Ln_Pg'] = np.log(dfg.Pg)
+dfg['Ln_Pnc'] = np.log(dfg.Pnc)
+dfg['Ln_Puc'] = np.log(dfg.Puc)
 ```
 
 ```python
-plt.plot(df.Year,df.Ln_G_Pop)
+plt.plot(dfg['Year'],dfg['Ln_G_Pop'])
 plt.xlabel('Sene')
 plt.ylabel('Ln(G/Nufus)')
 plt.title('Amerika Benzin Tuketimi')
@@ -110,18 +110,18 @@ Modeli tüm veri üzerinde işletirsek,
 
 ```python
 from statsmodels.formula.api import ols
-res_r = ols(model, data=df).fit()
+res_r = ols(model, data=dfg).fit()
 print (res_r.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:               Ln_G_Pop   R-squared:                       0.969
 Model:                            OLS   Adj. R-squared:                  0.965
 Method:                 Least Squares   F-statistic:                     243.2
-Date:                Wed, 17 Nov 2021   Prob (F-statistic):           6.25e-23
-Time:                        10:06:35   Log-Likelihood:                 79.913
+Date:                Mon, 14 Jul 2025   Prob (F-statistic):           6.25e-23
+Time:                        13:58:02   Log-Likelihood:                 79.913
 No. Observations:                  36   AIC:                            -149.8
 Df Residuals:                      31   BIC:                            -141.9
 Df Model:                           4                                         
@@ -151,37 +151,37 @@ bu değerin gerçekten bir kopuş noktası olup olmadığını test etmek
 istiyoruz, ve ardından Chow testi için gerekli değerleri hesaplıyoruz,
 
 ```python
-df_x = df[['Ln_Income_Pop','Ln_Pg','Ln_Pnc','Ln_Puc']]
-df_y = df['Ln_G_Pop']
+dfg_x = dfg[['Ln_Income_Pop','Ln_Pg','Ln_Pnc','Ln_Puc']]
+dfg_y = dfg['Ln_G_Pop']
 
-print (len(df[df.Year<=1973]), len(df[df.Year>1973]))
-res1 = ols(model, data=df[df.Year<1974]).fit()
-res2 = ols(model, data=df[df.Year>=1974]).fit()
+print (len(dfg[dfg.Year<=1973]), len(dfg[dfg.Year>1973]))
+res1 = ols(model, data=dfg[dfg.Year<1974]).fit()
+res2 = ols(model, data=dfg[dfg.Year>=1974]).fit()
 S_1 = np.sum(res1.resid**2)
 S_2 = np.sum(res2.resid**2)
 S_r = np.sum(res_r.resid**2)
 print ('S 1 =', S_1)
 print ('S 2 =', S_2)
 print ('S_r =', S_r)
-print ('N =', len(df))
-k = df_x.shape[1]
+print ('N =', len(dfg))
+k = dfg_x.shape[1]
 tmp1 = (S_r-(S_1+S_2))/k
-tmp2 = (S_1+S_2)/(len(df)-2*k-1)
+tmp2 = (S_1+S_2)/(len(dfg)-2*k-1)
 F = tmp1/tmp2
 print ('F =', F)
 
 import scipy.stats as st
-f = st.f(k,len(df)-2*k-1)
+f = st.f(k,len(dfg)-2*k-1)
 print ('p degeri =', 1-f.cdf(F))
 ```
 
-```
+```text
 14 22
-S 1 = 0.002567339947532824
-S 2 = 0.0049117547066572
-S_r = 0.02487343626197274
+S 1 = 0.0025673399475329207
+S 2 = 0.00491175470665726
+S_r = 0.024873436261972474
 N = 36
-F = 15.698665584711588
+F = 15.69866558471087
 p degeri = 9.40286063455531e-07
 ```
 
@@ -190,8 +190,8 @@ reddedildi. Demek ki hakikaten 1973'te bir değişim olmuş!
 
 Paket
 
-`pip install chow_test` ile kurulabilecek bir paket var [10], bu paketin
-kullanımı,
+`pip install chowtest` ile kurulabilecek bir paket var [10], bu
+paketin kullanımı,
 
 ```python
 import chow_test, pandas as pd
@@ -206,7 +206,38 @@ print (df.iloc[15])
 print (res)
 ```
 
-```
+```text
+     x   y
+0    1   3
+1    1   5
+2    2   6
+3    3  10
+4    4  13
+5    4  15
+6    5  17
+7    5  14
+8    6  20
+9    7  23
+10   7  25
+11   8  27
+12   8  30
+13   9  30
+14  10  31
+15  10  33
+16  11  32
+17  12  32
+18  12  30
+19  13  32
+20  14  34
+21  15  34
+22  15  37
+23  16  35
+24  17  34
+25  18  36
+26  18  34
+27  19  37
+28  20  38
+29  20  36
 Reject the null hypothesis of equality of regression coefficients in the two periods.
 Chow Statistic: 37.96716203561837, P_value: 2.6531641550420204e-08
 x    10
@@ -251,17 +282,17 @@ def supf(y, x, p):
     
 p = 0.2
 
-idx,val = supf(df_y, df_x, p)
+idx,val = supf(dfg_y, dfg_x, p)
 print (idx,val)
-print ('Sene', df.Year[idx])
+print ('Sene', dfg.Year[idx])
 ```
 
-```
+```text
 N = 36
 k = 4
 N-k = 32
-14 3.904972193103
-Sene 1974
+13 257.74906757993983
+Sene 1973
 ```
 
 Not: Sene araması için baştan ve sonda bir kısım veri atlandı, ki her iki
@@ -381,9 +412,9 @@ print (len(ta))
 print ('Baslangic =', tai[0], 'Bitis =', taf[0])
 ```
 
-```
+```text
 2
-Baslangic = 95 Bitis = 197
+Baslangic = 102 Bitis = 195
 ```
 
 Geri döndürülen `tai`, `taf` birer vektördür, ve sırasıyla kopuş
