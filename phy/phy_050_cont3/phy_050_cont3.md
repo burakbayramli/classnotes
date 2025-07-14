@@ -206,6 +206,7 @@ print (sol.y[0].shape)
 ```
 
 ```python
+import pandas as pd
 df = pd.DataFrame()
 df['x1'] = sol.y[0]
 df['x2'] = sol.y[1]
@@ -217,8 +218,8 @@ plt.savefig('phy_num_02.png')
 
 ```python
 df = pd.DataFrame()
-df['$\lambda_1$'] = sol.y[2]
-df['$\lambda_2$'] = sol.y[3]
+df[r'$\lambda_1$'] = sol.y[2]
+df[r'$\lambda_2$'] = sol.y[3]
 df.plot()
 plt.savefig('phy_num_03.png')
 ```

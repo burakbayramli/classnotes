@@ -595,7 +595,7 @@ drop_cols = ['u2','v2','w2','phi2x','phi2y','phi2z', \
              'u3','v3','w3','phi3x','phi3y','phi3z',\
              'u4','v4','w4','phi4x','phi4y','phi4z']
 df_super = dfutil.drop_col_row(df_super,drop_cols)
-df_super = df_super.applymap(lambda x: np.round(np.float(x),0))
+df_super = df_super.applymap(lambda x: np.round(float(x),0))
 print (df_super)
 ```
 
