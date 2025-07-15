@@ -155,10 +155,9 @@ price,v,block_val,block_vol,inst_value_vol,units,exec_cost,so_cost = calc_cost('
 print (so_cost)
 ```
 
+```text
+0.001862369502999681
 ```
-0.001862369503
-```
-
 
 ```python
 import pandas as pd, zipfile
@@ -177,24 +176,17 @@ for inst in instruments:
 print (pd.DataFrame(res,columns=cols)         )
 ```
 
-```
-      inst     price      v  block_val  block_vol  inst_value_vol   units  \
-0  CRUDE_W   85.3000 1.2678   853.0000  1081.4529       1081.4529  2.8896   
-1  EDOLLAR   97.0550 0.0563  2426.3750   136.7107        136.7107 22.8585   
-2      US5  117.0625 0.1699  1170.6250   198.9413        198.9413 15.7081   
-3  EUROSTX 2816.0000 1.1917   281.6000   335.5940        369.1534  8.4653   
-4      V2X   22.8000 2.6898    22.8000    61.3265         67.4592 46.3243   
-5      MXP    0.0718 0.5110   358.7500   183.3214        183.3214 17.0466   
-6     CORN  422.7500 1.2475   211.3750   263.6875        263.6875 11.8511   
+```text
+      inst     price      v  ...    units  exec_cost  so_cost
+0  CRUDE_W   85.3000 1.2678  ...   0.0339  1239.6534   0.0017
+1  EDOLLAR   97.0550 0.0563  ...   0.2355   606.5937   0.0057
+2      US5  117.0625 0.1699  ...   0.1342   468.2500   0.0025
+3  EUROSTX 2816.0000 1.1917  ...   0.0030 14080.0000   0.0019
+4      V2X   22.8000 2.6898  ...   2.0318    58.1400   0.0052
+5      MXP    0.0717 0.5110  ... 237.5827     0.4150   0.0039
+6     CORN  422.7500 1.2475  ...   0.0280  2642.1875   0.0030
 
-   exec_cost  so_cost  
-0    14.5329   0.0017  
-1     6.2500   0.0057  
-2     4.0000   0.0025  
-3     5.0000   0.0019  
-4     2.5500   0.0052  
-5     5.7835   0.0039  
-6     6.2500   0.0030  
+[7 rows x 9 columns]
 ```
 
 Devir (Turnover)
@@ -279,8 +271,8 @@ avg =  (pred_scaled / 10).diff().abs().mean()
 print ('devir', avg * 256)
 ```
 
-```
-devir 8.72554168599
+```text
+devir 8.695810384014125
 ```
 
 Alt Sistemlerin Ağırlıkları
@@ -357,8 +349,8 @@ weights=boot.optimise_over_periods(df,rollyears=20, monte_carlo=20,monte_length=
 print (np.array(weights.tail(1)))
 ```
 
-```
-[[ 0.34008769  0.65991231]]
+```text
+[[0.45390697 0.54609303]]
 ```
 
 ```python
@@ -396,13 +388,13 @@ idm=1.0 / (float(np.dot(np.dot(W, H), W.transpose()))) **.5
 print ('\nIDM', idm)
 ```
 
-```
+```text
 Korelasyon
-           US20     SP500
-US20   1.000000  0.096425
-SP500  0.096425  1.000000
+        US20  SP500
+US20  1.0000 0.0895
+SP500 0.0895 1.0000
 
-IDM 1.29697910974
+IDM 1.300377852662791
 ```
 
 Tahmin Çarpanlarını Hesaplamak
@@ -434,13 +426,13 @@ for (fast,slow) in ewmacs:
     print ('ewma', slow,fast,'=', target_abs_forecast/avg_abs_value)
 ```
 
-```
-ewma 2 8 = 12.8587606411
-ewma 4 16 = 8.91499507015
-ewma 8 32 = 6.09843054736
-ewma 16 64 = 4.17115322451
-ewma 32 128 = 2.84127283125
-ewma 64 256 = 1.92365849221
+```text
+ewma 8 2 = 12.862857782026538
+ewma 16 4 = 8.9180572164055
+ewma 32 8 = 6.100627559062258
+ewma 64 16 = 4.172707518719636
+ewma 128 32 = 2.842377277196493
+ewma 256 64 = 1.924451529561536
 ```
 
 Taşıma kuralı (carry) için (not: TK verisini ayrı kontratlardan nasıl
@@ -469,10 +461,11 @@ with zipfile.ZipFile('legacycsv.zip', 'r') as z:
     tmp=tmp.abs().iloc[:,0]
     avg_abs_value=tmp.mean()
     print (10./avg_abs_value )
-```
 
 ```
-21.44
+
+```text
+42.560661077684045
 ```
 
 Bu değerler [1, sf. 309] ile uyumlu.
@@ -505,127 +498,7 @@ enstrümanlar üzerinden elde edilen stratejilerin tahminlerini
 birleştireceğiz. Mesela EWMAC 16,64 ile CORN, EDOLLAR, vs tahminleri yapıp bu
 serileri uç uca koyacağız, böylece eldeki veriyi arttırmış olacağız.
 
-```python
-import util, zipfile, pandas as pd, collections
-
-ewmacs = [(16,64),(32,128),(64,256)]
-
-forecasts = collections.OrderedDict()
-for x in ewmacs: forecasts[x] = []
-forecasts['carry'] = []
-prices = collections.OrderedDict()
-for x in ewmacs: prices[x] = []
-prices['carry'] = []
-
-insts = ['CORN', 'EDOLLAR', 'EUROSTX', 'MXP', 'US10', 'V2X']
-with zipfile.ZipFile('legacycsv.zip', 'r') as z:
-    for inst in insts: 
-        df1 = pd.read_csv(z.open('%s_price.csv' % inst),\
-                          index_col=0,parse_dates=True )     
-        df2 = pd.read_csv(z.open('%s_carrydata.csv' % inst), \
-                          index_col=0,parse_dates=True )     
-        for (fast,slow) in ewmacs:
-             vol = util.robust_vol_calc(df1.PRICE.diff())
-             forecasts[(fast,slow)].append(util.ewma(df1.PRICE, fast, slow))
-             prices[(fast,slow)].append(df1.PRICE)
-
-        raw_carry = df2.CARRY_CONTRACT-df2.PRICE_CONTRACT
-        carryoffset = df2.PRICE_CONTRACT - df2.CARRY_CONTRACT
-        forecast =  util.carry(raw_carry, vol,  \
-                               carryoffset*1/util.CALENDAR_DAYS_IN_YEAR)
-        forecasts['carry'].append(forecast)
-        prices['carry'].append(df1.PRICE)
-    
-for x in forecasts:
-    forecasts[x] = pd.concat(forecasts[x])
-for x in prices:
-    prices[x] = pd.concat(prices[x])
-    
-dff = pd.DataFrame()
-for x in forecasts: dff[x] = forecasts[x]
-dfp = pd.DataFrame()
-for x in prices: dfp[x] = prices[x]
-
-rng = pd.date_range('1/1/1900', periods=len(dff), freq='D')
-
-dff = dff.set_index(rng)
-dfp = dfp.set_index(rng)
-
-df = dfp.pct_change() * dff.shift(1)
-df = df.dropna()
-```
-
-```python
-import sys; sys.path.append('../tser_port')
-import boot
-weights=boot.optimise_over_periods(df, rollyears=20, monte_carlo=20,monte_length=250)
-```
-
-Üstteki kod işledikten sonra EW 16,64, EW 32,128, EW 64,256, TK stratejileri
-için sırayla 0.45, 0.05, 0.22, 0.28 ağırlıkları rapor edilecek. Bu değerler
-[3]'te verilenlere benziyor, TK üzerinde oldukça ağırlık var, bu mantıklı
-çünkü diğer stratejilerle çok korelasyonu olmayan bir strateji bu. Ortalama
-hızdaki EWMA'ya yüzde 5 civarı verilmiş, geri kalanlar arasında daha hızlı
-olan en çok ağırlığa sahip, değişimlere hızlı tepki verebilmenin faydası var
-demek ki.
-
-Stratejilerin Korelasyonu
-
-Farklı EWMA stratejilerinin getirilerinin tek bir enstrüman üzerinden
-korelasyonu altta bulunabilir [1, sf. 319]. 
-
-```python
-import util, zipfile, pandas as pd, collections
-ewmacs = [(2,8),(4,16),(8,32),(16,64),(32,128),(64,256)]
-inst = 'US5'
-with zipfile.ZipFile('legacycsv.zip', 'r') as z:
-    p = pd.read_csv(z.open('%s_price.csv' % inst),\
-                    index_col=0,parse_dates=True)
-df = pd.DataFrame(index=p.index)
-for (fast,slow) in ewmacs:
-     fs = util.ewma(p.PRICE, fast, slow)
-     df['%d-%d' % (fast,slow)] = util.ccy_returns(p.PRICE, fs)
-print (df.corr())
-```
-
-```
-             2-8      4-16      8-32     16-64    32-128    64-256
-2-8     1.000000  0.869692  0.624934  0.402105  0.233632  0.143689
-4-16    0.869692  1.000000  0.898819  0.673206  0.433222  0.270579
-8-32    0.624934  0.898819  1.000000  0.902239  0.668067  0.437073
-16-64   0.402105  0.673206  0.902239  1.000000  0.896226  0.657881
-32-128  0.233632  0.433222  0.668067  0.896226  1.000000  0.891021
-64-256  0.143689  0.270579  0.437073  0.657881  0.891021  1.000000
-```
-
-Her stratejinin bir sonraki stratejiyle yakın bağlantısı olduğu görülüyor, ama
-en azından bu bağlantı yüzde 99 değil, yüzde 90 civarı. 
-
-Oynaklık Standardizasyonu 
-
-Ornek: Bund beklenen getirisi yılda \%2\, beklenen yıllık standart sapma \%8.
-Schatz vadeli işlem sözleşmesi 1\% ama beklenen oynaklık 2\%. Risk her iki
-tarafta aynı olacak şekilde eşitleme yaparsak, Schatz'in beklenen getirisi
-Bund'un iki katıdır.
-
-```python
-import util
-
-returns = [2.,1.] # bund,schatz
-volatilies = [8.,2.] # bund,schatz
-returns,vols = util.vol_equaliser(returns,volatilies)
-print ('getiriler', returns)
-print ('oynaklik', vols)
-```
-
-```
-getiriler [1.25, 2.5]
-oynaklik [5.0, 5.0]
-```
-
-Oynaklık standardizasyonu hesabı oynaklıklar için bir ortalama almaktan
-ibarettir. Tüm oynaklıklar bu ortalamaya eşitlenir, ve aynı oranda
-getiriler ayarlanır. 
+[atlandi]
 
 Kaynaklar
 

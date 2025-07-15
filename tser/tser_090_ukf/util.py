@@ -96,7 +96,7 @@ def plot_monte_carlo_mean(xs, ys, f, mean_fx, label, plot_colormap=True):
     computed_mean_x = np.average(fxs)
     computed_mean_y = np.average(fys)
     plt.subplot(121)
-    plt.gca().grid(b=False)
+    plt.gca().grid(visible=False)
 
     plot_bivariate_colormap(xs, ys)
 
@@ -105,7 +105,7 @@ def plot_monte_carlo_mean(xs, ys, f, mean_fx, label, plot_colormap=True):
     plt.ylim(-20, 20)
 
     plt.subplot(122)
-    plt.gca().grid(b=False)
+    plt.gca().grid(visible=False)
 
     plt.scatter(fxs, fys, marker='.', alpha=0.02, color='k')
     plt.scatter(mean_fx[0], mean_fx[1],

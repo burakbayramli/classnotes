@@ -147,7 +147,7 @@ class UKF(object):
                                              self.x_mean,
                                              self.residual_x)
 
-    def predict(self, dt, u):
+    def predict2(self, dt, u):
         sigmas = self.points_fn.sigma_points(self.x, self.P)        
         for i in range(self._num_sigmas):
             # parametre verilen dt oldugu gibi fx'e geciliyor,

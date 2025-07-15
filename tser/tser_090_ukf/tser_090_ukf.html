@@ -122,40 +122,37 @@ bu ağırlıklar da önceden kararlaştırılır, bazı uygulamalarda merkez
 noktaya daha fazla ağırlık vermek istenebilir, diğerleri dış noktaları
 tercih edebilir.</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> (absolute_import, division, print_function,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                        unicode_literals)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg, <span class="bu">filter</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> randn</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax<span class="op">=</span>plt.figure().gca()</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg, <span class="bu">filter</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> randn</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ax<span class="op">=</span>plt.figure().gca()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">5</span>])</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array([[<span class="dv">4</span>, <span class="op">-</span><span class="fl">2.2</span>], [<span class="op">-</span><span class="fl">2.2</span>, <span class="dv">3</span>]])</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">0</span>, <span class="dv">5</span>])</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array([[<span class="dv">4</span>, <span class="op">-</span><span class="fl">2.2</span>], [<span class="op">-</span><span class="fl">2.2</span>, <span class="dv">3</span>]])</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;b&#39;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, variance<span class="op">=</span><span class="dv">9</span>,plt<span class="op">=</span>plt)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sigmas <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(<span class="dv">2</span>, alpha<span class="op">=</span><span class="fl">.5</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span><span class="fl">0.</span>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;b&#39;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, variance<span class="op">=</span><span class="dv">9</span>,plt<span class="op">=</span>plt)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>sigmas <span class="op">=</span> <span class="bu">filter</span>.MerweScaledSigmaPoints(<span class="dv">2</span>, alpha<span class="op">=</span><span class="fl">.5</span>, beta<span class="op">=</span><span class="fl">2.</span>, kappa<span class="op">=</span><span class="fl">0.</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> sigmas.sigma_points(x<span class="op">=</span>x, P<span class="op">=</span>P)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.scatter(S[:,<span class="dv">0</span>], S[:,<span class="dv">1</span>], c<span class="op">=</span><span class="st">&#39;k&#39;</span>, s<span class="op">=</span><span class="dv">80</span>)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> sigmas.sigma_points(x<span class="op">=</span>x, P<span class="op">=</span>P)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.scatter(S[:,<span class="dv">0</span>], S[:,<span class="dv">1</span>], c<span class="op">=</span><span class="st">&#39;k&#39;</span>, s<span class="op">=</span><span class="dv">80</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">15</span>, <span class="dv">5</span>])</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array([[<span class="dv">3</span>, <span class="fl">1.2</span>],[<span class="fl">1.2</span>, <span class="dv">6</span>]])</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;g&#39;</span>, variance<span class="op">=</span><span class="dv">9</span>, alpha<span class="op">=</span><span class="fl">0.3</span>,plt<span class="op">=</span>plt)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">0</span>,<span class="dv">0</span>], S[<span class="dv">0</span>,<span class="dv">1</span>], <span class="dv">11</span>, <span class="fl">4.1</span>, <span class="fl">0.6</span>))</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">1</span>,<span class="dv">0</span>], S[<span class="dv">1</span>,<span class="dv">1</span>], <span class="dv">13</span>, <span class="fl">7.7</span>, <span class="fl">0.6</span>))</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">2</span>,<span class="dv">0</span>], S[<span class="dv">2</span>,<span class="dv">1</span>], <span class="fl">16.3</span>, <span class="fl">0.93</span>, <span class="fl">0.6</span>))</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">3</span>,<span class="dv">0</span>], S[<span class="dv">3</span>,<span class="dv">1</span>], <span class="fl">16.7</span>, <span class="fl">10.8</span>, <span class="fl">0.6</span>))</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">4</span>,<span class="dv">0</span>], S[<span class="dv">4</span>,<span class="dv">1</span>], <span class="fl">17.7</span>, <span class="fl">5.6</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.array([<span class="dv">15</span>, <span class="dv">5</span>])</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array([[<span class="dv">3</span>, <span class="fl">1.2</span>],[<span class="fl">1.2</span>, <span class="dv">6</span>]])</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>util.plot_covariance_ellipse(x, P, facecolor<span class="op">=</span><span class="st">&#39;g&#39;</span>, variance<span class="op">=</span><span class="dv">9</span>, alpha<span class="op">=</span><span class="fl">0.3</span>,plt<span class="op">=</span>plt)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">0</span>,<span class="dv">0</span>], S[<span class="dv">0</span>,<span class="dv">1</span>], <span class="dv">11</span>, <span class="fl">4.1</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">1</span>,<span class="dv">0</span>], S[<span class="dv">1</span>,<span class="dv">1</span>], <span class="dv">13</span>, <span class="fl">7.7</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">2</span>,<span class="dv">0</span>], S[<span class="dv">2</span>,<span class="dv">1</span>], <span class="fl">16.3</span>, <span class="fl">0.93</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">3</span>,<span class="dv">0</span>], S[<span class="dv">3</span>,<span class="dv">1</span>], <span class="fl">16.7</span>, <span class="fl">10.8</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>ax.add_artist(util.arrow(S[<span class="dv">4</span>,<span class="dv">0</span>], S[<span class="dv">4</span>,<span class="dv">1</span>], <span class="fl">17.7</span>, <span class="fl">5.6</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>ax.axes.get_xaxis().set_visible(<span class="va">False</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>ax.axes.get_yaxis().set_visible(<span class="va">False</span>)</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ax.axes.get_xaxis().set_visible(<span class="va">False</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ax.axes.get_yaxis().set_visible(<span class="va">False</span>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_ukf_02.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_ukf_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_ukf_02.png" /></p>
 <p>“Sigma bazlı transform edilmiş’’ (unscented transform) yeni Gaussian
 hesabı şöyle olur,</p>
@@ -356,207 +353,204 @@ class="math inline">\(1\sigma = 0.3\)</span> metre, bu bize alttaki
 kullanacağız.</p>
 <p>Kodlar altta,</p>
 <div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> (absolute_import, division, print_function,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                        unicode_literals)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> randn</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, util, scipy.linalg <span class="im">as</span> linalg</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> eye, zeros, dot, isscalar, outer</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> inv, cholesky</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> randn</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, multivariate_normal</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dot3(A,B,C):</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dot(A, dot(B,C))</span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dot3(A,B,C):</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dot(A, dot(B,C))</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logpdf(x, mean, cov):</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    flat_mean <span class="op">=</span> np.asarray(mean).flatten()</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    flat_x <span class="op">=</span> np.asarray(x).flatten()</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> multivariate_normal.logpdf(flat_x, flat_mean, cov, <span class="va">True</span>)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> unscented_transform(sigmas, Wm, Wc, noise_cov<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                        mean_fn<span class="op">=</span><span class="va">None</span>, residual_fn<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    kmax, n <span class="op">=</span> sigmas.shape</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mean_fn <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> np.dot(Wm, sigmas)    <span class="co"># dot = \Sigma^n_1 (W[k]*Xi[k])</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> mean_fn(sigmas, Wm)</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> residual_fn <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> sigmas <span class="op">-</span> x[np.newaxis,:]</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> y.T.dot(np.diag(Wc)).dot(y)</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> np.zeros((n, n))</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(kmax):</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> residual_fn(sigmas[k], x)</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            P <span class="op">+=</span> Wc[k] <span class="op">*</span> np.outer(y, y)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logpdf(x, mean, cov):</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    flat_mean <span class="op">=</span> np.asarray(mean).flatten()</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    flat_x <span class="op">=</span> np.asarray(x).flatten()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> multivariate_normal.logpdf(flat_x, flat_mean, cov, <span class="va">True</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> unscented_transform(sigmas, Wm, Wc, noise_cov<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                        mean_fn<span class="op">=</span><span class="va">None</span>, residual_fn<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    kmax, n <span class="op">=</span> sigmas.shape</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> mean_fn <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> np.dot(Wm, sigmas)    <span class="co"># dot = \Sigma^n_1 (W[k]*Xi[k])</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> mean_fn(sigmas, Wm)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> residual_fn <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> sigmas <span class="op">-</span> x[np.newaxis,:]</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> y.T.dot(np.diag(Wc)).dot(y)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>        P <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(kmax):</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> residual_fn(sigmas[k], x)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>            P <span class="op">+=</span> Wc[k] <span class="op">*</span> np.outer(y, y)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> noise_cov <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        P <span class="op">+=</span> noise_cov</span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> noise_cov <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        P <span class="op">+=</span> noise_cov</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (x, P)</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Q_discrete_white_noise(dim, dt<span class="op">=</span><span class="fl">1.</span>, var<span class="op">=</span><span class="fl">1.</span>):</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> dim <span class="op">==</span> <span class="dv">2</span> <span class="kw">or</span> dim <span class="op">==</span> <span class="dv">3</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dim <span class="op">==</span> <span class="dv">2</span>:</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>],</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>],</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>,       dt],</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>,       dt,        <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q <span class="op">*</span> var</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MerweScaledSigmaPoints(<span class="bu">object</span>):</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, alpha, beta, kappa, sqrt_method<span class="op">=</span><span class="va">None</span>, subtract<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n <span class="op">=</span> n</span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alpha <span class="op">=</span> alpha</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.beta <span class="op">=</span> beta</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.kappa <span class="op">=</span> kappa</span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> subtract <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.subtract<span class="op">=</span> np.subtract</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.subtract <span class="op">=</span> subtract</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (x, P)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> Q_discrete_white_noise(dim, dt<span class="op">=</span><span class="fl">1.</span>, var<span class="op">=</span><span class="fl">1.</span>):</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> dim <span class="op">==</span> <span class="dv">2</span> <span class="kw">or</span> dim <span class="op">==</span> <span class="dv">3</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dim <span class="op">==</span> <span class="dv">2</span>:</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>],</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        Q <span class="op">=</span> np.array([[<span class="fl">.25</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">4</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>, <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>],</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">3</span>,    dt<span class="op">**</span><span class="dv">2</span>,       dt],</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>                      [ <span class="fl">.5</span><span class="op">*</span>dt<span class="op">**</span><span class="dv">2</span>,       dt,        <span class="dv">1</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q <span class="op">*</span> var</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MerweScaledSigmaPoints(<span class="bu">object</span>):</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, alpha, beta, kappa, sqrt_method<span class="op">=</span><span class="va">None</span>, subtract<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n <span class="op">=</span> n</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alpha <span class="op">=</span> alpha</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.beta <span class="op">=</span> beta</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.kappa <span class="op">=</span> kappa</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> subtract <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.subtract<span class="op">=</span> np.subtract</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.subtract <span class="op">=</span> subtract</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> num_sigmas(<span class="va">self</span>):</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span><span class="va">self</span>.n <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> num_sigmas(<span class="va">self</span>):</span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">2</span><span class="op">*</span><span class="va">self</span>.n <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> sigma_points(<span class="va">self</span>, x, P):</span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="va">self</span>.n <span class="op">==</span> np.size(x), <span class="op">\</span></span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;expected size </span><span class="sc">{}</span><span class="st">, but size is </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="va">self</span>.n, np.size(x))</span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="va">self</span>.n</span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.isscalar(x): x <span class="op">=</span> np.asarray([x])</span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>  np.isscalar(P): P <span class="op">=</span> np.eye(n)<span class="op">*</span>P</span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>: P <span class="op">=</span> np.asarray(P)</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> sigma_points(<span class="va">self</span>, x, P):</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="va">self</span>.n <span class="op">==</span> np.size(x), <span class="op">\</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;expected size </span><span class="sc">{}</span><span class="st">, but size is </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(<span class="va">self</span>.n, np.size(x))</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="va">self</span>.n</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.isscalar(x): x <span class="op">=</span> np.asarray([x])</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span>  np.isscalar(P): P <span class="op">=</span> np.eye(n)<span class="op">*</span>P</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>: P <span class="op">=</span> np.asarray(P)</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span> <span class="va">self</span>.kappa) <span class="op">-</span> n</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>        U <span class="op">=</span> cholesky((lambda_ <span class="op">+</span> n)<span class="op">*</span>P)</span>
 <span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span> <span class="va">self</span>.kappa) <span class="op">-</span> n</span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>        U <span class="op">=</span> cholesky((lambda_ <span class="op">+</span> n)<span class="op">*</span>P)</span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> np.zeros((<span class="dv">2</span><span class="op">*</span>n<span class="op">+</span><span class="dv">1</span>, n))</span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>        sigmas[<span class="dv">0</span>] <span class="op">=</span> x</span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n):</span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>            sigmas[k<span class="op">+</span><span class="dv">1</span>]   <span class="op">=</span> <span class="va">self</span>.subtract(x, <span class="op">-</span>U[k])</span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>            sigmas[n<span class="op">+</span>k<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> <span class="va">self</span>.subtract(x, U[k])</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> np.zeros((<span class="dv">2</span><span class="op">*</span>n<span class="op">+</span><span class="dv">1</span>, n))</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>        sigmas[<span class="dv">0</span>] <span class="op">=</span> x</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>            sigmas[k<span class="op">+</span><span class="dv">1</span>]   <span class="op">=</span> <span class="va">self</span>.subtract(x, <span class="op">-</span>U[k])</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>            sigmas[n<span class="op">+</span>k<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> <span class="va">self</span>.subtract(x, U[k])</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sigmas</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sigmas</span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> weights(<span class="va">self</span>):</span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="va">self</span>.n</span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span><span class="va">self</span>.kappa) <span class="op">-</span> n</span>
-<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>        c <span class="op">=</span> <span class="fl">.5</span> <span class="op">/</span> (n <span class="op">+</span> lambda_)</span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>        Wc <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)</span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>        Wm <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)</span>
-<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>        Wc[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="va">self</span>.beta)</span>
-<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>        Wm[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_)</span>
-<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Wm, Wc</span>
-<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UKF(<span class="bu">object</span>):</span>
-<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim_x, dim_z, hx, fx, points,</span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>                 x_mean_fn<span class="op">=</span><span class="va">None</span>, z_mean_fn<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>                 residual_x<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>                 residual_z<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Q <span class="op">=</span> eye(dim_x)</span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.R <span class="op">=</span> eye(dim_z)</span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> zeros(dim_x)</span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> eye(dim_x)</span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._dim_x <span class="op">=</span> dim_x</span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._dim_z <span class="op">=</span> dim_z</span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.points_fn <span class="op">=</span> points</span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._num_sigmas <span class="op">=</span> points.num_sigmas()</span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.hx <span class="op">=</span> hx</span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fx <span class="op">=</span> fx</span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x_mean <span class="op">=</span> x_mean_fn</span>
-<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.z_mean <span class="op">=</span> z_mean_fn</span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Wm, <span class="va">self</span>.Wc <span class="op">=</span> <span class="va">self</span>.points_fn.weights()</span>
-<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> residual_x <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_x <span class="op">=</span> np.subtract</span>
-<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_x <span class="op">=</span> residual_x</span>
-<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> residual_z <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_z <span class="op">=</span> np.subtract</span>
-<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_z <span class="op">=</span> residual_z</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> weights(<span class="va">self</span>):</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="va">self</span>.n</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>        lambda_ <span class="op">=</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (n <span class="op">+</span><span class="va">self</span>.kappa) <span class="op">-</span> n</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>        c <span class="op">=</span> <span class="fl">.5</span> <span class="op">/</span> (n <span class="op">+</span> lambda_)</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>        Wc <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>        Wm <span class="op">=</span> np.full(<span class="dv">2</span><span class="op">*</span>n <span class="op">+</span> <span class="dv">1</span>, c)</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>        Wc[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.alpha<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> <span class="va">self</span>.beta)</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>        Wm[<span class="dv">0</span>] <span class="op">=</span> lambda_ <span class="op">/</span> (n <span class="op">+</span> lambda_)</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Wm, Wc</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UKF(<span class="bu">object</span>):</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dim_x, dim_z, hx, fx, points,</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>                 x_mean_fn<span class="op">=</span><span class="va">None</span>, z_mean_fn<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>                 residual_x<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>                 residual_z<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Q <span class="op">=</span> eye(dim_x)</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.R <span class="op">=</span> eye(dim_z)</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> zeros(dim_x)</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> eye(dim_x)</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._dim_x <span class="op">=</span> dim_x</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._dim_z <span class="op">=</span> dim_z</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.points_fn <span class="op">=</span> points</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._num_sigmas <span class="op">=</span> points.num_sigmas()</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.hx <span class="op">=</span> hx</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fx <span class="op">=</span> fx</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x_mean <span class="op">=</span> x_mean_fn</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.z_mean <span class="op">=</span> z_mean_fn</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Wm, <span class="va">self</span>.Wc <span class="op">=</span> <span class="va">self</span>.points_fn.weights()</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> residual_x <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_x <span class="op">=</span> np.subtract</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_x <span class="op">=</span> residual_x</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> residual_z <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_z <span class="op">=</span> np.subtract</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.residual_z <span class="op">=</span> residual_z</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigmas_f <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_x))</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigmas_h <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_z))</span>
 <span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigmas_f <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_x))</span>
-<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sigmas_h <span class="op">=</span> zeros((<span class="va">self</span>._num_sigmas, <span class="va">self</span>._dim_z))</span>
-<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, dt):</span>
-<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        </span>
-<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
-<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span></span>
-<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span></span>
-<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt)            </span>
-<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,</span>
-<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wm,</span>
-<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wc,</span>
-<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Q,</span>
-<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.x_mean,</span>
-<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.residual_x)</span>
-<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, dt, u):</span>
-<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        </span>
-<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
-<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span></span>
-<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a>            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span></span>
-<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt, u)</span>
-<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,</span>
-<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wm,</span>
-<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wc,</span>
-<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Q,</span>
-<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.x_mean,</span>
-<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.residual_x)</span>
-<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, z):</span>
-<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
-<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_h[i] <span class="op">=</span> <span class="va">self</span>.hx(<span class="va">self</span>.sigmas_f[i])</span>
-<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a>        zp, Pz <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_h,</span>
-<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.Wm,</span>
-<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.Wc,</span>
-<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.R,</span>
-<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.z_mean,</span>
-<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.residual_z)</span>
-<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>        Pxz <span class="op">=</span> zeros((<span class="va">self</span>._dim_x, <span class="va">self</span>._dim_z))</span>
-<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
-<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a>            dx <span class="op">=</span> <span class="va">self</span>.residual_x(<span class="va">self</span>.sigmas_f[i], <span class="va">self</span>.x)</span>
-<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a>            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(<span class="va">self</span>.sigmas_h[i], zp)</span>
-<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a>            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)</span>
-<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, dt):</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        </span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span></span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span></span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt)            </span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wm,</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wc,</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Q,</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.x_mean,</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.residual_x)</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>, dt, u):</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>        sigmas <span class="op">=</span> <span class="va">self</span>.points_fn.sigma_points(<span class="va">self</span>.x, <span class="va">self</span>.P)        </span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>            <span class="co"># parametre verilen dt oldugu gibi fx&#39;e geciliyor,</span></span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>            <span class="co"># yani UKF matematiginde direk kullanilmiyor</span></span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_f[i] <span class="op">=</span> <span class="va">self</span>.fx(sigmas[i], dt, u)</span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x, <span class="va">self</span>.P <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_f,</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wm,</span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Wc,</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.Q,</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.x_mean,</span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>                                             <span class="va">self</span>.residual_x)</span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, z):</span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.sigmas_h[i] <span class="op">=</span> <span class="va">self</span>.hx(<span class="va">self</span>.sigmas_f[i])</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>        zp, Pz <span class="op">=</span> unscented_transform(<span class="va">self</span>.sigmas_h,</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.Wm,</span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.Wc,</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.R,</span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.z_mean,</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a>                                     <span class="va">self</span>.residual_z)</span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a>        Pxz <span class="op">=</span> zeros((<span class="va">self</span>._dim_x, <span class="va">self</span>._dim_z))</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="va">self</span>._num_sigmas):</span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a>            dx <span class="op">=</span> <span class="va">self</span>.residual_x(<span class="va">self</span>.sigmas_f[i], <span class="va">self</span>.x)</span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(<span class="va">self</span>.sigmas_h[i], zp)</span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a>            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)</span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.K <span class="op">=</span> dot(Pxz, inv(Pz)) </span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.y <span class="op">=</span> <span class="va">self</span>.residual_z(z, zp) </span>
 <span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.K <span class="op">=</span> dot(Pxz, inv(Pz)) </span>
-<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.y <span class="op">=</span> <span class="va">self</span>.residual_z(z, zp) </span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> <span class="va">self</span>.x <span class="op">+</span> dot(<span class="va">self</span>.K, <span class="va">self</span>.y)</span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> <span class="va">self</span>.P <span class="op">-</span> dot3(<span class="va">self</span>.K, Pz, <span class="va">self</span>.K.T)</span>
 <span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> <span class="va">self</span>.x <span class="op">+</span> dot(<span class="va">self</span>.K, <span class="va">self</span>.y)</span>
-<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> <span class="va">self</span>.P <span class="op">-</span> dot3(<span class="va">self</span>.K, Pz, <span class="va">self</span>.K.T)</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(<span class="va">self</span>.y, np.zeros(<span class="bu">len</span>(<span class="va">self</span>.y)), Pz)</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.log_likelihood <span class="op">=</span> logpdf(<span class="va">self</span>.y, np.zeros(<span class="bu">len</span>(<span class="va">self</span>.y)), Pz)</span>
-<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> cross_variance(<span class="va">self</span>, x, z, sigmas_f, sigmas_h):</span>
-<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>        Pxz <span class="op">=</span> zeros((sigmas_f.shape[<span class="dv">1</span>], sigmas_h.shape[<span class="dv">1</span>]))</span>
-<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>        N <span class="op">=</span> sigmas_f.shape[<span class="dv">0</span>]</span>
-<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a>            dx <span class="op">=</span> <span class="va">self</span>.residual_x(sigmas_f[i], x)</span>
-<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a>            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(sigmas_h[i], z)</span>
-<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)</span>
-<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> likelihood(<span class="va">self</span>):</span>
-<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.exp(<span class="va">self</span>.log_likelihood)</span></code></pre></div>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> cross_variance(<span class="va">self</span>, x, z, sigmas_f, sigmas_h):</span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>        Pxz <span class="op">=</span> zeros((sigmas_f.shape[<span class="dv">1</span>], sigmas_h.shape[<span class="dv">1</span>]))</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a>        N <span class="op">=</span> sigmas_f.shape[<span class="dv">0</span>]</span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>            dx <span class="op">=</span> <span class="va">self</span>.residual_x(sigmas_f[i], x)</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>            dz <span class="op">=</span>  <span class="va">self</span>.residual_z(sigmas_h[i], z)</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a>            Pxz <span class="op">+=</span> <span class="va">self</span>.Wc[i] <span class="op">*</span> outer(dx, dz)</span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> likelihood(<span class="va">self</span>):</span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.exp(<span class="va">self</span>.log_likelihood)</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">filter</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -922,6 +916,8 @@ yaptığı için, bu filtre, örneklem bazlı parçacık filtreleri gibi, bir
 hipotez peşinden gitmiyor (o alandaki parçacıkları arttırıp), hep
 deterministik seçilen belli noktaları kullanıyor. İsmin belki buradan
 geldiği düşünülebilir.</p>
+<p>Kodlar</p>
+<p><a href="filter.py">filter.py</a>, <a href="util.py">util.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] Labbe, <em>Kalman and Bayesian Filters in Python</em>, <a
 href="https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python">https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python</a></p>

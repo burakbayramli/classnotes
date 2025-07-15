@@ -33,9 +33,6 @@ kararlaştırılır, bazı uygulamalarda merkez noktaya daha fazla ağırlık
 vermek istenebilir, diğerleri dış noktaları tercih edebilir.
 
 ```python
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import math, util, scipy.linalg as linalg, filter
 from numpy import eye, zeros, dot, isscalar, outer
 from scipy.linalg import inv, cholesky
@@ -310,9 +307,6 @@ kullanacağız.
 Kodlar altta,
 
 ```python
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import math, util, scipy.linalg as linalg
 from numpy import eye, zeros, dot, isscalar, outer
 from scipy.linalg import inv, cholesky
@@ -921,6 +915,10 @@ kullanımı İngilizce "iz takibi'', "iz sürme'' çağrışımı yaptığı iç
 filtre, örneklem bazlı parçacık filtreleri gibi, bir hipotez peşinden
 gitmiyor (o alandaki parçacıkları arttırıp), hep deterministik seçilen
 belli noktaları kullanıyor. İsmin belki buradan geldiği düşünülebilir.
+
+Kodlar
+
+[filter.py](filter.py), [util.py](util.py)
 
 Kaynaklar
 

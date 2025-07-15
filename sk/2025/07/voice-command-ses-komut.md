@@ -20,10 +20,12 @@ işletebilmeyi başarmışlar.
 
 YSA'yı kullanmak için tekrar eğitim yapmaya gerek yok, hazır
 pişirilmiş YSA modellerinin ağırlıkları kullanılabilir, 2.7 MB civarı
-yer tutuyor ve bir .h5 dosyasından hızlı bir şekilde yüklenebiliyor.
-Kodlar eğitilmiş bir ses tanıma YSA ağını içerir, `model-attRNN.h5` dosyasında.
-Github projesinin `HOME/Documents/repos/SpeechCmdRecognition` altında olduğunu,
-ve [3] dosyasının `/opt/Downloads/voice_cmd` dizininde olduğunu farzedersek,
+yer tutuyor ve bir .h5 dosyasından hızlı bir şekilde
+yüklenebiliyor. Önce [1] projesini indirelim, `git clone` ya da farklı
+bir yöntemle olabilir. Kodlar eğitilmiş bir ses tanıma YSA ağını
+içerir, `model-attRNN.h5` dosyasında.  Github projesinin
+`HOME/Documents/repos/SpeechCmdRecognition` altında olduğunu, ve [3]
+dosyasının `/opt/Downloads/voice_cmd` dizininde olduğunu farzedersek,
 alttaki kodu işletebiliriz.
 
 ```python
