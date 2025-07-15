@@ -124,7 +124,7 @@ import cv2
 
 dim = 3
 if __name__ == "__main__":    
-    fin = sys.argv[1]
+    fin = "/opt/Downloads/chessb-right.avi"
     cap = cv2.VideoCapture(fin)
     N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -216,7 +216,7 @@ from PF import *
 dim = 3
 if __name__ == "__main__":    
 
-    fin = sys.argv[1]
+    fin = "/opt/Downloads/chessb-right.avi"
     cap = cv2.VideoCapture(fin)
     N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -248,8 +248,8 @@ if __name__ == "__main__":
 
 Kaynaklar
 
-[1] Bayramlı, Sample Video, [https://drive.google.com/uc?export=view&id=1gq6J3mPFj4UMbkmi3vDrXKwa9IdtxNLH](https://drive.google.com/uc?export=view&id=1gq6J3mPFj4UMbkmi3vDrXKwa9IdtxNLH)
+[1] Bayramlı, [Sample Video](https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&st=1y9rflqg&raw=1)
 
-[2] Bayramlı, Sample Video, [https://drive.google.com/uc?export=view&id=1F8G5ROkD76YIRKOM5W9iVj6Jok4-CQxp](https://drive.google.com/uc?export=view&id=1F8G5ROkD76YIRKOM5W9iVj6Jok4-CQxp)
+[2] Bayramlı, [Sample Video](https://www.dropbox.com/scl/fi/pkjruc2u1g80cbn7ke6yw/chessb-right.avi?rlkey=3tl0x0c8tieo2z9j8tmzlspn1&st=075xba1m&raw=1)
 
 

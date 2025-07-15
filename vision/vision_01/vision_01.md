@@ -469,7 +469,6 @@ print (descriptors.shape)
 
 ```python
 descriptors.plot(kind='scatter',x=1,y=0)
-plt.hold(True)
 plt.imshow(im,cmap = plt.get_cmap('gray'))
 plt.savefig('vision_02_01.png')
 ```
@@ -480,7 +479,7 @@ plt.savefig('vision_02_01.png')
 öğesi)
 
 ```python
-print (descriptors.ix[0][:10])
+print (descriptors.iloc[0][:10])
 ```
 
 ```

@@ -23,7 +23,7 @@ np.random.seed(1)
 quad = np.array([[140,0],[164,90.],[212,90],[234,0]])
 util.plot_quad(quad, h, 'y')
 N = 1000 
-random_points = np.random.uniform(0, 320, (N, 2)).astype(np.int)
+random_points = np.random.uniform(0, 320, (N, 2)).astype(int)
 random_points = random_points[random_points[:,1] < 240]
 mask = np.array([util.inside_quad(quad, p)[0] for p in random_points])
 plt.plot(random_points[mask][:,0], h-random_points[mask][:,1], 'r.')
@@ -163,9 +163,8 @@ benzeyen bir nokta iki üstteki resimde mavi renkli gösterildi. Bu piksele
 doğru giden bir çizgi neye benzer?
 
 ```python
-from mpl_toolkits.mplot3d import Axes3D
 import scipy.linalg as lin
-import sys; sys.path.append('../vision_02')
+import sys; sys.path.append('../../phy/phy_072_rot')
 import plot3d
 
 K = [[ 282.363047,      0.,          166.21515189],
@@ -182,8 +181,7 @@ X = X / X[3]
 XX  = np.copy(X)
 XX[1] = X[2]; XX[2] = X[1]; XX[2] = -XX[2]
 w = 10
-f = plt.figure()
-ax = f.gca(projection='3d')
+fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
 xvec = C - XX[:3] 
 xvec = -xvec
 ax.quiver(C[0], C[1], C[2], xvec[0], xvec[1], xvec[2],color='red')

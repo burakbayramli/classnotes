@@ -151,55 +151,63 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> [<span class="st">&#39;magenta&#39;</span>,<span class="st">&#39;green&#39;</span>,<span class="st">&#39;white&#39;</span>,<span class="st">&#39;red&#39;</span>,<span class="st">&#39;yellow&#39;</span>]</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i,b <span class="kw">in</span> <span class="bu">enumerate</span>(bs):</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        fr <span class="op">=</span> b[<span class="dv">0</span>]<span class="op">;</span> to <span class="op">=</span> b[<span class="dv">1</span>]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        bnew <span class="op">=</span> [(fr[<span class="dv">0</span>],arr.shape[<span class="dv">0</span>]<span class="op">-</span>fr[<span class="dv">1</span>]),(to[<span class="dv">0</span>],arr.shape[<span class="dv">0</span>]<span class="op">-</span>to[<span class="dv">1</span>])]</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        draw.rectangle(bnew,outline<span class="op">=</span>colors[<span class="dv">0</span>])</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    plt.imshow(im)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="bu">eval</span>(x, H, edges):</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span>np.argmax(x[<span class="dv">0</span>]<span class="op">&lt;</span>edges[<span class="dv">0</span>])</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    j<span class="op">=</span>np.argmax(x[<span class="dv">1</span>]<span class="op">&lt;</span>edges[<span class="dv">1</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    k<span class="op">=</span>np.argmax(x[<span class="dv">2</span>]<span class="op">&lt;</span>edges[<span class="dv">2</span>])</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> H[i<span class="op">-</span><span class="dv">1</span>,j<span class="op">-</span><span class="dv">1</span>,k<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_pixels(box, im):</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> np.array(im)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    (yw,xw,d) <span class="op">=</span> arr.shape</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    (bx1,by1) <span class="op">=</span> box[<span class="dv">0</span>]<span class="op">;</span> (bx2,by2) <span class="op">=</span> box[<span class="dv">1</span>]</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    by1 <span class="op">=</span> yw<span class="op">-</span>by1<span class="op">;</span> by2 <span class="op">=</span> yw<span class="op">-</span>by2</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    x1 <span class="op">=</span> <span class="bu">min</span>(bx1,bx2)<span class="op">;</span> x2 <span class="op">=</span> <span class="bu">max</span>(bx1,bx2)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    y1 <span class="op">=</span> <span class="bu">min</span>(by1,by2)<span class="op">;</span> y2 <span class="op">=</span> <span class="bu">max</span>(by1,by2)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> arr[y1:y2, x1:x2, :]</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> arr</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;mitte.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>     im <span class="op">=</span> Image.<span class="bu">open</span>(z.<span class="bu">open</span>(<span class="st">&#39;105.jpg&#39;</span>)).convert(<span class="st">&#39;HSV&#39;</span>) </span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>box <span class="op">=</span> [(<span class="dv">110</span>,<span class="dv">0</span>),(<span class="dv">200</span>,<span class="dv">20</span>)]</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>bins <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>bim <span class="op">=</span> get_pixels(box, im)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>bnim <span class="op">=</span> np.reshape(bim, (bim.shape[<span class="dv">0</span>]<span class="op">*</span>bim.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>H, edges <span class="op">=</span> np.histogramdd(bnim, bins<span class="op">=</span>bins, normed<span class="op">=</span><span class="va">True</span>, <span class="bu">range</span><span class="op">=</span>[(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>)])</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>imm <span class="op">=</span> np.array(im)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>nim <span class="op">=</span> np.reshape(imm, (imm.shape[<span class="dv">0</span>]<span class="op">*</span>imm.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>e <span class="op">=</span> <span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="bu">eval</span>(x, H, edges), nim)</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>ee <span class="op">=</span> np.array(e)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>ee <span class="op">=</span> np.log(ee <span class="op">+</span> <span class="fl">1e-10</span>)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>imm2 <span class="op">=</span> np.array(im)</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>nim2 <span class="op">=</span> np.reshape(imm2, (imm2.shape[<span class="dv">0</span>]<span class="op">*</span>imm2.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>nim2[ee <span class="op">&gt;</span> <span class="op">-</span><span class="dv">15</span>] <span class="op">=</span> [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>imm2 <span class="op">=</span> np.reshape(nim2,imm2.shape)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>im2 <span class="op">=</span> Image.fromarray(imm2,<span class="st">&#39;HSV&#39;</span>)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>fig<span class="op">=</span>plt.imshow(im2)</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>draw_boxes_color([box],im2)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_70road_06.png&#39;</span>)</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>fig<span class="op">=</span>plt.imshow(im)</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>draw_boxes_color([box],im)</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_70road_07.png&#39;</span>)</span></code></pre></div>
-<p><img src="vision_70road_07.png" /> <img
-src="vision_70road_06.png" /></p>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Transform y-coordinates for Pillow</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        y0_transformed <span class="op">=</span> arr.shape[<span class="dv">0</span>] <span class="op">-</span> fr[<span class="dv">1</span>]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        y1_transformed <span class="op">=</span> arr.shape[<span class="dv">0</span>] <span class="op">-</span> to[<span class="dv">1</span>]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ensure y0 &lt;= y1 for Pillow&#39;s rectangle function</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        bnew <span class="op">=</span> [(<span class="bu">min</span>(fr[<span class="dv">0</span>], to[<span class="dv">0</span>]), <span class="bu">min</span>(y0_transformed, y1_transformed)),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                (<span class="bu">max</span>(fr[<span class="dv">0</span>], to[<span class="dv">0</span>]), <span class="bu">max</span>(y0_transformed, y1_transformed))]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        draw.rectangle(bnew, outline<span class="op">=</span>colors[<span class="dv">0</span>])</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    plt.imshow(im)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="bu">eval</span>(x, H, edges):</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span>np.argmax(x[<span class="dv">0</span>]<span class="op">&lt;</span>edges[<span class="dv">0</span>])</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    j<span class="op">=</span>np.argmax(x[<span class="dv">1</span>]<span class="op">&lt;</span>edges[<span class="dv">1</span>])</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    k<span class="op">=</span>np.argmax(x[<span class="dv">2</span>]<span class="op">&lt;</span>edges[<span class="dv">2</span>])</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> H[i<span class="op">-</span><span class="dv">1</span>,j<span class="op">-</span><span class="dv">1</span>,k<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_pixels(box, im):</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> np.array(im)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    (yw,xw,d) <span class="op">=</span> arr.shape</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    (bx1,by1) <span class="op">=</span> box[<span class="dv">0</span>]<span class="op">;</span> (bx2,by2) <span class="op">=</span> box[<span class="dv">1</span>]</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    by1 <span class="op">=</span> yw<span class="op">-</span>by1<span class="op">;</span> by2 <span class="op">=</span> yw<span class="op">-</span>by2</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    x1 <span class="op">=</span> <span class="bu">min</span>(bx1,bx2)<span class="op">;</span> x2 <span class="op">=</span> <span class="bu">max</span>(bx1,bx2)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    y1 <span class="op">=</span> <span class="bu">min</span>(by1,by2)<span class="op">;</span> y2 <span class="op">=</span> <span class="bu">max</span>(by1,by2)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    arr <span class="op">=</span> arr[y1:y2, x1:x2, :]</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> arr</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;mitte.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>     im <span class="op">=</span> Image.<span class="bu">open</span>(z.<span class="bu">open</span>(<span class="st">&#39;105.jpg&#39;</span>)).convert(<span class="st">&#39;HSV&#39;</span>) </span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>box <span class="op">=</span> [(<span class="dv">110</span>,<span class="dv">0</span>),(<span class="dv">200</span>,<span class="dv">20</span>)]</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>bins <span class="op">=</span> (<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>bim <span class="op">=</span> get_pixels(box, im)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>bnim <span class="op">=</span> np.reshape(bim, (bim.shape[<span class="dv">0</span>]<span class="op">*</span>bim.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>H, edges <span class="op">=</span> np.histogramdd(bnim, bins<span class="op">=</span>bins, density<span class="op">=</span><span class="va">True</span>, <span class="bu">range</span><span class="op">=</span>[(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>)])</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>imm <span class="op">=</span> np.array(im)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>nim <span class="op">=</span> np.reshape(imm, (imm.shape[<span class="dv">0</span>]<span class="op">*</span>imm.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>e <span class="op">=</span> <span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="bu">eval</span>(x, H, edges), nim)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>ee <span class="op">=</span> np.array(<span class="bu">list</span>(e)) </span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>ee <span class="op">=</span> np.log(ee <span class="op">+</span> <span class="fl">1e-10</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>imm2 <span class="op">=</span> np.array(im)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>nim2 <span class="op">=</span> np.reshape(imm2, (imm2.shape[<span class="dv">0</span>]<span class="op">*</span>imm2.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>nim2[ee <span class="op">&gt;</span> <span class="op">-</span><span class="dv">15</span>] <span class="op">=</span> [<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>imm2 <span class="op">=</span> np.reshape(nim2,imm2.shape)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>im2 <span class="op">=</span> Image.fromarray(imm2,<span class="st">&#39;HSV&#39;</span>)</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>fig<span class="op">=</span>plt.imshow(im2)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>draw_boxes_color([box],im2)</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_70road_06.png&#39;</span>)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>fig<span class="op">=</span>plt.imshow(im)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>draw_boxes_color([box],im)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_70road_07.png&#39;</span>)</span></code></pre></div>
+<p><img src="vision_70road_07.png" /></p>
+<p><img src="vision_70road_06.png" /></p>
 <p>Fena değil; yol ortasındaki direkler yol sayılmadı, ve genel olarak
 yolun gidişini görebiliyoruz.</p>
 <p>Filtreleme</p>
@@ -263,7 +271,7 @@ ile karşılaştırılabilecek bir sonuç veriyor. Tüm bu tahmin, düzeltme
 işlemleri KF matematiğinin içinde oluyor tabii. Şimdi ardı ardına üç
 resim üzerinde KF güncelleme kodunu görelim,</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../../tser/tser_kf&#39;</span>)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../../tser/tser_083_kf&#39;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> kalman</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image, ImageDraw</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
@@ -302,12 +310,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        bim <span class="op">=</span> get_pixels(box, im)</span>
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        bnim <span class="op">=</span> np.reshape(bim, (bim.shape[<span class="dv">0</span>]<span class="op">*</span>bim.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        H, edges <span class="op">=</span> np.histogramdd(bnim, bins<span class="op">=</span>bins, normed<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        H, edges <span class="op">=</span> np.histogramdd(bnim, bins<span class="op">=</span>bins, density<span class="op">=</span><span class="va">True</span>, </span>
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>                                  <span class="bu">range</span><span class="op">=</span>[(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>),(<span class="dv">0</span>,<span class="dv">255</span>)])</span>
 <span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        imm <span class="op">=</span> np.array(im)</span>
 <span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        nim <span class="op">=</span> np.reshape(imm, (imm.shape[<span class="dv">0</span>]<span class="op">*</span>imm.shape[<span class="dv">1</span>], <span class="dv">3</span>))</span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        e <span class="op">=</span> <span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="bu">eval</span>(x, H, edges), nim)</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        ee <span class="op">=</span> np.array(e)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        ee <span class="op">=</span> np.array(<span class="bu">list</span>(e))</span>
 <span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>        ee <span class="op">=</span> np.log(ee <span class="op">+</span> <span class="fl">1e-20</span>)        </span>
 <span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        f<span class="op">=</span>plt.imshow(im)</span>

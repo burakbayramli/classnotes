@@ -70,10 +70,18 @@ def draw_boxes_color(bs, im):
     colors = ['magenta','green','white','red','yellow']
     for i,b in enumerate(bs):
         fr = b[0]; to = b[1]
-        bnew = [(fr[0],arr.shape[0]-fr[1]),(to[0],arr.shape[0]-to[1])]
-        draw.rectangle(bnew,outline=colors[0])
-    plt.imshow(im)
+        
+        # Transform y-coordinates for Pillow
+        y0_transformed = arr.shape[0] - fr[1]
+        y1_transformed = arr.shape[0] - to[1]
 
+        # Ensure y0 <= y1 for Pillow's rectangle function
+        bnew = [(min(fr[0], to[0]), min(y0_transformed, y1_transformed)),
+                (max(fr[0], to[0]), max(y0_transformed, y1_transformed))]
+        
+        draw.rectangle(bnew, outline=colors[0])
+    plt.imshow(im)
+    
 def eval(x, H, edges):
     i=np.argmax(x[0]<edges[0])
     j=np.argmax(x[1]<edges[1])
@@ -98,11 +106,11 @@ box = [(110,0),(200,20)]
 bins = (8,8,8)
 bim = get_pixels(box, im)
 bnim = np.reshape(bim, (bim.shape[0]*bim.shape[1], 3))
-H, edges = np.histogramdd(bnim, bins=bins, normed=True, range=[(0,255),(0,255),(0,255)])
+H, edges = np.histogramdd(bnim, bins=bins, density=True, range=[(0,255),(0,255),(0,255)])
 imm = np.array(im)
 nim = np.reshape(imm, (imm.shape[0]*imm.shape[1], 3))
 e = map(lambda x: eval(x, H, edges), nim)
-ee = np.array(e)
+ee = np.array(list(e)) 
 ee = np.log(ee + 1e-10)
 imm2 = np.array(im)
 nim2 = np.reshape(imm2, (imm2.shape[0]*imm2.shape[1], 3))
@@ -120,6 +128,7 @@ plt.savefig('vision_70road_07.png')
 ```
 
 ![](vision_70road_07.png)
+
 ![](vision_70road_06.png)
 
 Fena değil; yol ortasındaki direkler yol sayılmadı, ve genel olarak yolun
@@ -193,7 +202,7 @@ düzeltme işlemleri KF matematiğinin içinde oluyor tabii. Şimdi ardı ardın
 üç resim üzerinde KF güncelleme kodunu görelim,
 
 ```python
-import sys; sys.path.append('../../tser/tser_kf')
+import sys; sys.path.append('../../tser/tser_083_kf')
 import kalman
 from PIL import Image, ImageDraw
 import pandas as pd, zipfile
@@ -226,18 +235,18 @@ with zipfile.ZipFile('mitte.zip', 'r') as zz:
         im = Image.open(zz.open(f)).convert('HSV')      
         boxes2 = []
         for (ylev, bwidth, bhight) in boxes:
-    	    boxes2.append(((rcurve(ylev,kf)-bwidth, ylev),\
+            boxes2.append(((rcurve(ylev,kf)-bwidth, ylev),\
                            (rcurve(ylev,kf)+bwidth, ylev+bhight)) )
         draw_boxes_color(boxes2, im)
 
         bim = get_pixels(box, im)
         bnim = np.reshape(bim, (bim.shape[0]*bim.shape[1], 3))
-        H, edges = np.histogramdd(bnim, bins=bins, normed=True, 
+        H, edges = np.histogramdd(bnim, bins=bins, density=True, 
                                   range=[(0,255),(0,255),(0,255)])
         imm = np.array(im)
         nim = np.reshape(imm, (imm.shape[0]*imm.shape[1], 3))
         e = map(lambda x: eval(x, H, edges), nim)
-        ee = np.array(e)
+        ee = np.array(list(e))
         ee = np.log(ee + 1e-20)        
 
         f=plt.imshow(im)
@@ -249,7 +258,7 @@ with zipfile.ZipFile('mitte.zip', 'r') as zz:
         for (ylev, bwidth, bhight) in boxes[1:]:
             low_left = (rcurve(ylev,kf)-bwidth, ylev)
             up_right = (rcurve(ylev,kf)+bwidth, ylev+bhight)
-    	    boxes2.append((low_left,up_right))
+            boxes2.append((low_left,up_right))
             mask = (idxs[:,1] >= low_left[0]) & (idxs[:,1] <= up_right[0]) & \
                    (idxs[:,0] >= low_left[1]) & (idxs[:,0] <= up_right[1] )
             mask2 = (ee > -15.0)
