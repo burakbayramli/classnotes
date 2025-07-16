@@ -254,7 +254,7 @@ ek işlemlerimiz sonrası [3].
 
 ```python
 import pandas as pd, zipfile
-with zipfile.ZipFile('/opt/Downloads/hidalgo.zip', 'r') as z:
+with zipfile.ZipFile('/opt/Downloads/skdata/hidalgo.zip', 'r') as z:
       df =  pd.read_csv(z.open('hidalgo.csv'),sep='\t')
       gdp =  pd.read_csv(z.open('gdp1416.csv'),sep=',',index_col=0)
       hs =  pd.read_csv(z.open('hs.csv'),sep='|')

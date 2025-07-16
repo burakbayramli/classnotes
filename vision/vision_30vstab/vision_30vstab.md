@@ -278,7 +278,7 @@ düzeltiyoruz.
 ```python
 import cv2, numpy as np, pandas as pd
 
-fin = "/opt/Downloads/bwalk1.mp4"
+fin = "/opt/Downloads/skdata/bwalk1.mp4"
 
 cap = cv2.VideoCapture(fin)
 N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

@@ -124,7 +124,7 @@ import cv2
 
 dim = 3
 if __name__ == "__main__":    
-    fin = "/opt/Downloads/chessb-right.avi"
+    fin = "/opt/Downloads/skdata/chessb-right.avi"
     cap = cv2.VideoCapture(fin)
     N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -216,7 +216,7 @@ from PF import *
 dim = 3
 if __name__ == "__main__":    
 
-    fin = "/opt/Downloads/chessb-right.avi"
+    fin = "/opt/Downloads/skdata/chessb-right.avi"
     cap = cv2.VideoCapture(fin)
     N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 

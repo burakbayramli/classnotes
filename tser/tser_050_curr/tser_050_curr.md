@@ -31,7 +31,7 @@ import pandas as pd, os, sys
 from scipy import io as spio
 
 cols = ['tday','cl','lo','hi','hhmm','op']
-base = "/opt/Downloads"
+base = "/opt/Downloads/skdata"
 a = spio.loadmat(base + '/inputData_USDCAD_20120426.mat')
 usdcad = pd.concat([pd.DataFrame(a[x]) for x in cols], axis=1)
 usdcad.columns = cols

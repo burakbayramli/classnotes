@@ -80,7 +80,7 @@ from mpl_toolkits.mplot3d import axes3d
 import scipy.linalg as lin
 import cv2
 
-dir = "/opt/Downloads"
+dir = "/opt/Downloads/skdata"
 img1 = cv2.imread(dir + "/alcatraz1.jpg")
 img2 = cv2.imread(dir + "/alcatraz2.jpg")
 

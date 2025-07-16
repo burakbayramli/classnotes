@@ -8,7 +8,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-dir = "/opt/Downloads"
+dir = "/opt/Downloads/skdata"
 extract_data = np.fromfile(dir + "/fm1.dat",dtype="uint8")
 interleavedData = extract_data[0::2] + 1j*extract_data[1::2]
 ```
