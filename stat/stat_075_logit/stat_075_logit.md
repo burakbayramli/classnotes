@@ -16,7 +16,7 @@ labels = df['labels']
 print (df[['x','y','labels']][:10])
 ```
 
-```
+```text
           x          y  labels
 0 -0.017612  14.053064       0
 1 -1.395634   4.662541       1
@@ -86,7 +86,7 @@ x = sympy.Symbol('x')
 print (sympy.integrate('1/(1+exp(-x))'))
 ```
 
-```
+```text
 x + log(1 + exp(-x))
 ```
 
@@ -111,7 +111,7 @@ print (np.log (1+np.exp(-np.inf)))
 print (np.log(1+np.exp(np.inf)))
 ```
 
-```
+```text
 0.0
 inf
 ```
@@ -368,10 +368,9 @@ theta = np.array(grad_ascent(np.array(data),np.array(labels).T ))
 print (theta.T)
 ```
 
-```
+```text
 [[ 4.12414349  0.48007329 -0.6168482 ]]
 ```
-
 
 ```python
 def plot_theta(theta):
@@ -424,7 +423,7 @@ theta = np.array(stoc_grad_ascent0(np.array(data),np.array(labels).T ))
 print (theta.T)
 ```
 
-```
+```text
 [[ 1.01702007  0.85914348 -0.36579921]]
 ```
 
@@ -467,8 +466,8 @@ theta = np.array(stoc_grad_ascent1(np.array(data),np.array(labels).T ))
 print (theta.T)
 ```
 
-```
-[[ 14.67440542   1.30317067  -2.08702677]]
+```text
+[[14.17364891  1.43777759 -2.07314246]]
 ```
 
 ```python
@@ -494,8 +493,9 @@ print (sigmoid(np.dot(np.array(pt), theta)), )
 print ('label =',labels[15])
 ```
 
-```
-[ 0.99999653] label = 1
+```text
+[0.99999506]
+label = 1
 ```
 
 Oldukça yüksek bir olasılık çıktı, ve hakikaten de o noktanın gerçek değeri 1
@@ -528,11 +528,11 @@ p = 0.7; print (logit(p))
 p = 0.99999; print (logit(p))
 ```
 
-```
--2.19722457734
+```text
+-2.197224577336219
 0.0
-0.847297860387
-11.5129154649
+0.8472978603872034
+11.51291546492478
 ```
 
 Sigmoid bunun tam tersidir, $-\infty,\infty$ arasındaki bir değeri (0,1) arasına
@@ -581,12 +581,12 @@ df2 = df[df['year'] == 1992]
 print (df2[:4])
 ```
 
-```
+```text
        year  female  income  black  presvote2
-32093  1992       1       4      0          1
-32094  1992       1       2      0          1
-32096  1992       1       1      1          0
-32097  1992       0       2      0          1
+32093  1992     1.0     4.0    0.0        1.0
+32094  1992     1.0     2.0    0.0        1.0
+32096  1992     1.0     1.0    1.0        0.0
+32097  1992     0.0     2.0    0.0        1.0
 ```
 
 ```python
@@ -597,7 +597,7 @@ mdlmf = mdlm.fit()
 print(mdlmf.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.661553
          Iterations 5
@@ -606,15 +606,15 @@ Optimization terminated successfully.
 Dep. Variable:              presvote2   No. Observations:                 1207
 Model:                          Logit   Df Residuals:                     1205
 Method:                           MLE   Df Model:                            1
-Date:                Mon, 23 Feb 2015   Pseudo R-squ.:                 0.02134
-Time:                        09:01:08   Log-Likelihood:                -798.49
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.02134
+Time:                        10:29:51   Log-Likelihood:                -798.49
 converged:                       True   LL-Null:                       -815.91
-                                        LLR p-value:                 3.598e-09
+Covariance Type:            nonrobust   LLR p-value:                 3.598e-09
 ==============================================================================
-                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                 coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept     -1.3863      0.187     -7.400      0.000        -1.754    -1.019
-income         0.3245      0.056      5.775      0.000         0.214     0.435
+Intercept     -1.3863      0.187     -7.400      0.000      -1.754      -1.019
+income         0.3245      0.056      5.775      0.000       0.214       0.435
 ==============================================================================
 ```
 
@@ -699,29 +699,29 @@ mdlmf = mdlm.fit()
 print (np.vstack((mdlmf.params.index, mdlmf.params,mdlmf.bse)).T)
 ```
 
-```
+```text
 coefs error
 Optimization terminated successfully.
          Current function value: 0.685646
          Iterations 5
-[['Intercept' -0.15937090803207216 0.22525976274228318]
- ['female' 0.23863850517270727 0.1365775569712597]
- ['black' -1.0585625868981525 0.3621668012097297]
- ['income' 0.03122275696614234 0.06237925936065817]]
+[['Intercept' -0.15937090803207044 0.2252597627422937]
+ ['female' 0.23863850517270663 0.13657755697125967]
+ ['black' -1.0585625868981527 0.3621668012097301]
+ ['income' 0.031222756966141935 0.06237925936066139]]
 Warning: Maximum number of iterations has been exceeded.
          Current function value: 0.590399
          Iterations: 35
-[['Intercept' -1.1551333142403977 0.21592167898447412]
- ['female' -0.07918311120690241 0.1361066805886836]
- ['black' -26.62869325566435 93069.88953763059]
- ['income' 0.190103316020662 0.05839253555236441]]
+[['Intercept' -1.1551333142403983 0.21592167898447617]
+ ['female' -0.07918311120690243 0.1361066805886843]
+ ['black' -26.628693255659098 93069.8895373862]
+ ['income' 0.19010331602066227 0.05839253555236447]]
 Optimization terminated successfully.
          Current function value: 0.626797
          Iterations 7
-[['Intercept' 0.47889431087596257 0.24427421556953816]
- ['female' -0.03135633331713884 0.1481293019619361]
- ['black' -3.6417024852622455 0.5946042228547078]
- ['income' -0.02613777851523365 0.06740777911367761]]
+[['Intercept' 0.47889431087596207 0.2442742155695298]
+ ['female' -0.03135633331713915 0.148129301961935]
+ ['black' -3.6417024852622455 0.5946042228547077]
+ ['income' -0.0261377785152334 0.06740777911367574]]
 ```
 
 1964 yılında siyahi (black) seçmenlerin oylarına ne oldu? Üstteki analizde
@@ -760,7 +760,7 @@ df = read_csv('wells.dat', sep = ' ', header = 0, index_col = 0)
 print (df.head())
 ```
 
-```
+```text
    switch  arsenic       dist  assoc  educ
 1       1     2.36  16.826000      0     0
 2       1     0.71  47.321999      0     0
@@ -778,7 +778,7 @@ model1 = logit("switch ~ dist", df).fit()
 print (model1.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.674874
          Iterations 4
@@ -787,15 +787,15 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3018
 Method:                           MLE   Df Model:                            1
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.01017
-Time:                        21:25:34   Log-Likelihood:                -2038.1
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.01017
+Time:                        10:30:19   Log-Likelihood:                -2038.1
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 9.798e-11
+Covariance Type:            nonrobust   LLR p-value:                 9.798e-11
 ==============================================================================
-                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                 coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept      0.6060      0.060     10.047      0.000         0.488     0.724
-dist          -0.0062      0.001     -6.383      0.000        -0.008    -0.004
+Intercept      0.6060      0.060     10.047      0.000       0.488       0.724
+dist          -0.0062      0.001     -6.383      0.000      -0.008      -0.004
 ==============================================================================
 ```
 
@@ -819,7 +819,7 @@ model1 = logit('switch ~I(dist/100.)', df).fit()
 print (model1.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.674874
          Iterations 4
@@ -828,15 +828,15 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3018
 Method:                           MLE   Df Model:                            1
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.01017
-Time:                        21:25:40   Log-Likelihood:                -2038.1
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.01017
+Time:                        10:30:29   Log-Likelihood:                -2038.1
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 9.798e-11
+Covariance Type:            nonrobust   LLR p-value:                 9.798e-11
 ==================================================================================
-                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                     coef    std err          z      P>|z|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-Intercept          0.6060      0.060     10.047      0.000         0.488     0.724
-I(dist / 100.)    -0.6219      0.097     -6.383      0.000        -0.813    -0.431
+Intercept          0.6060      0.060     10.047      0.000       0.488       0.724
+I(dist / 100.)    -0.6219      0.097     -6.383      0.000      -0.813      -0.431
 ==================================================================================
 ```
 
@@ -897,7 +897,7 @@ model2 = logit('switch ~ I(dist / 100.) + arsenic', df).fit()
 print (model2.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.650773
          Iterations 5
@@ -906,16 +906,16 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3017
 Method:                           MLE   Df Model:                            2
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.04551
-Time:                        21:25:48   Log-Likelihood:                -1965.3
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.04551
+Time:                        10:30:45   Log-Likelihood:                -1965.3
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 1.995e-41
+Covariance Type:            nonrobust   LLR p-value:                 1.995e-41
 ==================================================================================
-                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                     coef    std err          z      P>|z|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-Intercept          0.0027      0.079      0.035      0.972        -0.153     0.158
-I(dist / 100.)    -0.8966      0.104     -8.593      0.000        -1.101    -0.692
-arsenic            0.4608      0.041     11.134      0.000         0.380     0.542
+Intercept          0.0027      0.079      0.035      0.972      -0.153       0.158
+I(dist / 100.)    -0.8966      0.104     -8.593      0.000      -1.101      -0.692
+arsenic            0.4608      0.041     11.134      0.000       0.380       0.542
 ==================================================================================
 ```
 
@@ -932,17 +932,17 @@ ortalama noktasında bir kısmi olasılık hesabı yapalım.
 print (model2.get_margeff(at = 'mean').summary())
 ```
 
-```
+```text
         Logit Marginal Effects       
 =====================================
 Dep. Variable:                 switch
 Method:                          dydx
 At:                              mean
 ==================================================================================
-                    dy/dx    std err          z      P>|z|      [95.0% Conf. Int.]
+                    dy/dx    std err          z      P>|z|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-I(dist / 100.)    -0.2181      0.025     -8.598      0.000        -0.268    -0.168
-arsenic            0.1121      0.010     11.217      0.000         0.092     0.132
+I(dist / 100.)    -0.2181      0.025     -8.598      0.000      -0.268      -0.168
+arsenic            0.1121      0.010     11.217      0.000       0.092       0.132
 ==================================================================================
 ```
 
@@ -1006,7 +1006,7 @@ model3 = logit('switch ~ I(dist / 100.) + arsenic + I(dist / 100.):arsenic', df)
 print (model3.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.650270
          Iterations 5
@@ -1015,17 +1015,17 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3016
 Method:                           MLE   Df Model:                            3
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.04625
-Time:                        21:26:26   Log-Likelihood:                -1963.8
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.04625
+Time:                        10:31:07   Log-Likelihood:                -1963.8
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 4.830e-41
+Covariance Type:            nonrobust   LLR p-value:                 4.830e-41
 ==========================================================================================
-                             coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                             coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------------------
-Intercept                 -0.1479      0.118     -1.258      0.208        -0.378     0.083
-I(dist / 100.)            -0.5772      0.209     -2.759      0.006        -0.987    -0.167
-arsenic                    0.5560      0.069      8.021      0.000         0.420     0.692
-I(dist / 100.):arsenic    -0.1789      0.102     -1.748      0.080        -0.379     0.022
+Intercept                 -0.1479      0.118     -1.258      0.208      -0.378       0.083
+I(dist / 100.)            -0.5772      0.209     -2.759      0.006      -0.987      -0.167
+arsenic                    0.5560      0.069      8.021      0.000       0.420       0.692
+I(dist / 100.):arsenic    -0.1789      0.102     -1.748      0.080      -0.379       0.022
 ==========================================================================================
 ```
 
@@ -1060,7 +1060,7 @@ model4 = logit(model_form, df).fit()
 print (model4.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.644328
          Iterations 5
@@ -1069,20 +1069,20 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3013
 Method:                           MLE   Df Model:                            6
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.05497
-Time:                        21:27:19   Log-Likelihood:                -1945.9
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.05497
+Time:                        10:31:20   Log-Likelihood:                -1945.9
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 4.588e-46
+Covariance Type:            nonrobust   LLR p-value:                 4.588e-46
 ===============================================================================================================
-                                                  coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                                                  coef    std err          z      P>|z|      [0.025      0.975]
 ---------------------------------------------------------------------------------------------------------------
-Intercept                                       0.3563      0.040      8.844      0.000         0.277     0.435
-center(I(dist / 100.))                         -0.9029      0.107     -8.414      0.000        -1.113    -0.693
-center(arsenic)                                 0.4950      0.043     11.497      0.000         0.411     0.579
-center(I(educ / 4.))                            0.1850      0.039      4.720      0.000         0.108     0.262
-center(I(dist / 100.)):center(arsenic)         -0.1177      0.104     -1.137      0.256        -0.321     0.085
-center(I(dist / 100.)):center(I(educ / 4.))     0.3227      0.107      3.026      0.002         0.114     0.532
-center(arsenic):center(I(educ / 4.))            0.0722      0.044      1.647      0.100        -0.014     0.158
+Intercept                                       0.3563      0.040      8.844      0.000       0.277       0.435
+center(I(dist / 100.))                         -0.9029      0.107     -8.414      0.000      -1.113      -0.693
+center(arsenic)                                 0.4950      0.043     11.497      0.000       0.411       0.579
+center(I(educ / 4.))                            0.1850      0.039      4.720      0.000       0.108       0.262
+center(I(dist / 100.)):center(arsenic)         -0.1177      0.104     -1.137      0.256      -0.321       0.085
+center(I(dist / 100.)):center(I(educ / 4.))     0.3227      0.107      3.026      0.002       0.114       0.532
+center(arsenic):center(I(educ / 4.))            0.0722      0.044      1.647      0.100      -0.014       0.158
 ===============================================================================================================
 ```
 
@@ -1177,7 +1177,7 @@ model5 = logit(model_form, df).fit()
 print (model5.summary())
 ```
 
-```
+```text
 Optimization terminated successfully.
          Current function value: 0.639587
          Iterations 5
@@ -1186,20 +1186,20 @@ Optimization terminated successfully.
 Dep. Variable:                 switch   No. Observations:                 3020
 Model:                          Logit   Df Residuals:                     3013
 Method:                           MLE   Df Model:                            6
-Date:                Wed, 20 May 2015   Pseudo R-squ.:                 0.06192
-Time:                        21:26:41   Log-Likelihood:                -1931.6
+Date:                Thu, 17 Jul 2025   Pseudo R-squ.:                 0.06192
+Time:                        10:31:40   Log-Likelihood:                -1931.6
 converged:                       True   LL-Null:                       -2059.0
-                                        LLR p-value:                 3.517e-52
+Covariance Type:            nonrobust   LLR p-value:                 3.517e-52
 ==================================================================================================================
-                                                     coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                                                     coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------------------------------------------
-Intercept                                          0.3452      0.040      8.528      0.000         0.266     0.425
-center(I(dist / 100.))                            -0.9796      0.111     -8.809      0.000        -1.197    -0.762
-center(np.log(arsenic))                            0.9036      0.070     12.999      0.000         0.767     1.040
-center(I(educ / 4.))                               0.1785      0.039      4.577      0.000         0.102     0.255
-center(I(dist / 100.)):center(np.log(arsenic))    -0.1567      0.185     -0.846      0.397        -0.520     0.206
-center(I(dist / 100.)):center(I(educ / 4.))        0.3384      0.108      3.141      0.002         0.127     0.550
-center(np.log(arsenic)):center(I(educ / 4.))       0.0601      0.070      0.855      0.393        -0.078     0.198
+Intercept                                          0.3452      0.040      8.528      0.000       0.266       0.425
+center(I(dist / 100.))                            -0.9796      0.111     -8.809      0.000      -1.197      -0.762
+center(np.log(arsenic))                            0.9036      0.070     12.999      0.000       0.767       1.040
+center(I(educ / 4.))                               0.1785      0.039      4.577      0.000       0.102       0.255
+center(I(dist / 100.)):center(np.log(arsenic))    -0.1567      0.185     -0.846      0.397      -0.520       0.206
+center(I(dist / 100.)):center(I(educ / 4.))        0.3384      0.108      3.141      0.002       0.127       0.550
+center(np.log(arsenic)):center(I(educ / 4.))       0.0601      0.070      0.855      0.393      -0.078       0.198
 ==================================================================================================================
 ```
 
@@ -1247,9 +1247,9 @@ print ('Null Error Rate: {0: 3.0%}'.format(
     1 - df['switch'].mean()))
 ```
 
-```
-[[  568.   715.]
- [  387.  1350.]]
+```text
+[[ 568.  715.]
+ [ 387. 1350.]]
 Model Error rate:  36%
 Null Error Rate:  42%
 ```
@@ -1265,18 +1265,18 @@ resid_df = DataFrame({'var': df['arsenic'], 'resid': model4.df_resid})
 print (resid_df[:10])
 ```
 
-```
-    resid   var
-1    3013  2.36
-2    3013  0.71
-3    3013  2.07
-4    3013  1.15
-5    3013  1.10
-6    3013  3.90
-7    3013  2.97
-8    3013  3.24
-9    3013  3.28
-10   3013  2.52
+```text
+     var   resid
+1   2.36  3013.0
+2   0.71  3013.0
+3   2.07  3013.0
+4   1.15  3013.0
+5   1.10  3013.0
+6   3.90  3013.0
+7   2.97  3013.0
+8   3.24  3013.0
+9   3.28  3013.0
+10  2.52  3013.0
 ```
 
 Şimdi 40 tane dağılım bölgesi yaratalım
@@ -1285,42 +1285,23 @@ print (resid_df[:10])
 print (qcut(df['arsenic'], 40))
 ```
 
-```
-1      (2.327, 2.47]
-2       (0.68, 0.71]
-3      (1.953, 2.07]
-4        (1.1, 1.15]
-5      (1.0513, 1.1]
-6     (3.791, 4.475]
-7       (2.81, 2.98]
-8       (3.21, 3.42]
-9       (3.21, 3.42]
-10      (2.47, 2.61]
-11      (2.98, 3.21]
-12      (2.98, 3.21]
-13      (2.81, 2.98]
-14      (2.98, 3.21]
-15      (1.66, 1.76]
-...
-3006      (0.64, 0.68]
-3007     (2.327, 2.47]
-3008      (0.71, 0.75]
-3009       (1.25, 1.3]
-3010      (0.71, 0.75]
-3011      (0.56, 0.59]
-3012    (0.95, 1.0065]
-3013       (0.86, 0.9]
-3014      [0.51, 0.53]
-3015    (0.95, 1.0065]
-3016      [0.51, 0.53]
-3017     (1.0513, 1.1]
-3018      [0.51, 0.53]
-3019      (0.62, 0.64]
-3020      (0.64, 0.68]
+```text
+1       (2.327, 2.47]
+2        (0.68, 0.71]
+3       (1.953, 2.07]
+4         (1.1, 1.15]
+5        (1.051, 1.1]
+            ...      
+3016    (0.509, 0.53]
+3017     (1.051, 1.1]
+3018    (0.509, 0.53]
+3019     (0.62, 0.64]
+3020     (0.64, 0.68]
 Name: arsenic, Length: 3020, dtype: category
-Categories (40, object): [[0.51, 0.53] < (0.53, 0.56] < (0.56, 0.59] <
-(0.59, 0.62] ... (3.21, 3.42] 
-                          < (3.42, 3.791] < (3.791, 4.475] < (4.475, 9.65]] 
+Categories (40, interval[float64, right]):
+[(0.509, 0.53] < (0.53, 0.56] < (0.56, 0.59] <
+(0.59, 0.62] ... (3.21, 3.42] < (3.42, 3.79] <
+(3.79, 4.475] < (4.475, 9.65]]
 ```
 
 Görüldüğü gibi bölgeler bir obje aslında ve içinde levels diye bir değişkeni
@@ -1330,8 +1311,11 @@ var. Ayrıca labels diye bir değişken de var,
 print (qcut(df['arsenic'], 40).index)
 ```
 
-```
-[31  6 28 ...,  0  4  5]
+```text
+Index([   1,    2,    3,    4,    5,    6,    7,    8,    9,   10,
+       ...
+       3011, 3012, 3013, 3014, 3015, 3016, 3017, 3018, 3019, 3020],
+      dtype='int64', length=3020)
 ```
 
 ki bu değişken içinde hangi noktanın hangi olasılık bölgesine ait olduğunun
@@ -1341,8 +1325,8 @@ ataması var. Mesela 2. nokta 6. bölgeye aitmiş, bu bölge hangisi?
 print (qcut(df['arsenic'], 40)[6])
 ```
 
-```
-(0.68, 0.71]
+```text
+(3.79, 4.475]
 ```
 
 Şimdi şöyle bir atama yaparsak, yani qcut sonucunu direk olduğu gibi
@@ -1355,18 +1339,18 @@ resid_df['bins'] = qcut(df['arsenic'], 40)
 print (resid_df[:10])
 ```
 
-```
-       resid   var            bins
-1   0.842596  2.36   (2.327, 2.47]
-2   1.281417  0.71    (0.68, 0.71]
-3  -1.613751  2.07   (1.953, 2.07]
-4   0.996195  1.15     (1.1, 1.15]
-5   1.005102  1.10   (1.0513, 1.1]
-6   0.592056  3.90  (3.791, 4.475]
-7   0.941372  2.97    (2.81, 2.98]
-8   0.640139  3.24    (3.21, 3.42]
-9   0.886626  3.28    (3.21, 3.42]
-10  1.130149  2.52    (2.47, 2.61]
+```text
+     var   resid           bins
+1   2.36  3013.0  (2.327, 2.47]
+2   0.71  3013.0   (0.68, 0.71]
+3   2.07  3013.0  (1.953, 2.07]
+4   1.15  3013.0    (1.1, 1.15]
+5   1.10  3013.0   (1.051, 1.1]
+6   3.90  3013.0  (3.79, 4.475]
+7   2.97  3013.0   (2.81, 2.98]
+8   3.24  3013.0   (3.21, 3.42]
+9   3.28  3013.0   (3.21, 3.42]
+10  2.52  3013.0   (2.47, 2.61]
 ```
 
 Üstte hakikaten bakıyoruz ki 2. nokta var=`0.71` doğru aralık olan
@@ -1473,31 +1457,32 @@ print ('BIC', model.bic)
 print ('AIC', model.aic)
 ```
 
-```
+```text
                  Generalized Linear Model Regression Results                  
 ==============================================================================
 Dep. Variable:                   card   No. Observations:                 1312
 Model:                            GLM   Df Residuals:                     1304
 Model Family:                Binomial   Df Model:                            7
-Link Function:                  logit   Scale:                             1.0
+Link Function:                  Logit   Scale:                          1.0000
 Method:                          IRLS   Log-Likelihood:                -69.895
-Date:                Thu, 21 May 2015   Deviance:                       139.79
-Time:                        10:14:51   Pearson chi2:                     247.
-No. Iterations:                    13                                         
+Date:                Thu, 17 Jul 2025   Deviance:                       139.79
+Time:                        10:33:03   Pearson chi2:                     247.
+No. Iterations:                    11   Pseudo R-squ. (CS):             0.6169
+Covariance Type:            nonrobust                                         
 ================================================================================
-                   coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                   coef    std err          z      P>|z|      [0.025      0.975]
 --------------------------------------------------------------------------------
-Intercept       21.4739      3.674      5.844      0.000        14.272    28.675
-log_reports1    -2.9086      1.098     -2.650      0.008        -5.060    -0.757
-income           0.9033      0.190      4.760      0.000         0.531     1.275
-log_share        3.4230      0.530      6.452      0.000         2.383     4.463
-age              0.0227      0.022      1.036      0.300        -0.020     0.066
-owner            0.7052      0.533      1.323      0.186        -0.340     1.750
-dependents      -0.6649      0.267     -2.487      0.013        -1.189    -0.141
-months          -0.0057      0.004     -1.435      0.151        -0.014     0.002
+Intercept       21.4739      3.674      5.844      0.000      14.272      28.675
+log_reports1    -2.9086      1.098     -2.650      0.008      -5.060      -0.757
+income           0.9033      0.190      4.760      0.000       0.531       1.275
+log_share        3.4230      0.530      6.452      0.000       2.383       4.463
+age              0.0227      0.022      1.036      0.300      -0.020       0.066
+owner            0.7052      0.533      1.323      0.186      -0.340       1.750
+dependents      -0.6649      0.267     -2.487      0.013      -1.189      -0.141
+months          -0.0057      0.004     -1.435      0.151      -0.014       0.002
 ================================================================================
-BIC -9222.02662057
-AIC 155.790971664
+BIC -9222.026620568784
+AIC 155.79097166447676
 ```
 
 Değişken `reports` ve `share` transforme edilmemiş hali,
@@ -1513,31 +1498,32 @@ print ('BIC', model2.bic)
 print ('AIC', model2.aic)
 ```
 
-```
+```text
                  Generalized Linear Model Regression Results                  
 ==============================================================================
 Dep. Variable:                   card   No. Observations:                 1312
 Model:                            GLM   Df Residuals:                     1304
 Model Family:                Binomial   Df Model:                            7
-Link Function:                  logit   Scale:                             1.0
-Method:                          IRLS   Log-Likelihood:                    nan
-Date:                Thu, 21 May 2015   Deviance:                       142.88
-Time:                        10:14:59   Pearson chi2:                     229.
-No. Iterations:                    18                                         
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -71.440
+Date:                Thu, 17 Jul 2025   Deviance:                       142.88
+Time:                        10:33:12   Pearson chi2:                     229.
+No. Iterations:                    16   Pseudo R-squ. (CS):             0.6160
+Covariance Type:            nonrobust                                         
 ==============================================================================
-                 coef    std err          z      P>|z|      [95.0% Conf. Int.]
+                 coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept     -4.5817      0.859     -5.334      0.000        -6.265    -2.898
-reports       -2.0253      0.900     -2.249      0.024        -3.790    -0.261
-income         0.3850      0.133      2.884      0.004         0.123     0.647
-share       2966.3111    587.349      5.050      0.000      1815.128  4117.495
-age            0.0174      0.022      0.801      0.423        -0.025     0.060
-owner          0.5966      0.526      1.135      0.256        -0.434     1.627
-dependents    -0.6130      0.249     -2.457      0.014        -1.102    -0.124
-months        -0.0046      0.004     -1.201      0.230        -0.012     0.003
+Intercept     -4.5817      0.859     -5.334      0.000      -6.265      -2.898
+reports       -2.0253      0.900     -2.249      0.024      -3.790      -0.261
+income         0.3850      0.133      2.884      0.004       0.123       0.647
+share       2966.3111    587.346      5.050      0.000    1815.133    4117.489
+age            0.0174      0.022      0.801      0.423      -0.025       0.060
+owner          0.5966      0.526      1.135      0.256      -0.434       1.627
+dependents    -0.6130      0.249     -2.457      0.014      -1.102      -0.124
+months        -0.0046      0.004     -1.201      0.230      -0.012       0.003
 ==============================================================================
-BIC -9218.93777391
-AIC nan
+BIC -9218.937773905445
+AIC 158.8798183278164
 ```
 
 Görüldüğü gibi `share` katsayısı oldukça büyük, ve bu modelde modelin
