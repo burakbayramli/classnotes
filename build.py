@@ -225,6 +225,7 @@ if __name__ == "__main__":
     
     elif sys.argv[1] == "push":
         frdirs, todirs = copy_files_and_dirs(fr, to, ".git,.pdf,zwork")
+        shutil.copy(".gitignore", to + "/.gitignore")         
         os.chdir(to)
         title_sci(to)
         for topdir in dirs:
