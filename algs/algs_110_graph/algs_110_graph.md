@@ -81,6 +81,11 @@ print (cliques)
 
 Üçlü Gruplar (Triad)
 
+Birbirine bağlı üç düğüm bir üçlü grup oluşturabilir. Üçlü grupların
+ikili gruplara (dyad) kıyasla kendine has bazı sosyal özellikleri
+olduğu saptanmıştır. Bu tür yapılar çizit analizi ile saptanabilir.
+Üstteki örnek çizit üzerinde,
+
 ```python
 import triadic
 census, node_census = triadic.triadic_census(g)
@@ -246,6 +251,10 @@ Node X: 0.2791
 
 Görüldüğü gibi X'in çıkış derecesi A'dan az olmasına rağmen X'in
 CheiRank değeri A'dan yüksek çıktı.
+
+Kodlar
+
+[triadic.py](triadic.py)
 
 Kaynaklar
 
