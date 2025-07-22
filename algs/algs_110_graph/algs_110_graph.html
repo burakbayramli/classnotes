@@ -163,6 +163,94 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a h
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>net.draw_random(g,ax<span class="op">=</span>axs,with_labels<span class="op">=</span><span class="va">True</span>,font_size<span class="op">=</span><span class="dv">15</span>,width<span class="op">=</span><span class="dv">2</span>,alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;net2.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="net2.png" /></p>
+<p>CheiRank</p>
+<p>PageRank bir çizit yapısındaki art arda etki eden (cascading) geliş
+bağlantı kuvvetini hesaplayabilir. Fakat bazen, eğer tek yönlü bir çizit
+kenarını etki etme bağlamında ele alırsak, en etkili olan bir anlamda
+“çıkış noktası” düğümü, düğümleri bulmak isteyebiliriz. Mesela A düğümü
+B’ye işaret ediyor (onu etkiliyor), o da C’ye işaret ediyor, bu durumda
+A düğümü daha etkilidir, çünkü zincirin başında A vardır, halbuki tek
+adımlık çıkışları sayıyor olsak (<code>out_değree</code> ile) A ve B
+seviyesi aynı olmalıydı.</p>
+<p>Yön değişimine gelince, PageRank gelişleri hesaplar, CheiRank denen
+kavram gidişleri. Bu iki kavram birbirinin zıttıdır, bu sebeple CR için
+çiziti tersine çevirip onun üzerinde PR hesaplayabiliriz.</p>
+<p>Alttaki örnek çizit üzerinde görelim,</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> networkx <span class="im">as</span> nx</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> nx.DiGraph()</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>G.add_edges_from([</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;A&#39;</span>, <span class="st">&#39;C&#39;</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;B&#39;</span>, <span class="st">&#39;D&#39;</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;C&#39;</span>, <span class="st">&#39;E&#39;</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;D&#39;</span>, <span class="st">&#39;F&#39;</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    (<span class="st">&#39;X&#39;</span>, <span class="st">&#39;A&#39;</span>) </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>nodelist <span class="op">=</span> <span class="bu">sorted</span>(G.nodes())</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>adj_matrix <span class="op">=</span> nx.to_numpy_array(G, nodelist<span class="op">=</span>nodelist)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Adjacency Matrix:&quot;</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adj_matrix,<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Original Graph Nodes:&quot;</span>, G.nodes(), <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Original Graph Edges:&quot;</span>, G.edges(), <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>nx.draw(G,with_labels<span class="op">=</span><span class="va">True</span>,node_size<span class="op">=</span><span class="dv">2500</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;net3.jpg&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>Adjacency Matrix:
+[[0. 1. 1. 0. 0. 0. 0.]
+ [0. 0. 0. 1. 0. 0. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]
+ [0. 0. 0. 0. 0. 1. 0.]
+ [0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0.]
+ [1. 0. 0. 0. 0. 0. 0.]] 
+
+Original Graph Nodes: [&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;X&#39;] 
+
+Original Graph Edges: [(&#39;A&#39;, &#39;B&#39;), (&#39;A&#39;, &#39;C&#39;), (&#39;B&#39;, &#39;D&#39;), (&#39;C&#39;, &#39;D&#39;), (&#39;C&#39;, &#39;E&#39;), (&#39;D&#39;, &#39;F&#39;), (&#39;X&#39;, &#39;A&#39;)] 
+</code></pre>
+<p><img src="net3.jpg" /></p>
+<p>Tersine cevirip PR hesaplayalim,</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>G_reversed <span class="op">=</span> G.reverse()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Ters çevrilmiş çizit dügümleri:&quot;</span>, G_reversed.nodes())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Ters çevrilmiş çizit kenarları:&quot;</span>, G_reversed.edges())</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>pagerank_reversed <span class="op">=</span> nx.pagerank(G_reversed)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Çıkış derecesi (out-degrees):&quot;</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> node <span class="kw">in</span> <span class="bu">sorted</span>(G.nodes()):</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Node </span><span class="sc">{</span>node<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>G<span class="sc">.</span>out_degree(node)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>pagerank_reversed <span class="op">=</span> nx.pagerank(G_reversed)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;CheiRank:&quot;</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> node, pr <span class="kw">in</span> <span class="bu">sorted</span>(pagerank_reversed.items()):</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Node </span><span class="sc">{</span>node<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>pr<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Ters çevrilmiş çizit dügümleri: [&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;X&#39;]
+Ters çevrilmiş çizit kenarları: [(&#39;A&#39;, &#39;X&#39;), (&#39;B&#39;, &#39;A&#39;), (&#39;C&#39;, &#39;A&#39;), (&#39;D&#39;, &#39;B&#39;), (&#39;D&#39;, &#39;C&#39;), (&#39;E&#39;, &#39;C&#39;), (&#39;F&#39;, &#39;D&#39;)]
+Çıkış derecesi (out-degrees):
+Node A: 2
+Node B: 1
+Node C: 2
+Node D: 1
+Node E: 0
+Node F: 0
+Node X: 1
+CheiRank:
+Node A: 0.2633
+Node B: 0.0988
+Node C: 0.1458
+Node D: 0.1023
+Node E: 0.0553
+Node F: 0.0553
+Node X: 0.2791</code></pre>
+<p>Görüldüğü gibi X’in çıkış derecesi A’dan az olmasına rağmen X’in
+CheiRank değeri A’dan yüksek çıktı.</p>
 <p>Kaynaklar</p>
 <p>[1] Kouznetsov, <em>Social Network Analysis for Startups</em></p>
 <p>[2] Bayramli, Lineer Cebir, <em>Google İşleyişi, Ekonomi Teknikleri,

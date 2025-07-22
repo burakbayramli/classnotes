@@ -116,6 +116,111 @@ plt.savefig('net2.jpg')
 
 ![](net2.png)
 
+CheiRank
+
+PageRank bir çizit yapısındaki art arda etki eden (cascading) geliş
+bağlantı kuvvetini hesaplayabilir. Fakat bazen, eğer tek yönlü bir
+çizit kenarını etki etme bağlamında ele alırsak, en etkili olan bir
+anlamda "çıkış noktası" düğümü, düğümleri bulmak isteyebiliriz. Mesela
+A düğümü B'ye işaret ediyor (onu etkiliyor), o da C'ye işaret ediyor,
+bu durumda A düğümü daha etkilidir, çünkü zincirin başında A vardır,
+halbuki tek adımlık çıkışları sayıyor olsak (`out_değree` ile) A ve B
+seviyesi aynı olmalıydı.
+
+Yön değişimine gelince, PageRank gelişleri hesaplar, CheiRank denen
+kavram gidişleri. Bu iki kavram birbirinin zıttıdır, bu sebeple CR
+için çiziti tersine çevirip onun üzerinde PR hesaplayabiliriz.
+
+Alttaki örnek çizit üzerinde görelim,
+
+```python
+import networkx as nx
+
+G = nx.DiGraph()
+G.add_edges_from([
+    ('A', 'B'),
+    ('A', 'C'),
+    ('B', 'D'),
+    ('C', 'D'),
+    ('C', 'E'),
+    ('D', 'F'),
+    ('X', 'A') 
+])
+
+nodelist = sorted(G.nodes())
+adj_matrix = nx.to_numpy_array(G, nodelist=nodelist)
+print("Adjacency Matrix:")
+print(adj_matrix,'\n')
+
+print("Original Graph Nodes:", G.nodes(), '\n')
+print("Original Graph Edges:", G.edges(), '\n')
+
+nx.draw(G,with_labels=True,node_size=2500)
+plt.savefig('net3.jpg')
+```
+
+```text
+Adjacency Matrix:
+[[0. 1. 1. 0. 0. 0. 0.]
+ [0. 0. 0. 1. 0. 0. 0.]
+ [0. 0. 0. 1. 1. 0. 0.]
+ [0. 0. 0. 0. 0. 1. 0.]
+ [0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0. 0.]
+ [1. 0. 0. 0. 0. 0. 0.]] 
+
+Original Graph Nodes: ['A', 'B', 'C', 'D', 'E', 'F', 'X'] 
+
+Original Graph Edges: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('C', 'E'), ('D', 'F'), ('X', 'A')] 
+
+```
+
+![](net3.jpg)
+
+Tersine cevirip PR hesaplayalim,
+
+```python
+G_reversed = G.reverse()
+
+print("Ters çevrilmiş çizit dügümleri:", G_reversed.nodes())
+print("Ters çevrilmiş çizit kenarları:", G_reversed.edges())
+
+pagerank_reversed = nx.pagerank(G_reversed)
+
+print("Çıkış derecesi (out-degrees):")
+for node in sorted(G.nodes()):
+    print(f"Node {node}: {G.out_degree(node)}")
+
+pagerank_reversed = nx.pagerank(G_reversed)
+print("CheiRank:")
+for node, pr in sorted(pagerank_reversed.items()):
+    print(f"Node {node}: {pr:.4f}")
+```
+
+```text
+Ters çevrilmiş çizit dügümleri: ['A', 'B', 'C', 'D', 'E', 'F', 'X']
+Ters çevrilmiş çizit kenarları: [('A', 'X'), ('B', 'A'), ('C', 'A'), ('D', 'B'), ('D', 'C'), ('E', 'C'), ('F', 'D')]
+Çıkış derecesi (out-degrees):
+Node A: 2
+Node B: 1
+Node C: 2
+Node D: 1
+Node E: 0
+Node F: 0
+Node X: 1
+CheiRank:
+Node A: 0.2633
+Node B: 0.0988
+Node C: 0.1458
+Node D: 0.1023
+Node E: 0.0553
+Node F: 0.0553
+Node X: 0.2791
+```
+
+Görüldüğü gibi X'in çıkış derecesi A'dan az olmasına rağmen X'in
+CheiRank değeri A'dan yüksek çıktı.
+
 Kaynaklar
 
 [1] Kouznetsov, *Social Network Analysis for Startups*

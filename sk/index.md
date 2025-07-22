@@ -3,6 +3,8 @@
 
 ## En Son
 
+22e/7 - [Çizit Analizi (Graph Analysis)](https://burakbayramli.github.io/dersblog/algs/algs_110_graph/cizit_analizi__graph_analysis_.html)
+
 14/7 - [Ses Komut Tanıma, Dikkat (Attention) Modeli](https://burakbayramli.github.io/dersblog/sk/2025/07/voice-command-ses-komut.html)
 
 9/7 - [Keras OCR, Hazır YSA Ağırlıkları, Tensorflow](https://burakbayramli.github.io/dersblog/sk/2025/07/tensorflow-keras-ocr.html)
@@ -10,8 +12,6 @@
 2/7 - [Markdown ile PDF ve HTML Üretmek, Pandoc](https://burakbayramli.github.io/dersblog/sk/2025/06/markdown-pandoc-html-pdf.html)
 
 24/6 - [Ubuntu 24, Acer Swift 3](https://burakbayramli.github.io/dersblog/sk/2025/06/ubuntu-24-acer.html)
-
-19/6 - [Diferansiyel Denklemler - Ders 2 - Ekler, Runge-Kutta](https://burakbayramli.github.io/dersblog/ode/ode_mattuck_02/ders_2.html)
 
 ## Konular, Referans
 
