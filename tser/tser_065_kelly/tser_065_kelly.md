@@ -20,8 +20,8 @@ cumret1 = 100.*np.cumprod(1+ret)
 print (float(cumret1.tail(1)))
 ```
 
-```
-3315.34773076
+```text
+3315.3477307627527
 ```
 
 Diğeri ise her elde sadece sabit 5 lira koysun,
@@ -31,7 +31,7 @@ cumret2 = 100 + (5*df.dice).cumsum()
 print (float(cumret2.tail(1)))
 ```
 
-```
+```text
 575.0
 ```
 
@@ -40,11 +40,15 @@ Arada müthiş fark var. Her ikisinin grafiğini basalım,
 ```python
 cumret1.plot(title="Her Elde Sermayenin Yuzde 5'i")
 plt.savefig('tser_kelly_01.png')
+```
+
+![](tser_kelly_01.png)
+
+```python
 cumret2.plot(title='Her Elde 5 Lira')
 plt.savefig('tser_kelly_02.png')
 ```
 
-![](tser_kelly_01.png)
 ![](tser_kelly_02.png)
 
 Her elde hangi oranda para yatırdığımızı bulmak bir optimizasyon problemidir.
@@ -126,8 +130,8 @@ p=0.55;q=1-p;w=1
 print (p-q / w)
 ```
 
-```
-0.1
+```text
+0.10000000000000009
 ```
 
 değeridir. Yani her elde yüzde 10 koymak en iyisi. 
@@ -158,7 +162,7 @@ p=0.45;q=1-p;w=2
 print (p-q / w)
 ```
 
-```
+```text
 0.175
 ```
 
@@ -327,14 +331,14 @@ print ('biriken (kaldiracli) buyume orani', comp_levered_g)
 print ('biriken (kaldiracsiz) buyume orani', comp_unlevered_g)
 ```
 
-```
+```text
 r 0.04
-s 0.169131222871
-artik getiri 0.0723074732694
-sharpe orani 0.427522914113
-kelly orani 2.52775866487
-biriken (kaldiracli) buyume orani 0.131387921046
-biriken (kaldiracsiz) buyume orani 0.0980047879945
+s 0.16904139284296799
+artik getiri 0.0721880290011355
+sharpe orani 0.427043505658966
+kelly orani 2.526265895452427
+biriken (kaldiracli) buyume orani 0.13118307786274966
+biriken (kaldiracsiz) buyume orani 0.09790053275399019
 ```
 
 Dikkat, Kelly oranı $f$ zamandan bağımsızdır (kıyasla Sharpe oranı zamana
@@ -368,7 +372,7 @@ print ('Yila Uyarlanmis Kovaryans Matrisi, C')
 print (C)
 ```
 
-```
+```text
 Yila Uyarlanmis Ortalama Artik Getiriler, M
 oihxret    0.139568
 rkhxret    0.029400
@@ -388,7 +392,7 @@ print ('oih, rkh, rth')
 print (F)
 ```
 
-```
+```text
 oih, rkh, rth
 [ 1.2919082   1.17226473 -1.48821285]
 ```
@@ -403,8 +407,8 @@ g = 0.04+np.dot(np.dot(F.T,C),F/2)
 print (float(g))
 ```
 
-```
-0.152853578984
+```text
+0.15285357898405597
 ```
 
 ```python
@@ -412,8 +416,8 @@ S = np.sqrt(np.dot(np.dot(F.T,C),F))
 print (float(S))
 ```
 
-```
-0.4750864742
+```text
+0.4750864742003417
 ```
 
 Soru
@@ -477,7 +481,7 @@ print ('portfoy', 252000 * 0.90)
 print ('anapara', 100000 * (1. - 0.10*2.52))
 ```
 
-```
+```text
 portfoy 226800.0
 anapara 74800.0
 ```
@@ -491,7 +495,7 @@ küçüldü,
 print (74800*2.82)
 ```
 
-```
+```text
 210936.0
 ```
 
