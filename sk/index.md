@@ -3,7 +3,7 @@
 
 ## En Son
 
-22e/7 - [Çizit Analizi (Graph Analysis)](https://burakbayramli.github.io/dersblog/algs/algs_110_graph/cizit_analizi__graph_analysis_.html)
+22/7 - [Çizit Analizi (Graph Analysis)](https://burakbayramli.github.io/dersblog/algs/algs_110_graph/cizit_analizi__graph_analysis_.html)
 
 14/7 - [Ses Komut Tanıma, Dikkat (Attention) Modeli](https://burakbayramli.github.io/dersblog/sk/2025/07/voice-command-ses-komut.html)
 
