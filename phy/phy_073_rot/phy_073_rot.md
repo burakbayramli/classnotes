@@ -566,6 +566,10 @@ q1 * q2
 Out[1]: Quaternion(real=-8.00, imag=<4.00, 4.00, 8.00>)
 ```
 
+Kodlar
+
+[euclid.py](euclid.py)
+
 Kaynaklar
 
 [1] Dunn, *3D Math Primer for Graphics and Game Development*
