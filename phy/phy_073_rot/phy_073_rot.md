@@ -605,9 +605,9 @@ $$
 Ancak, bu hesaplamanın böyle bir döndürmeyle sonuçlanması hiç de bariz
 değildir. Bu makalede, bu hesaplamanın gerçekten de istenen
 döndürmeyle sonuçlandığını göstereceğiz. Bu, (1)'in Rodrigues'in
-döndürme formülüne eşdeğer olduğunu göstererek yapılacaktır. (1)'in
-döndürmesi Rodrigues'in formülü kullanılarak şu şekilde
-hesaplanabilir:
+döndürme formülüne [8] eşdeğer olduğunu göstererek
+yapılacaktır. (1)'in döndürmesi Rodrigues'in formülü kullanılarak şu
+şekilde hesaplanabilir:
 
 $$
 \vec{v} \cos(\theta) + (\vec{u} \times \vec{v}) \sin(\theta) + \vec{u}(\vec{u} \cdot \vec{v})(1 - \cos(\theta))
@@ -615,9 +615,9 @@ $$
 $$
 
 Denklem (2)'nin neden istediğimiz döndürmeyle sonuçlandığı çok daha
-açıktır (bir türetme için wikipedia'ya bakın). Bu nedenle, (1) ve
-(2)'nin eşdeğerliğini gösterecek ve böylece kuaterniyon döndürmesinin
-beklediğimizi yaptığından emin olacağız.
+açıktır. Bu nedenle, (1) ve (2)'nin eşdeğerliğini gösterecek ve
+böylece kuaterniyon döndürmesinin beklediğimizi yaptığından emin
+olacağız.
 
 Kuaterniyon Çarpımı
 
@@ -707,7 +707,7 @@ $$
 \vec{u}\sin\left(\frac{\theta}{2}\right)\right)
 $$
 
-Denklem (3) çarpımı genişletmek için iki kez kullanılır:
+Denklem (3) çarpımını genişletmek için iki kez kullanılır:
 
 $$
 \mathbf{q} \vec{v} \mathbf{q}^{-1} = \\
@@ -719,24 +719,24 @@ $$
 + \sin\thetatwo{}(\uv\times\vv) \right)
 \left(\cos\left(\frac{\theta}{2}\right) -
 \vec{u}\sin\left(\frac{\theta}{2}\right)\right) = \\
-\color{zerocol}{-\sin\thetatwo{}\cos\thetatwo{} \uv \cdot \vv + \left(
+-\sin\thetatwo{}\cos\thetatwo{} \uv \cdot \vv + \left(
 \cos\thetatwo{}\vv + \sin\thetatwo{}(\uv\times\vv)\right) \cdot
-\left(\uv\sin\thetatwo{}\right)+} \\
-\color{black}{}\left(-\sin\thetatwo{}\uv\cdot\vv\right)\left(-\uv\sin\thetatwo{}\right)+
+\left(\uv\sin\thetatwo{}\right)+ \\
+\left(-\sin\thetatwo{}\uv\cdot\vv\right)\left(-\uv\sin\thetatwo{}\right)+
 \\ \cos\thetatwo{}\left(\cos\thetatwo{}\vv +
 \sin\thetatwo(\uv\times\vv)\right) + \\ \left(\cos\thetatwo{}\vv+
 \sin\thetatwo{}(\uv \times \vv)\right) \times \left(-\uv
 \sin\thetatwo{}\right)
 $$
 
-Mor kısmın sıfıra eşit çıktığına dikkat edin. Bunun nedeni, nokta
-çarpımının toplama altında dağılımıdır ($a \cdot(b +c) = a \cdot b + a
-\cdot c$) ve $(\uv \times \vv) \cdot \uv = 0$ olduğu içindir. Bunun
-nedenini görmek kolaydır: $\uv \times \vv$ vektörü hem $\uv$ hem de
-$\vv$ ye dik bir vektördür. O zaman $(\uv \times \vv) \cdot \uv$
-basitçe birbirine dik olan iki vektörün nokta çarpımıdır. Dolayısıyla,
-bu nokta çarpımı sıfırdır. Geometrik durum aşağıdaki resimde
-gösterilmiştir.
+Üçüncü satırdaki formülün sıfıra eşit çıktığına dikkat edin. Bunun
+nedeni, nokta çarpımının toplama altında dağılımıdır ($a \cdot(b +c) =
+a \cdot b + a \cdot c$) ve $(\uv \times \vv) \cdot \uv = 0$ olduğu
+içindir. Bunun nedenini görmek kolaydır: $\uv \times \vv$ vektörü hem
+$\uv$ hem de $\vv$ ye dik bir vektördür. O zaman $(\uv \times \vv)
+\cdot \uv$ basitçe birbirine dik olan iki vektörün nokta
+çarpımıdır. Dolayısıyla, bu nokta çarpımı sıfırdır. Geometrik durum
+aşağıdaki resimde gösterilmiştir.
 
 ![](crossprod.jpg)
 
@@ -752,7 +752,7 @@ Daha sonra vektör üçlü çarpımı ($\vec{a}\times(\vec{b}\times\vec{c}) = \v
 
 $$\vv\cos(\theta) + (\uv\times\vv)\sin(\theta) + (\uv\cdot\vv)\uv(1 - \cos(\theta)).$$
 
-Ama bu basitçe (2) denklemidir. Ve bununla ispat
+Ama bu (2) denklemi değil midir? Ve bununla spat
 tamamlanmıştır. Kuaterniyon döndürmesinin Rodrigues'in formülüne
 eşdeğer olduğu gösterilmiştir ve bu, kuaterniyon döndürmesinin
 gerçekten de beklediğimizi yaptığı anlamına gelir.
@@ -780,3 +780,6 @@ Kaynaklar
     
 [7] Arneback, *Showing the Correctness of Quaternion Rotation*,
     [https://erkaman.github.io/posts/quaternion_rotation.html](https://erkaman.github.io/posts/quaternion_rotation.html)
+
+[8] Bayramli, Fizik - Döndürme (Rotation) - 1
+
