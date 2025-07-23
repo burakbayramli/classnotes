@@ -104,13 +104,13 @@ $$
 
 $$
 v' = \cos \theta (v - (v \cdot n) n) + \sin \theta (n \times v) + (v \cdot n) n
-\qquad (1)
+\qquad (5)
 $$
 
-Eğer (1) formülünü matris formunda göstermek istiyorsak, baz vektörleri
+Eğer (5) formülünü matris formunda göstermek istiyorsak, baz vektörleri
 $[\begin{array}{ccc} 1 & 0 & 0 \end{array}]^T$,
 $[\begin{array}{ccc} 0 & 1 & 0 \end{array}]^T$,
-$[\begin{array}{ccc} 0 & 0 & 1 \end{array}]^T$ teker teker (1) ile çarpıp
+$[\begin{array}{ccc} 0 & 0 & 1 \end{array}]^T$ teker teker (5) ile çarpıp
 sonuçları bir diğer 3 x 3 matrisin kolonlarına yazabiliriz [1, sf. 143][1, sf. 757], 
 böylece alttaki matrisi elde ederiz,
 
@@ -341,6 +341,17 @@ $$
 p' = q p q^{-1}
 $$
 
+Dikkat, üstteki yöntem üç boyutlu bir gerçek vektörü döndürmek için
+bulunmuştur, reel değere 0 verip diğer x,y,z değerlerini vektörün geri
+kalan yerlerine yazarak aslında bir numara gerçekleştiriyoruz, ki
+kuaterniyon cebiri bu değeri alıp 4 boyutlu uzaya "gömsun" ve onu
+kuaterniyon cebirine dahil edebilsin. Dönüş bu uzayda $q$ çarpımı ile
+gerçekleşiyor, ve bu hesap bitince $q^{-1}$ yani $q$'nun tersi ile
+başlangıç uzayına dönüyoruz.
+
+Üstteki formülün bir vektör dönüşüne eşdeğer olduğunun ispatı bu
+yazının altında bulunabilir.
+
 Kod üzerinde görelim [3],
 
 ```python
@@ -566,6 +577,186 @@ q1 * q2
 Out[1]: Quaternion(real=-8.00, imag=<4.00, 4.00, 8.00>)
 ```
 
+Kuaterniyon Döndürmesinin Doğruluğunu Göstermek
+
+\newcommand{\thetatwo}{\left(\frac{\theta}{2}\right)}
+\newcommand{\vv}{\vec{v}}
+\newcommand{\uv}{\vec{u}}
+\definecolor{zerocol}{RGB}{114,0,172}
+
+Bu makalede [7], kuaterniyon döndürmesinin doğru olduğunu gösteren
+cebirsel bir ispat sunacağız. İyi bilindiği gibi, bir $\vec{v}$
+vektörünü, $\vec{u}$ döndürme ekseni etrafında $\theta$ açısıyla
+kuaterniyonları kullanarak döndürebiliriz. Bu, aşağıdaki hesaplama ile
+yapılır:
+
+$$
+\mathbf{q} \vec{v} \mathbf{q}^{-1}.
+$$
+
+Burada $\mathbf{q}$ bir kuaterniyondur:
+
+$$
+\mathbf{q} = \cos\left(\frac{\theta}{2}\right) +
+\vec{u}\sin\left(\frac{\theta}{2}\right) 
+\qquad (1)
+$$
+
+Ancak, bu hesaplamanın böyle bir döndürmeyle sonuçlanması hiç de bariz
+değildir. Bu makalede, bu hesaplamanın gerçekten de istenen
+döndürmeyle sonuçlandığını göstereceğiz. Bu, (1)'in Rodrigues'in
+döndürme formülüne eşdeğer olduğunu göstererek yapılacaktır. (1)'in
+döndürmesi Rodrigues'in formülü kullanılarak şu şekilde
+hesaplanabilir:
+
+$$
+\vec{v} \cos(\theta) + (\vec{u} \times \vec{v}) \sin(\theta) + \vec{u}(\vec{u} \cdot \vec{v})(1 - \cos(\theta))
+\qquad (2)
+$$
+
+Denklem (2)'nin neden istediğimiz döndürmeyle sonuçlandığı çok daha
+açıktır (bir türetme için wikipedia'ya bakın). Bu nedenle, (1) ve
+(2)'nin eşdeğerliğini gösterecek ve böylece kuaterniyon döndürmesinin
+beklediğimizi yaptığından emin olacağız.
+
+Kuaterniyon Çarpımı
+
+Bir basamak taşı olarak, iki kuaterniyonun çarpımı için bir formül
+gereklidir. İki kuaterniyonun çarpımı şudur:
+
+$$
+(a + b \mathbf{i} + c\mathbf{j} + d\mathbf{k})(e + f \mathbf{i} + g\mathbf{j} +h\mathbf{k}) = \\ (ae + af\mathbf{i} + ag\mathbf{j} + ah\mathbf{k}) + \\ (be\mathbf{i} +bf \mathbf{i}\mathbf{i} + bg \mathbf{i}\mathbf{j} + bh \mathbf{i}\mathbf{k} + \\ (ce\mathbf{j} +cf \mathbf{j}\mathbf{i} + cg \mathbf{j}\mathbf{j} + ch \mathbf{j}\mathbf{k} + \\ (de\mathbf{k} +df \mathbf{k}\mathbf{i} + dg \mathbf{k}\mathbf{j} + dh \mathbf{k}\mathbf{k}
+$$
+
+$\mathbf{i}\mathbf{i}, \mathbf{i}\mathbf{j},
+\mathbf{i}\mathbf{k},\dots$ basitleştirmek mümkündür. Ünlü
+$\mathbf{i}\mathbf{i} = \mathbf{j}\mathbf{j} = \mathbf{k}\mathbf{k} =
+\mathbf{i}\mathbf{j}\mathbf{k} = -1$ gerçeğini hatırlayın. Böylece
+$\mathbf{i}\mathbf{i}$, $\mathbf{j}\mathbf{j}$ ve
+$\mathbf{k}\mathbf{k}$ için basitleştirmeler zaten açıktır. Peki ya
+$\mathbf{i}\mathbf{j}$? Elimzide şunlar var:
+
+$$
+\mathbf{i}\mathbf{j}\mathbf{k} = -1 \\ \mathbf{i}\mathbf{j}\mathbf{k}\mathbf{k} = -\mathbf{k} \\ -\mathbf{i}\mathbf{j} = -\mathbf{k} \\ \mathbf{i}\mathbf{j} = \mathbf{k}.
+$$
+
+Benzer şekilde,
+
+$$
+\mathbf{i}\mathbf{j}\mathbf{k} = -1 \\ \mathbf{i}\mathbf{i}\mathbf{j}\mathbf{k} = -\mathbf{i} \\ \mathbf{j}\mathbf{k} = \mathbf{i}.
+$$
+
+Yukarıdaki gerçeği kullanarak, şunlar çıkar:
+
+$$
+\mathbf{i} = \mathbf{j}\mathbf{k} \\ \mathbf{j}\mathbf{i} = \mathbf{j}\mathbf{j}\mathbf{k} \\ \mathbf{j}\mathbf{i} = -\mathbf{k}.
+$$
+
+Özellikle, $\mathbf{i}\mathbf{j} \neq \mathbf{j}\mathbf{i}$ olduğuna
+dikkat edin. Kalan üç özdeşliği kanıtlamak okuyucuya bir alıştırma
+olarak bırakılmıştır: $\mathbf{k}\mathbf{j} = -\mathbf{i}$,
+$\mathbf{i}\mathbf{k} = -\mathbf{j}$, $\mathbf{k}\mathbf{i} =
+\mathbf{j}$.
+
+Bu özdeşliklerle donanımımızda, kuaterniyon çarpımı önemli ölçüde
+basitleştirilebilir:
+
+$$
+(ae + af\mathbf{i} + ag\mathbf{j} + ah\mathbf{k}) + \\ (be\mathbf{i} +bf \mathbf{i}\mathbf{i} + bg \mathbf{i}\mathbf{j} + bh \mathbf{i}\mathbf{k} + \\ (ce\mathbf{j} +cf \mathbf{j}\mathbf{i} + cg \mathbf{j}\mathbf{j} + ch \mathbf{j}\mathbf{k} + \\ (de\mathbf{k} +df \mathbf{k}\mathbf{i} + dg \mathbf{k}\mathbf{j} + dh \mathbf{k}\mathbf{k} = \\ ae - (bf + cg + dh) + \\ (be + af + ch - dg)\mathbf{i} + \\ (ce + ag + df - bh)\mathbf{j} + \\ (de + ah + bg - cf)\mathbf{k}.
+$$
+
+Bir kuaterniyonu bir skalar ve bir vektörün toplamı olarak düşünmek
+faydalıdır. Örneğin, $a + b \mathbf{i} + c\mathbf{j} + d\mathbf{k}$
+kuaterniyonu basitçe $a$ skalarıdır artı üç boyutlu vektör $b\mathbf{i}
++ c\mathbf{j} + d\mathbf{k}$. Bu gösterim, $b$'nin vektörün
+$x$-bileşeni, $c$'nin $y$-bileşeni vb. olduğu anlamına gelir. Bu
+vektörü $\vec{v} = b\mathbf{i} + c\mathbf{j} + d\mathbf{k}$ olarak
+göstereceğiz, böylece $a + b \mathbf{i} + c\mathbf{j} + d\mathbf{k} =
+a + \vec{v}$ yazabiliriz. Benzer şekilde, $e + f \mathbf{i} +
+g\mathbf{j} +h\mathbf{k} = e + \vec{w}$ yazarız. Şimdi şunları
+gözlemleyin:
+
+$$
+ae - (bf + cg + dh) + \\ (be + af + ch - dg)\mathbf{i} + \\ (ce + ag + df - bh)\mathbf{j} + \\ (de + ah + bg - cf)\mathbf{k} = \\ ae - (bf + cg + dh) + \\ \begin{bmatrix} be + af + ch - dg \\ ce + ag + df - bh \\ de + ah + bg - cf \end{bmatrix} = \\ ae - (bf + cg + dh) + e\begin{bmatrix} b \\ c \\ d \end{bmatrix} + a\begin{bmatrix} f \\ g \\ h \end{bmatrix} + \begin{bmatrix} ch - dg \\ df - bh \\ bg - cf \end{bmatrix} = \\ ae - \vec{v} \cdot \vec{w} + e\vec{v} + a \vec{w} + \vec{v}\times\vec{w}
+$$
+
+Böylece, bir kuaterniyon bir skalar ve bir vektörün toplamı olarak
+görüldüğünde, zarif bir sonuç ortaya çıkar:
+
+$$
+(a + \vec{v})(e + \vec{w}) = (ae - \vec{v} \cdot \vec{w}) + (e\vec{v}
++ a \vec{w} + \vec{v}\times\vec{w})
+\qquad (3)
+$$
+
+Böylece kuaterniyon çarpımının skalar kısmı $(ae - \vec{v} \cdot
+\vec{w})$, vektör kısmı ise $(e\vec{v} + a \vec{w} +
+\vec{v}\times\vec{w})$'dir. Beklendiği gibi, iki kuaterniyonun çarpımı
+başka bir kuaterniyon verir. Bu formül bir sonraki bölümde yoğun bir
+şekilde uygulanacaktır.
+
+**Kuaterniyon Döndürmesini Basitleştirmek**
+
+Kuaterniyon döndürme formülü ile başlıyoruz:
+
+$$
+\mathbf{q} \vec{v} \mathbf{q}^{-1} =
+\left(\cos\left(\frac{\theta}{2}\right) +
+\vec{u}\sin\left(\frac{\theta}{2}\right)\right) \vec{v}
+\left(\cos\left(\frac{\theta}{2}\right) -
+\vec{u}\sin\left(\frac{\theta}{2}\right)\right)
+$$
+
+Denklem (3) çarpımı genişletmek için iki kez kullanılır:
+
+$$
+\mathbf{q} \vec{v} \mathbf{q}^{-1} = \\
+\left(\cos\left(\frac{\theta}{2}\right) +
+\vec{u}\sin\left(\frac{\theta}{2}\right)\right) \vec{v}
+\left(\cos\left(\frac{\theta}{2}\right) -
+\vec{u}\sin\left(\frac{\theta}{2}\right)\right) = \\
+\left(\left(-\sin\thetatwo{} \uv\cdot\vv \right) + \cos\thetatwo{}\vv
++ \sin\thetatwo{}(\uv\times\vv) \right)
+\left(\cos\left(\frac{\theta}{2}\right) -
+\vec{u}\sin\left(\frac{\theta}{2}\right)\right) = \\
+\color{zerocol}{-\sin\thetatwo{}\cos\thetatwo{} \uv \cdot \vv + \left(
+\cos\thetatwo{}\vv + \sin\thetatwo{}(\uv\times\vv)\right) \cdot
+\left(\uv\sin\thetatwo{}\right)+} \\
+\color{black}{}\left(-\sin\thetatwo{}\uv\cdot\vv\right)\left(-\uv\sin\thetatwo{}\right)+
+\\ \cos\thetatwo{}\left(\cos\thetatwo{}\vv +
+\sin\thetatwo(\uv\times\vv)\right) + \\ \left(\cos\thetatwo{}\vv+
+\sin\thetatwo{}(\uv \times \vv)\right) \times \left(-\uv
+\sin\thetatwo{}\right)
+$$
+
+Mor kısmın sıfıra eşit çıktığına dikkat edin. Bunun nedeni, nokta
+çarpımının toplama altında dağılımıdır ($a \cdot(b +c) = a \cdot b + a
+\cdot c$) ve $(\uv \times \vv) \cdot \uv = 0$ olduğu içindir. Bunun
+nedenini görmek kolaydır: $\uv \times \vv$ vektörü hem $\uv$ hem de
+$\vv$ ye dik bir vektördür. O zaman $(\uv \times \vv) \cdot \uv$
+basitçe birbirine dik olan iki vektörün nokta çarpımıdır. Dolayısıyla,
+bu nokta çarpımı sıfırdır. Geometrik durum aşağıdaki resimde
+gösterilmiştir.
+
+![](crossprod.jpg)
+
+Böylece basitleştirilmiş ifadeyi elde ederiz:
+
+$$\sin^2\thetatwo{} (\uv \cdot \vv)\uv + \\ \cos^2\thetatwo \vv + \sin\thetatwo\cos\thetatwo(\uv\times\vv) \\ +\sin\thetatwo{}\cos\thetatwo{} (\uv \times \vv) - \sin^2\thetatwo{} (\uv\times\vv) \times \uv$$
+
+Burada çapraz çarpımın dağılım özelliğini uyguladık: $(\vec{a} + \vec{b})\times\vec{c} = \vec{a}\times\vec{c} + \vec{b}\times\vec{c}$. Yarım açı formülünden $\sin(x) = 2\sin\left(\frac{x}{2}\right)\cos\left(\frac{x}{2}\right)$, şu şekilde basitleşir:
+
+$$\sin^2\thetatwo{} (\uv \cdot \vv)\uv + \cos^2\thetatwo \vv + \sin(\theta)(\uv \times \vv) -\sin^2\thetatwo{} (\uv\times\vv) \times \uv$$
+
+Daha sonra vektör üçlü çarpımı ($\vec{a}\times(\vec{b}\times\vec{c}) = \vec{b}(\vec{a}\cdot\vec{c}) - \vec{c}(\vec{a}\cdot\vec{b})$) ve birkaç yarım açı formülü daha kullanılarak bazı basitleştirmeler yapılır. Bu burada gösterilmemiştir, ancak okuyucuya küçük bir alıştırma olarak bırakılmıştır. Basitleştirmeler yapıldıktan sonra geriye kalan şudur:
+
+$$\vv\cos(\theta) + (\uv\times\vv)\sin(\theta) + (\uv\cdot\vv)\uv(1 - \cos(\theta)).$$
+
+Ama bu basitçe (2) denklemidir. Ve bununla ispat
+tamamlanmıştır. Kuaterniyon döndürmesinin Rodrigues'in formülüne
+eşdeğer olduğu gösterilmiştir ve bu, kuaterniyon döndürmesinin
+gerçekten de beklediğimizi yaptığı anlamına gelir.
+
 Kodlar
 
 [euclid.py](euclid.py)
@@ -587,5 +778,5 @@ Kaynaklar
 [6] Ezag, PyEuclid,
     [https://github.com/ezag/pyeuclid](https://github.com/ezag/pyeuclid)
     
-
-
+[7] Arneback, *Showing the Correctness of Quaternion Rotation*,
+    [https://erkaman.github.io/posts/quaternion_rotation.html](https://erkaman.github.io/posts/quaternion_rotation.html)
