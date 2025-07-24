@@ -1304,7 +1304,7 @@ class Quaternion:
     copy = __copy__
 
     def __repr__(self):
-        return 'Quaternion(real=%.2f, imag=<%.2f, %.2f, %.2f>)' % \
+        return 'Quaternion(real=%f, imag=<%f, %f, %f>)' % \
             (self.w, self.x, self.y, self.z)
 
     def __mul__(self, other):
