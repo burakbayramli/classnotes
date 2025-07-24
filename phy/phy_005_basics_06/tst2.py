@@ -19,21 +19,19 @@ tidx = 7
 
 m = 1 # kg
 p = np.ones(3) * 0 # linear momentum
+L = np.ones(3) * 0 # angular momentum
 w = np.ones(3) * 0 # angular vel
 q = np.ones(3) * 0 # orientation
 F = np.ones(3) * 0 # force
 tau  = np.ones(3) * 0 # torque
-dt = 0.05
 f0 = np.array([40,20,10])
 f1 = mesh.vectors[tidx][0]
-F_ext  = f1 - f0
-
 a = f1-f0
 b = cog-f0
 flin = (a.dot(b) / (lin.norm(b)**2))*b
-tau_ext = np.cross(f1-cog,f1-f0)
 x = cog
-
+S1,S2,N = 0,5,20
+dt = (S2-S1) / 20
 for i,t in enumerate(np.linspace(0,1,20)):
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
     # x ilk degeri cog, x degistikce cog'den ne kadar uzaklasmissa
@@ -46,8 +44,13 @@ for i,t in enumerate(np.linspace(0,1,20)):
     plot_vector2(ax, f0, f1)
     plot_vector1(ax, f0, flin, color='cyan')
     print (t)
-    F = 0
-    if t==0: p = F_ext*m
+    if t==0:
+       # baslangicta p sifir, ve ilk F entegre edilerek ilk p
+       # elde ediliyor. Ayni sekilde L.
+       F_ext  = f1-f0
+       p = F_ext*dt
+       tau_ext = np.cross(f1-cog,f1-f0)
+       L = tau_ext*dt
     x = x + dt*(p / m)
     print (x)
     ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
