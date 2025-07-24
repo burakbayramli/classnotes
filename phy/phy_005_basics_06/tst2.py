@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-import numpy as np
 from stl import mesh
-import numpy.linalg as lin
+import numpy.linalg as lin, sys
+sys.path.append("../phy_073_rot"); import euclid
 
 def plot_vector1(fig, orig, v, color='blue'):
    orig = np.array(orig); v=np.array(v)
@@ -32,6 +32,9 @@ flin = (a.dot(b) / (lin.norm(b)**2))*b
 x = cog
 S1,S2,N = 0,5,20
 dt = (S2-S1) / 20
+q = euclid.Quaternion(1,0,0,0)
+Jbodyinv = lin.inv(mesh.get_mass_properties()[2])
+
 for i,t in enumerate(np.linspace(0,1,20)):
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
     # x ilk degeri cog, x degistikce cog'den ne kadar uzaklasmissa
@@ -52,6 +55,8 @@ for i,t in enumerate(np.linspace(0,1,20)):
        tau_ext = np.cross(f1-cog,f1-f0)
        L = tau_ext*dt
     x = x + dt*(p / m)
+    R = q.get_rotation_matrix_3x3().to_numpy_array()
+    w = R.dot(Jbodyinv).dot(R.transpose())
     print (x)
     ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
     ax.view_init(elev=20, azim=200)    

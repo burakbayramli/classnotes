@@ -32,6 +32,7 @@ __revision__ = '$Revision$'
 import math
 import operator
 import types
+import numpy as np
 
 # Some magic here.  If _use_slots is True, the classes will derive from
 # object and will define a __slots__ class variable.  If _use_slots is
@@ -786,6 +787,16 @@ class Matrix3:
             tmp.k = d * (self.a*self.f - self.b*self.e)
 
             return tmp
+
+    def to_numpy_array(self):
+        """
+        Converts this Matrix3 instance into a 3x3 NumPy array.
+        """
+        return np.array([
+            [self.a, self.b, self.c],
+            [self.e, self.f, self.g],
+            [self.i, self.j, self.k]
+        ])        
 
 # a b c d
 # e f g h
@@ -1593,6 +1604,45 @@ class Quaternion:
         Q.z = q1.z * ratio1 + q2.z * ratio2
         return Q
     new_interpolate = classmethod(new_interpolate)
+
+    def get_rotation_matrix_3x3(self):
+        """
+        Returns a 3x3 rotation matrix from this quaternion,
+        compatible with the Matrix3 class in euclid.py.
+        """
+        n = self.normalized()
+        x, y, z, w = n.x, n.y, n.z, n.w
+
+        xx = x * x
+        yy = y * y
+        zz = z * z
+        xy = x * y
+        xz = x * z
+        yz = y * z
+        wx = w * x
+        wy = w * y
+        wz = w * z
+
+        # Create a new Matrix3 instance
+        m = Matrix3()
+
+        # Assign values to the Matrix3 attributes based on its __slots__ and __repr__
+        # Row 1 (a, b, c)
+        m.a = 1 - 2 * (yy + zz)
+        m.b = 2 * (xy - wz)
+        m.c = 2 * (xz + wy)
+
+        # Row 2 (e, f, g) - skipping 'd'
+        m.e = 2 * (xy + wz)
+        m.f = 1 - 2 * (xx + zz)
+        m.g = 2 * (yz - wx)
+
+        # Row 3 (i, j, k) - skipping 'h'
+        m.i = 2 * (xz - wy)
+        m.j = 2 * (yz + wx)
+        m.k = 1 - 2 * (xx + yy)
+        
+        return m
 
 #
 # Geometry
