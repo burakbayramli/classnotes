@@ -28,6 +28,9 @@ f0 = np.array([40,20,10])
 f1 = mesh.vectors[tidx][0]
 a = f1-f0
 b = cog-f0
+print ('f0',f0)
+print ('f1',f1)
+print ('cog',cog)
 flin = (a.dot(b) / (lin.norm(b)**2))*b
 x = cog
 S1,S2,N = 0,5,20
@@ -35,7 +38,7 @@ dt = (S2-S1) / 20
 q = euclid.Quaternion(1,0,0,0)
 Jbodyinv = lin.inv(mesh.get_mass_properties()[2])
 F_ext  = f1-f0
-tau_ext = -np.cross(f1-cog,f1-f0)
+tau_ext = np.cross(cog-f1,f1-f0)
 
 for i,t in enumerate(np.linspace(S1,S2,N)):
     print ('----------------')
