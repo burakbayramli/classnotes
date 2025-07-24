@@ -1303,6 +1303,13 @@ class Quaternion:
 
     copy = __copy__
 
+    def add(self, other):
+        Q = Quaternion(self.w + other.w,
+                       self.x + other.x,
+                       self.y + other.y,
+                       self.z + other.z)
+        return Q
+    
     def __repr__(self):
         return 'Quaternion(real=%f, imag=<%f, %f, %f>)' % \
             (self.w, self.x, self.y, self.z)
@@ -1382,6 +1389,13 @@ class Quaternion:
 
     magnitude = __abs__
 
+    def scalar_mul(self, s):
+        self.w = self.w * s
+        self.x = self.x * s
+        self.y = self.y * s
+        self.z = self.z * s
+        return self
+        
     def magnitude_squared(self):
         return self.w ** 2 + \
                self.x ** 2 + \

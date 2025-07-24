@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 from stl import mesh
-import numpy.linalg as lin, sys
+import numpy.linalg as lin, sys, copy
 sys.path.append("../phy_073_rot"); import euclid
 
 def plot_vector1(fig, orig, v, color='blue'):
@@ -36,11 +36,19 @@ q = euclid.Quaternion(1,0,0,0)
 Jbodyinv = lin.inv(mesh.get_mass_properties()[2])
 
 for i,t in enumerate(np.linspace(0,1,20)):
+    print ('----------------')
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
     # x ilk degeri cog, x degistikce cog'den ne kadar uzaklasmissa
     # o farki mesh.vectors uzerine eklersek figurde gorulen objeyi
     # o kadar yerinden oynatabiliriz.
-    obj = mplot3d.art3d.Poly3DCollection(mesh.vectors + (x - cog))
+    
+    R = q.get_rotation_matrix_3x3().to_numpy_array()
+    #new_mesh  = mesh.vectors + (x - cog)
+    #new_mesh.rotate_using_matrix(R)
+    currmesh = copy.deepcopy(mesh)
+    currmesh.rotate_using_matrix(R)
+    #print ('type',type(currmesh.vectors + (x - cog)))
+    obj = mplot3d.art3d.Poly3DCollection(currmesh.vectors + (x - cog))
     obj.set_edgecolor('k')
     obj.set_alpha(0.3)
     ax.add_collection3d(obj)
@@ -53,16 +61,16 @@ for i,t in enumerate(np.linspace(0,1,20)):
        F_ext  = f1-f0
        p = F_ext*dt
        tau_ext = np.cross(f1-cog,f1-f0)
-       L = tau_ext*dt
+       L = tau_ext*dt*100
     x = x + dt*(p / m)
     print (x)
     R = q.get_rotation_matrix_3x3().to_numpy_array()
     Jinv = R.dot(Jbodyinv).dot(R.transpose())
     w = L.dot(Jinv)
     wq = euclid.Quaternion(w=0, x=w[0], y=w[1], z=w[2])
-    print ('w',w)
-    print ('wq',wq)
-    exit()
+    qdiff = (wq * q).scalar_mul(1/2).scalar_mul(dt)
+    q = q.add(qdiff).normalize()
+    print ('q new',q)        
     ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
     ax.view_init(elev=20, azim=200)    
     plt.savefig('img/out-%02d.jpg' % i)
