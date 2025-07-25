@@ -105,7 +105,7 @@ model.compile(
     optimizer=keras.optimizers.Adam(learning_rate=0.001),
 )
 
-model.save("/opt/Downloads/recom2.h5")
+model.save("/opt/Downloads/skdata/recom2.keras")
 
 """
 ## Train the model based on the data split
@@ -113,7 +113,8 @@ model.save("/opt/Downloads/recom2.h5")
 history = model.fit(
     x=x_train,
     y=y_train,
-    batch_size=64,
+    #batch_size=64,
+    batch_size=1000,
     epochs=5,
     verbose=1,
     validation_data=(x_val, y_val),
