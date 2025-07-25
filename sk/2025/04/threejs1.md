@@ -1,2 +1,0 @@
-# Javascript ile Animasyon ThreeJS
-
