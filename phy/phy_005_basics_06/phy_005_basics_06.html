@@ -442,7 +442,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>S1,S2,N <span class="op">=</span> <span class="dv">0</span>,<span class="dv">5</span>,<span class="dv">20</span></span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> (S2<span class="op">-</span>S1) <span class="op">/</span> N</span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> euclid.Quaternion(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Jbodyinv <span class="op">=</span> lin.inv(mesh.get_mass_properties()[<span class="dv">2</span>])</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Jbodyinv <span class="op">=</span> lin.inv(mesh.get_mass_properties()[<span class="dv">2</span>]<span class="op">*</span><span class="fl">0.1</span>)</span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>F_ext  <span class="op">=</span> f1<span class="op">-</span>f0</span>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>tau_ext <span class="op">=</span> np.cross(cog<span class="op">-</span>f1,f1<span class="op">-</span>f0)</span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
@@ -466,7 +466,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>       <span class="co"># baslangicta p sifir, ve ilk F entegre edilerek ilk p</span></span>
 <span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>       <span class="co"># elde ediliyor. Ayni sekilde L.</span></span>
 <span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>       p <span class="op">=</span> F_ext<span class="op">*</span>dt</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>       L <span class="op">=</span> tau_ext<span class="op">*</span>dt<span class="op">*</span><span class="dv">20</span> <span class="co"># ufak bir &#39;hack&#39; donusun gozukmesi icin</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>       L <span class="op">=</span> tau_ext<span class="op">*</span>dt</span>
 <span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x <span class="op">+</span> dt<span class="op">*</span>(p <span class="op">/</span> m)</span>
 <span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> q.get_rotation_matrix_3x3().to_numpy_array()</span>
 <span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    Jinv <span class="op">=</span> R.dot(Jbodyinv).dot(R.transpose())</span>
@@ -482,6 +482,17 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>os.system(<span class="st">&quot;convert -loop 0 -delay 30 img/*.jpg img/rbmove1.gif&quot;</span>)</span></code></pre></div>
 <p>Sonuc animasyon [7]’de bulunabilir.</p>
+<p>Not: STL objesinden gelen atalet matrisi <span
+class="math inline">\(J_{cisim}\)</span> yani
+<code>mesh.get_mass_properties()[2]</code> değerinin 0.1 ile çarpılıp
+küçültülmesine dikkat. Bunun yapılmasının sebebi STL’den gelen <span
+class="math inline">\(J_{cisim}\)</span> değerinin çok büyük olması idi,
+herhalde objenin birim değerleri çok küçüktü (mesela milimetre) ve bu
+sebeple değerler binlerde oluyordu. Fakat bu yüzden 1 kg üzerindeki
+lineer momentumun etkisi ilk açısal momentum değerinden çok daha büyük
+oluyordu, objenin dönmeye karşı “ataleti” çok büyük idi, bizim rasgele
+seçilmiş kuvvet vektörü döndürmeyi sağlayamıyordu. Atalet matrisini suni
+şekilde biraz küçülterek bu problemi çözmüş olduk.</p>
 <p>Kaynaklar</p>
 <p>[1] Eberly, <em>Game Physics 2nd Ed</em></p>
 <p>[2] Bayramlı, <em>Diferansiyel Denklemler Ders 2</em></p>

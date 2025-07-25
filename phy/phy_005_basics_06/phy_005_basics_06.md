@@ -375,7 +375,7 @@ x = cog
 S1,S2,N = 0,5,20
 dt = (S2-S1) / N
 q = euclid.Quaternion(1,0,0,0)
-Jbodyinv = lin.inv(mesh.get_mass_properties()[2])
+Jbodyinv = lin.inv(mesh.get_mass_properties()[2]*0.1)
 F_ext  = f1-f0
 tau_ext = np.cross(cog-f1,f1-f0)
 
@@ -399,7 +399,7 @@ for i,t in enumerate(np.linspace(S1,S2,N)):
        # baslangicta p sifir, ve ilk F entegre edilerek ilk p
        # elde ediliyor. Ayni sekilde L.
        p = F_ext*dt
-       L = tau_ext*dt*20 # ufak bir 'hack' donusun gozukmesi icin
+       L = tau_ext*dt
     x = x + dt*(p / m)
     R = q.get_rotation_matrix_3x3().to_numpy_array()
     Jinv = R.dot(Jbodyinv).dot(R.transpose())
@@ -420,6 +420,17 @@ os.system("convert -loop 0 -delay 30 img/*.jpg img/rbmove1.gif")
 
 Sonuc animasyon [7]'de bulunabilir.
 
+Not: STL objesinden gelen atalet matrisi $J_{cisim}$ yani
+`mesh.get_mass_properties()[2]` değerinin 0.1 ile çarpılıp
+küçültülmesine dikkat. Bunun yapılmasının sebebi STL'den gelen
+$J_{cisim}$ değerinin çok büyük olması idi, herhalde objenin birim
+değerleri çok küçüktü (mesela milimetre) ve bu sebeple değerler
+binlerde oluyordu. Fakat bu yüzden 1 kg üzerindeki lineer momentumun
+etkisi ilk açısal momentum değerinden çok daha büyük oluyordu, objenin
+dönmeye karşı "ataleti" çok büyük idi, bizim rasgele seçilmiş kuvvet
+vektörü döndürmeyi sağlayamıyordu. Atalet matrisini suni şekilde biraz
+küçülterek bu problemi çözmüş olduk.
+
 Kaynaklar
 
 [1] Eberly, *Game Physics 2nd Ed*
@@ -435,3 +446,4 @@ Kaynaklar
 [6] Bayramlı, *Lineer Cebir Ders 15*
 
 [7] Bayramlı, [Animasyon 1](https://www.dropbox.com/scl/fi/7p1j0hsztb2qaq9pnylb1/rbmove1.gif?rlkey=j2g2crndc9sdfwyflrotazdsr&st=0ktgk41h&raw=1)
+
