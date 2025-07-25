@@ -25,7 +25,7 @@ yüklenebiliyor. Önce [1] projesini indirelim, `git clone` ya da farklı
 bir yöntemle olabilir. Kodlar eğitilmiş bir ses tanıma YSA ağını
 içerir, `model-attRNN.h5` dosyasında.  Github projesinin
 `HOME/Documents/repos/SpeechCmdRecognition` altında olduğunu, ve [3]
-dosyasının `/opt/Downloads/voice_cmd` dizininde olduğunu farzedersek,
+dosyasının `/opt/Downloads/skdata/voice_cmd` dizininde olduğunu farzedersek,
 alttaki kodu işletebiliriz.
 
 ```python
@@ -48,7 +48,7 @@ model.summary()
 model.load_weights(proj_src + '/model-attRNN.h5')
 print("Model loaded successfully and weights loaded.")
 
-audio_file_path = "/opt/Downloads/voice_cmd/wav/dog/fcb25a78_nohash_0.wav"
+audio_file_path = "/opt/Downloads/skdata/voice_cmd/wav/dog/fcb25a78_nohash_0.wav"
 print(f"\nProcessing audio file: {audio_file_path}")
 
 audio, current_sr = librosa.load(audio_file_path, sr=sr)
@@ -144,7 +144,7 @@ Non-trainable params: 22 (88.00 Byte)
 __________________________________________________________________________________________________
 Model loaded successfully and weights loaded.
 
-Processing audio file: /opt/Downloads/voice_cmd/wav/dog/fcb25a78_nohash_0.wav
+Processing audio file: /opt/Downloads/skdata/voice_cmd/wav/dog/fcb25a78_nohash_0.wav
    Original sampling rate of audio: 16000 Hz
    Processed audio shape for prediction: (1, 16000)
 WARNING: All log messages before absl::InitializeLog() is called are written to STDERR

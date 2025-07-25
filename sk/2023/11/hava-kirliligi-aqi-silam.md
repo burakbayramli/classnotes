@@ -82,7 +82,7 @@ def download_silam(f, outdir):
        open(target_file, 'wb').write(r.content)
 
 f = 'SILAM-AQstat-glob06_v5_8_2023110400.nc4'
-outdir = "/opt/Downloads/silam"
+outdir = "/opt/Downloads/skdata/silam"
 download_silam(f, outdir)
 ```
 

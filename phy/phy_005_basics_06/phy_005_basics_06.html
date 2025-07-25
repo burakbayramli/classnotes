@@ -261,6 +261,7 @@ sonrası toplam dönüş <span class="math inline">\(q&#39;\)</span> ne
 olurdu? Bu durumda formül,</p>
 <p><span class="math display">\[
 q&#39; = q + \frac{\Delta t}{2} \omega q
+\qquad (1)
 \]</span></p>
 <p>olur, ki <span class="math inline">\(\omega\)</span> yine kuaterniyon
 olarak gösterilen açısal hız.</p>
@@ -292,8 +293,6 @@ Bir üstteki resim üzerinde gösterirsek,</p>
 <p><img src="phy_005_basics_06_03.jpg" /></p>
 <p>Daha önce söylediğimiz gibi her iki kuvvet de ilk anda lineer ve
 açısal momentumu ekileyen faktörler, sonraki adımlarda etkileri yok.</p>
-<p>Başlangıç torku ve kuvvetin nasıl başlangıç hızına
-çevirilecebileceğini daha önceki derste gördük.</p>
 <p>Uygulanan kuvveti şöyle seçelim, STL objesi üzerindeki üçgenlerden
 birinin köşesini son nokta olarak alalım, uzayda herhangi bir noktası
 başlangıç noktası olarak alalım, ve ilk kuvvet bu vektör olsun.</p>
@@ -352,7 +351,137 @@ kuvveti hem de bileşenini aynı başlangıçtan gösterdik. Yansıtma hesabı
 için bkz [6]. Tork vektörü de hesaplanıyor, ve COG çıkışlı olarak
 gösteriliyor. Objenin dönüşü bu vektör etrafında ve vektörün büyüklüğüne
 oranlı hızda olacaktır.</p>
-<p>[devam edecek]</p>
+<p>Simulasyon</p>
+<p>Alttaki kodlarla bir dış kuvvet uygulanan objenin hareketini
+inceleyeceğiz. Obje uzayda hareketsiz duruyor, yerçekim etkisi yok. Önce
+ilk uygulanan kuvvet etkisinden bahsedelim. Daha önceki yazıda ilk
+uygulanan kuvveti direk hiza çevirmiştik, fakat kavramsal daha mantıklı
+olan geçiş kuvvet / tork ve onun ilk lineer ve açısal momentuma olan
+etkisidir.</p>
+<p>Lineer momentum icin Newton’un ikinci kanunu der ki</p>
+<p><span class="math display">\[\frac{dp}{dt} = F\]</span></p>
+<p>Lineer momentum değişimi için <span
+class="math inline">\(t=0\)</span> anında ve <span
+class="math inline">\(t_f - t_i = \Delta t\)</span> süresinde etki eden
+<span class="math inline">\(F\)</span> için</p>
+<p><span class="math display">\[\int_{p_i}^{p_f} dp = \int_{t_i}^{t_f} F
+dt\]</span></p>
+<p><span class="math display">\[\Delta p = p_f - p_i = \int_{0}^{\Delta
+t} F dt\]</span></p>
+<p>Eğer <span class="math inline">\(F\)</span> kuvveti <span
+class="math inline">\(\Delta t\)</span> süresince sabit ise,</p>
+<p><span class="math display">\[\Delta p = F \Delta t\]</span></p>
+<p>Başlangıç açısal momentum benzer şekilde</p>
+<p><span class="math display">\[\frac{dL}{dt} = \tau\]</span></p>
+<p><span class="math display">\[\int_{L_i}^{L_f} dL = \int_{t_i}^{t_f}
+\tau dt\]</span></p>
+<p><span class="math display">\[\Delta L = L_f - L_i = \int_{0}^{\Delta
+t} \tau dt\]</span></p>
+<p><span class="math display">\[\Delta L = \tau \Delta t\]</span></p>
+<p><span class="math display">\[\Delta L = (r \times F) \Delta
+t\]</span></p>
+<p>Yani ilk lineer ve açısal momentumu üstteki <span
+class="math inline">\(\Delta p\)</span> ve <span
+class="math inline">\(\Delta L\)</span> olarak başlangıçta sıfır olan
+<span class="math inline">\(p\)</span> ve <span
+class="math inline">\(L\)</span> değerlerine ekleyeceğiz.</p>
+<p>İlk değerler hesaplandıktan sonra simülasyonun geri kalanında <span
+class="math inline">\(t&gt;0\)</span> için Euler entegrasyonu ile
+güncellemeleri yapacak.</p>
+<p>Bir püf nokta atalet matrisi tersi <span
+class="math inline">\(J^{-1}\)</span> hesabı [1, sf. 467] (bizim daha
+önce <span class="math inline">\(I^{-1}\)</span> olarak işlediğimiz
+değer). Bunun için</p>
+<p><span class="math display">\[
+J^{-1} = R J_{cisim}^{-1} R^T
+\]</span></p>
+<p>kullanabileceğimizi biliyoruz. <span
+class="math inline">\(J_{cisim}^{-1}\)</span> değeri objenin
+başlangıçtaki atalet matrisi, yani dönüş matrislerini kullanarak atalet
+matrisi tersini sürekli güncelleyebiliyoruz. Böylece güncellenen <span
+class="math inline">\(J^{-1}\)</span> ile herhangi bir anda açısal hız
+<span class="math inline">\(w\)</span>’yi hesaplayabiliyoruz. <span
+class="math inline">\(L = J w\)</span> olmasından hareketle,</p>
+<p><span class="math display">\[
+w = J^{-1} L = J R J_{cisim}^{-1} R^T
+\]</span></p>
+<p>Tabii hızın kuaterniyon olarak temsil edilmesi lazım, açısal hızı
+üstteki <span class="math inline">\(w\)</span> ile hesapladıktan sonra
+onu skalar değeri sıfır olan bir kuaterniyon yapıp onu mevcut yönsel
+duruş (ki o da kuaterniyon ile temsil ediliyor) ile çarpıyoruz, ve
+duruştaki değişimi elde ediyoruz, (1) formülünde gördük.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits <span class="im">import</span> mplot3d</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> lin, sys, copy, os</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> stl <span class="im">import</span> mesh</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&quot;../phy_073_rot&quot;</span>)<span class="op">;</span> <span class="im">import</span> euclid</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_vector1(fig, orig, v, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>):</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>   orig <span class="op">=</span> np.array(orig)<span class="op">;</span> v<span class="op">=</span>np.array(v)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>   ax.quiver(orig[<span class="dv">0</span>], orig[<span class="dv">1</span>], orig[<span class="dv">2</span>], v[<span class="dv">0</span>], v[<span class="dv">1</span>], v[<span class="dv">2</span>],color<span class="op">=</span>color)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_vector2(fig, torig, tend, color<span class="op">=</span><span class="st">&#39;blue&#39;</span>):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>   v <span class="op">=</span> tend <span class="op">-</span> torig</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>   ax.quiver(torig[<span class="dv">0</span>], torig[<span class="dv">1</span>], torig[<span class="dv">2</span>], v[<span class="dv">0</span>], v[<span class="dv">1</span>], v[<span class="dv">2</span>],color<span class="op">=</span>color)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>mesh <span class="op">=</span> mesh.Mesh.from_file(<span class="st">&#39;../../sk/2020/08/shapes/Prism_hexagon.stl&#39;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>cog <span class="op">=</span> mesh.get_mass_properties()[<span class="dv">1</span>]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>tidx <span class="op">=</span> <span class="dv">7</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="dv">1</span> <span class="co"># kg</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> np.ones(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">0</span> <span class="co"># lineer momentum</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> np.ones(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">0</span> <span class="co"># acisal momentum</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> np.ones(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">0</span> <span class="co"># acisal hiz</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> np.ones(<span class="dv">3</span>) <span class="op">*</span> <span class="dv">0</span> <span class="co"># durus (orientation)</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>f0 <span class="op">=</span> np.array([<span class="dv">40</span>,<span class="dv">20</span>,<span class="dv">10</span>])</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>f1 <span class="op">=</span> mesh.vectors[tidx][<span class="dv">0</span>]</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> f1<span class="op">-</span>f0</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> cog<span class="op">-</span>f0</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>flin <span class="op">=</span> (a.dot(b) <span class="op">/</span> (lin.norm(b)<span class="op">**</span><span class="dv">2</span>))<span class="op">*</span>b</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> cog</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>S1,S2,N <span class="op">=</span> <span class="dv">0</span>,<span class="dv">5</span>,<span class="dv">20</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> (S2<span class="op">-</span>S1) <span class="op">/</span> N</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> euclid.Quaternion(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Jbodyinv <span class="op">=</span> lin.inv(mesh.get_mass_properties()[<span class="dv">2</span>])</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>F_ext  <span class="op">=</span> f1<span class="op">-</span>f0</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>tau_ext <span class="op">=</span> np.cross(cog<span class="op">-</span>f1,f1<span class="op">-</span>f0)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i,t <span class="kw">in</span> <span class="bu">enumerate</span>(np.linspace(S1,S2,N)):</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, subplot_kw<span class="op">=</span>{<span class="st">&#39;projection&#39;</span>: <span class="st">&#39;3d&#39;</span>})</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># x ilk degeri cog, x degistikce cog&#39;den ne kadar uzaklasmissa</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># o farki mesh.vectors uzerine eklersek figurde gorulen objeyi</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># o kadar yerinden oynatabiliriz.    </span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> q.get_rotation_matrix_3x3().to_numpy_array()</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    currmesh <span class="op">=</span> copy.deepcopy(mesh)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    currmesh.vectors <span class="op">=</span> currmesh.vectors <span class="op">+</span> (x <span class="op">-</span> cog)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    currmesh.rotate_using_matrix(R)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    obj <span class="op">=</span> mplot3d.art3d.Poly3DCollection(currmesh.vectors)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    obj.set_edgecolor(<span class="st">&#39;k&#39;</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    obj.set_alpha(<span class="fl">0.3</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    ax.add_collection3d(obj)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    plot_vector2(ax, f0, f1)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    plot_vector1(ax, f0, flin, color<span class="op">=</span><span class="st">&#39;cyan&#39;</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    plot_vector1(ax, cog, tau_ext <span class="op">/</span> <span class="dv">10</span>, color<span class="op">=</span><span class="st">&#39;cyan&#39;</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> t<span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>       <span class="co"># baslangicta p sifir, ve ilk F entegre edilerek ilk p</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>       <span class="co"># elde ediliyor. Ayni sekilde L.</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>       p <span class="op">=</span> F_ext<span class="op">*</span>dt</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>       L <span class="op">=</span> tau_ext<span class="op">*</span>dt<span class="op">*</span><span class="dv">20</span> <span class="co"># ufak bir &#39;hack&#39; donusun gozukmesi icin</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x <span class="op">+</span> dt<span class="op">*</span>(p <span class="op">/</span> m)</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> q.get_rotation_matrix_3x3().to_numpy_array()</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    Jinv <span class="op">=</span> R.dot(Jbodyinv).dot(R.transpose())</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> L.dot(Jinv)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    wq <span class="op">=</span> euclid.Quaternion(<span class="dv">0</span>, w[<span class="dv">0</span>], w[<span class="dv">1</span>], w[<span class="dv">2</span>])</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    qdiff <span class="op">=</span> (wq <span class="op">*</span> q).scalar_mul(<span class="dv">1</span><span class="op">/</span><span class="dv">2</span>).scalar_mul(dt)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> q.add(qdiff).normalize()</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&#39;x&#39;</span>)<span class="op">;</span>ax.set_ylabel(<span class="st">&#39;y&#39;</span>)<span class="op">;</span>ax.set_zlabel(<span class="st">&#39;z&#39;</span>)</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="dv">30</span>,<span class="dv">70</span>)<span class="op">;</span>ax.set_ylim(<span class="op">-</span><span class="dv">10</span>,<span class="dv">30</span>)<span class="op">;</span> ax.set_zlim(<span class="op">-</span><span class="dv">10</span>,<span class="dv">30</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    ax.view_init(elev<span class="op">=</span><span class="dv">20</span>, azim<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    plt.savefig(<span class="st">&#39;img/out-</span><span class="sc">%02d</span><span class="st">.jpg&#39;</span> <span class="op">%</span> i)</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    plt.close(fig)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>os.system(<span class="st">&quot;convert -loop 0 -delay 30 img/*.jpg img/rbmove1.gif&quot;</span>)</span></code></pre></div>
+<p>Sonuc animasyon [7]’de bulunabilir.</p>
 <p>Kaynaklar</p>
 <p>[1] Eberly, <em>Game Physics 2nd Ed</em></p>
 <p>[2] Bayramlı, <em>Diferansiyel Denklemler Ders 2</em></p>
@@ -361,6 +490,9 @@ oranlı hızda olacaktır.</p>
 <p>[5] Bayramlı, <em>Normal Diferansiyel Denklemler,
 Trigonometri</em></p>
 <p>[6] Bayramlı, <em>Lineer Cebir Ders 15</em></p>
+<p>[7] Bayramlı, <a
+href="https://www.dropbox.com/scl/fi/7p1j0hsztb2qaq9pnylb1/rbmove1.gif?rlkey=j2g2crndc9sdfwyflrotazdsr&amp;st=0ktgk41h&amp;raw=1">Animasyon
+1</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

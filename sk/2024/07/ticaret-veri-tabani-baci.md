@@ -23,7 +23,7 @@ Para deger birimi 1000 Amerikan doları, miktar ise metrik ton.
 Girdi verisine bir göz atalım,
 
 ```python
-baci_dir = "/opt/Downloads/baci"
+baci_dir = "/opt/Downloads/skdata/baci"
 
 !head -10 $baci_dir/BACI_HS22_Y2022_V202401b.csv
 ```

@@ -175,6 +175,7 @@ bu zaman sonrası toplam dönüş $q'$ ne olurdu? Bu durumda formül,
 
 $$
 q' = q + \frac{\Delta t}{2} \omega q
+\qquad (1)
 $$
 
 olur, ki $\omega$ yine kuaterniyon olarak gösterilen açısal hız.
@@ -213,9 +214,6 @@ kırmızı vektörü yansıtıyoruz, bu da lineer kuvvet oluyor. Bir üstteki re
 
 Daha önce söylediğimiz gibi her iki kuvvet de ilk anda lineer ve açısal
 momentumu ekileyen faktörler, sonraki adımlarda etkileri yok.
-
-Başlangıç torku ve kuvvetin nasıl başlangıç hızına çevirilecebileceğini daha
-önceki derste gördük.
 
 Uygulanan kuvveti şöyle seçelim, STL objesi üzerindeki üçgenlerden birinin
 köşesini son nokta olarak alalım, uzayda herhangi bir noktası başlangıç
@@ -280,9 +278,147 @@ gösterdik. Yansıtma hesabı için bkz [6]. Tork vektörü de hesaplanıyor,
 ve COG çıkışlı olarak gösteriliyor. Objenin dönüşü bu vektör etrafında
 ve vektörün büyüklüğüne oranlı hızda olacaktır.
 
+Simulasyon
 
+Alttaki kodlarla bir dış kuvvet uygulanan objenin hareketini
+inceleyeceğiz. Obje uzayda hareketsiz duruyor, yerçekim etkisi yok.
+Önce ilk uygulanan kuvvet etkisinden bahsedelim. Daha önceki yazıda
+ilk uygulanan kuvveti direk hiza çevirmiştik, fakat kavramsal daha
+mantıklı olan geçiş kuvvet / tork ve onun ilk lineer ve açısal
+momentuma olan etkisidir.
 
-[devam edecek]
+Lineer momentum icin Newton'un ikinci kanunu der ki
+
+$$\frac{dp}{dt} = F$$
+
+Lineer momentum değişimi için $t=0$ anında ve $t_f - t_i = \Delta t$
+süresinde etki eden $F$ için
+
+$$\int_{p_i}^{p_f} dp = \int_{t_i}^{t_f} F dt$$
+
+$$\Delta p = p_f - p_i = \int_{0}^{\Delta t} F dt$$
+
+Eğer $F$ kuvveti $\Delta t$ süresince sabit ise,
+
+$$\Delta p = F \Delta t$$
+
+Başlangıç açısal momentum benzer şekilde
+
+$$\frac{dL}{dt} = \tau$$
+
+$$\int_{L_i}^{L_f} dL = \int_{t_i}^{t_f} \tau dt$$
+
+$$\Delta L = L_f - L_i = \int_{0}^{\Delta t} \tau dt$$
+
+$$\Delta L = \tau \Delta t$$
+
+$$\Delta L = (r \times F) \Delta t$$
+
+Yani ilk lineer ve açısal momentumu üstteki $\Delta p$ ve $\Delta L$ olarak
+başlangıçta sıfır olan $p$ ve $L$ değerlerine ekleyeceğiz.
+
+İlk değerler hesaplandıktan sonra simülasyonun geri kalanında $t>0$
+için Euler entegrasyonu ile güncellemeleri yapacak.
+
+Bir püf nokta atalet matrisi tersi $J^{-1}$ hesabı [1, sf. 467] (bizim
+daha önce $I^{-1}$ olarak işlediğimiz değer). Bunun için
+
+$$
+J^{-1} = R J_{cisim}^{-1} R^T
+$$
+
+kullanabileceğimizi biliyoruz. $J_{cisim}^{-1}$ değeri objenin
+başlangıçtaki atalet matrisi, yani dönüş matrislerini kullanarak
+atalet matrisi tersini sürekli güncelleyebiliyoruz. Böylece güncellenen
+$J^{-1}$ ile herhangi bir anda açısal hız $w$'yi hesaplayabiliyoruz.
+$L = J w$ olmasından hareketle,
+
+$$
+w = J^{-1} L = J R J_{cisim}^{-1} R^T
+$$
+
+Tabii hızın kuaterniyon olarak temsil edilmesi lazım, açısal hızı
+üstteki $w$ ile hesapladıktan sonra onu skalar değeri sıfır olan bir
+kuaterniyon yapıp onu mevcut yönsel duruş (ki o da kuaterniyon ile
+temsil ediliyor) ile çarpıyoruz, ve duruştaki değişimi elde ediyoruz,
+(1) formülünde gördük.
+
+```python
+from mpl_toolkits import mplot3d
+import numpy.linalg as lin, sys, copy, os
+from stl import mesh
+sys.path.append("../phy_073_rot"); import euclid
+
+def plot_vector1(fig, orig, v, color='blue'):
+   orig = np.array(orig); v=np.array(v)
+   ax.quiver(orig[0], orig[1], orig[2], v[0], v[1], v[2],color=color)
+
+def plot_vector2(fig, torig, tend, color='blue'):
+   v = tend - torig
+   ax.quiver(torig[0], torig[1], torig[2], v[0], v[1], v[2],color=color)
+
+mesh = mesh.Mesh.from_file('../../sk/2020/08/shapes/Prism_hexagon.stl')
+cog = mesh.get_mass_properties()[1]
+tidx = 7
+
+m = 1 # kg
+p = np.ones(3) * 0 # lineer momentum
+L = np.ones(3) * 0 # acisal momentum
+w = np.ones(3) * 0 # acisal hiz
+q = np.ones(3) * 0 # durus (orientation)
+f0 = np.array([40,20,10])
+f1 = mesh.vectors[tidx][0]
+a = f1-f0
+b = cog-f0
+flin = (a.dot(b) / (lin.norm(b)**2))*b
+x = cog
+S1,S2,N = 0,5,20
+dt = (S2-S1) / N
+q = euclid.Quaternion(1,0,0,0)
+Jbodyinv = lin.inv(mesh.get_mass_properties()[2])
+F_ext  = f1-f0
+tau_ext = np.cross(cog-f1,f1-f0)
+
+for i,t in enumerate(np.linspace(S1,S2,N)):
+    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': '3d'})
+    # x ilk degeri cog, x degistikce cog'den ne kadar uzaklasmissa
+    # o farki mesh.vectors uzerine eklersek figurde gorulen objeyi
+    # o kadar yerinden oynatabiliriz.    
+    R = q.get_rotation_matrix_3x3().to_numpy_array()
+    currmesh = copy.deepcopy(mesh)
+    currmesh.vectors = currmesh.vectors + (x - cog)
+    currmesh.rotate_using_matrix(R)
+    obj = mplot3d.art3d.Poly3DCollection(currmesh.vectors)
+    obj.set_edgecolor('k')
+    obj.set_alpha(0.3)
+    ax.add_collection3d(obj)
+    plot_vector2(ax, f0, f1)
+    plot_vector1(ax, f0, flin, color='cyan')
+    plot_vector1(ax, cog, tau_ext / 10, color='cyan')
+    if t==0:
+       # baslangicta p sifir, ve ilk F entegre edilerek ilk p
+       # elde ediliyor. Ayni sekilde L.
+       p = F_ext*dt
+       L = tau_ext*dt*20 # ufak bir 'hack' donusun gozukmesi icin
+    x = x + dt*(p / m)
+    R = q.get_rotation_matrix_3x3().to_numpy_array()
+    Jinv = R.dot(Jbodyinv).dot(R.transpose())
+    w = L.dot(Jinv)
+    wq = euclid.Quaternion(0, w[0], w[1], w[2])
+    qdiff = (wq * q).scalar_mul(1/2).scalar_mul(dt)
+    q = q.add(qdiff).normalize()
+    ax.set_xlabel('x');ax.set_ylabel('y');ax.set_zlabel('z')
+    ax.set_xlim(30,70);ax.set_ylim(-10,30); ax.set_zlim(-10,30)
+    ax.view_init(elev=20, azim=50)
+    plt.savefig('img/out-%02d.jpg' % i)
+    plt.close(fig)
+```
+
+```python
+os.system("convert -loop 0 -delay 30 img/*.jpg img/rbmove1.gif")
+```
+
+Sonuc animasyon [7]'de bulunabilir.
 
 Kaynaklar
 
@@ -297,3 +433,5 @@ Kaynaklar
 [5] Bayramlı, *Normal Diferansiyel Denklemler, Trigonometri*
 
 [6] Bayramlı, *Lineer Cebir Ders 15*
+
+[7] Bayramlı, [Animasyon 1](https://www.dropbox.com/scl/fi/7p1j0hsztb2qaq9pnylb1/rbmove1.gif?rlkey=j2g2crndc9sdfwyflrotazdsr&st=0ktgk41h&raw=1)

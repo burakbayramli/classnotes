@@ -70,7 +70,7 @@ class OnlyOne(object):
 @app.before_first_request
 def start_check_db():
     sno = app.config.get('server_no')
-    db = "/opt/Downloads/kvf-%d.db" % int(sno)
+    db = "/opt/Downloads/skdata/kvf-%d.db" % int(sno)
     conn = sqlite3.connect(db)
     OnlyOne().conn = conn
     if not os.path.isfile(db): 
@@ -261,7 +261,7 @@ Taban içeriğine bakarsak objelerin nasıl yazılmış olduğunu görüyoruz,
 
 ```python
 import sqlite3
-c = sqlite3.connect("/opt/Downloads/kvf-0.db" )
+c = sqlite3.connect("/opt/Downloads/skdata/kvf-0.db" )
 cur = c.cursor()
 res = cur.execute("SELECT key,value FROM OBJ")
 for x in cur.fetchall():
