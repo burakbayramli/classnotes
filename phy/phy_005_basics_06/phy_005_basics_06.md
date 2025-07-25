@@ -318,7 +318,7 @@ Yani ilk lineer ve açısal momentumu üstteki $\Delta p$ ve $\Delta L$ olarak
 başlangıçta sıfır olan $p$ ve $L$ değerlerine ekleyeceğiz.
 
 İlk değerler hesaplandıktan sonra simülasyonun geri kalanında $t>0$
-için Euler entegrasyonu ile güncellemeleri yapacak.
+için Euler entegrasyonu ile güncellemeler yapılacak.
 
 Bir püf nokta atalet matrisi tersi $J^{-1}$ hesabı [1, sf. 467] (bizim
 daha önce $I^{-1}$ olarak işlediğimiz değer). Bunun için
