@@ -243,7 +243,7 @@ def plot_vector2(fig, torig, tend, color='blue'):
 tidx = 7
 f0 = np.array([40,20,10])
 f1 = mesh1.vectors[tidx][0]
-cog = mesh1.get_mass_properties()[1]
+cog = mesh1.get_mass_properties()[1] # cog = agirlik merkezi (center of gravity)
 
 a = f1-f0
 b = cog-f0
@@ -275,15 +275,14 @@ içinde belirtiliyor.  Merkeze olan bileşen kuvveti gösteren vektörün
 ucu muhakkak merkeze dokunuyor olmalı, biz burada gösterim amaçlı
 olarak hem kuvveti hem de bileşenini aynı başlangıçtan
 gösterdik. Yansıtma hesabı için bkz [6]. Tork vektörü de hesaplanıyor,
-ve COG çıkışlı olarak gösteriliyor. Objenin dönüşü bu vektör etrafında
-ve vektörün büyüklüğüne oranlı hızda olacaktır.
-
-Simulasyon
+ve COG (agirlik merkezi -center of gravity) çıkışlı olarak
+gösteriliyor. Objenin dönüşü bu vektör etrafında ve vektörün
+büyüklüğüne oranlı hızda olacaktır.
 
 Alttaki kodlarla bir dış kuvvet uygulanan objenin hareketini
 inceleyeceğiz. Obje uzayda hareketsiz duruyor, yerçekim etkisi yok.
 Önce ilk uygulanan kuvvet etkisinden bahsedelim. Daha önceki yazıda
-ilk uygulanan kuvveti direk hiza çevirmiştik, fakat kavramsal daha
+ilk uygulanan kuvveti direk hıza çevirmiştik, fakat kavramsal daha
 mantıklı olan geçiş kuvvet / tork ve onun ilk lineer ve açısal
 momentuma olan etkisidir.
 
@@ -342,6 +341,8 @@ Tabii hızın kuaterniyon olarak temsil edilmesi lazım, açısal hızı
 kuaterniyon yapıp onu mevcut yönsel duruş (ki o da kuaterniyon ile
 temsil ediliyor) ile çarpıyoruz, ve duruştaki değişimi elde ediyoruz,
 (1) formülünde gördük.
+
+Simulasyon
 
 ```python
 from mpl_toolkits import mplot3d
@@ -418,7 +419,7 @@ for i,t in enumerate(np.linspace(S1,S2,N)):
 os.system("convert -loop 0 -delay 30 img/*.jpg img/rbmove1.gif")
 ```
 
-Sonuc animasyon [7]'de bulunabilir.
+Sonuç animasyon [7]'de bulunabilir.
 
 Not: STL objesinden gelen atalet matrisi $J_{cisim}$ yani
 `mesh.get_mass_properties()[2]` değerinin 0.1 ile çarpılıp
@@ -446,4 +447,3 @@ Kaynaklar
 [6] Bayramlı, *Lineer Cebir Ders 15*
 
 [7] Bayramlı, [Animasyon 1](https://www.dropbox.com/scl/fi/7p1j0hsztb2qaq9pnylb1/rbmove1.gif?rlkey=j2g2crndc9sdfwyflrotazdsr&st=0ktgk41h&raw=1)
-
