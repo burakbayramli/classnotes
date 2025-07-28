@@ -158,6 +158,38 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <p>Aynı sonuca ulaştık. Bu sonuç gösteriyor ki “book’’ yazdığızda Google
 bize 5. sayfayı en başta olacak şekilde sonuç döndürmeli, çünkü onun
 durağan dağılımı 1,2,5 sayfalarının arasında en yüksek.</p>
+<p>Takım Sıralaması</p>
+<p>Eğer bir çizitteki okları mesela A’dan B’ye giden bir ilişkiyi A
+takımı ile B takımı maç yaptı ve A maçı B’ye kaybetti diye temsil
+edersek, ve pek çok takım arasındaki tüm maçlar arasında yapılmış
+maçları bu şekilde çizit içine koyarsak, PageRank hesabı, diğer her
+takımla maç oynamamış olsa bile her takıma doğru olan “genel akışı”
+göstereceği için o skor üzerinden bir takımın diğerine göre ne kadar
+kuvvetli olduğunu bu hesapla anlayabiliriz. Mesela [7]’deki veriye
+bakarsak,</p>
+<p><img src="teams1.jpg" /></p>
+<p>Burada NBA 2013-14 sezonu maçlarından bir kesit gösterilmiş. İki
+takım arasındaki oynanmış tüm maçlardaki skor farkı çizit kenarı
+üzerinde bir ağırlık olarak yazılmış. Bu veriyi bir ilişki matrisi
+ölarak yazabiliriz, ve bir satırı o satırın toplamına bölerek bu matrisi
+bir Markov matrisi haline geiririz. Ardından özvektör hesabı
+yaparız.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> lin</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> np.array([[<span class="dv">0</span>, <span class="fl">4.0</span>, <span class="fl">17.0</span>, <span class="fl">29.0</span>, <span class="fl">4.0</span>],</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">42.0</span>, <span class="dv">0</span>, <span class="fl">23.0</span>, <span class="fl">34.0</span>, <span class="fl">8.0</span>],</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">39.0</span>, <span class="fl">27.0</span>, <span class="dv">0</span>, <span class="fl">23.0</span>, <span class="fl">3.0</span>],</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">28.0</span>, <span class="fl">14.0</span>, <span class="fl">5.0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>              [<span class="fl">22.0</span>, <span class="fl">18.0</span>, <span class="fl">31.0</span>, <span class="fl">44.0</span>, <span class="dv">0</span>]])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span>  P <span class="op">/</span> P.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>).reshape(<span class="dv">1</span>,<span class="bu">len</span>(P)).T</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>evals,evec <span class="op">=</span> lin.eig(P.T)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Bulls, Cavaliers, Pistons, Pacers, Bucks</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>evec[:,<span class="dv">0</span>]</span></code></pre></div>
+<pre class="text"><code>Out[1]: array([0.64516903, 0.33846416, 0.36006211, 0.576504  , 0.08483719])</code></pre>
+<p>Chicago Bulls en üstte çıktı, doğru, bu sezonda CB güçlü bir takımdı.
+Gerçekte ne oldu? Indiana Pacers birinci idi, Bulls ikinci idi, yani
+üstteki temsili veri üzerinden yapılan hesap gerçek duruma yaklaştı.</p>
 <p>Durağan Dağılıma Bakış</p>
 <p>MZ ve durağan dağılımın PageRank’le alakasını bir daha düşünelim. MZ
 ile <span class="math inline">\(n\)</span> adım sonrasını
@@ -201,22 +233,22 @@ ikisinde de birazcık alarak (daha çok ana <span
 class="math inline">\(N\)</span>’den tabii) niahi matrisi oluşturur.
 Örnek olarak şu grafiğe bakalım,</p>
 <p><img src="pg3.png" /></p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> [[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.</span>, <span class="dv">0</span>],</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">2</span>],</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>],</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> np.array(N)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>Nf <span class="op">=</span> <span class="fl">0.20</span> <span class="op">*</span> np.ones((<span class="dv">5</span>,<span class="dv">5</span>))</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="fl">0.85</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> d<span class="op">*</span>N <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>d)<span class="op">*</span>Nf</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span>np.array([<span class="fl">.5</span>, <span class="fl">.3</span>, <span class="fl">.1</span>, <span class="fl">.1</span>, <span class="dv">0</span>]) <span class="co"># herhangi bir vektor</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>): </span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.dot(x,M)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;result = &#39;</span>, x )</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> [[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.</span>, <span class="dv">0</span>],</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">2</span>],</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">1.</span><span class="op">/</span><span class="dv">3</span>],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>     [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> np.array(N)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>Nf <span class="op">=</span> <span class="fl">0.20</span> <span class="op">*</span> np.ones((<span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="fl">0.85</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> d<span class="op">*</span>N <span class="op">+</span> (<span class="dv">1</span><span class="op">-</span>d)<span class="op">*</span>Nf</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>x<span class="op">=</span>np.array([<span class="fl">.5</span>, <span class="fl">.3</span>, <span class="fl">.1</span>, <span class="fl">.1</span>, <span class="dv">0</span>]) <span class="co"># herhangi bir vektor</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>): </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.dot(x,M)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;result = &#39;</span>, x )</span></code></pre></div>
 <pre><code>result =  [ 0.18959094  0.24375097  0.18775335  0.19115138  0.18775335]</code></pre>
 <p>Sonuca göre <span class="math inline">\(v_2\)</span> en yüksek
 PageRank değerine sahip.</p>
@@ -316,16 +348,16 @@ durumda 2. büyük özdeğerin özvektörü kullanılıyor.</p>
 <p>Altta bu yaklaşımı kullanan tüm ülkelerin 2014’te yaptığı ihracat
 verisini kullanan hesaplar bulunabilir, veri için [2]’yi temel aldık,
 bizim ek işlemlerimiz sonrası [3].</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;/opt/Downloads/hidalgo.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hidalgo.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      gdp <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;gdp1416.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      hs <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hs.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;|&#39;</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      hs2 <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hs2.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;ProductCode_x&#39;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(df))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.tail(<span class="dv">10</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> zipfile.ZipFile(<span class="st">&#39;/opt/Downloads/skdata/hidalgo.zip&#39;</span>, <span class="st">&#39;r&#39;</span>) <span class="im">as</span> z:</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hidalgo.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      gdp <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;gdp1416.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      hs <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hs.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;|&#39;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      hs2 <span class="op">=</span>  pd.read_csv(z.<span class="bu">open</span>(<span class="st">&#39;hs2.csv&#39;</span>),sep<span class="op">=</span><span class="st">&#39;,&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;ProductCode_x&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(df))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.tail(<span class="dv">10</span>))</span></code></pre></div>
 <pre><code>726013
         year origin    hs92  export_val  import_val  export_rca  import_rca
 726003  2014    ven  961610     39395.0   2026297.0       0.011       0.947
@@ -340,38 +372,38 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a h
 726012  2014    ven  970600         NaN      2484.0         NaN       0.000</code></pre>
 <p>Ülkeler satırlarda, ürünler kolonlarda olacak şekilde bir tablo
 oluşturalım,</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cp <span class="op">=</span> df.pivot_table(<span class="st">&#39;export_val&#39;</span>, index<span class="op">=</span><span class="st">&#39;origin&#39;</span>, columns<span class="op">=</span><span class="st">&#39;hs92&#39;</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp.shape)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(np.unique(df.hs92)), <span class="st">&#39;urun&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cp <span class="op">=</span> df.pivot_table(<span class="st">&#39;export_val&#39;</span>, index<span class="op">=</span><span class="st">&#39;origin&#39;</span>, columns<span class="op">=</span><span class="st">&#39;hs92&#39;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp.shape)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(np.unique(df.hs92)), <span class="st">&#39;urun&#39;</span>)</span></code></pre></div>
 <pre><code>(220, 4858)
 4858 urun</code></pre>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>denom <span class="op">=</span> cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> cp.<span class="bu">sum</span>().<span class="bu">sum</span>()</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>denom <span class="op">=</span> cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> cp.<span class="bu">sum</span>().<span class="bu">sum</span>()</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp.div(cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).T)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp2.div(denom,axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp2.fillna(<span class="dv">0</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>cp2[cp2 <span class="op">&gt;</span> <span class="fl">1.0</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>cp2[cp2 <span class="op">!=</span> <span class="fl">1.0</span>] <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>cp3 <span class="op">=</span> cp2</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>cp4 <span class="op">=</span> cp3.div(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>),axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>cp5 <span class="op">=</span> cp3.div(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>),axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp4.shape, cp5.shape)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>denom <span class="op">=</span> cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> cp.<span class="bu">sum</span>().<span class="bu">sum</span>()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>denom <span class="op">=</span> cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> cp.<span class="bu">sum</span>().<span class="bu">sum</span>()</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp.div(cp.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).T)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp2.div(denom,axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>cp2 <span class="op">=</span> cp2.fillna(<span class="dv">0</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>cp2[cp2 <span class="op">&gt;</span> <span class="fl">1.0</span>] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>cp2[cp2 <span class="op">!=</span> <span class="fl">1.0</span>] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>cp3 <span class="op">=</span> cp2</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>cp4 <span class="op">=</span> cp3.div(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>),axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>cp5 <span class="op">=</span> cp3.div(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>),axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp4.shape, cp5.shape)</span></code></pre></div>
 <pre><code>(220, 4858) (220, 4858)</code></pre>
 <p>Özanaliz ile en ileri 10 ülkeye bakalım, ülkeler için hesaplanan
 vektöre ECI adı veriliyor (economic complexity index -ekonomik
 çetrefillik indisi-),</p>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp4.shape)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>uc,vc <span class="op">=</span> lin.eig(np.dot(cp4,cp5.T))</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (vc.shape)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>eci <span class="op">=</span> np.array(vc)[:,<span class="dv">1</span>]</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(eci))</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.argmax(eci))</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>top_countries <span class="op">=</span> cp.index[np.argsort(eci)[:<span class="dv">10</span>]]</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (top_countries)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.linalg <span class="im">as</span> lin</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (cp4.shape)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>uc,vc <span class="op">=</span> lin.eig(np.dot(cp4,cp5.T))</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (vc.shape)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>eci <span class="op">=</span> np.array(vc)[:,<span class="dv">1</span>]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(eci))</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.argmax(eci))</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>top_countries <span class="op">=</span> cp.index[np.argsort(eci)[:<span class="dv">10</span>]]</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (top_countries)</span></code></pre></div>
 <pre><code>(220, 4858)
 (220, 220)
 220
@@ -382,33 +414,33 @@ Index([u&#39;jpn&#39;, u&#39;che&#39;, u&#39;deu&#39;, u&#39;kor&#39;, u&#39;swe
 <p>Şimdi ürünler, buna PCI deniyor (product complexity index -ürün
 çetrefillik indisi-). En çetrefil 10 ürün (en sağdaki en yüksek olacak
 şekilde),</p>
-<div class="sourceCode" id="cb18"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse.linalg <span class="im">as</span> lin</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse <span class="im">as</span> sps</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>scp4 <span class="op">=</span> sps.lil_matrix(cp4)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>scp5 <span class="op">=</span> sps.lil_matrix(cp5)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> scp4.T.dot(scp5)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>up,vp <span class="op">=</span> lin.eigs(A,k<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>pci <span class="op">=</span> np.array(vp)[:,<span class="dv">1</span>]</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>top_prods <span class="op">=</span> cp.columns[np.argsort(pci)[<span class="op">-</span><span class="dv">10</span>:]]</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (top_prods)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse.linalg <span class="im">as</span> lin</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.sparse <span class="im">as</span> sps</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>scp4 <span class="op">=</span> sps.lil_matrix(cp4)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>scp5 <span class="op">=</span> sps.lil_matrix(cp5)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> scp4.T.dot(scp5)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>up,vp <span class="op">=</span> lin.eigs(A,k<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>pci <span class="op">=</span> np.array(vp)[:,<span class="dv">1</span>]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>top_prods <span class="op">=</span> cp.columns[np.argsort(pci)[<span class="op">-</span><span class="dv">10</span>:]]</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (top_prods)</span></code></pre></div>
 <pre><code>Int64Index([851410, 390940, 847990, 847790, 840999, 852610, 841221, 848390,
             870810, 848590],
            dtype=&#39;int64&#39;, name=u&#39;hs92&#39;)</code></pre>
 <p>Bu ürünler hangileri?</p>
-<div class="sourceCode" id="cb20"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">&#39;expand_frame_repr&#39;</span>, <span class="va">False</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>top_prods2 <span class="op">=</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">list</span>(top_prods)]</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>hs2_index_str <span class="op">=</span> hs2.index.astype(<span class="bu">str</span>) <span class="co"># Ensure hs2 index is string type for comparison</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>valid_top_prods <span class="op">=</span> [p <span class="cf">for</span> p <span class="kw">in</span> top_prods2 <span class="cf">if</span> p <span class="kw">in</span> hs2_index_str]</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(valid_top_prods))</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> valid_top_prods: <span class="co"># Check if there are any valid products to avoid error on empty list</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (hs2.loc[valid_top_prods][[<span class="st">&#39;Product Description_y&#39;</span>,<span class="st">&#39;Product Description_x&#39;</span>]])</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;No matching product codes found in hs2 for the top products.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">&#39;expand_frame_repr&#39;</span>, <span class="va">False</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>top_prods2 <span class="op">=</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">list</span>(top_prods)]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>hs2_index_str <span class="op">=</span> hs2.index.astype(<span class="bu">str</span>) <span class="co"># Ensure hs2 index is string type for comparison</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>valid_top_prods <span class="op">=</span> [p <span class="cf">for</span> p <span class="kw">in</span> top_prods2 <span class="cf">if</span> p <span class="kw">in</span> hs2_index_str]</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(valid_top_prods))</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> valid_top_prods: <span class="co"># Check if there are any valid products to avoid error on empty list</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (hs2.loc[valid_top_prods][[<span class="st">&#39;Product Description_y&#39;</span>,<span class="st">&#39;Product Description_x&#39;</span>]])</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;No matching product codes found in hs2 for the top products.&quot;</span>)</span></code></pre></div>
 <pre><code>10
                                            Product Description_y                              Product Description_x
 ProductCode_x                                                                                                      
@@ -424,20 +456,20 @@ ProductCode_x
 848590         (-2006) Machinery parts not specified or inclu...                                    (-2006) - Other</code></pre>
 <p>Acaba ECI’yi 2014 yılında ülkelerin kişi başına gayrısafi yurtiçi
 hasılasını tahmin etmek için kullanabilir miyiz?</p>
-<div class="sourceCode" id="cb22"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>cindex <span class="op">=</span> [x.upper() <span class="cf">for</span> x <span class="kw">in</span> cp.index]</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> pd.DataFrame(eci,index<span class="op">=</span>cindex)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> ecigdp.join(gdp)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ecigdp.shape)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>ecigdp.columns <span class="op">=</span> [<span class="st">&#39;eci&#39;</span>, <span class="st">u&#39;gdp2014&#39;</span>, <span class="st">u&#39;gdp2016&#39;</span>]</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>ecigdp[<span class="st">&#39;prods&#39;</span>] <span class="op">=</span> np.array(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> ecigdp.dropna()</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ecigdp.tail())</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;np.log(gdp2014) ~ prods&#39;</span>, data<span class="op">=</span>ecigdp).fit()</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.rsquared_adj)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;np.log(gdp2014) ~ eci&#39;</span>, data<span class="op">=</span>ecigdp).fit()</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.rsquared_adj)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>cindex <span class="op">=</span> [x.upper() <span class="cf">for</span> x <span class="kw">in</span> cp.index]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> pd.DataFrame(eci,index<span class="op">=</span>cindex)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> ecigdp.join(gdp)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ecigdp.shape)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>ecigdp.columns <span class="op">=</span> [<span class="st">&#39;eci&#39;</span>, <span class="st">u&#39;gdp2014&#39;</span>, <span class="st">u&#39;gdp2016&#39;</span>]</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>ecigdp[<span class="st">&#39;prods&#39;</span>] <span class="op">=</span> np.array(cp3.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>ecigdp <span class="op">=</span> ecigdp.dropna()</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ecigdp.tail())</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;np.log(gdp2014) ~ prods&#39;</span>, data<span class="op">=</span>ecigdp).fit()</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.rsquared_adj)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;np.log(gdp2014) ~ eci&#39;</span>, data<span class="op">=</span>ecigdp).fit()</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.rsquared_adj)</span></code></pre></div>
 <pre><code>(220, 3)
           eci      gdp2014      gdp2016  prods
 WSM  0.025062  3761.912686  3524.649880  209.0
@@ -451,9 +483,9 @@ ZWE  0.063000   908.829980   932.548383  275.0
 zenginliği onun ürettiği ürünlerin çetrefilliği ile direk alakalı.
 Dikkat edersek düz ürün sayısını kullanarak yapılan regresyon o kadar
 başarılı değil, demek ki ECI hakikaten bir niceliği yakalayabilmiş.</p>
-<div class="sourceCode" id="cb24"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>plt.plot(ecigdp.eci,np.log(ecigdp.gdp2014),<span class="st">&#39;.&#39;</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;linear_app03eigen_01.png&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>plt.plot(ecigdp.eci,np.log(ecigdp.gdp2014),<span class="st">&#39;.&#39;</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;linear_app03eigen_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="linear_app03eigen_01.png" /></p>
 <p>Bu alanda daha fazla okuma yapmak isteyenler için [4] güzel bir
 kaynak. Üretime uygulanabilen bilgiden bahsedilirken mesela gelişmiş
@@ -476,6 +508,7 @@ href="http://atlas.cid.harvard.edu">http://atlas.cid.harvard.edu</a></p>
 <p>[5] Inoua, <em>A Simple Measure of Economic Complexity</em>, <a
 href="https://arxiv.org/abs/1601.05012">https://arxiv.org/abs/1601.05012</a></p>
 <p>[6] Bayramlı, <em>Istatistik, Markov Zincirleri</em></p>
+<p>[7] https://github.com/bnak/SportsRank</p>
 <p>
   <a href="..">Yukarı</a>
 </p>

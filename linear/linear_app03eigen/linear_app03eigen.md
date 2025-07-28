@@ -89,6 +89,48 @@ Aynı sonuca ulaştık. Bu sonuç gösteriyor ki "book'' yazdığızda Google bi
 5. sayfayı en başta olacak şekilde sonuç döndürmeli, çünkü onun durağan
 dağılımı 1,2,5 sayfalarının arasında en yüksek.
 
+Takım Sıralaması
+
+Eğer bir çizitteki okları mesela A'dan B'ye giden bir ilişkiyi A
+takımı ile B takımı maç yaptı ve A maçı B'ye kaybetti diye temsil
+edersek, ve pek çok takım arasındaki tüm maçlar arasında yapılmış
+maçları bu şekilde çizit içine koyarsak, PageRank hesabı, diğer her
+takımla maç oynamamış olsa bile her takıma doğru olan "genel akışı"
+göstereceği için o skor üzerinden bir takımın diğerine göre ne kadar
+kuvvetli olduğunu bu hesapla anlayabiliriz. Mesela [7]'deki veriye
+bakarsak,
+
+![](teams1.jpg)
+
+Burada NBA 2013-14 sezonu maçlarından bir kesit gösterilmiş. İki takım
+arasındaki oynanmış tüm maçlardaki skor farkı çizit kenarı üzerinde bir
+ağırlık olarak yazılmış. Bu veriyi bir ilişki matrisi ölarak yazabiliriz,
+ve bir satırı o satırın toplamına bölerek bu matrisi bir Markov matrisi
+haline geiririz. Ardından özvektör hesabı yaparız.
+
+```python
+import numpy.linalg as lin
+P = np.array([[0, 4.0, 17.0, 29.0, 4.0],
+              [42.0, 0, 23.0, 34.0, 8.0],
+              [39.0, 27.0, 0, 23.0, 3.0],
+              [28.0, 14.0, 5.0, 0, 0],
+              [22.0, 18.0, 31.0, 44.0, 0]])
+
+P =  P / P.sum(axis=1).reshape(1,len(P)).T
+evals,evec = lin.eig(P.T)
+# Bulls, Cavaliers, Pistons, Pacers, Bucks
+evec[:,0]
+```
+
+```text
+Out[1]: array([0.64516903, 0.33846416, 0.36006211, 0.576504  , 0.08483719])
+```
+
+Chicago Bulls en üstte çıktı, doğru, bu sezonda CB güçlü bir
+takımdı. Gerçekte ne oldu? Indiana Pacers birinci idi, Bulls ikinci
+idi, yani üstteki temsili veri üzerinden yapılan hesap gerçek duruma
+yaklaştı.
+
 Durağan Dağılıma Bakış
 
 MZ ve durağan dağılımın PageRank'le alakasını bir daha düşünelim. MZ ile
@@ -459,3 +501,4 @@ Kaynaklar
 
 [6] Bayramlı, *Istatistik, Markov Zincirleri*
 
+[7] https://github.com/bnak/SportsRank
