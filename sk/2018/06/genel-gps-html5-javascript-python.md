@@ -330,55 +330,6 @@ print (g.latlng)
 [40.0549886, 26.9278292]
 ```
 
-### Imajdan Kordinat Toplamak
-
-Diyelim ki elimizde JPG üzerinde bir harita var, üzerinde bir sınır
-gösterilmiş, ve oradan sınır verilerini toplamak istiyoruz. Alttaki
-basit GUI kodu şunu yapar 1) Parametre olarak geçilen resmi gösterir,
-2) O resim üzerinde yapılacak fare tıklamalarının x,y piksel
-kordinatlarını ekrana basar. Bu sayede çıplak gözle sınıra bakarız,
-üzerine tıklarız, ve kordinatlarını "geriye mühendislik" ile toplamış
-oluruz.
-
-```python
-from PIL import ImageDraw, Image, ImageTk
-import sys, tkinter
-
-window = tkinter.Tk(className="bla")
-image = Image.open(sys.argv[1])
-print ('size',image.size[0],image.size[1])
-
-image = image.resize((int(1000), int(700)), Image.ANTIALIAS)
-canvas = tkinter.Canvas(window, width=image.size[0], height=image.size[1])
-canvas.pack()
-image_tk = ImageTk.PhotoImage(image)
-
-canvas.create_image(image.size[0]//2, image.size[1]//2, image=image_tk)
-
-def callback(event):
-    print ("[%d,%d]," % (event.x, event.y))
-
-canvas.bind("<Button-1>", callback)
-tkinter.mainloop()
-```
-
-Gerekli paketi kurmak için `sudo apt install python3-tk` yeterli.
-
-Tabii nihai kordinatlar için ek bir adım daha gerekli, piksel
-değerlerini alıp enlem, boylama çevirmek; bu hesap için enlem
-boylamını bildiğimiz iki piksel değeri yeterli. Alttaki gibi bir kodla
-bu transformasyon yapılabilir. Referans iki kordinat değeri `refc`,
-ona tekabül eden iki piksel x,y değeri `refp` içinde, ve toplanan
-tüm piksel değerleri bir liste olarak `clicks` içinde.
-
-```python
-def platlon(refc, refp, clicks):
-    mlat = (refc[1,0]-refc[0,0]) / (refp[1,1]-refp[0,1])
-    mlon = (refc[1,1]-refc[0,1]) / (refp[1,0]-refp[0,0])
-    cs = [ [ refc[0,0]+(y-refp[0,1])*mlat, refc[0,1]+(x-refp[0,0])*mlon ] for x,y in data ]
-    return cs
-```
-
 Kaynaklar
 
 [1] Kenneth Gade (2010), A Non-singular Horizontal Position Representation,
