@@ -194,10 +194,10 @@ HTML dosyası
 
 Neler Oldu
 
-'r' tuşuna basınca kamera'dan fare göstergeçinin olduğu yere doğru bir "ışın"
-gönderilir. Bu ışının ilk kesiştiği objenin üstteki nokta kesişme noktası
-olarak bize dondurulur. Bu noktadan ışın yönünde ufak bir vektörü biz demo amaçlı
-olarak oraya koyuyoruz.
+'r' tuşuna basınca kamera'dan fare göstergeçinin olduğu yere doğru bir
+"ışın" gönderilir. Bu ışının ilk kesiştiği objenin üstteki nokta
+kesişme noktası olarak bize döndürülür. Bu noktadan ışın yönünde ufak
+bir vektörü biz demo amaçlı olarak o noktada çiziyoruz.
 
 
 Temel Kavramlar
@@ -321,3 +321,7 @@ olacaktır.
 Kaynaklar
 
 [1] <a href="../../2020/08/shapes/Prism_hexagon.stl">STL Objesi</a>
+
+
+
+

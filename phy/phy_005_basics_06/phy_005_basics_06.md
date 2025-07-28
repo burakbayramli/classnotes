@@ -432,6 +432,13 @@ dönmeye karşı "ataleti" çok büyük idi, bizim rasgele seçilmiş kuvvet
 vektörü döndürmeyi sağlayamıyordu. Atalet matrisini suni şekilde biraz
 küçülterek bu problemi çözmüş olduk.
 
+Üstteki yaklaşım Euler entegrasyonu kullandı. Runge-Kutta entegrasyonu
+kullanan kodlar alttadır.
+
+Kodlar
+
+[sim_rk4.py](sim_rk4.py)
+
 Kaynaklar
 
 [1] Eberly, *Game Physics 2nd Ed*
