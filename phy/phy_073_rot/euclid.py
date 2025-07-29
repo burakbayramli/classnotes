@@ -1605,10 +1605,6 @@ class Quaternion:
         
         return m
 
-
-
-
-
 if __name__ == "__main__": 
 
     q1 = Quaternion(1,1,1,1)
