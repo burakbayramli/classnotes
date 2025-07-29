@@ -165,6 +165,11 @@ Bu servisi bazen tekrar başlatmak gerekebilir, yeni komut
 sudo systemctl restart NetworkManager.service
 ```
 
+Matplotlib
+
+Python üzerinde kurulduktan sonra bu paket için `$HOME/.config/matplotlib/matplotlibrc`
+dosyasında `backend : Agg` ayarı yapmak iyi olur.
+
 Kaynaklar
 
 [1] https://www.youtube.com/watch?v=eMHr9jsbJG4

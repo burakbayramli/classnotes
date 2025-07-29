@@ -1,8 +1,10 @@
 # Hareketin Katı-Gövde Denklemleri - 2
 
-Daha önce rotasyon matrisi bazlı hareket denklemlerini vermiştik. Bu yazıda
-cisim duruşu ve dönüş mekaniğini kuaterniyon kavramı üzerinden hesaplayacağız,
-daha önce görülen bazı kavramların da tekrar üzerinden geçeceğiz. 
+Daha önce rotasyon matrisi bazlı hareket denklemlerini vermiştik. Bu
+yazıda cisim duruşu ve dönüş mekaniğini kuaterniyon kavramı üzerinden
+hesaplayacağız, daha önce görülen bazı kavramların da tekrar üzerinden
+geçeceğiz. Nihai amacımız $t=0$ anında bir kuvvet uygulanan objenin
+nasıl davranacağını simüle edebilmek.
 
 Lineer Hız, Momentum
 
@@ -215,9 +217,11 @@ kırmızı vektörü yansıtıyoruz, bu da lineer kuvvet oluyor. Bir üstteki re
 Daha önce söylediğimiz gibi her iki kuvvet de ilk anda lineer ve açısal
 momentumu ekileyen faktörler, sonraki adımlarda etkileri yok.
 
-Uygulanan kuvveti şöyle seçelim, STL objesi üzerindeki üçgenlerden birinin
-köşesini son nokta olarak alalım, uzayda herhangi bir noktası başlangıç
-noktası olarak alalım, ve ilk kuvvet bu vektör olsun.
+Bu kavramların şimdi bir sanal obje üzerinde etkilerini görelim. STL
+formatında tutulan bir 3D objesi olsun. Uygulanan kuvveti şöyle etki
+ettiririz, STL objelerinin dışı üçgenlerden oluşur, o üçgenlerden
+birinin köşesini son nokta olarak alalım, uzayda herhangi bir noktası
+başlangıç noktası olarak alalım, ve ilk kuvvet bu vektör olsun.
 
 ```python
 import numpy.linalg as lin
@@ -428,8 +432,8 @@ $J_{cisim}$ değerinin çok büyük olması idi, herhalde objenin birim
 değerleri çok küçüktü (mesela milimetre) ve bu sebeple değerler
 binlerde oluyordu. Fakat bu yüzden 1 kg üzerindeki lineer momentumun
 etkisi ilk açısal momentum değerinden çok daha büyük oluyordu, objenin
-dönmeye karşı "ataleti" çok büyük idi, bizim rasgele seçilmiş kuvvet
-vektörü döndürmeyi sağlayamıyordu. Atalet matrisini suni şekilde biraz
+dönmeye karşı "ataleti" çok büyük idi, seçtiğimiz kuvvet vektörü
+döndürmeyi sağlayamıyordu. Atalet matrisini suni şekilde biraz
 küçülterek bu problemi çözmüş olduk.
 
 Üstteki yaklaşım Euler entegrasyonu kullandı. Runge-Kutta entegrasyonu

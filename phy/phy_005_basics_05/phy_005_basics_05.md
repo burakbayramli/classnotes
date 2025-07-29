@@ -6,103 +6,18 @@ Runge-Kutta Hesabı
 hareketi için diferansiyel denklemleri entegre etmemiz gerekiyor, bunun
 için Runge-Kutta yaklaşımını bir örnek üzerine görebiliriz.
 
-İlk Uygulanan Kuvvet
-
-İki boyutlu ortama ağırlığı $m=1$ kg olan bir topu 45 derece açıyla sağ yukarı
-doğru atıyoruz, uyguladığımız kuvvet 500 Newton. Bu topun gidiş yönü nasıl
-hesaplanır?
-
-Önemli bir konu uygulanan kuvveti başlangıçta sisteme nasıl dahil edeceğimiz.
-Burada dürtü / vuruş / darbe (impulse) kavramına bakmak gerekiyor. Kuvvetle hız
-değişimini ilintilendirmek için Newton'un ikinci kanunu ile başlayalım,
-
-$$
-F = \frac{\mathrm{d} P}{\mathrm{d} t} 
-$$
-
-Uygulanan kuvvet momentum değişimine eşittir, ki $P = mv$ olmak üzere. Fakat
-sonsuz küçük zaman üzerinden iş yapamayız, iki tarafın entegralini alalım,
-
-$$
-\int_{t_1}^{t_2} F \mathrm{d} t = \int_{t_1}^{t_2} \mathrm{d} P \mathrm{d} t
-$$
-
-$$
-J = \int_{t_1}^{t_2} F \mathrm{d} t = P(t_2) - P(t_1)
-$$
-
-Sonuçtaki $J$ dürtü büyüklüğü, kuvvetin zaman üzerinden entegrali, yani
-bir zaman aralığında uygulanan kuvvetin toplamı. Bu büyüklük momentum
-üzerinde bir değişime yol açıyor, $P(t_1)$ momentumundan $P(t_2)$
-değerine geliyoruz.
-
-Üstteki formül şunu söylüyor, momentum değişimi için bir kuvvetin uygulandığı
-bir zaman aralığı gerekir. O zaman problem tanımı eksik, 500 Newton'luk kuvvet
-uyguladık, peki ne kadar süreli? Devam etmeden önce diyelim ki bir saniye, o
-zaman dürtü 500 Newton $\cdot$ saniye (Ns) olur. Dikkat $m$ değeri değişmediği
-için tek değişim hız değişkeninde olacaktır, $J = m(v_2 - v_1) = m \Delta v$,
-yani dürtü sonrası hızda değişim gözleyeceğiz.
-
-Başlangıçta $v_1=0$, dürtü için 500 N $\cdot$ saniye
-
-$$
-J = m v_2 - m v_1 = m v_2 - m(0) \to J = m v_2
-$$
-
-$$
-\to 500 Ns = m v_2
-\to 500 \frac{kg \cdot m/s^2}{1 kg } \cdot s = v_2
-\to v_2 = 500 m/s
-$$
-
-diyebiliriz.
-
-Ilk Uygulanan Tork
-
-Gerçi alttaki örnek için lazım değil ama ilk uygulanan kuvvet gibi ilk uygulanan
-dürtü (impulse), tork kavramı da simülasyonlarda gerekli. Bu durumda açısal
-dürtü belli bir zamanda uygulanan torktur, yani torkun zaman üzerinden
-entegralidir denir, ve bu dürtü açısal momentumdaki değişime eşittir. İlk
-tanımla başlarsak,
-
-$$
-J = \int \tau \mathrm{d} t
-$$
-
-Eğer zaman aralığı ufak ve tork sabit ise
-
-$$
-J = \tau \Delta t
-$$
-
-Diğer yandan açısal momentum eşitliğini hatırlayalım,
-
-$$
-L = I \omega
-$$
-
-Açısal dürtü açısal momentum değişimine eşit ise
-
-$$
-\tau \Delta t = \Delta L = \Delta (I \omega)= I (\omega_2 - \omega_1)
-$$
-
-ki $\omega_1$ başlangıç açısal hızı, $\omega_2$ nihai hız. Hız başlangıçta sıfır
-olsa, $\omega_1 = 0$, ve nihai hız ile başlangıçta uygulanan tork arasında
-bağlantı kurmak istesek
-
-$$
-\tau \Delta t = I \omega_2 
-$$
-
-$$
-\to \omega_2 = I^{-1} \tau \Delta t
-$$
+Not: Alttaki örnekte ilk uygulanan kuvvet bir başlangıç lineer hıza
+dönüştürüldü. Bu gösterim amaçlı yapıldı, sonraki örneklerde ilk
+uygulanan kuvveti direk momentuma çevireceğiz.
 
 Örnek
 
-Artık sistem denklemini entegre edebiliriz, sistem $\dot{x} = v_x$,
-$\dot{y} = v_y$ $\dot{v} = a$. Sürekli etki eden tek ivme etkisi yerçekimi
+İki boyutlu ortamda ağırlığı $m=1$ kg olan bir topu 45 derece açıyla
+sağ yukarı doğru atıyoruz, uyguladığımız kuvvet 500 Newton. Bu topun
+gidiş yönü nasıl hesaplanır?
+
+Sistem denklemi şöyle entegre edilir, sistem $\dot{x} = v_x$, $\dot{y}
+= v_y$ $\dot{v} = a$. Sürekli etki eden tek ivme etkisi yerçekimi
 $g$. Sistem bir vektör üzerinden temsil edilebiliyor,
 
 $$
@@ -416,7 +331,139 @@ COG sıfır noktasında olması, ayrıca atalet matrisinin köşegen olması man
 Üstteki simülasyonda kuvvetler, lineer, açısal momentum gibi kavramlar
 gösterilmedi, bir sonraki yazıda tüm kavramların olduğu bir simülasyon olacak,
 yazıda dönüş matematiği de sayısal açıdan daha sağlam farklı bir yaklaşım
-kullanıyor olacak.  
+kullanıyor olacak.
+
+Atalet Matrisi ve Dönüşler
+
+Daha önce atalet matrisi $I(t)$'yi görmüştük,
+
+$$
+I(t) = \sum \left[\begin{array}{ccc}
+m_i (y_i^2 + z_i^2) & -m_i x_i y_i & m_i x_i z_i \\
+-m_i y_i x_i & m_i (x_i^2 + z_i^2) & -m_i y_i z_i \\
+-m_i z_i x_i & -m_i z_i y_i & m_i (x_i^2 + y_i^2)
+\end{array}\right]
+$$
+
+Burada $x,y,z$ değerleri gövde uzayında, her nokta $r_i'$ için $x_i,y_i,z_i$
+değerleri $r_i - \chi(t)$ içeriğiyle hesaplanıyor. Ayrıca bir obje dönerse, onun
+belli noktalarının eksenden olan uzaklıkları değişir ve farklı bir $I$ elde
+ederiz... fakat üstteki hesabı obje hareket ederken sürekli yapmak oldukca
+külfetlidir. Acaba $I$'nin bir baz kısmını hesaplasak, sonra dönüşe göre onu
+güncellesek olmaz mı?
+
+Bunun bir yolu var [5, sf. 14]. $r_i'^T r_i' = x_i^2 + y_i^2 + z_i^2$ olduğundan
+hareketle, önceki $I$ denklemini şu şekilde yazabiliriz,
+
+$$
+I(t) = \sum
+m_i r_i'^T r_i' \left[\begin{array}{ccc}
+1 & 0 & 0 \\ 
+0 & 1 & 0 \\ 
+0 & 0 & 1 
+\end{array}\right] -
+\left[\begin{array}{ccc}
+m_i x_i^2 & -m_i x_i y_i & m_i x_i z_i \\
+-m_i y_i x_i & m_i y_i^2 & -m_i y_i z_i \\
+-m_i z_i x_i & -m_i z_i y_i & m_i z_i^2
+\end{array}\right]
+$$
+
+Simdi en sağdaki matrise dikkat edelim, onu bir dış çarpım (outer product)
+olarak temsil edebiliriz, alttaki gibi,
+
+$$
+r_i' r_i'^T = \left[\begin{array}{c}
+x_i \\ y_i \\ z_i
+\end{array}\right]
+\left[\begin{array}{ccc}
+x_i & y_i & z_i
+\end{array}\right] =
+\left[\begin{array}{ccc}
+x_i^2 &  x_i y_i &  x_i z_i \\
+y_i x_i & y_i^2 & y_i z_i \\
+z_i x_i & z_i y_i & z_i^2
+\end{array}\right]
+$$
+
+Bunu kullanarak ve 3 x 3 boyutlu birim matrisini $\overline{1}$ ile göstererek
+(normalde bu matris için $I$ notasyonu kullanılır ama o hard bu yazıda
+kapılmış durumda),
+
+$$
+I(t) = \sum m_i ((r_i'^T r_i') \overline{1} - r_i' r_i'^T)
+$$
+
+Bu nasıl faydalı? Çünkü $r_i(t) = R(t) r_{0i} + x_{CM}(t)$ ki $r_{0i}$
+başlangıçtaki kütlede $i$ parçacığın yeri, ve sabit, o zaman
+
+$$
+r_i(t) - x_{CM}(t) = R(t) r_{0i} = r_i'(t)
+$$
+
+Şimdi $r_i'(t) = R(t) r_{0i}$ eşitliğini iki üstteki formülde kullanırsak,
+
+$$
+I(t) = \sum
+m_i ( (R(t) r_{0i})^T  (R(t) r_{0i})  \overline{1} -  (R(t) r_{0i})  (R(t) r_{0i})^T  )
+$$
+
+$$
+= \sum
+m_i ( r_{0i}^T R(t)^T R(t) r_{0i} \overline{1} -  R(t) r_{0i} r_{0i}^T R(t)^T )
+$$
+
+$R(t)$ dikgen, ortonormal matris oldugu icin $R(t)^TR(t) = \overline{1}$
+
+$$
+= \sum
+m_i ( (r_{0i}^T r_{0i}) \overline{1} -  R(t) r_{0i} r_{0i}^T R(t)^T )
+$$
+
+
+Üstteki formülde ikinci terimde $R(t) .. R(t)^T$ ifadesi var, bunu
+birinci terime de eklemek için, ve $r_{0i}^T r_{0i}$ bir tek sayı değer
+olduğu için ve $R(t) R(t)^T$'nin birim matris olmasından hareketle,
+
+$$
+= \sum
+m_i ( R(t) (r_{0i}^T r_{0i}) R(t)^T \overline{1} -  R(t) r_{0i} r_{0i}^T R(t)^T )
+$$
+
+Böylece $R(t)$ ve $R(t)^T$ dışarı çekilebiliyor,
+
+$$
+= R(t) \left( \sum 
+m_i (( r_{0i}^T r_{0i}) \overline{1} -  r_{0i} r_{0i}^T
+\right)  R(t)^T 
+$$
+
+Böylece parantez içindeki, $I_{body}$ denebilecek değerler parçacıkların
+gövdenin ilk konumundaki yerlerine (ve değişmeyen kütle $m_i$ değerine) göre
+hesaplanabileceği için, onu bir kez hesaplayabiliriz, ve sonra ona $R(t)$'leri
+uygulayarak istediğimiz güncel $I(t)$ değerini elde ederiz [5, sf. 15].
+
+$$
+I(t) = R(t) I_{body} R(t)^T
+$$
+
+$I$'nin tersi $I_{body}^{-1}$ de gerekli (niye birazdan göreceğiz) fakat bu
+hesap ta başta hesaplanıp depolanabilir, çünkü
+
+$$
+I^{-1} = ( R(t) I_{body} R(t)^T )^{-1} 
+$$
+
+$$
+(R(t)^T)^{-1} I_{body}^{-1} R(t)^{-1} 
+$$
+
+$$
+= R(t) I_{body}^{-1} R(t)^T
+$$
+
+$R(t)^T = R(t)^{-1}$ ve $R(t)^T = R(t)$ olduğunu hatırlayalım çünkü $R(t)$
+orthonormal, dikgen bir matris. 
 
 Kaynaklar
 

@@ -3,15 +3,15 @@
 
 ## En Son
 
+29/7 - [Hareketin Katı-Gövde Denklemleri - 2](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_06/hareketin_katigovde_denklemleri__2.html)
+
+29/7 - [Hareketin Katı-Gövde Denklemleri - 1 - Ekler - Eğik Atış (Projectile Motion) RK4](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_05/hareketin_katigovde_denklemleri__1.html)
+
 22/7 - [Çizit Analizi (Graph Analysis)](https://burakbayramli.github.io/dersblog/algs/algs_110_graph/cizit_analizi__graph_analysis_.html)
 
 14/7 - [Ses Komut Tanıma, Dikkat (Attention) Modeli](https://burakbayramli.github.io/dersblog/sk/2025/07/voice-command-ses-komut.html)
 
 9/7 - [Keras OCR, Hazır YSA Ağırlıkları, Tensorflow](https://burakbayramli.github.io/dersblog/sk/2025/07/tensorflow-keras-ocr.html)
-
-2/7 - [Markdown ile PDF ve HTML Üretmek, Pandoc](https://burakbayramli.github.io/dersblog/sk/2025/06/markdown-pandoc-html-pdf.html)
-
-24/6 - [Ubuntu 24, Acer Swift 3](https://burakbayramli.github.io/dersblog/sk/2025/06/ubuntu-24-acer.html)
 
 ## Konular, Referans
 
