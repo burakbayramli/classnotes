@@ -24,6 +24,32 @@ p2 = LatLon(lat2, lon2)
 p1.distanceTo(p2)
 ```
 
+Not: Eğer E,W içeren değerler alırsak onları
+
+```python
+def parse_latlon_string(lat_str, lon_str):
+    lat_value, lat_hemi = lat_str.strip().split("° ")
+    lon_value, lon_hemi = lon_str.strip().split("° ")
+    
+    lat_deg = float(lat_value)
+    lon_deg = float(lon_value)
+    
+    # Adjust for hemisphere
+    if lat_hemi == "S":
+        lat_deg = -lat_deg
+    
+    if lon_hemi == "W":
+        lon_deg = -lon_deg
+        
+    return LatLon(lat_deg, lon_deg)
+
+lat_string = "33.18° N"
+lon_string = "129.72° E"
+point = parse_latlon_string(lat_string, lon_string)
+```
+
+ile çevirebiliriz.
+
 ### İki nokta arasında birinciden ikinciye olan açısal yön (bearing),
 
 ```python

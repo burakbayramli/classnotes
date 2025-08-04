@@ -348,8 +348,8 @@ var. MovieLens 1M (1 milyon not) ile daha iyi sonuçlar alınabilir (bu veri
 
 Ekler
 
-Alttaki kod Keras sitesindeki kodun 2.15 icin guncellenmis hali, su
-anda test ediliyor.
+Alttaki kod Keras sitesindeki kodun 2.15 ve ml-32 için güncellenmiş
+hali, şu anda test ediliyor.
 
 [recom2.py](recom2.py)
 

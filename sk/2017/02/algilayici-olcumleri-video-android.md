@@ -1,4 +1,9 @@
-# Algılayıcı Ölçümleri, Video, Android, GPS, Haritalama
+# Algılayıcılar, Android
+
+HTML, Javascript ile ivme algılayıcı verisinı toplayan bir örnek
+[sensorweb.html][sensorweb.html] dosyasında. Originali [1]'de.
+
+Eski Yazı
 
 İki uygulama: Birincisi cep telefonunda nerede olduğumuzu harita
 üzerinde bulmak, algılayıcı, GPS değerlerini kaydetmek için. Diğeri
@@ -60,9 +65,8 @@ Sigma Bazlı Kalman Filtreleri (Unscented Kalman Filter) Java kodları
 
 https://github.com/burakbayramli/kod/tree/master/sensorcam/ukf
 
-
-
-
-
 ![](bass2.png)
 
+Kaynaklar
+
+[1] https://sensor-js.xyz/demo.html
