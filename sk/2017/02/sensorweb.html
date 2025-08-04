@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Demo - The Web's Sixth Sense: A Study of Scripts Accessing Smartphone Sensors</title>
+    <title>JavaScript Sensor Access Demo</title>
+    <style>
+      #demo-div {color: lightgrey; border-radius: 0.3rem;}
+      #demo-div span, #demo-div #num-observed-events {color: black;}
+      h1 {margin-top: 0.5rem;}
+      h4 {margin-top: 0.66rem; font-size:1.33rem;}
+      #demo-div li {line-height: 21px;}
+      #demo-div ul {margin-bottom: 0.66rem;}
+    </style>
+</head>
+<body>
+<main role="main" class="container">
+
+<h1 align="left">JavaScript Sensor Access Demo</h1>
+
+<div class="p-3 mb-2 bg-secondary" id="demo-div">
+<a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
+<a id="download_button" class="btn btn-lg btn-info py-1" href="#" role="button" style="display:none;">Download data (CSV)</a>
+<p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning" id="num-observed-events">0</span></p>
+
+<h4 style="margin-top:0.75rem;">Orientation</h4>
+<ul>
+  <li>X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span></li>
+  <li>Y-axis (&gamma;): <span id="Orientation_g">0</span><span>&deg;</span></li>
+  <li>Z-axis (&alpha;): <span id="Orientation_a">0</span><span>&deg;</span></li>
+</ul>
+
+<h4>Accelerometer</h4>
+<ul>
+  <li>X-axis: <span id="Accelerometer_x">0</span><span> m/s<sup>2</sup></span></li>
+  <li>Y-axis: <span id="Accelerometer_y">0</span><span> m/s<sup>2</sup></span></li>
+  <li>Z-axis: <span id="Accelerometer_z">0</span><span> m/s<sup>2</sup></span></li>
+  <li>Data Interval: <span id="Accelerometer_i">0</span><span> ms</span></li>
+</ul>
+
+<h4>Accelerometer including gravity</h4>
+
+<ul>
+  <li>X-axis: <span id="Accelerometer_gx">0</span><span> m/s<sup>2</sup></span></li>
+  <li>Y-axis: <span id="Accelerometer_gy">0</span><span> m/s<sup>2</sup></span></li>
+  <li>Z-axis: <span id="Accelerometer_gz">0</span><span> m/s<sup>2</sup></span></li>
+</ul>
+
+<h4>Gyroscope</h4>
+<ul>
+  <li>X-axis: <span id="Gyroscope_x">0</span><span>&deg;/s</span></li>
+  <li>Y-axis: <span id="Gyroscope_y">0</span><span>&deg;/s</span></li>
+  <li>Z-axis: <span id="Gyroscope_z">0</span><span>&deg;/s</span></li>
+</ul>
+
+</div>
+</main>
+<footer class="footer">
+  <div class="container">
+    <span class="text-muted small">This page is hosted on GitHub Pages, please see GitHub's privacy statement
+    <a href="https://help.github.com/articles/github-privacy-statement/">here</a>.</span>
+  </div>
+</footer>
+<script>
+
+let sensorData = [];
+let is_running = false;
+const demo_button = document.getElementById("start_demo");
+const download_button = document.getElementById("download_button");
+
+function handleOrientation(event) {
+  updateFieldIfNotNull('Orientation_a', event.alpha);
+  updateFieldIfNotNull('Orientation_b', event.beta);
+  updateFieldIfNotNull('Orientation_g', event.gamma);
+  incrementEventCount();
+  
+  // Store orientation data in a single, unified format
+  const dataPoint = {
+    timestamp: new Date().toISOString(),
+    accel_x: null,
+    accel_y: null,
+    accel_z: null,
+    accel_gravity_x: null,
+    accel_gravity_y: null,
+    accel_gravity_z: null,
+    gyro_alpha: null,
+    gyro_beta: null,
+    gyro_gamma: null,
+    orientation_alpha: event.alpha,
+    orientation_beta: event.beta,
+    orientation_gamma: event.gamma
+  };
+  sensorData.push(dataPoint);
+}
+
+function incrementEventCount(){
+  let counterElement = document.getElementById("num-observed-events");
+  let eventCount = parseInt(counterElement.innerHTML);
+  counterElement.innerHTML = eventCount + 1;
+}
+
+function updateFieldIfNotNull(fieldName, value, precision=10){
+  if (value != null) {
+    document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+  }
+}
+
+function handleMotion(event) {
+  updateFieldIfNotNull('Accelerometer_gx', event.accelerationIncludingGravity.x);
+  updateFieldIfNotNull('Accelerometer_gy', event.accelerationIncludingGravity.y);
+  updateFieldIfNotNull('Accelerometer_gz', event.accelerationIncludingGravity.z);
+
+  updateFieldIfNotNull('Accelerometer_x', event.acceleration.x);
+  updateFieldIfNotNull('Accelerometer_y', event.acceleration.y);
+  updateFieldIfNotNull('Accelerometer_z', event.acceleration.z);
+
+  updateFieldIfNotNull('Accelerometer_i', event.interval, 2);
+
+  updateFieldIfNotNull('Gyroscope_z', event.rotationRate.alpha);
+  updateFieldIfNotNull('Gyroscope_x', event.rotationRate.beta);
+  updateFieldIfNotNull('Gyroscope_y', event.rotationRate.gamma);
+  incrementEventCount();
+
+  // Store motion data in a single, unified format
+  const dataPoint = {
+    timestamp: new Date().toISOString(),
+    accel_x: event.acceleration.x,
+    accel_y: event.acceleration.y,
+    accel_z: event.acceleration.z,
+    accel_gravity_x: event.accelerationIncludingGravity.x,
+    accel_gravity_y: event.accelerationIncludingGravity.y,
+    accel_gravity_z: event.accelerationIncludingGravity.z,
+    gyro_alpha: event.rotationRate.alpha,
+    gyro_beta: event.rotationRate.beta,
+    gyro_gamma: event.rotationRate.gamma,
+    orientation_alpha: null,
+    orientation_beta: null,
+    orientation_gamma: null
+  };
+  sensorData.push(dataPoint);
+}
+
+// Function to convert the collected data to CSV format with a fixed header
+function convertToCSV(data) {
+  if (data.length === 0) return '';
+  
+  const headers = [
+    "timestamp",
+    "accel_x", "accel_y", "accel_z",
+    "accel_gravity_x", "accel_gravity_y", "accel_gravity_z",
+    "gyro_alpha", "gyro_beta", "gyro_gamma",
+    "orientation_alpha", "orientation_beta", "orientation_gamma"
+  ];
+  
+  const csvRows = [
+    headers.join(',')
+  ];
+  
+  data.forEach(row => {
+    const values = headers.map(header => {
+      const value = row[header] !== null ? row[header] : '';
+      return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+    });
+    csvRows.push(values.join(','));
+  });
+  
+  return csvRows.join('\n');
+}
+
+// Function to download data
+function downloadData(data, filename) {
+  const content = convertToCSV(data);
+  const filetype = 'text/csv';
+  
+  const blob = new Blob([content], { type: filetype });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = filename;
+  
+  document.body.appendChild(a);
+  a.click();
+  
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+// Add an event listener for the download button
+download_button.onclick = function(e) {
+  e.preventDefault();
+  downloadData(sensorData, 'sensor_data.csv');
+};
+
+demo_button.onclick = function(e) {
+  e.preventDefault();
+  
+  if (
+    DeviceMotionEvent &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    DeviceMotionEvent.requestPermission();
+  }
+  
+  if (is_running){
+    window.removeEventListener("devicemotion", handleMotion);
+    window.removeEventListener("deviceorientation", handleOrientation);
+    demo_button.innerHTML = "Start demo";
+    demo_button.classList.add('btn-success');
+    demo_button.classList.remove('btn-danger');
+    is_running = false;
+    download_button.style.display = 'inline-block';
+  }else{
+    sensorData = [];
+    download_button.style.display = 'none';
+    
+    window.addEventListener("devicemotion", handleMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
+    document.getElementById("start_demo").innerHTML = "Stop demo";
+    demo_button.classList.remove('btn-success');
+    demo_button.classList.add('btn-danger');
+    is_running = true;
+  }
+};
+
+/*
+Light and proximity are not supported anymore by mainstream browsers.
+window.addEventListener('devicelight', function(e) {
+   document.getElementById("DeviceLight").innerHTML="AmbientLight current Value: "+e.value+" Max: "+e.max+" Min: "+e.min;
+});
+
+window.addEventListener('lightlevel', function(e) {
+   document.getElementById("Lightlevel").innerHTML="Light level: "+e.value;
+});
+
+window.addEventListener('deviceproximity', function(e) {
+   document.getElementById("DeviceProximity").innerHTML="DeviceProximity current Value: "+e.value+" Max: "+e.max+" Min: "+e.min;
+});
+
+window.addEventListener('userproximity', function(event) {
+   document.getElementById("UserProximity").innerHTML="UserProximity: "+event.near;
+});
+*/
+
+</script>
+
+<h1 align="left">original src here: https://sensor-js.xyz/demo.html</h1><br/>
+</body>
+</html>
