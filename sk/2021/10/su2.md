@@ -112,8 +112,13 @@ Paralel isletmek icin
 parallel_computation.py -f turb_naca0012.cfg -n 4
 ```
 
+Dosyalar
+
+Örnek işletimlerde faydalı olabilecek bazı dosyalar [2]'de
+
 Kaynaklar
 
 [1] https://su2code.github.io/tutorials/Inc_Turbulent_NACA0012/
 
+[2] [Test Dosyalari](https://www.dropbox.com/scl/fi/lkrt8kvyb06wsdzm5ld56/su2.zip?rlkey=d7jltldv4emy5vxjzks4ed1md&st=afhb6x29&raw=1)
 

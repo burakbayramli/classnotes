@@ -52,5 +52,4 @@
 
 [Özkodlama (Autoencoding)](../../2018/02/autoencoding.html)
 
-(Otomatik Tercüme, Makine Tercümesi, Machine Translation)[../../2016/10/nmt-nn.html)
 

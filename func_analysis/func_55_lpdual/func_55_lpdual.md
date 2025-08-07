@@ -325,7 +325,7 @@ $$
 
 Not: $\backslash$ işareti "hariç" demek. 
 
-Maks akış problemi eldeki bir mali, nakliyatı diyelim, bir başlangıç
+Maks akış problemi eldeki bir malı, nakliyatı diyelim, bir başlangıç
 noktası $s$ bitişi noktası $t$'ye maksimum miktarda nakil edebilecek yolları
 bulmaktır. Dikkat: $s$'den mal göndermek deyince $s$'den çıkan pek çok
 yoldan nakliyat paylaştırılarak gönderilebilir, altta görüldüğü gibi
@@ -378,7 +378,7 @@ $$
 b_{ij}, x_i,x_j \in \{ 0,1\} \quad \forall i,j
 $$
 
-Elde ettiğimiz sonuc (hala ikize gelmedik) şunu söylüyor, elimdeki
+Elde ettiğimiz sonuç (hala ikize gelmedik) şunu söylüyor, elimdeki
 düğümleri öyle iki gruba ayırmak istiyorum ki (altta bir grup görülüyor,
 renkli kısım), bir gruptan diğer gruba geçen kapasitelerin, geçen
 kenarların kapasitelerinin toplamı minimal olsun.
@@ -408,11 +408,12 @@ kesmiş olurum, ve o renkli bölge içindeki akış en yüksek kapasitede olur.
 Ve buradaki problemde güçlü ikizlik durumu olduğu için bu iki değer
 birbirine eşit! 
 
-Şimdi LP ikizliğine farklı bir açıdan bakalım, ki bu açı oldukca faydalı
+Şimdi LP ikizliğine farklı bir açıdan bakalım, ki bu açı oldukça faydalı
 olacak. 
 
-(1) ve (2) formunu tekrar hatırlayalım. Ana problemdeki $c^Tx$'e eşitlik ve
-eşitsizlik  kısıtlamalarını daha önce bir kez gördüğümüz gibi ekleyince,
+Şimdi (1) ve (2) formunu tekrar hatırlayalım. Ana problemdeki $c^Tx$'e
+eşitlik ve eşitsizlik kısıtlamalarını daha önce bir kez gördüğümüz
+gibi ekleyince,
 
 $$
 c^T x \ge c^T x + u^T (Ax-b) + v^T (Gx-h)
@@ -630,9 +631,5 @@ Kaynaklar
 
 [3] Zisserman, *C25 Optimization*, 
 [http://www.robots.ox.ac.uk/~az/lectures/opt/](http://www.robots.ox.ac.uk/~az/lectures/opt/)   
-
-
-
-
 
 
