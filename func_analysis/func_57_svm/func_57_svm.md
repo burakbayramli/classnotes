@@ -23,7 +23,7 @@ Karar düzlemi: $w^{T}x + b=0$
 Şöyle bir tanım yapalım:
 
 $$
-q = \min_{x}\big\|x - 0\big\|, \quad w^T x+b=0 \textrm { sartina gore }
+q = \min_{x}\big\|x - 0\big\|, \quad w^T x+b=0 \textrm { şartına göre }
 $$
 
 $q$, $H^{+}$ ve $H^{-}$ formüllerini ileride kullanacağız.
@@ -474,5 +474,3 @@ Kaynaklar
 [4] Harrington, *Machine Learning in Action*
 
 [5] Stanford, *Stanford, CS246: Mining Massive Data Sets*, [http://web.stanford.edu/class/cs246/](http://web.stanford.edu/class/cs246/)
-
-
