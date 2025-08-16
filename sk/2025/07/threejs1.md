@@ -1,4 +1,4 @@
-# Javascript ile Animasyon ThreeJS
+# Javascript ile Animasyon Three.js
 
 Üç boyutlu etkileşimli grafikleri Javascript Three.js paketi ile
 yapabiliriz. Temel bir 3D sahne oluşturmak, STL modeli yüklemek,
@@ -321,7 +321,3 @@ olacaktır.
 Kaynaklar
 
 [1] <a href="../../2020/08/shapes/Prism_hexagon.stl">STL Objesi</a>
-
-
-
-

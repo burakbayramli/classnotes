@@ -3,7 +3,7 @@
 
 ## En Son
 
-16/8 - [Javascript ile Animasyon ThreeJS](https://burakbayramli.github.io/dersblog/sk/2025/07/threejs1.html)
+16/8 - [Javascript ile Animasyon Three.js](https://burakbayramli.github.io/dersblog/sk/2025/07/threejs1.html)
 
 16/8 - [Tavsiye Sistemleri, Derin Öğrenme (Deep Recommender Systems)](https://burakbayramli.github.io/dersblog/sk/2025/07/recommend-nn.html)
 
