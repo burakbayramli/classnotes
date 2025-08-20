@@ -816,6 +816,10 @@ while iter < 50:
 
 ![](img1/level_1_40.png)
 
+Kodlar
+
+Üstteki kodlar Chunming Li'nin Matlab bazlı kodlarını baz almıştır. Detaylar için
+`chunming_drlse` ve `chunming_lsbias` dizinlerine bakılabilir.
 
 Kaynaklar
 
@@ -836,5 +840,5 @@ Kaynaklar
 [7] Lombaert, *Level set method: Explanation*,
     [https://profs.etsmtl.ca/hlombaert/levelset/](https://profs.etsmtl.ca/hlombaert/levelset/)
 
-
-
+[8] Chunming Li, *Level set evolution without re-initialization: a new variational formulation*
+    

@@ -302,19 +302,19 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 ve HTML icindeki kisim
 
 ```html
-		<script type="importmap">
-      {
-        "imports": {
-                "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
-                "three/": "https://unpkg.com/three@0.158.0/"
-         }
-	    }
-		</script>
+<script type="importmap">
+{
+  "imports": {
+          "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+          "three/": "https://unpkg.com/three@0.158.0/"
+   }
+}
+</script>
 ```
 
-olarak değiseçektir. Böylece gereken yardımcı dosyalar İnternet'ten alınır,
-bizim tek servis etmemiz gereken bir HTML, bir STL ve bir de Javascript dosyası
-olacaktır.
+olarak değişecektir. Böylece gereken yardımcı dosyalar Internet'ten
+alınır, bizim tek servis etmemiz gereken bir HTML, bir STL ve bir de
+Javascript dosyası olacaktır.
 
 [Örnek](stldemo1.html)
 
