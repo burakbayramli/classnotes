@@ -100,11 +100,15 @@ yaparsak Pymacs [2] tekrar çalışır hale gelir, değişimler `git diff`
 ile üretildi,
 
 ```
-index 08e3d4d..577c151 100755
+index 08e3d4d..10393bb 100755
 --- a/Pymacs.py.in
 +++ b/Pymacs.py.in
-@@ -44,7 +44,7 @@ if PYTHON3:
-         return isinstance(value, collections.Callable)
+@@ -41,10 +41,10 @@ if PYTHON3:
+     import collections
+ 
+     def callable(value):
+-        return isinstance(value, collections.Callable)
++        return isinstance(value, collections.abc.Callable)
  
      basestring = str
 -    from imp import reload

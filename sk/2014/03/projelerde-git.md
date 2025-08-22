@@ -20,6 +20,13 @@ değişti:
 git diff --name-only HEAD~10
 ```
 
+Sadece diskte ve commit edilmemis icerik ile en son commit edilmis icerik
+arasindaki farklar icin
+
+```
+git diff HEAD
+```
+
 ### Git Pull
 
 Artık Github çoğu projede kullanılan bir servis, onu baz alan bazı

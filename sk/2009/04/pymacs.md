@@ -47,7 +47,7 @@ kullanarak bu çağrı Lisp tarafından yapılabiliyor. Metot ismi demek ki
 pymaçstest-test olacak.
 
 Hızlı geliştirme için bazı numaralar; Python kodu değiştiği zaman
-modülü tekrar yüklettirmek için *Pymacs* ışımlı buffer'i oldurmek,
+modülü tekrar yüklettirmek için *Pymacs* isimli buffer'i oldurmek,
 sonra modülü tekrar yüklemek. Bizim .emacs dosyamız şu anda şöyle
 (başka modül ve metot ışimleriyle):
 
@@ -92,7 +92,7 @@ gözükebilecek bir metin basmak için
 lisp.message("mesaj")
 ```
 
-İçinde olduğumüz Emacs buffer'in ismi
+İçinde olduğumuz Emacs buffer'in ismi
 
 ```
 lisp.buffer_name()
@@ -110,4 +110,6 @@ Diyelim ki olduğumuz noktaya bir sürü işlemden sonra dönmek istiyoruz
 remember_where = lisp.point()...
 lisp.goto_char(remember_where)
 ```
+
+
 
