@@ -30,19 +30,67 @@ seçeneğini seçiyoruz.
 Termux kurulumu için [2] bağlantısından Termux apk'si indirilir. Bu
 indirilen apk üzerinde seçim yapıp onu kurarız, uyarıları iptal edip
 devam ederiz, işlemi tamamlarız. Artık bir Termux ikonu program
-listesinde gözüküyor olmalı. 
+listesinde gözüküyor olmalı. İkona tıklayıp komut satırına gireriz,
+burada `pkg ınstall` ile istenen programları kurmak artık mümkün.
 
+Proot
 
+Fakat hala elimizdeki tam tekmilli bir Ünix değil. Unix'te kullanılan
+programların Android için derlenmiş hallerini kullanıyoruz. Eğer ciddi
+bir Linux, yani dosya sistemi, kullanıcı idaresi vs ile birlikte olan,
+bunun için Proot [3] kullanabiliriz.
 
+Proot bir emülasyon sistemidir. Mesela Ubuntu Linux kullanmak
+istiyorsak onun işler kodlarını olduğu gibi alır, işletirken sistem
+çağrıları varsa onları yakalayıp (intercept) o çağrıları gerekli
+Termux çağrısına tercüme eder, Termux kütüphaneleri Android ile
+iletişimi halleder. Mesela Ubuntu dosyaya yazmak için bir sistem
+çağrısı yapabilir, Proot bunu alıp Termux üzerinden dosyaya yazma
+komutu haline getirir.
 
+Kurmak için Termux üzerinde,
 
+```
+pkg install proot-distro
+```
 
+Ardından
 
+```
+proot-distro install ubuntu
+```
 
+Şimdi sisteme girmek için 
 
+```
+proot-distro login ubuntu
+```
 
+kullanırız. Bu bizi Ubuntu sistemine sokar. Etrafa bakınınca Ünix
+demirbaşlarını görebiliyoruz, dosya sistemi, `/var`, '/etc', ya da
+süreçler için `/proc`. Ben hemen `useradd` ile bir normal kullanıcı
+yarattım, `root` için `passwd` ile bir şifre atadım, böylece gerekli
+sistem kurulumlarını `su - root` sonrası yapıyorum, diğer her iş için
+`root` üzerinden normal kullanıcıya geçiş yapıyorum, `su - user1`
+gibi.
 
-[devam edecek]
+Girer girmez hemen bir `upt update` ve `apt upgrade` yapmak faydalı olur.
+
+Artık `apt install` ile istediğimiz her Ubuntu programını kurabiliriz.
+
+İlginç bir nokta Termux üzerinde `pkg ınstall` ile kurulmuş
+programların Proot içinden görülebilmesi. Mesela `pkg ınstall htop`
+kurmuşsam bu programı Übüntü'da işletebiliyorum. Fakat tersi olmuyor.
+Benim tercihim programları emülasyon içinde o sisteme göre kurmak,
+Termux'ta degil, böylece o programin diğerleri ile olan iletişimi daha
+rahat olabilir.
+
+X11
+
+[1] bağlantısında görüldüğü gibi tablet üzerinde Linux masaüstü bile
+işletmek mümkün. APK alınan yerde bir Termux:X11 apk'si var, bu
+kurulup geri kalan ayarlar yapılınca görsel X uygulamaları da
+işletilebiliyor.
 
 Kaynaklar
 
