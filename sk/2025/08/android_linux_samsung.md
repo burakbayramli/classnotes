@@ -74,6 +74,12 @@ sistem kurulumlarını `su - root` sonrası yapıyorum, diğer her iş için
 `root` üzerinden normal kullanıcıya geçiş yapıyorum, `su - user1`
 gibi.
 
+Dikkat, eğer başlangıç ayarları için bir `.bashrc` tanımladıysak bunun
+çağrılması normal Ubuntu'daki gibi otomatik değil, bir `.bash_profile`
+ekleyip oradan `. .bashrc` ile çağrıyı bizim kodlamamız gerekiyor. Bu
+yapıldıktan sonra `şu - user1` ile giriş yapılınca gerekli ayarlar
+`.başhrç` içinden çağrılır.
+
 Girer girmez hemen bir `upt update` ve `apt upgrade` yapmak faydalı olur.
 
 Artık `apt install` ile istediğimiz her Ubuntu programını kurabiliriz.

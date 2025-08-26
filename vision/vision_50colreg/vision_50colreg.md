@@ -226,9 +226,9 @@ print (L)
 üzerindeler. Bu durumda oranın daha düşük olmasını bekleriz,
 
 ```python
-arr1 = get_pixels(box1, im)
-arr2 = get_pixels(box3, im)
-L = likratio(arr1, arr2)
+arr21 = get_pixels(box1, im)
+arr22 = get_pixels(box3, im)
+L = likratio(arr21, arr22)
 print (L)
 ```
 
@@ -237,6 +237,20 @@ print (L)
 ```
 
 Hakikaten de öyle.
+
+Kovaryans Karsilastirmasi
+
+[devam edecek]
+
+
+
+
+
+
+
+
+
+
 
 Çok Boyutlu Gaussian Kullanmak
 
