@@ -1,4 +1,8 @@
 
+Kovaryans Uzakligi
+
+
+
 ```python
 from PIL import Image, ImageDraw
 
@@ -64,3 +68,9 @@ plt.savefig('vision_50colreg_05.jpg')
 
 ![](vision_50colreg_05.jpg)
 
+Kaynaklar
+
+[3] Forstner, *A Metric for Covariance Matrices*, [https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf](https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf)
+
+[4] Porikli, *Region Covariance: A Fast Descriptor for Detection and Classification*,
+    [URL](https://www.porikli.com/mysite/pdfs/porikli%202006%20-%20Region%20Covariance%20A%20Fast%20Descriptor%20for%20Detection%20and%20Classification.pdf)

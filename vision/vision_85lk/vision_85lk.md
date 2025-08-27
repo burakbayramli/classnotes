@@ -51,9 +51,9 @@ $$ \frac{\partial I}{\partial x}\frac{dx}{dt} +
 \frac{\partial I}{\partial t} = 0
 $$
 
-Bu formülde $dx/dt$ ve $dy/dt$, hareket halindeki (zaman geçerken) noktanın
-sonsuz küçüklükteki yer değimi. Ayrıksal bağlamda arka arkaya iki kare
-içindeki yer değişimi. O zaman,
+Bu formülde $dx/dt$ ve $dy/dt$, hareket halindeki (zaman geçerken)
+noktanın sonsuz küçüklükteki yer değişimi. Ayrıksal bağlamda arka
+arkaya iki kare içindeki yer değişimi. O zaman,
 
 $$ \frac{dx}{dt}, \frac{dy}{dt} = u, v $$
 

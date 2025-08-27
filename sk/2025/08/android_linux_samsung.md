@@ -1,12 +1,13 @@
 # Samsung Android Tablet Üzerinde Linux Ubuntu
 
 Android üzerinde tam tekmilli Linux işletmek mümkün. Android alt
-seviyeleri bilindiği gibi çekirdek seviyesinde Linux kullanır, fakat
-işletim sistemi seviyesinde sistem çağrıları dışarıya kapatılmıştır.
-Termux uygulaması hem bu çağrılara erişip onları dışa bağlar, aynı
-zamanda kullanıcıyı Linux sistemlerinden tanıdık bir komut satırı
-programı sunar. Bu program üzerine pek çok bilinen Ünix komutu `pkg
-install` ile kurulabilir. Bu konuyu daha önce işletmiştik [4].
+seviyeleri bilindiği gibi çekirdek seviyesinde Linux kullanır, bu
+cekirdek uzerine birkac katman Java, gorsel bilesenler,
+vs. eklenmistir. Termux uygulaması Android'in cekirdegi ile iletisim
+kurar, ve bildik Unix sistem cagrilarinin islemesini saglar, aynı
+zamanda kullanıcıya Linux sistemlerinden tanıdık bir komut satırı
+programı sunar. Bu program üzerine pek çok bilinen Unix komutu `pkg
+install` ile kurulabilir. Bu konuyu daha önce işlemiştik [4].
 
 Bu yazıyı paylaştığımızdan bu yana Termux bazı iniş çıkışlar yaşadı,
 Google Play Store'daki versiyon problem çıkartıyordu, kurulumlar tam
@@ -18,9 +19,9 @@ süreç durdurması için ise bir Android 14 üzerinde yeni bir seçenek
 var, bunu kullanıyoruz.
 
 Yazımız temel olarak Samsung Galaxy Tab A9 tabletini merkez
-alacak. Şuradaki arkadaş [2] A10 tablet kullanmış. Bu donanımlar hızlı
-işler, işletim sistem versiyonlari Android 14, gerekli seçeneğe
-sahip. Donanımı açınca önce `Settings` | `About Phone` seçip oradan
+alacak. Şuradaki arkadaş [2] A10 tablet kullanmış. Bu donanımlar
+saglamdir, işletim sistem versiyonlari Android 14, gerekli seçeneğe
+sahipler. Donanımı açınca önce `Settings` | `About Phone` seçip oradan
 `Build Number` diyen yere gidiyoruz, ve yedi kere ardı ardına bu yazı
 üstüne basıyoruz. Bitince bu işlem ile Android'in geliştirici seviyesi
 (developer mode) aktif edilmiş oluyor. Şimdi `Developer Options`
@@ -31,7 +32,7 @@ Termux kurulumu için [2] bağlantısından Termux apk'si indirilir. Bu
 indirilen apk üzerinde seçim yapıp onu kurarız, uyarıları iptal edip
 devam ederiz, işlemi tamamlarız. Artık bir Termux ikonu program
 listesinde gözüküyor olmalı. İkona tıklayıp komut satırına gireriz,
-burada `pkg ınstall` ile istenen programları kurmak artık mümkün.
+burada `pkg install` ile istenen programları kurmak artık mümkün.
 
 Proot
 
@@ -47,6 +48,16 @@ Termux çağrısına tercüme eder, Termux kütüphaneleri Android ile
 iletişimi halleder. Mesela Ubuntu dosyaya yazmak için bir sistem
 çağrısı yapabilir, Proot bunu alıp Termux üzerinden dosyaya yazma
 komutu haline getirir.
+
+Peki işler kodlar (executable) ne oluyor? Bazı tur emülasyonlar vardır
+ki mesela Intel x86 için yazılmış kodları Motorola işlemcisi üzerinde
+işletebilir, yani herşey tercüme edilir. Buradaki durum farklı,
+emülasyon baştan kendine uyumlu işler kodları indiriyor, yani en alt
+seviye makina kodu bazında emülasyona gerek yok. PRoot üzerinden
+emülasyon içinde bir program kurduğumuzda hala kendi işlemcimize göre
+kodlar alıyoruz, mesela Samsung üzerinde Ubuntu ARM uyumlu programlar
+indirilecektir.
+
 
 Kurmak için Termux üzerinde,
 
@@ -66,7 +77,7 @@ proot-distro install ubuntu
 proot-distro login ubuntu
 ```
 
-kullanırız. Bu bizi Ubuntu sistemine sokar. Etrafa bakınınca Ünix
+kullanırız. Bu bizi Ubuntu sistemine sokar. Etrafa bakınınca Unix
 demirbaşlarını görebiliyoruz, dosya sistemi, `/var`, '/etc', ya da
 süreçler için `/proc`. Ben hemen `useradd` ile bir normal kullanıcı
 yarattım, `root` için `passwd` ile bir şifre atadım, böylece gerekli
@@ -74,22 +85,22 @@ sistem kurulumlarını `su - root` sonrası yapıyorum, diğer her iş için
 `root` üzerinden normal kullanıcıya geçiş yapıyorum, `su - user1`
 gibi.
 
-Dikkat, eğer başlangıç ayarları için bir `.bashrc` tanımladıysak bunun
-çağrılması normal Ubuntu'daki gibi otomatik değil, bir `.bash_profile`
-ekleyip oradan `. .bashrc` ile çağrıyı bizim kodlamamız gerekiyor. Bu
-yapıldıktan sonra `şu - user1` ile giriş yapılınca gerekli ayarlar
-`.başhrç` içinden çağrılır.
+Dikkat, normal kullanıcı için eğer başlangıç ayarları `.bashrc` içinde
+tanımladıysak bunun çağrılması normal Ubuntu'daki gibi otomatik
+olmuyor, bir `.bash_profile` ekleyip oradan `. .bashrc` ile çağrıyı
+bizim kodlamamız gerekiyor. Bu yapıldıktan sonra `su - user1` ile
+giriş yapılınca gerekli ayarlar `.bashrc` içinden çağrılır.
 
-Girer girmez hemen bir `upt update` ve `apt upgrade` yapmak faydalı olur.
+Girer girmez hemen bir `upt update` ve `apt upgrade` yapmak faydalı
+olur. Artık `apt install` ile istediğimiz her Ubuntu programını
+kurabiliriz.
 
-Artık `apt install` ile istediğimiz her Ubuntu programını kurabiliriz.
-
-İlginç bir nokta Termux üzerinde `pkg ınstall` ile kurulmuş
-programların Proot içinden görülebilmesi. Mesela `pkg ınstall htop`
-kurmuşsam bu programı Übüntü'da işletebiliyorum. Fakat tersi olmuyor.
-Benim tercihim programları emülasyon içinde o sisteme göre kurmak,
-Termux'ta degil, böylece o programin diğerleri ile olan iletişimi daha
-rahat olabilir.
+İlginç bir nokta Termux üzerinde `pkg install` ile kurulmuş
+programların Proot içinden görülebilmesi. Mesela `pkg install htop`
+kurmuşsam bu programı Ubuntu'da işletebiliyorum. Fakat tersi olmuyor.
+Benim tercihim programları emulasyon içinde, yani Ubuntu ise Ubuntu
+üzerinde, o sisteme göre kurmak, Termux'ta degil, böylece o programın
+diğerleri ile olan etkileşimi daha rahat olur.
 
 X11
 

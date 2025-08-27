@@ -3,6 +3,8 @@
 
 ## En Son
 
+27/8 - [Samsung Android Tablet Üzerinde Linux Ubuntu](https://burakbayramli.github.io/dersblog/sk/2025/08/android_linux_samsung.html)
+
 16/8 - [Javascript ile Animasyon Three.js](https://burakbayramli.github.io/dersblog/sk/2025/07/threejs1.html)
 
 16/8 - [Tavsiye Sistemleri, Derin Öğrenme (Deep Recommender Systems)](https://burakbayramli.github.io/dersblog/sk/2025/07/recommend-nn.html)
@@ -10,8 +12,6 @@
 29/7 - [Hareketin Katı-Gövde Denklemleri - 2](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_06/hareketin_katigovde_denklemleri__2.html)
 
 29/7 - [Hareketin Katı-Gövde Denklemleri - 1 - Ekler - Eğik Atış (Projectile Motion) RK4](https://burakbayramli.github.io/dersblog/phy/phy_005_basics_05/hareketin_katigovde_denklemleri__1.html)
-
-22/7 - [Çizit Analizi (Graph Analysis)](https://burakbayramli.github.io/dersblog/algs/algs_110_graph/cizit_analizi__graph_analysis_.html)
 
 ## Konular, Referans
 

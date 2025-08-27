@@ -26,7 +26,7 @@ convert buyuk_resim.jpg  -quality 90  -scale 50% yeni_resim.jpg
 Eğer animasyon gif dosyası üzerinde aynı komutu işletirsek,
 animasyondaki her kare ayrı bir png dosyası olarak verilirdi. Sonek
 png dosyalarının numaralandırması kontrol edilebilir, Dikkat: tüm
-imajın animasyondan çıkartılması için -coalesçe seçeneği gerekebilir.
+imajın animasyondan çıkartılması için -coalesce seçeneği gerekebilir.
 
 ```
 convert -coalesce dosya.gif dosya-%3d.png
@@ -137,4 +137,6 @@ convert -brightness-contrast 30x20 in.tif out.tif
 ```
 
 Bu örnekte ışık seviyesi 30 farklılık 20 arttırıldı.
+
+
 
