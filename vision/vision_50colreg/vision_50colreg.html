@@ -288,12 +288,120 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <p>İkinci resimde her iki dikdörtgen aynı direğin üzerinde, yani aynı
 obje üzerindeler. Bu durumda oranın daha düşük olmasını bekleriz,</p>
 <div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>arr1 <span class="op">=</span> get_pixels(box1, im)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>arr2 <span class="op">=</span> get_pixels(box3, im)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> likratio(arr1, arr2)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>arr21 <span class="op">=</span> get_pixels(box1, im)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>arr22 <span class="op">=</span> get_pixels(box3, im)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> likratio(arr21, arr22)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (L)</span></code></pre></div>
 <pre class="text"><code>247.8054950906153</code></pre>
 <p>Hakikaten de öyle.</p>
+<p>Kovaryans Karşılaştırması</p>
+<p>Bir bölgenin diğerinden farkını hesaplamak için bir ölçüt o bölgenin
+bazı özellikleri üzerinden kovaryansını hesaplamaktır. Mesela gri bazlı
+bir resmi düşünelim, <span class="math inline">\(x,y\)</span>
+kordinatlarındaki grilik seviyesi <span
+class="math inline">\(I(x,y)\)</span> ile veriliyor, bir bölge için
+şöyle bir ölçüt yaratabilirdik [4],</p>
+<p><span class="math display">\[
+F(x,y) =
+[\begin{array}{ccc}
+x &amp; y &amp; I(x,y)
+\end{array}]^T
+\]</span></p>
+<p>Yani o bölge içindeki her <span class="math inline">\(x,y\)</span>
+kordinatı ve o kordinatların grilik seviyesi bir vektör içine yazılıyor,
+bu vektörlerin tamamı bir matris oluşturuyor, 3 x N boyutlu bir matris
+ise, bu matris üzerinde kovaryans hesabı bize bir 3 x 3 matris verir. Bu
+matrisin o bölgeyi temsil ettiğini düşünebiliriz, çünkü kordinatlar ve
+grilik seviyeleri arasında bir bağlantı hesapladık sonuçta, koyu
+siyahlar ve bazı örüntüler içeren bir bölge çoğunluğu beyaz, farklı
+örüntü içeren bir bölgeden farklı sonuçlar verecektir. Sadece üstteki
+özelliklerle kısıtlı değiliz, farklı öğeler ekleyebilirdik, mesela
+renkli bir resim için,</p>
+<p><span class="math display">\[
+F(x,y) =
+[\begin{array}{ccccccccc}
+x &amp; y &amp; R(x,y) &amp; G(x,y) &amp; B(x,y) &amp;
+| \frac{\partial I(x,y)}{\partial x} | &amp;
+| \frac{\partial I(x,y)}{\partial y} | &amp;
+| \frac{\partial^2 I(x,y)}{\partial y} | &amp;
+| \frac{\partial^2 I(x,y)}{\partial y} |
+\end{array}]^T
+\]</span></p>
+<p>Üstteki ifadede R,G,B renk kanalları vektör içinde kullanılmış,
+ayrıca gri seviyeleri üzerinden resmin değişimi (birinci türev) ve
+değişimin değişimi (ikinci türev) vektör içine eklenmiş. Burada 9
+boyutlu bir vektör var, ve nihai matrisin kovaryansı 9 x 9 boyutunda
+olacaktır.</p>
+<p>Peki iki kovaryansın birbirinden farkını, ya da birbirine olan
+uzaklığını nasıl hesaplarız? Bu hesap bize lazım olacak çünkü iki
+bölgenin ne kadar farklı olduğunu bilmek istiyoruz. [3]’te şöyle bir
+hesap öne sürülmüştür,</p>
+<p><span class="math display">\[
+d(A,B) = \sqrt{ \sum_{i=1}^{n} \ln^2 \lambda_i (A,B) }
+\]</span></p>
+<p>ki <span class="math inline">\(\lambda_i (A,B)\)</span> değerleri
+<span class="math inline">\(| \lambda A - B | = 0\)</span> hesabının
+özdeğerleridir.</p>
+<p>Bir örnek üzerinde görelim,</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image, ImageDraw</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cov_box(A, xx, yy, box):</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    xmin,ymin <span class="op">=</span> box[<span class="dv">0</span>]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    xmax,ymax <span class="op">=</span> box[<span class="dv">1</span>]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    filt <span class="op">=</span> (xx <span class="op">&gt;=</span> xmin) <span class="op">&amp;</span> (xx <span class="op">&lt;=</span> xmax) <span class="op">&amp;</span> (yy <span class="op">&gt;=</span> ymin) <span class="op">&amp;</span> (yy <span class="op">&lt;=</span> ymax)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    xxc <span class="op">=</span> xx[filt]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    yyc <span class="op">=</span> yy[filt]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    A_filtered <span class="op">=</span> A[yyc, xxc, :]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    features <span class="op">=</span> np.zeros((<span class="bu">len</span>(xxc), <span class="dv">5</span>))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    features[:, <span class="dv">0</span>] <span class="op">=</span> xxc</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    features[:, <span class="dv">1</span>] <span class="op">=</span> yyc</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    features[:, <span class="dv">2</span>:] <span class="op">=</span> A_filtered    </span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    features_centered <span class="op">=</span> features <span class="op">-</span> np.mean(features, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    covariance_matrix <span class="op">=</span> (features_centered.T <span class="op">@</span> features_centered) <span class="op">/</span> (<span class="bu">len</span>(xxc) <span class="op">-</span> <span class="dv">1</span>)     </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> covariance_matrix</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> frobenius_distance(A, B):</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.isnan(A).<span class="bu">all</span>() <span class="kw">or</span> np.isnan(B).<span class="bu">all</span>(): <span class="cf">return</span> np.inf</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> np.linalg.solve(A, B)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    eigvals <span class="op">=</span> np.linalg.eigvals(C)    </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    log_eigvals <span class="op">=</span> np.log(np.<span class="bu">abs</span>(eigvals))    </span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    dist_sq <span class="op">=</span> np.<span class="bu">sum</span>(log_eigvals<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    distance <span class="op">=</span> np.sqrt(dist_sq)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> distance</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>box1 <span class="op">=</span> [(<span class="dv">300</span>,<span class="dv">200</span>),(<span class="dv">350</span>,<span class="dv">330</span>)]</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>box2 <span class="op">=</span> [(<span class="dv">380</span>,<span class="dv">200</span>),(<span class="dv">420</span>,<span class="dv">350</span>)]</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>box3 <span class="op">=</span> [(<span class="dv">250</span>,<span class="dv">150</span>),(<span class="dv">280</span>,<span class="dv">350</span>)]</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>image <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">&quot;t00100.jpg&quot;</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array(image)</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>M, N, d <span class="op">=</span> A.shape</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>, N <span class="op">-</span> <span class="dv">1</span>, N).astype(<span class="bu">int</span>)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="dv">0</span>, M <span class="op">-</span> <span class="dv">1</span>, M).astype(<span class="bu">int</span>)</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>xx, yy <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>c1 <span class="op">=</span> cov_box(A, xx, yy, box1)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>c2 <span class="op">=</span> cov_box(A, xx, yy, box2)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>c3 <span class="op">=</span> cov_box(A, xx, yy, box3)</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (frobenius_distance(c1,c2))</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (frobenius_distance(c1,c3))</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> ImageDraw.Draw(image)  </span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>img.rectangle(box1, outline<span class="op">=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>img.rectangle(box2, outline<span class="op">=</span><span class="st">&quot;yellow&quot;</span>)</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>img.rectangle(box3, outline<span class="op">=</span><span class="st">&quot;white&quot;</span>)</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>plt.imshow(image)</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_50colreg_05.jpg&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>2.4203367108521308
+8.200977783832409</code></pre>
+<p><img src="vision_50colreg_05.jpg" /></p>
 <p>Çok Boyutlu Gaussian Kullanmak</p>
 <p>Eğer renkli resimleri işlemek istiyorsak, her pikselin H,S,V
 değerlerini kullanabiliriz, bu durumda bir resim bölgesini üç boyutlu
@@ -342,8 +450,9 @@ class="math inline">\(m_1+m_2\)</span> yerine <span
 class="math inline">\(n\)</span> olsun, ve <span
 class="math inline">\(z_i\)</span> ifadesi <span class="math inline">\(p
 \times 1\)</span> boyutunda vektörler. Genel olarak şu ifadeyi</p>
-<p><span class="math display">\[ \sum_{i=1}^n z_i^T\left(\sum_{k=1}^n
-z_kz_k^T\right)^{-1}z_i \]</span></p>
+<p><span class="math display">\[
+\sum_{i=1}^n z_i^T\left(\sum_{k=1}^n z_kz_k^T\right)^{-1}z_i
+\]</span></p>
 <p>kısaltmaya uğraşıyoruz. Burada iz operatörünü kullanabiliriz, iz
 bildiğimiz gibi bir matrisin köşegeninin toplamını verir. Güzel
 özellikleri vardır, mesela <span
@@ -410,15 +519,20 @@ iptal olur, sonuç</p>
 <p>Tabii hesaptan önce üstteki formülde yine kestirme değerleri yerine
 koyarak hesabı yapacağız.</p>
 <p>Renkli bir resme bakalım şimdi,</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">&#39;t00100.jpg&#39;</span>).convert(<span class="st">&#39;HSV&#39;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.array(im).shape)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> Image.<span class="bu">open</span>(<span class="st">&#39;t00100.jpg&#39;</span>).convert(<span class="st">&#39;HSV&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.array(im).shape)</span></code></pre></div>
 <pre><code>(360, 640, 3)</code></pre>
 <p>Görüldüğü gibi imaj matrisinde artık her hücrede üç öğe var.</p>
 <p>Kaynaklar</p>
 <p>[1] Schunk, <em>Machine Vision</em></p>
 <p>[2] Dhakar, <em>Color Thief</em>, <a
 href="https://github.com/fengsp/color-thief-py">https://github.com/fengsp/color-thief-py</a></p>
+<p>[3] Forstner, <em>A Metric for Covariance Matrices</em>, <a
+href="https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf">https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf</a></p>
+<p>[4] Porikli, <em>Region Covariance: A Fast Descriptor for Detection
+and Classification</em>, <a
+href="https://www.porikli.com/mysite/pdfs/porikli%202006%20-%20Region%20Covariance%20A%20Fast%20Descriptor%20for%20Detection%20and%20Classification.pdf">URL</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

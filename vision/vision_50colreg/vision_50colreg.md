@@ -238,19 +238,125 @@ print (L)
 
 Hakikaten de öyle.
 
-Kovaryans Karsilastirmasi
+Kovaryans Karşılaştırması
 
-[devam edecek]
+Bir bölgenin diğerinden farkını hesaplamak için bir ölçüt o bölgenin bazı
+özellikleri üzerinden kovaryansını hesaplamaktır. Mesela gri bazlı bir resmi
+düşünelim, $x,y$ kordinatlarındaki grilik seviyesi $I(x,y)$ ile veriliyor,
+bir bölge için şöyle bir ölçüt yaratabilirdik [4],
+
+$$
+F(x,y) = 
+[\begin{array}{ccc} 
+x & y & I(x,y)
+\end{array}]^T
+$$
+
+Yani o bölge içindeki her $x,y$ kordinatı ve o kordinatların grilik
+seviyesi bir vektör içine yazılıyor, bu vektörlerin tamamı bir matris
+oluşturuyor, 3 x N boyutlu bir matris ise, bu matris üzerinde
+kovaryans hesabı bize bir 3 x 3 matris verir. Bu matrisin o bölgeyi
+temsil ettiğini düşünebiliriz, çünkü kordinatlar ve grilik seviyeleri
+arasında bir bağlantı hesapladık sonuçta, koyu siyahlar ve bazı
+örüntüler içeren bir bölge çoğunluğu beyaz, farklı örüntü içeren bir
+bölgeden farklı sonuçlar verecektir. Sadece üstteki özelliklerle
+kısıtlı değiliz, farklı öğeler ekleyebilirdik, mesela renkli bir resim
+için,
 
 
+$$
+F(x,y) = 
+[\begin{array}{ccccccccc} 
+x & y & R(x,y) & G(x,y) & B(x,y) & 
+| \frac{\partial I(x,y)}{\partial x} | &
+| \frac{\partial I(x,y)}{\partial y} | &
+| \frac{\partial^2 I(x,y)}{\partial y} | &
+| \frac{\partial^2 I(x,y)}{\partial y} | 
+\end{array}]^T
+$$
+
+Üstteki ifadede R,G,B renk kanalları vektör içinde kullanılmış, ayrıca
+gri seviyeleri üzerinden resmin değişimi (birinci türev) ve değişimin
+değişimi (ikinci türev) vektör içine eklenmiş. Burada 9 boyutlu bir
+vektör var, ve nihai matrisin kovaryansı 9 x 9 boyutunda olacaktır.
+
+Peki iki kovaryansın birbirinden farkını, ya da birbirine olan
+uzaklığını nasıl hesaplarız? Bu hesap bize lazım olacak çünkü iki
+bölgenin ne kadar farklı olduğunu bilmek istiyoruz. [3]'te şöyle bir
+hesap öne sürülmüştür,
+
+$$
+d(A,B) = \sqrt{ \sum_{i=1}^{n} \ln^2 \lambda_i (A,B) }
+$$
+
+ki $\lambda_i (A,B)$ değerleri $| \lambda A - B | = 0$ hesabının özdeğerleridir.
+
+Bir örnek üzerinde görelim,
+
+```python
+from PIL import Image, ImageDraw
+
+def cov_box(A, xx, yy, box):
+    xmin,ymin = box[0]
+    xmax,ymax = box[1]
+    filt = (xx >= xmin) & (xx <= xmax) & (yy >= ymin) & (yy <= ymax)
+    xxc = xx[filt]
+    yyc = yy[filt]
+    A_filtered = A[yyc, xxc, :]
+    features = np.zeros((len(xxc), 5))
+    features[:, 0] = xxc
+    features[:, 1] = yyc
+    features[:, 2:] = A_filtered    
+    features_centered = features - np.mean(features, axis=0)
+    covariance_matrix = (features_centered.T @ features_centered) / (len(xxc) - 1)     
+    return covariance_matrix
+
+def frobenius_distance(A, B):
+    if np.isnan(A).all() or np.isnan(B).all(): return np.inf
+    C = np.linalg.solve(A, B)
+    eigvals = np.linalg.eigvals(C)    
+    log_eigvals = np.log(np.abs(eigvals))    
+    dist_sq = np.sum(log_eigvals**2)
+    distance = np.sqrt(dist_sq)
+    return distance
 
 
+box1 = [(300,200),(350,330)]
+box2 = [(380,200),(420,350)]
+box3 = [(250,150),(280,350)]
 
+image = Image.open("t00100.jpg")
+A = np.array(image)
+M, N, d = A.shape
 
+x = np.linspace(0, N - 1, N).astype(int)
+y = np.linspace(0, M - 1, M).astype(int)
+xx, yy = np.meshgrid(x, y)
 
+c1 = cov_box(A, xx, yy, box1)
 
+c2 = cov_box(A, xx, yy, box2)
 
+c3 = cov_box(A, xx, yy, box3)
 
+print (frobenius_distance(c1,c2))
+
+print (frobenius_distance(c1,c3))
+
+img = ImageDraw.Draw(image)  
+img.rectangle(box1, outline="red")
+img.rectangle(box2, outline="yellow")
+img.rectangle(box3, outline="white")
+plt.imshow(image)
+plt.savefig('vision_50colreg_05.jpg')
+```
+
+```text
+2.4203367108521308
+8.200977783832409
+```
+
+![](vision_50colreg_05.jpg)
 
 Çok Boyutlu Gaussian Kullanmak
 
@@ -299,7 +405,9 @@ Bu formül nasıl kısalabilir? Herhangi bir $\mu$ için $z_i=x_i-\hat{\mu}$
 diyelim, $m_1+m_2$ yerine $n$ olsun, ve $z_i$ ifadesi $p \times 1$ boyutunda
 vektörler. Genel olarak şu ifadeyi
 
-$$ \sum_{i=1}^n z_i^T\left(\sum_{k=1}^n z_kz_k^T\right)^{-1}z_i $$
+$$
+\sum_{i=1}^n z_i^T\left(\sum_{k=1}^n z_kz_k^T\right)^{-1}z_i
+$$
 
 kısaltmaya uğraşıyoruz. Burada iz operatörünü kullanabiliriz, iz bildiğimiz gibi
 bir matrisin köşegeninin toplamını verir. Güzel özellikleri vardır, mesela
@@ -391,6 +499,11 @@ Kaynaklar
 [1] Schunk, *Machine Vision*  
 
 [2] Dhakar, *Color Thief*, [https://github.com/fengsp/color-thief-py](https://github.com/fengsp/color-thief-py)
+
+[3] Forstner, *A Metric for Covariance Matrices*, [https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf](https://www.ipb.uni-bonn.de/pdfs/Forstner1999Metric.pdf)
+
+[4] Porikli, *Region Covariance: A Fast Descriptor for Detection and Classification*,
+    [URL](https://www.porikli.com/mysite/pdfs/porikli%202006%20-%20Region%20Covariance%20A%20Fast%20Descriptor%20for%20Detection%20and%20Classification.pdf)
 
 
 
