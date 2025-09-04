@@ -36,7 +36,7 @@ burada `pkg install` ile istenen programları kurmak artık mümkün.
 
 Proot
 
-Fakat hala elimizdeki tam tekmilli bir Ünix değil. Unix'te kullanılan
+Fakat hala elimizdeki tam tekmilli bir Unix değil. Unix'te kullanılan
 programların Android için derlenmiş hallerini kullanıyoruz. Eğer ciddi
 bir Linux, yani dosya sistemi, kullanıcı idaresi vs ile birlikte olan,
 bunun için Proot [3] kullanabiliriz.
@@ -78,22 +78,21 @@ proot-distro login ubuntu
 ```
 
 kullanırız. Bu bizi Ubuntu sistemine sokar. Etrafa bakınınca Unix
-demirbaşlarını görebiliyoruz, dosya sistemi, `/var`, '/etc', ya da
+demirbaşlarını görebiliyoruz, dosya sistemi, `/var`, `/etc`, ya da
 süreçler için `/proc`. Ben hemen `useradd` ile bir normal kullanıcı
 yarattım, `root` için `passwd` ile bir şifre atadım, böylece gerekli
-sistem kurulumlarını `su - root` sonrası yapıyorum, diğer her iş için
-`root` üzerinden normal kullanıcıya geçiş yapıyorum, `su - user1`
-gibi.
+sistem kurulumlarını `su` sonrası yapıyorum, diğer her iş için `root`
+üzerinden normal kullanıcıya geçiş yapıyorum, `su - user1` gibi.
 
-Dikkat, normal kullanıcı için eğer başlangıç ayarları `.bashrc` içinde
-tanımladıysak bunun çağrılması normal Ubuntu'daki gibi otomatik
+Bir problem, normal kullanıcı için eğer başlangıç ayarları `.bashrc`
+içinde tanımladıysak bunun çağrılması normal Ubuntu'daki gibi otomatik
 olmuyor, bir `.bash_profile` ekleyip oradan `. .bashrc` ile çağrıyı
 bizim kodlamamız gerekiyor. Bu yapıldıktan sonra `su - user1` ile
 giriş yapılınca gerekli ayarlar `.bashrc` içinden çağrılır.
 
 Girer girmez hemen bir `upt update` ve `apt upgrade` yapmak faydalı
-olur. Artık `apt install` ile istediğimiz her Ubuntu programını
-kurabiliriz.
+olur. Artık `apt install` ile admin üzerinden istediğimiz her Ubuntu
+programını kurabiliriz.
 
 İlginç bir nokta Termux üzerinde `pkg install` ile kurulmuş
 programların Proot içinden görülebilmesi. Mesela `pkg install htop`
@@ -118,4 +117,3 @@ Kaynaklar
 [3] https://github.com/termux/proot-distro
 
 [4] [Android Uzerinde Linux - Termux, Samsung J6](../../2018/09/android-uzerinde-linux-termux.html)
-

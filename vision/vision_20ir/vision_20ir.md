@@ -1,4 +1,8 @@
-# Yamultma (Warp) Tespiti, Hareket Eden Bölge
+# Hareket Eden Bölge, Arkaplan (Background) Tespiti
+
+KDE
+
+Yamultma (Warp) 
 
 
 
@@ -9,6 +13,18 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+[devam edecek]
 
 Kaynaklar
 
