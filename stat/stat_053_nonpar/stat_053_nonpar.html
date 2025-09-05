@@ -145,6 +145,7 @@ uğraşılıyor, bunu</p>
 <p><span class="math display">\[
 \hat{f}(x) = \frac{1}{n} \sum _{i=1}^{n} \frac{1}{h} K \left( \frac{x -
 x_i}{h}  \right)
+\qquad{1}
 \]</span></p>
 <p>hesabı ile gerçekleştirebiliriz. <span
 class="math inline">\(K\)</span> ile gösterilen çekirdek
@@ -200,6 +201,18 @@ class="math inline">\(h^2\)</span>. Yani KDE mekanizması başlangıç <span
 class="math inline">\(N(0,1)\)</span> çekirdeği üzerinden bizi dolaylı
 olarak her veri noktasında bir <span class="math inline">\(N(x_i,
 h^2)\)</span> tepesi eklemeye götürmüş oluyor.</p>
+<p>Kavramsal olarak tahmin edici <span
+class="math inline">\(\hat{f}\)</span> her <span
+class="math inline">\(x\)</span> noktasında <span
+class="math inline">\(x_i\)</span> verisini merkez almış çekirdek
+fonksiyonlarının ortalamasıdır. Yani <span
+class="math inline">\(x_1\)</span>’i merkez alan bir Gaussian vardır,
+tabii ki <span class="math inline">\(K(x)\)</span> hesabı için <span
+class="math inline">\(x_1\)</span>’deki çekirdeğe <span
+class="math inline">\(x_2,x_3,..\)</span> üzerindeki Gaussian’ların
+değerleri de eklenir [2, sf. 313].</p>
+<p><img src="stat_053_nonpar_03.jpg" /></p>
+<p>Kod ile bu hesabı görelim,</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kernel(<span class="bu">type</span><span class="op">=</span><span class="st">&#39;gaussian&#39;</span>):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">lambda</span> u: (<span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="dv">2</span> <span class="op">*</span> np.pi)) <span class="op">*</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> u<span class="op">**</span><span class="dv">2</span>)</span>
@@ -210,22 +223,154 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(data)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="fl">0.5</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    diffs <span class="op">=</span> (x[:, np.newaxis] <span class="op">-</span> data) <span class="op">/</span> h</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    kernel_values <span class="op">=</span> k(diffs)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    kde <span class="op">=</span> np.<span class="bu">sum</span>(kernel_values, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> (n <span class="op">*</span> h)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kde</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>fhat_kde <span class="op">=</span> kde(data)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, fhat_kde, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;KDE&#39;</span>)</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_02.png&#39;</span>)</span></code></pre></div>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;diffs&#39;</span>, diffs.shape)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    kernel_values <span class="op">=</span> k(diffs)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    kde <span class="op">=</span> np.<span class="bu">sum</span>(kernel_values, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> (n <span class="op">*</span> h)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kde</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>fhat_kde <span class="op">=</span> kde(data)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, fhat_kde, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;KDE&#39;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_02.png&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>diffs (1000, 100)</code></pre>
 <p><img src="stat_053_nonpar_02.png" /></p>
+<p>Bu kod standart KDE kodlaması. Bu noktada bazı performans konularına
+dikkat çekmek gerekiyor. Formül (1)’deki <span class="math inline">\(K(x
+- x_i / h)\)</span> hesabının bir toplam içinde olduğuna ve her <span
+class="math inline">\(x\)</span> hesabi için <em>tüm</em> diğer <span
+class="math inline">\(x\)</span>’lerin üzerinden geçilmesi gerektiğine
+dikkat çekmek gerekiyor. Bu demektir ki üstte verilen yaklaşımın
+hesapsal karmaşıklığı <span class="math inline">\(O(n^2)\)</span>
+olacaktır, ki bu hız anlık (online) işlem yapan uygulamalar için tercih
+edilen bir performans olmaz. KDE’yi daha hızlandırmak için bir yaklaşımı
+ileride göreceğiz.</p>
+<p>KDE Olasılık Dağılımıdır</p>
+<p>Çekirdek üzerinden tanımlanan fonksiyon bize bir yaklaşıksal
+olasılıksal yoğunluk fonksiyonu (pdf) veriyor mu? Bunun ispatı için
+<span class="math inline">\(K\)</span> seçimindeki bazı şartları tam
+belirleyelim. KDE matematiğine göre çekirdek pürüzsüz bir fonksiyon
+olmalıdır, öyle ki <span class="math inline">\(K(x) \ge 0\)</span>,
+<span class="math inline">\(\int K(x) \,dx = 1\)</span>, <span
+class="math inline">\(\int x K(x) \,dx = 0\)</span>, ve <span
+class="math inline">\(\int x^2 K(x) \,dx &gt; 0\)</span>.</p>
+<p>Bir fonksiyonun pdf olması için iki şart var, <span
+class="math inline">\(\hat{f}(x) \ge 0\)</span> olmalı, ve <span
+class="math inline">\(\int \hat{f}(x) \,dx = 1\)</span> olmalı. Dikkat
+edersek bu iki şart <span class="math inline">\(K\)</span> için
+tanımlanan şartlarla aynı. Bunun KDE formülü üzerinden yansıması şöyle
+olur,</p>
+<p><span class="math display">\[
+\int_{-\infty}^{\infty} \hat{f}(x) \,dx = \int_{-\infty}^{\infty}
+\frac{1}{n} \sum_{i=1}^n K(x-x_i) \,dx
+\]</span></p>
+<p>Eşitliğin sağındaki sabit <span class="math inline">\(1/n\)</span>
+entegral dışına çıkartılabilir,</p>
+<p><span class="math display">\[= \frac{1}{n} \sum_{i=1}^n
+\int_{-\infty}^{\infty} K(x-x_i) \,dx\]</span></p>
+<p>Bir değişken değişimi yapalım, <span class="math inline">\(u =
+\frac{x-x_i}{h}\)</span> olsun, o zaman <span class="math inline">\(x =
+uh + x_i\)</span>, ve <span class="math inline">\(dx = h\,du\)</span>.
+Entegral limitleri aynı kalıyor, demek ki</p>
+<p><span class="math display">\[= \frac{1}{n} \sum_{i=1}^n
+\int_{-\infty}^{\infty} \frac{1}{h}K(u) (h\,du)\]</span></p>
+<p>Bölüm ve bölendeki <span class="math inline">\(h\)</span> terimleri
+iptal olur,</p>
+<p><span class="math display">\[= \frac{1}{n} \sum_{i=1}^n
+\int_{-\infty}^{\infty} K(u) \,du\]</span></p>
+<p>Çekirdek fonksiyonu tanımına göre <span
+class="math inline">\(K(u)\)</span>’nun tüm tanım alanı üzerinden
+entegrali 1 olmak zorundaydı, <span
+class="math inline">\(\int_{-\infty}^{\infty} K(u) \,du = 1\)</span>. O
+zaman,</p>
+<p><span class="math display">\[= \frac{1}{n} \sum_{i=1}^n (1) =
+\frac{1}{n} (n) = 1\]</span></p>
+<p>Görüldüğü gibi çekirdek yoğunluk tahminsel hesap hem negatif olmama
+hem de normalizasyon (entegralin 1 olması) şartlarını yerine getiriyor,
+o zaman tanım itibariyle o bir pdf’tır.</p>
+<p>KDE Ana Yoğunluğa Ne Kadar Yakındır?</p>
+<p>KDE ile elde edilen fonksiyonun bir pdf olması yeterli değil, önemli
+olan tahmin edilmeye uğraşılan ana pdf’e ne kadar yaklaştığı.</p>
+<p>Her <span class="math inline">\(x\)</span> noktasında KDE’nin
+ortalama ve varyansına bakalım. Once ortalama,</p>
+<p><span class="math display">\[
+E[\hat{f}(x) ] = \frac{1}{n} \sum _{i=1}^{n}
+E \left[
+\frac{1}{h} K \left( \frac{x - x_i}{h}  \right)
+\right]
+\]</span></p>
+<p><span class="math display">\[
+= \int K(u) \left[
+f(x) - h u f&#39;(x) + \frac{h^2 u^2 }{2} f&#39;&#39;(x) + o(h^2)
+\right] \,du
+\]</span></p>
+<p><span class="math display">\[
+= f(x) \int K(u)\,du
+\;-\; h f&#39;(x)\int u K(u)\,du
+\;+\; \frac{h^2 f&#39;&#39;(x)}{2}\int u^2 K(u)\,du
+\;+\; \int K(u)\,o(h^2)\,du.
+\]</span></p>
+<p><span class="math inline">\(K\)</span> tanımına göre <span
+class="math inline">\(\int K(x) \,dx = 1\)</span>, <span
+class="math inline">\(\int x K(x) \,dx = 0\)</span> olması gerektiğini
+hatırlarsak,</p>
+<p><span class="math display">\[
+= f(x) + \frac{h^2 f&#39;&#39;(x)}{2} \int K(u) u^2 \,du + o(h^2)
+\]</span></p>
+<p>Eğer <span class="math inline">\(\int K(u) u^2 \,du =
+\sigma_K^2\)</span> dersek, ve <span class="math inline">\(f(x)\)</span>
+ifadesini eşitliğin soluna taşırsak,</p>
+<p><span class="math display">\[
+E[\hat{f}(x)] - f(x) = \frac{h^2 \sigma_K^2 f&#39;&#39;(x)}{2} + o(h^2)
+\]</span></p>
+<p>Eşitliğin solundaki terim yanlılık (bias) hesabıdır. Doğal olarak
+yanlılığın azalmasını isteriz, üstteki ifade diyor ki <span
+class="math inline">\(h\)</span> küçüldükçe yanlılık ta sıfıra gidecek.
+Demek ki <span class="math inline">\(h\)</span> değerini küçültürsem
+yanlılığı azaltırım.</p>
+<p>Fakat yanlılık tek başına yeterli değil, genellikle aranan bir hata
+kare ortalaması (mean square error), MSE olarak bilinen hesabın
+ufalmasıdır.. MSE hesabı da yanlılık karesi artı varyanstır, burada
+istatistik literatüründe bilinen yanlılık / varyans dengesi (tradeoff)
+aklımıza gelebilir, yanlılığı azalttığımızda varyansta patlamaya sebep
+olabiliriz, bu sebeple her iki ölçümü dengeleyen bir yaklaşım
+bulunmalıdır. O zaman nihai bir optimal sonuca ulaşmak için KDE’nin
+varyansını hesaplayalım.</p>
+<p>Tüm toplamın varyansını gerek yok aslında, toplanan her terim
+bağımsız, tıpatıp aynı dağılıma sahipse (i.i.d.), o zaman bazı
+kolaylıklar elde ediyoruz, diyelim ki</p>
+<p><span class="math display">\[
+Z_i := \frac{1}{h} K\!\left(\frac{x - X_i}{h}\right)
+\]</span></p>
+<p><span class="math display">\[
+\hat f(x) = \frac{1}{n} \sum_{i=1}^n Z_i.
+\]</span></p>
+<p>ki <span class="math inline">\(Z_1,\dots,Z_n\)</span> i.i.d. ve her
+dağılımın varyansı aynı, <span class="math inline">\(\sigma^2\)</span>.
+Tüm toplam üzerinde varyans alırsak,</p>
+<p><span class="math display">\[
+Var \left[ \frac{1}{n}  \sum_{i=1}^n Z_i \right] \;=\; \frac{1}{n^2}\, n
+\sigma^2 \;=\; \frac{1}{n} \sigma^2.
+\]</span></p>
+<p><span class="math display">\[
+Var \left[ \hat f(x) \right] = \frac{1}{n} \, \mathrm{Var}[Z_1].
+\]</span></p>
+<p>Bu demektir ki toplam içindeki tek bir terimin varyansını hesaplayıp
+<span class="math inline">\(n\)</span>’ye bölersek istenilen sonuca
+erisebiliriz. O şekilde devam edelim o zaman,</p>
+<p><span class="math display">\[
+Var[\hat{f}(x)] = \frac{1}{n} Var \left[
+\frac{1}{h} K(\frac{x-x_i}{h})
+\right]
+\]</span></p>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
-<p>[1] Shalizi, Advanced Data Analysis</p>
+<p>[1] Shalizi, <em>Advanced Data Analysis From An Elementary Point of
+View</em></p>
+<p>[2] Wasserman, <em>All of Statistics</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

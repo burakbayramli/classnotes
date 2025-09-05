@@ -110,11 +110,12 @@ dtype: float64
 
 Bu çıktıda gösterilenler ne anlama gelir? 
 
-1) `coef` altında görülen değerler sırasıyla $\beta_o,\beta_1$
-tahminleridir, yani $\hat{\beta}_o,\hat{\beta}_1$. Bunlar bulmak istediğimiz
-katsayılar.  İki boyutta olduğumuz için düz bir çizgiden bahsediyoruz, bu
-çizginin $y$ eksenini kestiği yer kesi (intercept) $\hat{\beta}_0$'da ve ebeyne
-(`parent`)  tekabül eden katsayı $\hat{\beta}_1$.
+\#1: `coef` altında görülen değerler sırasıyla $\beta_o,\beta_1$
+tahminleridir, yani $\hat{\beta}_o,\hat{\beta}_1$. Bunlar bulmak
+istediğimiz katsayılar.  İki boyutta olduğumuz için düz bir çizgiden
+bahsediyoruz, bu çizginin $y$ eksenini kestiği yer kesi (intercept)
+$\hat{\beta}_0$'da ve ebeyne (`parent`) tekabül eden katsayı
+$\hat{\beta}_1$.
 
 Teorik olarak eğer bir katsayı sıfır ise bu işe yaramaz bir katsayıdır, çünkü
 modele hiçbir şey "eklemez''.  Fakat Basit En Az Kareler (ordinary least
@@ -209,36 +210,39 @@ print (2*(1-t(927).cdf(np.abs(8.517))))
 
 Üstteki sonuç 0.0 değeri çok iyi. Demek ki bu katsayı önemli (significant).
 
-2) Artıklarda sıfırdan sapma, herhangi bir yöne doğru yamukluk (skew) OLS
-uyumsuzluğunun işareti olabilir, üstte artıklar üzerinde `describe`
-çağrısı ile medyanı (\%50 noktası) hesaplattık, bu değerin 0.04 ile sıfırdan
-çok az sağa doğru saptığını görüyoruz. \%25, \%75 bölgelerinin işaretlerine
-bakmadan tam (absolute) değerlerine bakalım, 1.36 ve 1.63, çok az
-farklılar. İdealde hiç fark olmamasını isteriz çünkü normal dağılım
-simetriktir, her iki tarafında da bu bölgelerin yakın değerde olmasını
-bekleriz. Fakat bu değerler alarm yaratacak nitelikte değil.
+\#2: Artıklarda sıfırdan sapma, herhangi bir yöne doğru yamukluk
+(skew) OLS uyumsuzluğunun işareti olabilir, üstte artıklar üzerinde
+`describe` çağrısı ile medyanı (\%50 noktası) hesaplattık, bu değerin
+0.04 ile sıfırdan çok az sağa doğru saptığını görüyoruz. \%25, \%75
+bölgelerinin işaretlerine bakmadan tam (absolute) değerlerine bakalım,
+1.36 ve 1.63, çok az farklılar. İdealde hiç fark olmamasını isteriz
+çünkü normal dağılım simetriktir, her iki tarafında da bu bölgelerin
+yakın değerde olmasını bekleriz. Fakat bu değerler alarm yaratacak
+nitelikte değil.
 
 Artıkların minimum, maksimum (`min,max`) değerleri verideki ekstrem, aykırı
 değerlere (outlier) dair bir işaret olabilir.
 
-3) $R^2$, ya da `R-squared`, modelin kalitesiyle alakalıdır, ne kadar
-büyükse o kadar iyidir. Matematiksel olarak bu değer $y$'nin değişiminin /
-varyansının oran olarak ne kadarının regresyon modeli tarafından
-"açıklanabildiğini'' belirtir. Üstteki örnekte $R^2=0.21$ ise model varyansın
-yüzde 21'ini açıklıyor. Ya da "bir çocuğun boyunun yüzde 21'i ebeveyn boyu ile
-açıklanabilir'' sözü de söylenebilir. Geri kalan 0.75'lik yani yüzde 75'lik
-"açıklanamayan'' kısmın değişik sebepleri olabilir; belki hesaba katmadığımız
-değişkenler vardır, ya da örnekleme prosedüründe hatalar yapılmıştır, ya da
-lineerlik bu probleme uygun değildir, vs.
+\#3: $R^2$, ya da `R-squared`, modelin kalitesiyle alakalıdır, ne
+kadar büyükse o kadar iyidir. Matematiksel olarak bu değer $y$'nin
+değişiminin / varyansının oran olarak ne kadarının regresyon modeli
+tarafından "açıklanabildiğini'' belirtir. Üstteki örnekte $R^2=0.21$
+ise model varyansın yüzde 21'ini açıklıyor. Ya da "bir çocuğun boyunun
+yüzde 21'i ebeveyn boyu ile açıklanabilir'' sözü de söylenebilir. Geri
+kalan 0.75'lik yani yüzde 75'lik "açıklanamayan'' kısmın değişik
+sebepleri olabilir; belki hesaba katmadığımız değişkenler vardır, ya
+da örnekleme prosedüründe hatalar yapılmıştır, ya da lineerlik bu
+probleme uygun değildir, vs.
 
 Tavsiyemiz düz $R^2$ yerine OLS çıktısında görülen "düzeltilmiş $R^2$'' yani
 `Adj. R-squared` bilgisinin kullanılmasıdır, çünkü bu bilgi modeldeki
 değişken sayısını da hesaba katar ve daha iyi bir ölçüttür.
 
-4) F istatistiği: Bu istatistik tüm modelin önemli mi önemsiz mi olduğunu
-irdeler. Eğer modelde sıfır olmayan en az bir katsayı var ise model önemlidir
-(herhangi bir $i$ için $\beta_i \ne 0$). Eğer tüm katsayılar sıfır ise model
-önemsizdir ($\beta_0=\beta_1,\dots,\beta_n=0$). Örnekte
+\#4: F istatistiği: Bu istatistik tüm modelin önemli mi önemsiz mi
+olduğunu irdeler. Eğer modelde sıfır olmayan en az bir katsayı var ise
+model önemlidir (herhangi bir $i$ için $\beta_i \ne 0$). Eğer tüm
+katsayılar sıfır ise model önemsizdir
+($\beta_0=\beta_1,\dots,\beta_n=0$). Örnekte
 
 ```text
 ... F-statistic:                     246.8
