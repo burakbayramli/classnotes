@@ -145,7 +145,7 @@ uğraşılıyor, bunu</p>
 <p><span class="math display">\[
 \hat{f}(x) = \frac{1}{n} \sum _{i=1}^{n} \frac{1}{h} K \left( \frac{x -
 x_i}{h}  \right)
-\qquad{1}
+\qquad{(1)}
 \]</span></p>
 <p>hesabı ile gerçekleştirebiliriz. <span
 class="math inline">\(K\)</span> ile gösterilen çekirdek
@@ -325,6 +325,7 @@ hatırlarsak,</p>
 ifadesini eşitliğin soluna taşırsak,</p>
 <p><span class="math display">\[
 E[\hat{f}(x)] - f(x) = \frac{h^2 \sigma_K^2 f&#39;&#39;(x)}{2} + o(h^2)
+\qquad{(3)}
 \]</span></p>
 <p>Eşitliğin solundaki terim yanlılık (bias) hesabıdır. Doğal olarak
 yanlılığın azalmasını isteriz, üstteki ifade diyor ki <span
@@ -339,38 +340,71 @@ aklımıza gelebilir, yanlılığı azalttığımızda varyansta patlamaya sebep
 olabiliriz, bu sebeple her iki ölçümü dengeleyen bir yaklaşım
 bulunmalıdır. O zaman nihai bir optimal sonuca ulaşmak için KDE’nin
 varyansını hesaplayalım.</p>
-<p>Tüm toplamın varyansına gerek yok aslında, toplanan her terim
-bağımsız, tıpatıp aynı dağılıma sahipse (i.i.d.), o zaman bazı
-kolaylıklar elde ediyoruz, diyelim ki</p>
 <p><span class="math display">\[
-Y_i := \frac{1}{h} K\!\left(\frac{x - X_i}{h}\right), \quad
-\hat f(x) = \frac{1}{n} \sum_{i=1}^n Y_i.
-\]</span></p>
-<p>ki <span class="math inline">\(Y_1,\dots,Z_n\)</span> i.i.d. ve her
-dağılımın varyansı aynı, <span class="math inline">\(\sigma^2\)</span>.
-Tüm toplam üzerinde varyans alırsak,</p>
-<p><span class="math display">\[
-Var \left[ \frac{1}{n}  \sum_{i=1}^n Y_i \right] =
-\frac{1}{n^2}\, n \sigma^2 \;=\; \frac{1}{n} \sigma^2.
-\]</span></p>
-<p><span class="math display">\[
-Var \left[ \hat f(x) \right] = \frac{1}{n} \, \mathrm{Var}[Y_1].
-\]</span></p>
-<p><span class="math inline">\(Y_1\)</span> kullanıldı, yani herhangi
-bir <span class="math inline">\(Y_i\)</span> anlamında.. Üstteki diyor
-ki toplam içindeki tek bir terimin varyansını hesaplayıp <span
-class="math inline">\(n\)</span>’ye bölersek istenilen sonuca
-erisebiliriz. O şekilde devam edelim o zaman,</p>
-<p><span class="math display">\[
-Var[\hat{f}(x)] = \frac{1}{n} Var \left[
-\frac{1}{h} K(\frac{x-x_i}{h})
+Var \left[ \hat{f}(x)  \right] =
+\frac{1}{n} Var \left[
+  \frac{1}{h} K \left( \frac{x - X}{h}  \right)
 \right]
 \]</span></p>
 <p>Temel İstatistiği hatırlarsak <span class="math inline">\(Var(X) =
-E(X^2) - E(X)^2\)</span></p>
+E(X^2) - E(X)^2\)</span>, o zaman üstteki</p>
 <p><span class="math display">\[
 = \frac{1}{n} \left[
-\int \frac{1}{h} K^2(u) (f(x) - h u f&#39;(x) ) \,du - f^2(x) + O(h)
+E \left[ \frac{1}{h^2} K^2 \left( \frac{x - X}{h}  \right) \right]
+\right] -
+\left(
+E \left[ \frac{1}{h} K \left( \frac{x - X}{h}  \right)  \right]
+\right)^2
+\]</span></p>
+<p>olacaktır. İlk beklenti (expectation) hesabını standart beklenti
+formülü ile açabiliriz, bu bir entegraldir, <span
+class="math inline">\(X\)</span> pdf fonksiyonu <span
+class="math inline">\(f_X\)</span> için bunun <span
+class="math inline">\(\int x f_X \,dx\)</span> olduğunu biliyoruz, bunu
+uygularız. İkinci beklenti için daha önce bulduğumuz (3)’teki formülü
+kullanırız,</p>
+<p><span class="math display">\[
+E[\hat{f}(x)]  = \frac{h^2 \sigma_K^2 f&#39;&#39;(x)}{2} + f(x) + o(h^2)
+\]</span></p>
+<p>Buradaki ilk terimi <span class="math inline">\(o(h^2)\)</span>’ye
+dahil edebiliriz, o zaman iki üstteki,</p>
+<p><span class="math display">\[
+= \frac{1}{n} \left[
+\int K^2 \left( \frac{x - t}{h}  \right) \,dt - [ f(x) + O(h^2)]^2
+\right]
+\]</span></p>
+<p>olur. Eksiden sonraki kare alma işlemini açalım,</p>
+<p><span class="math display">\[
+[ f(x) + O(h^2)]^2 = f(x)^2 + 2f(x) O(h^2) + (O(h^2))^2 =
+\]</span></p>
+<p><span class="math inline">\(f(x)\)</span>, O(h^2)’e kıyasla sabit
+sayılır, etkisi yoktur, <span class="math inline">\((O(h^2))^2 =
+O(h^4)\)</span>,</p>
+<p><span class="math display">\[
+= f(x)^2 + O(h^2) + O(h^4)
+\]</span></p>
+<p>elde ederiz. Büyük O notasyonu matematiğine göre iki farklı dereceyi
+topladığımız zaman daha yavaş azalan / sönümlenen (decay) terim tutulur,
+o zaman <span class="math inline">\(O(h^4)\)</span> atılır, geriye <span
+class="math inline">\(f(x)^2 + O(h^2)\)</span> kalır.</p>
+<p><span class="math display">\[
+= \frac{1}{n} \left[
+\int K^2 \left( \frac{x - t}{h}  \right) \,dt - f(x) + O(h^2)]
+\right]
+\]</span></p>
+<p>Not: Büyük O notasyonunda <span class="math inline">\(-O(h^2) =
+O(h^2)\)</span>, negatif işaret farketmiyor.</p>
+<p>Değişken değişimi yapıyoruz</p>
+<p><span class="math display">\[
+\frac{1}{n} \left[
+\int \frac{1}{h} K^2(u) f(x - hu) \,du - f(x)^2 + O(h^2)
+\right]
+\]</span></p>
+<p>Taylor açılımını tekrar uyguluyoruz,</p>
+<p><span class="math display">\[
+\frac{1}{n} \left[
+\int \frac{1}{h} K^2(u) \big( f(x) - huf&#39;(x) \big) \,du - f(x)^2 +
+O(h^2)
 \right]
 \]</span></p>
 <p>[devam edecek]</p>
@@ -378,6 +412,8 @@ E(X^2) - E(X)^2\)</span></p>
 <p>[1] Shalizi, <em>Advanced Data Analysis From An Elementary Point of
 View</em></p>
 <p>[2] Wasserman, <em>All of Statistics</em></p>
+<p>[3] Bayramli, <em>Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar,
+Yürüyen Ortalama</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

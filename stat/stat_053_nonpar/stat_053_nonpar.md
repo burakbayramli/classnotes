@@ -62,7 +62,7 @@ uğraşılıyor, bunu
 
 $$
 \hat{f}(x) = \frac{1}{n} \sum _{i=1}^{n} \frac{1}{h} K \left( \frac{x - x_i}{h}  \right)
-\qquad{1}
+\qquad{(1)}
 $$
 
 hesabı ile gerçekleştirebiliriz. $K$ ile gösterilen çekirdek
@@ -250,6 +250,7 @@ eşitliğin soluna taşırsak,
 
 $$
 E[\hat{f}(x)] - f(x) = \frac{h^2 \sigma_K^2 f''(x)}{2} + o(h^2)
+\qquad{(3)}
 $$
 
 Eşitliğin solundaki terim yanlılık (bias) hesabıdır. Doğal olarak
@@ -266,68 +267,83 @@ olabiliriz, bu sebeple her iki ölçümü dengeleyen bir yaklaşım
 bulunmalıdır. O zaman nihai bir optimal sonuca ulaşmak için KDE'nin
 varyansını hesaplayalım.
 
-Tüm toplamın varyansına gerek yok aslında, toplanan her terim
-bağımsız, tıpatıp aynı dağılıma sahipse (i.i.d.), o zaman bazı
-kolaylıklar elde ediyoruz, diyelim ki
-
 $$
-Y_i := \frac{1}{h} K\!\left(\frac{x - X_i}{h}\right), \quad
-\hat f(x) = \frac{1}{n} \sum_{i=1}^n Y_i.
-$$
-
-ki $Y_1,\dots,Z_n$ i.i.d. ve her dağılımın varyansı aynı,
-$\sigma^2$. Tüm toplam üzerinde varyans alırsak,
-
-$$
-Var \left[ \frac{1}{n}  \sum_{i=1}^n Y_i \right] =
-\frac{1}{n^2}\, n \sigma^2 \;=\; \frac{1}{n} \sigma^2.
-$$
-
-$$
-Var \left[ \hat f(x) \right] = \frac{1}{n} \, \mathrm{Var}[Y_1].
-$$
-
-$Y_1$ kullanıldı, yani herhangi bir $Y_i$ anlamında.. Üstteki diyor ki
-toplam içindeki tek bir terimin varyansını hesaplayıp $n$'ye bölersek
-istenilen sonuca erisebiliriz. O şekilde devam edelim o zaman,
-
-$$
-Var[\hat{f}(x)] = \frac{1}{n} Var \left[
-\frac{1}{h} K(\frac{x-x_i}{h})
+Var \left[ \hat{f}(x)  \right] =
+\frac{1}{n} Var \left[
+  \frac{1}{h} K \left( \frac{x - X}{h}  \right)
 \right]
 $$
 
-Temel İstatistiği hatırlarsak $Var(X) = E(X^2) - E(X)^2$
-
+Temel İstatistiği hatırlarsak $Var(X) = E(X^2) - E(X)^2$, o zaman üstteki 
 
 $$
 = \frac{1}{n} \left[
-\int \frac{1}{h} K^2(u) (f(x) - h u f'(x) ) \,du - f^2(x) + O(h) 
+E \left[ \frac{1}{h^2} K^2 \left( \frac{x - X}{h}  \right) \right]
+\right] -
+\left(
+E \left[ \frac{1}{h} K \left( \frac{x - X}{h}  \right)  \right]
+\right)^2
+$$
+
+olacaktır. İlk beklenti (expectation) hesabını standart beklenti
+formülü ile açabiliriz, bu bir entegraldir, $X$ pdf fonksiyonu $f_X$
+için bunun $\int x f_X \,dx$ olduğunu biliyoruz, bunu
+uygularız. İkinci beklenti için daha önce bulduğumuz (3)'teki formülü
+kullanırız, 
+
+$$
+E[\hat{f}(x)]  = \frac{h^2 \sigma_K^2 f''(x)}{2} + f(x) + o(h^2)
+$$
+
+Buradaki ilk terimi $o(h^2)$'ye dahil edebiliriz, o zaman iki üstteki,
+
+$$
+= \frac{1}{n} \left[
+\int K^2 \left( \frac{x - t}{h}  \right) \,dt - [ f(x) + O(h^2)]^2
 \right]
 $$
 
-Koseli parantez icine bakalim, ilk terim
+olur. Eksiden sonraki kare alma işlemini açalım,
 
 $$
-\int \frac{1}{h} K^2(u) f(x)\,du = \frac{f(x)}{h} \int K^2(u)\,du
+[ f(x) + O(h^2)]^2 = f(x)^2 + 2f(x) O(h^2) + (O(h^2))^2 = 
 $$
 
-Ikinci terim
+$f(x)$, O(h^2)'e kıyasla sabit sayılır, etkisi yoktur, $(O(h^2))^2 = O(h^4)$,
 
 $$
-\int \frac{1}{h} K^2(u) f(x)\,du = \frac{f(x)}{h} \int K^2(u)\,du
+= f(x)^2 + O(h^2) + O(h^4)
 $$
 
-Bu terim yokolur çünkü $\int u K^2(u) du$ sıfırdır, $K(u)$ bir çift
-fonksiyon (tek fonksiyon, çift fonksiyon kavramlarını hatırlarsak,
-$K(u)=K(-u)$), ve $K^2(u)$ yine çift, fakat $u K^2(u)$ tek çünkü $u$
-degiskeni, bir fonksiyon olarak düşünülürse tektir. Ve tek
-fonksiyonların sıfır etrafındaki simetrik limitleri üzerinden
-entegrali sıfırdır.
+elde ederiz. Büyük O notasyonu matematiğine göre iki farklı dereceyi
+topladığımız zaman daha yavaş azalan / sönümlenen (decay) terim
+tutulur, o zaman $O(h^4)$ atılır, geriye $f(x)^2 + O(h^2)$ kalır.
 
 $$
-= \frac{f(x)}{hn} \int K^2 (u) \,du + O(1/n)
+= \frac{1}{n} \left[
+\int K^2 \left( \frac{x - t}{h}  \right) \,dt - f(x) + O(h^2)]
+\right]
 $$
+
+Not: Büyük O notasyonunda $-O(h^2) = O(h^2)$, negatif işaret farketmiyor.
+
+Değişken değişimi yapıyoruz
+
+$$
+\frac{1}{n} \left[
+\int \frac{1}{h} K^2(u) f(x - hu) \,du - f(x)^2 + O(h^2)
+\right]
+$$
+
+Taylor açılımını tekrar uyguluyoruz,
+
+$$
+\frac{1}{n} \left[
+\int \frac{1}{h} K^2(u) \big( f(x) - huf'(x) \big) \,du - f(x)^2 + O(h^2)
+\right]
+$$
+
+
 
 
 [devam edecek]
@@ -337,3 +353,5 @@ Kaynaklar
 [1] Shalizi, *Advanced Data Analysis From An Elementary Point of View*
 
 [2] Wasserman, *All of Statistics*
+
+[3] Bayramli, *Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama*
