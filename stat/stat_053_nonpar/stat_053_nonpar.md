@@ -341,10 +341,65 @@ $$
 \frac{1}{n} \left[
 \int \frac{1}{h} K^2(u) \big( f(x) - huf'(x) \big) \,du - f(x)^2 + O(h^2)
 \right]
+\qquad{(2)}
 $$
 
+Şimdi entegrali açalım, sonuç şöyle olur,
 
+$$
+= \frac{f(x)}{hn} \int K^2(u) \,du - f'(x) \int u K^2(u) \,du - ...
+$$
 
+Ilk terimde $\int K^2(u) \,du$ var, bu bir sabite esittir.
+
+$$
+K(u)^2 = \left( \frac{1}{\sqrt{2\pi}} e^{-u^2/2} \right)^2
+= \frac{1}{2\pi} e^{-u^2}.
+$$
+
+$$
+\int_{-\infty}^{\infty} K(u)^2 \, du
+= \frac{1}{2\pi} \int_{-\infty}^{\infty} e^{-u^2} \, du.
+$$
+
+Eşitliğin sağındaki entegralin $\sqrt{\pi}$ olduğu biliniyor, o zaman
+
+$$
+\Rightarrow \frac{1}{2\pi} \cdot \sqrt{\pi} \Rightarrow
+\int_{-\infty}^{\infty} K(u)^2 \, du = \frac{1}{2\sqrt{\pi}} = R(K)
+$$
+
+Üstteki sonuç literatürde $R(K)$ ile anılır.
+
+İkinci terimde $\int u K^2(u) du$ var, bu sıfırdır, $K(u)$ bir çift
+fonksiyon (tek fonksiyon, çift fonksiyon kavramlarını hatırlarsak,
+$K(u)=K(-u)$), ve $K^2(u)$ yine çift, fakat $u K^2(u)$ tek çünkü $u$
+değişkeni, bir fonksiyon olarak düşünülürse tektir. Ve tek
+fonksiyonların sıfır etrafındaki simetrik limitleri üzerinden
+entegrali sıfırdır.
+
+Formül (2)'den geriye kalanlar
+
+$$
+= \frac{1}{n} \left[ \frac{f(x)}{h}R(K) - f(x)^2 + O(h^2)  \right]
+$$
+
+Şimdi O notasyonu bağlamında düşünürsek, ilk terimde $f(x)R(K) / nh$
+var, burada $R(K)$ seçilen çekirdek $K$'ye bağlı bir sabittir, o zaman
+O notasyon sonucunda $O(1/nh)$ elde ederiz. İkinci terimde $f(x)^2/n$
+var, burası $O(1/n)$ oluyor, çünkü $n$ ve $h$ büyümesine göre $f(x)^2$
+sabit sayılır. Üçüncü terimde $O(h^2)/n$ var, bu da $O(h^2/n)$ oluyor.
+Hepsinin nihai toplamı $O(1/nh)$ olurdu. Ama birinci terimi tutalım
+ve şunu gösterelim,
+
+$$
+Var \left[ \hat{f}(x)  \right] = \frac{f(x)R(K)}{nh} + O(1/n)
+$$
+
+$n \to \infty$ iken ve $nh \to \infty$ ise üstteki sıfıra gider. O
+zaman yanlılık ve varyans dengesi bağlamında suna dikkat edersek
+yöntem işler; $h$ sıfıra gitmelidir, ama bunu $1/n$'den daha yavaş
+yapmalıdır [1, sf. 314]. 
 
 [devam edecek]
 
