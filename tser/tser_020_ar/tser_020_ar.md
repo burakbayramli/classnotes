@@ -496,7 +496,69 @@ zaman özyineli ifade şu olur [8, sf. 502],
 
 $$ y_t = \alpha x_t + (1-\alpha) y_{t-1}$$
 
+Etkili Örneklem Büyüklüğü
 
+EWMA hesabı en son değerlere ağırlık verir ve eskiler bir süre sonra
+unutulur.  Acaba bu "en son" ve "eski" kavramlarını bir şekilde somut
+hale getirebilir miyiz? Bu mümkün, üstte kullanılan $\alpha$ değeri
+ile bir etkili örneklem büyüklüğü (effective sample size) hesaplamak
+mümkün, yani EWMA'nın bir nevi önceden tanımlı pencere içinde etkili
+bir hareket eden ortalama (moving average) gibi işlediğini
+düşünebiliriz, ve bu sanal EWMA penceresinin büyüklüğü, $N_{eff}$
+diyelim, hesaplanabilir. Gördük ki,
+
+$$
+y_t=\frac{x_t+(1-\alpha)x_{t-1}+(1-\alpha)^2x_{t-2}+\cdots}{1+(1-\alpha)+(1-\alpha)^2+\cdots}.
+$$
+
+Bölen geometrik seri olduğu için $\frac{1}{\alpha}$. 
+
+O zaman $k$ anındaki normalize edilmiş ağırlık
+
+$$
+w_k=\alpha(1-\alpha)^k,\qquad k=0,1,2,\dots,
+$$
+
+Elimizde bir tahmin edici $\hat{\mu}$ olsun,
+
+$\hat\mu=\sum_i w_i x_i$, ki $\sum_i w_i=1$ ve birbirinden bağımsız,
+tıpatıp aynı $x_i$'lar için $Var(x_i)=\sigma^2$, o zaman
+$Var(\hat\mu)=\sigma^2\sum_i w_i^2$.
+
+Bu durumda şöyle bir hesap ta yapılabilir $Var(\bar x)=\sigma^2/N$, ki
+bu örneklem ortalaması (ve onun varyansı).
+
+Şimdi şu soru sorulur, "hangi $N_{eff}$ penceresi için ağırlıklı
+ortalama, basit averaj ile aynı varyansa sahiptir?". Bunun için son
+iki formülü birbirine eşitleyip $N_{eff}$ için çözeriz,
+
+$$
+\sigma^2\sum_i w_i^2 = \frac{\sigma^2}{N_{\text{eff}}} \quad\Rightarrow\quad
+N_{\text{eff}}=\frac{1}{\sum_i w_i^2}.
+$$
+
+$w_k$ formülü ile açalım,
+
+$$
+\sum_{k=0}^\infty w_k^2
+= \sum_{k=0}^\infty \alpha^2(1-\alpha)^{2k}
+= \alpha^2\sum_{k=0}^\infty \big((1-\alpha)^2\big)^k
+= \alpha^2\cdot\frac{1}{1-(1-\alpha)^2}.
+$$
+
+$1-(1-\alpha)^2 = 1 - (1 - 2\alpha + \alpha^2) = 2\alpha - \alpha^2$ olduğu için,
+
+$$
+\sum_{k=0}^\infty w_k^2 = \frac{\alpha^2}{2\alpha-\alpha^2}=\frac{\alpha}{2-\alpha}.
+$$
+
+$$
+N_{\text{eff}} \equiv \frac{1}{\sum w_k^2}
+= \frac{2-\alpha}{\alpha} = \frac{2}{\alpha}-1.
+$$
+
+Yani $\alpha$'dan yola çıkarak onun kabaca tekabül ettiği basit
+pencereli ortalama hesabının pencere büyüklüğünü bulmuş oluyoruz.
 
 Enflasyon
 
