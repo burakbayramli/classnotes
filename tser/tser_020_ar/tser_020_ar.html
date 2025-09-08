@@ -179,7 +179,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;x ~ x_lag1&#39;</span>, data<span class="op">=</span>df).fit()</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.params)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;aic&#39;</span>, results.aic)</span></code></pre></div>
-<pre><code>      x  x_lag1
+<pre class="text"><code>      x  x_lag1
 0   269     NaN
 1   321   269.0
 2   585   321.0
@@ -197,26 +197,29 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>model10 <span class="op">=</span> ARIMA(df.x, order<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>model_fit <span class="op">=</span> model10.fit()</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_fit.summary())</span></code></pre></div>
-<pre><code>                              ARMA Model Results                              
+<pre class="text"><code>                               SARIMAX Results                                
 ==============================================================================
 Dep. Variable:                      x   No. Observations:                  114
-Model:                     ARMA(1, 0)   Log Likelihood                -960.495
-Method:                       css-mle   S.D. of innovations           1100.247
-Date:                Tue, 13 Nov 2018   AIC                           1926.991
-Time:                        11:45:20   BIC                           1935.199
-Sample:                             0   HQIC                          1930.322
-                                                                              
+Model:                 ARIMA(1, 0, 0)   Log Likelihood                -960.496
+Date:                Mon, 08 Sep 2025   AIC                           1926.992
+Time:                        09:41:29   BIC                           1935.201
+Sample:                             0   HQIC                          1930.324
+                                - 114                                         
+Covariance Type:                  opg                                         
 ==============================================================================
                  coef    std err          z      P&gt;|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const       1550.1773    356.690      4.346      0.000     851.078    2249.276
-ar.L1.x        0.7173      0.065     11.042      0.000       0.590       0.845
-                                    Roots                                    
-=============================================================================
-                  Real          Imaginary           Modulus         Frequency
------------------------------------------------------------------------------
-AR.1            1.3941           +0.0000j            1.3941            0.0000
------------------------------------------------------------------------------</code></pre>
+const       1538.0176    518.209      2.968      0.003     522.346    2553.689
+ar.L1          0.7173      0.078      9.155      0.000       0.564       0.871
+sigma2      1.214e+06   1.21e+05     10.011      0.000    9.77e+05    1.45e+06
+===================================================================================
+Ljung-Box (L1) (Q):                  21.87   Jarque-Bera (JB):                35.50
+Prob(Q):                              0.00   Prob(JB):                         0.00
+Heteroskedasticity (H):               1.70   Skew:                             0.81
+Prob(H) (two-sided):                  0.10   Kurtosis:                         5.20
+===================================================================================
+
+Warnings:</code></pre>
 <p>Sonuçlar oldukça yakın (gerçi kesi farklı -niye?-, ama katsayı daha
 önemli).</p>
 <p>En İyi Model?</p>
@@ -231,12 +234,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>res.append(ARIMA(df.x, order<span class="op">=</span>(<span class="dv">5</span>,<span class="dv">0</span>,<span class="dv">0</span>)).fit())</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>res.append(ARIMA(df.x, order<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">0</span>,<span class="dv">0</span>)).fit())</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> res: <span class="bu">print</span> (x.df_model<span class="op">+</span><span class="dv">1</span>, x.aic)</span></code></pre></div>
-<pre><code>3 1926.9906490207566
-4 1878.031850120836
-5 1879.9567487161364
-6 1874.221797648189
-7 1875.2758635012437
-8 1876.858328122954</code></pre>
+<pre class="text"><code>4 1926.9924398325463
+5 1878.0406372333928
+6 1879.9789477534478
+7 1874.2668130645723
+8 1875.3543450306533
+9 1876.9445293129488</code></pre>
 <p>En iyi model AR(4) olarak gözüküyor. Şimdi sadece MA olarak
 bakalım,</p>
 <div class="sourceCode" id="cb11"><pre
@@ -354,24 +357,24 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a h
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>am <span class="op">=</span> arch_model(ret)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> am.fit(update_freq<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res.summary())</span></code></pre></div>
-<pre><code>Iteration:      5,   Func. Count:     41,   Neg. LLF: 3034.2183086575697
-Iteration:     10,   Func. Count:     76,   Neg. LLF: 3032.126998485467
-Iteration:     15,   Func. Count:    107,   Neg. LLF: 3032.061301642375
-Optimization terminated successfully.    (Exit mode 0)
-            Current function value: 3032.061301642018
+<pre class="text"><code>Iteration:      5,   Func. Count:     37,   Neg. LLF: 503856629.4052248
+Iteration:     10,   Func. Count:     67,   Neg. LLF: 3032.10088603183
+Iteration:     15,   Func. Count:     92,   Neg. LLF: 3032.061301641462
+Optimization terminated successfully    (Exit mode 0)
+            Current function value: 3032.061301641112
             Iterations: 15
-            Function evaluations: 107
+            Function evaluations: 92
             Gradient evaluations: 15
                      Constant Mean - GARCH Model Results                      
 ==============================================================================
-Dep. Variable:              Adj Close   R-squared:                      -0.000
-Mean Model:             Constant Mean   Adj. R-squared:                 -0.000
+Dep. Variable:              Adj Close   R-squared:                       0.000
+Mean Model:             Constant Mean   Adj. R-squared:                  0.000
 Vol Model:                      GARCH   Log-Likelihood:               -3032.06
 Distribution:                  Normal   AIC:                           6072.12
 Method:            Maximum Likelihood   BIC:                           6095.46
                                         No. Observations:                 2528
-Date:                Tue, Nov 13 2018   Df Residuals:                     2524
-Time:                        12:31:10   Df Model:                            4
+Date:                Mon, Sep 08 2025   Df Residuals:                     2527
+Time:                        09:42:31   Df Model:                            1
                                  Mean Model                                 
 ============================================================================
                  coef    std err          t      P&gt;|t|      95.0% Conf. Int.
@@ -414,7 +417,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a h
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>dfsp500[<span class="st">&#39;simulasyon&#39;</span>].plot()</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Simulasyon&#39;</span>)</span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_ar_05.png&#39;</span>)</span></code></pre></div>
-<p><img src="tser_ar_04.png" /> <img src="tser_ar_05.png" /></p>
+<p><img src="tser_ar_04.png" /></p>
+<p><img src="tser_ar_05.png" /></p>
 <p>Bir serinin değişen varyansa sahip olup olmadığını anlamak için bir
 istatistiki test [3, sf. 355] Breusch-Pagan testi,</p>
 <div class="sourceCode" id="cb22"><pre
@@ -441,7 +445,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a h
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> breusch</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>dflynx <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_015_stoc/lynx.csv&#39;</span>)<span class="op">;</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (breusch.breusch_pagan_test(dflynx.x, np.array(<span class="bu">range</span>(<span class="bu">len</span>(dflynx)))))</span></code></pre></div>
-<pre><code>(0.429236, 1.0, 0.6677515)</code></pre>
+<pre class="text"><code>(0.429236, 1.0, np.float64(0.6677515))</code></pre>
 <p>En sondaki değer p-değeridir, 0.05’ten düşüklük varyansın sabit
 olduğu hipotezinin reddedildiği anlamına gelir, yani değişen varyans
 durumu vardır. Üstteki sonuçta tezi reddedemedik, demek ki Lynx

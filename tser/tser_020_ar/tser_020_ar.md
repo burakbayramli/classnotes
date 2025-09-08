@@ -106,7 +106,7 @@ print (results.params)
 print ('aic', results.aic)
 ```
 
-```
+```text
       x  x_lag1
 0   269     NaN
 1   321   269.0
@@ -130,27 +130,30 @@ model_fit = model10.fit()
 print(model_fit.summary())
 ```
 
-```
-                              ARMA Model Results                              
+```text
+                               SARIMAX Results                                
 ==============================================================================
 Dep. Variable:                      x   No. Observations:                  114
-Model:                     ARMA(1, 0)   Log Likelihood                -960.495
-Method:                       css-mle   S.D. of innovations           1100.247
-Date:                Tue, 13 Nov 2018   AIC                           1926.991
-Time:                        11:45:20   BIC                           1935.199
-Sample:                             0   HQIC                          1930.322
-                                                                              
+Model:                 ARIMA(1, 0, 0)   Log Likelihood                -960.496
+Date:                Mon, 08 Sep 2025   AIC                           1926.992
+Time:                        09:41:29   BIC                           1935.201
+Sample:                             0   HQIC                          1930.324
+                                - 114                                         
+Covariance Type:                  opg                                         
 ==============================================================================
                  coef    std err          z      P>|z|      [0.025      0.975]
 ------------------------------------------------------------------------------
-const       1550.1773    356.690      4.346      0.000     851.078    2249.276
-ar.L1.x        0.7173      0.065     11.042      0.000       0.590       0.845
-                                    Roots                                    
-=============================================================================
-                  Real          Imaginary           Modulus         Frequency
------------------------------------------------------------------------------
-AR.1            1.3941           +0.0000j            1.3941            0.0000
------------------------------------------------------------------------------
+const       1538.0176    518.209      2.968      0.003     522.346    2553.689
+ar.L1          0.7173      0.078      9.155      0.000       0.564       0.871
+sigma2      1.214e+06   1.21e+05     10.011      0.000    9.77e+05    1.45e+06
+===================================================================================
+Ljung-Box (L1) (Q):                  21.87   Jarque-Bera (JB):                35.50
+Prob(Q):                              0.00   Prob(JB):                         0.00
+Heteroskedasticity (H):               1.70   Skew:                             0.81
+Prob(H) (two-sided):                  0.10   Kurtosis:                         5.20
+===================================================================================
+
+Warnings:
 ```
 
 Sonuçlar oldukça yakın (gerçi kesi farklı -niye?-, ama katsayı daha önemli).
@@ -159,7 +162,6 @@ En İyi Model?
 
 AR, ARIMA, MA, onların dereceleri arasında bir seçim yapmak gerekiyor. Önce
 sırf AR deneyelim,
-
 
 
 ```python
@@ -173,13 +175,13 @@ res.append(ARIMA(df.x, order=(6,0,0)).fit())
 for x in res: print (x.df_model+1, x.aic)
 ```
 
-```
-3 1926.9906490207566
-4 1878.031850120836
-5 1879.9567487161364
-6 1874.221797648189
-7 1875.2758635012437
-8 1876.858328122954
+```text
+4 1926.9924398325463
+5 1878.0406372333928
+6 1879.9789477534478
+7 1874.2668130645723
+8 1875.3543450306533
+9 1876.9445293129488
 ```
 
 En iyi model AR(4) olarak gözüküyor. Şimdi sadece MA olarak bakalım,
@@ -316,25 +318,25 @@ res = am.fit(update_freq=5)
 print (res.summary())
 ```
 
-```
-Iteration:      5,   Func. Count:     41,   Neg. LLF: 3034.2183086575697
-Iteration:     10,   Func. Count:     76,   Neg. LLF: 3032.126998485467
-Iteration:     15,   Func. Count:    107,   Neg. LLF: 3032.061301642375
-Optimization terminated successfully.    (Exit mode 0)
-            Current function value: 3032.061301642018
+```text
+Iteration:      5,   Func. Count:     37,   Neg. LLF: 503856629.4052248
+Iteration:     10,   Func. Count:     67,   Neg. LLF: 3032.10088603183
+Iteration:     15,   Func. Count:     92,   Neg. LLF: 3032.061301641462
+Optimization terminated successfully    (Exit mode 0)
+            Current function value: 3032.061301641112
             Iterations: 15
-            Function evaluations: 107
+            Function evaluations: 92
             Gradient evaluations: 15
                      Constant Mean - GARCH Model Results                      
 ==============================================================================
-Dep. Variable:              Adj Close   R-squared:                      -0.000
-Mean Model:             Constant Mean   Adj. R-squared:                 -0.000
+Dep. Variable:              Adj Close   R-squared:                       0.000
+Mean Model:             Constant Mean   Adj. R-squared:                  0.000
 Vol Model:                      GARCH   Log-Likelihood:               -3032.06
 Distribution:                  Normal   AIC:                           6072.12
 Method:            Maximum Likelihood   BIC:                           6095.46
                                         No. Observations:                 2528
-Date:                Tue, Nov 13 2018   Df Residuals:                     2524
-Time:                        12:31:10   Df Model:                            4
+Date:                Mon, Sep 08 2025   Df Residuals:                     2527
+Time:                        09:42:31   Df Model:                            1
                                  Mean Model                                 
 ============================================================================
                  coef    std err          t      P>|t|      95.0% Conf. Int.
@@ -385,6 +387,7 @@ plt.savefig('tser_ar_05.png')
 ```
 
 ![](tser_ar_04.png)
+
 ![](tser_ar_05.png)
 
 Bir serinin değişen varyansa sahip olup olmadığını anlamak için bir
@@ -420,8 +423,8 @@ dflynx = pd.read_csv('../tser_015_stoc/lynx.csv');
 print (breusch.breusch_pagan_test(dflynx.x, np.array(range(len(dflynx)))))
 ```
 
-```
-(0.429236, 1.0, 0.6677515)
+```text
+(0.429236, 1.0, np.float64(0.6677515))
 ```
 
 En sondaki değer p-değeridir, 0.05'ten düşüklük varyansın sabit olduğu
@@ -492,6 +495,8 @@ $\alpha$ ile çarpılan köşeli parantezdekiler $y_{t-1}$'in ta kendisi. O
 zaman özyineli ifade şu olur [8, sf. 502],
 
 $$ y_t = \alpha x_t + (1-\alpha) y_{t-1}$$
+
+
 
 Enflasyon
 
