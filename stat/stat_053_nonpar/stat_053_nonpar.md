@@ -401,7 +401,23 @@ zaman yanlılık ve varyans dengesi bağlamında suna dikkat edersek
 yöntem işler; $h$ sıfıra gitmelidir, ama bunu $1/n$'den daha yavaş
 yapmalıdır [1, sf. 314]. 
 
-[devam edecek]
+Alttaki formülde daha açık görebiliriz, hataların kare ortalaması
+(mean square error, MSE) hesabı yanlılık karesi artı varyanstır, o zaman
+
+$$
+MSE = \frac{h^4 \sigma_K^4 (f''(x))^2}{4} + \frac{f(x)}{hn} \int K^2 (u) \,du + \textrm{ufak degerler}
+$$
+
+Doğru seçilmiş $h,n$ değerleri büyürken MSE'yi minimal hale
+getirebilir, ama tabii ki bölünende olan $h$ değerine dikkat
+edersek. Bu iki değer, $h,n$ arasındaki denge için ek hesabı [1,
+sf. 315]'te bulabiliriz, optimal oran $h_{opt} = O(n^{-1/5})$ olarak
+gösterilmiş, yani en iyi bant genişliği $h$ değeri veri noktası
+sayısının 1 bölü beşinci kuvvetine oranla sıfıra gitmelidir. Not:
+Üstteki formül her $x$ bazındadır, [1] kaynağında optimal $h$ bulmak
+için tüm $x$'ler üzerinden entegral alınarak $h$ üzerinden türev
+alınmıştır, bir "hata karelerinin entegresi alınmış beklentisi"
+hesaplanmıştır.
 
 Kaynaklar
 
