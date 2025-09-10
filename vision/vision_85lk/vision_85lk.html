@@ -204,12 +204,12 @@ tarafla çarparsak, <span class="math inline">\(d\)</span> yanlız kalır,
 ve sonuç elde edilir.</p>
 <p>Bu denklemi Python Numpy’da <code>pinv</code> kullanarak çözeriz.</p>
 <p>Test için üç tane resim kullandık, bu resimlerden
-<code>flow1-bw-0.png</code> başlangıç resmi, bu resmin ortasındaki
-objeleri GIMP kullanarak elle kopyaladık, bir üst sağ çapraza doğru, bir
-alt sol çapraza doğru, ve iki yeni resim elde ettik
-(<code>upright.png</code>, <code>dleft.png</code>). Takip edilen nokta
-gri dörtgenin alt sol köşesinde. Lucas Kanade algoritması bu noktayı
-takip ederek, yeşil ile işaretledi.</p>
+<code>flow1.png</code> başlangıç resmi, bu resmin ortasındaki objeleri
+GIMP kullanarak elle kopyaladık, bir üst sağ çapraza doğru, bir alt sol
+çapraza doğru, ve iki yeni resim elde ettik (<code>flow3.png</code>,
+<code>flow2.png</code>). Takip edilen nokta gri dörtgenin alt sol
+köşesinde. Lucas Kanade algoritması bu noktayı takip ederek, yeşil ile
+işaretledi.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.signal <span class="im">as</span> si</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
@@ -221,80 +221,87 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x<span class="op">-</span>h2<span class="op">/</span><span class="dv">2</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> y<span class="op">-</span>h1<span class="op">/</span><span class="dv">2</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> <span class="fl">1.5</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> np.exp( <span class="op">-</span>( x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> ) <span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>) )<span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> np.exp( <span class="op">-</span>( x<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> y<span class="op">**</span><span class="dv">2</span> ) <span class="op">/</span> (<span class="dv">2</span><span class="op">*</span>sigma<span class="op">**</span><span class="dv">2</span>) )</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> g <span class="op">/</span> g.<span class="bu">sum</span>()</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> deriv(im1, im2):</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> gauss_kern()</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    Img_smooth <span class="op">=</span> si.convolve(im1,g,mode<span class="op">=</span><span class="st">&#39;same&#39;</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    fx,fy<span class="op">=</span>np.gradient(Img_smooth)    </span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    ft <span class="op">=</span> si.convolve2d(im1, <span class="fl">0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>))) <span class="op">+</span> <span class="op">\</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        si.convolve2d(im2, <span class="op">-</span><span class="fl">0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>)))</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                    </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    fx <span class="op">=</span> fx[<span class="dv">0</span>:fx.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:fx.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]    </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    fy <span class="op">=</span> fy[<span class="dv">0</span>:fy.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:fy.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    ft <span class="op">=</span> ft[<span class="dv">0</span>:ft.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:ft.shape[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fx, fy, ft</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&#39;flow1-bw-0.png&#39;</span>))</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&quot;upright.png&quot;</span>))</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>fx, fy, ft <span class="op">=</span> deriv(im1, im2)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (fx[:<span class="dv">5</span>])</span></code></pre></div>
-<pre class="text"><code>[[32.07763979 48.21839171 58.5675253  ... 63.94363287 62.82211772
-  58.56746171]
- [26.32259667 39.56753942 48.05993696 ... 52.47151812 51.55121378
-  48.05988478]
- [14.51156379 21.81345859 26.49529034 ... 28.92738099 28.42002014
-  26.49526157]
- [ 5.34221958  8.03030516  9.75385292 ... 10.64919146 10.462414
-   9.75384233]
- [ 1.3027865   1.95831957  2.37863452 ...  2.59697728  2.55142858
-   2.37863194]]</code></pre>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    fx,fy<span class="op">=</span>np.gradient(Img_smooth)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    ft <span class="op">=</span> si.convolve2d(im1, <span class="fl">0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>))) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        si.convolve2d(im2, <span class="op">-</span><span class="fl">0.25</span> <span class="op">*</span> np.ones((<span class="dv">2</span>,<span class="dv">2</span>)))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    fx <span class="op">=</span> fx[<span class="dv">0</span>:ft.shape[<span class="dv">0</span>], <span class="dv">0</span>:ft.shape[<span class="dv">1</span>]]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    fy <span class="op">=</span> fy[<span class="dv">0</span>:ft.shape[<span class="dv">0</span>], <span class="dv">0</span>:ft.shape[<span class="dv">1</span>]]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fx, fy, ft</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&#39;flow1.png&#39;</span>))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(<span class="st">&quot;flow3.png&quot;</span>))</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>fx, fy, ft <span class="op">=</span> deriv(im1, im2)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (fx[:<span class="dv">5</span>])</span></code></pre></div>
+<pre class="text"><code>[[32.07763979 48.21839171 58.5675253  ... 62.82211772 58.56746171
+  48.21832812]
+ [26.32259667 39.56753942 48.05993696 ... 51.55121378 48.05988478
+  39.56748724]
+ [14.51156379 21.81345859 26.49529034 ... 28.42002014 26.49526157
+  21.81342983]
+ [ 5.34221958  8.03030516  9.75385292 ... 10.462414    9.75384233
+   8.03029457]
+ [ 1.3027865   1.95831957  2.37863452 ...  2.55142858  2.37863194
+   1.95831699]]</code></pre>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.signal <span class="im">as</span> si</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy.linalg <span class="im">as</span> lin</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lk(im1, im2, i, j, window_size) :</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lk(im1, im2, i, j, window_size):</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    fx, fy, ft <span class="op">=</span> deriv(im1, im2)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    halfWindow <span class="op">=</span> np.floor(window_size<span class="op">/</span><span class="dv">2</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    curFx <span class="op">=</span> fx[<span class="bu">int</span>(i<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(i<span class="op">+</span>halfWindow), </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>               <span class="bu">int</span>(j<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(j<span class="op">+</span>halfWindow)]</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    curFy <span class="op">=</span> fy[<span class="bu">int</span>(i<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(i<span class="op">+</span>halfWindow), </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>               <span class="bu">int</span>(j<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(j<span class="op">+</span>halfWindow)]</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    curFt <span class="op">=</span> ft[<span class="bu">int</span>(i<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(i<span class="op">+</span>halfWindow), </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>               <span class="bu">int</span>(j<span class="op">-</span>halfWindow<span class="op">-</span><span class="dv">1</span>):<span class="bu">int</span>(j<span class="op">+</span>halfWindow)]</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    curFx <span class="op">=</span> curFx.T</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    curFy <span class="op">=</span> curFy.T</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    curFt <span class="op">=</span> curFt.T</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    halfWindow <span class="op">=</span> <span class="bu">int</span>(np.floor(window_size <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    min_x <span class="op">=</span> <span class="bu">max</span>(<span class="dv">0</span>, i <span class="op">-</span> halfWindow)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    max_x <span class="op">=</span> <span class="bu">min</span>(im1.shape[<span class="dv">0</span>], i <span class="op">+</span> halfWindow)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    min_y <span class="op">=</span> <span class="bu">max</span>(<span class="dv">0</span>, j <span class="op">-</span> halfWindow)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    max_y <span class="op">=</span> <span class="bu">min</span>(im1.shape[<span class="dv">1</span>], j <span class="op">+</span> halfWindow)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    curFx <span class="op">=</span> fx[min_x:max_x, min_y:max_y]</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    curFy <span class="op">=</span> fy[min_x:max_x, min_y:max_y]</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    curFt <span class="op">=</span> ft[min_x:max_x, min_y:max_y]</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    curFx <span class="op">=</span> curFx.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    curFy <span class="op">=</span> curFy.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    curFt <span class="op">=</span> <span class="op">-</span>curFt.flatten(order<span class="op">=</span><span class="st">&#39;F&#39;</span>) </span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    curFx <span class="op">=</span> curFx.flatten()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    curFy <span class="op">=</span> curFy.flatten()</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    curFt <span class="op">=</span> curFt.flatten()</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.vstack((curFx, curFy)).T</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),curFt)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> U[<span class="dv">0</span>], U[<span class="dv">1</span>]</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test(image1,image2,output): </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="dv">165</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="dv">95</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    win<span class="op">=</span><span class="dv">50</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image1))</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image2))</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    u, v <span class="op">=</span> lk(im1, im2, x, y, win)</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    plt.imshow(im1, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    plt.plot(x,y,<span class="st">&#39;+r&#39;</span>)<span class="op">;</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3 ile carptik cunku vektor degisimi iyi hesaplandi ama</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># grafikleme icin cok ufakti, ikinci yesil nokta iyi gozuksun</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># diye onu biraz buyuttuk</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    plt.plot(x<span class="op">+</span>u<span class="op">*</span><span class="dv">3</span>,y<span class="op">+</span>v<span class="op">*</span><span class="dv">3</span>,<span class="st">&#39;og&#39;</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    plt.savefig(output)</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;flow1.png&#39;</span>,<span class="st">&#39;flow2.png&#39;</span>,<span class="st">&#39;vision_85lk_03.png&#39;</span>)</span></code></pre></div>
-<p><img src="vision_85lk_03.png" /></p>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> <span class="op">-</span>curFt</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.dot(np.dot(lin.pinv(np.dot(A.T, A)), A.T), b)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> U[<span class="dv">0</span>], U[<span class="dv">1</span>]</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test(image1, image2, output, step<span class="op">=</span><span class="dv">16</span>, win<span class="op">=</span><span class="dv">50</span>):</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    im1 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image1))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    im2 <span class="op">=</span> np.asarray(Image.<span class="bu">open</span>(image2))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    h, w <span class="op">=</span> im1.shape[:<span class="dv">2</span>]</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    plt.imshow(im1, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    y_grid, x_grid <span class="op">=</span> np.mgrid[step<span class="op">/</span><span class="dv">2</span>:h:step, step<span class="op">/</span><span class="dv">2</span>:w:step].reshape(<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    scaling_factor <span class="op">=</span> <span class="fl">2.0</span>    </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    max_magnitude <span class="op">=</span> <span class="dv">50</span> </span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x, y <span class="kw">in</span> <span class="bu">zip</span>(x_grid, y_grid):</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        u, v <span class="op">=</span> lk(im1, im2, y, x, win)            </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        magnitude <span class="op">=</span> np.sqrt(u<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> v<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="co"># asiri buyuk oklari cikart</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> magnitude <span class="op">&gt;</span> max_magnitude: <span class="cf">continue</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        plt.arrow(x, y, u <span class="op">*</span> scaling_factor, v <span class="op">*</span> scaling_factor, color<span class="op">=</span><span class="st">&#39;g&#39;</span>, head_width<span class="op">=</span><span class="dv">2</span>, head_length<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    plt.savefig(output)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;flow1.png&#39;</span>,<span class="st">&#39;flow3.png&#39;</span>, <span class="st">&#39;vision_85lk_04.png&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;flow1.png&#39;</span>,<span class="st">&#39;flow2.png&#39;</span>,<span class="st">&#39;vision_85lk_03.png&#39;</span>)</span></code></pre></div>
+<p><img src="vision_85lk_03.png" /></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>test(<span class="st">&#39;flow1.png&#39;</span>,<span class="st">&#39;flow3.png&#39;</span>, <span class="st">&#39;vision_85lk_04.png&#39;</span>)</span></code></pre></div>
 <p><img src="vision_85lk_04.png" /></p>
 <p>Bu matematiksel modele alternatif bir bakış şöyle olabilir. İki imaj
 karesi içinde birincisine <span class="math inline">\(I(x,y)\)</span>
@@ -344,27 +351,27 @@ Taylor açılımı kulladığı için ufak piksel değişimleri için geçerlidi
 fonksiyona yakın sonuçlar verir. Bu da aklımızda bulunsun.</p>
 <p>OpenCV</p>
 <p>OpenCV ile optik akış kullanımı altta görülüyor.</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_flow(img, flow, step<span class="op">=</span><span class="dv">16</span>):</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    h, w <span class="op">=</span> img.shape[:<span class="dv">2</span>]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    y, x <span class="op">=</span> np.mgrid[step<span class="op">/</span><span class="dv">2</span>:h:step, step<span class="op">/</span><span class="dv">2</span>:w:step].reshape(<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    fx, fy <span class="op">=</span> flow[y,x].T</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> np.vstack([x, y, x<span class="op">+</span>fx, y<span class="op">+</span>fy]).T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> np.int32(lines <span class="op">+</span> <span class="fl">0.5</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    vis <span class="op">=</span> cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    cv2.polylines(vis, lines, <span class="dv">0</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>))</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (x1, y1), (x2, y2) <span class="kw">in</span> lines:</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        cv2.circle(vis, (x1, y1), <span class="dv">1</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vis</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>prevgray <span class="op">=</span> cv2.imread(<span class="st">&#39;106.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>gray <span class="op">=</span> cv2.imread(<span class="st">&#39;107.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>flow <span class="op">=</span> cv2.calcOpticalFlowFarneback(prevgray, gray, <span class="va">None</span>, <span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dv">15</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="fl">1.2</span>, <span class="dv">0</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>cv2.imwrite(<span class="st">&#39;pde_lk_01.png&#39;</span>, draw_flow(gray, flow))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd, zipfile</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_flow(img, flow, step<span class="op">=</span><span class="dv">16</span>):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    h, w <span class="op">=</span> img.shape[:<span class="dv">2</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    y, x <span class="op">=</span> np.mgrid[step<span class="op">/</span><span class="dv">2</span>:h:step, step<span class="op">/</span><span class="dv">2</span>:w:step].reshape(<span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    fx, fy <span class="op">=</span> flow[y,x].T</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> np.vstack([x, y, x<span class="op">+</span>fx, y<span class="op">+</span>fy]).T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    lines <span class="op">=</span> np.int32(lines <span class="op">+</span> <span class="fl">0.5</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    vis <span class="op">=</span> cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    cv2.polylines(vis, lines, <span class="dv">0</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (x1, y1), (x2, y2) <span class="kw">in</span> lines:</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        cv2.circle(vis, (x1, y1), <span class="dv">1</span>, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), <span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vis</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>prevgray <span class="op">=</span> cv2.imread(<span class="st">&#39;106.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>gray <span class="op">=</span> cv2.imread(<span class="st">&#39;107.jpg&#39;</span>, cv2.IMREAD_GRAYSCALE)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>flow <span class="op">=</span> cv2.calcOpticalFlowFarneback(prevgray, gray, <span class="va">None</span>, <span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dv">15</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="fl">1.2</span>, <span class="dv">0</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>cv2.imwrite(<span class="st">&#39;pde_lk_01.png&#39;</span>, draw_flow(gray, flow))</span></code></pre></div>
 <pre class="text"><code>Out[1]: True</code></pre>
 <p><img src="pde_lk_01.png" /></p>
 <p>Kaynaklar</p>

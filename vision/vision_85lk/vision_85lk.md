@@ -127,12 +127,12 @@ sonuç elde edilir.
 
 Bu denklemi Python Numpy'da `pinv` kullanarak çözeriz.
 
-Test için üç tane resim kullandık, bu resimlerden `flow1-bw-0.png`
-başlangıç resmi, bu resmin ortasındaki objeleri GIMP kullanarak elle kopyaladık,
-bir üst sağ çapraza doğru, bir alt sol çapraza doğru, ve iki yeni resim elde
-ettik (`upright.png`, `dleft.png`). Takip edilen nokta gri dörtgenin
-alt sol köşesinde. Lucas Kanade algoritması bu noktayı takip ederek, yeşil ile
-işaretledi.
+Test için üç tane resim kullandık, bu resimlerden `flow1.png`
+başlangıç resmi, bu resmin ortasındaki objeleri GIMP kullanarak elle
+kopyaladık, bir üst sağ çapraza doğru, bir alt sol çapraza doğru, ve
+iki yeni resim elde ettik (`flow3.png`, `flow2.png`). Takip edilen
+nokta gri dörtgenin alt sol köşesinde. Lucas Kanade algoritması bu
+noktayı takip ederek, yeşil ile işaretledi.
 
 ```python
 import scipy.signal as si
@@ -145,38 +145,40 @@ def gauss_kern():
     x = x-h2/2
     y = y-h1/2
     sigma = 1.5
-    g = np.exp( -( x**2 + y**2 ) / (2*sigma**2) );
+    g = np.exp( -( x**2 + y**2 ) / (2*sigma**2) )
     return g / g.sum()
 
 def deriv(im1, im2):
     g = gauss_kern()
     Img_smooth = si.convolve(im1,g,mode='same')
-    fx,fy=np.gradient(Img_smooth)    
+    
+    fx,fy=np.gradient(Img_smooth)
+    
     ft = si.convolve2d(im1, 0.25 * np.ones((2,2))) + \
         si.convolve2d(im2, -0.25 * np.ones((2,2)))
-                    
-    fx = fx[0:fx.shape[0]-1, 0:fx.shape[1]-1]    
-    fy = fy[0:fy.shape[0]-1, 0:fy.shape[1]-1];
-    ft = ft[0:ft.shape[0]-1, 0:ft.shape[1]-1];
+    
+    fx = fx[0:ft.shape[0], 0:ft.shape[1]]
+    fy = fy[0:ft.shape[0], 0:ft.shape[1]]
+    
     return fx, fy, ft
 
-im1 = np.asarray(Image.open('flow1-bw-0.png'))
-im2 = np.asarray(Image.open("upright.png"))
+im1 = np.asarray(Image.open('flow1.png'))
+im2 = np.asarray(Image.open("flow3.png"))
 fx, fy, ft = deriv(im1, im2)
 print (fx[:5])
 ```
 
 ```text
-[[32.07763979 48.21839171 58.5675253  ... 63.94363287 62.82211772
-  58.56746171]
- [26.32259667 39.56753942 48.05993696 ... 52.47151812 51.55121378
-  48.05988478]
- [14.51156379 21.81345859 26.49529034 ... 28.92738099 28.42002014
-  26.49526157]
- [ 5.34221958  8.03030516  9.75385292 ... 10.64919146 10.462414
-   9.75384233]
- [ 1.3027865   1.95831957  2.37863452 ...  2.59697728  2.55142858
-   2.37863194]]
+[[32.07763979 48.21839171 58.5675253  ... 62.82211772 58.56746171
+  48.21832812]
+ [26.32259667 39.56753942 48.05993696 ... 51.55121378 48.05988478
+  39.56748724]
+ [14.51156379 21.81345859 26.49529034 ... 28.42002014 26.49526157
+  21.81342983]
+ [ 5.34221958  8.03030516  9.75385292 ... 10.462414    9.75384233
+   8.03029457]
+ [ 1.3027865   1.95831957  2.37863452 ...  2.55142858  2.37863194
+   1.95831699]]
 ```
 
 ```python
@@ -184,42 +186,49 @@ import scipy.signal as si
 from PIL import Image
 import numpy.linalg as lin
 
-def lk(im1, im2, i, j, window_size) :
+def lk(im1, im2, i, j, window_size):
     fx, fy, ft = deriv(im1, im2)
-    halfWindow = np.floor(window_size/2)
-    curFx = fx[int(i-halfWindow-1):int(i+halfWindow), 
-               int(j-halfWindow-1):int(j+halfWindow)]
-    curFy = fy[int(i-halfWindow-1):int(i+halfWindow), 
-               int(j-halfWindow-1):int(j+halfWindow)]
-    curFt = ft[int(i-halfWindow-1):int(i+halfWindow), 
-               int(j-halfWindow-1):int(j+halfWindow)]
-    curFx = curFx.T
-    curFy = curFy.T
-    curFt = curFt.T
+    halfWindow = int(np.floor(window_size / 2))
 
-    curFx = curFx.flatten(order='F') 
-    curFy = curFy.flatten(order='F') 
-    curFt = -curFt.flatten(order='F') 
-    
+    min_x = max(0, i - halfWindow)
+    max_x = min(im1.shape[0], i + halfWindow)
+    min_y = max(0, j - halfWindow)
+    max_y = min(im1.shape[1], j + halfWindow)
+
+    curFx = fx[min_x:max_x, min_y:max_y]
+    curFy = fy[min_x:max_x, min_y:max_y]
+    curFt = ft[min_x:max_x, min_y:max_y]
+
+    curFx = curFx.flatten()
+    curFy = curFy.flatten()
+    curFt = curFt.flatten()
+
     A = np.vstack((curFx, curFy)).T
-    U = np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),curFt)
+    b = -curFt
+        
+    U = np.dot(np.dot(lin.pinv(np.dot(A.T, A)), A.T), b)
     return U[0], U[1]
 
-def test(image1,image2,output): 
-    x=165
-    y=95
-    win=50
+def test(image1, image2, output, step=16, win=50):
     im1 = np.asarray(Image.open(image1))
     im2 = np.asarray(Image.open(image2))
-    u, v = lk(im1, im2, x, y, win)
+    h, w = im1.shape[:2]
     plt.imshow(im1, cmap='gray')
-    plt.plot(x,y,'+r');
-    # 3 ile carptik cunku vektor degisimi iyi hesaplandi ama
-    # grafikleme icin cok ufakti, ikinci yesil nokta iyi gozuksun
-    # diye onu biraz buyuttuk
-    plt.plot(x+u*3,y+v*3,'og')
-    plt.savefig(output)
+    y_grid, x_grid = np.mgrid[step/2:h:step, step/2:w:step].reshape(2,-1).astype(int)
+    scaling_factor = 2.0    
+    max_magnitude = 50 
+    for x, y in zip(x_grid, y_grid):
+        u, v = lk(im1, im2, y, x, win)            
+        magnitude = np.sqrt(u**2 + v**2)
+        # asiri buyuk oklari cikart
+        if magnitude > max_magnitude: continue
+            
+        plt.arrow(x, y, u * scaling_factor, v * scaling_factor, color='g', head_width=2, head_length=3)
 
+    plt.savefig(output)
+```
+
+```python
 test('flow1.png','flow2.png','vision_85lk_03.png')
 ```
 
