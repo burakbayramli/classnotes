@@ -50,21 +50,3 @@ Bu bir lineer fonksiyon, alttaki gibi bir çizgi ile gösterilebilir,
 
 ![](compscieng_1_20_03.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-[devam edecek]
-
-
-
-

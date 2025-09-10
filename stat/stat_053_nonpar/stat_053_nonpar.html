@@ -115,22 +115,24 @@ temsilini gösteriyoruz.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>rand_seed <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_data_binormal(data_count<span class="op">=</span><span class="dv">100</span>):</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="fl">0.3</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    np.random.seed(rand_seed)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_data_binormal(data_count<span class="op">=</span><span class="dv">1000</span>, seed<span class="op">=</span><span class="dv">100</span>):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    np.random.seed(seed)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    n1 <span class="op">=</span> data_count <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    n2 <span class="op">=</span> data_count <span class="op">-</span> n1</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.concatenate([</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        np.random.normal(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, <span class="bu">int</span>(data_count <span class="op">*</span> alpha)),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        np.random.normal(<span class="dv">5</span>, <span class="dv">1</span>, <span class="bu">int</span>(data_count <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> alpha)))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        np.random.normal(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>, n1),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        np.random.normal(<span class="dv">5</span>, <span class="dv">1</span>, n2)  </span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    ])</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> <span class="kw">lambda</span> z: alpha <span class="op">*</span> stats.norm(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>).pdf(z) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> alpha) <span class="op">*</span> stats.norm(<span class="dv">5</span>, <span class="dv">1</span>).pdf(z)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, dist</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>data, d <span class="op">=</span> make_data_binormal()</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(np.<span class="bu">min</span>(data), np.<span class="bu">max</span>(data), <span class="dv">1000</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.hist(data, bins<span class="op">=</span><span class="dv">20</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&#39;Histogram&#39;</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;True Distribution&#39;</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_01.png&#39;</span>)</span></code></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> true_pdf(z):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.5</span> <span class="op">*</span> norm(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>).pdf(z) <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> norm(<span class="dv">5</span>, <span class="dv">1</span>).pdf(z)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    np.random.shuffle(x)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x, true_pdf</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>data, d <span class="op">=</span> make_data_binormal()</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(np.<span class="bu">min</span>(data), np.<span class="bu">max</span>(data), <span class="dv">1000</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>plt.hist(data, bins<span class="op">=</span><span class="dv">20</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&#39;Histogram&#39;</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;True Distribution&#39;</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_053_nonpar_01.png" /></p>
 <p>Histogram yaklaşımı gerçek dağılımın iki tepesini kabaca yakaladı,
 her iki tepe de grafikte görülebiliyor.</p>
@@ -236,7 +238,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_02.png&#39;</span>)</span></code></pre></div>
-<pre class="text"><code>diffs (1000, 100)</code></pre>
+<pre class="text"><code>diffs (1000, 1000)</code></pre>
 <p><img src="stat_053_nonpar_02.png" /></p>
 <p>Bu kod standart KDE kodlaması. Bu noktada bazı performans konularına
 dikkat çekmek gerekiyor. Formül (1)’deki <span class="math inline">\(K(x
@@ -487,12 +489,124 @@ class="math inline">\(x\)</span> bazındadır, [1] kaynağında optimal
 class="math inline">\(x\)</span>’ler üzerinden entegral alınarak <span
 class="math inline">\(h\)</span> üzerinden türev alınmıştır, bir “hata
 karelerinin entegresi alınmış beklentisi” hesaplanmıştır.</p>
+<p>Artımsal KDE</p>
+<p>KDE formülünü kullanarak <span class="math inline">\(p_n(x)\)</span>
+tanımlayalım,</p>
+<p><span class="math display">\[
+p_n(x) = \frac{1}{n}\sum_{i=1}^{n} K_h(x - x_i).
+\]</span></p>
+<p><span class="math inline">\((n+1)\)</span>’inci veri gelince <span
+class="math inline">\(n+1\)</span> veri noktası içeren KDE şudur,</p>
+<p><span class="math display">\[
+p_{n+1}(x)
+=\frac{1}{n+1}\sum_{i=1}^{n+1} K_h(x - x_i)
+=\frac{1}{n+1}\Big(\sum_{i=1}^{n} K_h(x - x_i) + K_h(x - x_{n+1})\Big).
+\]</span></p>
+<p>Eşitliğin sağındaki ilk terimde <span
+class="math inline">\(\sum_{i=1}^{n} K_h(x - x_i)\)</span> ifadesi
+yerine bir önceki tanımdan <span class="math inline">\(n p_n(x)\)</span>
+formüle sokulabilir, bu bize <span
+class="math inline">\(p_{n+1}(x)\)</span> için özyineli bir güncelleme
+formülü verir,</p>
+<p><span class="math display">\[
+p_{n+1}(x) = \frac{n}{n+1}\,p_n(x) + \frac{1}{n+1}\,K_h(x - x_{n+1})
+\qquad{(1)}
+\]</span></p>
+<p>Kodları görelim,</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>num_points <span class="op">=</span> <span class="bu">len</span>(data)    </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>total_density <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>x_values <span class="op">=</span> np.linspace(<span class="bu">min</span>(data) <span class="op">-</span> <span class="dv">1</span>, <span class="bu">max</span>(data) <span class="op">+</span> <span class="dv">1</span>, num_points)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> data[<span class="dv">0</span>]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>total_density <span class="op">=</span> norm.pdf(x_values, loc<span class="op">=</span>current, scale<span class="op">=</span>h)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(data)):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    current <span class="op">=</span> data[i]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    density <span class="op">=</span> norm.pdf(x_values, loc<span class="op">=</span>current, scale<span class="op">=</span>h)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    total_density <span class="op">=</span> (N<span class="op">/</span>(N<span class="op">+</span><span class="dv">1</span>)) <span class="op">*</span> total_density <span class="op">+</span>  (<span class="dv">1</span> <span class="op">/</span> (N<span class="op">+</span><span class="dv">1</span>)) <span class="op">*</span> density</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    N <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(np.<span class="bu">min</span>(data), np.<span class="bu">max</span>(data), <span class="dv">1000</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;-&#39;</span>, label<span class="op">=</span><span class="st">&#39;Gercek Dagilim&#39;</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>plt.plot(x_values, total_density, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;Artimsal KDE&#39;</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_03.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_053_nonpar_03.png" /></p>
+<p>EWMA Baglantisi</p>
+<p>Önce [6] yazısında gördüğümüz basit sayılar üzerinde artımsal
+(incremental) ortalama hesabı formülünü hatırlayalım,</p>
+<p><span class="math display">\[
+\bar{x}_n = \left(1 - \tfrac{1}{n}\right)\bar{x}_{n-1} + \tfrac{1}{n}
+x_n.
+\]</span></p>
+<p>Şimdi KDE, sayaç güncellemesinin nerede olduğuna bağlı olarak ve bir
+indis kaydırması yaparak KDE özyineli formül (1) şu şekilde de
+gösterilebilir,</p>
+<p><span class="math display">\[
+p_{n}(x) = \frac{n-1}{n}\,p_{n-1}(x) + \frac{1}{n}\,K_h(x - x_{n})
+\]</span></p>
+<p>Her iki form birbirinin aynısı. Tek fark güncelleme için kullanılan
+“yeni veri” noktasının birinde reel sayı olması diğerinde ise <span
+class="math inline">\(K_h(x - x_{n})\)</span> ile hesaplanan son
+noktanının olasılık değeri.</p>
+<p>Bu form benzerliğini saptamak önemli çünkü şimdi, aynen [5]’de
+gösterildiği gibi, ortalama güncellemesini üstel ağırlıklı EWMA forma
+geçirebildiğimiz gibi üstteki KDE güncellemesini de EWMA formatına
+geçirebiliriz. Yani, en son veriye daha ağırlık veren EWMA formundaki
+KDE şu şekilde yazılabilir.</p>
+<p><span class="math display">\[
+p_n(x) = (1-\alpha)\,p_{n-1}(x) + \alpha\,K_h(x - x_n).
+\]</span></p>
+<p>Bu noktada EWMA’nın bir tür “kayan pencere ortalaması” olduğunu
+hatırlayabiliriz, kabaca bu pencere büyüklüğünün <span
+class="math inline">\(\alpha\)</span> bazlı nasıl saptanabildiğini
+[3]’te görmüştük. Yani ortalama güncellemesi, kayan pencere ortalaması,
+oradan tek parametre kullanarak hızlı şekilde pencere ortalaması EWMA
+ile yapmaya doğru bir geçiş mümkündür. Bu geçiş performans, kodlama
+açısından faydalı olabilir, çünkü çok uzun süreli güncelleme alan bir
+sistem düşünelim, veri nokta sayısı <span
+class="math inline">\(n\)</span> çok büyüyecektir, bu sayı bölüm
+sırasında problem çıkartabilir. Fakat EWMA yaklaşımının bu tür
+problemleri olmaz.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data, d <span class="op">=</span> make_data_binormal(data_count<span class="op">=</span><span class="dv">300</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>num_points <span class="op">=</span> <span class="bu">len</span>(data)    </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>total_density <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="fl">0.001</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>x_values <span class="op">=</span> np.linspace(<span class="bu">min</span>(data) <span class="op">-</span> <span class="dv">1</span>, <span class="bu">max</span>(data) <span class="op">+</span> <span class="dv">1</span>, num_points)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>current <span class="op">=</span> data[<span class="dv">0</span>]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>total_density <span class="op">=</span> norm.pdf(x_values, loc<span class="op">=</span>current, scale<span class="op">=</span>h)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(data)):</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    current <span class="op">=</span> data[i]</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    density <span class="op">=</span> norm.pdf(x_values, loc<span class="op">=</span>current, scale<span class="op">=</span>h)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    total_density <span class="op">=</span>  (<span class="dv">1</span><span class="op">-</span>alpha)<span class="op">*</span>total_density <span class="op">+</span>  (alpha)<span class="op">*</span>density</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>data, d <span class="op">=</span> make_data_binormal(data_count<span class="op">=</span><span class="dv">1</span><span class="op">*</span><span class="dv">10000</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>x_vals <span class="op">=</span> np.linspace(np.<span class="bu">min</span>(data), np.<span class="bu">max</span>(data), <span class="dv">1000</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>plt.plot(x_vals, d(x_vals), color<span class="op">=</span><span class="st">&#39;green&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;-&#39;</span>, label<span class="op">=</span><span class="st">&#39;Gercek Dagilim&#39;</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plt.plot(x_values, total_density, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;EWMA KDE&#39;</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_053_nonpar_04.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_053_nonpar_04.png" /></p>
 <p>Kaynaklar</p>
 <p>[1] Shalizi, <em>Advanced Data Analysis From An Elementary Point of
 View</em></p>
 <p>[2] Wasserman, <em>All of Statistics</em></p>
 <p>[3] Bayramli, <em>Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar,
 Yürüyen Ortalama</em></p>
+<p>[4] Bayramli, <em>Istatistik, Parametresiz İstatistik (Nonparametric
+Statistics)</em></p>
+<p>[5] Bayramli, <em>Zaman Serileri, ARIMA, ARCH, GARCH, Periyotlar,
+Yürüyen Ortalama</em></p>
+<p>[6] Bayramli, <em>Azar Azar İstatistik (Incremental
+Statistics)</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

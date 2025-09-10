@@ -446,7 +446,7 @@ $$
 
 Aynı sonuca eriştik.
 
-[devam edecek]
+[atlandı]
 
 Gauss-Green Eşitliği
 

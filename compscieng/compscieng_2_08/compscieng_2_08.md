@@ -184,13 +184,3 @@ olduğunu ayırtetmeyi göstereceğim. Şok hızı $s$'yi bulmayı öğreneceği
 ile yayılma arasındaki seçim entropi hesabı üzerinden olacak.
 
 
-
-
-
-
-
-
-[devam edecek]
-  
-
-

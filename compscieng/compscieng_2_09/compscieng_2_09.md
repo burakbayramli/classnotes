@@ -102,20 +102,3 @@ yakalamak / kaydetmek için o şekilde entegral sınırı tanımlamam normal.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[devam edecek]
-
-

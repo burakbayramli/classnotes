@@ -27,16 +27,18 @@ temsilini gösteriyoruz.
 ```python
 from scipy import stats
 
-rand_seed = 100
-def make_data_binormal(data_count=100):
-    alpha = 0.3
-    np.random.seed(rand_seed)
+def make_data_binormal(data_count=1000, seed=100):
+    np.random.seed(seed)
+    n1 = data_count // 2
+    n2 = data_count - n1
     x = np.concatenate([
-        np.random.normal(-1, 2, int(data_count * alpha)),
-        np.random.normal(5, 1, int(data_count * (1 - alpha)))
+        np.random.normal(-1, 2, n1),
+        np.random.normal(5, 1, n2)  
     ])
-    dist = lambda z: alpha * stats.norm(-1, 2).pdf(z) + (1 - alpha) * stats.norm(5, 1).pdf(z)
-    return x, dist
+    def true_pdf(z):
+        return 0.5 * norm(-1, 2).pdf(z) + 0.5 * norm(5, 1).pdf(z)
+    np.random.shuffle(x)
+    return x, true_pdf
 
 data, d = make_data_binormal()
 x_vals = np.linspace(np.min(data), np.max(data), 1000)
@@ -156,7 +158,7 @@ plt.savefig('stat_053_nonpar_02.png')
 ```
 
 ```text
-diffs (1000, 100)
+diffs (1000, 1000)
 ```
 
 ![](stat_053_nonpar_02.png)
@@ -419,6 +421,129 @@ için tüm $x$'ler üzerinden entegral alınarak $h$ üzerinden türev
 alınmıştır, bir "hata karelerinin entegresi alınmış beklentisi"
 hesaplanmıştır.
 
+Artımsal KDE
+
+KDE formülünü kullanarak $p_n(x)$ tanımlayalım,
+
+$$
+p_n(x) = \frac{1}{n}\sum_{i=1}^{n} K_h(x - x_i).
+$$
+
+$(n+1)$'inci veri gelince $n+1$ veri noktası içeren KDE şudur,
+
+$$
+p_{n+1}(x)
+=\frac{1}{n+1}\sum_{i=1}^{n+1} K_h(x - x_i)
+=\frac{1}{n+1}\Big(\sum_{i=1}^{n} K_h(x - x_i) + K_h(x - x_{n+1})\Big).
+$$
+
+Eşitliğin sağındaki ilk terimde $\sum_{i=1}^{n} K_h(x - x_i)$ ifadesi
+yerine bir önceki tanımdan $n p_n(x)$ formüle sokulabilir, bu bize
+$p_{n+1}(x)$ için özyineli bir güncelleme formülü verir,
+
+$$
+p_{n+1}(x) = \frac{n}{n+1}\,p_n(x) + \frac{1}{n+1}\,K_h(x - x_{n+1})
+\qquad{(1)}
+$$
+
+Kodları görelim,
+
+```python
+from scipy.stats import norm
+
+num_points = len(data)    
+total_density = None
+N = 0
+h = 0.5
+x_values = np.linspace(min(data) - 1, max(data) + 1, num_points)
+current = data[0]
+total_density = norm.pdf(x_values, loc=current, scale=h)
+for i in range(len(data)):
+    current = data[i]
+    density = norm.pdf(x_values, loc=current, scale=h)
+    total_density = (N/(N+1)) * total_density +  (1 / (N+1)) * density
+    N += 1
+
+x_vals = np.linspace(np.min(data), np.max(data), 1000)
+plt.plot(x_vals, d(x_vals), color='green', lw=2, linestyle='-', label='Gercek Dagilim')
+plt.plot(x_values, total_density, color='red', lw=2, linestyle='--', label='Artimsal KDE')
+plt.legend()
+plt.savefig('stat_053_nonpar_03.png')
+```
+
+![](stat_053_nonpar_03.png)
+
+EWMA Baglantisi
+
+Önce [6] yazısında gördüğümüz basit sayılar üzerinde artımsal
+(incremental) ortalama hesabı formülünü hatırlayalım,
+
+$$
+\bar{x}_n = \left(1 - \tfrac{1}{n}\right)\bar{x}_{n-1} + \tfrac{1}{n} x_n.
+$$
+
+Şimdi KDE, sayaç güncellemesinin nerede olduğuna bağlı olarak ve bir
+indis kaydırması yaparak KDE özyineli formül (1) şu şekilde de
+gösterilebilir,
+
+$$
+p_{n}(x) = \frac{n-1}{n}\,p_{n-1}(x) + \frac{1}{n}\,K_h(x - x_{n})
+$$
+
+Her iki form birbirinin aynısı. Tek fark güncelleme için kullanılan
+"yeni veri" noktasının birinde reel sayı olması diğerinde ise $K_h(x -
+x_{n})$ ile hesaplanan son noktanının olasılık değeri.
+
+Bu form benzerliğini saptamak önemli çünkü şimdi, aynen [5]'de
+gösterildiği gibi, ortalama güncellemesini üstel ağırlıklı EWMA forma
+geçirebildiğimiz gibi üstteki KDE güncellemesini de EWMA formatına
+geçirebiliriz. Yani, en son veriye daha ağırlık veren EWMA formundaki
+KDE şu şekilde yazılabilir.
+
+$$
+p_n(x) = (1-\alpha)\,p_{n-1}(x) + \alpha\,K_h(x - x_n).
+$$
+
+Bu noktada EWMA'nın bir tür "kayan pencere ortalaması" olduğunu
+hatırlayabiliriz, kabaca bu pencere büyüklüğünün $\alpha$ bazlı nasıl
+saptanabildiğini [3]'te görmüştük. Yani ortalama güncellemesi, kayan
+pencere ortalaması, oradan tek parametre kullanarak hızlı şekilde
+pencere ortalaması EWMA ile yapmaya doğru bir geçiş mümkündür.  Bu
+geçiş performans, kodlama açısından faydalı olabilir, çünkü çok uzun
+süreli güncelleme alan bir sistem düşünelim, veri nokta sayısı $n$ çok
+büyüyecektir, bu sayı bölüm sırasında problem çıkartabilir.  Fakat
+EWMA yaklaşımının bu tür problemleri olmaz.
+
+```python
+data, d = make_data_binormal(data_count=300)
+```
+
+```python
+from scipy.stats import norm
+
+num_points = len(data)    
+total_density = None
+h = 0.5
+alpha = 0.001
+x_values = np.linspace(min(data) - 1, max(data) + 1, num_points)
+current = data[0]
+total_density = norm.pdf(x_values, loc=current, scale=h)
+for i in range(len(data)):
+    current = data[i]
+    density = norm.pdf(x_values, loc=current, scale=h)
+    total_density =  (1-alpha)*total_density +  (alpha)*density
+
+data, d = make_data_binormal(data_count=10*1000)
+x_vals = np.linspace(np.min(data), np.max(data), 1000)
+plt.plot(x_vals, d(x_vals), color='green', lw=2, linestyle='-', label='Gercek Dagilim')
+plt.plot(x_values, total_density, color='red', lw=2, linestyle='--', label='EWMA KDE')
+plt.legend()
+plt.savefig('stat_053_nonpar_04.png')
+```
+
+![](stat_053_nonpar_04.png)
+
+
 Kaynaklar
 
 [1] Shalizi, *Advanced Data Analysis From An Elementary Point of View*
@@ -426,3 +551,9 @@ Kaynaklar
 [2] Wasserman, *All of Statistics*
 
 [3] Bayramli, *Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama*
+
+[4] Bayramli, *Istatistik, Parametresiz İstatistik (Nonparametric Statistics)*
+
+[5] Bayramli, *Zaman Serileri, ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama*
+
+[6] Bayramli, *Azar Azar İstatistik (Incremental Statistics)*

@@ -121,6 +121,12 @@ elde olan ortalamayı çıkartıp $n$'ye bölüp bu sonucu önceki ortalamaya
 ekliyoruz. Böylece sürekli daha ufak sayılarla uğraşıyoruz, patlama olmuyor
 ayrıca elde sürekli bir ortalama hesabı oluyor.
 
+Biraz düzenleme sonrası formül şu şekilde de belirtilebilir,
+
+$$
+\bar{x}_n = \left(1 - \tfrac{1}{n}\right)\bar{x}_{n-1} + \tfrac{1}{n} x_n.
+$$
+
 ```python
 barx = 160 # ilk degeri ilk ortalama olarak kullan
 for n,xn in enumerate(np.array(df.Height)):

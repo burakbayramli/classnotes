@@ -52,20 +52,3 @@ Bu ilk bakışta garip bir ifade gibi geliyor, fakat şimdiye kadar
 gördüklerimizden daha garip değil aslında. Terimleri açıklayalım, $C$ kapalı bir
 eğri, $S$ ise $C$ ile sınırlanan herhangi bir yüzey.
 
-
-
-
-
-
-
-
-
-
-
-
-
-[devam edecek]
-
-Kaynaklar
-
-
