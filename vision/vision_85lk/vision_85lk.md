@@ -22,7 +22,7 @@ mesela, ve bu arabanın üzerindeki piksellerin renkleri, en azından iki kare
 arasında değişmiyor. Işık seviyesi, gölgede olma, vs. gibi durumlarda biraz
 değişebilir, fakat basitleştirme amacıyla bu faraziye geçerlidir. 
 
-![](disp2.png)
+![](vision_85lk_01.png)
 
 Bir diğer faraziye, kameralar hareket ettiklerinde alınan iki görüntü
 arasındaki tüm piksellerin yer değişimi genellikle aynı yönde olmasıdır. Bu
@@ -31,7 +31,7 @@ görüntü arasındaki değişimde tüm pikseller için aynı olacaktır. Bu da
 normal, kamerayı alıp mesela sağa doğru hareket ettiriyoruz, ve görüntüdeki
 tüm pikseller sola doğru gidiyorlar.
 
-![](disp1.png)
+![](vision_85lk_02.png)
 
 Tüm bunları modelimizde nasıl kullanırız? 
 
@@ -220,16 +220,16 @@ def test(image1,image2,output):
     plt.plot(x+u*3,y+v*3,'og')
     plt.savefig(output)
 
-test('flow1-bw-0.png','dleft.png','lk_1.png')
+test('flow1.png','flow2.png','vision_85lk_03.png')
 ```
 
-![](lk_1.png)
+![](vision_85lk_03.png)
 
 ```python
-test('flow1-bw-0.png','upright.png', 'lk_2.png')
+test('flow1.png','flow3.png', 'vision_85lk_04.png')
 ```
 
-![](lk_2.png)
+![](vision_85lk_04.png)
 
 Bu matematiksel modele alternatif bir bakış şöyle olabilir. İki imaj karesi
 içinde birincisine $I(x,y)$ ikincisine $H(x,y)$ diyelim, burada $t$
@@ -280,7 +280,7 @@ Ufak Piksel Değişimleri
 Konu hakkında bir nokta daha şu; Lucas-Kanade yöntemi 1. derece Taylor
 açılımı kulladığı için ufak piksel değişimleri için geçerlidir, çünkü
 Taylor açılımı yerel bir noktaya çok yakın bölgelerde bir fonksiyona
-yakın sonuçlar verir. Bu da aklımızda bulunsun.e
+yakın sonuçlar verir. Bu da aklımızda bulunsun.
 
 OpenCV
 

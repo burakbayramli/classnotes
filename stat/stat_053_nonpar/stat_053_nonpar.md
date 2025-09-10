@@ -37,7 +37,10 @@ def make_data_binormal(data_count=1000, seed=100):
     ])
     def true_pdf(z):
         return 0.5 * norm(-1, 2).pdf(z) + 0.5 * norm(5, 1).pdf(z)
-    np.random.shuffle(x)
+    # verileri karistir yoksa verinin ilk yarisinda sadece bir tur tepe
+    # gelecektir, bu durum azar azar (incremental) islem yaparken problem
+    # cikartabilir. 
+    np.random.shuffle(x) 
     return x, true_pdf
 
 data, d = make_data_binormal()
@@ -163,9 +166,9 @@ diffs (1000, 1000)
 
 ![](stat_053_nonpar_02.png)
 
-Bu kod standart KDE kodlaması. Bu noktada bazı performans konularına
-dikkat çekmek gerekiyor. Formül (1)'deki $K(x - x_i / h)$ hesabının
-bir toplam içinde olduğuna ve her $x$ hesabi için *tüm* diğer
+Üstteki standart KDE kodlaması. Bu noktada bazı performans konularına
+dikkat çekmek gerekiyor. Formül (1)'deki $K((x - x_i) / h)$ hesabının
+bir toplam içinde olduğuna ve her $x$ hesabı için *tüm* diğer
 $x$'lerin üzerinden geçilmesi gerektiğine dikkat çekmek gerekiyor. Bu
 demektir ki üstte verilen yaklaşımın hesapsal karmaşıklığı $O(n^2)$
 olacaktır, ki bu hız anlık (online) işlem yapan uygulamalar için
@@ -473,13 +476,19 @@ plt.savefig('stat_053_nonpar_03.png')
 
 ![](stat_053_nonpar_03.png)
 
-EWMA Baglantisi
+EWMA Bağlantısı
 
 Önce [6] yazısında gördüğümüz basit sayılar üzerinde artımsal
 (incremental) ortalama hesabı formülünü hatırlayalım,
 
 $$
 \bar{x}_n = \left(1 - \tfrac{1}{n}\right)\bar{x}_{n-1} + \tfrac{1}{n} x_n.
+$$
+
+Ya da
+
+$$
+\bar{x}_n = \frac{n-1}{n} \bar{x}_{n-1} + \tfrac{1}{n} x_n.
 $$
 
 Şimdi KDE, sayaç güncellemesinin nerede olduğuna bağlı olarak ve bir
@@ -492,7 +501,7 @@ $$
 
 Her iki form birbirinin aynısı. Tek fark güncelleme için kullanılan
 "yeni veri" noktasının birinde reel sayı olması diğerinde ise $K_h(x -
-x_{n})$ ile hesaplanan son noktanının olasılık değeri.
+x_{n})$ ile hesaplanan son noktanın olasılık değeri.
 
 Bu form benzerliğini saptamak önemli çünkü şimdi, aynen [5]'de
 gösterildiği gibi, ortalama güncellemesini üstel ağırlıklı EWMA forma
@@ -506,23 +515,19 @@ $$
 
 Bu noktada EWMA'nın bir tür "kayan pencere ortalaması" olduğunu
 hatırlayabiliriz, kabaca bu pencere büyüklüğünün $\alpha$ bazlı nasıl
-saptanabildiğini [3]'te görmüştük. Yani ortalama güncellemesi, kayan
-pencere ortalaması, oradan tek parametre kullanarak hızlı şekilde
-pencere ortalaması EWMA ile yapmaya doğru bir geçiş mümkündür.  Bu
-geçiş performans, kodlama açısından faydalı olabilir, çünkü çok uzun
-süreli güncelleme alan bir sistem düşünelim, veri nokta sayısı $n$ çok
-büyüyecektir, bu sayı bölüm sırasında problem çıkartabilir.  Fakat
-EWMA yaklaşımının bu tür problemleri olmaz.
-
-```python
-data, d = make_data_binormal(data_count=300)
-```
+saptanabildiğini [3]'te görmüştük. Yani ortalama güncellemesinden
+kayan pencere ortalamasına, oradan tek parametre kullanarak hızlı
+şekilde pencere ortalaması EWMA ile yapmaya doğru bir geçiş mümkündür.
+Bu geçiş performans, kodlama açısından faydalı olabilir, çünkü çok
+uzun süreli güncelleme alan bir sistem düşünelim, veri nokta sayısı
+$n$ çok büyüyecektir, bu sayı bölüm sırasında problem çıkartabilir.
+Fakat EWMA yaklaşımı sabit tek parametre üzerinden işlediği için bu
+tür problemleri olmaz.
 
 ```python
 from scipy.stats import norm
 
 num_points = len(data)    
-total_density = None
 h = 0.5
 alpha = 0.001
 x_values = np.linspace(min(data) - 1, max(data) + 1, num_points)
