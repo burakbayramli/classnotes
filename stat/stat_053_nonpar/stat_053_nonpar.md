@@ -10,13 +10,13 @@ varsayımlara dayanmaz; veriler belirli bir dağılımı takip etmeyen bir
 örneklemden toplanabilir, ya da dağılım varsa bile yaklaşım varsayım
 yapmayarak belki daha kuvvetli bazı sonuçlar almaya uğraşır.
 
-Parametresiz İstatistik yaklaşımlarını aslında pek çoğumuz belki de
-ait olduğu kategoriyi bilmeden sürekli kullanıyoruz. Bir histogram
-aldığımızda aslına parametresiz istatistik uygulamış oluyoruz, çünkü
-histogram yaklaşımı bilindiği gibi hiçbir dağılım varsayımı yapmıyor
-ve herhangi bir veriyle işleme kabiliyetine sahip. Verinin
-histogramını hesapladığımızda diyelim ki $N$ tane kutucuk içine düşen
-verileri sayıyoruz, onların frekansını hesaplıyoruz ve bu frekans
+Parametresiz İstatistik yaklaşımlarını pek çoğumuz belki de ait olduğu
+kategoriyi bilmeden sürekli kullanıyoruz. Bir histogram aldığımızda
+aslında parametresiz istatistik uygulamış oluyoruz, çünkü histogram
+yaklaşımı bilindiği gibi hiçbir dağılım varsayımı yapmıyor ve herhangi
+bir veri kümesiyle işleme kabiliyetine sahip. Verinin histogramını
+hesapladığımızda diyelim ki $N$ tane kutucuk içine düşen verileri
+sayıyoruz, onların frekansını hesaplıyoruz ve bu frekans
 grafiklendiğinde bize verinin gerçek dağılımının ne olduğu hakkında
 bir fikir verebiliyor.
 
@@ -145,7 +145,6 @@ def kde(data, k=None):
     n = len(data)
     h = 0.5
     diffs = (x[:, np.newaxis] - data) / h
-    print ('diffs', diffs.shape)
     kernel_values = k(diffs)
     kde = np.sum(kernel_values, axis=1) / (n * h)
     return kde
@@ -160,20 +159,23 @@ plt.grid(True)
 plt.savefig('stat_053_nonpar_02.png')
 ```
 
-```text
-diffs (1000, 1000)
-```
-
 ![](stat_053_nonpar_02.png)
 
-Üstteki standart KDE kodlaması. Bu noktada bazı performans konularına
-dikkat çekmek gerekiyor. Formül (1)'deki $K((x - x_i) / h)$ hesabının
-bir toplam içinde olduğuna ve her $x$ hesabı için *tüm* diğer
-$x$'lerin üzerinden geçilmesi gerektiğine dikkat çekmek gerekiyor. Bu
-demektir ki üstte verilen yaklaşımın hesapsal karmaşıklığı $O(n^2)$
-olacaktır, ki bu hız anlık (online) işlem yapan uygulamalar için
-tercih edilen bir performans olmaz. KDE'yi daha hızlandırmak için bir
-yaklaşımı ileride göreceğiz.
+Üstteki standart KDE kodlaması. Açıklamada tahmin edicinin "her $x$
+noktasında" yaptığı hesaptan bahsettik, bu $x$ noktası teorik
+muhakkak, sayısal hesaplar için en az ve en çok $x$ değerleri arasında
+belli noktaları önceden `np.linspace` ile tanımlıyoruz, ve sadece bu
+noktalar üzerinde Gaussian hesapları yapıyoruz. Bir nevi histogramsal
+bir yaklaşım bu, ama kutucuklar yok, önceden seçilmiş $x$ noktaları
+var.
+
+Bir performans konusuna da dikkat çekelim. Formül (1)'deki $K((x -
+x_i) / h)$ hesabının bir toplam içinde olduğuna ve her $x$ hesabı için
+*tüm* diğer $x$'lerin üzerinden geçilmesi gerektiğine dikkat çekmek
+gerekiyor. Bu demektir ki üstte verilen yaklaşımın hesapsal
+karmaşıklığı $O(n^2)$ olacaktır, ki bu hız anlık (online) işlem yapan
+uygulamalar için tercih edilen bir performans olmaz. KDE'yi daha
+hızlandırmak için bir yaklaşımı ileride göreceğiz.
 
 KDE Olasılık Dağılımıdır
 
