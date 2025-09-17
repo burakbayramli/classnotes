@@ -528,9 +528,9 @@ $Var(\hat\mu)=\sigma^2\sum_i w_i^2$.
 Bu durumda şöyle bir hesap ta yapılabilir $Var(\bar x)=\sigma^2/N$, ki
 bu örneklem ortalaması (ve onun varyansı).
 
-Şimdi şu soru sorulur, "hangi $N_{eff}$ penceresi için ağırlıklı
-ortalama, basit averaj ile aynı varyansa sahiptir?". Bunun için son
-iki formülü birbirine eşitleyip $N_{eff}$ için çözeriz,
+Şimdi şu soru sorulur, "hangi $N$ penceresi (yani $N_{eff}$) için
+ağırlıklı ortalama, basit averaj ile aynı varyansa sahiptir?". Bunun
+için son iki formülü birbirine eşitleyip $N_{eff}$ için çözeriz,
 
 $$
 \sigma^2\sum_i w_i^2 = \frac{\sigma^2}{N_{\text{eff}}} \quad\Rightarrow\quad
