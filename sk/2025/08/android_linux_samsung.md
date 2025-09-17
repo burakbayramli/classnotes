@@ -101,6 +101,19 @@ Benim tercihim programları emulasyon içinde, yani Ubuntu ise Ubuntu
 üzerinde, o sisteme göre kurmak, Termux'ta degil, böylece o programın
 diğerleri ile olan etkileşimi daha rahat olur.
 
+Tus Değişimi
+
+Eğer bir Bluetooth klavye ile bağlanıyorsak, bu klavyenin bazı
+tuşlarını diğer tuşlara eşleme imkanı artık var, bu son Android sürümü
+paketten çıktığı haliyle bunu destekliyor. Bu Ubuntu üzerinde Emacs
+gibi programları kullanırken oldukca faydalı çünkü Cmd ve ÇAPS gibi
+tuşları sırasıyla Alt ve CTRL yapabilmek klavyede yazmayı
+hızlandırabiliyor. Ayar değişimi için `Settings`'e gidiyoruz, oradan
+
+`General Management` / `Physical keyboard` / `Customize Keys`
+
+altında tüm ana tuşları görebiliriz. Eşleme değiştirme bu ekranda yapılır.
+
 X11
 
 [1] bağlantısında görüldüğü gibi tablet üzerinde Linux masaüstü bile
@@ -108,6 +121,19 @@ işletmek mümkün. APK alınan yerde bir Termux:X11 apk'si var, bu
 kurulup geri kalan ayarlar yapılınca görsel X uygulamaları da
 işletilebiliyor.
 
+Hotspot
+
+Samsung telefon üzerinden Wifi ile İnternet paylaşımı (hotspot)
+yapanlar, son Android versiyonlarında paylaşım kullanımsız kaldığında
+kapatıldığını görebilir... Bu durumda paylaşım yapan telefonda
+`Settings` | `Connections` | `Mobile Hotspots and Tethering` ekranına
+gidip oradan `Mobile Hotspot` üzerine tıklayabilir. Bu ekranda
+bağlanılan ağın ismine, `Network Name`, tıklanır. Bu bizi yeni bir
+ekrana götürür, orada `Advanced` ile daha fazla seçenek görürüz, bu
+seçeneklerden biri `Turnoff when no device connected for..` diye
+gider, orada `Never` seçersek habire hotspot kapatılma durumundan
+kurtuluruz.
+ 
 Kaynaklar
 
 [1] https://youtu.be/UgRds3iP0BU

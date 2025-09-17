@@ -550,6 +550,19 @@ plt.savefig('stat_053_nonpar_04.png')
 
 ![](stat_053_nonpar_04.png)
 
+Üstteki metotun ne kadar verimli çalıştığını ne kadar anlatsak az
+gelir. Örnek amaçlı olarak `data` içindeki veriyi yarattık ve onun
+üzerinden geçiyoruz fakat dikkatlice bakarsak kodun aslında elde
+hiçbir veri tutmasına ihtiyacı yok. Onun tek hatırlaması gereken
+`total_density`, `x_values` icindeki $x$ değer listesi (bunlar bir
+kere ayarlandıktan sonra bir daha değişmiyor), ve tek bir `alpha`
+sabiti. Bu kadar. Yeni veri bize dış sistemden teker teker veriliyor
+olabilirdi, biz yine üstteki aynı güncelleme mantığını kullanırdık, ve
+bu mantık her yeni veri için `x_values` kadar nokta üzerinden geçerdi,
+orada bir Gaussian hesabı yapardı ve özyineli güncellemesini tek bir
+satırda gerçekleştirdi. Bu sayede, bu hızlı güncelleme ile, verinin
+dağılımı ne olursa olsun, onun esas dağılımı hakkında hiçbir şey
+bilmeden bu dağılımı yaklaşık şekilde temsil edebilmiş oluyoruz.
 
 Kaynaklar
 
