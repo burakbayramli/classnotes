@@ -121,6 +121,8 @@ işletmek mümkün. APK alınan yerde bir Termux:X11 apk'si var, bu
 kurulup geri kalan ayarlar yapılınca görsel X uygulamaları da
 işletilebiliyor.
 
+Android A16 Telefon
+
 Hotspot
 
 Samsung telefon üzerinden Wifi ile İnternet paylaşımı (hotspot)
@@ -133,6 +135,13 @@ ekrana götürür, orada `Advanced` ile daha fazla seçenek görürüz, bu
 seçeneklerden biri `Turnoff when no device connected for..` diye
 gider, orada `Never` seçersek habire hotspot kapatılma durumundan
 kurtuluruz.
+
+Ekran
+
+Ekrana iki kere tıklama yapınca ekran kapatılması / açılması durumunu
+iptal etmek istersek, `Settings` | `Advanced features` | `Motions and
+gestüres` ekranına giderek oradan `Double tap to turn on / off`
+seçeneklerini iptal edebiliriz.
  
 Kaynaklar
 
