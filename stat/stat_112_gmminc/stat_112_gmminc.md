@@ -1,5 +1,23 @@
 # Artımsal (Incremental) GMM
 
+Gaussian Karışım Modelleri [1]'de işlendi. O yazıda gösterilen her
+biri $d$ boyutlu olabilecek $G$ tane Gaussian'dan oluşan bir karışım
+ile bir veriyi temsil edebilmekten bahsediyordu. Bu tür bir modelde
+bilinmeyenler $G$ tane Gaussian'ın parametreleriydi, yani her Gaussian
+için D x 1 boyutunda bir $\mu$, D x D boyutunda bir $\Sigma$, ve tüm
+karışımın seviyelerini gösteren D x 1 boyutunda bir $\pi$. Eğer [2]
+notasyonu ile gösterirsek, karışım olasılık dağılım fonksiyonu,
+
+$$
+p(x) = \sum _{g=1}^{G} \pi_g N(x | \mu_g, \Sigma_g)
+$$
+
+ki $x \in R^{D}$.
+
+Dikkat edersek [1] yazısı ardından veriyi toptan (batch) ısleyen bir
+yaklaşım gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
+(Expeçtation-Maximization / EM) adıyla bilinir, döngüsünün her
+adımında verinin tamamını işleyen bir yaklaşımdır. 
 
 $$
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
@@ -316,4 +334,7 @@ Kaynaklar
 [3] Titterington, *Recursive Parameter Estimation using Incomplete Data*
 
 [4] Zivkovic, *Recursive unsupervised learning of finite mixture models*
+
+
+
 

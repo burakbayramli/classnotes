@@ -143,8 +143,9 @@ Fakat yine de şekil olarak iki kümeyi görebiliyoruz.  Acaba öyle bir yapay
 karışımı veriye uydururken, etiket değerlerini de kendiliğinden tahmin
 etse?
 
-Alttaki kod Beklenti-Maksimizasyon üzerinden kümeleme yapar. Konunun teorik
-kısmı altta ve [6] yazısında bulunabilir.
+Alttaki kod Beklenti-Maksimizasyon (Expectation-Maximization)
+üzerinden kümeleme yapar. Konunun teorik kısmı altta ve [6] yazısında
+bulunabilir.
 
 Türetmek 
 
