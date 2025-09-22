@@ -1,0 +1,173 @@
+# Artımsal (Incremental) GMM
+
+```python
+from scipy.stats import multivariate_normal
+
+def generate_gmm_data(weights, means, covs, n_samples):
+    n_components = len(weights)
+    data = np.zeros((n_samples, 2))    
+    component_choices = np.random.choice(n_components, size=n_samples, p=weights)
+    for i in range(n_components):
+        indices = np.where(component_choices == i)[0]
+        n_points_to_sample = len(indices)
+        if n_points_to_sample > 0:
+            data[indices, :] = np.random.multivariate_normal(
+                mean=means[i], 
+                cov=covs[i], 
+                size=n_points_to_sample
+            )
+
+    shuffle_indices = np.arange(len(data))
+    np.random.shuffle(shuffle_indices)
+    res_data = data[shuffle_indices]
+    return res_data
+
+def gmm_pdf(x, y, weights, means, covs):
+    """Calculate GMM probability density at point (x, y)"""
+    z = 0
+    for i in range(len(weights)):
+        rv = multivariate_normal(means[i], covs[i])
+        z += weights[i] * rv.pdf([x, y])
+    return z
+
+weights = [0.7, 0.3]
+means = [
+    [0, 5],
+    [5, -2]
+]
+covs = [
+    [[2, 1.5], [1.5, 3]],
+    [[10, -3], [-3, 5]]
+]
+
+n_points = 1000
+
+# Generate data points
+gmm_data = generate_gmm_data(weights, means, covs, n_points)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(gmm_data[:, 0], gmm_data[:, 1], alpha=0.6, s=10)
+plt.xlabel("X-coordinate")
+plt.ylabel("Y-coordinate")
+plt.grid(True)
+plt.savefig('stat_112_gmminc_01.png')
+```
+
+![](stat_112_gmminc_01.png)
+
+
+```python
+def responsibilities(x, weights, means, covs):
+    p = np.zeros(len(weights))
+    for k in range(len(weights)):
+        p[k] = weights[k] * multivariate_normal(mean=means[k], cov=covs[k]).pdf(x)
+    denom = p.sum()
+    if denom == 0:
+        return np.ones_like(p) / len(p)
+    return p / denom
+
+def log_likelihood(X, weights, means, covs):
+    ll = 0.0
+    for x in X:
+        px = sum(weights[k] *
+                 multivariate_normal(mean=means[k], cov=covs[k]).pdf(x)
+                 for k in range(len(weights)))
+        ll += np.log(px + 1e-12)  # guard against log(0)
+    return ll
+
+data = generate_gmm_data(weights, means, covs, n_points)
+n_components = 2
+d = data.shape[1]
+weights_tmp = np.ones(n_components) / n_components
+means_tmp = np.random.randn(n_components, d) * 5
+covs_tmp = np.array([np.eye(d) for _ in range(n_components)])
+
+m_total = 1
+N_g = weights * m_total
+
+for idx in range(len(data)):
+    x = data[idx]
+    r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
+    m_total += 1.0
+    for k in range(n_components):
+        r_k = r[k]
+        N_old = N_g[k]
+        N_new = N_old + r_k
+        N_g[k] = N_new
+        # Update mixing weight
+        weights_tmp[k] = N_new / m_total
+        # Update mean
+        mu_old = means_tmp[k].copy()
+        means_tmp[k] = mu_old + (r_k / N_new) * (x - mu_old)
+        # Update covariance
+        diff_var = (x - mu_old).reshape(-1, 1)
+        covs_tmp[k] = covs_tmp[k] + (r_k / N_new) * (diff_var @ diff_var.T - covs_tmp[k])
+
+ll = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
+print (ll)
+```
+
+```text
+-4464.929418673403
+```
+
+```python
+print (weights_tmp)        
+print (means_tmp)
+print (covs_tmp)
+```
+
+```text
+[0.31203614 0.68796386]
+[[ 5.2066373  -2.21923644]
+ [ 0.02514121  4.96786565]]
+[[[ 9.21310167 -2.07072758]
+  [-2.07072758  4.41050016]]
+
+ [[ 1.93204572  1.5493632 ]
+  [ 1.5493632   3.63932262]]]
+```
+
+```python
+xs = np.linspace(-10, 15, 120)
+ys = np.linspace(-10, 15, 120)
+Xg, Yg = np.meshgrid(xs, ys)
+Z_true = np.zeros_like(Xg)
+Z_learned = np.zeros_like(Xg)
+
+for i in range(Xg.shape[0]):
+    for j in range(Xg.shape[1]):
+        pt = np.array([Xg[i, j], Yg[i, j]])
+        Z_true[i, j] = sum(weights[k] *
+                           multivariate_normal(mean=means[k], cov=covs[k]).pdf(pt)
+                           for k in range(len(weights)))
+        Z_learned[i, j] = sum(weights_tmp[k] *
+                              multivariate_normal(mean=means_tmp[k], cov=covs_tmp[k]).pdf(pt)
+                              for k in range(n_components))
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
+ax1, ax2 = axes
+cf1 = ax1.contourf(Xg, Yg, Z_true, levels=40, cmap='viridis')
+ax1.scatter(data[:, 0], data[:, 1], c='white', s=8, alpha=0.6,
+            edgecolors='k', linewidth=0.2)
+ax1.set_title("Veri")
+ax1.set_xlabel("x")
+ax1.set_ylabel("y")
+fig.colorbar(cf1, ax=ax1, fraction=0.046, pad=0.04)
+
+cf2 = ax2.contourf(Xg, Yg, Z_learned, levels=40, cmap='viridis')
+ax2.scatter(data[:, 0], data[:, 1], c='white', s=8, alpha=0.6,
+            edgecolors='k', linewidth=0.2)
+ax2.set_title(u'Artımsal GMM ile Öğrenilmiş PDF')
+ax2.set_xlabel("x")
+ax2.set_ylabel("y")
+
+ax2.legend()
+fig.colorbar(cf2, ax=ax2, fraction=0.046, pad=0.04)
+plt.savefig('stat_112_gmminc_02.png')
+```
+
+![](stat_112_gmminc_02.png)
+
+
+
