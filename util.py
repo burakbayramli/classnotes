@@ -24,7 +24,6 @@ html_head = '''
    <script type="text/javascript"
        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full">
    </script>
-   <script async="async" data-cfasync="false" src="//pl22489825.profitablegatecpm.com/d84f574876e65b2d8f0c7bae784c22b3/invoke.js"></script>
 
    <link rel="stylesheet" type="text/css" media="screen" href="https://burakbayramli.github.io/css/style.css">
   </head>
@@ -43,7 +42,6 @@ html_head = '''
 '''   
 
 bottom = """
-          <div id="container-d84f574876e65b2d8f0c7bae784c22b3"></div>
 
           <br/><a href="../index.html">Yukarı</a>
         </section>          
