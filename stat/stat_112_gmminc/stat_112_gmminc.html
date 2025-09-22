@@ -80,11 +80,150 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="artımsal-incremental-gmm">Artımsal (Incremental) GMM</h1>
+<p><span class="math display">\[
+p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
+\]</span></p>
+<h3 id="update-for-mixing-weights-pi_g">1. Update for Mixing Weights
+<span class="math inline">\(\pi_g\)</span></h3>
+<p><span class="math display">\[
+\pi_g^{(m)} = \frac{1}{m} \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i)
+\]</span></p>
+<p><span class="math display">\[
+\pi_g^{(m+1)} = \frac{1}{m+1} \sum_{i=1}^{m+1} p^{(m+1)}(C_g |
+\mathbf{x}_i)
+\]</span></p>
+<p><span class="math display">\[
+\pi_g^{(m+1)} \approx \frac{1}{m+1} \left( \sum_{i=1}^{m} p^{(m)}(C_g |
+\mathbf{x}_i) + p^{(m)}(C_g | \mathbf{x}_{m+1}) \right)
+\]</span></p>
+<p><span class="math display">\[
+\sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) = m \pi_g^{(m)}
+\]</span></p>
+<p><span class="math display">\[
+\pi_g^{(m+1)} \approx \frac{1}{m+1} \left( m \pi_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) \right)
+\]</span></p>
+<p><span class="math display">\[
+\pi_g^{(m+1)} = \pi_g^{(m)} + \frac{1}{m+1} \left( p^{(m)}(C_g |
+\mathbf{x}_{m+1}) - \pi_g^{(m)} \right)
+\]</span></p>
+<h3 id="update-for-mean-mu_g">2. Update for Mean <span
+class="math inline">\(\mu_g\)</span></h3>
+<p><span class="math display">\[
+\mu_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g |
+\mathbf{x}_i) \mathbf{x}_i
+\]</span></p>
+<p><span class="math display">\[
+S_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) \mathbf{x}_i = m
+\pi_g^{(m)} \mu_g^{(m)}
+\]</span></p>
+<p><span class="math display">\[
+S_g^{(m+1)} = S_g^{(m)} + p^{(m+1)}(C_g | \mathbf{x}_{m+1})
+\mathbf{x}_{m+1}
+\]</span></p>
+<p><span class="math display">\[
+S_g^{(m+1)} \approx S_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+\mathbf{x}_{m+1}
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} = \frac{S_g^{(m+1)}}{(m+1) \pi_g^{(m+1)}}
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} \approx \frac{ S_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+\mathbf{x}_{m+1} }{ (m+1) \pi_g^{(m+1)} }
+\]</span></p>
+<p>Now substitute <span class="math inline">\(S_g^{(m)} = m \pi_g^{(m)}
+\mu_g^{(m)}\)</span> and the earlier expression for <span
+class="math inline">\(\pi_g^{(m+1)}\)</span>:</p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \mu_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) \mathbf{x}_{m+1} }{ (m+1) \left[ \pi_g^{(m)} +
+\frac{1}{m+1} \left( p^{(m)}(C_g | \mathbf{x}_{m+1}) - \pi_g^{(m)}
+\right) \right] }
+\]</span></p>
+<p><span class="math display">\[
+(m+1) \pi_g^{(m+1)} = m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \mu_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) \mathbf{x}_{m+1} }{ m \pi_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) }
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} = \mu_g^{(m)} + \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{
+m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) } \left(
+\mathbf{x}_{m+1} - \mu_g^{(m)} \right)
+\]</span></p>
+<p><span class="math display">\[
+m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \approx (m+1)
+\pi_g^{(m+1)}
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} \approx \mu_g^{(m)} + \frac{1}{m+1} \cdot \frac{
+p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1}
+- \mu_g^{(m)} \right)
+\]</span></p>
+<h3 id="update-for-covariance-sigma_g">3. Update for Covariance <span
+class="math inline">\(\Sigma_g\)</span></h3>
+<p><span class="math display">\[
+\Sigma_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g |
+\mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i -
+\mu_g^{(m)})^T
+\]</span></p>
+<p><span class="math display">\[
+T_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i -
+\mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T = m \pi_g^{(m)}
+\Sigma_g^{(m)}
+\]</span></p>
+<p><span class="math display">\[
+T_g^{(m+1)} \approx T_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+(\mathbf{x}_{m+1} - \mu_g^{(m+1)}) (\mathbf{x}_{m+1} - \mu_g^{(m+1)})^T
+\]</span></p>
+<p><span class="math display">\[
+(\mathbf{x}_{m+1} - \mu_g^{(m+1)}) \approx (\mathbf{x}_{m+1} -
+\mu_g^{(m)})
+\]</span></p>
+<p><span class="math display">\[
+T_g^{(m+1)} \approx T_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+(\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T
+\]</span></p>
+<p><span class="math display">\[
+\Sigma_g^{(m+1)} = \frac{T_g^{(m+1)}}{(m+1) \pi_g^{(m+1)}}
+\]</span></p>
+<p><span class="math display">\[
+\Sigma_g^{(m+1)} \approx \frac{ T_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} -
+\mu_g^{(m)})^T }{ (m+1) \pi_g^{(m+1)} }
+\]</span></p>
+<p>Using <span class="math inline">\(T_g^{(m)} = m \pi_g^{(m)}
+\Sigma_g^{(m)}\)</span> and the expression for <span
+class="math inline">\(\pi_g^{(m+1)}\)</span>, we get:</p>
+<p><span class="math display">\[
+\Sigma_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \Sigma_g^{(m)} +
+p^{(m)}(C_g | \mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m)})
+(\mathbf{x}_{m+1} - \mu_g^{(m)})^T }{ m \pi_g^{(m)} + p^{(m)}(C_g |
+\mathbf{x}_{m+1}) }
+\]</span></p>
+<p><span class="math display">\[
+\Sigma_g^{(m+1)} = \Sigma_g^{(m)} + \frac{ p^{(m)}(C_g |
+\mathbf{x}_{m+1}) }{ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) }
+\left[ (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} -
+\mu_g^{(m)})^T - \Sigma_g^{(m)} \right]
+\]</span></p>
+<p><span class="math display">\[  
+\Sigma_g^{(m+1)} \approx \Sigma_g^{(m)} + \frac{1}{m+1} \cdot \frac{
+p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left[
+(\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T -
+\Sigma_g^{(m)} \right]
+\]</span></p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> multivariate_normal</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -108,7 +247,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> res_data</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gmm_pdf(x, y, weights, means, covs):</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Calculate GMM probability density at point (x, y)&quot;&quot;&quot;</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;(x,y) noktasinda GMM olasilik yogunlugunu hesapla&quot;&quot;&quot;</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(weights)):</span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        rv <span class="op">=</span> multivariate_normal(means[i], covs[i])</span>
@@ -237,6 +376,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>fig.colorbar(cf2, ax<span class="op">=</span>ax2, fraction<span class="op">=</span><span class="fl">0.046</span>, pad<span class="op">=</span><span class="fl">0.04</span>)</span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_112_gmminc_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_112_gmminc_02.png" /></p>
+<p>[devam edecek]</p>
+<p>Kaynaklar</p>
+<p>[1] Bayramli, <em>Istatistik, Gaussian Karışım Modeli (GMM) ile
+Kümelemek</em></p>
+<p>[2] Zheng, <em>Recursive Gaussian Mixture Models for Adaptive Process
+Monitoring</em></p>
+<p>[3] Titterington, <em>Recursive Parameter Estimation using Incomplete
+Data</em></p>
+<p>[4] Zivkovic, <em>Recursive unsupervised learning of finite mixture
+models</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
