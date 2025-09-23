@@ -169,8 +169,29 @@ $$ f(x) = \sum_{i=1}^{k} f_i(x)P(C_i) =
 $$
 
 $P(C_i)$'a karışım oranları deniyor, ki $\sum_i P(C_i) = 1$. Bazı
-metinlerde bu $\pi_i$ olarak ta gösterilebiliyor.  Tüm veri için maksimum
-olurluk
+metinlerde bu $\pi_i$ olarak ta gösterilebiliyor.
+
+İleride lazım olacak bir formül daha, $i$ Gaussian öğesi için verilen
+veri noktası $x$'in olasılığı / sorumluluğu (responsibility) şöyle,
+
+$$
+p(C_i \mid \mathbf{x}) = \frac{p(C_i)\,p(\mathbf{x}\mid C_i)}{p(\mathbf{x})}
+$$
+
+Üstteki Bayes kuralının basit bir uygulaması. GMM bağlamında
+Gaussian'lar ile şu notasyon eklenebilir,
+
+$$
+p(C_i) = \pi_i,\quad p(\mathbf{x}\mid C_i) = \mathcal{N}(\mathbf{x}\mid \mu_i,\Sigma_i)
+$$
+
+Bu bize alttaki sonucu verir,
+
+$$
+p(C_i \mid \mathbf{x}) = \frac{\pi_i \,\mathcal{N}(\mathbf{x}\mid \mu_i,\Sigma_i)}{\sum_h \pi_h \,\mathcal{N}(\mathbf{x}\mid \mu_h,\Sigma_h)}
+$$
+
+Devam edelim, tüm veri için maksimum olurluk
 
 $$ 
 L = \sum_{j=1}^{n} \ln f(x_j) = \sum_{j=1}^{n} \ln \bigg(

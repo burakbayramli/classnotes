@@ -17,7 +17,22 @@ ki $x \in R^{D}$.
 Dikkat edersek [1] yazısı ardından veriyi toptan (batch) işleyen bir
 yaklaşım gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
 (Expectation-Maximization / EM) adıyla bilinir, döngüsünün her
-adımında verinin tamamını işleyen bir teknikti.
+adımında verinin tamamını işleyen bir teknikti. Bu yazıda veriyi azar
+azar, artımsal şekilde işleyerek yaklaşık EM yapmanın tekniğini
+göreceğiz. Eğer her veri noktası aynı şekilde dağılmış, bağımsız
+şekilde geliyorsa uzun vadede bu artımsal öğrenim tekniği normal
+toptan EM'in bulduğu sonuca yaklaşacaktır.
+
+Notasyon şöyle, veriler $x_i$ olarak geliyor, $i$ bir indistır, ve $i
+= 1,..,m,m+1$ olarak gider. Bizi ilgilendiren onemli an $m$ anından
+$m+1$ anına geçiş, yani $m$'ye kadar olan model parametrelerini
+$m+1$'inci veri gelince ona göre güncellemek.
+
+Bu baglamda ilk varsayimi, yaklasiksallamayi soyle yapalim, tek bir
+veri noktasi ekledigimizde GMM modelinin parametrelerinin cok fazla
+degismesini beklemeyiz, o zaman GMM karisiminin icindeki $g$'inci
+Gaussian $x_{i+1}$ verisi uzerinde hesapladigi olasilik / sorumluluk
+(responsibility) soyle gosterilebilir,
 
 $$
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
