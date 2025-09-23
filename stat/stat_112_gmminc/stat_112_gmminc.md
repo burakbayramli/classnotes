@@ -14,10 +14,10 @@ $$
 
 ki $x \in R^{D}$.
 
-Dikkat edersek [1] yazısı ardından veriyi toptan (batch) ısleyen bir
+Dikkat edersek [1] yazısı ardından veriyi toptan (batch) işleyen bir
 yaklaşım gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
-(Expeçtation-Maximization / EM) adıyla bilinir, döngüsünün her
-adımında verinin tamamını işleyen bir yaklaşımdır. 
+(Expectation-Maximization / EM) adıyla bilinir, döngüsünün her
+adımında verinin tamamını işleyen bir teknikti.
 
 $$
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)

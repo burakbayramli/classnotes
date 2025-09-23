@@ -12,9 +12,6 @@ Bu notlarda yazılanları takip etmek için önkoşul bilgiler şunlar:
 * Modülo Matematiği
 * Cebir
 
-Yani üniversite sınavına hazırlık için gereken konular (gerçi artık
-Calculus gerekiyor mu bilmiyorum, benim zamanımda gerekiyordu).
-
 ### Web, PDF
 
 Lineer Cebir (Linear Algebra)
