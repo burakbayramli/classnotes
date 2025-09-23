@@ -1,49 +1,56 @@
 # Artımsal (Incremental) GMM
 
-Gaussian Karışım Modelleri [1]'de işlendi. O yazıda gösterilen her
-biri $d$ boyutlu olabilecek $G$ tane Gaussian'dan oluşan bir karışım
-ile bir veriyi temsil edebilmekten bahsediyordu. Bu tür bir modelde
-bilinmeyenler $G$ tane Gaussian'ın parametreleriydi, yani her Gaussian
-için D x 1 boyutunda bir $\mu$, D x D boyutunda bir $\Sigma$, ve tüm
-karışımın seviyelerini gösteren D x 1 boyutunda bir $\pi$. Eğer [2]
-notasyonu ile gösterirsek, karışım olasılık dağılım fonksiyonu,
+Gaussian Karışım Modelleri (Mixtüre Models / GMM) [1]'de işlendi. O
+yazı her biri $d$ boyutlu olabilecek $G$ tane Gaussian'dan oluşan bir
+karışım ile veriyi temsil edebilmekten bahsediyordu. Bu tür bir
+modelde bilinmeyenler $G$ tane Gaussian'ın parametreleriydi, yani her
+Gaussian için D x 1 boyutunda bir $\mu$, D x D boyutunda bir $\Sigma$,
+ve tüm karışım için karışım seviyelerini gösteren D x 1 boyutunda bir
+$\pi$ bulunması gerekiyordu. Eğer [2] notasyonu ile gösterirsek,
+karışım olasılık dağılım fonksiyonu,
 
 $$
 p(x) = \sum _{g=1}^{G} \pi_g N(x | \mu_g, \Sigma_g)
 $$
 
-ki $x \in R^{D}$.
+oluyordu, ki $x \in R^{D}$.
 
-Dikkat edersek [1] yazısı ardından veriyi toptan (batch) işleyen bir
-yaklaşım gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
+Dikkat edersek [1] yazısı veriyi toptan (batch) işleyen bir yaklaşım
+gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
 (Expectation-Maximization / EM) adıyla bilinir, döngüsünün her
-adımında verinin tamamını işleyen bir teknikti. Bu yazıda veriyi azar
-azar, artımsal şekilde işleyerek yaklaşık EM yapmanın tekniğini
+adımında verinin tamamını işliyordu. Bu yazıda veriyi azar azar,
+artımsal şekilde işleyerek yaklaşık EM yapmanın tekniğini
 göreceğiz. Eğer her veri noktası aynı şekilde dağılmış, bağımsız
 şekilde geliyorsa uzun vadede bu artımsal öğrenim tekniği normal
 toptan EM'in bulduğu sonuca yaklaşacaktır.
 
-Notasyon şöyle, veriler $x_i$ olarak geliyor, $i$ bir indistır, ve $i
-= 1,..,m,m+1$ olarak gider. Bizi ilgilendiren onemli an $m$ anından
+Notasyon şöyle, veriler $x_i$ olarak geliyor, $i$ bir indistir, ve $i
+= 1,..,m,m+1$ olarak gider. Bizi ilgilendiren önemli an $m$ anından
 $m+1$ anına geçiş, yani $m$'ye kadar olan model parametrelerini
 $m+1$'inci veri gelince ona göre güncellemek.
 
-Bu baglamda ilk varsayimi, yaklasiksallamayi soyle yapalim, tek bir
-veri noktasi ekledigimizde GMM modelinin parametrelerinin cok fazla
-degismesini beklemeyiz, o zaman GMM karisiminin icindeki $g$'inci
-Gaussian $x_{i+1}$ verisi uzerinde hesapladigi olasilik / sorumluluk
-(responsibility) soyle gosterilebilir,
+Bu bağlamda ilk varsayımı, yaklaşıksallamayı şöyle yapalım, tek bir
+veri noktası eklediğimizde GMM modelinin parametrelerinin çok fazla
+değişmesini beklemeyiz, o zaman GMM karışımının içindeki $g$'inci
+Gaussian $x_{i+1}$ verisi üzerinde hesapladığı olasılık / sorumluluk
+(responsibility) şöyle gösterilebilir,
 
 $$
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
+\qquad (1)
 $$
 
-### 1. Update for Mixing Weights $\pi_g$
+### Karışım Ağırlıkları $\pi_g$
+
+Her $g$ bileşeni için karışım ağırlığı tüm $m$ verileri üzerinden
+hesaplanan ortalama sorumluluktur. Bu hesap tabii ki toptan EM
+mantığından geliyor, referans için [2],
 
 $$
 \pi_g^{(m)} = \frac{1}{m} \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i)
 $$
 
+Yeni $x_{m+1}$ verisi gelince üstteki formül doğal olarak alttaki gibi olur,
 
 $$
 \pi_g^{(m+1)} = \frac{1}{m+1} \sum_{i=1}^{m+1} p^{(m+1)}(C_g | \mathbf{x}_i)
@@ -349,7 +356,4 @@ Kaynaklar
 [3] Titterington, *Recursive Parameter Estimation using Incomplete Data*
 
 [4] Zivkovic, *Recursive unsupervised learning of finite mixture models*
-
-
-
 

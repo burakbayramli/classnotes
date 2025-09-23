@@ -88,33 +88,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 </div>
 <h1 id="artımsal-incremental-gmm">Artımsal (Incremental) GMM</h1>
-<p>Gaussian Karışım Modelleri [1]’de işlendi. O yazıda gösterilen her
-biri <span class="math inline">\(d\)</span> boyutlu olabilecek <span
-class="math inline">\(G\)</span> tane Gaussian’dan oluşan bir karışım
-ile bir veriyi temsil edebilmekten bahsediyordu. Bu tür bir modelde
+<p>Gaussian Karışım Modelleri (Mixtüre Models / GMM) [1]’de işlendi. O
+yazı her biri <span class="math inline">\(d\)</span> boyutlu olabilecek
+<span class="math inline">\(G\)</span> tane Gaussian’dan oluşan bir
+karışım ile veriyi temsil edebilmekten bahsediyordu. Bu tür bir modelde
 bilinmeyenler <span class="math inline">\(G\)</span> tane Gaussian’ın
 parametreleriydi, yani her Gaussian için D x 1 boyutunda bir <span
 class="math inline">\(\mu\)</span>, D x D boyutunda bir <span
-class="math inline">\(\Sigma\)</span>, ve tüm karışımın seviyelerini
-gösteren D x 1 boyutunda bir <span class="math inline">\(\pi\)</span>.
-Eğer [2] notasyonu ile gösterirsek, karışım olasılık dağılım
-fonksiyonu,</p>
+class="math inline">\(\Sigma\)</span>, ve tüm karışım için karışım
+seviyelerini gösteren D x 1 boyutunda bir <span
+class="math inline">\(\pi\)</span> bulunması gerekiyordu. Eğer [2]
+notasyonu ile gösterirsek, karışım olasılık dağılım fonksiyonu,</p>
 <p><span class="math display">\[
 p(x) = \sum _{g=1}^{G} \pi_g N(x | \mu_g, \Sigma_g)
 \]</span></p>
-<p>ki <span class="math inline">\(x \in R^{D}\)</span>.</p>
-<p>Dikkat edersek [1] yazısı ardından veriyi toptan (batch) işleyen bir
-yaklaşım gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
+<p>oluyordu, ki <span class="math inline">\(x \in R^{D}\)</span>.</p>
+<p>Dikkat edersek [1] yazısı veriyi toptan (batch) işleyen bir yaklaşım
+gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
 (Expectation-Maximization / EM) adıyla bilinir, döngüsünün her adımında
-verinin tamamını işleyen bir teknikti.</p>
+verinin tamamını işliyordu. Bu yazıda veriyi azar azar, artımsal şekilde
+işleyerek yaklaşık EM yapmanın tekniğini göreceğiz. Eğer her veri
+noktası aynı şekilde dağılmış, bağımsız şekilde geliyorsa uzun vadede bu
+artımsal öğrenim tekniği normal toptan EM’in bulduğu sonuca
+yaklaşacaktır.</p>
+<p>Notasyon şöyle, veriler <span class="math inline">\(x_i\)</span>
+olarak geliyor, <span class="math inline">\(i\)</span> bir indistir, ve
+<span class="math inline">\(i = 1,..,m,m+1\)</span> olarak gider. Bizi
+ilgilendiren önemli an <span class="math inline">\(m\)</span> anından
+<span class="math inline">\(m+1\)</span> anına geçiş, yani <span
+class="math inline">\(m\)</span>’ye kadar olan model parametrelerini
+<span class="math inline">\(m+1\)</span>’inci veri gelince ona göre
+güncellemek.</p>
+<p>Bu bağlamda ilk varsayımı, yaklaşıksallamayı şöyle yapalım, tek bir
+veri noktası eklediğimizde GMM modelinin parametrelerinin çok fazla
+değişmesini beklemeyiz, o zaman GMM karışımının içindeki <span
+class="math inline">\(g\)</span>’inci Gaussian <span
+class="math inline">\(x_{i+1}\)</span> verisi üzerinde hesapladığı
+olasılık / sorumluluk (responsibility) şöyle gösterilebilir,</p>
 <p><span class="math display">\[
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
+\qquad (1)
 \]</span></p>
-<h3 id="update-for-mixing-weights-pi_g">1. Update for Mixing Weights
-<span class="math inline">\(\pi_g\)</span></h3>
+<h3 id="karışım-ağırlıkları-pi_g">Karışım Ağırlıkları <span
+class="math inline">\(\pi_g\)</span></h3>
+<p>Her <span class="math inline">\(g\)</span> bileşeni için karışım
+ağırlığı tüm <span class="math inline">\(m\)</span> verileri üzerinden
+hesaplanan ortalama sorumluluktur. Bu hesap tabii ki toptan EM
+mantığından geliyor, referans için [2],</p>
 <p><span class="math display">\[
 \pi_g^{(m)} = \frac{1}{m} \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i)
 \]</span></p>
+<p>Yeni <span class="math inline">\(x_{m+1}\)</span> verisi gelince
+üstteki formül doğal olarak alttaki gibi olur,</p>
 <p><span class="math display">\[
 \pi_g^{(m+1)} = \frac{1}{m+1} \sum_{i=1}^{m+1} p^{(m+1)}(C_g |
 \mathbf{x}_i)

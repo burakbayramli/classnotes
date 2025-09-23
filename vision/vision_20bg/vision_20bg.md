@@ -1,11 +1,32 @@
 # Arkaplan (Background) Tespiti
 
+```python
+vfile = '/opt/Downloads/skdata/campus_vibe_video4.mp4'
+```
+
+```python
+import time, datetime, cv2
+cap = cv2.VideoCapture(vfile)
+frame_index = 0
+N = 3600
+pixvals = np.zeros(N)
+for i in range(N):
+    ret, frame = cap.read()
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)
+    pixvals[i] = gray_frame[40,130]
+cap.release()    
+
+plt.hist(pixvals)
+plt.savefig('vision_20bg_04.jpg')
+```
+
+![](vision_20bg_04.jpg)
+
 KDE
 
 ```python
 from PIL import Image
-import numpy as np, cv2
-import time, datetime
+import time, datetime, cv2
 
 N = 400                    # "hafiza" faktoru (daha yuksek = daha yavas guncelleme)
 bandwidth = 40.0           # Gaussian bant genisligi
@@ -13,7 +34,7 @@ num_bins = 32              # PDF temsil etmek icin kac tane nokta secelim
 bin_centers = np.linspace(0, 255, num_bins).astype(np.float32)
 alpha = 1/N
 
-cap = cv2.VideoCapture('/opt/Downloads/skdata/campus_vibe_video4.mp4')
+cap = cv2.VideoCapture(vfile)
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 print(f"Frame rate: {fps} FPS")
 
@@ -65,7 +86,7 @@ min_variance = 15.0      # floor for variance
 snapshot_frames = [220, 1200, 1900, 3500]  # frames where we snapshot background
 
 # --- Open video ---
-cap = cv2.VideoCapture('/opt/Downloads/skdata/campus_vibe_video4.mp4')
+cap = cv2.VideoCapture(vfile)
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 print(f"Frame rate: {fps} FPS")
 
