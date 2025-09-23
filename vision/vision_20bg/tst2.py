@@ -4,7 +4,7 @@ import time, datetime
 
 # --- CONFIG ---
 K = 3                    # number of GMM components per pixel
-lambda_forget = 0.995    # forgetting factor (1.0 -> no forgetting)
+lambda_forget = 0.98    # forgetting factor (1.0 -> no forgetting)
 min_variance = 15.0      # floor for variance
 snapshot_frames = [220, 1200, 1900, 3500]  # frames where we snapshot background
 
