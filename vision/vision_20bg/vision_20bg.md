@@ -157,6 +157,8 @@ cv2.destroyAllWindows()
 
 Anlik Islem
 
+![](vision_20bg_03.jpg)
+
 [gmm_online_rect.py](gmm_online_rect.py)
 
 [devam edecek]
