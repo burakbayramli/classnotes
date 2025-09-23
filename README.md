@@ -140,15 +140,6 @@ Analysis written in plaintext markdown, in Turkish. All necessary
 Python code and data is either in the document itself or included in
 the same directory as the article, residing in this GH repository.
 
-Anaconda is the suggested Python installation, and for the necessary
-side packages. Use `conda install` to do this, or `pip install` on the
-list above.
-
-R
-
-The R installation command for Ubuntu, as well as the R package
-installation command is shown above in the TR section.
-
 Blog
 
 https://burakbayramli.github.io/dersblog
