@@ -62,7 +62,7 @@ IT, Bilisim
 
 https://burakbayramli.github.io/dersblog/sk/index.html
 
-### Kodlar, TeX
+### Kodlar, Markdown
 
 [Linear Algebra](linear)
 
@@ -101,8 +101,8 @@ https://burakbayramli.github.io/dersblog/sk/2016/01/python-dil-ogrenimi.html
 
 Belgelerde görülen her bölümdeki kodlar kendi başına (bölümün dizini
 içinden) işleyebilecek şekilde ayarlanmıştır. Bu kodlar notların
-Github tex dosyalarından kopyalayarak alınabilir, ya da ayrı ayrı elle
-girilir. Eğer kodlar not defteri dışında, dosya bazlı, pür Python
+Github markdown dosyalarından kopyalayarak alınabilir, ya da ayrı ayrı
+elle girilir. Eğer kodlar not defteri dışında, dosya bazlı, pür Python
 olarak işletilmek istenirse,
 
 ```
@@ -136,9 +136,9 @@ altında `pyconometrics.py` adlı bir dosyayı görüyoruz. Gerekli kod burada.
 
 Here are lecture notes on ODE, Multivariate Calculus, Linear Algebra,
 Computational Science, Computer Science, Statistics, Functional
-Analysis written in Latex, in Turkish. All necessary Python code and
-data is either in the document itself or included in the same
-directory as the article, residing in this GH repository.
+Analysis written in plaintext markdown, in Turkish. All necessary
+Python code and data is either in the document itself or included in
+the same directory as the article, residing in this GH repository.
 
 Anaconda is the suggested Python installation, and for the necessary
 side packages. Use `conda install` to do this, or `pip install` on the
