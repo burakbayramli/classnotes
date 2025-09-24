@@ -274,13 +274,13 @@ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1}
 elde etmiş oluyoruz.</p>
 <h3 id="kovaryans-sigma_g-güncellemesi">Kovaryans <span
 class="math inline">\(\Sigma_g\)</span> Güncellemesi</h3>
-<p>Bilesen <span class="math inline">\(g\)</span> icin kovaryans</p>
+<p>Bileşen <span class="math inline">\(g\)</span> için kovaryans</p>
 <p><span class="math display">\[
 \Sigma_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g |
 \mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i -
 \mu_g^{(m)})^T
 \]</span></p>
-<p>Su tanimi one surelim,</p>
+<p>Şu tanımı öne sürelim,</p>
 <p><span class="math display">\[
 T_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i -
 \mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T = m \pi_g^{(m)}
@@ -421,43 +421,43 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>covs_tmp <span class="op">=</span> np.array([np.eye(d) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_components)])</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>m_total <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>N_g <span class="op">=</span> weights <span class="op">*</span> m_total</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>cumulative_r <span class="op">=</span> weights <span class="op">*</span> m_total</span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(data)):</span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> data[idx]</span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> responsibilities(x, weights_tmp, means_tmp, covs_tmp)</span>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    m_total <span class="op">+=</span> <span class="fl">1.0</span></span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        N_old <span class="op">=</span> N_g[k]</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        N_new <span class="op">=</span> N_old <span class="op">+</span> r[k]</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        N_g[k] <span class="op">=</span> N_new</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># karisim agirliklarini guncelle</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> N_new <span class="op">/</span> m_total</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ortalama guncelle</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> (r[k] <span class="op">/</span> N_new) <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># kovaryans guncelle</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update cumulative responsibilities</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        cumulative_r[k] <span class="op">+=</span> r[k]</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update mixture weights</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> cumulative_r[k] <span class="op">/</span> m_total</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mean update using Zheng&#39;s form</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        coef <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> m_total) <span class="op">*</span> (r[k] <span class="op">/</span> (weights_tmp[k] <span class="op">+</span> <span class="fl">1e-12</span>))</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> coef <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Covariance update (same structure)</span></span>
 <span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        diff_var <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">+</span> (r[k]<span class="op">/</span> N_new) <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T <span class="op">-</span> covs_tmp[k])</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">+</span> coef <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T <span class="op">-</span> covs_tmp[k])</span>
 <span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ll)</span></code></pre></div>
-<pre class="text"><code>-4360.846471826622</code></pre>
+<pre class="text"><code>-4457.0162888977675</code></pre>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (weights_tmp)        </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (means_tmp)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (covs_tmp)</span></code></pre></div>
-<pre class="text"><code>[0.27031847 0.72968153]
-[[ 4.82938522 -1.85086552]
- [-0.096788    4.98560362]]
-[[[10.98910245 -3.28339688]
-  [-3.28339688  5.42591678]]
+<pre class="text"><code>[0.29698269 0.70301731]
+[[ 4.95850944 -1.96333327]
+ [-0.09937333  4.98941925]]
+[[[12.4988802  -3.52676769]
+  [-3.52676769  4.98789128]]
 
- [[ 2.0410508   1.55670221]
-  [ 1.55670221  3.11409028]]]</code></pre>
+ [[ 2.01466638  1.36292997]
+  [ 1.36292997  3.1163339 ]]]</code></pre>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">120</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ys <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">120</span>)</span>

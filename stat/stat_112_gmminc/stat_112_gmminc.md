@@ -197,13 +197,13 @@ Böylece $\mu_g$ güncellemesini elde etmiş oluyoruz.
 
 ### Kovaryans $\Sigma_g$ Güncellemesi
 
-Bilesen $g$ icin kovaryans
+Bileşen $g$ için kovaryans
 
 $$
 \Sigma_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T
 $$
 
-Su tanimi one surelim,
+Şu tanımı öne sürelim,
 
 $$
 T_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T = m \pi_g^{(m)} \Sigma_g^{(m)}
@@ -350,34 +350,34 @@ means_tmp = np.random.randn(n_components, d) * 5
 covs_tmp = np.array([np.eye(d) for _ in range(n_components)])
 
 m_total = 1
-N_g = weights * m_total
+cumulative_r = weights * m_total
 
 for idx in range(len(data)):
     x = data[idx]
     r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
     m_total += 1.0
     for k in range(n_components):
-        N_old = N_g[k]
-        N_new = N_old + r[k]
-        N_g[k] = N_new
-	
-        # karisim agirliklarini guncelle
-        weights_tmp[k] = N_new / m_total
-	
-        # ortalama guncelle
+        # Update cumulative responsibilities
+        cumulative_r[k] += r[k]
+
+        # Update mixture weights
+        weights_tmp[k] = cumulative_r[k] / m_total
+
+        # Mean update using Zheng's form
         mu_old = means_tmp[k].copy()
-        means_tmp[k] = mu_old + (r[k] / N_new) * (x - mu_old)
-	
-        # kovaryans guncelle
+        coef = (1.0 / m_total) * (r[k] / (weights_tmp[k] + 1e-12))
+        means_tmp[k] = mu_old + coef * (x - mu_old)
+
+        # Covariance update (same structure)
         diff_var = (x - mu_old).reshape(-1, 1)
-        covs_tmp[k] = covs_tmp[k] + (r[k]/ N_new) * (diff_var @ diff_var.T - covs_tmp[k])
+        covs_tmp[k] = covs_tmp[k] + coef * (diff_var @ diff_var.T - covs_tmp[k])
 
 ll = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
 print (ll)
 ```
 
 ```text
--4360.846471826622
+-4457.0162888977675
 ```
 
 ```python
@@ -387,14 +387,14 @@ print (covs_tmp)
 ```
 
 ```text
-[0.27031847 0.72968153]
-[[ 4.82938522 -1.85086552]
- [-0.096788    4.98560362]]
-[[[10.98910245 -3.28339688]
-  [-3.28339688  5.42591678]]
+[0.29698269 0.70301731]
+[[ 4.95850944 -1.96333327]
+ [-0.09937333  4.98941925]]
+[[[12.4988802  -3.52676769]
+  [-3.52676769  4.98789128]]
 
- [[ 2.0410508   1.55670221]
-  [ 1.55670221  3.11409028]]]
+ [[ 2.01466638  1.36292997]
+  [ 1.36292997  3.1163339 ]]]
 ```
 
 ```python
@@ -450,4 +450,7 @@ Kaynaklar
 [3] Titterington, *Recursive Parameter Estimation using Incomplete Data*
 
 [4] Zivkovic, *Recursive unsupervised learning of finite mixture models*
+
+
+
 
