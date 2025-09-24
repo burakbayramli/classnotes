@@ -137,8 +137,8 @@ $$
 S_g^{(m+1)} \approx S_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \mathbf{x}_{m+1}
 $$
 
-Simdi (2) formulundeki esitligin sol tarafini baz alirsak, ve bunu
-$m+1$ icin adapte edersek,
+Şimdi (2) formülündeki eşitliğin sol tarafını baz alırsak, ve bunu
+$m+1$ için adapte edersek,
 
 $$
 S_g^{(m+1)} = (m+1) \pi_g^{(m+1)} \mu_g^{(m+1)}
@@ -156,6 +156,114 @@ $$
 \mu_g^{(m+1)} \approx \frac{ S_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \mathbf{x}_{m+1} }{ (m+1) \pi_g^{(m+1)} }
 $$
 
+Şimdi $S_g^{(m)} = m \pi_g^{(m)} \mu_g^{(m)}$ ifadesini ve daha önceki
+$\pi_g^{(m+1)}$ eşitliğini sok,
+
+$$
+\mu_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \mu_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \mathbf{x}_{m+1} }{ (m+1) \left[ \pi_g^{(m)} + \frac{1}{m+1} \left( p^{(m)}(C_g | \mathbf{x}_{m+1}) - \pi_g^{(m)} \right) \right] }
+$$
+
+Böleni basitleştir,
+
+$$
+(m+1) \pi_g^{(m+1)} = m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1})
+$$
+
+O zaman
+
+$$
+\mu_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \mu_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \mathbf{x}_{m+1} }{ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) }
+$$
+
+Şöyle de yazılabilir,
+
+$$
+\mu_g^{(m+1)} = \mu_g^{(m)} + \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) } \left( \mathbf{x}_{m+1} - \mu_g^{(m)} \right)
+$$
+
+Şimdi, alttaki ifadenin doğru olduğunu bildiğimize göre
+
+$$
+m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \approx (m+1) \pi_g^{(m+1)}
+$$
+
+Büyük $m$ için alttaki de doğru olmalıdır.
+
+$$
+\mu_g^{(m+1)} \approx \mu_g^{(m)} + \frac{1}{m+1} \cdot \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1} - \mu_g^{(m)} \right)
+$$
+
+Böylece $\mu_g$ güncellemesini elde etmiş oluyoruz.
+
+### Kovaryans $\Sigma_g$ Güncellemesi
+
+Bilesen $g$ icin kovaryans
+
+$$
+\Sigma_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T
+$$
+
+Su tanimi one surelim,
+
+$$
+T_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) (\mathbf{x}_i - \mu_g^{(m)}) (\mathbf{x}_i - \mu_g^{(m)})^T = m \pi_g^{(m)} \Sigma_g^{(m)}
+$$
+
+Yeni veri noktası için
+
+$$
+T_g^{(m+1)} \approx T_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m+1)}) (\mathbf{x}_{m+1} - \mu_g^{(m+1)})^T
+$$
+
+Şimdi $\mu_g^{(m+1)}$ güncellemesi üzerinden de bir yaklaşıksallama tanımlayacağız,
+
+$$
+(\mathbf{x}_{m+1} - \mu_g^{(m+1)}) \approx (\mathbf{x}_{m+1} - \mu_g^{(m)})
+$$
+
+O zaman
+
+$$
+T_g^{(m+1)} \approx T_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T
+$$
+
+Yani
+
+$$
+\Sigma_g^{(m+1)} = \frac{T_g^{(m+1)}}{(m+1) \pi_g^{(m+1)}}
+$$
+
+Yerine geçir
+
+$$
+\Sigma_g^{(m+1)} \approx \frac{ T_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T }{ (m+1) \pi_g^{(m+1)} }
+$$
+
+$T_g^{(m)} = m \pi_g^{(m)} \Sigma_g^{(m)}$ eşitliğini kullanarak ve
+$\pi_g^{(m+1)}$ formülü ile alttakini elde ederiz,
+
+$$
+\Sigma_g^{(m+1)} \approx \frac{ m \pi_g^{(m)} \Sigma_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T }{ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) }
+$$
+
+Bu şöyle de yazılabilir
+
+$$
+\Sigma_g^{(m+1)} = \Sigma_g^{(m)} + \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) } \left[ (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T - \Sigma_g^{(m)} \right]
+$$
+
+Tekrar büyük $m$ için yaklaşıksallama yapıyoruz
+
+$$  
+\Sigma_g^{(m+1)} \approx \Sigma_g^{(m)} + \frac{1}{m+1} \cdot \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left[ (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T - \Sigma_g^{(m)} \right]
+$$  
+
+Böylece kovaryans güncellemesini elde etmiş olduk.
+
+Ornek
+
+Alttaki kodda önce 2 boyutlu veri baz alındı, iki Gaussian tepesini
+karışımından rasgele örneklem alıyoruz.
 
 ```python
 from scipy.stats import multivariate_normal
@@ -212,6 +320,8 @@ plt.savefig('stat_112_gmminc_01.png')
 
 ![](stat_112_gmminc_01.png)
 
+Grafikte iki tepenin aşağı yukarı nerede olduğu görülüyor.
+
 
 ```python
 def responsibilities(x, weights, means, covs):
@@ -247,25 +357,27 @@ for idx in range(len(data)):
     r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
     m_total += 1.0
     for k in range(n_components):
-        r_k = r[k]
         N_old = N_g[k]
-        N_new = N_old + r_k
+        N_new = N_old + r[k]
         N_g[k] = N_new
-        # Update mixing weight
+	
+        # karisim agirliklarini guncelle
         weights_tmp[k] = N_new / m_total
-        # Update mean
+	
+        # ortalama guncelle
         mu_old = means_tmp[k].copy()
-        means_tmp[k] = mu_old + (r_k / N_new) * (x - mu_old)
-        # Update covariance
+        means_tmp[k] = mu_old + (r[k] / N_new) * (x - mu_old)
+	
+        # kovaryans guncelle
         diff_var = (x - mu_old).reshape(-1, 1)
-        covs_tmp[k] = covs_tmp[k] + (r_k / N_new) * (diff_var @ diff_var.T - covs_tmp[k])
+        covs_tmp[k] = covs_tmp[k] + (r[k]/ N_new) * (diff_var @ diff_var.T - covs_tmp[k])
 
 ll = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
 print (ll)
 ```
 
 ```text
--4464.929418673403
+-4360.846471826622
 ```
 
 ```python
@@ -275,14 +387,14 @@ print (covs_tmp)
 ```
 
 ```text
-[0.31203614 0.68796386]
-[[ 5.2066373  -2.21923644]
- [ 0.02514121  4.96786565]]
-[[[ 9.21310167 -2.07072758]
-  [-2.07072758  4.41050016]]
+[0.27031847 0.72968153]
+[[ 4.82938522 -1.85086552]
+ [-0.096788    4.98560362]]
+[[[10.98910245 -3.28339688]
+  [-3.28339688  5.42591678]]
 
- [[ 1.93204572  1.5493632 ]
-  [ 1.5493632   3.63932262]]]
+ [[ 2.0410508   1.55670221]
+  [ 1.55670221  3.11409028]]]
 ```
 
 ```python
