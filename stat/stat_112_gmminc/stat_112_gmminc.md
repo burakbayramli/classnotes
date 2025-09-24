@@ -56,22 +56,54 @@ $$
 \pi_g^{(m+1)} = \frac{1}{m+1} \sum_{i=1}^{m+1} p^{(m+1)}(C_g | \mathbf{x}_i)
 $$
 
+Şimdi (1)'deki yaklaşıksallamayı kullanırız,
 
 $$
 \pi_g^{(m+1)} \approx \frac{1}{m+1} \left( \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) + p^{(m)}(C_g | \mathbf{x}_{m+1}) \right)
 $$
 
+Hatırlarsak,
+
 $$
 \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) = m \pi_g^{(m)}
 $$
+
+O zaman,
 
 $$
 \pi_g^{(m+1)} \approx \frac{1}{m+1} \left( m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \right)
 $$
 
+Burada bir tekrar düzenleme daha yapalım. Eşitliğin sağ tarafını
+mevcut kestirme hesabı $\pi_g^{(m)}$ artı bir düzeltme terimi olarak
+düşünelim. Bunu ortaya çıkartmak için şöyle yazabiliriz,
+ 
 $$
-\pi_g^{(m+1)} = \pi_g^{(m)} + \frac{1}{m+1} \left( p^{(m)}(C_g | \mathbf{x}_{m+1}) - \pi_g^{(m)} \right)
+\pi_g^{(m+1)} \approx \pi_g^{(m)} + \left[ \frac{1}{m+1} \left( m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) \right) - \pi_g^{(m)} \right]
 $$
+
+Üstte bir $\pi_g^{(m)}$ ekledik ve bir tane de çıkarttık, böylece
+aslında hiçbir değişim yapmamış olduk. Formül hala aynı şey
+söylüyor. Şimdi köşeli parantez içindekiler için ortak bir bölen
+$(m+1)$ yaratalım,
+
+$$
+\pi_g^{(m+1)} \approx \pi_g^{(m)} + \frac{1}{m+1} \left( m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) - (m+1)\pi_g^{(m)} \right)
+$$
+
+Parantez icindeki ifadeleri basitlestirelim,
+
+$$
+m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) - m\pi_g^{(m)} - \pi_g^{(m)} = p^{(m)}(C_g | \mathbf{x}_{m+1}) - \pi_g^{(m)}
+$$
+
+Geri sokalım,
+
+$$
+\pi_g^{(m+1)} \approx \pi_g^{(m)} + \frac{1}{m+1} \left( p^{(m)}(C_g | \mathbf{x}_{m+1}) - \pi_g^{(m)} \right) 
+$$
+
+Böylece karışım ağırlıkları için özyineli güncelleme formülüne erişmiş olduk.
 
 ### 2. Update for Mean $\mu_g$
 

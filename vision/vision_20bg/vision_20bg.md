@@ -186,9 +186,7 @@ Anlik Islem
 
 Kaynaklar
 
-[1] Evangelidis, *Parametric Image Alignment Using Enhanced Correlation Coefficient Maximization*
+[1] [Video 1](https://www.dropbox.com/scl/fi/oczbpoicx243wd857doti/campus_vibe_video4.mp4?rlkey=0h026033fbwho59frsq3ewuu1&st=7axsjn6x&raw=1)
 
-[2] [Video 1](https://www.dropbox.com/scl/fi/oczbpoicx243wd857doti/campus_vibe_video4.mp4?rlkey=0h026033fbwho59frsq3ewuu1&st=7axsjn6x&raw=1)
-
-[3] Bayramli, *Istatistik, Parametresiz İstatistik (Nonparametric Statistics)*
+[2] Bayramli, *Istatistik, Parametresiz İstatistik (Nonparametric Statistics)*
 
