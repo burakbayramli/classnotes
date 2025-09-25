@@ -29,6 +29,8 @@ Notasyon şöyle, veriler $x_i$ olarak geliyor, $i$ bir indistir, ve $i
 $m+1$ anına geçiş, yani $m$'ye kadar olan model parametrelerini
 $m+1$'inci veri gelince ona göre güncellemek.
 
+### Tüm Veriyle Artımsal
+
 Bu bağlamda ilk varsayımı, yaklaşıksallamayı şöyle yapalım, tek bir
 veri noktası eklediğimizde GMM modelinin parametrelerinin çok fazla
 değişmesini beklemeyiz, o zaman GMM karışımının içindeki $g$'inci
@@ -40,7 +42,7 @@ p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
 \qquad (1)
 $$
 
-### Karışım Ağırlıkları $\pi_g$
+Karışım Ağırlıkları $\pi_g$
 
 Her $g$ bileşeni için karışım ağırlığı tüm $m$ verileri üzerinden
 hesaplanan ortalama sorumluluktur. Bu hesap tabii ki toptan EM
@@ -105,7 +107,7 @@ $$
 
 Böylece karışım ağırlıkları için özyineli güncelleme formülüne erişmiş olduk.
 
-### Ortalama $\mu_g$ Güncellemesi
+Ortalama $\mu_g$ Güncellemesi
 
 Bileşen $g$'nin ortalaması şöyle tanımlıdır,
 
@@ -195,7 +197,7 @@ $$
 
 Böylece $\mu_g$ güncellemesini elde etmiş oluyoruz.
 
-### Kovaryans $\Sigma_g$ Güncellemesi
+Kovaryans $\Sigma_g$ Güncellemesi
 
 Bileşen $g$ için kovaryans
 
@@ -374,7 +376,7 @@ print (ll)
 ```
 
 ```text
--4457.0162888977675
+-4373.507980537245
 ```
 
 ```python
@@ -435,8 +437,101 @@ plt.savefig('stat_112_gmminc_02.png')
 
 ![](stat_112_gmminc_02.png)
 
+### EWMA Usulü Artımsal
 
-[devam edecek]
+Şimdiye kadar gördüklerimiz artımsal güncelleme yapıyor olsa bile
+görülen tüm verilere aynı ağırlığı / önemi veriyordu. Fakat son
+görülen verilere daha fazla ağırlık veren ve eskileri (bir parametreye
+bağlı olarak) yavaş yavaş "unutan" bir yaklaşım bazen daha faydalı
+olabilir. EWMA yaklaşımı burada devreye girebilir, [5] yazısında
+gösterildiği gibi EWMA'nın kabaca bir kaydırılan pencere içindeki
+verileri işleme mantığı vardır (ve bu 'etkili pencere' büyüklüğü
+hesaplanabilir) böylece eski verilerin yavaşça unutulması
+sağlanabilir.
+
+EWMA yaklaşımında bir $\lambda$ parametresi vardır, o zaman önceki
+güncelleme formüllerini bir $\lambda$ içerecek şekilde tekrar
+düzenlersek [2],
+
+$$
+\pi_g^{m+1} = \pi_g^{m} + \lambda [ p^{(m)} (C_g | x_{m+1}) - \pi_g^{m} ]
+$$
+
+$$
+\mu_g^{(m+1)} = \mu_g^{(m)} + \lambda \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1} - \mu_g^{(m)} \right)
+$$
+
+$$  
+\Sigma_g^{(m+1)} = \Sigma_g^{(m)} + \lambda \frac{ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left[ (\mathbf{x}_{m+1} - \mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T - \Sigma_g^{(m)} \right]
+$$  
+
+Üstteki formüller aslında daha önceki güncelleme formüllerinin
+genelleşmiş halidir denebilir, eğer $\lambda = \frac{1}{m+1}$ dersek,
+ve sürekli artan $m$ bağlamında önceki formüllerin aynısını elde
+ederiz. Fakat farklı bir unutma faktörü $\lambda$ verirsek, mesela
+$\lambda=0.999$, ve onun tekabül ettiği etkili pencere (örneklem)
+büyüklüğünü $m$ için kullanırsak, o zaman EWMA usulü bir GMM
+güncellemesi elde etmiş oluyoruz.
+
+Veriyi tekrar üretelim,
+
+```python
+n_points = 1000
+data = generate_gmm_data(weights, means, covs, n_points)
+d = data.shape[1]
+```
+
+EWMA güncellemesi kodu,
+
+```python
+lambda_forget = 0.999 
+effective_m = 600
+n_components = 2
+weights_tmp = np.ones(n_components) / n_components
+means_tmp = np.random.randn(n_components, d) * 5
+covs_tmp = np.array([np.eye(d) for _ in range(n_components)])
+cumulative_r = weights_tmp.copy()
+
+for idx in range(len(data)):
+    x = data[idx]
+    r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
+        
+    for k in range(n_components):
+        cumulative_r[k] = lambda_forget * cumulative_r[k] + r[k]        
+        weights_tmp[k] = cumulative_r[k] / effective_m
+        
+        mu_old = means_tmp[k].copy()
+        coef = (1.0 / effective_m) * (r[k] / (weights_tmp[k] + 1e-12))
+        means_tmp[k] = mu_old + coef * (x - mu_old)
+        
+        diff_var = (x - mu_old).reshape(-1, 1)
+        covs_tmp[k] = lambda_forget * covs_tmp[k] + (1 - lambda_forget) * (diff_var @ diff_var.T)
+
+ll = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
+print(f"Nihai log olurluk: {ll}")
+print("Hesaplanan karisim agirliklari:", weights_tmp)        
+print("Hesaplanan ortalama:", means_tmp)
+print("Hesaplanan kovaryans:", covs_tmp)
+
+print(f"Unutma Parametresi: {lambda_forget}")
+print(f"Etkili Orneklem Buyuklugu: {effective_m}")
+print(f"Gercek Orneklem Buyuklugu: {len(data)}")
+```
+
+```text
+Nihai log olurluk: -5000.103521633212
+Hesaplanan karisim agirliklari: [0.2839097  0.77054409]
+Hesaplanan ortalama: [[ 5.1110981  -1.61293691]
+ [ 0.24702352  4.39721026]]
+Hesaplanan kovaryans: [[[ 14.76472365 -15.45280993]
+  [-15.45280993  23.80034537]]
+
+ [[  7.83400218  -6.47764292]
+  [ -6.47764292  11.87788992]]]
+Unutma Parametresi: 0.999
+Etkili Orneklem Buyuklugu: 600
+Gercek Orneklem Buyuklugu: 1000
+```
 
 Kaynaklar
 
@@ -448,6 +543,4 @@ Kaynaklar
 
 [4] Zivkovic, *Recursive unsupervised learning of finite mixture models*
 
-
-
-
+[5] Bayramli, *Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama*

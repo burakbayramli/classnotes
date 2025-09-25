@@ -480,7 +480,7 @@ plt.savefig('stat_053_nonpar_03.png')
 
 EWMA Bağlantısı
 
-Önce [6] yazısında gördüğümüz basit sayılar üzerinde artımsal
+Önce [5] yazısında gördüğümüz basit sayılar üzerinde artımsal
 (incremental) ortalama hesabı formülünü hatırlayalım,
 
 $$
@@ -505,7 +505,7 @@ Her iki form birbirinin aynısı. Tek fark güncelleme için kullanılan
 "yeni veri" noktasının birinde reel sayı olması diğerinde ise $K_h(x -
 x_{n})$ ile hesaplanan son noktanın olasılık değeri.
 
-Bu form benzerliğini saptamak önemli çünkü şimdi, aynen [5]'de
+Bu form benzerliğini saptamak önemli çünkü şimdi, aynen [3]'de
 gösterildiği gibi, ortalama güncellemesini üstel ağırlıklı EWMA forma
 geçirebildiğimiz gibi üstteki KDE güncellemesini de EWMA formatına
 geçirebiliriz. Yani, en son veriye daha ağırlık veren EWMA formundaki
@@ -574,6 +574,4 @@ Kaynaklar
 
 [4] Bayramli, *Istatistik, Parametresiz İstatistik (Nonparametric Statistics)*
 
-[5] Bayramli, *Zaman Serileri, ARIMA, ARCH, GARCH, Periyotlar, Yürüyen Ortalama*
-
-[6] Bayramli, *Azar Azar İstatistik (Incremental Statistics)*
+[5] Bayramli, *Azar Azar İstatistik (Incremental Statistics)*

@@ -119,6 +119,7 @@ ilgilendiren önemli an <span class="math inline">\(m\)</span> anından
 class="math inline">\(m\)</span>’ye kadar olan model parametrelerini
 <span class="math inline">\(m+1\)</span>’inci veri gelince ona göre
 güncellemek.</p>
+<h3 id="tüm-veriyle-artımsal">Tüm Veriyle Artımsal</h3>
 <p>Bu bağlamda ilk varsayımı, yaklaşıksallamayı şöyle yapalım, tek bir
 veri noktası eklediğimizde GMM modelinin parametrelerinin çok fazla
 değişmesini beklemeyiz, o zaman GMM karışımının içindeki <span
@@ -129,8 +130,7 @@ olasılık / sorumluluk (responsibility) şöyle gösterilebilir,</p>
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
 \qquad (1)
 \]</span></p>
-<h3 id="karışım-ağırlıkları-pi_g">Karışım Ağırlıkları <span
-class="math inline">\(\pi_g\)</span></h3>
+<p>Karışım Ağırlıkları <span class="math inline">\(\pi_g\)</span></p>
 <p>Her <span class="math inline">\(g\)</span> bileşeni için karışım
 ağırlığı tüm <span class="math inline">\(m\)</span> verileri üzerinden
 hesaplanan ortalama sorumluluktur. Bu hesap tabii ki toptan EM
@@ -188,8 +188,7 @@ m \pi_g^{(m)} + p^{(m)}(C_g | \mathbf{x}_{m+1}) - m\pi_g^{(m)} -
 \]</span></p>
 <p>Böylece karışım ağırlıkları için özyineli güncelleme formülüne
 erişmiş olduk.</p>
-<h3 id="ortalama-mu_g-güncellemesi">Ortalama <span
-class="math inline">\(\mu_g\)</span> Güncellemesi</h3>
+<p>Ortalama <span class="math inline">\(\mu_g\)</span> Güncellemesi</p>
 <p>Bileşen <span class="math inline">\(g\)</span>’nin ortalaması şöyle
 tanımlıdır,</p>
 <p><span class="math display">\[
@@ -272,8 +271,8 @@ p^{(m)}(C_g | \mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1}
 \]</span></p>
 <p>Böylece <span class="math inline">\(\mu_g\)</span> güncellemesini
 elde etmiş oluyoruz.</p>
-<h3 id="kovaryans-sigma_g-güncellemesi">Kovaryans <span
-class="math inline">\(\Sigma_g\)</span> Güncellemesi</h3>
+<p>Kovaryans <span class="math inline">\(\Sigma_g\)</span>
+Güncellemesi</p>
 <p>Bileşen <span class="math inline">\(g\)</span> için kovaryans</p>
 <p><span class="math display">\[
 \Sigma_g^{(m)} = \frac{1}{m \pi_g^{(m)}} \sum_{i=1}^{m} p^{(m)}(C_g |
@@ -431,21 +430,18 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update cumulative responsibilities</span></span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        cumulative_r[k] <span class="op">+=</span> r[k]</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Update mixture weights</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> cumulative_r[k] <span class="op">/</span> m_total</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mean update using Zheng&#39;s form</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        coef <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> m_total) <span class="op">*</span> (r[k] <span class="op">/</span> (weights_tmp[k] <span class="op">+</span> <span class="fl">1e-12</span>))</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> coef <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Covariance update (same structure)</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        diff_var <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">+</span> coef <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T <span class="op">-</span> covs_tmp[k])</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ll)</span></code></pre></div>
-<pre class="text"><code>-4457.0162888977675</code></pre>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> cumulative_r[k] <span class="op">/</span> m_total</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        coef <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> m_total) <span class="op">*</span> (r[k] <span class="op">/</span> (weights_tmp[k] <span class="op">+</span> <span class="fl">1e-12</span>))</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> coef <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        diff_var <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">+</span> coef <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T <span class="op">-</span> covs_tmp[k])</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (ll)</span></code></pre></div>
+<pre class="text"><code>-4373.507980537245</code></pre>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (weights_tmp)        </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (means_tmp)</span>
@@ -496,7 +492,94 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>fig.colorbar(cf2, ax<span class="op">=</span>ax2, fraction<span class="op">=</span><span class="fl">0.046</span>, pad<span class="op">=</span><span class="fl">0.04</span>)</span>
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_112_gmminc_02.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_112_gmminc_02.png" /></p>
-<p>[devam edecek]</p>
+<h3 id="ewma-usulü-artımsal">EWMA Usulü Artımsal</h3>
+<p>Şimdiye kadar gördüklerimiz artımsal güncelleme yapıyor olsa bile
+görülen tüm verilere aynı ağırlığı / önemi veriyordu. Fakat son görülen
+verilere daha fazla ağırlık veren ve eskileri (bir parametreye bağlı
+olarak) yavaş yavaş “unutan” bir yaklaşım bazen daha faydalı olabilir.
+EWMA yaklaşımı burada devreye girebilir, [5] yazısında gösterildiği gibi
+EWMA’nın kabaca bir kaydırılan pencere içindeki verileri işleme mantığı
+vardır (ve bu ‘etkili pencere’ büyüklüğü hesaplanabilir) böylece eski
+verilerin yavaşça unutulması sağlanabilir.</p>
+<p>EWMA yaklaşımında bir <span class="math inline">\(\lambda\)</span>
+parametresi vardır, o zaman önceki güncelleme formüllerini bir <span
+class="math inline">\(\lambda\)</span> içerecek şekilde tekrar
+düzenlersek [2],</p>
+<p><span class="math display">\[
+\pi_g^{m+1} = \pi_g^{m} + \lambda [ p^{(m)} (C_g | x_{m+1}) - \pi_g^{m}
+]
+\]</span></p>
+<p><span class="math display">\[
+\mu_g^{(m+1)} = \mu_g^{(m)} + \lambda \frac{ p^{(m)}(C_g |
+\mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left( \mathbf{x}_{m+1} - \mu_g^{(m)}
+\right)
+\]</span></p>
+<p><span class="math display">\[  
+\Sigma_g^{(m+1)} = \Sigma_g^{(m)} + \lambda \frac{ p^{(m)}(C_g |
+\mathbf{x}_{m+1}) }{ \pi_g^{(m)} } \left[ (\mathbf{x}_{m+1} -
+\mu_g^{(m)}) (\mathbf{x}_{m+1} - \mu_g^{(m)})^T - \Sigma_g^{(m)} \right]
+\]</span></p>
+<p>Üstteki formüller aslında daha önceki güncelleme formüllerinin
+genelleşmiş halidir denebilir, eğer <span class="math inline">\(\lambda
+= \frac{1}{m+1}\)</span> dersek, ve sürekli artan <span
+class="math inline">\(m\)</span> bağlamında önceki formüllerin aynısını
+elde ederiz. Fakat farklı bir unutma faktörü <span
+class="math inline">\(\lambda\)</span> verirsek, mesela <span
+class="math inline">\(\lambda=0.999\)</span>, ve onun tekabül ettiği
+etkili pencere (örneklem) büyüklüğünü <span
+class="math inline">\(m\)</span> için kullanırsak, o zaman EWMA usulü
+bir GMM güncellemesi elde etmiş oluyoruz.</p>
+<p>Veriyi tekrar üretelim,</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_points <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> generate_gmm_data(weights, means, covs, n_points)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> data.shape[<span class="dv">1</span>]</span></code></pre></div>
+<p>EWMA güncellemesi kodu,</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lambda_forget <span class="op">=</span> <span class="fl">0.999</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>effective_m <span class="op">=</span> <span class="dv">600</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>n_components <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>weights_tmp <span class="op">=</span> np.ones(n_components) <span class="op">/</span> n_components</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>means_tmp <span class="op">=</span> np.random.randn(n_components, d) <span class="op">*</span> <span class="dv">5</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>covs_tmp <span class="op">=</span> np.array([np.eye(d) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_components)])</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>cumulative_r <span class="op">=</span> weights_tmp.copy()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(data)):</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> data[idx]</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> responsibilities(x, weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        cumulative_r[k] <span class="op">=</span> lambda_forget <span class="op">*</span> cumulative_r[k] <span class="op">+</span> r[k]        </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> cumulative_r[k] <span class="op">/</span> effective_m</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        coef <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> effective_m) <span class="op">*</span> (r[k] <span class="op">/</span> (weights_tmp[k] <span class="op">+</span> <span class="fl">1e-12</span>))</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> coef <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        diff_var <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> lambda_forget <span class="op">*</span> covs_tmp[k] <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> lambda_forget) <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Nihai log olurluk: </span><span class="sc">{</span>ll<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan karisim agirliklari:&quot;</span>, weights_tmp)        </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan ortalama:&quot;</span>, means_tmp)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan kovaryans:&quot;</span>, covs_tmp)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Unutma Parametresi: </span><span class="sc">{</span>lambda_forget<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Etkili Orneklem Buyuklugu: </span><span class="sc">{</span>effective_m<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Gercek Orneklem Buyuklugu: </span><span class="sc">{</span><span class="bu">len</span>(data)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Nihai log olurluk: -5000.103521633212
+Hesaplanan karisim agirliklari: [0.2839097  0.77054409]
+Hesaplanan ortalama: [[ 5.1110981  -1.61293691]
+ [ 0.24702352  4.39721026]]
+Hesaplanan kovaryans: [[[ 14.76472365 -15.45280993]
+  [-15.45280993  23.80034537]]
+
+ [[  7.83400218  -6.47764292]
+  [ -6.47764292  11.87788992]]]
+Unutma Parametresi: 0.999
+Etkili Orneklem Buyuklugu: 600
+Gercek Orneklem Buyuklugu: 1000</code></pre>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, <em>Istatistik, Gaussian Karışım Modeli (GMM) ile
 Kümelemek</em></p>
@@ -506,6 +589,8 @@ Monitoring</em></p>
 Data</em></p>
 <p>[4] Zivkovic, <em>Recursive unsupervised learning of finite mixture
 models</em></p>
+<p>[5] Bayramli, <em>Zaman Serileri - ARIMA, ARCH, GARCH, Periyotlar,
+Yürüyen Ortalama</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
