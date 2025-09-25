@@ -154,99 +154,101 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2, time, datetime</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- CONFIG ---</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">3</span>                    <span class="co"># number of GMM components per pixel</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>lambda_forget <span class="op">=</span> <span class="fl">0.995</span>    <span class="co"># forgetting factor (1.0 -&gt; no forgetting)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>min_variance <span class="op">=</span> <span class="fl">15.0</span>      <span class="co"># floor for variance</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>snapshot_frames <span class="op">=</span> [<span class="dv">220</span>, <span class="dv">1200</span>, <span class="dv">1900</span>, <span class="dv">3500</span>]  <span class="co"># frames where we snapshot background</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>lambda_forget <span class="op">=</span> <span class="fl">0.005</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>min_variance <span class="op">=</span> <span class="fl">15.0</span>   </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>snapshot_frames <span class="op">=</span> [<span class="dv">220</span>, <span class="dv">1200</span>, <span class="dv">1900</span>, <span class="dv">3500</span>]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>resize_width <span class="op">=</span> <span class="dv">640</span> </span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Open video ---</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>cap <span class="op">=</span> cv2.VideoCapture(vfile)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>fps <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FPS))</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Frame rate: </span><span class="sc">{</span>fps<span class="sc">}</span><span class="ss"> FPS&quot;</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>frame_index <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">4</span>, ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">8</span>))</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>g_row <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># GMM state</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>gmm_initialized <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>means <span class="op">=</span> vars_ <span class="op">=</span> weights <span class="op">=</span> N_g <span class="op">=</span> M1 <span class="op">=</span> M2 <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3600</span>):</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> ret:</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> frame.astype(np.float32)</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    H, W, C <span class="op">=</span> frame.shape</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> gmm_initialized:</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialize</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        means <span class="op">=</span> np.zeros((K, H, W, C), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        vars_ <span class="op">=</span> np.ones((K, H, W, C), dtype<span class="op">=</span>np.float32) <span class="op">*</span> <span class="fl">225.0</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones((K, H, W), dtype<span class="op">=</span>np.float32) <span class="op">/</span> K</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        N_g <span class="op">=</span> np.ones((K, H, W), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        M1 <span class="op">=</span> np.zeros((K, H, W, C), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>        M2 <span class="op">=</span> np.zeros((K, H, W, C), dtype<span class="op">=</span>np.float32)</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> kk <span class="kw">in</span> <span class="bu">range</span>(K):</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>            noise <span class="op">=</span> np.random.normal(scale<span class="op">=</span><span class="fl">4.0</span><span class="op">*</span>(kk<span class="op">+</span><span class="dv">1</span>), size<span class="op">=</span>(H,W,C)).astype(np.float32)</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>            means[kk] <span class="op">=</span> frame <span class="op">+</span> noise</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>            M1[kk] <span class="op">=</span> N_g[kk,:,:,<span class="va">None</span>] <span class="op">*</span> means[kk]</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>            M2[kk] <span class="op">=</span> N_g[kk,:,:,<span class="va">None</span>] <span class="op">*</span> (vars_[kk] <span class="op">+</span> means[kk]<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        gmm_initialized <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Initialized GMM from first frame&quot;</span>)</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Expand dims for broadcasting</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    xk <span class="op">=</span> np.expand_dims(frame, <span class="dv">0</span>)  <span class="co"># (1,H,W,C)</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Likelihoods per component (diagonal Gaussians)</span></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> diag_gauss_pdf(x, mean, var):</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        eps <span class="op">=</span> <span class="fl">1e-6</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>        denom <span class="op">=</span> np.sqrt(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>(var<span class="op">+</span>eps))</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>        exponent <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>((x<span class="op">-</span>mean)<span class="op">**</span><span class="dv">2</span>)<span class="op">/</span>(var<span class="op">+</span>eps)</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.prod(np.exp(exponent)<span class="op">/</span>denom, axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>cap <span class="op">=</span> cv2.VideoCapture(vfile)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>ret, frame <span class="op">=</span> cap.read()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> resize_width <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    h0, w0 <span class="op">=</span> frame.shape[:<span class="dv">2</span>]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    scale <span class="op">=</span> resize_width <span class="op">/</span> <span class="bu">float</span>(w0)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> cv2.resize(frame, (resize_width, <span class="bu">int</span>(h0 <span class="op">*</span> scale)))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>H, W, C <span class="op">=</span> frame.shape</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>frame_index <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">4</span>, ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">8</span>))</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>g_row <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>pi_g <span class="op">=</span> np.ones((K, H, W), dtype<span class="op">=</span>np.float32) <span class="op">/</span> K</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>means <span class="op">=</span> np.zeros((K, H, W, C), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    noise <span class="op">=</span> np.random.normal(scale<span class="op">=</span><span class="fl">4.0</span><span class="op">*</span>(k<span class="op">+</span><span class="dv">1</span>), size<span class="op">=</span>(H,W,C)).astype(np.float32)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    means[k] <span class="op">=</span> frame.astype(np.float32) <span class="op">+</span> noise</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>covars <span class="op">=</span> np.ones((K, H, W, C), dtype<span class="op">=</span>np.float32) <span class="op">*</span> <span class="fl">225.0</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>inv_covars <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> np.maximum(covars, min_variance)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>det_covars <span class="op">=</span> np.prod(covars, axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> diag_gauss_pdf(x, mean, inv_covar, det_covar):</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> <span class="fl">1e-6</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    exponent <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> np.<span class="bu">sum</span>((x <span class="op">-</span> mean)<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> inv_covar, axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    denom <span class="op">=</span> np.sqrt((<span class="dv">2</span><span class="op">*</span>np.pi)<span class="op">**</span>C <span class="op">*</span> np.maximum(det_covar.squeeze(<span class="op">-</span><span class="dv">1</span>), eps))</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.exp(exponent) <span class="op">/</span> np.maximum(denom, eps)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> <span class="fl">1e-12</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> frame_index <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3550</span>):</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> ret:  <span class="cf">break</span>        </span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> resize_width <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>        frame <span class="op">=</span> cv2.resize(frame, (resize_width, <span class="bu">int</span>(frame.shape[<span class="dv">0</span>]<span class="op">*</span>resize_width<span class="op">/</span>frame.shape[<span class="dv">1</span>])))</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    frame_f <span class="op">=</span> frame.astype(np.float32)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    likelihoods <span class="op">=</span> np.zeros((K, H, W), dtype<span class="op">=</span>np.float32)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>        likelihoods[k] <span class="op">=</span> diag_gauss_pdf(frame_f, means[k], inv_covars[k], det_covars[k])</span>
 <span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>    px_given_k <span class="op">=</span> diag_gauss_pdf(xk, means, vars_)  <span class="co"># (K,H,W)</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>    numer <span class="op">=</span> weights <span class="op">*</span> px_given_k</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    denom <span class="op">=</span> np.<span class="bu">sum</span>(numer, axis<span class="op">=</span><span class="dv">0</span>) <span class="op">+</span> <span class="fl">1e-12</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    responsibilities <span class="op">=</span> numer <span class="op">/</span> denom  <span class="co"># (K,H,W)</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Forgetting update</span></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> lambda_forget</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    rkc <span class="op">=</span> responsibilities[...,<span class="va">None</span>]</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    N_g <span class="op">=</span> lam<span class="op">*</span>N_g <span class="op">+</span> responsibilities</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>    M1 <span class="op">=</span> lam<span class="op">*</span>M1 <span class="op">+</span> rkc<span class="op">*</span>xk</span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    M2 <span class="op">=</span> lam<span class="op">*</span>M2 <span class="op">+</span> rkc<span class="op">*</span>(xk<span class="op">*</span>xk)</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>    N_safe <span class="op">=</span> np.maximum(N_g[...,<span class="va">None</span>], <span class="fl">1e-6</span>)</span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    means <span class="op">=</span> M1 <span class="op">/</span> N_safe</span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    vars_ <span class="op">=</span> (M2 <span class="op">/</span> N_safe) <span class="op">-</span> means<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>    vars_ <span class="op">=</span> np.maximum(vars_, min_variance)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>    numerator <span class="op">=</span> pi_g <span class="op">*</span> likelihoods</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>    denominator <span class="op">=</span> np.<span class="bu">sum</span>(numerator, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> eps</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    responsibilities <span class="op">=</span> numerator <span class="op">/</span> denominator</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    pi_g <span class="op">=</span> pi_g <span class="op">+</span> lambda_forget <span class="op">*</span> (responsibilities <span class="op">-</span> pi_g)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    pi_sum <span class="op">=</span> np.<span class="bu">sum</span>(pi_g, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> eps</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    pi_g <span class="op">=</span> pi_g <span class="op">/</span> pi_sum</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>        r_k <span class="op">=</span> responsibilities[k]</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>        pi_k <span class="op">=</span> pi_g[k]           </span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>        denom <span class="op">=</span> np.maximum(pi_k, eps)</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>        ratio <span class="op">=</span> (r_k <span class="op">/</span> denom)[..., <span class="va">None</span>]</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>        delta <span class="op">=</span> frame_f <span class="op">-</span> means[k]</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>        means[k] <span class="op">=</span> means[k] <span class="op">+</span> lambda_forget <span class="op">*</span> ratio <span class="op">*</span> delta</span>
 <span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>    total <span class="op">=</span> np.<span class="bu">sum</span>(N_g, axis<span class="op">=</span><span class="dv">0</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-12</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> N_g <span class="op">/</span> total</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>        delta_sq <span class="op">=</span> delta <span class="op">*</span> delta</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>        covars[k] <span class="op">=</span> covars[k] <span class="op">+</span> lambda_forget <span class="op">*</span> ratio <span class="op">*</span> (delta_sq <span class="op">-</span> covars[k])</span>
 <span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    <span class="co"># === Background estimate: dominant component mean ===</span></span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>    k_star <span class="op">=</span> np.argmax(weights, axis<span class="op">=</span><span class="dv">0</span>)   <span class="co"># (H,W) indices of dominant component</span></span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> np.indices((H, W))</span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>    background <span class="op">=</span> means[k_star, rows, cols].astype(np.uint8)</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>        covars[k] <span class="op">=</span> np.maximum(covars[k], min_variance)</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>        inv_covars[k] <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> covars[k]</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>        det_covars[k] <span class="op">=</span> np.prod(covars[k], axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>    frame_uint8 <span class="op">=</span> frame.astype(np.uint8)</span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frame_index <span class="kw">in</span> snapshot_frames:</span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> datetime.datetime.now()</span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Frame </span><span class="sc">{</span>frame_index<span class="sc">}</span><span class="ss">, Time </span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">: saving background snapshot&quot;</span>)</span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">0</span>].imshow(cv2.cvtColor(frame_uint8, cv2.COLOR_BGR2RGB))</span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">1</span>].imshow(cv2.cvtColor(background, cv2.COLOR_BGR2RGB))</span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>        g_row <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>    frame_index <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(pad<span class="op">=</span><span class="dv">0</span>, w_pad<span class="op">=</span><span class="dv">0</span>, h_pad<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_02.jpg&#39;</span>)</span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>cap.release()</span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>cv2.destroyAllWindows()</span></code></pre></div>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>    k_bg <span class="op">=</span> np.argmax(pi_g, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>    rows, cols <span class="op">=</span> np.indices((H, W))</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>    background <span class="op">=</span> means[k_bg, rows, cols].astype(np.uint8)</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>    frame_uint8 <span class="op">=</span> frame.astype(np.uint8)</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frame_index <span class="kw">in</span> snapshot_frames:</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> datetime.datetime.now()</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Frame </span><span class="sc">{</span>frame_index<span class="sc">}</span><span class="ss">, Time </span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">: saving background snapshot&quot;</span>)</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">0</span>].imshow(cv2.cvtColor(frame_uint8, cv2.COLOR_BGR2RGB))</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">1</span>].imshow(cv2.cvtColor(background, cv2.COLOR_BGR2RGB))</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>        g_row <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(pad<span class="op">=</span><span class="dv">0</span>, w_pad<span class="op">=</span><span class="dv">0</span>, h_pad<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_02.jpg&#39;</span>)</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>cap.release()</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>cv2.destroyAllWindows()</span></code></pre></div>
 <p><img src="vision_20bg_02.jpg" /></p>
 <p>Anlik Islem</p>
 <p><img src="vision_20bg_03.jpg" /></p>

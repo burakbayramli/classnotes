@@ -3,12 +3,12 @@ import numpy as np
 
 # --- CONFIG ---
 K = 3
-lambda_forget = 0.1
+lambda_forget = 0.005
 min_variance = 15.0
 video_path = '/opt/Downloads/skdata/campus_vibe_video4.mp4'
-resize_width = 640  # for speed; set None to keep original size
-thresh_val = 30     # threshold for foreground detection
-min_area = 500      # minimum area for contour to be considered an object
+resize_width = 640  
+thresh_val = 30     
+min_area = 500      
 
 cap = cv2.VideoCapture(video_path)
 ret, frame = cap.read()
@@ -24,8 +24,6 @@ if resize_width is not None:
 
 H, W, C = frame.shape
 
-m = 1  # sample count as in paper
-
 pi_g = np.ones((K, H, W), dtype=np.float32) / K
 
 means = np.zeros((K, H, W, C), dtype=np.float32)
@@ -38,10 +36,7 @@ covars = np.ones((K, H, W, C), dtype=np.float32) * 225.0
 inv_covars = 1.0 / np.maximum(covars, min_variance)
 det_covars = np.prod(covars, axis=-1, keepdims=True)
 
-print("Initialized RGMM from first frame")
-
 def diag_gauss_pdf(x, mean, inv_covar, det_covar):
-    """Calculate Gaussian PDF with diagonal covariance"""
     eps = 1e-6
     exponent = -0.5 * np.sum((x - mean)**2 * inv_covar, axis=-1)
     denom = np.sqrt((2*np.pi)**C * np.maximum(det_covar.squeeze(-1), eps))
@@ -59,46 +54,30 @@ while True:
     
     frame_f = frame.astype(np.float32)
 
-
-    # --- compute likelihoods and responsibilities (using current params) ---
     likelihoods = np.zeros((K, H, W), dtype=np.float32)
     for k in range(K):
         likelihoods[k] = diag_gauss_pdf(frame_f, means[k], inv_covars[k], det_covars[k])
 
-    numerator = pi_g * likelihoods  # shape (K,H,W)
+    numerator = pi_g * likelihoods
     denominator = np.sum(numerator, axis=0, keepdims=True) + eps
-    responsibilities = numerator / denominator  # shape (K,H,W), r_g(x_m)
+    responsibilities = numerator / denominator  
 
-    # --- 1) update mixing probabilities (Zheng eq.13) ---
-    # pi_g_new = pi_g + lambda * (r - pi_g)
     pi_g = pi_g + lambda_forget * (responsibilities - pi_g)
-    # numerical guard and normalization
     pi_sum = np.sum(pi_g, axis=0, keepdims=True) + eps
-    pi_g = pi_g / pi_sum  # now sum_g pi_g == 1 at each pixel
+    pi_g = pi_g / pi_sum
 
-    # --- 2) update means and covariances using updated pi_g (Zheng eqs.14-15) ---
     for k in range(K):
-        r_k = responsibilities[k]                # shape (H,W)
-        pi_k = pi_g[k]                           # updated mixing prob (H,W)
-        # avoid division by zero: denom = max(pi_k, eps)
-        denom = np.maximum(pi_k, eps)            # (H,W)
-        ratio = (r_k / denom)[..., None]         # shape (H,W,1) to broadcast over channels
-
-        # mean update: mu <- mu + lambda * (r / pi) * (x - mu)
-        delta = frame_f - means[k]               # shape (H,W,C)
+        r_k = responsibilities[k]                
+        pi_k = pi_g[k]                           
+        denom = np.maximum(pi_k, eps)            
+        ratio = (r_k / denom)[..., None]         
+        delta = frame_f - means[k]               
         means[k] = means[k] + lambda_forget * ratio * delta
-
-        # covariance update (diagonal): Σ <- Σ + λ * (r/π) * [ (x - μ)(x - μ) - Σ ]
-        delta_sq = delta * delta                 # elementwise squared (H,W,C)
+        delta_sq = delta * delta                 
         covars[k] = covars[k] + lambda_forget * ratio * (delta_sq - covars[k])
-
-        # enforce minimum variance (per channel)
         covars[k] = np.maximum(covars[k], min_variance)
-
-        # update inverses and determinants used to compute likelihoods next frame
         inv_covars[k] = 1.0 / covars[k]
         det_covars[k] = np.prod(covars[k], axis=-1, keepdims=True)
-
     
     k_bg = np.argmax(pi_g, axis=0)
     rows, cols = np.indices((H, W))

@@ -79,83 +79,87 @@ GMM
 ```python
 import cv2, time, datetime
 
-# --- CONFIG ---
-K = 3                    # number of GMM components per pixel
-lambda_forget = 0.995    # forgetting factor (1.0 -> no forgetting)
-min_variance = 15.0      # floor for variance
-snapshot_frames = [220, 1200, 1900, 3500]  # frames where we snapshot background
+K = 3
+lambda_forget = 0.005 
+min_variance = 15.0   
+snapshot_frames = [220, 1200, 1900, 3500]
+resize_width = 640 
 
-# --- Open video ---
 cap = cv2.VideoCapture(vfile)
-fps = int(cap.get(cv2.CAP_PROP_FPS))
-print(f"Frame rate: {fps} FPS")
+ret, frame = cap.read()
+
+if resize_width is not None:
+    h0, w0 = frame.shape[:2]
+    scale = resize_width / float(w0)
+    frame = cv2.resize(frame, (resize_width, int(h0 * scale)))
+
+H, W, C = frame.shape
 
 frame_index = 0
 fig, axes = plt.subplots(nrows=4, ncols=2, figsize=(6,8))
 g_row = 0
 
-# GMM state
-gmm_initialized = False
-means = vars_ = weights = N_g = M1 = M2 = None
+pi_g = np.ones((K, H, W), dtype=np.float32) / K
 
-for k in range(3600):
+means = np.zeros((K, H, W, C), dtype=np.float32)
+for k in range(K):
+    noise = np.random.normal(scale=4.0*(k+1), size=(H,W,C)).astype(np.float32)
+    means[k] = frame.astype(np.float32) + noise
+
+covars = np.ones((K, H, W, C), dtype=np.float32) * 225.0
+
+inv_covars = 1.0 / np.maximum(covars, min_variance)
+det_covars = np.prod(covars, axis=-1, keepdims=True)
+
+def diag_gauss_pdf(x, mean, inv_covar, det_covar):
+    eps = 1e-6
+    exponent = -0.5 * np.sum((x - mean)**2 * inv_covar, axis=-1)
+    denom = np.sqrt((2*np.pi)**C * np.maximum(det_covar.squeeze(-1), eps))
+    return np.exp(exponent) / np.maximum(denom, eps)
+
+eps = 1e-12
+
+for frame_index in range(3550):
+
     ret, frame = cap.read()
-    if not ret:
-        break
-    frame = frame.astype(np.float32)
-    H, W, C = frame.shape
+    if not ret:  break        
+    if resize_width is not None:
+        frame = cv2.resize(frame, (resize_width, int(frame.shape[0]*resize_width/frame.shape[1])))
+    
+    frame_f = frame.astype(np.float32)
 
-    if not gmm_initialized:
-        # Initialize
-        means = np.zeros((K, H, W, C), dtype=np.float32)
-        vars_ = np.ones((K, H, W, C), dtype=np.float32) * 225.0
-        weights = np.ones((K, H, W), dtype=np.float32) / K
-        N_g = np.ones((K, H, W), dtype=np.float32)
+    likelihoods = np.zeros((K, H, W), dtype=np.float32)
+    for k in range(K):
+        likelihoods[k] = diag_gauss_pdf(frame_f, means[k], inv_covars[k], det_covars[k])
 
-        M1 = np.zeros((K, H, W, C), dtype=np.float32)
-        M2 = np.zeros((K, H, W, C), dtype=np.float32)
-        for kk in range(K):
-            noise = np.random.normal(scale=4.0*(kk+1), size=(H,W,C)).astype(np.float32)
-            means[kk] = frame + noise
-            M1[kk] = N_g[kk,:,:,None] * means[kk]
-            M2[kk] = N_g[kk,:,:,None] * (vars_[kk] + means[kk]**2)
-        gmm_initialized = True
-        print("Initialized GMM from first frame")
+    numerator = pi_g * likelihoods
+    denominator = np.sum(numerator, axis=0, keepdims=True) + eps
+    responsibilities = numerator / denominator
 
-    # Expand dims for broadcasting
-    xk = np.expand_dims(frame, 0)  # (1,H,W,C)
+    pi_g = pi_g + lambda_forget * (responsibilities - pi_g)
+    pi_sum = np.sum(pi_g, axis=0, keepdims=True) + eps
+    pi_g = pi_g / pi_sum
 
-    # Likelihoods per component (diagonal Gaussians)
-    def diag_gauss_pdf(x, mean, var):
-        eps = 1e-6
-        denom = np.sqrt(2*np.pi*(var+eps))
-        exponent = -0.5*((x-mean)**2)/(var+eps)
-        return np.prod(np.exp(exponent)/denom, axis=-1)
+    for k in range(K):
+        r_k = responsibilities[k]
+        pi_k = pi_g[k]           
+        denom = np.maximum(pi_k, eps)
+        ratio = (r_k / denom)[..., None]
 
-    px_given_k = diag_gauss_pdf(xk, means, vars_)  # (K,H,W)
-    numer = weights * px_given_k
-    denom = np.sum(numer, axis=0) + 1e-12
-    responsibilities = numer / denom  # (K,H,W)
+        delta = frame_f - means[k]
+        means[k] = means[k] + lambda_forget * ratio * delta
 
-    # Forgetting update
-    lam = lambda_forget
-    rkc = responsibilities[...,None]
-    N_g = lam*N_g + responsibilities
-    M1 = lam*M1 + rkc*xk
-    M2 = lam*M2 + rkc*(xk*xk)
+        delta_sq = delta * delta
+        covars[k] = covars[k] + lambda_forget * ratio * (delta_sq - covars[k])
 
-    N_safe = np.maximum(N_g[...,None], 1e-6)
-    means = M1 / N_safe
-    vars_ = (M2 / N_safe) - means**2
-    vars_ = np.maximum(vars_, min_variance)
+        covars[k] = np.maximum(covars[k], min_variance)
 
-    total = np.sum(N_g, axis=0, keepdims=True) + 1e-12
-    weights = N_g / total
+        inv_covars[k] = 1.0 / covars[k]
+        det_covars[k] = np.prod(covars[k], axis=-1, keepdims=True)
 
-    # === Background estimate: dominant component mean ===
-    k_star = np.argmax(weights, axis=0)   # (H,W) indices of dominant component
+    k_bg = np.argmax(pi_g, axis=0)
     rows, cols = np.indices((H, W))
-    background = means[k_star, rows, cols].astype(np.uint8)
+    background = means[k_bg, rows, cols].astype(np.uint8)
 
     frame_uint8 = frame.astype(np.uint8)
 
@@ -165,8 +169,6 @@ for k in range(3600):
         axes[g_row, 0].imshow(cv2.cvtColor(frame_uint8, cv2.COLOR_BGR2RGB))
         axes[g_row, 1].imshow(cv2.cvtColor(background, cv2.COLOR_BGR2RGB))
         g_row += 1
-
-    frame_index += 1
 
 plt.tight_layout(pad=0, w_pad=0, h_pad=0)
 plt.savefig('vision_20bg_02.jpg')
