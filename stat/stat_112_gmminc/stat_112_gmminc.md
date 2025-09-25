@@ -360,15 +360,12 @@ for idx in range(len(data)):
         # Update cumulative responsibilities
         cumulative_r[k] += r[k]
 
-        # Update mixture weights
         weights_tmp[k] = cumulative_r[k] / m_total
 
-        # Mean update using Zheng's form
         mu_old = means_tmp[k].copy()
         coef = (1.0 / m_total) * (r[k] / (weights_tmp[k] + 1e-12))
         means_tmp[k] = mu_old + coef * (x - mu_old)
 
-        # Covariance update (same structure)
         diff_var = (x - mu_old).reshape(-1, 1)
         covs_tmp[k] = covs_tmp[k] + coef * (diff_var @ diff_var.T - covs_tmp[k])
 
