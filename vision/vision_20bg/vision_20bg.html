@@ -80,29 +80,81 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="arkaplan-background-tespiti">Arkaplan (Background) Tespiti</h1>
+<p>Durağan bir kameranın sürekli aldığı görüntülerde arka plan tespiti
+(background extraction) yapmak için su andaki en iyi teknikler
+istatistiki. Ana fikir şu; arka plan demek bir tür değişmezlik,
+statiklik ima eder, o zaman görüntüdeki her pikselin en çok aldığı
+piksel değeri (gri seviyesi ise 0..255 arası değerler, RGB ise onun üç
+boyutlu hali) arka plan olarak kabul edilmelidir.</p>
+<p>Tabii ki arka planın önünde, üzerinde farklı objeler gelip
+gidecektir. Eğer kamera bir yola bakıyorsa, yoldan bazen arabalar geçer,
+bir kampüs içini gösteriyorsa insanlar yürürler. Bu sebeple her pikselin
+en çok aldigi değeri matematiksel olarak temsil edebilmemiz
+gerekiyor.</p>
+<p>Örnek olarak bir video’daki spesifik bir pikselin aldığı değerlere
+bakalım, bu değerlerin histogramını çıkartalım. Bu bize o spesifik
+pikselin aldığı değerlerin frekansı, istatistiksel özelliği hakkında bir
+fikir verecektir. Örnek video [1]’den indirilebilir, ve alttaki dizinde
+olduğunu farzedelim,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>vfile <span class="op">=</span> <span class="st">&#39;/opt/Downloads/skdata/campus_vibe_video4.mp4&#39;</span></span></code></pre></div>
+<p>Video bir kampüste kaydedilmiş, kamera hareket etmiyor sadece önünde
+olanları gösteriyor. Şimdi bu video karelerinin <code>coord</code>
+noktasındaki, kordinatında aldığı değerlere bakalım. Video renkli ama bu
+ilk rapor için biz gri seviyelere bakabiliriz, yani RGB değerlerini alıp
+grileştiriyoruz sonra o noktadaki gri değerlere bakıyoruz.</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time, datetime, cv2</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cap <span class="op">=</span> cv2.VideoCapture(vfile)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>frame_index <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">3600</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pixvals <span class="op">=</span> np.zeros(N)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    gray_frame <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    pixvals[i] <span class="op">=</span> gray_frame[<span class="dv">40</span>,<span class="dv">130</span>]</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>cap.release()    </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.hist(pixvals)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_04.jpg&#39;</span>)</span></code></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>coord <span class="op">=</span> (<span class="dv">40</span>,<span class="dv">130</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>pixvals <span class="op">=</span> np.zeros(N)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    gray_frame <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    pixvals[i] <span class="op">=</span> gray_frame[<span class="op">*</span>coord]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>cap.release()    </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>plt.hist(pixvals)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_04.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="vision_20bg_04.jpg" /></p>
-<p>KDE</p>
+<p>Histogram üstteki gibi çıktı. Kabaca ilk bakış bize 45 değeri
+etrafında bir gruplanma gösteriyor, 70 etrafında daha az ama yine de
+mevcut bir tepe var, bir diğeri 100 etrafında. Yani <code>coord</code>
+noktasındaki piksel çoğunlukla köyümsü bir rengi olan bir yeri
+gösteriyor, ve arada sırada önünden daha aydınlık renkleri olan şeyler
+geçiyor. Belki açık gri renkli tişört giymiş bir kaç öğrenci oradan
+geçmiş.</p>
+<p>Fakat bu rapor bize arka plan tespitinde izlenebilecek tekniğin
+ipuçlarını veriyor. Üstteki histograma bakarak eğer bir arka plan seçmek
+istesek, bunu frekanların maksimum olduğu değer için yapabilirdik, bu
+örnekte aşağı yukarı 45 değeri.</p>
+<h3 id="kde">KDE</h3>
+<p>O zaman şöyle bir yaklaşım tasarlanabilir. Bir video’nun karelerini
+işlerken her pikselin o ana kadar aldığı değerlerin dağılımını modelle,
+ve bir arka plan gerektiğinde tüm bu dağılımların maksimum değerini bul
+(yani maksimum frekansa tekabül eden piksel değeri) ve o değerleri arka
+plan resmi olarak kabul et. Bu yaklaşımı histogram ile kodlayabilirdik,
+fakat daha pürüzsüz bir dağılım saptamamıza yardım edecek bir teknik KDE
+tekniğidir [1]. Bu teknikle aynen histogramda olduğu gibi önceden
+saptanmış belli <span class="math inline">\(x\)</span> noktaları
+(histogram için kutucuk) üzerinden hesap yapıyor olsak bile KDE Gaussian
+toplamlarını temsil ettiği için daha az ayrıksal gözüken sonuçlar
+almamızı sağlar.</p>
+<p>KDE değerlerini artımsal olarak güncellemeyi de biliyoruz [1], hatta
+bu güncelleme sırasında eski değerlere daha az önem vermeyi de öğrendik,
+böylece algoritmamiz güncel olan bir arka plan varsayımını sürekli
+bilip, istediğimiz anda bize verebilir. Üstte işlediğimiz video üzerinde
+bunu görelim,</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time, datetime, cv2</span>
@@ -118,39 +170,86 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Frame rate: </span><span class="sc">{</span>fps<span class="sc">}</span><span class="ss"> FPS&quot;</span>)</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>pdf_model <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>frame_index <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">4</span>, ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">5</span>,<span class="dv">7</span>))</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>g_row <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3600</span>):</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    gray_frame <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    H, W <span class="op">=</span> gray_frame.shape</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pdf_model <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        pdf_model <span class="op">=</span> np.ones((H, W, num_bins), dtype<span class="op">=</span>np.float32) <span class="op">/</span> num_bins</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    diffs <span class="op">=</span> gray_frame[..., <span class="va">None</span>] <span class="op">-</span> bin_centers[<span class="va">None</span>, <span class="va">None</span>, :]</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    new_pdf <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (diffs <span class="op">/</span> bandwidth) <span class="op">**</span> <span class="dv">2</span>)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    new_pdf <span class="op">/=</span> (new_pdf.<span class="bu">sum</span>(axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span>)  <span class="co"># normalize</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    pdf_model <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> alpha) <span class="op">*</span> pdf_model <span class="op">+</span> alpha <span class="op">*</span> new_pdf</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frame_index <span class="kw">in</span> [<span class="dv">220</span>,<span class="dv">1200</span>,<span class="dv">1900</span>,<span class="dv">3500</span>]:</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        background_bins <span class="op">=</span> pdf_model.argmax(axis<span class="op">=-</span><span class="dv">1</span>)  <span class="co"># index of most likely bin</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        background <span class="op">=</span> bin_centers[background_bins].astype(np.uint8)</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> datetime.datetime.now()</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Frame </span><span class="sc">{</span>frame_index<span class="sc">}</span><span class="ss">, Time </span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">: saving background snapshot&quot;</span>)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        background_bins <span class="op">=</span> pdf_model.argmax(axis<span class="op">=-</span><span class="dv">1</span>)  <span class="co"># index of most likely bin</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        background <span class="op">=</span> bin_centers[background_bins].astype(np.uint8)</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">0</span>].imshow(gray_frame, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">1</span>].imshow(background, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        g_row <span class="op">=</span> g_row <span class="op">+</span> <span class="dv">1</span>        </span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    frame_index <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(pad<span class="op">=</span><span class="dv">0</span>, w_pad<span class="op">=</span><span class="dv">0</span>, h_pad<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_01.jpg&#39;</span>)</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>cap.release()</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>cv2.destroyAllWindows()</span></code></pre></div>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">4</span>, ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">5</span>,<span class="dv">7</span>))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>g_row <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> frame_index <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3600</span>):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    ret, frame <span class="op">=</span> cap.read()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    gray_frame <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY).astype(np.float32)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    H, W <span class="op">=</span> gray_frame.shape</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pdf_model <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        pdf_model <span class="op">=</span> np.ones((H, W, num_bins), dtype<span class="op">=</span>np.float32) <span class="op">/</span> num_bins</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    diffs <span class="op">=</span> gray_frame[..., <span class="va">None</span>] <span class="op">-</span> bin_centers[<span class="va">None</span>, <span class="va">None</span>, :]</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    new_pdf <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (diffs <span class="op">/</span> bandwidth) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    new_pdf <span class="op">/=</span> (new_pdf.<span class="bu">sum</span>(axis<span class="op">=-</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> <span class="fl">1e-8</span>)  <span class="co"># normalize</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    pdf_model <span class="op">=</span> (<span class="dv">1</span> <span class="op">-</span> alpha) <span class="op">*</span> pdf_model <span class="op">+</span> alpha <span class="op">*</span> new_pdf</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frame_index <span class="kw">in</span> [<span class="dv">220</span>,<span class="dv">1200</span>,<span class="dv">1900</span>,<span class="dv">3500</span>]:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        background_bins <span class="op">=</span> pdf_model.argmax(axis<span class="op">=-</span><span class="dv">1</span>)  <span class="co"># index of most likely bin</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        background <span class="op">=</span> bin_centers[background_bins].astype(np.uint8)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        t <span class="op">=</span> datetime.datetime.now()</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Frame </span><span class="sc">{</span>frame_index<span class="sc">}</span><span class="ss">, Time </span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">: saving background snapshot&quot;</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        background_bins <span class="op">=</span> pdf_model.argmax(axis<span class="op">=-</span><span class="dv">1</span>)  <span class="co"># index of most likely bin</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        background <span class="op">=</span> bin_centers[background_bins].astype(np.uint8)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">0</span>].imshow(gray_frame, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        axes[g_row, <span class="dv">1</span>].imshow(background, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        g_row <span class="op">=</span> g_row <span class="op">+</span> <span class="dv">1</span>        </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(pad<span class="op">=</span><span class="dv">0</span>, w_pad<span class="op">=</span><span class="dv">0</span>, h_pad<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_20bg_01.jpg&#39;</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>cap.release()</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>cv2.destroyAllWindows()</span></code></pre></div>
 <p><img src="vision_20bg_01.jpg" /></p>
-<p>GMM</p>
+<p>Resimde sol kolondakiler video’nun belli anlarda alınmış kareleri,
+sol kolondaki ise algoritmamizin o andaki arka plan tasavvuru. Görüldüğü
+gibi video o anda insanlar gösteriyor olsa bile, KDE kümemiz hala arka
+planın ne olduğunu biliyor. Bu saptamayı her piksel için sürekli
+hesaplanan KDE’ler üzerinde <code>pdf_model.argmax</code> işleterek
+yapıyor. Çağrı <code>argmax</code> bilindiği gibi bir vektör üzerinde
+işletilince o vektördeki maksimum değerin indisini verir. Bizim
+örneğimizde indis değerleri seçilmiş gri değer seviyelerinin indisi,
+mesela bu seviyeler <code>[0., 8.2, 16.4, ..., 255]</code> olabilir eğer
+ikinci indisteki frekanslar yüksekse <code>argmax</code> sonucu 8.2
+değerini elde ederiz. Not: Gri seviyesi 8.2 anlamsız olabilir fakat 0
+ila 255 değerini 32 eşit aralığa bölünce bazı değerler kesirli oluyor.
+Problem değil arka plan resmini grafiklerken kesirli gri değerlerini en
+yakın tam sayı gri değerine yuvarlayabiliriz.</p>
+<h3 id="gmm">GMM</h3>
+<p>Üstte parametresiz istatistik kullanarak gri seviyelerini
+halledebildik. Peki renkli resim işliyor olsaydık ne yapardık? Aynı KDE
+tekniği burada da işler mi?</p>
+<p>Renkli resimler problemli olabilir.. Bu durumda tek gri seviyesi
+yerine her piksel için üç tane R,G,B değerini takip etmemiz gerekiyor.
+Eğer aynı KDE yaklaşımını kullanmak istesek ve yine renk skalasını
+mesela 32 parçaya bolsek, bu bize 32 x 32 x 32 ~ 32K tane nokta verir,
+ve bu sadece tek piksel içindir. 640 x 480 boyutlu resim kareleri için
+640 x 480 x 32 x 32 x 32 yani 10 milyar KDE noktası takip edilmesi
+gerekecektir. Bu algoritmaya çok fazla yük yaratacaktır. Bu durumda KDE
+tekniğinden uzaklaşmak gerekiyor.</p>
+<p>Fakat temel olarak bize gereken nedir? Bize gereken birden fazla odak
+noktasi, tepe noktasi olabilen bir dagilim teknigi, ve cok boyutlu
+verileri rahat bir sekilde halledebilen bir matematiksel yapi.</p>
+<p>Gaussian Karışım Modeli [3] bu ihtiyaçları karşılayabilir. Bir
+Gaussian’ın veri boyutunu 1’den 3 seviyesine çıkartmak onun kapsadığı
+yer açısından patlama yaratmaz. Gaussian için gereken <span
+class="math inline">\(\mu\)</span>, <span
+class="math inline">\(\Sigma\)</span> parametreleri 1 x 3 ve 3 x 3
+boyutundadir, ve bu artış sadece üç katı seviyesinde bir artıştır. Çoklu
+tepe takip etmek istiyorsak her piksel için bir Gaussian yerine mesela
+üç Gaussian tasarlayabiliriz, ve onların karışımlarını yine 1 x 3
+boyutlu bir “ağırlık vektörü” ile takip edebiliriz. Demek ki her piksel
+için depolanması gereken rakamlar 1 x 3 + ( 3 x (3 x 3 + 1 x 3)), yani
+39. Bu idare edilebilir bir büyüklüktür.</p>
+<p>Tekrarlamak gerekirse her piksel seviyesinde bir GMM tasarlıyoruz, ve
+video’nun her karesindeki piksel RGB değerlerini o piksel GMM’ini
+güncellemek için kullanıyoruz. Arka plan çıktısı almak gerektiğinde bir
+GMM’in karışım seviyesi en yüksek olan Gaussian’inin tepe noktasını arka
+plan RGB değeri olarak kabul ediyoruz.</p>
+<p>Ayrıca GMM güncellemesini artımsal olarak ta yapabildiğimiz için [4]
+geriye dönük olarak sürekli toptan işlem yapılmasına da gerek yok, aynen
+KDE’lerde olduğu gibi son video karesini alıp onun değerlerini mevcut
+son GMM modeli üzerinde hızlı güncelleme yapmak için kullanabiliyoruz.
+EWMA benzeri eski veriye daha az önem verme burada da kullanılabilmekte,
+böylece en son değerlerin ima ettiği arka plan bulunabilmiş oluyor.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2, time, datetime</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -250,16 +349,29 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>cap.release()</span>
 <span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>cv2.destroyAllWindows()</span></code></pre></div>
 <p><img src="vision_20bg_02.jpg" /></p>
-<p>Anlik Islem</p>
+<p>Sonuçlar üstte görülüyor. Aynı fotoğraf karelerinde bu sefer renkli
+olarak arka plan çıktısı alabildik. GMM doğru bir arka plan hipotezini
+bulmayı başardı.</p>
+<p>Canlı Video’da Hareket Eden Bölge Tespiti</p>
+<p>Eğer bir video’da canlı olarak hareket eden cisimleri, kişileri takip
+etmek istesek arka plan tespiti bu ihtiyaç için faydalı, sonuçta hareket
+eden bölgeler o ana kadar bilinen arka plan resminden “farklı olan”
+pikseller diye tanımlanabilir. Alttaki kod tam da bunu yapıyor. O andaki
+video karesi ile arka plan arasında <code>absdiff</code> hesabı yapıyor,
+elde edilen piksel kordinatları üzerine bazı ek işlemler yaparak (ufak
+bölgeleri atmak, çok az farkları elemek) geri kalan bölgeler etrafında
+bir kırmızı dikdörtgen çiziyor. Sonuç altta görülebilir.</p>
 <p><img src="vision_20bg_03.jpg" /></p>
 <p><a href="gmm_online_rect.py">gmm_online_rect.py</a></p>
-<p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] <a
 href="https://www.dropbox.com/scl/fi/oczbpoicx243wd857doti/campus_vibe_video4.mp4?rlkey=0h026033fbwho59frsq3ewuu1&amp;st=7axsjn6x&amp;raw=1">Video
 1</a></p>
 <p>[2] Bayramli, <em>Istatistik, Parametresiz İstatistik (Nonparametric
 Statistics)</em></p>
+<p>[3] Bayramli, *Istatistik, Gaussian Karışım Modeli (GMM) ile
+Kümelemek</p>
+<p>[4] Bayramli, *Istatistik, Artımsal (Incremental) GMM</p>
 <p>
   <a href="..">Yukarı</a>
 </p>

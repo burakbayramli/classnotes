@@ -473,64 +473,113 @@ $\lambda=0.999$, ve onun tekabül ettiği etkili pencere (örneklem)
 büyüklüğünü $m$ için kullanırsak, o zaman EWMA usulü bir GMM
 güncellemesi elde etmiş oluyoruz.
 
-Veriyi tekrar üretelim,
-
-```python
-n_points = 1000
-data = generate_gmm_data(weights, means, covs, n_points)
-d = data.shape[1]
-```
-
 EWMA güncellemesi kodu,
 
 ```python
-lambda_forget = 0.999 
-effective_m = 600
-n_components = 2
-weights_tmp = np.ones(n_components) / n_components
-means_tmp = np.random.randn(n_components, d) * 5
-covs_tmp = np.array([np.eye(d) for _ in range(n_components)])
-cumulative_r = weights_tmp.copy()
+from scipy.stats import multivariate_normal
 
-for idx in range(len(data)):
-    x = data[idx]
-    r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
-        
+def generate_gmm_data(weights, means, covs, n_samples):
+    rng = np.random.RandomState()
+    n_components = len(weights)
+    d = len(means[0])
+    data = np.zeros((n_samples, d))
+    comps = rng.choice(n_components, size=n_samples, p=weights)
     for k in range(n_components):
-        cumulative_r[k] = lambda_forget * cumulative_r[k] + r[k]        
-        weights_tmp[k] = cumulative_r[k] / effective_m
-        
-        mu_old = means_tmp[k].copy()
-        coef = (1.0 / effective_m) * (r[k] / (weights_tmp[k] + 1e-12))
-        means_tmp[k] = mu_old + coef * (x - mu_old)
-        
-        diff_var = (x - mu_old).reshape(-1, 1)
-        covs_tmp[k] = lambda_forget * covs_tmp[k] + (1 - lambda_forget) * (diff_var @ diff_var.T)
+        idx = np.where(comps == k)[0]
+        if len(idx) > 0:
+            data[idx] = rng.multivariate_normal(mean=means[k], cov=covs[k], size=len(idx))
+    rng.shuffle(data)
+    return data
 
-ll = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
-print(f"Nihai log olurluk: {ll}")
-print("Hesaplanan karisim agirliklari:", weights_tmp)        
-print("Hesaplanan ortalama:", means_tmp)
-print("Hesaplanan kovaryans:", covs_tmp)
+def responsibilities(x, weights, means, covs, eps=1e-12):
+    p = np.zeros(len(weights))
+    for k in range(len(weights)):
+        # enforce SPD-ish covariance
+        cov = (covs[k] + covs[k].T) / 2.0
+        cov = cov + np.eye(cov.shape[0]) * 1e-6
+        rv = multivariate_normal(mean=means[k], cov=cov, allow_singular=True)
+        p[k] = weights[k] * rv.pdf(x)
+    denom = p.sum()
+    if denom < eps:
+        return np.ones_like(p) / len(p)
+    return p / denom
 
-print(f"Unutma Parametresi: {lambda_forget}")
-print(f"Etkili Orneklem Buyuklugu: {effective_m}")
-print(f"Gercek Orneklem Buyuklugu: {len(data)}")
+def log_likelihood(X, weights, means, covs, eps=1e-12):
+    ll = 0.0
+    for x in X:
+        px = 0.0
+        for k in range(len(weights)):
+            cov = (covs[k] + covs[k].T) / 2.0
+            cov = cov + np.eye(cov.shape[0]) * 1e-6
+            rv = multivariate_normal(mean=means[k], cov=cov, allow_singular=True)
+            px += weights[k] * rv.pdf(x)
+        ll += np.log(px + eps)
+    return ll
+
+if __name__ == "__main__":
+    n_points = 1000
+    data = generate_gmm_data(weights, means, covs, n_points)
+    d = data.shape[1]
+    lambda_forget = 0.1 
+    n_components = 2
+
+    weights_tmp = np.ones(n_components) / n_components
+    means_tmp = np.random.randn(n_components, d) * 5
+    covs_tmp = np.array([np.eye(d) for _ in range(n_components)])
+    min_covar = 1e-6
+    eps = 1e-12
+
+    for idx, x in enumerate(data):
+        r = responsibilities(x, weights_tmp, means_tmp, covs_tmp)
+
+        weights_tmp = weights_tmp + lambda_forget * (r - weights_tmp)
+        weights_tmp = np.maximum(weights_tmp, eps)
+        weights_tmp /= np.sum(weights_tmp)
+
+        for k in range(n_components):
+            pi_k = max(weights_tmp[k], eps)
+            mu_old = means_tmp[k].copy()
+            means_tmp[k] = mu_old + lambda_forget * (r[k] / pi_k) * (x - mu_old)
+            diff = (x - mu_old).reshape(-1, 1)
+            outer = diff @ diff.T
+            covs_tmp[k] = covs_tmp[k] + lambda_forget * (r[k] / pi_k) * (outer - covs_tmp[k])
+            covs_tmp[k] = (covs_tmp[k] + covs_tmp[k].T) / 2.0
+            diag = np.diag(covs_tmp[k])
+            diag = np.maximum(diag, min_covar)
+            covs_tmp[k] = covs_tmp[k] - np.diag(np.diag(covs_tmp[k])) + np.diag(diag)
+
+        if (idx + 1) % 200 == 0:
+            ll = log_likelihood(data[:200], weights_tmp, means_tmp, covs_tmp)
+            print(f"iter {idx+1}: partial log-likelihood = {ll:.3f}")
+
+    ll_final = log_likelihood(data, weights_tmp, means_tmp, covs_tmp)
+    print(f"Nihai log olurluk: {ll_final:.3f}")
+    print("Hesaplanan Karisim Agirliklari:", weights_tmp)
+    print("Hesaplanan Ortalama:\n", means_tmp)
+    print("Hesaplanan Kovaryans:\n", covs_tmp)
+    print("Unutma Faktoru:", lambda_forget)
+    print("Orneklem:", n_points)
 ```
 
 ```text
-Nihai log olurluk: -5000.103521633212
-Hesaplanan karisim agirliklari: [0.2839097  0.77054409]
-Hesaplanan ortalama: [[ 5.1110981  -1.61293691]
- [ 0.24702352  4.39721026]]
-Hesaplanan kovaryans: [[[ 14.76472365 -15.45280993]
-  [-15.45280993  23.80034537]]
+iter 200: partial log-likelihood = -976.455
+iter 400: partial log-likelihood = -937.786
+iter 600: partial log-likelihood = -955.248
+iter 800: partial log-likelihood = -999.386
+iter 1000: partial log-likelihood = -936.467
+Nihai log olurluk: -4604.283
+Hesaplanan Karisim Agirliklari: [0.70080574 0.29919426]
+Hesaplanan Ortalama:
+ [[-0.35565126  4.74680112]
+ [ 4.33770918 -1.21072193]]
+Hesaplanan Kovaryans:
+ [[[ 1.67484021  0.68862933]
+  [ 0.68862933  1.41498905]]
 
- [[  7.83400218  -6.47764292]
-  [ -6.47764292  11.87788992]]]
-Unutma Parametresi: 0.999
-Etkili Orneklem Buyuklugu: 600
-Gercek Orneklem Buyuklugu: 1000
+ [[ 9.57519709 -2.98166738]
+  [-2.98166738  4.51008999]]]
+Unutma Faktoru: 0.1
+Orneklem: 1000
 ```
 
 Kaynaklar

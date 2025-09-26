@@ -529,57 +529,109 @@ class="math inline">\(\lambda=0.999\)</span>, ve onun tekabül ettiği
 etkili pencere (örneklem) büyüklüğünü <span
 class="math inline">\(m\)</span> için kullanırsak, o zaman EWMA usulü
 bir GMM güncellemesi elde etmiş oluyoruz.</p>
-<p>Veriyi tekrar üretelim,</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_points <span class="op">=</span> <span class="dv">1000</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> generate_gmm_data(weights, means, covs, n_points)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> data.shape[<span class="dv">1</span>]</span></code></pre></div>
 <p>EWMA güncellemesi kodu,</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lambda_forget <span class="op">=</span> <span class="fl">0.999</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>effective_m <span class="op">=</span> <span class="dv">600</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>n_components <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>weights_tmp <span class="op">=</span> np.ones(n_components) <span class="op">/</span> n_components</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>means_tmp <span class="op">=</span> np.random.randn(n_components, d) <span class="op">*</span> <span class="dv">5</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>covs_tmp <span class="op">=</span> np.array([np.eye(d) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_components)])</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>cumulative_r <span class="op">=</span> weights_tmp.copy()</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(data)):</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> data[idx]</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> responsibilities(x, weights_tmp, means_tmp, covs_tmp)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        cumulative_r[k] <span class="op">=</span> lambda_forget <span class="op">*</span> cumulative_r[k] <span class="op">+</span> r[k]        </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        weights_tmp[k] <span class="op">=</span> cumulative_r[k] <span class="op">/</span> effective_m</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        mu_old <span class="op">=</span> means_tmp[k].copy()</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        coef <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> effective_m) <span class="op">*</span> (r[k] <span class="op">/</span> (weights_tmp[k] <span class="op">+</span> <span class="fl">1e-12</span>))</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> coef <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        diff_var <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        covs_tmp[k] <span class="op">=</span> lambda_forget <span class="op">*</span> covs_tmp[k] <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> lambda_forget) <span class="op">*</span> (diff_var <span class="op">@</span> diff_var.T)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>ll <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Nihai log olurluk: </span><span class="sc">{</span>ll<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan karisim agirliklari:&quot;</span>, weights_tmp)        </span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan ortalama:&quot;</span>, means_tmp)</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hesaplanan kovaryans:&quot;</span>, covs_tmp)</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Unutma Parametresi: </span><span class="sc">{</span>lambda_forget<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Etkili Orneklem Buyuklugu: </span><span class="sc">{</span>effective_m<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Gercek Orneklem Buyuklugu: </span><span class="sc">{</span><span class="bu">len</span>(data)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
-<pre class="text"><code>Nihai log olurluk: -5000.103521633212
-Hesaplanan karisim agirliklari: [0.2839097  0.77054409]
-Hesaplanan ortalama: [[ 5.1110981  -1.61293691]
- [ 0.24702352  4.39721026]]
-Hesaplanan kovaryans: [[[ 14.76472365 -15.45280993]
-  [-15.45280993  23.80034537]]
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> multivariate_normal</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_gmm_data(weights, means, covs, n_samples):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.RandomState()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    n_components <span class="op">=</span> <span class="bu">len</span>(weights)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> <span class="bu">len</span>(means[<span class="dv">0</span>])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> np.zeros((n_samples, d))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    comps <span class="op">=</span> rng.choice(n_components, size<span class="op">=</span>n_samples, p<span class="op">=</span>weights)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        idx <span class="op">=</span> np.where(comps <span class="op">==</span> k)[<span class="dv">0</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(idx) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            data[idx] <span class="op">=</span> rng.multivariate_normal(mean<span class="op">=</span>means[k], cov<span class="op">=</span>covs[k], size<span class="op">=</span><span class="bu">len</span>(idx))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    rng.shuffle(data)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> responsibilities(x, weights, means, covs, eps<span class="op">=</span><span class="fl">1e-12</span>):</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.zeros(<span class="bu">len</span>(weights))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(weights)):</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># enforce SPD-ish covariance</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        cov <span class="op">=</span> (covs[k] <span class="op">+</span> covs[k].T) <span class="op">/</span> <span class="fl">2.0</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        cov <span class="op">=</span> cov <span class="op">+</span> np.eye(cov.shape[<span class="dv">0</span>]) <span class="op">*</span> <span class="fl">1e-6</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        rv <span class="op">=</span> multivariate_normal(mean<span class="op">=</span>means[k], cov<span class="op">=</span>cov, allow_singular<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        p[k] <span class="op">=</span> weights[k] <span class="op">*</span> rv.pdf(x)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    denom <span class="op">=</span> p.<span class="bu">sum</span>()</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> denom <span class="op">&lt;</span> eps:</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.ones_like(p) <span class="op">/</span> <span class="bu">len</span>(p)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> p <span class="op">/</span> denom</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_likelihood(X, weights, means, covs, eps<span class="op">=</span><span class="fl">1e-12</span>):</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    ll <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> x <span class="kw">in</span> X:</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        px <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(weights)):</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>            cov <span class="op">=</span> (covs[k] <span class="op">+</span> covs[k].T) <span class="op">/</span> <span class="fl">2.0</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>            cov <span class="op">=</span> cov <span class="op">+</span> np.eye(cov.shape[<span class="dv">0</span>]) <span class="op">*</span> <span class="fl">1e-6</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>            rv <span class="op">=</span> multivariate_normal(mean<span class="op">=</span>means[k], cov<span class="op">=</span>cov, allow_singular<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>            px <span class="op">+=</span> weights[k] <span class="op">*</span> rv.pdf(x)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        ll <span class="op">+=</span> np.log(px <span class="op">+</span> eps)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    n_points <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> generate_gmm_data(weights, means, covs, n_points)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> data.shape[<span class="dv">1</span>]</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    lambda_forget <span class="op">=</span> <span class="fl">0.1</span> </span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    n_components <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    weights_tmp <span class="op">=</span> np.ones(n_components) <span class="op">/</span> n_components</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    means_tmp <span class="op">=</span> np.random.randn(n_components, d) <span class="op">*</span> <span class="dv">5</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    covs_tmp <span class="op">=</span> np.array([np.eye(d) <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_components)])</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    min_covar <span class="op">=</span> <span class="fl">1e-6</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> <span class="fl">1e-12</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> idx, x <span class="kw">in</span> <span class="bu">enumerate</span>(data):</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> responsibilities(x, weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>        weights_tmp <span class="op">=</span> weights_tmp <span class="op">+</span> lambda_forget <span class="op">*</span> (r <span class="op">-</span> weights_tmp)</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>        weights_tmp <span class="op">=</span> np.maximum(weights_tmp, eps)</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>        weights_tmp <span class="op">/=</span> np.<span class="bu">sum</span>(weights_tmp)</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>            pi_k <span class="op">=</span> <span class="bu">max</span>(weights_tmp[k], eps)</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>            mu_old <span class="op">=</span> means_tmp[k].copy()</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>            means_tmp[k] <span class="op">=</span> mu_old <span class="op">+</span> lambda_forget <span class="op">*</span> (r[k] <span class="op">/</span> pi_k) <span class="op">*</span> (x <span class="op">-</span> mu_old)</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>            diff <span class="op">=</span> (x <span class="op">-</span> mu_old).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>            outer <span class="op">=</span> diff <span class="op">@</span> diff.T</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>            covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">+</span> lambda_forget <span class="op">*</span> (r[k] <span class="op">/</span> pi_k) <span class="op">*</span> (outer <span class="op">-</span> covs_tmp[k])</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>            covs_tmp[k] <span class="op">=</span> (covs_tmp[k] <span class="op">+</span> covs_tmp[k].T) <span class="op">/</span> <span class="fl">2.0</span></span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>            diag <span class="op">=</span> np.diag(covs_tmp[k])</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>            diag <span class="op">=</span> np.maximum(diag, min_covar)</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>            covs_tmp[k] <span class="op">=</span> covs_tmp[k] <span class="op">-</span> np.diag(np.diag(covs_tmp[k])) <span class="op">+</span> np.diag(diag)</span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (idx <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> <span class="dv">200</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>            ll <span class="op">=</span> log_likelihood(data[:<span class="dv">200</span>], weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;iter </span><span class="sc">{</span>idx<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">: partial log-likelihood = </span><span class="sc">{</span>ll<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>    ll_final <span class="op">=</span> log_likelihood(data, weights_tmp, means_tmp, covs_tmp)</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Nihai log olurluk: </span><span class="sc">{</span>ll_final<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Hesaplanan Karisim Agirliklari:&quot;</span>, weights_tmp)</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Hesaplanan Ortalama:</span><span class="ch">\n</span><span class="st">&quot;</span>, means_tmp)</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Hesaplanan Kovaryans:</span><span class="ch">\n</span><span class="st">&quot;</span>, covs_tmp)</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Unutma Faktoru:&quot;</span>, lambda_forget)</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Orneklem:&quot;</span>, n_points)</span></code></pre></div>
+<pre class="text"><code>iter 200: partial log-likelihood = -976.455
+iter 400: partial log-likelihood = -937.786
+iter 600: partial log-likelihood = -955.248
+iter 800: partial log-likelihood = -999.386
+iter 1000: partial log-likelihood = -936.467
+Nihai log olurluk: -4604.283
+Hesaplanan Karisim Agirliklari: [0.70080574 0.29919426]
+Hesaplanan Ortalama:
+ [[-0.35565126  4.74680112]
+ [ 4.33770918 -1.21072193]]
+Hesaplanan Kovaryans:
+ [[[ 1.67484021  0.68862933]
+  [ 0.68862933  1.41498905]]
 
- [[  7.83400218  -6.47764292]
-  [ -6.47764292  11.87788992]]]
-Unutma Parametresi: 0.999
-Etkili Orneklem Buyuklugu: 600
-Gercek Orneklem Buyuklugu: 1000</code></pre>
+ [[ 9.57519709 -2.98166738]
+  [-2.98166738  4.51008999]]]
+Unutma Faktoru: 0.1
+Orneklem: 1000</code></pre>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, <em>Istatistik, Gaussian Karışım Modeli (GMM) ile
 Kümelemek</em></p>
