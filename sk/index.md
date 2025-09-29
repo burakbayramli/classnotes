@@ -3,6 +3,8 @@
 
 ## En Son
 
+29/9 - [Artımsal (Incremental) GMM](https://burakbayramli.github.io/dersblog/stat/stat_112_gmminc/artimsal__incremental__gmm.html)
+
 23/9 - [Parametresiz İstatistik (Nonparametric Statistics)](https://burakbayramli.github.io/dersblog/stat/stat_053_nonpar/parametresiz_istatistik__nonparametric_statistics_.html)
 
 17/9 - [Yürüyen Ortalama, EWMA - Ekler, Etkili Örneklem Büyüklüğü](https://burakbayramli.github.io/dersblog/tser/tser_020_ar/arima_arch_garch_periyotlar_yuruyen_ortalama.html)
@@ -10,8 +12,6 @@
 8/9 - [Renk, Bölgeler - Ekler, Dijital Kovaryans, Uzaklık Hesabı](https://burakbayramli.github.io/dersblog/vision/vision_50colreg/renk_bolgeler_ve_doku__texture_.html)
 
 27/8 - [Samsung Android Tablet Üzerinde Linux Ubuntu](https://burakbayramli.github.io/dersblog/sk/2025/08/android_linux_samsung.html)
-
-16/8 - [Javascript ile Animasyon Three.js](https://burakbayramli.github.io/dersblog/sk/2025/07/threejs1.html)
 
 ## Konular, Referans
 

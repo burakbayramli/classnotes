@@ -18,11 +18,11 @@ oluyordu, ki $x \in R^{D}$.
 Dikkat edersek [1] yazısı veriyi toptan (batch) işleyen bir yaklaşım
 gösterdi, bu yaklaşım, ki Beklenti-Maksimizasyon
 (Expectation-Maximization / EM) adıyla bilinir, döngüsünün her
-adımında verinin tamamını işliyordu. Bu yazıda veriyi azar azar,
-artımsal şekilde işleyerek yaklaşık EM yapmanın tekniğini
-göreceğiz. Eğer her veri noktası aynı şekilde dağılmış, bağımsız
-şekilde geliyorsa uzun vadede bu artımsal öğrenim tekniği normal
-toptan EM'in bulduğu sonuca yaklaşacaktır.
+adımında verinin tamamını işler. Bu yazıda veriyi azar azar, artımsal
+şekilde işleyerek yaklaşık EM yapmanın tekniğini göreceğiz. Eğer her
+veri noktası aynı şekilde dağılmış, bağımsız şekilde geliyorsa uzun
+vadede bu artımsal öğrenim tekniği normal toptan EM'in bulduğu sonuca
+yaklaşacaktır.
 
 Notasyon şöyle, veriler $x_i$ olarak geliyor, $i$ bir indistir, ve $i
 = 1,..,m,m+1$ olarak gider. Bizi ilgilendiren önemli an $m$ anından
@@ -262,9 +262,9 @@ $$
 
 Böylece kovaryans güncellemesini elde etmiş olduk.
 
-Ornek
+Örnek
 
-Alttaki kodda önce 2 boyutlu veri baz alındı, iki Gaussian tepesini
+Alttaki kodda 2 boyutlu veri baz alındı, iki Gaussian tepesini
 karışımından rasgele örneklem alıyoruz.
 
 ```python
@@ -322,7 +322,8 @@ plt.savefig('stat_112_gmminc_01.png')
 
 ![](stat_112_gmminc_01.png)
 
-Grafikte iki tepenin aşağı yukarı nerede olduğu görülüyor.
+Grafikte iki tepenin aşağı yukarı nerede olduğu görülüyor. Şimdi
+artımsal olarak üstteki veriyi temsil eden GMM'i bulmaya uğraşalım.
 
 
 ```python
@@ -469,9 +470,8 @@ $$
 genelleşmiş halidir denebilir, eğer $\lambda = \frac{1}{m+1}$ dersek,
 ve sürekli artan $m$ bağlamında önceki formüllerin aynısını elde
 ederiz. Fakat farklı bir unutma faktörü $\lambda$ verirsek, mesela
-$\lambda=0.999$, ve onun tekabül ettiği etkili pencere (örneklem)
-büyüklüğünü $m$ için kullanırsak, o zaman EWMA usulü bir GMM
-güncellemesi elde etmiş oluyoruz.
+$\lambda=0.999$, o zaman EWMA usulü bir GMM güncellemesi elde etmiş
+oluyoruz.
 
 EWMA güncellemesi kodu,
 
