@@ -129,7 +129,7 @@ print ('3 icin', f(3))
 print ('1 icin', f(1))
 ```
 
-```
+```text
 3 icin 0.004431848411938008
 1 icin 0.24197072451914337
 ```
@@ -166,7 +166,7 @@ import scipy.stats
 print (scipy.stats.norm.cdf(1.5,0,1))
 ```
 
-```
+```text
 0.9331927987311419
 ```
 
@@ -416,8 +416,8 @@ hst = plt.hist(data,bins=6,density=True)
 print (hst[0])
 ```
 
-```
-[ 1.79234778  2.81654651  4.60889429  2.17642231  1.15222357  0.25604968]
+```text
+[0.25361812 1.9021359  3.93108086 3.29703556 2.15575402 1.14128154]
 ```
 
 Görüldüğü gibi 1'den büyük değerler var, ve "yoğunluk'' ortadaki iki
@@ -428,8 +428,8 @@ ağırlığı nedir desek,
 print (scipy.stats.norm.pdf(10,mu,sigma))
 ```
 
-```
-3.98942280401
+```text
+3.989422804014327
 ```
 
 Şimdi olasılık değerleri, $P(a < X < b)$ ifadesi, alan hesabı ve rasgele
@@ -727,9 +727,9 @@ print (norm.cdf(-0.8944))
 print (1-norm.cdf(-0.8944))
 ```
 
-```
-0.18555395624
-0.81444604376
+```text
+0.18555395623998766
+0.8144460437600123
 ```
 
 Soru
@@ -1192,8 +1192,8 @@ m = np.array([1.,1.])
 print (gauss(m, v, x))
 ```
 
-```
-[ 0.07957743]
+```text
+[0.07957743]
 ```
 
 Maksimum olurluk ile elde edilen eldeki $n$ veri noktası için $\mu,\Sigma$'nin
@@ -1226,8 +1226,8 @@ from scipy.stats.distributions import norm
 print (norm.cdf(-1.64))
 ```
 
-```
-0.0505025834741
+```text
+0.05050258347410371
 ```
 
 Bu yüzden, $P(z_1 < Z < z_2)$ gibi bir ifadede mesela, $Z$'nin iki

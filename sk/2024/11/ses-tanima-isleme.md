@@ -1,4 +1,4 @@
-# Ses Tanıma, İşleme
+# Ses Tanıma, İşleme - 1
 
 Veri Okuma, Yazma
 
