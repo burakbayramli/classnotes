@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+      });
+    });
+    </script>  
+   
+  <title>Tahmin Edici Hesaplar (Estimators)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1 id="tahmin-edici-hesaplar-estimators">Tahmin Edici Hesaplar
+(Estimators)</h1>
+<p>Maksimum Olurluk (maximum likelihood) kavramını kullanarak ilginç
+bazı sonuçlara erişmek mümkün; bu sayede dağılım fonksiyonları ve veri
+arasında bazı sonuçlar elde edebiliriz. Maksimum olurluk nedir? MO ile
+verinin her noktası teker teker olasılık fonksiyonuna geçilir, ve elde
+edilen olasılık sonuçları birbiri ile çarpılır. Çoğunlukla formül içinde
+bilinmeyen bir(kaç) parametre vardır, ve bu çarpım sonrası, içinde bu
+parametre(ler) olan yeni bir formül ortaya çıkar. Bu nihai formülün
+kısmi türevi alınıp sıfıra eşitlenince cebirsel bazı teknikler ile
+bilinmeyen parametre bulunabilir. Bu sonuç eldeki veri bağlamında en
+mümkün (olur) parametre değeridir. Öyle ya, mesela Gaussian <span
+class="math inline">\(N(10,2)\)</span> dağılımı var ise, 60,90 gibi
+değerlerin “olurluğu’’ düşüktür. Gaussin üzerinde örnek,</p>
+<p><span class="math display">\[
+f(x;\mu,\sigma) = \frac{1}{\sigma\sqrt{2\pi}}
+\exp \bigg\{ - \frac{1}{2\sigma^2}(x-\mu)^2  \bigg\}
+, \ x \in \mathbb{R}
+\]</span></p>
+<p>Çarpım sonrası</p>
+<p><span class="math display">\[ f(x_1,..,x_n;\mu,\sigma) =
+\prod \frac{1}{\sigma\sqrt{2\pi}}
+\exp \bigg\{ - \frac{1}{2\sigma^2}(x_i-\mu)^2  \bigg\}
+\]</span></p>
+<p><span class="math display">\[ =
+\frac{(2\pi)^{-n/2}}{\sigma^n}
+\exp \bigg\{ - \frac{\sum (x_i-\mu)^2}{2\sigma^2}  \bigg\}
+\]</span></p>
+<p>Üstel kısım <span class="math inline">\(-n/2\)</span> nereden geldi?
+Çünkü bölen olan karekökü üste çıkardık, böylece <span
+class="math inline">\(-1/2\)</span> oldu, <span
+class="math inline">\(n\)</span> çünkü <span
+class="math inline">\(n\)</span> tane veri noktası yüzünden formül <span
+class="math inline">\(n\)</span> kere çarpılıyor. Veri noktaları <span
+class="math inline">\(x_i\)</span> içinde. Eğer log, yani <span
+class="math inline">\(\ln\)</span> alırsak <span
+class="math inline">\(\exp\)</span>’den kurtuluruz, ve biliyoruz ki log
+olurluğu maksimize etmek normal olurluğu maksimize etmek ile aynı
+şeydir, çünkü <span class="math inline">\(\ln\)</span> transformasyonu
+monoton bir transformasyondur. Ayrıca olurluk içbukeydir (concave) yani
+kesin tek bir maksimumu vardır.</p>
+<p><span class="math display">\[ \ln f = -\frac{1}{2} n \ln (2\pi)
+- n \ln \sigma -
+\frac{\sum (x_i-\mu)^2}{2\sigma^2}  
+\]</span></p>
+<p>Türevi alıp sıfıra eşitleyelim</p>
+<p><span class="math display">\[ \frac{\partial (\ln f)}{\partial \mu} =
+\frac{\sum (x_i-\mu)^2}{2\sigma^2}   = 0
+\]</span></p>
+<p><span class="math display">\[ \hat{\mu} = \frac{\sum x_i }{n}
+\]</span></p>
+<p>Bu sonuç (1)‘deki formül, yani örneklem ortalaması ile aynı! Fakat
+buradan hemen bir bağlantıya zıplamadan önce şunu hatırlayalım -
+örneklem ortalaması formülünü <em>biz</em> tanımladık. “Tanım’’ diyerek
+bir ifade yazdık, ve budur dedik. Şimdi sonradan, verinin dağılımının
+Gaussian olduğunu farzederek, bu verinin mümkün kılabileceği en optimal
+parametre değeri nedir diye hesap ederek aynı formüle eriştik, fakat bu
+bir anlamda bir güzel raslantı oldu.. Daha doğrusu bu aynılık Gaussian /
+Normal dağılımlarının”normalliği’’ ile alakalı muhakkak, fakat örnekleme
+ortalaması hiçbir dağılım faraziyesi yapmıyor, herhangi bir dağılımdan
+geldiği bilinen ya da bilinmeyen bir veri üzerinde kullanılabiliyor.
+Bunu unutmayalım. İstatistikte matematiğin lakaytlaşması (sloppy)
+kolaydır, o sebeple neyin tanım, neyin hangi faraziyeye göre optimal,
+neyin nüfus (population) neyin örneklem (sample) olduğunu hep
+hatırlamamız lazım.</p>
+<p>Devam edelim, maksimum olurluk ile <span
+class="math inline">\(\hat{\sigma}\)</span> hesaplayalım,</p>
+<p><span class="math display">\[ \frac{\partial (\ln f)}{\partial
+\sigma} =
+-\frac{n}{\sigma} + \frac{\sum (x_i-\mu)^2}{2\sigma^3}   = 0
+\]</span></p>
+<p>Cebirsel birkac duzenleme sonrasi ve <span
+class="math inline">\(\mu\)</span> yerine yeni hesapladigimiz <span
+class="math inline">\(\hat{\mu}\)</span> kullanarak,</p>
+<p><span class="math display">\[ \hat{\sigma}^2 = \frac{\sum
+(x_i-\hat{\mu})^2}{n} \]</span></p>
+<p>Bu da örneklem varyansı ile aynı!</p>
+<p>Yansızlık (Unbiasedness)</p>
+<p>Tahmin edicilerin kendileri de birer rasgele değişken olduğu için her
+örneklem için değişik değerler verirler. Diyelim ki <span
+class="math inline">\(\theta\)</span> için bir tahmin edici <span
+class="math inline">\(\hat{\theta}\)</span> hesaplıyoruz, bu <span
+class="math inline">\(\hat{\theta}\)</span> gerçek <span
+class="math inline">\(\theta\)</span> için bazı örneklemler için çok
+küçük, bazı örneklemler için çok büyük sonuçlar (tahminler)
+verebilecektir. Kabaca ideal durumun, az çıkan tahminlerin çok çıkan
+tahminleri bir şekilde dengelemesi olduğunu tahmin edebiliriz, yani
+tahmin edicinin üreteceği pek çok değerin <span
+class="math inline">\(\theta\)</span>’yı bir şekilde “ortalaması’’ iyi
+olacaktır.</p>
+<p><img src="unbias.png" /></p>
+<p>Bu durumu şöyle açıklayalım, madem tahmin ediciler birer rasgele
+değişken, o zaman bir dağılım fonksiyonları var. Ve üstteki resimde
+örnek olarak <span
+class="math inline">\(\hat{\theta_1},\hat{\theta_2}\)</span> olarak iki
+tahmin edici gösteriliyor mesela ve onlara tekabül eden yoğunluklar
+<span class="math inline">\(f_{\hat{\theta_1}},
+f_{\hat{\theta_1}}\)</span>. İdeal durum soldaki resimdir, yoğunluğun
+fazla olduğu yer gerçek <span class="math inline">\(\theta\)</span>’ya
+yakın olması. Bu durumu matematiksel olarak nasıl belirtiriz? Beklenti
+ile!</p>
+<p>Tanım</p>
+<p><span class="math inline">\(Y_1,..,Y_n\)</span> üzerindeki <span
+class="math inline">\(\theta\)</span> tahmin edicisi <span
+class="math inline">\(\hat{\theta}\)</span>’den alınmış rasgele
+örneklem. Eğer tüm <span class="math inline">\(\theta\)</span>’lar için
+<span class="math inline">\(E(\hat{\theta}) = \theta\)</span> işe, bu
+durumda tahmin edicinin yansız olduğu söylenir.</p>
+<p>Örnek olarak maksimum olurluk ile önceden hesapladığımız <span
+class="math inline">\(\hat{\sigma}\)</span> tahmin edicisine bakalım. Bu
+ifade</p>
+<p><span class="math display">\[ \hat{\sigma}^2 = \frac{1}{n}\sum
+(Y_i-\hat{\mu})^2 \]</span></p>
+<p>ya da</p>
+<p><span class="math display">\[ \hat{\sigma}^2 = \frac{1}{n}\sum_i
+(Y_i-\bar{Y})^2 \]</span></p>
+<p>ile belirtildi. Tahmin edici <span
+class="math inline">\(\hat{\sigma}^2\)</span>, <span
+class="math inline">\(\sigma^2\)</span> için yansız midir? Tanımımıza
+göre eğer tahmin edici yansız ise <span
+class="math inline">\(E(\hat{\sigma}^2) = \sigma^2\)</span>
+olmalıdır.</p>
+<p>Not: Faydalı olacak bazı eşitlikler, daha önceden gördüğümüz</p>
+<p><span class="math display">\[ Var(X) = E(X^2) - (E(X)^2)\]</span></p>
+<p>ve sayısal ortalama <span class="math inline">\(\bar{Y}\)</span>’nin
+beklentisi <span class="math inline">\(E({\bar{Y}}) = E(Y_i)\)</span>,
+ve <span class="math inline">\(Var(\bar{Y}) = 1/n Var(Y_i)\)</span>.</p>
+<p>Başlayalım,</p>
+<p><span class="math display">\[ E(\hat{\sigma}^2) =
+E\bigg(\frac{1}{n}\sum_i (Y_i-\bar{Y})^2 \bigg)\]</span></p>
+<p>Parantez içindeki <span class="math inline">\(1/n\)</span>
+sonrasındaki ifadeyi açarsak,</p>
+<p><span class="math display">\[ \sum_i (Y_i-\bar{Y})^2  =  \sum_i
+(Y_i^2-2Y_i\bar{Y}+ \bar{Y}^2)\]</span></p>
+<p><span class="math display">\[ = \sum_iY_i^2 -2\sum_i Y_i\bar{Y} +
+n\bar{Y}^2  \]</span></p>
+<p><span class="math inline">\(\sum_i Y_i\)</span>’nin hemen yanında
+<span class="math inline">\(\bar{Y}\)</span> görüyoruz. Fakat <span
+class="math inline">\(\bar{Y}\)</span>’nin kendisi zaten <span
+class="math inline">\(1/n \sum_i Y_i\)</span> demek değil midir? Ya da,
+toplam içinde her <span class="math inline">\(i\)</span> için
+değişmeyecek <span class="math inline">\(\bar{Y}\)</span>’yi toplam
+dışına çekersek, <span class="math inline">\(\bar{Y}\sum_iY_i\)</span>
+olur, bu da <span class="math inline">\(\bar{Y} \cdot n \bar{Y}\)</span>
+demektir ya da <span class="math inline">\(n\bar{Y}^2\)</span>,</p>
+<p><span class="math display">\[ = \sum_iY_i^2 -2 n\bar{Y}^2 +
+n\bar{Y}^2  \]</span></p>
+<p><span class="math display">\[ = \sum_iY_i^2
+-n\bar{Y}^2  \]</span></p>
+<p>Dikkat, artık <span class="math inline">\(-n\bar{Y}^2\)</span>
+toplama işleminin <em>dışında</em>. Şimdi beklentiye geri dönelim,</p>
+<p><span class="math display">\[ = E \bigg( \frac{1}{n} \bigg(
+\sum_iY_i^2 -n\bar{Y}^2 \bigg) \bigg) \]</span></p>
+<p><span class="math inline">\(1/n\)</span> dışarı çekilir, beklenti
+toplamdan içeri nüfuz eder,</p>
+<p><span class="math display">\[ = \frac{1}{n} \bigg(  \sum_i  E(Y_i^2)
+-n E(\bar{Y}^2) \bigg) \]</span></p>
+<p>Daha önce demiştik ki (genel bağlamda)</p>
+<p><span class="math display">\[ Var(X) = E(X^2) - (E(X)^2)\]</span></p>
+<p>Bu örnek için harfleri değiştirirsek,</p>
+<p><span class="math display">\[ Var(Y_i) = E(Y_i^2) -
+E(Y_i)^2\]</span></p>
+<p>Yani</p>
+<p><span class="math display">\[ E(Y_i^2) = Var(Y_i) + E(Y_i)^2
+\]</span></p>
+<p><span class="math inline">\(E(Y_i) = \mu\)</span> oldugunu
+biliyoruz,</p>
+<p><span class="math display">\[ E(Y_i^2) = Var(Y_i) + \mu^2
+\]</span></p>
+<p>Aynısını <span class="math inline">\(E(\bar{Y}^2)\)</span> için
+kullanırsak,</p>
+<p><span class="math display">\[  E(\bar{Y}^2) = Var(\bar{Y}) +
+E(\bar{Y})^2 \]</span></p>
+<p><span class="math inline">\(E(\bar{Y}) = \mu\)</span>,</p>
+<p><span class="math display">\[  E(\bar{Y}^2) = Var(\bar{Y}) + \mu^2
+\]</span></p>
+<p><span class="math display">\[
+= \frac{1}{n} \bigg(  \sum_i Var(Y_i) + \mu^2   
+-n (Var(\bar{Y}) + \mu^2 ) \bigg)
+\]</span></p>
+<p><span class="math inline">\(Var(Y_i) = \sigma\)</span>, ve başta
+verdiğimiz eşitlikler ile beraber</p>
+<p><span class="math display">\[
+= \frac{1}{n} \bigg(  \sum_i (\sigma^2 + \mu^2)
+-n (\frac{\sigma^2}{n} + \mu^2 ) \bigg)
+\]</span></p>
+<p>Tekrar hatırlatalım, <span class="math inline">\(\sum_i\)</span>
+sadece ilk iki terim için geçerli, o zaman, ve sabit değerleri <span
+class="math inline">\(n\)</span> kadar topladığımıza göre bu aslında bir
+çarpım işlemi olur,</p>
+<p><span class="math display">\[
+= \frac{1}{n} \bigg(  n\sigma^2 + n\mu^2   
+-n (\frac{\sigma^2}{n} + \mu^2 ) \bigg)
+\]</span></p>
+<p><span class="math display">\[
+=  \sigma^2 + \mu^2 -\frac{\sigma^2}{n} - \mu^2
+\]</span></p>
+<p><span class="math display">\[
+=  \sigma^2 -\frac{\sigma^2}{n}
+\]</span></p>
+<p><span class="math display">\[
+=  \frac{n\sigma^2}{n} -\frac{\sigma^2}{n}
+\]</span></p>
+<p><span class="math display">\[
+=  \frac{n\sigma^2 - \sigma^2}{n}
+\]</span></p>
+<p><span class="math display">\[
+=  \frac{\sigma^2(n-1)}{n}
+\]</span></p>
+<p><span class="math display">\[ = \sigma^2 \frac{n-1}{n} \]</span></p>
+<p>Görüldüğü gibi eriştiğimiz sonuç <span
+class="math inline">\(\sigma^2\)</span> değil, demek ki bu tahmin edici
+yansız değil. Kontrol tamamlandı.</p>
+<p>Fakat eriştiğimiz son denklem bize başka bir şey gösteriyor, eğer
+üstteki sonucu <span class="math inline">\(\frac{n}{n-1}\)</span> ile
+çarpsaydık, <span class="math inline">\(\sigma^2\)</span> elde etmez
+miydik? O zaman yanlı tahmin ediciyi yansız hale çevirmek için, onu
+<span class="math inline">\(\frac{n}{n-1}\)</span> ile çarparız ve</p>
+<p><span class="math display">\[ \frac{n}{n-1} \frac{1}{n}\sum_i
+(Y_i-\bar{Y})^2 \]</span></p>
+<p><span class="math display">\[ =  \frac{1}{n-1}\sum_i (Y_i-\bar{Y})^2
+\]</span></p>
+<p>Üstteki ifade <span class="math inline">\(\sigma^2\)</span>’nin
+yansız tahmin edicisidir.</p>
+<p>Hesap için kullandığınız kütüphanelerin yanlı mı yansız mı hesap
+yaptığını bilmek iyi olur, mesela Numpy versiyon 1.7.1 itibariyle yanlı
+standart sapma hesabı yapıyor, fakat Pandas yansız olanı kullanıyor
+(Pandas versiyonu daha iyi)</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.array([<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>])</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;numpy&#39;</span>, np.std(arr))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;pandas&#39;</span>, pd.DataFrame(arr).std().iloc[<span class="dv">0</span>])</span></code></pre></div>
+<pre><code>numpy 0.816496580928
+pandas 1.0</code></pre>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
