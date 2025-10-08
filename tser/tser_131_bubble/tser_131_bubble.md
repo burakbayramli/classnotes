@@ -380,19 +380,20 @@ sayede eşsizlik noktasını yakalamamız kolaylaşıyor çünkü uydurma
 rutinimiz artık verideki bu salınımları da veride bulmaya uğraşıyor
 böylece aradığı tüm parametrelerin kalitesi artmış oluyor.
 
-Sornette bazı kaynaklarda bir değişik türetim şekli daha uyguluyor [1,5];
-buna göre $p(t)$ olarak belirttiğimiz $h(t)$, tehlike oranı (hazard rate)
-olarak modellenir, ve fiyat serisi $p(t)$ olarak rasgele calculus'tan
-gelinerek modelleniyor, ve $h(t)$, $p(t)$'ye sokuluyor, ve ortaya log
-salınımlı model çıkıyor. Bu türetişin bazı ilginç bağlantıları var, mesela
-tehlike oranının kimi aşırı, kimi az ama hepsi birbiriyle etkileşimde olan
-borsacıların birbirini taklit etmesi yüzünden $h(t)$'nin arttığı
-modellenmekte, ki bu artış ta bir üstel kanunu takip ediyor. Fizik ve
-sosyal modelde birbiri ile aşırı etkileşim sürekli ortaya üstel kanun
-çıkartıyor, bunu biliyoruz. Patlama anı ve öncesinde aslında ortada olan
-bir kaos değil, kaos {\em yokluğu}. Bütüne bakıldığında biri rasgele bazen
-satan, biri rasgele bazen alan borsacıların patlama anı öncesi birdenbire
-düzenli bir şekilde hepsi {\em satıyor}. 
+Sornette bazı kaynaklarda bir değişik türetim şekli daha uyguluyor
+[1,5]; buna göre $p(t)$ olarak belirttiğimiz $h(t)$, tehlike oranı
+(hazard rate) olarak modellenir, ve fiyat serisi $p(t)$ olarak rasgele
+calculus'tan gelinerek modelleniyor, ve $h(t)$, $p(t)$'ye sokuluyor,
+ve ortaya log salınımlı model çıkıyor. Bu türetişin bazı ilginç
+bağlantıları var, mesela tehlike oranının kimi aşırı, kimi az ama
+hepsi birbiriyle etkileşimde olan borsacıların birbirini taklit etmesi
+yüzünden $h(t)$'nin arttığı modellenmekte, ki bu artış ta bir üstel
+kanunu takip ediyor. Fizik ve sosyal modelde birbiri ile aşırı
+etkileşim sürekli ortaya üstel kanun çıkartıyor, bunu
+biliyoruz. Patlama anı ve öncesinde aslında ortada olan bir kaos
+değil, kaos *yokluğu*. Bütüne bakıldığında biri rasgele bazen satan,
+biri rasgele bazen alan borsacıların patlama anı öncesi birdenbire
+düzenli bir şekilde hepsi *satıyor*.
 
 Kaynaklar
 
