@@ -30,9 +30,22 @@ uyduracağız. Normal şartlarda yapılacak budur, bir varlığın, endeksin
 gidişatının balon olup olmadığı, eğer balon ise ne zaman patlayabileceği
 merak konusudur. Örnek olarak 1929 ve 1987 krizlerini seçtik. 
 
-Ekim 1929 krizi Amerika'da ``Büyük Depresyon'' adı verilen dönemin
-başlangıcıydı, ve kriz öncesi Dow Jones (DJIA) endeksinde müthiş bir artış
-ardından düşüş gerçekleşti.
+Ekim 1929 krizi Amerika'da "Büyük Depresyon" adı verilen dönemin
+başlangıcıydı, ve kriz öncesi Dow Jones (DJIA) endeksinde müthiş bir
+artış ardından düşüş gerçekleşti.
+
+Bazi teknik detaylar: Kullanilan **Log-Periodic Power Law (LPPL)**
+modelinin bir uygulamasıdır ve bu modelin en zorlayıcı kısmı, yedi
+parametreden dördünün doğrusal, üçünün ise karmaşık bir şekilde
+doğrusal olmayan parametreler olması.
+
+SciPy ile LPPL optimizasyonunda kullanılan, **iki aşamalı (two-step)**
+en küçük kareler yöntemini uygulayacağız. Bu yöntem, doğrusal olmayan
+parametreleri ($t_c$, $\beta/m$, $\omega$) ararken, doğrusal
+parametreleri ($A, B, C_1, C_2$) her iterasyonda hızlıca bulmak için
+lineer cebir kullanır. Hesap üstteki formüldeki salınım terimini iki
+ayrı lineer bileşene ayırır ($C \cos(\cdot) + D \sin(\cdot)$ formuna
+dönüştürmek).
 
 ```python
 import statsmodels.tsa.stattools as st
@@ -277,16 +290,17 @@ Türetmek
 
 Sornette'in modelinin başlangıcı bir zaman serisindeki artışının üstel
 (exponential) hızı geçtiği zaman sonlu-anda (finite-time) bir eşsizlik
-(singularity) çıktığı iddiası [1,4]. Eşsizlik konusunu {\em Diferansiyel
-  Denklemler} notlarında işledik; eşsiz nokta bir fonksiyonun analitikliği
-kaybettiği yerdir. Peki modelde eşsizliğin ortaya çıkması gerçek hayatta
-illa bunun olacağı anlamına geliyor mu? İlginç bir şekilde eğer
-matematiksel model sağlam ise eşsizliğin tahmin edildiği yerde hakikaten bu
-durum ortaya çıkıyor, mesela izafiyet kuramının matematiği eşsiz noktaların
-varlığını tahmin eder, ve hakikaten de tahmin edildiği şekilde uzayda bu
-noktalarda kara deliklerin olduğu ispatlanmıştır. Aynı şekilde bir
-materyelin kırılması / parçalanması matematiksel modelin eşsizlik
-noktasında olur, ve deneylerde bu anda materyel kırılması gözlenmiştir.
+(singularity) çıktığı iddiası [1,4]. Eşsizlik konusunu [8] notlarında
+işledik; eşsiz nokta bir fonksiyonun analitikliği kaybettiği
+yerdir. Peki modelde eşsizliğin ortaya çıkması gerçek hayatta illa
+bunun olacağı anlamına geliyor mu? İlginç bir şekilde eğer
+matematiksel model sağlam ise eşsizliğin tahmin edildiği yerde
+hakikaten bu durum ortaya çıkıyor, mesela izafiyet kuramının
+matematiği eşsiz noktaların varlığını tahmin eder, ve hakikaten de
+tahmin edildiği şekilde uzayda bu noktalarda kara deliklerin olduğu
+ispatlanmıştır. Aynı şekilde bir materyelin kırılması / parçalanması
+matematiksel modelin eşsizlik noktasında olur, ve deneylerde bu anda
+materyel kırılması gözlenmiştir.
 
 Sornette'e göre nüfus artışı, bir ekonominin ürettiği değeri temsil
 eden gayrısafi yurtiçi hasıla (gross domestic product -GDP-) artışı
@@ -359,17 +373,17 @@ Log Salınım (Log Oscillation)
 
 [4,5]'te bu modelin geliştirilerek (1) formülüne nasıl erişildiğinin
 detayları bulunabilir. Hikayenin özü şöyle; materyel kırılması ve buna
-benzer diğer doğal olaylarda eşsizlik anı öncesi log salınımlar olduğu da
-görülmüştür. Bu salınımlara matematiksel olarak erişmek için (2)'deki
-formüldeki $z$ üstelinin kompleks sayı olmasına izin verilir, yani $\beta +
-i\omega$ formunda olduğu farz edilir, ve bu şekilde türetime devam edince
-ortaya (1)'deki log periyodik salınımlar çıkar. Detaylar için
-[1,4]. Sornette bu salınım ekinin formülü ``dekore'' ettiğini
-söylemektedir, güzel bir kelime seçilmiş, hakikaten bu salınımlar ana
-formüle bir ek, onu ``süslüyor'', fakat tabii ki bu sayede eşsizlik
-noktasını yakalamamız kolaylaşıyor çünkü uydurma rutinimiz artık verideki
-bu salınımları da veride bulmaya uğraşıyor böylece aradığı tüm
-parametrelerin kalitesi artmış oluyor.
+benzer diğer doğal olaylarda eşsizlik anı öncesi log salınımlar olduğu
+da görülmüştür. Bu salınımlara matematiksel olarak erişmek için
+(2)'deki formüldeki $z$ üstelinin kompleks sayı olmasına izin verilir,
+yani $\beta + i\omega$ formunda olduğu farz edilir, ve bu şekilde
+türetime devam edince ortaya (1)'deki log periyodik salınımlar
+çıkar. Detaylar için [1,4]. Sornette bu salınım ekinin formülü
+"dekore" ettiğini söylemektedir, güzel bir kelime seçilmiş, hakikaten
+bu salınımlar ana formüle bir ek, onu "süslüyor", fakat tabii ki bu
+sayede eşsizlik noktasını yakalamamız kolaylaşıyor çünkü uydurma
+rutinimiz artık verideki bu salınımları da veride bulmaya uğraşıyor
+böylece aradığı tüm parametrelerin kalitesi artmış oluyor.
 
 Sornette bazı kaynaklarda bir değişik türetim şekli daha uyguluyor [1,5];
 buna göre $p(t)$ olarak belirttiğimiz $h(t)$, tehlike oranı (hazard rate)
