@@ -108,13 +108,126 @@ farketmiştir.</p>
 \big[ 1 + C \cos (\omega \ln(t_c-t) + \phi )  \big]
 \qquad (1)
 \]</span></p>
-<p>Türetilmesiyle ilgili detaylar ve referanslar yazının sonunda
-bulunabilir. Bazı teknik detaylar: Kullanılan Log-Periodic Power Law
-(LPPL) modelinin bir uygulamasıdır ve bu modelin en zorlayıcı kısmı,
-yedi parametreden dördünün doğrusal, üçünün ise karmaşık bir şekilde
-doğrusal olmayan parametreler olması. SciPy ile LPPL optimizasyonunda
-kullanılan, iki aşamalı (two-step) en küçük kareler yöntemini
-uygulayacağız. Bu yöntem, doğrusal olmayan parametreleri (<span
+<p>Türetmek</p>
+<p>Sornette’in modelinin başlangıcı bir zaman serisindeki artışının
+üstel (exponential) hızı geçtiği zaman sonlu-anda (finite-time) bir
+eşsizlik (singularity) çıktığı iddiası [1,4]. Eşsizlik konusunu [8]
+notlarında işledik; eşsiz nokta bir fonksiyonun analitikliği kaybettiği
+yerdir. Peki modelde eşsizliğin ortaya çıkması gerçek hayatta illa bunun
+olacağı anlamına geliyor mu? İlginç bir şekilde eğer matematiksel model
+sağlam ise eşsizliğin tahmin edildiği yerde hakikaten bu durum ortaya
+çıkıyor, mesela bir materyelin kırılması / parçalanması matematiksel
+modelin eşsizlik noktasında olur, ve deneylerde bu anda materyel
+kırılması gözlenmiştir.</p>
+<p>Sornette’e göre nüfus artışı, bir ekonominin ürettiği değeri temsil
+eden gayrısafi yurtiçi hasıla (gross domestic product -GDP-) artışı
+rakamlarına dünya bazında bakarsak üstel üstü artışları görebiliyoruz,
+ve aynen materyel kırılmasında olduğu gibi modelin eşsizlik tahmin
+ettiği yeri “bir fazın bittiği an” olarak görürsek, bu nokta bir tür
+sürdüremezliğin geldiği an olacaktır, ve tabiri caizse “inceldiği yerden
+kopma” noktasıdır, ve bunun ötesinde mesela ne daha fazla nüfus artışı,
+ne de ekonomik büyüme mümkün değildir. En azından mevcut çevre, mevcut
+ölçümler üzerinden ekonomik büyüme dediğimiz şey olmayacaktır.</p>
+<p>Sonlu an eşsizliğine erişmek için mesela normal nüfus artışı
+modelinden başlayalım, nüfusu modellemenin en iyi bilinen yolu Lojistik
+Denklemdir, bkz [6], [7], [8]. Model şöyledir;</p>
+<p><span class="math display">\[ \frac{dp}{dt} = rp(t) [ K - p(t) ]
+\]</span></p>
+<p>Lojistik modelde bir taşıma kapasitesi <span
+class="math inline">\(K\)</span> vardır, ve bu kapasitenin daha
+fazlasını çevre koşullarının taşıması mümkün değildir. Fakat [4]’teki
+referanslara göre şu iddia edilmektedir; <span
+class="math inline">\(p(t)\)</span> ile birlikte <span
+class="math inline">\(K\)</span> de artmaktadır, çünkü araçlarımızı daha
+iyi kullanıyoruz, sürekli keşifler yapıyoruz, ilaçlar, gübre çeşitleri,
+vs. ve yeni bölgelere yayılıyoruz, yani sürekli taşıma kapasitesini
+aşıyoruz. Bu durumda, yani <span class="math inline">\(K &gt;
+p(t)\)</span>’in olduğu durumda lojistik denklemini çözümü patlar, yani
+uzaklaşır (divergent) hale gelir ve sonsuza gider. Bu gidiş süresi,
+eşsizlik öncesi varışta giden zaman sonludur, yani belli bir büyüklüğü
+vardır.</p>
+<p>Bu durumda denkleme artık hiçbir etkisi olmayan <span
+class="math inline">\(-p(t)\)</span> denklemden çıkartılabilir, ve o
+zaman geri kalanlar <span class="math inline">\(\delta &gt; 1\)</span>
+olacak şekilde <span class="math inline">\(K \propto
+p^{1+\delta}\)</span> kabul edilebilir, yani <span
+class="math inline">\(K\)</span>’nin kendisi <span
+class="math inline">\(p\)</span>’ye oranla büyüyor ve arada bir üstel
+kanun (power law) ilişkisi vardır. Şimdi aynı formülü şu şekilde
+yazarız,</p>
+<p><span class="math display">\[ \frac{dp}{dt} = r [p(t)]^{1+\delta}
+\]</span></p>
+<p>ki bu formüle göre artış oranı <span class="math inline">\(r
+[p(t)]^{1+\delta}\)</span> olarak hızlanmaktadır. Çözelim,</p>
+<p><span class="math display">\[ \int \frac{dp}{p(t)^{1+\delta}} = \int
+rt\]</span></p>
+<p><span class="math display">\[ \int p(t)^{-1-\delta} \,dp = rt + C
+\]</span></p>
+<p><span class="math inline">\(t_c\)</span>’ye (ki bir sabit) erişmek
+amaçlı olarak <span class="math inline">\(C = -rt_c\)</span>
+tanımlayalım,</p>
+<p><span class="math display">\[ \frac{p(t)^{-\delta}}{-\delta} = rt -
+rt_c \]</span></p>
+<p><span class="math display">\[ p(t)^{-\delta}= -\delta r(t - t_c)
+\]</span></p>
+<p><span class="math inline">\(t-t_c = -(t_c-t)\)</span> olduğu için
+parantez içindeki çıkartma işlemi şu hale gelir,</p>
+<p><span class="math display">\[ p(t)^{-\delta}= \delta r(t_c - t)
+\]</span></p>
+<p>İstediğimiz forma yaklaştık çünkü <span
+class="math inline">\(t_c\)</span>’yi eşsizlik anı olarak hesaplamak
+istiyoruz, ve <span class="math inline">\(t\)</span> bu andan önceki
+zamanı temsil ediyor olmalı. Şimdi <span class="math inline">\(\alpha =
+-\frac{1}{\delta}\)</span> tanımlayalım, ve eşitliğin her iki tarafının
+<span class="math inline">\(\alpha\)</span> üstünü alalım,</p>
+<p><span class="math display">\[ (p(t)^{-\delta})^\alpha= (\delta r
+)^\alpha (t_c - t)^\alpha \]</span></p>
+<p>Eğer <span class="math inline">\(p(0) = p_0 = (\delta r
+)^\alpha\)</span> kabul edersek, eşitliğin sol tarafını
+basitleştirince,</p>
+<p><span class="math display">\[ p(t) = p_0 (t_c - t)^\alpha
+\]</span></p>
+<p>elde ederiz, ki bu denklemin <span class="math inline">\(t_c\)</span>
+anında eşsizliği vardır.</p>
+<p>Log Salınım (Log Oscillation)</p>
+<p>[4,5]’te bu modelin geliştirilerek (1) formülüne nasıl erişildiğinin
+detayları bulunabilir. Hikayenin özü şöyle; materyel kırılması ve buna
+benzer diğer doğal olaylarda eşsizlik anı öncesi log salınımlar olduğu
+da görülmüştür. Bu salınımlara matematiksel olarak erişmek için (2)’deki
+formüldeki <span class="math inline">\(z\)</span> üstelinin kompleks
+sayı olmasına izin verilir, yani <span class="math inline">\(\beta +
+i\omega\)</span> formunda olduğu farz edilir, ve bu şekilde türetime
+devam edince ortaya (1)’deki log periyodik salınımlar çıkar. Detaylar
+için [1,4]. Sornette bu salınım ekinin formülü “dekore” ettiğini
+söylemektedir, güzel bir kelime seçilmiş, hakikaten bu salınımlar ana
+formüle bir ek, onu “süslüyor”, fakat tabii ki bu sayede eşsizlik
+noktasını yakalamamız kolaylaşıyor çünkü uydurma rutinimiz artık
+verideki bu salınımları da veride bulmaya uğraşıyor böylece aradığı tüm
+parametrelerin kalitesi artmış oluyor.</p>
+<p>Sornette bazı kaynaklarda bir değişik türetim şekli daha uyguluyor
+[1,5]; buna göre <span class="math inline">\(p(t)\)</span> olarak
+belirttiğimiz <span class="math inline">\(h(t)\)</span>, tehlike oranı
+(hazard rate) olarak modellenir, ve fiyat serisi <span
+class="math inline">\(p(t)\)</span> olarak rasgele calculus’tan
+gelinerek modelleniyor, ve <span class="math inline">\(h(t)\)</span>,
+<span class="math inline">\(p(t)\)</span>’ye sokuluyor, ve ortaya log
+salınımlı model çıkıyor. Bu türetişin bazı ilginç bağlantıları var,
+mesela tehlike oranının kimi aşırı, kimi az ama hepsi birbiriyle
+etkileşimde olan borsacıların birbirini taklit etmesi yüzünden <span
+class="math inline">\(h(t)\)</span>’nin arttığı modellenmekte, ki bu
+artış ta bir üstel kanunu takip ediyor. Fizik ve sosyal modelde birbiri
+ile aşırı etkileşim sürekli ortaya üstel kanun çıkartıyor, bunu
+biliyoruz. Patlama anı ve öncesinde aslında ortada olan bir kaos değil,
+kaos <em>yokluğu</em>. Bütüne bakıldığında biri rasgele bazen satan,
+biri rasgele bazen alan borsacıların patlama anı öncesi birdenbire
+düzenli bir şekilde hepsi <em>satıyor</em>.</p>
+<p>Hesaplamak</p>
+<p>Bazı teknik detaylar: Kullanılan Log-Periodic Power Law (LPPL)
+modelinin bir uygulamasıdır ve bu modelin en zorlayıcı kısmı, yedi
+parametreden dördünün doğrusal, üçünün ise karmaşık bir şekilde doğrusal
+olmayan parametreler olması. SciPy ile LPPL optimizasyonunda kullanılan,
+iki aşamalı (two-step) en küçük kareler yöntemini uygulayacağız. Bu
+yöntem, doğrusal olmayan parametreleri (<span
 class="math inline">\(t_c\)</span>, <span
 class="math inline">\(\beta/m\)</span>, <span
 class="math inline">\(\omega\)</span>) ararken, doğrusal parametreleri
@@ -412,122 +525,6 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_130_bbl_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="tser_130_bbl_02.jpg" /></p>
-<p>Türetmek</p>
-<p>Sornette’in modelinin başlangıcı bir zaman serisindeki artışının
-üstel (exponential) hızı geçtiği zaman sonlu-anda (finite-time) bir
-eşsizlik (singularity) çıktığı iddiası [1,4]. Eşsizlik konusunu [8]
-notlarında işledik; eşsiz nokta bir fonksiyonun analitikliği kaybettiği
-yerdir. Peki modelde eşsizliğin ortaya çıkması gerçek hayatta illa bunun
-olacağı anlamına geliyor mu? İlginç bir şekilde eğer matematiksel model
-sağlam ise eşsizliğin tahmin edildiği yerde hakikaten bu durum ortaya
-çıkıyor, mesela izafiyet kuramının matematiği eşsiz noktaların varlığını
-tahmin eder, ve hakikaten de tahmin edildiği şekilde uzayda bu
-noktalarda kara deliklerin olduğu ispatlanmıştır. Aynı şekilde bir
-materyelin kırılması / parçalanması matematiksel modelin eşsizlik
-noktasında olur, ve deneylerde bu anda materyel kırılması
-gözlenmiştir.</p>
-<p>Sornette’e göre nüfus artışı, bir ekonominin ürettiği değeri temsil
-eden gayrısafi yurtiçi hasıla (gross domestic product -GDP-) artışı
-rakamlarına dünya bazında bakarsak üstel üstü artışları görebiliyoruz,
-ve aynen materyel kırılmasında olduğu gibi modelin eşsizlik tahmin
-ettiği yeri “bir fazın bittiği an” olarak görürsek, bu nokta bir tür
-sürdüremezliğin geldiği an olacaktır, ve tabiri caizse “inceldiği yerden
-kopma” noktasıdır, ve bunun ötesinde mesela ne daha fazla nüfus artışı,
-ne de ekonomik büyüme mümkün değildir. En azından mevcut çevre, mevcut
-ölçümler üzerinden ekonomik büyüme dediğimiz şey olmayacaktır.</p>
-<p>Sonlu an eşsizliğine erişmek için mesela normal nüfus artışı
-modelinden başlayalım, nüfusu modellemenin en iyi bilinen yolu Lojistik
-Denklemdir, bkz [6], [7], [8]. Model şöyledir;</p>
-<p><span class="math display">\[ \frac{dp}{dt} = rp(t) [ K - p(t) ]
-\]</span></p>
-<p>Lojistik modelde bir taşıma kapasitesi <span
-class="math inline">\(K\)</span> vardır, ve bu kapasitenin daha
-fazlasını çevre koşullarının taşıması mümkün değildir. Fakat [4]’teki
-referanslara göre şu iddia edilmektedir; <span
-class="math inline">\(p(t)\)</span> ile birlikte <span
-class="math inline">\(K\)</span> de artmaktadır, çünkü araçlarımızı daha
-iyi kullanıyoruz, sürekli keşifler yapıyoruz, ilaçlar, gübre çeşitleri,
-vs. ve yeni bölgelere yayılıyoruz, yani sürekli taşıma kapasitesini
-aşıyoruz. Bu durumda, yani <span class="math inline">\(K &gt;
-p(t)\)</span>’in olduğu durumda lojistik denklemini çözümü patlar, yani
-uzaklaşır (divergent) hale gelir ve sonsuza gider. Bu gidiş süresi,
-eşsizlik öncesi varışta giden zaman sonludur, yani belli bir büyüklüğü
-vardır.</p>
-<p>Bu durumda denkleme artık hiçbir etkisi olmayan <span
-class="math inline">\(-p(t)\)</span> denklemden çıkartılabilir, ve o
-zaman geri kalanlar <span class="math inline">\(\delta &gt; 1\)</span>
-olacak şekilde <span class="math inline">\(K \propto
-p^{1+\delta}\)</span> kabul edilebilir, yani <span
-class="math inline">\(K\)</span>’nin kendisi <span
-class="math inline">\(p\)</span>’ye oranla büyüyor ve arada bir üstel
-kanun (power law) ilişkisi vardır. Şimdi aynı formülü şu şekilde
-yazarız,</p>
-<p><span class="math display">\[ \frac{dp}{dt} = r [p(t)]^{1+\delta}
-\]</span></p>
-<p>ki bu formüle göre artış oranı <span class="math inline">\(r
-[p(t)]^{1+\delta}\)</span> olarak hızlanmaktadır. Çözelim,</p>
-<p><span class="math display">\[ \int \frac{dp}{p(t)^{1+\delta}} = \int
-rt\]</span></p>
-<p><span class="math display">\[ \int p(t)^{-1-\delta} \,dp = rt + C
-\]</span></p>
-<p><span class="math inline">\(t_c\)</span>’ye (ki bir sabit) erişmek
-amaçlı olarak <span class="math inline">\(C = -rt_c\)</span>
-tanımlayalım,</p>
-<p><span class="math display">\[ \frac{p(t)^{-\delta}}{-\delta} = rt -
-rt_c \]</span></p>
-<p><span class="math display">\[ p(t)^{-\delta}= -\delta r(t - t_c)
-\]</span></p>
-<p><span class="math inline">\(t-t_c = -(t_c-t)\)</span> olduğu için
-parantez içindeki çıkartma işlemi şu hale gelir,</p>
-<p><span class="math display">\[ p(t)^{-\delta}= \delta r(t_c - t)
-\]</span></p>
-<p>İstediğimiz forma yaklaştık çünkü <span
-class="math inline">\(t_c\)</span>’yi eşsizlik anı olarak hesaplamak
-istiyoruz, ve <span class="math inline">\(t\)</span> bu andan önceki
-zamanı temsil ediyor olmalı. Şimdi <span class="math inline">\(\alpha =
--\frac{1}{\delta}\)</span> tanımlayalım, ve eşitliğin her iki tarafının
-<span class="math inline">\(\alpha\)</span> üstünü alalım,</p>
-<p><span class="math display">\[ (p(t)^{-\delta})^\alpha= (\delta r
-)^\alpha (t_c - t)^\alpha \]</span></p>
-<p>Eğer <span class="math inline">\(p(0) = p_0 = (\delta r
-)^\alpha\)</span> kabul edersek, eşitliğin sol tarafını
-basitleştirince,</p>
-<p><span class="math display">\[ p(t) = p_0 (t_c - t)^\alpha
-\]</span></p>
-<p>elde ederiz, ki bu denklemin <span class="math inline">\(t_c\)</span>
-anında eşsizliği vardır.</p>
-<p>Log Salınım (Log Oscillation)</p>
-<p>[4,5]’te bu modelin geliştirilerek (1) formülüne nasıl erişildiğinin
-detayları bulunabilir. Hikayenin özü şöyle; materyel kırılması ve buna
-benzer diğer doğal olaylarda eşsizlik anı öncesi log salınımlar olduğu
-da görülmüştür. Bu salınımlara matematiksel olarak erişmek için (2)’deki
-formüldeki <span class="math inline">\(z\)</span> üstelinin kompleks
-sayı olmasına izin verilir, yani <span class="math inline">\(\beta +
-i\omega\)</span> formunda olduğu farz edilir, ve bu şekilde türetime
-devam edince ortaya (1)’deki log periyodik salınımlar çıkar. Detaylar
-için [1,4]. Sornette bu salınım ekinin formülü “dekore” ettiğini
-söylemektedir, güzel bir kelime seçilmiş, hakikaten bu salınımlar ana
-formüle bir ek, onu “süslüyor”, fakat tabii ki bu sayede eşsizlik
-noktasını yakalamamız kolaylaşıyor çünkü uydurma rutinimiz artık
-verideki bu salınımları da veride bulmaya uğraşıyor böylece aradığı tüm
-parametrelerin kalitesi artmış oluyor.</p>
-<p>Sornette bazı kaynaklarda bir değişik türetim şekli daha uyguluyor
-[1,5]; buna göre <span class="math inline">\(p(t)\)</span> olarak
-belirttiğimiz <span class="math inline">\(h(t)\)</span>, tehlike oranı
-(hazard rate) olarak modellenir, ve fiyat serisi <span
-class="math inline">\(p(t)\)</span> olarak rasgele calculus’tan
-gelinerek modelleniyor, ve <span class="math inline">\(h(t)\)</span>,
-<span class="math inline">\(p(t)\)</span>’ye sokuluyor, ve ortaya log
-salınımlı model çıkıyor. Bu türetişin bazı ilginç bağlantıları var,
-mesela tehlike oranının kimi aşırı, kimi az ama hepsi birbiriyle
-etkileşimde olan borsacıların birbirini taklit etmesi yüzünden <span
-class="math inline">\(h(t)\)</span>’nin arttığı modellenmekte, ki bu
-artış ta bir üstel kanunu takip ediyor. Fizik ve sosyal modelde birbiri
-ile aşırı etkileşim sürekli ortaya üstel kanun çıkartıyor, bunu
-biliyoruz. Patlama anı ve öncesinde aslında ortada olan bir kaos değil,
-kaos <em>yokluğu</em>. Bütüne bakıldığında biri rasgele bazen satan,
-biri rasgele bazen alan borsacıların patlama anı öncesi birdenbire
-düzenli bir şekilde hepsi <em>satıyor</em>.</p>
 <p>Kaynaklar</p>
 <p>[1] Sornette, <em>Why Stock Markets Crash</em></p>
 <p>[2] <a href="https://www.youtube.com/watch?v=C_eFjLZqXt8">Sornette,
