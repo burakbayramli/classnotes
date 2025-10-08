@@ -23,7 +23,19 @@ $$ \ln(p(t)) = A + B(t_c - t)^\beta
 \qquad (1)
 $$
 
-Türetilmesiyle ilgili detaylar ve referanslar yazının sonunda bulunabilir.
+Türetilmesiyle ilgili detaylar ve referanslar yazının sonunda
+bulunabilir.  Bazı teknik detaylar: Kullanılan Log-Periodic Power Law
+(LPPL) modelinin bir uygulamasıdır ve bu modelin en zorlayıcı kısmı,
+yedi parametreden dördünün doğrusal, üçünün ise karmaşık bir şekilde
+doğrusal olmayan parametreler olması.
+
+SciPy ile LPPL optimizasyonunda kullanılan, iki aşamalı (two-step) en
+küçük kareler yöntemini uygulayacağız. Bu yöntem, doğrusal olmayan
+parametreleri ($t_c$, $\beta/m$, $\omega$) ararken, doğrusal
+parametreleri ($A, B, C_1, C_2$) her iterasyonda hızlıca bulmak için
+lineer cebir kullanır. Hesap üstteki formüldeki salınım terimini iki
+ayrı lineer bileşene ayırır ($C \cos(\cdot) + D \sin(\cdot)$ formuna
+dönüştürmek).
 
 Formülü kullanmak için onu bilinen krizlerden önce elde olan veriye
 uyduracağız. Normal şartlarda yapılacak budur, bir varlığın, endeksin
@@ -33,19 +45,6 @@ merak konusudur. Örnek olarak 1929 ve 1987 krizlerini seçtik.
 Ekim 1929 krizi Amerika'da "Büyük Depresyon" adı verilen dönemin
 başlangıcıydı, ve kriz öncesi Dow Jones (DJIA) endeksinde müthiş bir
 artış ardından düşüş gerçekleşti.
-
-Bazi teknik detaylar: Kullanilan **Log-Periodic Power Law (LPPL)**
-modelinin bir uygulamasıdır ve bu modelin en zorlayıcı kısmı, yedi
-parametreden dördünün doğrusal, üçünün ise karmaşık bir şekilde
-doğrusal olmayan parametreler olması.
-
-SciPy ile LPPL optimizasyonunda kullanılan, **iki aşamalı (two-step)**
-en küçük kareler yöntemini uygulayacağız. Bu yöntem, doğrusal olmayan
-parametreleri ($t_c$, $\beta/m$, $\omega$) ararken, doğrusal
-parametreleri ($A, B, C_1, C_2$) her iterasyonda hızlıca bulmak için
-lineer cebir kullanır. Hesap üstteki formüldeki salınım terimini iki
-ayrı lineer bileşene ayırır ($C \cos(\cdot) + D \sin(\cdot)$ formuna
-dönüştürmek).
 
 ```python
 import statsmodels.tsa.stattools as st
