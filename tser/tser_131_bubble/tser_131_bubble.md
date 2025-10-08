@@ -193,8 +193,6 @@ t_index = dfj2.index
 t_ordinal = t_index.to_series().apply(lambda x: x.toordinal()).values
 t_data = t_ordinal - t_ordinal[0] + 1
     
-# --- REMOVED MOCK DATA GENERATION (The cause of the error) ---
-
 max_t = np.max(t_data) 
 
 # Initial guess for non-linear parameters [tc, m, w]
@@ -239,11 +237,11 @@ bu değerleri üstteki sonuçta görüyoruz.
 
 | Parametre | Değer | LPPL Teorisiyle Uyum | Analiz |
 | :--- | :--- | :--- | :--- |
-| **Maliyet (Cost)** | **1.9182** | Mükemmel | Önceki **103.34** olan maliyetin bu kadar düşmesi, modelin veriye çok iyi oturduğunu gösterir. |
-| **`tc` (Kritik An)** | **2555.000000** | Mantıksal Sınırda | Model, çökeceği tahmin edilen kritik anı (zaman serinizin başlangıcından itibaren 2555. gün) buldu. **SciPy'daki sınırlandırma (`max_t`) muhtemelen `tc`'yi bu değere itmiştir.** Gerçek dünyadaki **1929 Çöküşü**, bu dönemin hemen sonrasına denk gelir. |
+| **Maliyet (Cost)** | **1.9182** | Mükemmel | Önceki 103.34 olan maliyetin bu kadar düşmesi, modelin veriye çok iyi oturduğunu gösterir. |
+| **`tc` (Kritik An)** | **2555.000000** | Mantıksal Sınırda | Model, çökeceği tahmin edilen kritik anı (zaman serinizin başlangıcından itibaren 2555. gün) buldu. SciPy'daki sınırlandırma (`max_t`) muhtemelen `tc`'yi bu değere itmiştir. Gerçek dünyadaki 1929 Çöküşü, bu dönemin hemen sonrasına denk gelir. |
 | **`m`** | **0.742213** | **Uyumlu ($0.01 < m < 0.99$)** | Süper-üstel büyüme hızı. Beklenen aralıkta ve balon dinamiği için sağlam bir gösterge. |
 | **`w`** | **7.930258** | **Uyumlu ($6 < w < 13$)** | Log-periyodik salınım frekansı. Beklenen aralıkta olup, piyasa katılımcıları arasındaki artan taklitçiliğin (mimicry) bir göstergesidir. |
-| **`B`** | **-0.003674** | **Teoriyle Uyumlu ($B < 0$)** | En kritik parametre. **Negatif** olması, modelin **yukarı yönlü bir balon** (hızlanan büyüme ve ardından çöküş) yakaladığı anlamına gelir. Bu, 1929 krizini tahmin eden bir sinyaldir. |
+| **`B`** | **-0.003674** | **Teoriyle Uyumlu ($B < 0$)** | En kritik parametre. Negatif olması, modelin yukarı yönlü bir balon (hızlanan büyüme ve ardından çöküş) yakaladığı anlamına gelir. Bu, 1929 krizini tahmin eden bir sinyaldir. |
 | **`C_amplitude`** | **0.118326** | Uyumlu | Salınım genliği. Pozitif ve anlamlı bir salınım bileşeninin varlığını gösterir. |
 
 

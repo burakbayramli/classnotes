@@ -267,24 +267,22 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>t_ordinal <span class="op">=</span> t_index.to_series().<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.toordinal()).values</span>
 <span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>t_data <span class="op">=</span> t_ordinal <span class="op">-</span> t_ordinal[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="co"># --- REMOVED MOCK DATA GENERATION (The cause of the error) ---</span></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>max_t <span class="op">=</span> np.<span class="bu">max</span>(t_data) </span>
 <span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>max_t <span class="op">=</span> np.<span class="bu">max</span>(t_data) </span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial guess for non-linear parameters [tc, m, w]</span></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>x0_nonlin <span class="op">=</span> [max_t <span class="op">*</span> <span class="fl">1.05</span>, <span class="fl">0.5</span>, <span class="fl">10.0</span>]</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a><span class="co"># Bounds: ([tc_min, m_min, w_min], [tc_max, m_max, w_max])</span></span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>bounds_nonlin <span class="op">=</span> (</span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>    [max_t, <span class="fl">0.01</span>, <span class="fl">6.0</span>],</span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>    [max_t <span class="op">*</span> <span class="fl">2.0</span>, <span class="fl">0.99</span>, <span class="fl">13.0</span>]</span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial guess for non-linear parameters [tc, m, w]</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>x0_nonlin <span class="op">=</span> [max_t <span class="op">*</span> <span class="fl">1.05</span>, <span class="fl">0.5</span>, <span class="fl">10.0</span>]</span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a><span class="co"># Bounds: ([tc_min, m_min, w_min], [tc_max, m_max, w_max])</span></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>bounds_nonlin <span class="op">=</span> (</span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>    [max_t, <span class="fl">0.01</span>, <span class="fl">6.0</span>],</span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>    [max_t <span class="op">*</span> <span class="fl">2.0</span>, <span class="fl">0.99</span>, <span class="fl">13.0</span>]</span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>final_params, fit_result <span class="op">=</span> run_lppl_fit_scipy(t_data, log_p_data, x0_nonlin, bounds_nonlin)</span>
 <span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>final_params, fit_result <span class="op">=</span> run_lppl_fit_scipy(t_data, log_p_data, x0_nonlin, bounds_nonlin)</span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Nihai Parametreler:&quot;</span>)</span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> final_params.items():</span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">:.6f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Nihai Parametreler:&quot;</span>)</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> final_params.items():</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">:.6f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
 <pre class="text"><code>`ftol` termination condition is satisfied.
 Function evaluations 12, initial cost 2.7183e+00, final cost 1.9182e+00, first-order optimality 9.62e-05.
 
@@ -328,9 +326,8 @@ değerleri üstteki sonuçta görüyoruz.</p>
 <td style="text-align: left;"><strong>Maliyet (Cost)</strong></td>
 <td style="text-align: left;"><strong>1.9182</strong></td>
 <td style="text-align: left;">Mükemmel</td>
-<td style="text-align: left;">Önceki <strong>103.34</strong> olan
-maliyetin bu kadar düşmesi, modelin veriye çok iyi oturduğunu
-gösterir.</td>
+<td style="text-align: left;">Önceki 103.34 olan maliyetin bu kadar
+düşmesi, modelin veriye çok iyi oturduğunu gösterir.</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong><code>tc</code> (Kritik
@@ -338,11 +335,10 @@ An)</strong></td>
 <td style="text-align: left;"><strong>2555.000000</strong></td>
 <td style="text-align: left;">Mantıksal Sınırda</td>
 <td style="text-align: left;">Model, çökeceği tahmin edilen kritik anı
-(zaman serinizin başlangıcından itibaren 2555. gün) buldu.
-<strong>SciPy’daki sınırlandırma (<code>max_t</code>) muhtemelen
-<code>tc</code>’yi bu değere itmiştir.</strong> Gerçek dünyadaki
-<strong>1929 Çöküşü</strong>, bu dönemin hemen sonrasına denk
-gelir.</td>
+(zaman serinizin başlangıcından itibaren 2555. gün) buldu. SciPy’daki
+sınırlandırma (<code>max_t</code>) muhtemelen <code>tc</code>’yi bu
+değere itmiştir. Gerçek dünyadaki 1929 Çöküşü, bu dönemin hemen
+sonrasına denk gelir.</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><strong><code>m</code></strong></td>
@@ -366,10 +362,10 @@ aralıkta olup, piyasa katılımcıları arasındaki artan taklitçiliğin
 <td style="text-align: left;"><strong>-0.003674</strong></td>
 <td style="text-align: left;"><strong>Teoriyle Uyumlu (<span
 class="math inline">\(B &lt; 0\)</span>)</strong></td>
-<td style="text-align: left;">En kritik parametre.
-<strong>Negatif</strong> olması, modelin <strong>yukarı yönlü bir
-balon</strong> (hızlanan büyüme ve ardından çöküş) yakaladığı anlamına
-gelir. Bu, 1929 krizini tahmin eden bir sinyaldir.</td>
+<td style="text-align: left;">En kritik parametre. Negatif olması,
+modelin yukarı yönlü bir balon (hızlanan büyüme ve ardından çöküş)
+yakaladığı anlamına gelir. Bu, 1929 krizini tahmin eden bir
+sinyaldir.</td>
 </tr>
 <tr class="even">
 <td
