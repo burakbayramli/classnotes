@@ -72,7 +72,7 @@ $$ \frac{\partial (\ln f)}{\partial \sigma} =
 -\frac{n}{\sigma} + \frac{\sum (x_i-\mu)^2}{2\sigma^3}   = 0 
 $$
 
-Cebirsel birkac duzenleme sonrasi ve $\mu$ yerine yeni hesapladigimiz
+Cebirsel birkaç düzenleme sonrası ve $\mu$ yerine yeni hesapladığımız
 $\hat{\mu}$ kullanarak,
 
 $$ \hat{\sigma}^2 = \frac{\sum (x_i-\hat{\mu})^2}{n} $$
@@ -255,4 +255,6 @@ pandas 1.0
 ```
 
 [devam edecek]
+
+
 
