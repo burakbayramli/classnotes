@@ -314,13 +314,6 @@ Kaynaklar
 
 [2] Bayramli, *Istatistik, Parametresiz İstatistik (Nonparametric Statistics)*
 
-[3] Bayramli, *Istatistik, Gaussian Karışım Modeli (GMM) ile Kümelemek
+[3] Bayramli, *Istatistik, Gaussian Karışım Modeli (GMM) ile Kümelemek*
 
-[4] Bayramli, *Istatistik, Artımsal (Incremental) GMM
-
-
-
-
-
-
-
+[4] Bayramli, *Istatistik, Artımsal (Incremental) GMM*
