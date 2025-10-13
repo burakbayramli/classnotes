@@ -1,7 +1,7 @@
 # Arkaplan (Background) Tespiti
 
 Durağan bir kameranın sürekli aldığı görüntülerde arka plan tespiti
-(background extraction) yapmak için su andaki en iyi teknikler
+(background extraction) yapmak için şu andaki en iyi teknikler
 istatistiki. Ana fikir şu; arka plan demek bir tür değişmezlik,
 statiklik ima eder, o zaman görüntüdeki her pikselin en çok aldığı
 piksel değeri (gri seviyesi ise 0..255 arası değerler, RGB ise onun üç
@@ -10,7 +10,7 @@ boyutlu hali) arka plan olarak kabul edilmelidir.
 Tabii ki arka planın önünde, üzerinde farklı objeler gelip
 gidecektir. Eğer kamera bir yola bakıyorsa, yoldan bazen arabalar
 geçer, bir kampüs içini gösteriyorsa insanlar yürürler. Bu sebeple her
-pikselin en çok aldigi değeri matematiksel olarak temsil edebilmemiz
+pikselin en çok aldığı değeri matematiksel olarak temsil edebilmemiz
 gerekiyor.
 
 Örnek olarak bir video'daki spesifik bir pikselin aldığı değerlere
@@ -27,7 +27,7 @@ Video bir kampüste kaydedilmiş, kamera hareket etmiyor sadece önünde
 olanları gösteriyor. Şimdi bu video karelerinin `coord` noktasındaki,
 kordinatında aldığı değerlere bakalım. Video renkli ama bu ilk rapor
 için biz gri seviyelere bakabiliriz, yani RGB değerlerini alıp
-grileştiriyoruz sonra o noktadaki gri değerlere bakıyoruz.
+grileştiriyoruz sonra o noktadaki gri değerlerin frekansına bakıyoruz.
 
 ```python
 import time, datetime, cv2
@@ -51,15 +51,15 @@ plt.savefig('vision_20bg_04.jpg')
 Histogram üstteki gibi çıktı. Kabaca ilk bakış bize 45 değeri
 etrafında bir gruplanma gösteriyor, 70 etrafında daha az ama yine de
 mevcut bir tepe var, bir diğeri 100 etrafında. Yani `coord`
-noktasındaki piksel çoğunlukla köyümsü bir rengi olan bir yeri
+noktasındaki piksel çoğunlukla koyumsu bir rengi olan bir yeri
 gösteriyor, ve arada sırada önünden daha aydınlık renkleri olan şeyler
 geçiyor. Belki açık gri renkli tişört giymiş bir kaç öğrenci oradan
 geçmiş.
 
-Fakat bu rapor bize arka plan tespitinde izlenebilecek tekniğin
-ipuçlarını veriyor. Üstteki histograma bakarak eğer bir arka plan
-seçmek istesek, bunu frekanların maksimum olduğu değer için
-yapabilirdik, bu örnekte aşağı yukarı 45 değeri.
+Bu rapor bize arka plan tespitinde izlenebilecek tekniğin ipuçlarını
+veriyor. Üstteki histograma bakarak eğer bir arka plan seçmek istesek,
+bunu frekansların maksimum olduğu değer üzerinden yapabilirdik, bu
+örnekte aşağı yukarı 45 değeri.
 
 ### KDE
 
@@ -317,3 +317,10 @@ Kaynaklar
 [3] Bayramli, *Istatistik, Gaussian Karışım Modeli (GMM) ile Kümelemek
 
 [4] Bayramli, *Istatistik, Artımsal (Incremental) GMM
+
+
+
+
+
+
+

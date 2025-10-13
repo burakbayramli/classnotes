@@ -89,7 +89,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <h1 id="arkaplan-background-tespiti">Arkaplan (Background) Tespiti</h1>
 <p>Durağan bir kameranın sürekli aldığı görüntülerde arka plan tespiti
-(background extraction) yapmak için su andaki en iyi teknikler
+(background extraction) yapmak için şu andaki en iyi teknikler
 istatistiki. Ana fikir şu; arka plan demek bir tür değişmezlik,
 statiklik ima eder, o zaman görüntüdeki her pikselin en çok aldığı
 piksel değeri (gri seviyesi ise 0..255 arası değerler, RGB ise onun üç
@@ -97,7 +97,7 @@ boyutlu hali) arka plan olarak kabul edilmelidir.</p>
 <p>Tabii ki arka planın önünde, üzerinde farklı objeler gelip
 gidecektir. Eğer kamera bir yola bakıyorsa, yoldan bazen arabalar geçer,
 bir kampüs içini gösteriyorsa insanlar yürürler. Bu sebeple her pikselin
-en çok aldigi değeri matematiksel olarak temsil edebilmemiz
+en çok aldığı değeri matematiksel olarak temsil edebilmemiz
 gerekiyor.</p>
 <p>Örnek olarak bir video’daki spesifik bir pikselin aldığı değerlere
 bakalım, bu değerlerin histogramını çıkartalım. Bu bize o spesifik
@@ -110,7 +110,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 olanları gösteriyor. Şimdi bu video karelerinin <code>coord</code>
 noktasındaki, kordinatında aldığı değerlere bakalım. Video renkli ama bu
 ilk rapor için biz gri seviyelere bakabiliriz, yani RGB değerlerini alıp
-grileştiriyoruz sonra o noktadaki gri değerlere bakıyoruz.</p>
+grileştiriyoruz sonra o noktadaki gri değerlerin frekansına
+bakıyoruz.</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time, datetime, cv2</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cap <span class="op">=</span> cv2.VideoCapture(vfile)</span>
@@ -130,13 +131,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <p>Histogram üstteki gibi çıktı. Kabaca ilk bakış bize 45 değeri
 etrafında bir gruplanma gösteriyor, 70 etrafında daha az ama yine de
 mevcut bir tepe var, bir diğeri 100 etrafında. Yani <code>coord</code>
-noktasındaki piksel çoğunlukla köyümsü bir rengi olan bir yeri
+noktasındaki piksel çoğunlukla koyumsu bir rengi olan bir yeri
 gösteriyor, ve arada sırada önünden daha aydınlık renkleri olan şeyler
 geçiyor. Belki açık gri renkli tişört giymiş bir kaç öğrenci oradan
 geçmiş.</p>
-<p>Fakat bu rapor bize arka plan tespitinde izlenebilecek tekniğin
-ipuçlarını veriyor. Üstteki histograma bakarak eğer bir arka plan seçmek
-istesek, bunu frekanların maksimum olduğu değer için yapabilirdik, bu
+<p>Bu rapor bize arka plan tespitinde izlenebilecek tekniğin ipuçlarını
+veriyor. Üstteki histograma bakarak eğer bir arka plan seçmek istesek,
+bunu frekansların maksimum olduğu değer üzerinden yapabilirdik, bu
 örnekte aşağı yukarı 45 değeri.</p>
 <h3 id="kde">KDE</h3>
 <p>O zaman şöyle bir yaklaşım tasarlanabilir. Bir video’nun karelerini
@@ -358,9 +359,10 @@ etmek istesek arka plan tespiti bu ihtiyaç için faydalı, sonuçta hareket
 eden bölgeler o ana kadar bilinen arka plan resminden “farklı olan”
 pikseller diye tanımlanabilir. Alttaki kod tam da bunu yapıyor. O andaki
 video karesi ile arka plan arasında <code>absdiff</code> hesabı yapıyor,
-elde edilen piksel kordinatları üzerine bazı ek işlemler yaparak (ufak
-bölgeleri atmak, çok az farkları elemek) geri kalan bölgeler etrafında
-bir kırmızı dikdörtgen çiziyor. Sonuç altta görülebilir.</p>
+elde edilen piksel kordinatları üzerine bazı ek filtreleme işlemleri
+yaparak (ufak bölgeleri atmak, çok az farkları elemek gibi) geri kalan
+bölgeler etrafında bir kırmızı dikdörtgen çiziyor. Sonuç altta
+görülebilir.</p>
 <p><img src="vision_20bg_03.jpg" /></p>
 <p><a href="gmm_online_rect.py">gmm_online_rect.py</a></p>
 <p>Kaynaklar</p>

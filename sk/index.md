@@ -3,6 +3,8 @@
 
 ## En Son
 
+13/10 - [Arkaplan (Background) Tespiti](https://burakbayramli.github.io/dersblog/vision/vision_20bg/arkaplan__background__tespiti.html)
+
 8/10 - [Balonlar Ne Zaman Patlar?](https://burakbayramli.github.io/dersblog/tser/tser_131_bubble/balonlar_ne_zaman_patlar.html)
 
 29/9 - [Artımsal (Incremental) GMM](https://burakbayramli.github.io/dersblog/stat/stat_112_gmminc/artimsal__incremental__gmm.html)
@@ -10,8 +12,6 @@
 23/9 - [Parametresiz İstatistik (Nonparametric Statistics)](https://burakbayramli.github.io/dersblog/stat/stat_053_nonpar/parametresiz_istatistik__nonparametric_statistics_.html)
 
 17/9 - [Yürüyen Ortalama, EWMA - Ekler, Etkili Örneklem Büyüklüğü](https://burakbayramli.github.io/dersblog/tser/tser_020_ar/arima_arch_garch_periyotlar_yuruyen_ortalama.html)
-
-8/9 - [Renk, Bölgeler - Ekler, Dijital Kovaryans, Uzaklık Hesabı](https://burakbayramli.github.io/dersblog/vision/vision_50colreg/renk_bolgeler_ve_doku__texture_.html)
 
 ## Konular, Referans
 
@@ -50,3 +50,6 @@
 [Sene](year.html)
 
 [Ara](https://burakbayramli.github.io/sksearch)
+
+
+
