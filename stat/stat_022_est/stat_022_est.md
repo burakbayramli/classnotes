@@ -1,17 +1,22 @@
 # Tahmin Edici Hesaplar (Estimators)
 
-Maksimum Olurluk (maximum likelihood) kavramını kullanarak ilginç bazı
-sonuçlara erişmek mümkün; bu sayede dağılım fonksiyonları ve veri
-arasında bazı sonuçlar elde edebiliriz. Maksimum olurluk nedir? MO ile
+### Maksimum Olurluk (Maximum Likelihood)
+
+Maksimum olurluk bir kestirme hesabı yapmanın yolu. Bu teknik ile
 verinin her noktası teker teker olasılık fonksiyonuna geçilir, ve elde
 edilen olasılık sonuçları birbiri ile çarpılır. Çoğunlukla formül
 içinde bilinmeyen bir(kaç) parametre vardır, ve bu çarpım sonrası,
-içinde bu parametre(ler) olan yeni bir formül ortaya çıkar. Bu nihai
-formülün kısmi türevi alınıp sıfıra eşitlenince cebirsel bazı
-teknikler ile bilinmeyen parametre bulunabilir. Bu sonuç eldeki veri
-bağlamında en mümkün (olur) parametre değeridir. Öyle ya, mesela
-Gaussian $N(10,2)$ dağılımı var ise, 60,90 gibi değerlerin "olurluğu''
-düşüktür. Gaussin üzerinde örnek,
+içinde bu parametre(ler) olan yeni bir formül ortaya çıkar. Püf nokta
+şudur ki eğer bir model "doğru" ya da doğruya yakın modelse o veri
+üzerinde işletilince yüksek olasılık değerler rapor edilecektir. Öyle
+ya, mesela Gaussian $N(10,2)$ dağılımı var ise, 60,90 gibi değerlerin
+"olurluğu'' düşüktür.
+
+Demek ki elimizde bir maksimizasyon, optimizasyon problemi var. O
+zaman çarpımlardan elde edilen nihai formülün kısmı türevi alınıp
+sıfıra eşitlenince cebirsel bazı teknikler ile bilinmeyen parametre
+bulunabilir. Bu sonuç eldeki veri bağlamında en mümkün (olur)
+parametre değeridir. Gaussin üzerinde örnek,
 
 $$
 f(x;\mu,\sigma) = \frac{1}{\sigma\sqrt{2\pi}} 
@@ -254,7 +259,26 @@ numpy 0.816496580928
 pandas 1.0
 ```
 
+### Maksimum Sonsal (Maximum a Posteriori / MAP)
+
+Maksimum Olurluk hesabi icin bir bilinmeyen parametre, diyelim ki
+$\theta$'yi kestirmeye ugrastik ve bunu icin verinin formulunu
+olusturduk. Bu formulde parametre sabit idi fakat bilinmiyordu.
+
+Simdi eger perspektifimizi biraz degistirirsek ve bilinmeyen parametre
+$\theta$'yi da bir rasgele degisken olarak addedersek, bu bize
+tahminsel hesaplama acisindan biraz daha esneklik saglayacaktir.
+
+
+
+
+
+
 [devam edecek]
 
 
+
+Kaynaklar
+
+[1] Unpingco, Python for Probability, Statistics and Machine Learning
 
