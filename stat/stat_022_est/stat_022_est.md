@@ -259,18 +259,74 @@ numpy 0.816496580928
 pandas 1.0
 ```
 
-### Maksimum Sonsal (Maximum a Posteriori / MAP)
+Binom ve $p$ İçin Maksimum Olurluk Tahmini [1]
 
-Maksimum Olurluk hesabi icin bir bilinmeyen parametre, diyelim ki
-$\theta$'yi kestirmeye ugrastik ve bunu icin verinin formulunu
-olusturduk. Bu formulde parametre sabit idi fakat bilinmiyordu.
+$$ L(p;x) = \prod_{i=1}^n f(x_i;p) = \prod_{i=1}^n {n \choose x} p^x(1-p)^{1-x} $$
 
-Simdi eger perspektifimizi biraz degistirirsek ve bilinmeyen parametre
-$\theta$'yi da bir rasgele degisken olarak addedersek, bu bize
-tahminsel hesaplama acisindan biraz daha esneklik saglayacaktir.
+Log alalım
 
+$$ \log L(p;x) = 
+\sum_{i=1}^n \log {n \choose x} + x \log p + (1-x) \log (1-p) $$
 
+$p$'ye göre türevi alalım, bu sırada kombinasyon ifadesi ${n \choose x}$
+içinde $p$ olmadığı için o yokolacaktır,
 
+$$ \frac{\partial \log L(p)}{\partial p} =
+\frac{x}{p} - \frac{n-x}{1-p}
+$$
+
+Maksimum değeri bulmak için sıfıra eşitleyelim ve $p$ için çözelim,
+
+$$ 0 = \frac{x}{p} - \frac{n-x}{1-p} $$
+
+$$  \frac{x}{p} = \frac{n-x}{1-p}  $$
+
+$$ p(n-x)  = x(1-p) $$
+
+$$ pn - px = x-px $$
+
+$$ pn = x $$
+
+$$ p = \frac{x}{n} $$
+
+Yani $p$ için maksimum olurluk tahmini $x/n$. 
+
+Bernoulli dağılımı Binom dağılımına çok benzer, sadece onun baş kısmında
+kombinasyon ifadesi yoktur. Fakat o ifade $p$'ye göre türevde nasıl olsa
+yokolacağına göre Bernoulli dağılımı için de tahmin edici aynıdır.
+
+### Maksimum Sonsal Hesabı (Maximum a Posteriori / MAP)
+
+Maksimum Olurluk hesabı için bir bilinmeyen parametre, diyelim ki
+$\theta$'yi kestirmeye uğraştık ve bunu için verinin formülünü
+oluşturduk. Bu formülde parametre sabit idi fakat bilinmiyordu. Eğer
+perspektifimizi biraz değiştirirsek ve bilinmeyen parametre
+$\theta$'yi da bir rasgele değişken olarak addedersek, bu bize
+tahminsel hesaplama açısından biraz daha esneklik sağlayacaktır.
+
+Bakış açısı Bayes olacak, bulmak istediğimiz $\theta_{MAP}$ tahmini,
+bunun için olurluk $P(\theta | D)$'yi maksimize eden bir $\theta$
+bulmaya uğraşacağız. $P(D|\theta)$ içeren formül Bayes yaklaşımıyla
+şöyledir,
+
+$$
+P(\theta | D) = \frac{P(D|\theta) P(\theta) }{P(D)}
+$$
+
+$P(\theta|D)$: Sonsal dağılım, bize verilmiş olan ham veriyi dikkate
+alınca tahmin $\theta$'nin olasılığı nedir? "Verilmiş olması" terimine
+dikkat, Bayes yaklaşımı ile veriyi bile bir rasgele değişken kabul
+ediyoruz, ve onun verilmiş olması, bu değişkenin koşulsal bir bağ ile
+birleşik dağılıma dahil edilmesini ima ediyor.
+
+$P(D|\theta)$: Olurluk, elimizdeki tahmin parametresini hesaba
+katarsak verinin olurluğu nedir?
+
+$P(\theta)$: Önsel dağılım. Hiçbir şeyi bilmeden önce tahminimizin
+olasılığı neydi?
+
+$P(D)$: Kısmi (margınal) olasılık. Mümkün tüm tahmin parametreleri
+üzerinden bakınca yeni elde edilen gözlemin olasılığı nedir?
 
 
 

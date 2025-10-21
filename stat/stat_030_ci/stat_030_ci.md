@@ -567,6 +567,88 @@ print (norm.cdf(2)-norm.cdf(-2)) # iki standart sapma
 Her dağılımın tamamının alanı bilindiği gibi 1, bu sebeple üstteki rakamlar
 bir yüzde olarak algılanabilir.
 
+Bayes Usulü Güven Aralığı (Confidence Intervals) 
+
+Bayes ile bu hesabı yapmak için bir dağılımı baz almak lazım. Eğer sonuç
+olarak bir tek sayı değil, bir dağılım elde edersek bu dağılım üzerinde
+güvenlik hesaplarını yaparız. Mesela sonuç, sonsal dağılım (posterior) bir
+Gaussian dağılım ise, bu dağılımın yüzde 95 ağırlığının nerede olduğu, ve
+nasıl hesaplandığı bellidir.
+
+Bayes Teorisi
+
+$$ P(A \mid B)  = \frac{P(B \mid A)P(A)}{P(B)} $$
+
+Veri analizi bağlamında diyelim ki deneyler yaparak tahmini olarak
+hesaplamak (estimate) istediğimiz bir parametre var, bu bir protonun
+kütlesi ya da bir ameliyat sonrası hayatta kalma oranı olabilir. Bu
+durumlarda iki ayrı "olaydan" bahsetmemiz gerekir, B olayı spesifik bazı
+ölçümlerin elde edilmesi "olayıdır", mesela ölçüm üç sayıdan oluşuyorsa,
+biz bir ölçümde spesifik olarak $\{0.2,4,5.4\}$ değerlerini elde
+etmişiz. İkinci olay bilmediğimiz parametrenin belli bir değere sahip
+olması olacak. O zaman Bayes Teorisinin şu şekilde tekrar yazabiliriz, 
+
+$$ P(parametre \mid veri ) \propto P(veri \mid parametre)P(parametre) $$
+
+$\propto$ işareti orantılı olmak (proportional to) anlamına geliyor. Böleni
+attık çünkü o bir sabit (tamamen veriye bağlı, tahmini hesaplamak
+istediğimiz parametreye bağlı değil). Tabii bu durumda sol ve sağ taraf
+birbirine eşit olmaz, o yüzden eşitlik yerine orantılı olmak işaretini
+kullandık. Bu çerçevede "belli bir sayısal sabit çerçevesinde birbirine
+eşit (equal within a numeric constant)" gibi cümleler de görülebilir. 
+
+Örnek
+
+Diyelim ki bir bozuk para ile 10 kere yazı-tura attık, ve sonuç altta
+
+T H H H H T T H H H
+
+Bu veriye bakarak paranın hileli olup olmadığını anlamaya
+çalışacağız. Bayes ifadesini bu veriye göre yazalım,
+
+$$ P(p | \{ \textrm{T H H H H T T H H H} \} \propto 
+P(\{ \textrm{T H H H H T T H H H} | p) P(p) \}
+$$
+
+$P(p)$ ifadesi ne anlama gelir? Aslında bu ifadeyi $P([Dagilim] = p)$ olarak
+görmek daha iyi, artık $p$ parametresini bir dağılımdan gelen bir özgün değer
+olarak gördüğümüze göre, o dağılımın belli bir $p$'ye eşit olduğu zamanı
+modelliyoruz burada. Her halükarda $P(p)$ dağılımını, yani onsel (prior)
+olasılığı bilmiyoruz, hesaptan önce her değerin mümkün olduğunu biliyoruz, o
+zaman bu onsel dağılımı düz (flat) olarak alırız, yani $P(p) = 1$.
+
+$P( \{\textrm{T H H H H T T H H H} \} | p)$ ifadesi göz korkutucu olabilir, ama
+buradaki her öğenin bağımsız özdeşçe dağılmış (independent identically
+distributed) olduğunu görürsek, ama bu ifadeyi ayrı ayrı
+$P( \textrm{T} | p)$ ve $P( \textrm{H} | p)$ çarpımları olarak
+görebiliriz. $P( \textrm{T} | p) = p$ ve $P(  \textrm{H} | p)=1-p$ olduğunu
+biliyoruz. O zaman
+
+$$
+P(p | \{ \textrm{7 Tura, 3 Yazı} \} \propto
+p^7(1-p)^3
+$$
+
+Grafiklersek, 
+
+![](stat_appendix_01.png)
+
+Böylece $p$ için bir sonsal dağılım elde ettik. Artık bu dağılımın yüzde 95
+ağırlığının nerede olduğunu rahatça görebiliriz /
+hesaplayabiliriz. Dağılımın tepe noktasının $p=0.7$ civarında olduğu
+görülüyor. Bir dağılımla daha fazlasını yapmak ta mümkün, mesela bu
+fonksiyonu $p$'ye bağlı başka bir fonksiyona karşı entegre etmek mümkün,
+mesela beklentiyi bu şekilde hesaplayabiliriz.
+
+Önsel dağılımın her noktaya eşit ağırlık veren birörnek (uniform) seçilmiş
+olması, yani problemi çözmeye sıfır bilgiden başlamış olmamız, yöntemin bir
+zayıflığı olarak görülmemeli. Yöntemin kuvveti elimizdeki bilgiyle başlayıp
+onu net bir şekilde veri ve olurluk üzerinden sonsal tek dağılıma
+götürebilmesi. Başlangıç ve sonuç arasındaki bağlantı gayet net. Fazlası da
+var; ilgilendiğimiz alanı (domain) öğrendikçe, başta hiç bilmediğimiz onsel
+dağılımı daha net, bilgili bir şekilde seçebiliriz ve bu sonsal dağılımı da
+daha olması gereken modele daha yaklaştırabilir. 
+
 Kaynaklar 
 
 [1] Larsen, *Introduction to Mathematical Statistics and Its Applications*
@@ -574,8 +656,5 @@ Kaynaklar
 [2] Runger, *Applied Statistics and Probability for Engineers*
 
 [3] Dekker, *Probability and Statistical Inference*
-
-
-
 
 

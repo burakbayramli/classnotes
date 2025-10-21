@@ -245,6 +245,50 @@ plt.savefig('stat_intro_12.png')
 Poisson dağılımın sola doğru meyilli olabileceğini görüyoruz üstte, demek ki
 veride bu tür bir şekil görürsek onu temsil için Poisson seçebiliriz.
 
+Şartsal Olasılık
+
+$A$ olayının $B$ verili olduğu durumdaki şartsal olasılığı şu şekilde
+tanımlanır [6, sf. 12],
+
+$$
+P(A | B) = \frac{P(A \cap B)}{P(B)}
+$$
+
+Not: Çoğu notasyonda ve ilerideki notlarımızda $P(A \cap B) = P(A,B)$
+olarak gösterilir.
+
+![](stat_intro_13.jpg)
+
+Toplamsal (Total) Olasılık Kanunu
+
+$A$ bir olay olsun, ve $B_1,B_2,..,B_n$ olayları $\Omega$ bölümleri
+olsun. O zaman
+
+$$
+P(A) = _{i=1}^{n} P(A|B_i) P(B_i)
+$$
+
+İspat
+
+Toplam kuralı bize $P(A) = \sum_{i=1}^{n} P(A \cap B_i)$ verir ve çarpım
+kuralı $P(A \cap B_i) = P(A|B_i) P(B_i)$. Bunun üzerinden bir $B$
+toplamı almak bize $P(A)$ yi verecektir.
+
+Bayes Kanunu
+
+$A$ bir olay olsun ki olasiligi $P(A)$ ve diyelim ki $B_1,B_2,..,B_n$
+olayları $\Omega$ uzayinin bölümleri. O zaman
+
+$$
+P(B_j | A) =
+\frac {P(A | B_j) P(B_j)} {\sum_{i=1}^{n}P(A | B_j) P(B_i) }
+$$
+
+İspat
+
+Tanım itibariyle $P(B_j | A) = P(A \cap B_j) / P(A) = P(A | B_j) P(B_j) / P(A)$.
+Şimdi Toplam Olasılık Kuralını $P(A)$'ya uygulayınca ispat tamamlanır.
+
 Rasgele Değişkenler
 
 Rasgele değişkenler çoğunlukla büyük harfle gösterilirler, mesela $X$ ya da $Y$
@@ -1305,10 +1349,4 @@ Kaynaklar
 
 [5] Bayramlı, *Büyük Sayılar, Veri, Parametre Tahmin Ediciler (Estimators)*
 
-
-
-
-
-
-
-
+[6] Kroese, Statistical Modeling and Computation
