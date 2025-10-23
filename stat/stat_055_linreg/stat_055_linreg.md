@@ -165,6 +165,7 @@ Kalıntıların normalliği QQ grafiği ile kontrol edilebilir, bkz [11],
 
 ```python
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 sm.qqplot(results.resid)
 plt.savefig('stat_linreg_01.png')
 ```
@@ -193,7 +194,7 @@ bir alan hesabıdır, t değeri 2 ise ve $t_5$ için bu alan hesabı şöyle,
 
 ![](stat_linreg_03.png)
 
-Ayrıca bu olasılık sonucu sıfır ile karşılaştırmak kolay olsun diye 1'den
+Ayrıca bu olasılık sonuçu sıfır ile karşılaştırmak kolay olsun diye 1'den
 çıkartılır ve 2 ile çarpılır, istatistiğin böylece iki taraflı (two-sided)
 olduğu belirtilir. $m$, veri nokta sayısı, eksi katsayı sayısı, artı bir olarak
 hesaplanıyor. Eğer sonuç 0.05'ten küçük ise bu iyiye işarettir, 0.05'ten büyük
@@ -201,7 +202,8 @@ olan değerler iyi değildir. Galton örneğinde $\hat{\beta_0}$ için,
 
 ```python
 from scipy.stats import t
-print (2*(1-t(927).cdf(np.abs(8.517))))
+import numpy as np
+print (2*(1-t.cdf(np.abs(8.517), 927)))
 ```
 
 ```text
@@ -269,11 +271,12 @@ etkilediği için deneme / yanılma ile ekleme / çıkartma işleminin yapılmas
 gerekebilir, ki bu işlemi elle yapmak külfetli olur. Acaba bu yöntemi otomize
 edemez miyiz?
 
-R dilindeki `lm`'in `step` adlı özelliği burada yardımcı
-olabilir. Önce yapay bir veri üretelim,
+Python'da `mlxtend` kütüphanesi burada yardımcı olabilir. Önce yapay
+bir veri üretelim,
 
 ```python
 import pandas as pd
+import numpy as np
 n = 100
 df = pd.DataFrame()
 np.random.seed(10)
@@ -289,111 +292,112 @@ değişkenler önemsiz, ürettiğimiz için biz bunu biliyoruz. Bakalım regresy
 keşfedecek mi? Şimdi tüm değişkenlerle bir OLS yapalım,
 
 ```python
-%load_ext rpy2.ipython
+import statsmodels.formula.api as smf
+results = smf.ols('y ~ x1 + x2 + x3 + x4', data=df).fit()
+print(results.summary())
 ```
+
+```text
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       1.000
+Model:                            OLS   Adj. R-squared:                  1.000
+Method:                 Least Squares   F-statistic:                 4.230e+05
+Date:                Thu, 23 Oct 2025   Prob (F-statistic):          5.97e-201
+Time:                        09:46:12   Log-Likelihood:                -131.99
+No. Observations:                 100   AIC:                             274.0
+Df Residuals:                      95   BIC:                             287.0
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      9.9495      0.094    106.098      0.000       9.763      10.136
+x1           -99.9533      0.097  -1031.975      0.000    -100.146     -99.761
+x2            -0.0410      0.095     -0.432      0.667      -0.230       0.148
+x3            75.1472      0.102    733.851      0.000      74.944      75.350
+x4             0.0486      0.100      0.486      0.628      -0.150       0.247
+==============================================================================
+Omnibus:                        3.126   Durbin-Watson:                   2.267
+Prob(Omnibus):                  0.210   Jarque-Bera (JB):                2.795
+Skew:                          -0.191   Prob(JB):                        0.247
+Kurtosis:                       3.724   Cond. No.                         1.26
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+```
+
+Görüldüğü gibi daha baştan `x2,x4` önemsiz bulundu. Ama daha karmaşık
+bir modelde bu o kadar rahat bulunmayabilirdi. Şimdi `mlxtend` ile
+basamaklı regresyon uygulayalım.
+
+Python'da basamaklı regresyon iki şekilde işler. Ya tam modelden
+geriye gidersiniz yani tam modelden ise yaramayan değişkenleri
+atarsınız, ya da en baz (boş) modelden başlayıp ileri gidersiniz yani
+ekleye ekleye en iyi değişkenlere erişmeye uğraşırsınız. İlk önce
+geriye eliminasyonu görelim,
 
 ```python
-%R -i df
-%R fullmodel <- lm(y~x1+x2+x3+x4,data=df)
-%R -o res res = summary(fullmodel)
-print (res)
+from mlxtend.feature_selection import SequentialFeatureSelector
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# Özellik matrisi ve hedef değişkeni hazırlayalım
+X = df[['x1', 'x2', 'x3', 'x4']]
+y = df['y']
+
+# Geriye eliminasyon (Backward Elimination)
+sfs_backward = SequentialFeatureSelector(LinearRegression(),
+                                         k_features='best',
+                                         forward=False,  # Backward selection
+                                         floating=False,
+                                         scoring='r2',
+                                         cv=5)
+sfs_backward = sfs_backward.fit(X, y)
+
+print('Seçilen özellikler (geriye eliminasyon):', sfs_backward.k_feature_names_)
+print('R² skoru:', sfs_backward.k_score_)
+
+# İndirgenmiş modeli oluşturalım
+X_reduced = X[list(sfs_backward.k_feature_names_)]
+reduced_model = LinearRegression().fit(X_reduced, y)
+print('İndirgenmiş model katsayıları:', reduced_model.coef_)
 ```
 
-```
-
-Call:
-lm(formula = y ~ x1 + x2 + x3 + x4, data = df)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--3.15789 -0.63251 -0.01537  0.58051  2.30127 
-
-Coefficients:
-             Estimate Std. Error   t value Pr(>|t|)    
-(Intercept)   9.94953    0.09378   106.098   <2e-16 ***
-x1          -99.95333    0.09686 -1031.975   <2e-16 ***
-x2           -0.04103    0.09500    -0.432    0.667    
-x3           75.14720    0.10240   733.851   <2e-16 ***
-x4            0.04863    0.10015     0.486    0.628    
----
-
-Residual standard error: 0.9292 on 95 degrees of freedom
-Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
-F-statistic: 4.23e+05 on 4 and 95 DF,  p-value: < 2.2e-16
-
-
-```
-
-Görüldüğü gibi daha baştan `x2,x4` önemsiz bulundu. Ama daha karmaşık bir
-modelde bu o kadar rahat bulunmayabilirdi. Şimdi `step` ile tam modelden bu
-değişkenler çekip çıkartılabiliyor mu ona bakacağız.
-
-R dilinde basamaklı regresyon iki şekilde işler. Ya tam modelden geriye
-gidersiniz yani tam modelden ise yaramayan değişkenleri atarsınız, ya da en baz
-(boş) modelden başlayıp ileri gidersiniz yani ekleye ekleye en iyi değişkenlere
-erişmeye uğraşırsınız. İlk önce eliminasyonu görelim,
-
-```python
-%R reducedmodel <- step(fullmodel, direction="backward")
-%R -o resred resred<-summary(reducedmodel)
-print (resred)
-```
-
-```
-
-Call:
-lm(formula = y ~ x1 + x3, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.1667 -0.6078 -0.0256  0.5732  2.3592 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   9.95039    0.09251   107.6   <2e-16 ***
-x1          -99.95181    0.09540 -1047.7   <2e-16 ***
-x3           75.14514    0.10101   744.0   <2e-16 ***
----
-
-Residual standard error: 0.9217 on 97 degrees of freedom
-Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
-F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: < 2.2e-16
+```text
+Seçilen özellikler (geriye eliminasyon): ('x1', 'x3')
+R² skoru: 0.9999286630993385
+İndirgenmiş model katsayıları: [-99.95180577  75.14513527]
 ```
 
 Doğru sonuçlar bulundu. Bu yöntem fena değildir, ama bazen o kadar çok değişken
 vardır ki tam modelle başlamak iyi bir fikir olmayabilir, o zaman boş başlayıp
-ileri gitmek daha mantıklı olabilir. Boş modelde sadece `y ~ 1` olacak,
-biraz garip gelebilir, çünkü hiç değişken yok (ki bu durumda uydurulan tüm
-değişkenler sadece $y$'nin ortalamasıdır). Neyse, ileri giden modelde
-`step`'e hangi değişkenlerin aday / potansiyel değişken olduğunu belirtmek
-gerekir, bunu `scope` ile yaparız,
+ileri gitmek daha mantıklı olabilir. Boş modelde sadece sabit terim olacak.
 
 ```python
-%R minmodel <- lm(y ~ 1,data=df)
-%R fwd <- step(minmodel, direction="forward", scope = ( ~ x1 + x2 + x3 + x4))
-%R -o fwdres fwdres <- summary(fwd)
-print (fwdres)
+# İleri seçim (Forward Selection)
+sfs_forward = SequentialFeatureSelector(LinearRegression(),
+                                        k_features='best',
+                                        forward=True,  # Forward selection
+                                        floating=False,
+                                        scoring='r2',
+                                        cv=5)
+sfs_forward = sfs_forward.fit(X, y)
+
+print('Seçilen özellikler (ileri seçim):', sfs_forward.k_feature_names_)
+print('R² skoru:', sfs_forward.k_score_)
+
+# İndirgenmiş modeli oluşturalım
+X_reduced_forward = X[list(sfs_forward.k_feature_names_)]
+reduced_model_forward = LinearRegression().fit(X_reduced_forward, y)
+print('İndirgenmiş model katsayıları:', reduced_model_forward.coef_)
 ```
 
-```
-
-Call:
-lm(formula = y ~ x1 + x3, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.1667 -0.6078 -0.0256  0.5732  2.3592 
-
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   9.95039    0.09251   107.6   <2e-16 ***
-x1          -99.95181    0.09540 -1047.7   <2e-16 ***
-x3           75.14514    0.10101   744.0   <2e-16 ***
----
-
-Residual standard error: 0.9217 on 97 degrees of freedom
-Multiple R-squared:  0.9999,	Adjusted R-squared:  0.9999 
-F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: < 2.2e-16
+```text
+Seçilen özellikler (ileri seçim): ('x1', 'x3')
+R² skoru: 0.9999286630993385
+İndirgenmiş model katsayıları: [-99.95180577  75.14513527]
 ```
 
 Yine aynı sonuca geldik. Tabii bu çok basit bir yapay veri, o yüzden aynı yere
@@ -405,21 +409,7 @@ Bir diğer tavsiye basamaklı regresyonu her derda deva bir yöntem olarak
 görmemek, çünkü üstteki çıktılara göre sihirli bir şekilde en kullanışlı alt
 kümeyi buluveriyor, vs, fakat bu metot, değişkenleri iyi tanıyan birisi
 tarafından dikkatli bir şekilde alt kümenin elenip, seçilerek bulunması yerine
-geçemez. Bunu özellikle belirtiyoruz, çünkü bazılarının aklına şöyle bir şey
-gelebilir,
-
-```python
-%R full.model <- lm(y ~ (x1 + x2 + x3 + x4)^4)
-%R reduced.model <- step(full.model, direction="backward")
-```
-
-Üstte görülen `^4` kullanımı dört değişken arasındaki *tüm mümkün*
-etkileşimleri (interaction) ortaya çıkartır, yani
-`x1:x2,x1:x2:x3:x4,x3:x4,..`  gibi ve bunların tamamını basamaklı
-regresyona sokar, çünkü bu cinliğe göre nasılsa eliminasyon metotu ise yaramayan
-değişkenleri atacaktır (!). Bu metot iyi işlemeyecektir, çoğu etkileşimin hiçbir
-anlamı yoktur, `step`  fonksiyonu herhalde çok fazla seçenek arasında
-boğulur, sonuçta elimizde bir sürü ise yaramaz değişken kalacaktır.
+geçemez.
 
 Soru
 
@@ -792,4 +782,5 @@ Very Close Election}, [http://www.centerforpolitics.org/crystalball/articles/abr
 [11] Bayramlı, Istatistik, *Güven Aralıkları, Hipotez Testleri*
 
 [12] Bayramlı, Istatistik, *Tahmin Aralıkları (Prediction Interval)*
+```
 

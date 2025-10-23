@@ -240,8 +240,9 @@ hatayı bölünce başka bir Öğrenci t dağılımı ortaya çıkacak.</p>
 [11],</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sm.qqplot(results.resid)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_linreg_01.png&#39;</span>)</span></code></pre></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sm.qqplot(results.resid)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_linreg_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="stat_linreg_01.png" /></p>
 <p>Oldukça düz bir çizgi, uyum başarılı demek ki..</p>
 <p>Şimdi, katsayı için olan kalıntı değerlerinin karesini alıp toplarsak
@@ -264,7 +265,7 @@ soru. Olasılık hesabı yoğunluk fonksiyonu üzerinde bir alan hesabıdır, t
 değeri 2 ise ve <span class="math inline">\(t_5\)</span> için bu alan
 hesabı şöyle,</p>
 <p><img src="stat_linreg_03.png" /></p>
-<p>Ayrıca bu olasılık sonucu sıfır ile karşılaştırmak kolay olsun diye
+<p>Ayrıca bu olasılık sonuçu sıfır ile karşılaştırmak kolay olsun diye
 1’den çıkartılır ve 2 ile çarpılır, istatistiğin böylece iki taraflı
 (two-sided) olduğu belirtilir. <span class="math inline">\(m\)</span>,
 veri nokta sayısı, eksi katsayı sayısı, artı bir olarak hesaplanıyor.
@@ -273,7 +274,8 @@ değerler iyi değildir. Galton örneğinde <span
 class="math inline">\(\hat{\beta_0}\)</span> için,</p>
 <div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> t</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>t(<span class="dv">927</span>).cdf(np.<span class="bu">abs</span>(<span class="fl">8.517</span>))))</span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="dv">2</span><span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>t.cdf(np.<span class="bu">abs</span>(<span class="fl">8.517</span>), <span class="dv">927</span>)))</span></code></pre></div>
 <pre class="text"><code>0.0</code></pre>
 <p>Üstteki sonuç 0.0 değeri çok iyi. Demek ki bu katsayı önemli
 (significant).</p>
@@ -333,114 +335,115 @@ sayıları burada biraz yardımcı olabilir, fakat değişkenlerin eklenip,
 çıkartılması regresyonun tamamını etkilediği için deneme / yanılma ile
 ekleme / çıkartma işleminin yapılması gerekebilir, ki bu işlemi elle
 yapmak külfetli olur. Acaba bu yöntemi otomize edemez miyiz?</p>
-<p>R dilindeki <code>lm</code>’in <code>step</code> adlı özelliği burada
-yardımcı olabilir. Önce yapay bir veri üretelim,</p>
+<p>Python’da <code>mlxtend</code> kütüphanesi burada yardımcı olabilir.
+Önce yapay bir veri üretelim,</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">10</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x1&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x2&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x3&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x4&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> <span class="dv">10</span> <span class="op">+</span> <span class="op">-</span><span class="dv">100</span><span class="op">*</span>df[<span class="st">&#39;x1&#39;</span>] <span class="op">+</span>  <span class="dv">75</span><span class="op">*</span>df[<span class="st">&#39;x3&#39;</span>] <span class="op">+</span> np.random.normal(size<span class="op">=</span>n)</span></code></pre></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">10</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x1&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x2&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x3&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x4&#39;</span>] <span class="op">=</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> <span class="dv">10</span> <span class="op">+</span> <span class="op">-</span><span class="dv">100</span><span class="op">*</span>df[<span class="st">&#39;x1&#39;</span>] <span class="op">+</span>  <span class="dv">75</span><span class="op">*</span>df[<span class="st">&#39;x3&#39;</span>] <span class="op">+</span> np.random.normal(size<span class="op">=</span>n)</span></code></pre></div>
 <p>Yapay veride farkedileceği üzere <code>x2,x4</code> modele eklenmedi
 bile. Bu değişkenler önemsiz, ürettiğimiz için biz bunu biliyoruz.
 Bakalım regresyon bunu keşfedecek mi? Şimdi tüm değişkenlerle bir OLS
 yapalım,</p>
 <div class="sourceCode" id="cb12"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext rpy2.ipython</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>i df</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R fullmodel <span class="op">&lt;-</span> lm(y<span class="op">~</span>x1<span class="op">+</span>x2<span class="op">+</span>x3<span class="op">+</span>x4,data<span class="op">=</span>df)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o res res <span class="op">=</span> summary(fullmodel)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span></code></pre></div>
-<pre><code>
-Call:
-lm(formula = y ~ x1 + x2 + x3 + x4, data = df)
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y ~ x1 + x2 + x3 + x4&#39;</span>, data<span class="op">=</span>df).fit()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(results.summary())</span></code></pre></div>
+<pre class="text"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       1.000
+Model:                            OLS   Adj. R-squared:                  1.000
+Method:                 Least Squares   F-statistic:                 4.230e+05
+Date:                Thu, 23 Oct 2025   Prob (F-statistic):          5.97e-201
+Time:                        09:46:12   Log-Likelihood:                -131.99
+No. Observations:                 100   AIC:                             274.0
+Df Residuals:                      95   BIC:                             287.0
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      9.9495      0.094    106.098      0.000       9.763      10.136
+x1           -99.9533      0.097  -1031.975      0.000    -100.146     -99.761
+x2            -0.0410      0.095     -0.432      0.667      -0.230       0.148
+x3            75.1472      0.102    733.851      0.000      74.944      75.350
+x4             0.0486      0.100      0.486      0.628      -0.150       0.247
+==============================================================================
+Omnibus:                        3.126   Durbin-Watson:                   2.267
+Prob(Omnibus):                  0.210   Jarque-Bera (JB):                2.795
+Skew:                          -0.191   Prob(JB):                        0.247
+Kurtosis:                       3.724   Cond. No.                         1.26
+==============================================================================
 
-Residuals:
-     Min       1Q   Median       3Q      Max 
--3.15789 -0.63251 -0.01537  0.58051  2.30127 
-
-Coefficients:
-             Estimate Std. Error   t value Pr(&gt;|t|)    
-(Intercept)   9.94953    0.09378   106.098   &lt;2e-16 ***
-x1          -99.95333    0.09686 -1031.975   &lt;2e-16 ***
-x2           -0.04103    0.09500    -0.432    0.667    
-x3           75.14720    0.10240   733.851   &lt;2e-16 ***
-x4            0.04863    0.10015     0.486    0.628    
----
-
-Residual standard error: 0.9292 on 95 degrees of freedom
-Multiple R-squared:  0.9999,    Adjusted R-squared:  0.9999 
-F-statistic: 4.23e+05 on 4 and 95 DF,  p-value: &lt; 2.2e-16
-
-</code></pre>
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
 <p>Görüldüğü gibi daha baştan <code>x2,x4</code> önemsiz bulundu. Ama
 daha karmaşık bir modelde bu o kadar rahat bulunmayabilirdi. Şimdi
-<code>step</code> ile tam modelden bu değişkenler çekip çıkartılabiliyor
-mu ona bakacağız.</p>
-<p>R dilinde basamaklı regresyon iki şekilde işler. Ya tam modelden
+<code>mlxtend</code> ile basamaklı regresyon uygulayalım.</p>
+<p>Python’da basamaklı regresyon iki şekilde işler. Ya tam modelden
 geriye gidersiniz yani tam modelden ise yaramayan değişkenleri
 atarsınız, ya da en baz (boş) modelden başlayıp ileri gidersiniz yani
-ekleye ekleye en iyi değişkenlere erişmeye uğraşırsınız. İlk önce
+ekleye ekleye en iyi değişkenlere erişmeye uğraşırsınız. İlk önce geriye
 eliminasyonu görelim,</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R reducedmodel <span class="op">&lt;-</span> step(fullmodel, direction<span class="op">=</span><span class="st">&quot;backward&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o resred resred<span class="op">&lt;-</span>summary(reducedmodel)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (resred)</span></code></pre></div>
-<pre><code>
-Call:
-lm(formula = y ~ x1 + x3, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.1667 -0.6078 -0.0256  0.5732  2.3592 
-
-Coefficients:
-             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)   9.95039    0.09251   107.6   &lt;2e-16 ***
-x1          -99.95181    0.09540 -1047.7   &lt;2e-16 ***
-x3           75.14514    0.10101   744.0   &lt;2e-16 ***
----
-
-Residual standard error: 0.9217 on 97 degrees of freedom
-Multiple R-squared:  0.9999,    Adjusted R-squared:  0.9999 
-F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: &lt; 2.2e-16</code></pre>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mlxtend.feature_selection <span class="im">import</span> SequentialFeatureSelector</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Özellik matrisi ve hedef değişkeni hazırlayalım</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[[<span class="st">&#39;x1&#39;</span>, <span class="st">&#39;x2&#39;</span>, <span class="st">&#39;x3&#39;</span>, <span class="st">&#39;x4&#39;</span>]]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">&#39;y&#39;</span>]</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Geriye eliminasyon (Backward Elimination)</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>sfs_backward <span class="op">=</span> SequentialFeatureSelector(LinearRegression(),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                                         k_features<span class="op">=</span><span class="st">&#39;best&#39;</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                                         forward<span class="op">=</span><span class="va">False</span>,  <span class="co"># Backward selection</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                                         floating<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                                         scoring<span class="op">=</span><span class="st">&#39;r2&#39;</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                                         cv<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>sfs_backward <span class="op">=</span> sfs_backward.fit(X, y)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Seçilen özellikler (geriye eliminasyon):&#39;</span>, sfs_backward.k_feature_names_)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;R² skoru:&#39;</span>, sfs_backward.k_score_)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co"># İndirgenmiş modeli oluşturalım</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>X_reduced <span class="op">=</span> X[<span class="bu">list</span>(sfs_backward.k_feature_names_)]</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>reduced_model <span class="op">=</span> LinearRegression().fit(X_reduced, y)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;İndirgenmiş model katsayıları:&#39;</span>, reduced_model.coef_)</span></code></pre></div>
+<pre class="text"><code>Seçilen özellikler (geriye eliminasyon): (&#39;x1&#39;, &#39;x3&#39;)
+R² skoru: 0.9999286630993385
+İndirgenmiş model katsayıları: [-99.95180577  75.14513527]</code></pre>
 <p>Doğru sonuçlar bulundu. Bu yöntem fena değildir, ama bazen o kadar
 çok değişken vardır ki tam modelle başlamak iyi bir fikir olmayabilir, o
 zaman boş başlayıp ileri gitmek daha mantıklı olabilir. Boş modelde
-sadece <code>y ~ 1</code> olacak, biraz garip gelebilir, çünkü hiç
-değişken yok (ki bu durumda uydurulan tüm değişkenler sadece <span
-class="math inline">\(y\)</span>’nin ortalamasıdır). Neyse, ileri giden
-modelde <code>step</code>’e hangi değişkenlerin aday / potansiyel
-değişken olduğunu belirtmek gerekir, bunu <code>scope</code> ile
-yaparız,</p>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R minmodel <span class="op">&lt;-</span> lm(y <span class="op">~</span> <span class="dv">1</span>,data<span class="op">=</span>df)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R fwd <span class="op">&lt;-</span> step(minmodel, direction<span class="op">=</span><span class="st">&quot;forward&quot;</span>, scope <span class="op">=</span> ( <span class="op">~</span> x1 <span class="op">+</span> x2 <span class="op">+</span> x3 <span class="op">+</span> x4))</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o fwdres fwdres <span class="op">&lt;-</span> summary(fwd)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (fwdres)</span></code></pre></div>
-<pre><code>
-Call:
-lm(formula = y ~ x1 + x3, data = df)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--3.1667 -0.6078 -0.0256  0.5732  2.3592 
-
-Coefficients:
-             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)   9.95039    0.09251   107.6   &lt;2e-16 ***
-x1          -99.95181    0.09540 -1047.7   &lt;2e-16 ***
-x3           75.14514    0.10101   744.0   &lt;2e-16 ***
----
-
-Residual standard error: 0.9217 on 97 degrees of freedom
-Multiple R-squared:  0.9999,    Adjusted R-squared:  0.9999 
-F-statistic: 8.599e+05 on 2 and 97 DF,  p-value: &lt; 2.2e-16</code></pre>
+sadece sabit terim olacak.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># İleri seçim (Forward Selection)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>sfs_forward <span class="op">=</span> SequentialFeatureSelector(LinearRegression(),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                        k_features<span class="op">=</span><span class="st">&#39;best&#39;</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                        forward<span class="op">=</span><span class="va">True</span>,  <span class="co"># Forward selection</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                                        floating<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                                        scoring<span class="op">=</span><span class="st">&#39;r2&#39;</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                                        cv<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>sfs_forward <span class="op">=</span> sfs_forward.fit(X, y)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Seçilen özellikler (ileri seçim):&#39;</span>, sfs_forward.k_feature_names_)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;R² skoru:&#39;</span>, sfs_forward.k_score_)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># İndirgenmiş modeli oluşturalım</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>X_reduced_forward <span class="op">=</span> X[<span class="bu">list</span>(sfs_forward.k_feature_names_)]</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>reduced_model_forward <span class="op">=</span> LinearRegression().fit(X_reduced_forward, y)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;İndirgenmiş model katsayıları:&#39;</span>, reduced_model_forward.coef_)</span></code></pre></div>
+<pre class="text"><code>Seçilen özellikler (ileri seçim): (&#39;x1&#39;, &#39;x3&#39;)
+R² skoru: 0.9999286630993385
+İndirgenmiş model katsayıları: [-99.95180577  75.14513527]</code></pre>
 <p>Yine aynı sonuca geldik. Tabii bu çok basit bir yapay veri, o yüzden
 aynı yere gelmiş olmamız şaşırtıcı değil. Gerçek problemlerde geriye ve
 ileri giden modellerin ikisini de deneyip sonuçları karşılaştırmak iyi
@@ -449,19 +452,7 @@ oluyor. Sonuçlar şaşırtıcı olabilir.</p>
 olarak görmemek, çünkü üstteki çıktılara göre sihirli bir şekilde en
 kullanışlı alt kümeyi buluveriyor, vs, fakat bu metot, değişkenleri iyi
 tanıyan birisi tarafından dikkatli bir şekilde alt kümenin elenip,
-seçilerek bulunması yerine geçemez. Bunu özellikle belirtiyoruz, çünkü
-bazılarının aklına şöyle bir şey gelebilir,</p>
-<div class="sourceCode" id="cb19"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R full.model <span class="op">&lt;-</span> lm(y <span class="op">~</span> (x1 <span class="op">+</span> x2 <span class="op">+</span> x3 <span class="op">+</span> x4)<span class="op">^</span><span class="dv">4</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R reduced.model <span class="op">&lt;-</span> step(full.model, direction<span class="op">=</span><span class="st">&quot;backward&quot;</span>)</span></code></pre></div>
-<p>Üstte görülen <code>^4</code> kullanımı dört değişken arasındaki
-<em>tüm mümkün</em> etkileşimleri (interaction) ortaya çıkartır, yani
-<code>x1:x2,x1:x2:x3:x4,x3:x4,..</code> gibi ve bunların tamamını
-basamaklı regresyona sokar, çünkü bu cinliğe göre nasılsa eliminasyon
-metotu ise yaramayan değişkenleri atacaktır (!). Bu metot iyi
-işlemeyecektir, çoğu etkileşimin hiçbir anlamı yoktur, <code>step</code>
-fonksiyonu herhalde çok fazla seçenek arasında boğulur, sonuçta elimizde
-bir sürü ise yaramaz değişken kalacaktır.</p>
+seçilerek bulunması yerine geçemez.</p>
 <p>Soru</p>
 <p>Diyelim ki elimde bir veri seti var ve üzerinde OLS uyguladım,
 sonuçlara baktım. Eğer bu veri setini alıp, kendisine eklersem, yani
@@ -512,10 +503,10 @@ küçülürse katsayı / hata olarak hesaplanan t değeri buyur. Daha büyüyen
 t değeri daha küçülen p-değeri demektir! Yani veriyi ikiye katlayınca
 birden bire önemsiz olan (<span class="math inline">\(&gt;0.05\)</span>)
 bir değişken, önemli hale gelebilir. Altta örneğini görüyoruz,</p>
-<div class="sourceCode" id="cb20"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y~x1+x2+x3+x4&#39;</span>, data<span class="op">=</span>df).fit()</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y~x1+x2+x3+x4&#39;</span>, data<span class="op">=</span>df).fit()</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
 <pre class="text"><code>                            OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       1.000
@@ -543,10 +534,10 @@ Kurtosis:                       3.724   Cond. No.                         1.26
 ==============================================================================
 </code></pre>
 <p>Veriyi ikiye katlayıp bir daha OLS,</p>
-<div class="sourceCode" id="cb22"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.concat((df,df))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y~x1+x2+x3+x4&#39;</span>, data<span class="op">=</span>df2).fit()</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.concat((df,df))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y~x1+x2+x3+x4&#39;</span>, data<span class="op">=</span>df2).fit()</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
 <pre class="text"><code>                            OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       1.000
@@ -605,14 +596,14 @@ tahmin etmeye uğraşıyoruz, çünkü başta Demokrat Clinton var, ve iki
 dönemdir orada. Net popülarite ve büyüme hep o anki başkan ve onun
 partisinin performansı ile alakalı. Bu regresyonu işlettiğimizde,
 sonuçlar şöyle,</p>
-<div class="sourceCode" id="cb24"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;prez.csv&#39;</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.head() , <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>regr <span class="op">=</span> <span class="st">&#39;incumbent_vote ~ gdp_growth + net_approval + two_terms&#39;</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df).fit()</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;prez.csv&#39;</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.head() , <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>regr <span class="op">=</span> <span class="st">&#39;incumbent_vote ~ gdp_growth + net_approval + two_terms&#39;</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df).fit()</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
 <pre class="text"><code>   year  gdp_growth  net_approval  two_terms  incumbent_vote
 0  2016         1.2           0.0       48.6             NaN
 1  2012         1.3          -0.8        0.0            52.0
@@ -653,19 +644,19 @@ değerleri 0.05’ten küçük).</p>
 ne olurdu diye merak ediyoruz, bunun için tahmin edeceğimiz senenin veri
 noktasını dışarıda bırakarak (out-of-sample) regresyon işletip o seneyi
 bilmiyormuş gibi yapıp tahmin ediyoruz,</p>
-<div class="sourceCode" id="cb26"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> out_of_sample_pred(year):</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    df2 <span class="op">=</span> df[df[<span class="st">&#39;year&#39;</span>] <span class="op">!=</span> year]</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    results2 <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df2).fit()</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    conf <span class="op">=</span> results2.conf_int()</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> np.array(df[df[<span class="st">&#39;year&#39;</span>] <span class="op">==</span> year])[<span class="dv">0</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span> pred[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">1.</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(pred, conf)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># o senenin verisinin disarida birakarak gecmisi tahmin et</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;bush/clinton&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">1992</span>))</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;gore/bush&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2000</span>))</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;bush/kerry&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2004</span>))</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;mccain/obama&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2008</span>))</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;obama/romney&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2012</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> out_of_sample_pred(year):</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    df2 <span class="op">=</span> df[df[<span class="st">&#39;year&#39;</span>] <span class="op">!=</span> year]</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    results2 <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df2).fit()</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    conf <span class="op">=</span> results2.conf_int()</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    pred <span class="op">=</span> np.array(df[df[<span class="st">&#39;year&#39;</span>] <span class="op">==</span> year])[<span class="dv">0</span>][:<span class="op">-</span><span class="dv">1</span>]<span class="op">;</span> pred[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">1.</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(pred, conf)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># o senenin verisinin disarida birakarak gecmisi tahmin et</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;bush/clinton&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">1992</span>))</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;gore/bush&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2000</span>))</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;bush/kerry&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2004</span>))</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;mccain/obama&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2008</span>))</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;obama/romney&#39;</span>)<span class="op">;</span> <span class="bu">print</span> (out_of_sample_pred(<span class="dv">2012</span>))</span></code></pre></div>
 <pre class="text"><code>bush/clinton
 [43.68758927 52.47911415]
 gore/bush
@@ -705,10 +696,10 @@ bile şaşırmıştı.</p>
 (dikkat belli bir adaydan bahsetmiyoruz bile); Haziran 2016 itibariyle
 büyüme 2%, Obama’nın net popülaritesi sıfır olduğu durumda (bu
 değişkenlerin ne olduğuna o tarihte tekrar bakılmalı),</p>
-<div class="sourceCode" id="cb28"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>conf <span class="op">=</span> results.conf_int()</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> [<span class="fl">1.</span>, <span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="dv">1</span>]</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.dot(pred, conf), np.dot(pred, results.params))</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>conf <span class="op">=</span> results.conf_int()</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> [<span class="fl">1.</span>, <span class="fl">2.0</span>, <span class="fl">0.0</span>, <span class="dv">1</span>]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.dot(pred, conf), np.dot(pred, results.params))</span></code></pre></div>
 <pre class="text"><code>[43.80446415 52.79105137] 48.297757758277356</code></pre>
 <p>Yani Demokrat adayın kaybetme şansı daha fazla, her ne kadar kesin
 bir şey söylenemezse de, güven aralığının iki ucu da yüzde 50 altında
@@ -751,13 +742,13 @@ meyilli oluyor. Tabii eğer parti yeni başa gelmişse, o zaman dezavantaj
 olmadığı için bazı durumlarda”ilk dönem başkan avantajlıymış gibi’’
 durmuş olabilir. Şimdi bu faraziyeyi test edelim, hangi model daha
 doğru? Yeni bir veri setinde bu değişikliği test edebiliriz,</p>
-<div class="sourceCode" id="cb30"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;prez_incumb.csv&#39;</span>)</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>regr <span class="op">=</span> <span class="st">&#39;incumbent_vote ~ gdp_growth + net_approval + incumb_prez&#39;</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df).fit()</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.aic)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;prez_incumb.csv&#39;</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>regr <span class="op">=</span> <span class="st">&#39;incumbent_vote ~ gdp_growth + net_approval + incumb_prez&#39;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(regr, data<span class="op">=</span>df).fit()</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.aic)</span></code></pre></div>
 <pre class="text"><code>91.79663654753915</code></pre>
 <p>AIC sonucu arttı, bu modelin daha kötüleştiği anlamına gelir.</p>
 <p>Not: Gayri-safi yurtiçi hasıla (GDP) 2. çeyrekteki artışına
@@ -787,7 +778,7 @@ Kareler</em></p>
 <p>[11] Bayramlı, Istatistik, <em>Güven Aralıkları, Hipotez
 Testleri</em></p>
 <p>[12] Bayramlı, Istatistik, <em>Tahmin Aralıkları (Prediction
-Interval)</em></p>
+Interval)</em> ```</p>
 <p>
   <a href="..">Yukarı</a>
 </p>
