@@ -8,7 +8,7 @@ katsayılarının belli bir grup için (şehir, okul, zaman, bölge, vs), her
 grup için farklı şekillerde veriye uydurulmasını (fit) istiyorsak, o zaman
 çok seviyeli modelleri kullanmak gerekebilir.
 
-Altta gösterilen iki parametreli klasik regresyon 
+Altta gösterilen iki parametreli klasik regresyon
 
 $$ y_i = \alpha + \beta x_i + \epsilon_i $$
 
@@ -36,11 +36,11 @@ $\alpha_j,\beta_j$ gibi parametrelere "sabit etki'' adı veriliyor, çünkü o
 parametreler grup içinde değişmemektedir, modelin geri kalanı ise rasgele
 etki olacaktır. Bu iki kavramın karışımı da (ki neredeyse her zaman öyle
 olur) "karışık etki (mixed effects)'' modeli olarak anılıyor. Bu
-terminoloji biraz kafa karıştırıcı olabilir, bilinmesi iyidir böylece
-literatürü takip edebiliriz, ama biz [1]'deki tavsiyeyi kullanıp "çok
-seviyeli modeller'' kelimelerini kullanacağız.
+terminoloji biraz kafa karıştırıcı olabilir, ama bilinmesi iyidir böylece
+literatürü takip edebiliriz. Biz burada Gelman & Hill [1]’deki tavsiyeyi
+kullanıp "çok seviyeli modeller" kelimelerini tercih edeceğiz.
 
-Örnek
+Örnek: İlaç Etkisi Verisi
 
 Yeni bir ilacın etkili olup olmadığını anlamak için hastalar (subject)
 üzerinde deneyler yapılır [2]. Bu veride ilginç olan hastanın durumunun
@@ -48,174 +48,161 @@ tekrar tekrar belli aralıklarla ölçülmesi, ve durumun (status) yeni bir
 veri satırı olarak kaydedilmesi. Ayrıca rasgele seçilen hastalara ya ilaç,
 ya da etkisiz ilaç (placebo) veriliyor. Veride cinsiyet (gender), yaş
 (age), tedavi merkezi numarası (centre) kolonları var. İlk aydaki durum
-"başlangıç noktası (baseline)'' olarak ayrı bir kolona ayrılıyor, ve ilk
+"başlangıç noktası (baseline)" olarak ayrı bir kolona ayrılıyor, ve ilk
 ay satırları regresyon öncesi siliniyor. Soru şudur: ilaç etkili midir?
 
-Soru bir evet/hayır sorusu olduğu için lojistik regresyon kullanacağız. 
+Soru bir evet/hayır sorusu olduğu için lojistik regresyon kullanacağız.
+
+Tek seviyeli (bağımsız gözlem varsayımıyla) model
 
 ```python
 import statsmodels.api as sm, pandas as pd
 import statsmodels.formula.api as smf
-df = pd.read_csv('respiratory.csv',index_col=0)
+
+df = pd.read_csv('respiratory.csv', index_col=0)
 baseline = df[df['month'] == 0][['subject','status']].set_index('subject')
 df['status'] = (df['status'] == 'good').astype(int)
-df['baseline'] = df.apply(lambda x: baseline.loc[x['subject']],axis=1)
+df['baseline'] = df.apply(lambda x: baseline.loc[x['subject']], axis=1)
 df['centre'] = df['centre'].astype(str)
 df = df[df['month'] > 0]
-print (df.head(4).to_string())
-```
 
-```
-    centre treatment  gender  age  status  month  subject baseline
-112      1   placebo  female   46       0      1        1     poor
-223      1   placebo  female   46       0      2        1     poor
-334      1   placebo  female   46       0      3        1     poor
-445      1   placebo  female   46       0      4        1     poor
-```
-
-```python
-mdlm = smf.logit("status ~ baseline + month  + treatment + gender + \
-age + C(centre)", df)
+mdlm = smf.logit("status ~ baseline + month + treatment + gender + age + C(centre)", df)
 mdlmf = mdlm.fit()
 print(mdlmf.summary())
-```
+````
 
 ```
-Optimization terminated successfully.
-         Current function value: 0.543694
-         Iterations 6
-                           Logit Regression Results                           
-==============================================================================
-Dep. Variable:                 status   No. Observations:                  444
-Model:                          Logit   Df Residuals:                      437
-Method:                           MLE   Df Model:                            6
-Date:                Tue, 13 Nov 2018   Pseudo R-squ.:                  0.2071
-Time:                        12:00:13   Log-Likelihood:                -241.40
-converged:                       True   LL-Null:                       -304.47
-                                        LLR p-value:                 8.385e-25
-==========================================================================================
-                             coef    std err          z      P>|z|      [0.025      0.975]
-------------------------------------------------------------------------------------------
-Intercept                  1.1436      0.426      2.682      0.007       0.308       1.979
-baseline[T.poor]          -1.8841      0.241     -7.802      0.000      -2.357      -1.411
-treatment[T.treatment]     1.3006      0.237      5.488      0.000       0.836       1.765
-gender[T.male]             0.1194      0.295      0.405      0.686      -0.458       0.697
-C(centre)[T.2]             0.6723      0.240      2.805      0.005       0.203       1.142
-month                     -0.0643      0.100     -0.646      0.518      -0.259       0.131
-age                       -0.0182      0.009     -2.050      0.040      -0.036      -0.001
-==========================================================================================
+Pseudo R-squ.: 0.2071
+...
+treatment[T.treatment]  1.3006 (p<0.001)
 ```
 
-Statsmodels altyapısı kategorik gördüğü değerleri 1-hot kodlamasıyla 1/0
-değerli kolonlara çevirir, yani `treatment[T.treatment]` tedavi
-uygulanıp uygulanmadığını gösteren 1/0 değerli kolondur. Bir başkası
-`treatment[T.placebo]`; fakat bu kolon regresyonda "önemli''
-bulunmadığı için üstte gösterilmemiş. 
+Bu sonuçlara göre tedavinin katsayısı **1.30**, yani
+$exp(1.3)=3.66$. İlaç uygulaması, iyileşme olasılığını yaklaşık **3.66 kat**
+artırmaktadır.
 
-Görülen katsayılara göre tedavinin (treatment) katsayısı 1.3,
-$exp(1.3)=3.66$. Yani tedavi katsayısındaki 1 birimlik değişiklik (ki bu
-0/1 bazlı bir değişken olduğu için tedavi uygulamak ya da uygulamamak
-anlamına gelir), hastanın iyileşmesinde 3.66 kat etki yaratıyor.
+Fakat bu modelin önemli bir problemi vardır: aynı kişiden gelen tekrar ölçümleri
+bağımsız varsayar. Halbuki bir hastaya ait 4–5 satır veri birbirine
+bağımlıdır. Bu nedenle, standart hatalar olduğundan küçük çıkabilir ve
+sonuçlar fazla iyimser olur.
 
-Fakat bu regresyon sonuçlarındaki standart hatalarının bazılarından pek
-memnun değiliz, mesela gruplararası değişkenlerin (between-subject
-covariates), yaş gibi, standart hataları aşırı ufak. Bunun sebebi regresyon
-işleminin tüm veri satırlarını bağımsız (independent) kabul etmesidir, yani
-her satırdaki verinin çoğu aynı kişiye ait olsa bile farklı kişilere aitmiş
-gibi işlenmektedir. Regresyon sonuçlarını irdelerken sürekli tetikte olmak
-gerekir, görüldüğü gibi ufak hata bile bazen iyi bir şey olmayabiliyor!
+Çok seviyeli model (Bayesçi hiyerarşik yaklaşım, PyMC ile)
 
-Peki çözüm nedir? Çok seviyeli modeller burada devreye girebilir. Eğer
-kişiyi ve ona tekabül eden tüm verileri bir grup olarak alırsak, o kişi
-için alınan tüm ölçümlerin tekrar eden kısımlarının genele daha az etkide
-bulunmasını sağlayabiliriz. Altta `glmer` adlı komut üzerinden çok
-seviyeli regresyon örneğini görüyoruz, ayrıca R diliyle bağlantı kurmak ta
-burada gösteriliyor; Python `statsmodels`'a bu fonksiyon daha
-taşınmadı. Daha fazla detay için [3]'e bakılabilir.
+Bu problemi çözmek için hiyerarşik (çok seviyeli) modeller
+kullanabiliriz. Bu modellerde, her **hasta** kendi kesisine (intercept)
+sahip olur ve bu değerlerin tamamı üst düzey bir dağılımdan (örneğin
+normal) geldiği varsayılır. Böylece bireysel farklılıklar hesaba katılır.
+
+Bayesçi çerçevede bu yaklaşımın avantajları:
+
+* Her parametre için **önceller (priors)** tanımlanır. Bu, modelin
+  gerçekçi sınırlara sahip olmasını sağlar.
+* Model çıktısı bir tek sayı yerine, her parametrenin **olasılık
+  dağılımını (posterior)** verir.
+* Hiyerarşik yapı sayesinde küçük gruplar veya az gözleme sahip bireyler
+  için **kısmi havuzlama (partial pooling)** gerçekleşir; bu da
+  katsayıların aşırı uç değerlerden uzaklaşmasını sağlar.
+
+Model kurulumu
 
 ```python
-%load_ext rpy2.ipython
-%R library(lme4)
+import pandas as pd
+import pymc as pm
+import arviz as az
+import numpy as np
+
+df = pd.read_csv('respiratory.csv', index_col=0)
+baseline = df[df['month'] == 0][['subject','status']].set_index('subject')
+df['status'] = (df['status'] == 'good').astype(int)
+df['baseline'] = df.apply(lambda x: baseline.loc[x['subject']], axis=1)
+df['centre'] = df['centre'].astype(str)
+df = df[df['month'] > 0]
+
+# Kodlamalar
+df['baseline_code'] = (df['baseline'] == 'poor').astype(int)
+df['treatment_code'] = (df['treatment'] == 'treatment').astype(int)
+df['gender_code'] = (df['gender'] == 'male').astype(int)
+subject_idx, subjects = pd.factorize(df['subject'])
+centre_idx, centres = pd.factorize(df['centre'])
+
+with pm.Model() as hierarchical_model:
+    sigma_subject = pm.HalfNormal('sigma_subject', sigma=2)
+    sigma_centre = pm.HalfNormal('sigma_centre', sigma=2)
+    subject_offset = pm.Normal('subject_offset', mu=0, sigma=1, shape=len(subjects))
+    centre_offset = pm.Normal('centre_offset', mu=0, sigma=1, shape=len(centres))
+    subject_effect = sigma_subject * subject_offset
+    centre_effect = sigma_centre * centre_offset
+
+    alpha = pm.Normal('alpha', mu=0, sigma=2)
+    beta_baseline = pm.Normal('beta_baseline', mu=0, sigma=2)
+    beta_month = pm.Normal('beta_month', mu=0, sigma=1)
+    beta_treatment = pm.Normal('beta_treatment', mu=0, sigma=2)
+    beta_gender = pm.Normal('beta_gender', mu=0, sigma=1)
+    beta_age = pm.Normal('beta_age', mu=0, sigma=0.1)
+
+    mu = (alpha +
+          subject_effect[subject_idx] +
+          centre_effect[centre_idx] +
+          beta_baseline * df['baseline_code'].values +
+          beta_month * df['month'].values +
+          beta_treatment * df['treatment_code'].values +
+          beta_gender * df['gender_code'].values +
+          beta_age * df['age'].values)
+
+    y = pm.Bernoulli('y', logit_p=mu, observed=df['status'].values)
+    trace = pm.sample(2000, tune=1000, chains=4, target_accept=0.95)
 ```
 
-```python
-%R -i df 
-%R p1 = "status ~ baseline + month + treatment + gender "
-%R p2 = "+ age + centre + (1 | subject) "
-%R params = paste(p1,p2)
-%R resp_lmer <- glmer(as.formula(params), family = binomial(), data = df)
-%R -o res res = summary(resp_lmer)
-%R -o exp_res exp_res = exp(fixef(resp_lmer))
-print (res)
-print (exp_res)
-```
+Sonuçlar
 
-```
-Generalized linear mixed model fit by maximum likelihood (Laplace
-  Approximation) [glmerMod]
- Family: binomial  ( logit )
-Formula: status ~ baseline + month + treatment + gender + age + centre +  
-    (1 | subject)
-   Data: df
+Örneklemden elde edilen posterior özetleri:
 
-     AIC      BIC   logLik deviance df.resid 
-   444.3    477.1   -214.2    428.3      436 
+| Parametre     | Ortalama | sd    | 3% HDI | 97% HDI |
+| ------------- | -------- | ----- | ------ | ------- |
+| sigma (Intercept) | 1.52     | 1.09  | -0.67  | 3.46    |
+| beta_baseline    | -2.92    | 0.57  | -4.06  | -1.90   |
+| beta_month       | -0.09    | 0.13  | -0.33  | 0.15    |
+| beta_treatment   | 2.07     | 0.55  | 1.03   | 3.08    |
+| beta_gender      | 0.12     | 0.58  | -0.99  | 1.22    |
+| beta_age         | -0.018   | 0.021 | -0.056 | 0.021   |
+| sigma_subject     | 2.19     | 0.34  | 1.56   | 2.82    |
+| sigma_centre      | 1.27     | 0.93  | 0.00   | 2.98    |
 
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--2.8574 -0.3590  0.1427  0.3693  2.2393 
+Tedavi etkisi (beta_treatment) için posterior dağılımın log-odds değeri
+2.07’tir. Bunun üssü alınarak olasılık oranı (odds ratio) hesaplanır:
 
-Random effects:
- Groups  Name        Variance Std.Dev.
- subject (Intercept) 3.89     1.972   
-Number of obs: 444, groups:  subject, 111
+$$ \text{OR} = e^{2.07} \approx 7.75 $$
 
-Fixed effects:
-                   Estimate Std. Error z value Pr(>|z|)    
-(Intercept)         1.68254    0.84436   1.993 0.046296 *  
-baselinepoor       -3.07838    0.60272  -5.107 3.26e-07 ***
-month              -0.10133    0.12518  -0.809 0.418257    
-treatmenttreatment  2.16325    0.55644   3.888 0.000101 ***
-gendermale          0.20249    0.67270   0.301 0.763402    
-age                -0.02546    0.02014  -1.264 0.206125    
-centre2             1.04667    0.54784   1.911 0.056064 .  
----
+94% güven aralığı (HDI): [2.05, 19.16]
 
-Correlation of Fixed Effects:
-            (Intr) bslnpr month  trtmnt gndrml age   
-baselinepor -0.367                                   
-month       -0.383  0.041                            
-trtmnttrtmn -0.178 -0.301 -0.031                     
-gendermale   0.065 -0.102 -0.003  0.219              
-age         -0.655 -0.015  0.009 -0.050 -0.263       
-centre2     -0.184  0.150 -0.015  0.058 -0.147 -0.223
+Bu sonuç, tedavinin iyileşme olasılığını yaklaşık 7.75 kat artırdığını
+göstermektedir.  Bu değer, tek seviyeli modelin bulduğu 3.66
+katsayısından oldukça büyüktür. Ayrıca yaş değişkeninin belirsizliği
+daha gerçekçi (daha geniş) hale gelmiştir. Bu, hiyerarşik modelin
+gruplar arası varyansı hesaba katmasının bir sonucudur.
 
-       (Intercept)       baselinepoor              month treatmenttreatment 
-        5.37919357         0.04603378         0.90363768         8.69940763 
-        gendermale                age            centre2 
-        1.22445202         0.97485954         2.84815273 
+Sonuçların yorumlanması
 
-```
+* **Hiyerarşik yapı**, aynı kişiye ait tekrar ölçümlerin bağımlılığını
+  dikkate alır ve parametre tahminlerini daha güvenilir hale getirir.
+  
+* **Posterior dağılımlar**, sadece noktadan tahmin yerine olasılık aralıkları
+  verir; bu da belirsizliği açıkça görmemizi sağlar.
+  
+* **sigma_subject** değeri (~2.19), bireyler arası farklılıkların güçlü
+  olduğunu göstermektedir.
+  
+* **sigma_centre** (~1.27) ise tedavi merkezleri arasında da bir miktar
+  varyans bulunduğunu işaret eder.
 
-`(1+subject)` kullanımı gruplamayı kişi bazında yapıyor ve her grup
-için kesinin değişmesine izin veriliyor. Regresyonun sonucu 2.16,
-$exp(2.16)=8.67$, yani bu ilaç aslında hastanın iyileşmesinde 8.67 kat
-etkili! Bu çok daha büyük bir rakam ve gerçek sonuç aslında bu. Yaş
-değişkeninin standart hatasına bakarsak, daha büyük olduğunu görüyoruz,
-yani bu katsayı daha uygun bir seviyeye gelmiş bulunuyor.
+Sonuç olarak, Bayesçi çok seviyeli yaklaşım hem daha esnek hem de daha
+gerçekçi bir modelleme imkânı sunar. Posterior dağılımları inceleyerek
+hem tahmin değerlerini hem de bu tahminlerin belirsizlik düzeyini
+görebiliriz.
 
 Kaynaklar
 
-[1] Gelman, Hill, {\em Data Analysis Using Regression and
-  Multilevel/Hierarchical Models}
+[1] Gelman, Hill, *Data Analysis Using Regression and Multilevel/Hierarchical Models*
 
 [2] Everitt, *A Handbook of Statistical Analysis Using R*
-
-[3] Bayramlı, 
-   *iPython, rpy2, rmagic*, 
-   [https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html](https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html)
-
-
-
-
 

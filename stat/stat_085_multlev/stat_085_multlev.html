@@ -123,159 +123,214 @@ parametrelere “sabit etki’’ adı veriliyor, çünkü o parametreler grup
 içinde değişmemektedir, modelin geri kalanı ise rasgele etki olacaktır.
 Bu iki kavramın karışımı da (ki neredeyse her zaman öyle olur)”karışık
 etki (mixed effects)’’ modeli olarak anılıyor. Bu terminoloji biraz kafa
-karıştırıcı olabilir, bilinmesi iyidir böylece literatürü takip
-edebiliriz, ama biz [1]‘deki tavsiyeyi kullanıp “çok seviyeli modeller’’
-kelimelerini kullanacağız.</p>
-<p>Örnek</p>
+karıştırıcı olabilir, ama bilinmesi iyidir böylece literatürü takip
+edebiliriz. Biz burada Gelman &amp; Hill [1]’deki tavsiyeyi kullanıp
+“çok seviyeli modeller” kelimelerini tercih edeceğiz.</p>
+<p>Örnek: İlaç Etkisi Verisi</p>
 <p>Yeni bir ilacın etkili olup olmadığını anlamak için hastalar
 (subject) üzerinde deneyler yapılır [2]. Bu veride ilginç olan hastanın
 durumunun tekrar tekrar belli aralıklarla ölçülmesi, ve durumun (status)
 yeni bir veri satırı olarak kaydedilmesi. Ayrıca rasgele seçilen
 hastalara ya ilaç, ya da etkisiz ilaç (placebo) veriliyor. Veride
 cinsiyet (gender), yaş (age), tedavi merkezi numarası (centre) kolonları
-var. İlk aydaki durum “başlangıç noktası (baseline)’’ olarak ayrı bir
+var. İlk aydaki durum “başlangıç noktası (baseline)” olarak ayrı bir
 kolona ayrılıyor, ve ilk ay satırları regresyon öncesi siliniyor. Soru
 şudur: ilaç etkili midir?</p>
 <p>Soru bir evet/hayır sorusu olduğu için lojistik regresyon
 kullanacağız.</p>
+<p>Tek seviyeli (bağımsız gözlem varsayımıyla) model</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm, pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;respiratory.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">==</span> <span class="dv">0</span>][[<span class="st">&#39;subject&#39;</span>,<span class="st">&#39;status&#39;</span>]].set_index(<span class="st">&#39;subject&#39;</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;status&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;status&#39;</span>] <span class="op">==</span> <span class="st">&#39;good&#39;</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;baseline&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: baseline.loc[x[<span class="st">&#39;subject&#39;</span>]],axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;centre&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;centre&#39;</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.head(<span class="dv">4</span>).to_string())</span></code></pre></div>
-<pre><code>    centre treatment  gender  age  status  month  subject baseline
-112      1   placebo  female   46       0      1        1     poor
-223      1   placebo  female   46       0      2        1     poor
-334      1   placebo  female   46       0      3        1     poor
-445      1   placebo  female   46       0      4        1     poor</code></pre>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;respiratory.csv&#39;</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">==</span> <span class="dv">0</span>][[<span class="st">&#39;subject&#39;</span>,<span class="st">&#39;status&#39;</span>]].set_index(<span class="st">&#39;subject&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;status&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;status&#39;</span>] <span class="op">==</span> <span class="st">&#39;good&#39;</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;baseline&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: baseline.loc[x[<span class="st">&#39;subject&#39;</span>]], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;centre&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;centre&#39;</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>mdlm <span class="op">=</span> smf.logit(<span class="st">&quot;status ~ baseline + month + treatment + gender + age + C(centre)&quot;</span>, df)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>mdlmf <span class="op">=</span> mdlm.fit()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mdlmf.summary())</span></code></pre></div>
+<pre><code>Pseudo R-squ.: 0.2071
+...
+treatment[T.treatment]  1.3006 (p&lt;0.001)</code></pre>
+<p>Bu sonuçlara göre tedavinin katsayısı <strong>1.30</strong>, yani
+<span class="math inline">\(exp(1.3)=3.66\)</span>. İlaç uygulaması,
+iyileşme olasılığını yaklaşık <strong>3.66 kat</strong>
+artırmaktadır.</p>
+<p>Fakat bu modelin önemli bir problemi vardır: aynı kişiden gelen
+tekrar ölçümleri bağımsız varsayar. Halbuki bir hastaya ait 4–5 satır
+veri birbirine bağımlıdır. Bu nedenle, standart hatalar olduğundan küçük
+çıkabilir ve sonuçlar fazla iyimser olur.</p>
+<p>Çok seviyeli model (Bayesçi hiyerarşik yaklaşım, PyMC ile)</p>
+<p>Bu problemi çözmek için hiyerarşik (çok seviyeli) modeller
+kullanabiliriz. Bu modellerde, her <strong>hasta</strong> kendi kesisine
+(intercept) sahip olur ve bu değerlerin tamamı üst düzey bir dağılımdan
+(örneğin normal) geldiği varsayılır. Böylece bireysel farklılıklar
+hesaba katılır.</p>
+<p>Bayesçi çerçevede bu yaklaşımın avantajları:</p>
+<ul>
+<li>Her parametre için <strong>önceller (priors)</strong> tanımlanır.
+Bu, modelin gerçekçi sınırlara sahip olmasını sağlar.</li>
+<li>Model çıktısı bir tek sayı yerine, her parametrenin <strong>olasılık
+dağılımını (posterior)</strong> verir.</li>
+<li>Hiyerarşik yapı sayesinde küçük gruplar veya az gözleme sahip
+bireyler için <strong>kısmi havuzlama (partial pooling)</strong>
+gerçekleşir; bu da katsayıların aşırı uç değerlerden uzaklaşmasını
+sağlar.</li>
+</ul>
+<p>Model kurulumu</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mdlm <span class="op">=</span> smf.logit(<span class="st">&quot;status ~ baseline + month  + treatment + gender + </span><span class="ch">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">age + C(centre)&quot;</span>, df)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mdlmf <span class="op">=</span> mdlm.fit()</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mdlmf.summary())</span></code></pre></div>
-<pre><code>Optimization terminated successfully.
-         Current function value: 0.543694
-         Iterations 6
-                           Logit Regression Results                           
-==============================================================================
-Dep. Variable:                 status   No. Observations:                  444
-Model:                          Logit   Df Residuals:                      437
-Method:                           MLE   Df Model:                            6
-Date:                Tue, 13 Nov 2018   Pseudo R-squ.:                  0.2071
-Time:                        12:00:13   Log-Likelihood:                -241.40
-converged:                       True   LL-Null:                       -304.47
-                                        LLR p-value:                 8.385e-25
-==========================================================================================
-                             coef    std err          z      P&gt;|z|      [0.025      0.975]
-------------------------------------------------------------------------------------------
-Intercept                  1.1436      0.426      2.682      0.007       0.308       1.979
-baseline[T.poor]          -1.8841      0.241     -7.802      0.000      -2.357      -1.411
-treatment[T.treatment]     1.3006      0.237      5.488      0.000       0.836       1.765
-gender[T.male]             0.1194      0.295      0.405      0.686      -0.458       0.697
-C(centre)[T.2]             0.6723      0.240      2.805      0.005       0.203       1.142
-month                     -0.0643      0.100     -0.646      0.518      -0.259       0.131
-age                       -0.0182      0.009     -2.050      0.040      -0.036      -0.001
-==========================================================================================</code></pre>
-<p>Statsmodels altyapısı kategorik gördüğü değerleri 1-hot kodlamasıyla
-1/0 değerli kolonlara çevirir, yani <code>treatment[T.treatment]</code>
-tedavi uygulanıp uygulanmadığını gösteren 1/0 değerli kolondur. Bir
-başkası <code>treatment[T.placebo]</code>; fakat bu kolon regresyonda
-“önemli’’ bulunmadığı için üstte gösterilmemiş.</p>
-<p>Görülen katsayılara göre tedavinin (treatment) katsayısı 1.3, <span
-class="math inline">\(exp(1.3)=3.66\)</span>. Yani tedavi katsayısındaki
-1 birimlik değişiklik (ki bu 0/1 bazlı bir değişken olduğu için tedavi
-uygulamak ya da uygulamamak anlamına gelir), hastanın iyileşmesinde 3.66
-kat etki yaratıyor.</p>
-<p>Fakat bu regresyon sonuçlarındaki standart hatalarının bazılarından
-pek memnun değiliz, mesela gruplararası değişkenlerin (between-subject
-covariates), yaş gibi, standart hataları aşırı ufak. Bunun sebebi
-regresyon işleminin tüm veri satırlarını bağımsız (independent) kabul
-etmesidir, yani her satırdaki verinin çoğu aynı kişiye ait olsa bile
-farklı kişilere aitmiş gibi işlenmektedir. Regresyon sonuçlarını
-irdelerken sürekli tetikte olmak gerekir, görüldüğü gibi ufak hata bile
-bazen iyi bir şey olmayabiliyor!</p>
-<p>Peki çözüm nedir? Çok seviyeli modeller burada devreye girebilir.
-Eğer kişiyi ve ona tekabül eden tüm verileri bir grup olarak alırsak, o
-kişi için alınan tüm ölçümlerin tekrar eden kısımlarının genele daha az
-etkide bulunmasını sağlayabiliriz. Altta <code>glmer</code> adlı komut
-üzerinden çok seviyeli regresyon örneğini görüyoruz, ayrıca R diliyle
-bağlantı kurmak ta burada gösteriliyor; Python
-<code>statsmodels</code>’a bu fonksiyon daha taşınmadı. Daha fazla detay
-için [3]’e bakılabilir.</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext rpy2.ipython</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R library(lme4)</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>i df </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R p1 <span class="op">=</span> <span class="st">&quot;status ~ baseline + month + treatment + gender &quot;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R p2 <span class="op">=</span> <span class="st">&quot;+ age + centre + (1 | subject) &quot;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R params <span class="op">=</span> paste(p1,p2)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R resp_lmer <span class="op">&lt;-</span> glmer(<span class="im">as</span>.formula(params), family <span class="op">=</span> binomial(), data <span class="op">=</span> df)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o res res <span class="op">=</span> summary(resp_lmer)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o exp_res exp_res <span class="op">=</span> exp(fixef(resp_lmer))</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (res)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (exp_res)</span></code></pre></div>
-<pre><code>Generalized linear mixed model fit by maximum likelihood (Laplace
-  Approximation) [glmerMod]
- Family: binomial  ( logit )
-Formula: status ~ baseline + month + treatment + gender + age + centre +  
-    (1 | subject)
-   Data: df
-
-     AIC      BIC   logLik deviance df.resid 
-   444.3    477.1   -214.2    428.3      436 
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--2.8574 -0.3590  0.1427  0.3693  2.2393 
-
-Random effects:
- Groups  Name        Variance Std.Dev.
- subject (Intercept) 3.89     1.972   
-Number of obs: 444, groups:  subject, 111
-
-Fixed effects:
-                   Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)         1.68254    0.84436   1.993 0.046296 *  
-baselinepoor       -3.07838    0.60272  -5.107 3.26e-07 ***
-month              -0.10133    0.12518  -0.809 0.418257    
-treatmenttreatment  2.16325    0.55644   3.888 0.000101 ***
-gendermale          0.20249    0.67270   0.301 0.763402    
-age                -0.02546    0.02014  -1.264 0.206125    
-centre2             1.04667    0.54784   1.911 0.056064 .  
----
-
-Correlation of Fixed Effects:
-            (Intr) bslnpr month  trtmnt gndrml age   
-baselinepor -0.367                                   
-month       -0.383  0.041                            
-trtmnttrtmn -0.178 -0.301 -0.031                     
-gendermale   0.065 -0.102 -0.003  0.219              
-age         -0.655 -0.015  0.009 -0.050 -0.263       
-centre2     -0.184  0.150 -0.015  0.058 -0.147 -0.223
-
-       (Intercept)       baselinepoor              month treatmenttreatment 
-        5.37919357         0.04603378         0.90363768         8.69940763 
-        gendermale                age            centre2 
-        1.22445202         0.97485954         2.84815273 
-</code></pre>
-<p><code>(1+subject)</code> kullanımı gruplamayı kişi bazında yapıyor ve
-her grup için kesinin değişmesine izin veriliyor. Regresyonun sonucu
-2.16, <span class="math inline">\(exp(2.16)=8.67\)</span>, yani bu ilaç
-aslında hastanın iyileşmesinde 8.67 kat etkili! Bu çok daha büyük bir
-rakam ve gerçek sonuç aslında bu. Yaş değişkeninin standart hatasına
-bakarsak, daha büyük olduğunu görüyoruz, yani bu katsayı daha uygun bir
-seviyeye gelmiş bulunuyor.</p>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;respiratory.csv&#39;</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">==</span> <span class="dv">0</span>][[<span class="st">&#39;subject&#39;</span>,<span class="st">&#39;status&#39;</span>]].set_index(<span class="st">&#39;subject&#39;</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;status&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;status&#39;</span>] <span class="op">==</span> <span class="st">&#39;good&#39;</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;baseline&#39;</span>] <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: baseline.loc[x[<span class="st">&#39;subject&#39;</span>]], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;centre&#39;</span>] <span class="op">=</span> df[<span class="st">&#39;centre&#39;</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">&#39;month&#39;</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Kodlamalar</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;baseline_code&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;baseline&#39;</span>] <span class="op">==</span> <span class="st">&#39;poor&#39;</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;treatment_code&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;treatment&#39;</span>] <span class="op">==</span> <span class="st">&#39;treatment&#39;</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;gender_code&#39;</span>] <span class="op">=</span> (df[<span class="st">&#39;gender&#39;</span>] <span class="op">==</span> <span class="st">&#39;male&#39;</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>subject_idx, subjects <span class="op">=</span> pd.factorize(df[<span class="st">&#39;subject&#39;</span>])</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>centre_idx, centres <span class="op">=</span> pd.factorize(df[<span class="st">&#39;centre&#39;</span>])</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> hierarchical_model:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    sigma_subject <span class="op">=</span> pm.HalfNormal(<span class="st">&#39;sigma_subject&#39;</span>, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    sigma_centre <span class="op">=</span> pm.HalfNormal(<span class="st">&#39;sigma_centre&#39;</span>, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    subject_offset <span class="op">=</span> pm.Normal(<span class="st">&#39;subject_offset&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, shape<span class="op">=</span><span class="bu">len</span>(subjects))</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    centre_offset <span class="op">=</span> pm.Normal(<span class="st">&#39;centre_offset&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>, shape<span class="op">=</span><span class="bu">len</span>(centres))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    subject_effect <span class="op">=</span> sigma_subject <span class="op">*</span> subject_offset</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    centre_effect <span class="op">=</span> sigma_centre <span class="op">*</span> centre_offset</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> pm.Normal(<span class="st">&#39;alpha&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    beta_baseline <span class="op">=</span> pm.Normal(<span class="st">&#39;beta_baseline&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    beta_month <span class="op">=</span> pm.Normal(<span class="st">&#39;beta_month&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    beta_treatment <span class="op">=</span> pm.Normal(<span class="st">&#39;beta_treatment&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    beta_gender <span class="op">=</span> pm.Normal(<span class="st">&#39;beta_gender&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    beta_age <span class="op">=</span> pm.Normal(<span class="st">&#39;beta_age&#39;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> (alpha <span class="op">+</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>          subject_effect[subject_idx] <span class="op">+</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>          centre_effect[centre_idx] <span class="op">+</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>          beta_baseline <span class="op">*</span> df[<span class="st">&#39;baseline_code&#39;</span>].values <span class="op">+</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>          beta_month <span class="op">*</span> df[<span class="st">&#39;month&#39;</span>].values <span class="op">+</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>          beta_treatment <span class="op">*</span> df[<span class="st">&#39;treatment_code&#39;</span>].values <span class="op">+</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>          beta_gender <span class="op">*</span> df[<span class="st">&#39;gender_code&#39;</span>].values <span class="op">+</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>          beta_age <span class="op">*</span> df[<span class="st">&#39;age&#39;</span>].values)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> pm.Bernoulli(<span class="st">&#39;y&#39;</span>, logit_p<span class="op">=</span>mu, observed<span class="op">=</span>df[<span class="st">&#39;status&#39;</span>].values)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, chains<span class="op">=</span><span class="dv">4</span>, target_accept<span class="op">=</span><span class="fl">0.95</span>)</span></code></pre></div>
+<p>Sonuçlar</p>
+<p>Örneklemden elde edilen posterior özetleri:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Parametre</th>
+<th>Ortalama</th>
+<th>sd</th>
+<th>3% HDI</th>
+<th>97% HDI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sigma (Intercept)</td>
+<td>1.52</td>
+<td>1.09</td>
+<td>-0.67</td>
+<td>3.46</td>
+</tr>
+<tr class="even">
+<td>beta_baseline</td>
+<td>-2.92</td>
+<td>0.57</td>
+<td>-4.06</td>
+<td>-1.90</td>
+</tr>
+<tr class="odd">
+<td>beta_month</td>
+<td>-0.09</td>
+<td>0.13</td>
+<td>-0.33</td>
+<td>0.15</td>
+</tr>
+<tr class="even">
+<td>beta_treatment</td>
+<td>2.07</td>
+<td>0.55</td>
+<td>1.03</td>
+<td>3.08</td>
+</tr>
+<tr class="odd">
+<td>beta_gender</td>
+<td>0.12</td>
+<td>0.58</td>
+<td>-0.99</td>
+<td>1.22</td>
+</tr>
+<tr class="even">
+<td>beta_age</td>
+<td>-0.018</td>
+<td>0.021</td>
+<td>-0.056</td>
+<td>0.021</td>
+</tr>
+<tr class="odd">
+<td>sigma_subject</td>
+<td>2.19</td>
+<td>0.34</td>
+<td>1.56</td>
+<td>2.82</td>
+</tr>
+<tr class="even">
+<td>sigma_centre</td>
+<td>1.27</td>
+<td>0.93</td>
+<td>0.00</td>
+<td>2.98</td>
+</tr>
+</tbody>
+</table>
+<p>Tedavi etkisi (beta_treatment) için posterior dağılımın log-odds
+değeri 2.07’tir. Bunun üssü alınarak olasılık oranı (odds ratio)
+hesaplanır:</p>
+<p><span class="math display">\[ \text{OR} = e^{2.07} \approx 7.75
+\]</span></p>
+<p>94% güven aralığı (HDI): [2.05, 19.16]</p>
+<p>Bu sonuç, tedavinin iyileşme olasılığını yaklaşık 7.75 kat
+artırdığını göstermektedir. Bu değer, tek seviyeli modelin bulduğu 3.66
+katsayısından oldukça büyüktür. Ayrıca yaş değişkeninin belirsizliği
+daha gerçekçi (daha geniş) hale gelmiştir. Bu, hiyerarşik modelin
+gruplar arası varyansı hesaba katmasının bir sonucudur.</p>
+<p>Sonuçların yorumlanması</p>
+<ul>
+<li><p><strong>Hiyerarşik yapı</strong>, aynı kişiye ait tekrar
+ölçümlerin bağımlılığını dikkate alır ve parametre tahminlerini daha
+güvenilir hale getirir.</p></li>
+<li><p><strong>Posterior dağılımlar</strong>, sadece noktadan tahmin
+yerine olasılık aralıkları verir; bu da belirsizliği açıkça görmemizi
+sağlar.</p></li>
+<li><p><strong>sigma_subject</strong> değeri (~2.19), bireyler arası
+farklılıkların güçlü olduğunu göstermektedir.</p></li>
+<li><p><strong>sigma_centre</strong> (~1.27) ise tedavi merkezleri
+arasında da bir miktar varyans bulunduğunu işaret eder.</p></li>
+</ul>
+<p>Sonuç olarak, Bayesçi çok seviyeli yaklaşım hem daha esnek hem de
+daha gerçekçi bir modelleme imkânı sunar. Posterior dağılımları
+inceleyerek hem tahmin değerlerini hem de bu tahminlerin belirsizlik
+düzeyini görebiliriz.</p>
 <p>Kaynaklar</p>
-<p>[1] Gelman, Hill, {}</p>
+<p>[1] Gelman, Hill, <em>Data Analysis Using Regression and
+Multilevel/Hierarchical Models</em></p>
 <p>[2] Everitt, <em>A Handbook of Statistical Analysis Using R</em></p>
-<p>[3] Bayramlı, <em>iPython, rpy2, rmagic</em>, <a
-href="https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html">https://burakbayramli.github.io/dersblog/sk/2015/02/ipython-rpy2-rmagic.html</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

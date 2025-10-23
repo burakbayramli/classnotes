@@ -304,37 +304,80 @@ perspektifimizi biraz değiştirirsek ve bilinmeyen parametre
 $\theta$'yi da bir rasgele değişken olarak addedersek, bu bize
 tahminsel hesaplama açısından biraz daha esneklik sağlayacaktır.
 
-Bakış açısı Bayes olacak, bulmak istediğimiz $\theta_{MAP}$ tahmini,
-bunun için olurluk $P(\theta | D)$'yi maksimize eden bir $\theta$
-bulmaya uğraşacağız. $P(D|\theta)$ içeren formül Bayes yaklaşımıyla
-şöyledir,
+Bakış açısı Bayes [2] olacak, bulmak istediğimiz $\theta_{MAP}$
+tahmini, bunun için olurluk $P(\theta | x)$'yi maksimize eden bir
+$\theta$ bulmaya uğraşacağız. $P(x|\theta)$ içeren formül Bayes
+yaklaşımıyla şöyledir,
 
 $$
-P(\theta | D) = \frac{P(D|\theta) P(\theta) }{P(D)}
+P(\theta | x) = \frac{P(x|\theta) P(\theta) }{P(x)}
+\qquad (3)
 $$
 
-$P(\theta|D)$: Sonsal dağılım, bize verilmiş olan ham veriyi dikkate
+$P(\theta|x)$: Sonsal dağılım, bize verilmiş olan ham veriyi dikkate
 alınca tahmin $\theta$'nin olasılığı nedir? "Verilmiş olması" terimine
 dikkat, Bayes yaklaşımı ile veriyi bile bir rasgele değişken kabul
 ediyoruz, ve onun verilmiş olması, bu değişkenin koşulsal bir bağ ile
 birleşik dağılıma dahil edilmesini ima ediyor.
 
-$P(D|\theta)$: Olurluk, elimizdeki tahmin parametresini hesaba
+$P(x|\theta)$: Olurluk, elimizdeki tahmin parametresini hesaba
 katarsak verinin olurluğu nedir?
 
 $P(\theta)$: Önsel dağılım. Hiçbir şeyi bilmeden önce tahminimizin
 olasılığı neydi?
 
-$P(D)$: Kısmi (margınal) olasılık. Mümkün tüm tahmin parametreleri
-üzerinden bakınca yeni elde edilen gözlemin olasılığı nedir?
+$P(x)$: Kısmi (marginal) olasılık. Mümkün tüm tahmin parametreleri
+üzerinden bakınca yeni elde edilen gözlemin olasılığı nedir [3]?
+
+[1, sf. 183]'e bakarsak orada $P(x)$'in "çok kuvvetli bir iddiada
+bulunduğunu" söylüyor çünkü daha hiçbir veriyi toplamadan ya da
+işlemeden "o verinin ihtimalinin ne olduğunu biliyoruz". Çok derin
+felsefi argümanlara girmeden önce $P(x)$ hakkında şu somut noktayı
+bilmek gerekir, $P(x)$'in bir olurluk, yani o olurluğu tanımlayan
+fonksiyon dışında bir anlamı yoktur. Aslında $P(x)$, aklımızdaki belli
+bir olurluk modelinin alabileceği tüm mümkün parametre değerlerinin
+ortalamasının bir sonucudur, matematiksel olarak
+
+$$
+P(x) = \int_\theta P(x | \theta) P(\theta) \ d\theta =
+\int_\theta P(x,\theta) \ d\theta
+$$
+
+Yani $P(x)$'i $P(x|\theta)$ dışında düşünmek pek anlamlı değildir. Bu
+püf nokta ileride Bayessel çıkarsama (inference) paketleriyle
+karşılaşınca faydalı olabilir (mesela `pymc`) çünkü bu paketlerin
+üstteki entegrali hesaplamak için kapsamlı kodları vardır. Demek ki
+$P(x)$ hesaplamak sadece düşünsel bir takla değil, ciddi kodlar
+gerektiren yaklaşık entegral hesabı gerektiren bir işlemdir.  Bizim bu
+yazıda kullanacağımız matematik açısından $P(x)$ hesabı gerekli değil,
+bunun sebebini birazdan göreceğiz.
+
+Bayes (3) formülüne dönelim. Maksimize etmek istediğimiz bu formülde
+gösterilen sol kısım, yani sonsal fonksiyon $P(\theta | x)$,
+karşılaştırma yaparsak maksimum olurluk yöntemi sadece olurluğu
+maksimize ediyordu. Kendimize bir kolaylık sağlayalım, logarıtma
+dışbükey (convex) bir fonksiyon, o zaman log alarak çarpımları toplama
+çevirirsek hala aynı maksimizasyon işlemini yapmış oluruz, yani
+
+$$
+L = \log P(\theta | x) = \log l(\theta) + \log P(\theta) - \log P(x)
+$$
+
+Log sayesinde çarpımlar toplam bölme çıkartma oldu. Maksimize etmek
+istediğimiz $L$.
+
+Daha önce gösterilen yazı-tura atmak probleminin çözümünü bulalım. 
+
 
 
 
 [devam edecek]
 
-
-
 Kaynaklar
 
 [1] Unpingco, Python for Probability, Statistics and Machine Learning
+
+[2] Bayramli, Istatistik, Olasılık, Dağılımlar, Giriş
+
+[3] Nath, CS 217: Artificial Intelligence and Machine Learning
 
