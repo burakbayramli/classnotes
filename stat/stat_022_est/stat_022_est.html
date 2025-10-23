@@ -326,37 +326,54 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;pandas&#39;</span>, pd.DataFrame(arr).std().iloc[<span class="dv">0</span>])</span></code></pre></div>
 <pre><code>numpy 0.816496580928
 pandas 1.0</code></pre>
-<p>Binom ve <span class="math inline">\(p\)</span> İçin Maksimum Olurluk
-Tahmini [1]</p>
-<p><span class="math display">\[ L(p;x) = \prod_{i=1}^n f(x_i;p) =
-\prod_{i=1}^n {n \choose x} p^x(1-p)^{1-x} \]</span></p>
-<p>Log alalım</p>
-<p><span class="math display">\[ \log L(p;x) =
-\sum_{i=1}^n \log {n \choose x} + x \log p + (1-x) \log (1-p)
+<p>Binom ve <span class="math inline">\(\theta\)</span> İçin Maksimum
+Olurluk Tahmini [3, Lecture 5]</p>
+<p>Bir yanlı madeni para tura gelme ihtimali <span
+class="math inline">\(\theta\)</span> ise, <span
+class="math inline">\(n\)</span> deneyde <span
+class="math inline">\(k\)</span> tura olasılık kütle fonksiyonu binom
+dağılımı Binom(n,k) ile temsil edilebilir,</p>
+<p><span class="math display">\[
+P(X = k) = {n \choose k} \theta^k(1-p)^{n-k}
 \]</span></p>
-<p><span class="math inline">\(p\)</span>’ye göre türevi alalım, bu
-sırada kombinasyon ifadesi <span class="math inline">\({n \choose
-x}\)</span> içinde <span class="math inline">\(p\)</span> olmadığı için
-o yokolacaktır,</p>
-<p><span class="math display">\[ \frac{\partial \log L(p)}{\partial p} =
-\frac{x}{p} - \frac{n-x}{1-p}
+<p>Log olurluk fonksiyonu <span
+class="math inline">\(LL(\theta)\)</span> olurluk fonksiyonunun log
+alınmış halidir,</p>
+<p><span class="math display">\[
+LL(\theta) = \log \left(  {n \choose k}
+\theta^k(1-\theta)^{n-k}   \right)
 \]</span></p>
-<p>Maksimum değeri bulmak için sıfıra eşitleyelim ve <span
-class="math inline">\(p\)</span> için çözelim,</p>
-<p><span class="math display">\[ 0 = \frac{x}{p} - \frac{n-x}{1-p}
+<p>Şimdi maksimum olurluk tahmini için üstteki ifadeyi <span
+class="math inline">\(\theta\)</span> bağlamında maksimize etmek
+isteriz, log ifadesini uygulayalım,</p>
+<p><span class="math display">\[
+= \log {n \choose k} + k \log(\theta) + (n-k) \log(1-\theta)
 \]</span></p>
-<p><span class="math display">\[  \frac{x}{p} =
-\frac{n-x}{1-p}  \]</span></p>
-<p><span class="math display">\[ p(n-x)  = x(1-p) \]</span></p>
-<p><span class="math display">\[ pn - px = x-px \]</span></p>
-<p><span class="math display">\[ pn = x \]</span></p>
-<p><span class="math display">\[ p = \frac{x}{n} \]</span></p>
-<p>Yani <span class="math inline">\(p\)</span> için maksimum olurluk
-tahmini <span class="math inline">\(x/n\)</span>.</p>
+<p>Maksimum için <span class="math inline">\(\theta\)</span>’ya göre
+türevi alalım ve sıfıra eşitleyelim,</p>
+<p><span class="math display">\[
+\frac{dL}{d\theta} = \frac{k}{\theta} - \frac{n-k}{1-\theta} = 0
+\]</span></p>
+<p><span class="math inline">\(\theta\)</span> için çözersek,</p>
+<p><span class="math display">\[
+\frac{k}{\theta} = \frac{n-k}{1-\theta}
+\]</span></p>
+<p><span class="math display">\[
+k(1-\theta) = \theta (n-k)
+\]</span></p>
+<p><span class="math display">\[
+k - k\theta = n\theta - k\theta
+\]</span></p>
+<p><span class="math display">\[
+k = n \theta
+\]</span></p>
+<p><span class="math display">\[
+\theta = \frac{k}{n}
+\]</span></p>
 <p>Bernoulli dağılımı Binom dağılımına çok benzer, sadece onun baş
 kısmında kombinasyon ifadesi yoktur. Fakat o ifade <span
-class="math inline">\(p\)</span>’ye göre türevde nasıl olsa yokolacağına
-göre Bernoulli dağılımı için de tahmin edici aynıdır.</p>
+class="math inline">\(\theta\)</span>’ya göre türevde nasıl olsa
+yokolacağına göre Bernoulli dağılımı için de tahmin edici aynıdır.</p>
 <h3 id="maksimum-sonsal-hesabı-maximum-a-posteriori-map">Maksimum Sonsal
 Hesabı (Maximum a Posteriori / MAP)</h3>
 <p>Maksimum Olurluk hesabı için bir bilinmeyen parametre, diyelim ki
@@ -418,12 +435,91 @@ gerekli değil, bunun sebebini birazdan göreceğiz.</p>
 gösterilen sol kısım, yani sonsal fonksiyon <span
 class="math inline">\(P(\theta | x)\)</span>, karşılaştırma yaparsak
 maksimum olurluk yöntemi sadece olurluğu maksimize ediyordu. Kendimize
-bir kolaylık sağlayalım, logarıtma dışbükey (convex) bir fonksiyon, o
+bir kolaylık sağlayalım, logaritma dışbükey (convex) bir fonksiyon, o
 zaman log alarak çarpımları toplama çevirirsek hala aynı maksimizasyon
 işlemini yapmış oluruz, yani</p>
 <p><span class="math display">\[
-\log P(\theta | x) = \log l(\theta) + \log P(\theta) - \log P(x)
+L = \log P(\theta | x) = \log l(\theta) + \log P(\theta) - \log P(x)
 \]</span></p>
+<p>Log sayesinde çarpımlar toplam bölme çıkartma oldu. Maksimize etmek
+istediğimiz <span class="math inline">\(L\)</span>. Ayrıca maksimizasyon
+<span class="math inline">\(\theta\)</span> temelli olacak, bu durumda
+<span class="math inline">\(P(x)\)</span> kısmını yok sayabiliriz çünkü
+optimizasyonda hiçbir rol oynamayacak. Sadece alttaki formül
+yeterli,</p>
+<p><span class="math display">\[
+L = \log P(\theta | x) = \log l(\theta) + \log P(\theta)
+\]</span></p>
+<p>Daha önce gösterilen yazı-tura atmak probleminin çözümünü bulalım.
+Onsel dağılım <span class="math inline">\(Beta(\alpha,\beta)\)</span>
+olsun,</p>
+<p><span class="math display">\[
+P(\theta) = Beta(\alpha,\beta) =
+\frac{\theta^{\alpha-1} (1-\theta)^{\beta-1}}{B(\alpha,\beta)}
+\]</span></p>
+<p>Binom dağılımı</p>
+<p><span class="math display">\[
+P(x | \theta) = \bigg(\begin{array}{c} n \\ k \end{array} \bigg)
+\theta^k (1-\theta)^{n-k}
+\]</span></p>
+<p>O zaman</p>
+<p><span class="math display">\[
+P(\theta | x) \approx
+\bigg(\begin{array}{c} n \\ k \end{array} \bigg) \theta^k
+(1-\theta)^{n-k}
+\cdot
+\frac{\theta^{\alpha-1} (1-\theta)^{\beta-1}}{B(\alpha,\beta)}
+\]</span></p>
+<p>Log alınca ve sabit olan terimleri toparlayınca</p>
+<p><span class="math display">\[
+\log P(\theta | x) \approx \underbrace{\log \left[
+\bigg(\begin{array}{c} n \\ k \end{array} \bigg)
+\frac{1}{B(\alpha,\beta)} \right]}_{\text{Sabitler}} + \log
+\left[ \theta^{k + \alpha - 1} (1-\theta)^{n - k + \beta - 1} \right]
+\]</span></p>
+<p>Aynen <span class="math inline">\(P(x)\)</span>’i normalize edici
+sabit oldugu ve optimizasyon etkilemedigi icin disarida biraktigimiz
+gibi ustteki sabitler grubunu da atabiliriz,</p>
+<p><span class="math display">\[
+\log P(\theta | x) \approx
+\log \left[ \theta^{k + \alpha - 1} (1-\theta)^{n - k + \beta - 1}
+\right]
+\]</span></p>
+<p>Ve tabii ki log alınca üsteller çarpan haline gelirler,</p>
+<p><span class="math display">\[
+\log P(\theta | x) \approx
+(k + \alpha - 1) \log(\theta) + (n - k + \beta - 1) \log(1-\theta)
+\]</span></p>
+<p>Şimdi üstteki ifadenin <span class="math inline">\(\theta\)</span>’ya
+göre türevini alıp sıfıra eşitlersek, optimal değeri bulabiliriz [3,
+Lecture 5],</p>
+<p><span class="math display">\[
+\frac{d}{d\theta} \log P(\theta | x) =
+\frac{k + \alpha - 1}{\theta} - \frac{n - k + \beta - 1}{1 - \theta} = 0
+\]</span></p>
+<p><span class="math display">\[
+\theta_{MAP} = \frac{k + \alpha - 1}{n + \alpha + \beta - 2}
+\]</span></p>
+<p>Eğer Beta(6,6) onsel dağılımı için aynı türetimi <code>sympy</code>
+ile yapmak istersek [1, sf. 184],</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sympy <span class="im">import</span> stats <span class="im">as</span> st</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sympy.abc <span class="im">import</span> p,k,n</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>obj<span class="op">=</span>sympy.expand_log(sympy.log(p<span class="op">**</span>k<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p)<span class="op">**</span>(n<span class="op">-</span>k)<span class="op">*</span> st.density(st.Beta(<span class="st">&#39;p&#39;</span>,<span class="dv">6</span>,<span class="dv">6</span>))(p)))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>sol<span class="op">=</span>sympy.solve(sympy.simplify(sympy.diff(obj,p)),p)[<span class="dv">0</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (sol)</span></code></pre></div>
+<pre class="text"><code>(k + 5)/(n + 10)</code></pre>
+<p>Aynı sonuca ulaştık.</p>
+<p>Üstteki sonucun maksimum olurluk tahmini <span
+class="math inline">\(k/n\)</span>’den farklı olduğuna dikkat edelim.
+Aslında her iki yöntem de maksimize edilen ifade içinde olurluk vardı,
+fakat MAP ile bir fark onsel dağılımın da çarpıma dahil edilmiş
+olmasıydı. Fakat eğer onsel dağılımı birörnek (üniform) dağılım olarak
+alsaydık, ki bu elimizde hiçbir onsel bilgi olmadığı anlamına gelirdi, o
+zaman çarpıma dahil edilen bir sabit olacaktı, ve o bölüm maksimizasyona
+dahil olmazdı, bu durumda maksimum olurluk ile aynı sonucu elde
+ederdik.</p>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Unpingco, Python for Probability, Statistics and Machine

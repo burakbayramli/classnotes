@@ -259,41 +259,62 @@ numpy 0.816496580928
 pandas 1.0
 ```
 
-Binom ve $p$ İçin Maksimum Olurluk Tahmini [1]
+Binom ve $\theta$ İçin Maksimum Olurluk Tahmini [3, Lecture 5]
 
-$$ L(p;x) = \prod_{i=1}^n f(x_i;p) = \prod_{i=1}^n {n \choose x} p^x(1-p)^{1-x} $$
+Bir yanlı madeni para tura gelme ihtimali $\theta$ ise, $n$ deneyde
+$k$ tura olasılık kütle fonksiyonu binom dağılımı Binom(n,k) ile
+temsil edilebilir, 
 
-Log alalım
-
-$$ \log L(p;x) = 
-\sum_{i=1}^n \log {n \choose x} + x \log p + (1-x) \log (1-p) $$
-
-$p$'ye göre türevi alalım, bu sırada kombinasyon ifadesi ${n \choose x}$
-içinde $p$ olmadığı için o yokolacaktır,
-
-$$ \frac{\partial \log L(p)}{\partial p} =
-\frac{x}{p} - \frac{n-x}{1-p}
+$$
+P(X = k) = {n \choose k} \theta^k(1-p)^{n-k}
 $$
 
-Maksimum değeri bulmak için sıfıra eşitleyelim ve $p$ için çözelim,
+Log olurluk fonksiyonu $LL(\theta)$ olurluk fonksiyonunun log alınmış
+halidir,
 
-$$ 0 = \frac{x}{p} - \frac{n-x}{1-p} $$
+$$
+LL(\theta) = \log \left(  {n \choose k} \theta^k(1-\theta)^{n-k}   \right)
+$$
 
-$$  \frac{x}{p} = \frac{n-x}{1-p}  $$
+Şimdi maksimum olurluk tahmini için üstteki ifadeyi $\theta$
+bağlamında maksimize etmek isteriz, log ifadesini uygulayalım,
 
-$$ p(n-x)  = x(1-p) $$
+$$
+= \log {n \choose k} + k \log(\theta) + (n-k) \log(1-\theta)
+$$
 
-$$ pn - px = x-px $$
+Maksimum için $\theta$'ya göre türevi alalım ve sıfıra eşitleyelim,
 
-$$ pn = x $$
+$$
+\frac{dL}{d\theta} = \frac{k}{\theta} - \frac{n-k}{1-\theta} = 0
+$$
 
-$$ p = \frac{x}{n} $$
+$\theta$ için çözersek,
 
-Yani $p$ için maksimum olurluk tahmini $x/n$. 
+$$
+\frac{k}{\theta} = \frac{n-k}{1-\theta}
+$$
 
-Bernoulli dağılımı Binom dağılımına çok benzer, sadece onun baş kısmında
-kombinasyon ifadesi yoktur. Fakat o ifade $p$'ye göre türevde nasıl olsa
-yokolacağına göre Bernoulli dağılımı için de tahmin edici aynıdır.
+$$
+k(1-\theta) = \theta (n-k)
+$$
+
+$$
+k - k\theta = n\theta - k\theta
+$$
+
+$$
+k = n \theta
+$$
+
+$$
+\theta = \frac{k}{n}
+$$
+
+Bernoulli dağılımı Binom dağılımına çok benzer, sadece onun baş
+kısmında kombinasyon ifadesi yoktur. Fakat o ifade $\theta$'ya göre
+türevde nasıl olsa yokolacağına göre Bernoulli dağılımı için de tahmin
+edici aynıdır.
 
 ### Maksimum Sonsal Hesabı (Maximum a Posteriori / MAP)
 
@@ -348,14 +369,14 @@ püf nokta ileride Bayessel çıkarsama (inference) paketleriyle
 karşılaşınca faydalı olabilir (mesela `pymc`) çünkü bu paketlerin
 üstteki entegrali hesaplamak için kapsamlı kodları vardır. Demek ki
 $P(x)$ hesaplamak sadece düşünsel bir takla değil, ciddi kodlar
-gerektiren yaklaşık entegral hesabı gerektiren bir işlemdir.  Bizim bu
+gerektiren yaklaşık entegral hesabı gerektiren bir işlemdir. Bizim bu
 yazıda kullanacağımız matematik açısından $P(x)$ hesabı gerekli değil,
 bunun sebebini birazdan göreceğiz.
 
 Bayes (3) formülüne dönelim. Maksimize etmek istediğimiz bu formülde
 gösterilen sol kısım, yani sonsal fonksiyon $P(\theta | x)$,
 karşılaştırma yaparsak maksimum olurluk yöntemi sadece olurluğu
-maksimize ediyordu. Kendimize bir kolaylık sağlayalım, logarıtma
+maksimize ediyordu. Kendimize bir kolaylık sağlayalım, logaritma
 dışbükey (convex) bir fonksiyon, o zaman log alarak çarpımları toplama
 çevirirsek hala aynı maksimizasyon işlemini yapmış oluruz, yani
 
@@ -364,12 +385,100 @@ L = \log P(\theta | x) = \log l(\theta) + \log P(\theta) - \log P(x)
 $$
 
 Log sayesinde çarpımlar toplam bölme çıkartma oldu. Maksimize etmek
-istediğimiz $L$.
+istediğimiz $L$. Ayrıca maksimizasyon $\theta$ temelli olacak, bu
+durumda $P(x)$ kısmını yok sayabiliriz çünkü optimizasyonda hiçbir rol
+oynamayacak. Sadece alttaki formül yeterli,
 
-Daha önce gösterilen yazı-tura atmak probleminin çözümünü bulalım. 
+$$
+L = \log P(\theta | x) = \log l(\theta) + \log P(\theta) 
+$$
 
+Daha önce gösterilen yazı-tura atmak probleminin çözümünü
+bulalım. Onsel dağılım $Beta(\alpha,\beta)$ olsun,
 
+$$
+P(\theta) = Beta(\alpha,\beta) =
+\frac{\theta^{\alpha-1} (1-\theta)^{\beta-1}}{B(\alpha,\beta)}
+$$
 
+Binom dağılımı
+
+$$
+P(x | \theta) = \bigg(\begin{array}{c} n \\ k \end{array} \bigg) \theta^k (1-\theta)^{n-k}
+$$
+
+O zaman
+
+$$
+P(\theta | x) \approx
+\bigg(\begin{array}{c} n \\ k \end{array} \bigg) \theta^k (1-\theta)^{n-k}
+\cdot
+\frac{\theta^{\alpha-1} (1-\theta)^{\beta-1}}{B(\alpha,\beta)}
+$$
+
+Log alınca ve sabit olan terimleri toparlayınca
+
+$$
+\log P(\theta | x) \approx \underbrace{\log \left[
+\bigg(\begin{array}{c} n \\ k \end{array} \bigg)
+\frac{1}{B(\alpha,\beta)} \right]}_{\text{Sabitler}} + \log
+\left[ \theta^{k + \alpha - 1} (1-\theta)^{n - k + \beta - 1} \right]
+$$
+
+Aynen $P(x)$'i normalize edici sabit oldugu ve optimizasyon
+etkilemedigi icin disarida biraktigimiz gibi ustteki sabitler grubunu
+da atabiliriz,
+
+$$
+\log P(\theta | x) \approx
+\log \left[ \theta^{k + \alpha - 1} (1-\theta)^{n - k + \beta - 1} \right]
+$$
+
+Ve tabii ki log alınca üsteller çarpan haline gelirler, 
+
+$$
+\log P(\theta | x) \approx
+(k + \alpha - 1) \log(\theta) + (n - k + \beta - 1) \log(1-\theta)
+$$
+
+Şimdi üstteki ifadenin $\theta$'ya göre türevini alıp sıfıra eşitlersek,
+optimal değeri bulabiliriz [3, Lecture 5],
+
+$$
+\frac{d}{d\theta} \log P(\theta | x) =
+\frac{k + \alpha - 1}{\theta} - \frac{n - k + \beta - 1}{1 - \theta} = 0
+$$
+
+$$
+\theta_{MAP} = \frac{k + \alpha - 1}{n + \alpha + \beta - 2}
+$$
+
+Eğer Beta(6,6) onsel dağılımı için aynı türetimi `sympy` ile yapmak
+istersek [1, sf. 184],
+
+```python
+import sympy
+from sympy import stats as st
+from sympy.abc import p,k,n
+obj=sympy.expand_log(sympy.log(p**k*(1-p)**(n-k)* st.density(st.Beta('p',6,6))(p)))
+sol=sympy.solve(sympy.simplify(sympy.diff(obj,p)),p)[0]
+print (sol)
+```
+
+```text
+(k + 5)/(n + 10)
+```
+
+Aynı sonuca ulaştık.
+
+Üstteki sonucun maksimum olurluk tahmini $k/n$'den farklı olduğuna
+dikkat edelim. Aslında her iki yöntem de maksimize edilen ifade içinde
+olurluk vardı, fakat MAP ile bir fark onsel dağılımın da çarpıma dahil
+edilmiş olmasıydı. Fakat eğer onsel dağılımı birörnek (üniform)
+dağılım olarak alsaydık, ki bu elimizde hiçbir onsel bilgi olmadığı
+anlamına gelirdi, o zaman çarpıma dahil edilen bir sabit olacaktı, ve
+o bölüm maksimizasyona dahil olmazdı, bu durumda maksimum olurluk ile
+aynı sonucu elde ederdik. 
 
 [devam edecek]
 
