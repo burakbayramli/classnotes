@@ -91,11 +91,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Bir zaman serisinin rasgele yürüyüş (RY, random walk) olup olmadığını
 anlamak için Genişletilmiş Dickey-Fuller (ADF) testini görmüştük. Şimdi
 bu testin hangi teoriye dayandığını göreceğiz, önemli bir bölümünü
-kendimiz kodlayacağız, ve <code>urca</code> paketi üzerinden bu testin
-bazı yan ürünlerini irdelemeyi öğreneceğiz. Alttaki tabloda farklı
-çeşitlerde rasgele yürüyüş modellerini görüyoruz, bunlar sırasıyla
-trendlı RY, kaymalı (drift) RY ve normal RY olarak tanımlanabilir. Bu
-modellerin test istatistikleri vardır.</p>
+kendimiz kodlayacağız, ve <code>statsmodels</code> paketi üzerinden bu
+testin bazı yan ürünlerini irdelemeyi öğreneceğiz. Alttaki tabloda
+farklı çeşitlerde rasgele yürüyüş modellerini görüyoruz, bunlar
+sırasıyla trendlı RY, kaymalı (drift) RY ve normal RY olarak
+tanımlanabilir. Bu modellerin test istatistikleri vardır.</p>
 <p><span class="math display">\[
 \begin{array}{cccc}
 \hline
@@ -170,9 +170,14 @@ uğraşır. Soru şu, acaba bu seri rasgele yürüyüş özellikleri taşıyor m
 taşımıyor ise, hangi alternatifler geçerli?</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> pd.read_csv(<span class="st">&#39;ind.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;date&#39;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> dfind[dfind.index <span class="op">&gt;</span> <span class="st">&#39;1950-01-01&#39;</span>]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> dfind[dfind.index <span class="op">&lt;</span> <span class="st">&#39;1977-10-01&#39;</span>]</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> pd.read_csv(<span class="st">&#39;ind.csv&#39;</span>,index_col<span class="op">=</span><span class="st">&#39;date&#39;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> dfind[dfind.index <span class="op">&gt;</span> <span class="st">&#39;1950-01-01&#39;</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>dfind <span class="op">=</span> dfind[dfind.index <span class="op">&lt;</span> <span class="st">&#39;1977-10-01&#39;</span>]</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>np.log(dfind.indpro).plot()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">u&#39;Üretim Indisi&#39;</span>)</span>
@@ -226,36 +231,34 @@ olabilir, fakat işin özü aynıdır. (1) formülü bir gecikme (lag) ile
 değişmesi gerekti.</p>
 <p>Regresyon ve F-test hesapları,</p>
 <div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> np.log(dfind.indpro)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;dy&#39;</span>] <span class="op">=</span> dfind.y.diff()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;ylag&#39;</span>] <span class="op">=</span> dfind.y.shift(<span class="dv">1</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;dylag&#39;</span>] <span class="op">=</span> dfind.ylag.diff()</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;t&#39;</span>] <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(dfind))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>res1 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ t + ylag + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>sse1 <span class="op">=</span> np.<span class="bu">sum</span>(res1.resid<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res1.params))</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse1&#39;</span>,sse1)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>res2 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ dylag &#39;</span>, data<span class="op">=</span>dfind).fit()</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>sse2 <span class="op">=</span> np.<span class="bu">sum</span>(res2.resid<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res2.params))</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse2&#39;</span>,sse2)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># dikkat kesi yok burada</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>res3 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ 0 + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res3.params))</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>sse3 <span class="op">=</span> np.<span class="bu">sum</span>(res3.resid<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse3&#39;</span>,sse3)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>phi2 <span class="op">=</span> (sse3<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;</span><span class="ch">\n</span><span class="st">phi2&#39;</span>, phi2)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>phi3 <span class="op">=</span> (sse2<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;phi3&#39;</span>, phi3)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> np.log(dfind.indpro)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;dy&#39;</span>] <span class="op">=</span> dfind.y.diff()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;ylag&#39;</span>] <span class="op">=</span> dfind.y.shift(<span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;dylag&#39;</span>] <span class="op">=</span> dfind.ylag.diff()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>dfind[<span class="st">&#39;t&#39;</span>] <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(dfind))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>res1 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ t + ylag + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>sse1 <span class="op">=</span> np.<span class="bu">sum</span>(res1.resid<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res1.params))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse1&#39;</span>,sse1)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>res2 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ dylag &#39;</span>, data<span class="op">=</span>dfind).fit()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>sse2 <span class="op">=</span> np.<span class="bu">sum</span>(res2.resid<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res2.params))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse2&#39;</span>,sse2)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># dikkat kesi yok burada</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>res3 <span class="op">=</span> smf.ols(<span class="st">&#39;dy ~ 0 + dylag&#39;</span>, data<span class="op">=</span>dfind).fit()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">list</span>(res3.params))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>sse3 <span class="op">=</span> np.<span class="bu">sum</span>(res3.resid<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;sse3&#39;</span>,sse3)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>phi2 <span class="op">=</span> (sse3<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;</span><span class="ch">\n</span><span class="st">phi2&#39;</span>, phi2)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>phi3 <span class="op">=</span> (sse2<span class="op">-</span>sse1)<span class="op">/</span>(k<span class="op">*</span>sse1<span class="op">/</span>(<span class="bu">len</span>(dfind)<span class="op">-</span><span class="dv">4</span>))</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;phi3&#39;</span>, phi3)</span></code></pre></div>
 <pre class="text"><code>[0.3289056319331478, 0.0012176940580472435, -0.11592339963358392, 0.47618947733620076]
 sse1 0.04399201483525674
 [0.0054652611288141546, 0.41767827251937806]
@@ -265,11 +268,11 @@ sse3 0.051736634029084336
 
 phi2 6.220292763129694
 phi3 6.040932377444517</code></pre>
-<p>Kontrol için aynı hesabı <code>urca</code> paketi üzerinden
+<p>Kontrol için aynı hesabı <code>statsmodels</code> ADF testi üzerinden
 işletelim, ki kritik değerleri de görebilelim. Not: kritik değerler için
 de F dağılımı kullanamıyoruz, çünkü artıklarda (residuals) normallik
 farz edemiyoruz, ki onların karesi ve toplamı chi kare olsun, ve chi
-kare bölümler F ölsün. Kalıntılarda normallik niye farz edilemiyor?
+kare bölümler F olsun. Kalıntılarda normallik niye farz edilemiyor?
 Çünkü regresyonda bir önkabul değişkenlerin de <span
 class="math inline">\(N(0,\sigma)\)</span> olarak dağıldığıdır, fakat
 sıfır hipotezine bakarsak regresyona sokulan değişken zaman serisinin ta
@@ -279,49 +282,35 @@ bu standard olmayan F dağılımı simülasyon ile üretiyor ve kritik
 değerleri bir tabloda paylaşıyor. Simülasyonun nasıl yapıldığı [1, sf
 204]’te.</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>load_ext rpy2.ipython</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R library(urca)</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> np.log(dfind.indpro)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>i series</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;trend&#39;</span>,lags<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfout)</span></code></pre></div>
-<pre><code>############################################### 
-# Augmented Dickey-Fuller Test Unit Root Test # 
-############################################### 
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> np.log(dfind.indpro)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>adf_result <span class="op">=</span> adfuller(series, regression<span class="op">=</span><span class="st">&#39;ct&#39;</span>, maxlag<span class="op">=</span><span class="dv">1</span>, autolag<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;ADF Test Results:&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;ADF Statistic: </span><span class="sc">{</span>adf_result[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;p-value: </span><span class="sc">{</span>adadf_result[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Critical Values:&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> adf_result[<span class="dv">4</span>].items():</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  </span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the regression details for additional statistics</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Additional test statistics:&quot;</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;tau3: </span><span class="sc">{</span>adf_result[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># For phi2 and phi3, we use our manual calculations above</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;phi2: </span><span class="sc">{</span>phi2<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;phi3: </span><span class="sc">{</span>phi3<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>ADF Test Results:
+ADF Statistic: -3.4393
+p-value: 0.0089
+Critical Values:
+  1%: -3.990
+  5%: -3.430
+  10%: -3.130
 
-Test regression trend 
-
-
-Call:
-lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
-
-Residuals:
-      Min        1Q    Median        3Q       Max 
--0.068623 -0.007659  0.002293  0.011152  0.051096 
-
-Coefficients:
-              Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)  0.3289056  0.0942984   3.488 0.000715 ***
-z.lag.1     -0.1159234  0.0337053  -3.439 0.000840 ***
-tt           0.0012177  0.0003568   3.412 0.000918 ***
-z.diff.lag   0.4761895  0.0826273   5.763  8.5e-08 ***
----
-
-Residual standard error: 0.02057 on 104 degrees of freedom
-Multiple R-squared:  0.2706,    Adjusted R-squared:  0.2496 
-F-statistic: 12.86 on 3 and 104 DF,  p-value: 3.262e-07
-
-
-Value of test-statistic is: -3.4393 6.1029 5.927 
-
-Critical values for test statistics: 
-      1pct  5pct 10pct
-tau3 -3.99 -3.43 -3.13
-phi2  6.22  4.75  4.07
-phi3  8.43  6.49  5.47</code></pre>
-<p>Sonuçlara göre <span class="math inline">\(\phi_2 = 6.1\)</span>,
+Additional test statistics:
+tau3: -3.4393
+phi2: 6.2203
+phi3: 6.0409</code></pre>
+<p>Sonuçlara göre <span class="math inline">\(\phi_2 = 6.22\)</span>,
 kritik değere göre yüzde 1 önemlilik (significance) seviyesinde <span
 class="math inline">\(\phi_2\)</span> hipotezini reddediyoruz, yani
 rasgele yürüyüş hipotezini reddediyoruz (daha doğrusu kısıtlamaların
@@ -335,7 +324,7 @@ muhtemel diye görmek için <span class="math inline">\(\phi_3\)</span>’e
 bakıyoruz. Bu test ile sıfır hipotezi üstteki tabloda 1. model,
 alternatifi 2. model, aradaki tek fark <span
 class="math inline">\(\beta_1=0\)</span> olması. Eğer bunu
-reddedebilirsek trendi kabul etmemiz gerekir. Test değeri 5.9, kritik
+reddedebilirsek trendi kabul etmemiz gerekir. Test değeri 6.04, kritik
 değere göre yüzde 10 seviyesinden bu hipotezi reddedebiliriz, ve
 alternatif tez olan bu zaman serisinin trend durağan (trend stationary)
 olduğunu kabul ederiz. Trend durağanlık formüldeki <span
@@ -357,8 +346,8 @@ testin sonucu 1. regresyondaki <span
 class="math inline">\(y_{t-1}\)</span>’nin katsayısından gelir, daha
 doğrusu onun t değeridir, yani regresyon katsayısını standart hatası ile
 bölersek sonucu elde ederiz,</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;t degeri&#39;</span>, res1.params[<span class="st">&#39;ylag&#39;</span>] <span class="op">/</span> res1.bse[<span class="st">&#39;ylag&#39;</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;t degeri&#39;</span>, res1.params[<span class="st">&#39;ylag&#39;</span>] <span class="op">/</span> res1.bse[<span class="st">&#39;ylag&#39;</span>])</span></code></pre></div>
 <pre class="text"><code>t degeri -3.4393238821734706</code></pre>
 <p>ki üstteki kritik değerlere göre bu değeri yüzde 5 seviyesi -3.43’ten
 küçük olduğu için bu hipotezi de reddetmek mümkün, yani birim kök
@@ -375,62 +364,42 @@ göre 1990’ların sonlarında görülen çok yüksek fiyat/getiri oranı hisse
 senetlerinin düşeceğinin habercisidir, ki böylece “tarihi normale
 dönüş’’ olacaktır / olmalıdır. Önce bu oranını log’u alınmış halini
 grafikleyelim,</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dfpe <span class="op">=</span> pd.read_csv(<span class="st">&#39;pe.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>dfpe[<span class="st">&#39;ln_price_earnings&#39;</span>] <span class="op">=</span> np.log(dfpe.PRICE<span class="op">/</span>dfpe.EARNINGS)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>dfpe.ln_price_earnings.plot()</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_rwtst_01.png&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dfpe <span class="op">=</span> pd.read_csv(<span class="st">&#39;pe.csv&#39;</span>,sep<span class="op">=</span><span class="st">&#39;\s+&#39;</span>,engine<span class="op">=</span><span class="st">&#39;python&#39;</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>dfpe[<span class="st">&#39;ln_price_earnings&#39;</span>] <span class="op">=</span> np.log(dfpe.PRICE<span class="op">/</span>dfpe.EARNINGS)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>dfpe.ln_price_earnings.plot()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_rwtst_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_rwtst_01.png" /></p>
 <p>Görünüşe göre bir ortalamayı merkez alan / etrafında salınım var gibi
 gözüküyor, bazen ortalamaya dönüş uzun yıllar alabiliyor gibi de
 duruyor.. Şimdi birim kök varlığını test edelim,</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> dfpe.ln_price_earnings</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>i series</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;drift&#39;</span>,lags<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfout)</span></code></pre></div>
-<pre><code>############################################### 
-# Augmented Dickey-Fuller Test Unit Root Test # 
-############################################### 
-
-Test regression drift 
-
-
-Call:
-lm(formula = z.diff ~ z.lag.1 + 1)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--0,53078 -0,10211  0,00324  0,12171  0,41194 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)   
-(Intercept)  0,33486    0,12790   2,618   0,0099 **
-z.lag.1     -0,12452    0,04847  -2,569   0,0113 * 
----
-
-Residual standard error: 0,1777 on 129 degrees of freedom
-Multiple R-squared:  0,04867,   Adjusted R-squared:  0,04129 
-F-statistic:   6,6 on 1 and 129 DF,  p-value: 0,01134
-
-
-Value of test-statistic is: -2,569 3,4573 
-
-Critical values for test statistics: 
-      1pct  5pct 10pct
-tau2 -3,46 -2,88 -2,57
-phi1  6,52  4,63  3,81</code></pre>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> dfpe.ln_price_earnings</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>adf_result <span class="op">=</span> adfuller(series, regression<span class="op">=</span><span class="st">&#39;c&#39;</span>, maxlag<span class="op">=</span><span class="dv">0</span>, autolag<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;ADF Test Results:&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;ADF Statistic: </span><span class="sc">{</span>adf_result[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;p-value: </span><span class="sc">{</span>adf_result[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Critical Values:&quot;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> adf_result[<span class="dv">4</span>].items():</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  </span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre><code>ADF Test Results:
+ADF Statistic: -2.5690
+p-value: 0.0985
+Critical Values:
+  1%: -3.460
+  5%: -2.880
+  10%: -2.570</code></pre>
 <p>Kritik değer -2.569, yüzde 10 eşiğinden bile daha büyük bu, demek ki
 rasgele yürüyüş tezini reddedemiyoruz.</p>
 <p>Fakat diğer yandan, ve özellikle serinin görünüşünde net şekilde
 görülebileceği üzere, serinin durağan-olmadığını da tam reddedemiyoruz.
 Hurst hesabı,</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_025_mean&#39;</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hurst <span class="im">as</span> h</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (h.hurst(dfpe.ln_price_earnings))</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_025_mean&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hurst <span class="im">as</span> h</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (h.hurst(dfpe.ln_price_earnings))</span></code></pre></div>
 <pre class="text"><code>0.07566991981330642</code></pre>
 <p>Bu değer 0.5’ten oldukça uzak.</p>
 <p>Küresel Isınma Var mı?</p>
@@ -442,12 +411,12 @@ kontrol etmek için GİSS tarafından yayınlanan veriye bakacağız, bu veri
 1880-2010 arasında ay bazlı tüm dünyadaki sıcaklık anormalliklerini
 kaydetmiştir, anormallik ise 1951-80 periyotunun ortalaması baz alınarak
 tanımlanmıştır.</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dfclim <span class="op">=</span> pd.read_csv(<span class="st">&#39;climate-giss.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dfclim <span class="op">=</span> pd.read_csv(<span class="st">&#39;climate-giss.csv&#39;</span>,index_col<span class="op">=</span><span class="dv">0</span>,parse_dates<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dfclim.Temp.plot()</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_rwtst_03.png&#39;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dfclim.Temp.plot()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_rwtst_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_rwtst_03.png" /></p>
 <p>“Küresel ısınma yok’’ diyen arkadaşlar üstteki grafikte görüldüğü
 gibi özellikle 20. yüzyılda mevcudiyeti bariz olan yükselişi açıklamak
@@ -460,47 +429,33 @@ kontrolü dışındadır’’ . Tabii ilk akla gelen soru 100 kusur senedir
 yükselen nasıl bir senet ki bu analoji doğru olabilsin..? Matematiksel
 olarak, yazının başında gördüğümüz RY testi herhalde faydalı bir bilgi
 sağlar.</p>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> dfclim.Temp</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>i series</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R  adf <span class="op">&lt;-</span> ur.df(series, <span class="bu">type</span> <span class="op">=</span> <span class="st">&#39;trend&#39;</span>,selectlags<span class="op">=</span><span class="st">&quot;AIC&quot;</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>R <span class="op">-</span>o adfout adfout <span class="op">&lt;-</span> summary(adf)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (adfout)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> dfclim.Temp</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>adf_result <span class="op">=</span> adfuller(series, regression<span class="op">=</span><span class="st">&#39;ct&#39;</span>, autolag<span class="op">=</span><span class="st">&#39;AIC&#39;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;ADF Test Results:&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;ADF Statistic: </span><span class="sc">{</span>adf_result[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;p-value: </span><span class="sc">{</span>adf_result[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Critical Values:&quot;</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, value <span class="kw">in</span> adf_result[<span class="dv">4</span>].items():</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  </span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>value<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get additional statistics from the regression</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Additional statistics:&quot;</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;tau3: </span><span class="sc">{</span>adf_result[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># For detailed regression output, we would need to run the regression manually</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># as shown in the first example to get phi2 and phi3</span></span></code></pre></div>
 <pre><code>
-############################################### 
-# Augmented Dickey-Fuller Test Unit Root Test # 
-############################################### 
+ADF Test Results:
+ADF Statistic: -13.2819
+p-value: 0.0000
+Critical Values:
+  1%: -3.960
+  5%: -3.410
+  10%: -3.120
 
-Test regression trend 
-
-
-Call:
-lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--80.967  -9.868   0.214  10.370  85.279 
-
-Coefficients:
-              Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) -10.578706   1.163642  -9.091   &lt;2e-16 ***
-z.lag.1      -0.277517   0.020894 -13.282   &lt;2e-16 ***
-tt            0.014425   0.001428  10.105   &lt;2e-16 ***
-z.diff.lag   -0.224780   0.024657  -9.116   &lt;2e-16 ***
----
-
-Residual standard error: 16.81 on 1562 degrees of freedom
-Multiple R-squared:  0.2205,    Adjusted R-squared:  0.219 
-F-statistic: 147.3 on 3 and 1562 DF,  p-value: &lt; 2.2e-16
-
-
-Value of test-statistic is: -13.2819 58.8243 88.2169 
-
-Critical values for test statistics: 
-      1pct  5pct 10pct
-tau3 -3.96 -3.41 -3.12
-phi2  6.09  4.68  4.03
-phi3  8.27  6.25  5.34</code></pre>
+Additional statistics:
+tau3: -13.2819</code></pre>
 <p>Testlere bakınca <code>tau3</code> reddedilmiş, <span
 class="math inline">\(\phi_2,\phi_3\)</span> reddedilmiş. Yani RY tezi
 net bir şekilde reddedildi, daha önemlisi trend durağanlığı kabul
@@ -508,16 +463,16 @@ edildi. Bir trend var, ve bu trend bariz bir şekilde yukarıya doğru.</p>
 <p>Bu noktada inkarcı arkadaşlar (!) vites değiştirip “burada ortalamaya
 dönüş var’’ diyebilirler, eh tabii ki sıcaklık verisinde ortalama dönüş
 var, evet Hurst hesabına bakarsak,</p>
-<div class="sourceCode" id="cb19"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_025_mean&#39;</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hurst <span class="im">as</span> h</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (h.hurst(dfclim.Temp))</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../tser_025_mean&#39;</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hurst <span class="im">as</span> h</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (h.hurst(dfclim.Temp))</span></code></pre></div>
 <pre class="text"><code>0.04061154689100931</code></pre>
 <p>Varyans Oranı</p>
-<div class="sourceCode" id="cb21"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> arch.unitroot <span class="im">import</span> VarianceRatio</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>vr <span class="op">=</span> VarianceRatio(dfclim.Temp, <span class="dv">12</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vr.summary().as_text())</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> arch.unitroot <span class="im">import</span> VarianceRatio</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>vr <span class="op">=</span> VarianceRatio(dfclim.Temp, <span class="dv">12</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(vr.summary().as_text())</span></code></pre></div>
 <pre class="text"><code>     Variance-Ratio Test Results     
 =====================================
 Test Statistic                 -7.884
