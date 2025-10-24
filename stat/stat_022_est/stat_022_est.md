@@ -474,11 +474,45 @@ Aynı sonuca ulaştık.
 Üstteki sonucun maksimum olurluk tahmini $k/n$'den farklı olduğuna
 dikkat edelim. Aslında her iki yöntem de maksimize edilen ifade içinde
 olurluk vardı, fakat MAP ile bir fark onsel dağılımın da çarpıma dahil
-edilmiş olmasıydı. Fakat eğer onsel dağılımı birörnek (üniform)
+edilmiş olmasıydı. Fakat eğer önsel dağılımı birörnek (uniform)
 dağılım olarak alsaydık, ki bu elimizde hiçbir onsel bilgi olmadığı
 anlamına gelirdi, o zaman çarpıma dahil edilen bir sabit olacaktı, ve
 o bölüm maksimizasyona dahil olmazdı, bu durumda maksimum olurluk ile
 aynı sonucu elde ederdik. 
+
+Gaussian Önsel Gaussian Sonsal
+
+Veriye bakarak tek boyutlu Gaussian'ın ortalaması $\mu$'yu nasıl
+öğreniriz, öyle ki $P(x|\mu) \sim N(\mu,\sigma^2)$. Diyelim ki $\mu$
+hakkında bir hipotezimiz var, onun aşağı yukarı ne büyüklükte olduğunu
+biliyoruz [4, sf. 52], ve bu "aşağı yukarı", "tahmin" sözlerini
+matematiksel olarak bir önsel Gaussian olarak modele sokmak
+istiyoruz. Yani $\mu$'nun 10 civarında ve standart sapma 5 bağlamında
+olduğunu sisteme dahil etmek için $P(\mu) \sim N(\mu_0,\sigma_0^2)$,
+ki $\mu_0 = 10,\sigma_0=5$. Daha once gördüğümüz notasyona bağlantı
+kurmak için tahmin edilecek parametre $\theta=\mu$, ayrıca daha önce
+olduğu gibi $x = [x_1,x_2,..,x_n]$. Bayes formülü o zaman,
+
+$$
+P(\mu | x) = \frac{P(x | \mu) P(\mu) }{P(x)}
+$$
+
+$$
+= \alpha \prod _{k=1}^{n} P(x_k | \mu) P(\mu)
+$$
+
+$\alpha$ büyüklüğü iki üstteki formüldeki bölen, o bir ölçekleme
+büyüklüğü, veri $x$'e bağlı ama $\mu$'e bağlı değil.
+
+Demistik ki
+
+$$
+P(x|\mu) \sim N(\mu,\sigma^2) = \frac{1}{\sqrt{2\pi} \sigma}
+\exp \left[ -\frac{1}{2} \left( \frac{x - \mu}{\sigma}  \right)^2 \right]
+$$
+
+
+
 
 [devam edecek]
 
@@ -489,4 +523,6 @@ Kaynaklar
 [2] Bayramli, Istatistik, Olasılık, Dağılımlar, Giriş
 
 [3] Nath, CS 217: Artificial Intelligence and Machine Learning
+
+[4] Duda, Pattern Classification and Scene Analysis
 

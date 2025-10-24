@@ -3,15 +3,15 @@
 
 ## En Son
 
+23/10 - [Çok Seviyeli Modeller - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_085_multlev/cok_seviyeli_modeller__multilevel_models_.html)
+
+23/10 - [Lucas Kanade Algoritması](https://burakbayramli.github.io/dersblog/vision/vision_85lk/piksel_takibi_optik_akis_lucas_kanade_algoritmasi.html)
+
 13/10 - [Arkaplan (Background) Tespiti](https://burakbayramli.github.io/dersblog/vision/vision_20bg/arkaplan__background__tespiti.html)
 
 8/10 - [Balonlar Ne Zaman Patlar?](https://burakbayramli.github.io/dersblog/tser/tser_131_bubble/balonlar_ne_zaman_patlar.html)
 
 29/9 - [Artımsal (Incremental) GMM](https://burakbayramli.github.io/dersblog/stat/stat_112_gmminc/artimsal__incremental__gmm.html)
-
-23/9 - [Parametresiz İstatistik (Nonparametric Statistics)](https://burakbayramli.github.io/dersblog/stat/stat_053_nonpar/parametresiz_istatistik__nonparametric_statistics_.html)
-
-17/9 - [Yürüyen Ortalama, EWMA - Ekler, Etkili Örneklem Büyüklüğü](https://burakbayramli.github.io/dersblog/tser/tser_020_ar/arima_arch_garch_periyotlar_yuruyen_ortalama.html)
 
 ## Konular, Referans
 
