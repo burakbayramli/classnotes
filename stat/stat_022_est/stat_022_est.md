@@ -499,6 +499,7 @@ $$
 
 $$
 = \alpha \prod _{k=1}^{n} P(x_k | \mu) P(\mu)
+\qquad (4)
 $$
 
 $\alpha$ büyüklüğü iki üstteki formüldeki bölen, o bir ölçekleme
@@ -507,11 +508,30 @@ büyüklüğü, veri $x$'e bağlı ama $\mu$'e bağlı değil.
 Demistik ki
 
 $$
-P(x|\mu) \sim N(\mu,\sigma^2) = \frac{1}{\sqrt{2\pi} \sigma}
-\exp \left[ -\frac{1}{2} \left( \frac{x - \mu}{\sigma}  \right)^2 \right]
+P(x|\mu) \sim N(\mu,\sigma^2) = \frac{1}{\sqrt{2\pi} \sigma} \exp \left[
+-\frac{1}{2} \left( \frac{x - \mu}{\sigma}  \right)^2
+\right]
 $$
 
+$$
+P(\mu) \sim N(\mu_0,\sigma_0^2) =
+\frac{1}{\sqrt{2\pi} \sigma_0} \exp \left[
+-\frac{1}{2} \left( \frac{\mu - \mu_0}{\sigma_0}  \right)^2
+\right]
+$$
 
+O zaman (4) formulunu su sekilde acabiliriz,
+
+$$
+P(\mu | x) = 
+\alpha \prod _{k=1}^{n}
+\frac{1}{\sqrt{2\pi} \sigma} \exp \left[
+-\frac{1}{2} \left( \frac{x - \mu}{\sigma}  \right)^2
+\right]
+\frac{1}{\sqrt{2\pi} \sigma_0} \exp \left[
+-\frac{1}{2} \left( \frac{\mu - \mu_0}{\sigma_0}  \right)^2
+\right]
+$$
 
 
 [devam edecek]
