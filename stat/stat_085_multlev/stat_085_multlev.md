@@ -95,12 +95,14 @@ normal) geldiği varsayılır. Böylece bireysel farklılıklar hesaba katılır
 
 Bayesçi çerçevede bu yaklaşımın avantajları:
 
-* Her parametre için **önceller (priors)** tanımlanır. Bu, modelin
+* Her parametre için önceller (priors) tanımlanır. Bu, modelin
   gerçekçi sınırlara sahip olmasını sağlar.
-* Model çıktısı bir tek sayı yerine, her parametrenin **olasılık
-  dağılımını (posterior)** verir.
-* Hiyerarşik yapı sayesinde küçük gruplar veya az gözleme sahip bireyler
-  için **kısmi havuzlama (partial pooling)** gerçekleşir; bu da
+  
+* Model çıktısı bir tek sayı yerine, her parametrenin sonsal olasılık
+  dağılımını verir.
+  
+* Hiyerarşik yapı sayesinde küçük gruplar veya az gözleme sahip
+  bireyler için kısmi havuzlama (partial pooling) gerçekleşir; bu da
   katsayıların aşırı uç değerlerden uzaklaşmasını sağlar.
 
 Model kurulumu
@@ -183,16 +185,16 @@ gruplar arası varyansı hesaba katmasının bir sonucudur.
 
 Sonuçların yorumlanması
 
-* **Hiyerarşik yapı**, aynı kişiye ait tekrar ölçümlerin bağımlılığını
+* Hiyerarşik yapı, aynı kişiye ait tekrar ölçümlerin bağımlılığını
   dikkate alır ve parametre tahminlerini daha güvenilir hale getirir.
   
-* **Posterior dağılımlar**, sadece noktadan tahmin yerine olasılık aralıkları
+* Sonsal dağılımlar, sadece noktadan tahmin yerine olasılık aralıkları
   verir; bu da belirsizliği açıkça görmemizi sağlar.
   
-* **sigma_subject** değeri (~2.19), bireyler arası farklılıkların güçlü
+* `sigma_subject` değeri (~2.19), bireyler arası farklılıkların güçlü
   olduğunu göstermektedir.
   
-* **sigma_centre** (~1.27) ise tedavi merkezleri arasında da bir miktar
+* `sigma_centre` (~1.27) ise tedavi merkezleri arasında da bir miktar
   varyans bulunduğunu işaret eder.
 
 Sonuç olarak, Bayesçi çok seviyeli yaklaşım hem daha esnek hem de daha

@@ -95,7 +95,7 @@ tahminlerin çok çıkan tahminleri bir şekilde dengelemesi olduğunu tahmin
 edebiliriz, yani tahmin edicinin üreteceği pek çok değerin $\theta$'yı bir
 şekilde "ortalaması'' iyi olacaktır.
 
-![](unbias.png)
+![](stat_022_est_01.jpg)
 
 Bu durumu şöyle açıklayalım, madem tahmin ediciler birer rasgele değişken,
 o zaman bir dağılım fonksiyonları var. Ve üstteki resimde örnek olarak
@@ -505,7 +505,7 @@ $$
 $\alpha$ büyüklüğü iki üstteki formüldeki bölen, o bir ölçekleme
 büyüklüğü, veri $x$'e bağlı ama $\mu$'e bağlı değil.
 
-Demistik ki
+Demiştik ki
 
 $$
 P(x|\mu) \sim N(\mu,\sigma^2) = \frac{1}{\sqrt{2\pi} \sigma} \exp \left[
@@ -520,7 +520,7 @@ P(\mu) \sim N(\mu_0,\sigma_0^2) =
 \right]
 $$
 
-O zaman (4) formulunu su sekilde acabiliriz,
+O zaman (4) formülünü şu şekilde açabiliriz,
 
 $$
 P(\mu | x) = 
