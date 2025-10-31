@@ -533,16 +533,122 @@ P(\mu | x) =
 \right]
 $$
 
+$\mu$'ye bağlı olmayan terimleri başka bir büyüklük içinde topladık,
+üstte $\alpha$. Üstteki çarpımda $\exp$ içindekileri birleştirip dış
+çarpım ifadesini $\exp$ içine toplam olarak sokabiliriz, ve yine
+sabitleri toparlayıp geri kalanları yazarsak,
+
+$$
+= \alpha' \exp \left[ -\frac{1}{2} \left(
+\sum_{k=1}^n \left( \frac{\mu - x_k}{\sigma} \right)^2 + \left(
+\frac{\mu - \mu_0}{\sigma_0} \right)^2 \right) \right]
+$$
+
+Simdi ustteki formulun kendisinin bir Guassian dagilimi olup
+olmadigini bilmek istiyoruz. Ustel icindeki carpimlari yapalim,
+acalim,
+
+$$
+\text{Üstel} = -\frac{1}{2} \left[ \sum_{k=1}^n \frac{(\mu^2 - 2\mu
+x_k + x_k^2)}{\sigma^2} + \frac{(\mu^2 - 2\mu\mu_0 +
+\mu_0^2)}{\sigma_0^2} \right]
+$$
+
+Şimdi, terimleri $\mu$'nün kuvvetlerine göre ($\mu^2$ terimleri ve $\mu$ terimleri) gruplayalım. $x_k^2$ ve $\mu_0^2$ terimleri $\mu$'ya göre sabittir ve yeni normalization sabiti $\alpha''$ içine yutulacaktır.
+
+$$
+= -\frac{1}{2} \left[ \mu^2 \left( \frac{n}{\sigma^2} +
+\frac{1}{\sigma_0^2} \right) - 2\mu \left(
+\frac{1}{\sigma^2}\sum_{k=1}^n x_k + \frac{\mu_0}{\sigma_0^2} \right)
++ \text{(sabit terimler)} \right]
+$$
+
+Yani şu ifadeyi yazabiliriz şu anda,
+
+$$
+P(\mu | x) = \alpha'' \exp \left[ 
+-\frac{1}{2} \left\{ \mu^2 \left( \frac{n}{\sigma^2} +
+\frac{1}{\sigma_0^2} \right) - 2\mu \left(
+\frac{1}{\sigma^2}\sum_{k=1}^n x_k + \frac{\mu_0}{\sigma_0^2} \right)
+\right\} \right]
+$$
+
+Gaussian dağılım eşleşmesine gelelim. Genel bir Gaussian dağılım
+$N(\mu_n, \sigma_n^2)$ için formun şu olduğunu biliyoruz:
+
+$$
+p(\mu | x) = \frac{1}{\sqrt{2\pi} \sigma_n} \exp \left[
+-\frac{1}{2} \left( \frac{\mu^2}{\sigma_n^2} -
+\frac{2\mu\mu_n}{\sigma_n^2} + \frac{\mu_n^2}{\sigma_n^2} \right)
+\right]
+$$
+
+Bunu $\mu^2$ ve $\mu$ terimlerini gruplayarak da yazabiliriz:
+
+$$
+p(\mu | x) = \frac{1}{\sqrt{2\pi} \sigma_n} \exp \left[
+-\frac{\mu_n^2}{2\sigma_n^2} \right] \exp \left[ -\frac{1}{2} \left(
+\frac{1}{\sigma_n^2} \mu^2 - \frac{2\mu_n}{\sigma_n^2} \mu \right)
+\right]
+$$
+
+$\exp \left[ -\frac{\mu_n^2}{2\sigma_n^2} \right]$ terimi $\mu$'ya
+göre bir sabittir ve normalization'ın bir parçası olacaktır. Biz
+$\mu^2$ ve $\mu$'nün katsayılarıyla ilgileniyoruz.
+
+Türettiğimiz son dağılımın üssünü, genel normal dağılım formunun
+üssüyle karşılaştırıyoruz:
+
+Türettiğimiz son dağılımdan
+
+* $\mu^2$ katsayısı: $-\frac{1}{2} \left( \frac{n}{\sigma^2} +
+  \frac{1}{\sigma_0^2} \right)$
+
+* $\mu$ katsayısı: $-\frac{1}{2} \cdot (-2) \left( \frac{1}{\sigma^2}
+  \sum_{k=1}^n x_k + \frac{\mu_0}{\sigma_0^2} \right) = + \left(
+  \frac{1}{\sigma^2} \sum_{k=1}^n x_k + \frac{\mu_0}{\sigma_0^2}
+  \right)$
+
+Genel normal dağılım formundan $N(\mu_n, \sigma_n^2)$:
+
+* $\mu^2$ katsayısı: $-\frac{1}{2} \left( \frac{1}{\sigma_n^2}
+  \right)$
+
+* $\mu$ katsayısı: $+\left( \frac{\mu_n}{\sigma_n^2} \right)$
+
+İki ifadenin tüm $\mu$ değerleri için aynı olabilmesi için,
+katsayıların eşit olması gerekir.
+
+$\mu^2$ katsayılarını eşitlemek:
+
+$$
+-\frac{1}{2} \left( \frac{1}{\sigma_n^2} \right) = -\frac{1}{2} \left(
+ \frac{n}{\sigma^2} + \frac{1}{\sigma_0^2} \right)
+$$
+
+Her iki taraftaki $-\frac{1}{2}$'ler sadeleşir ve suna erisiriz,
+
+$$
+\frac{1}{\sigma_n^2} = \frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}
+$$
+
+$\mu$ katsayılarını eşitlemek:
+
+$$
+\frac{\mu_n}{\sigma_n^2} = \frac{n}{\sigma^2} m_n +
+\frac{\mu_0}{\sigma_0^2} \quad \text{(burada } m_n = \frac{1}{n}\sum
+x_k \text{)}
+$$
 
 [devam edecek]
 
 Kaynaklar
 
-[1] Unpingco, Python for Probability, Statistics and Machine Learning
+[1] Unpingco, *Python for Probability, Statistics and Machine Learning*
 
-[2] Bayramli, Istatistik, Olasılık, Dağılımlar, Giriş
+[2] Bayramli, *Istatistik, Olasılık, Dağılımlar, Giriş*
 
-[3] Nath, CS 217: Artificial Intelligence and Machine Learning
+[3] Nath, *CS 217: Artificial Intelligence and Machine Learning*
 
-[4] Duda, Pattern Classification and Scene Analysis
+[4] Duda, *Pattern Classification and Scene Analysis*
 
