@@ -1,4 +1,4 @@
-# Konuşma Tanıma (Speech Recognition)
+# YSA ile Konuşma Tanıma (Speech Recognition)
 
 Frekans Üzerinden Özellik Çıkartımı, RNN, LSTM, GRU
 
