@@ -3,6 +3,8 @@
 
 ## En Son
 
+03/11 - [Maksimum Sonsal Hesabı (Maximum a Posteriori / MAP)](https://burakbayramli.github.io/dersblog/stat/stat_022_est/tahmin_edici_hesaplar__estimators_.html)
+
 23/10 - [Çok Seviyeli Modeller - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_085_multlev/cok_seviyeli_modeller__multilevel_models_.html)
 
 23/10 - [Lucas Kanade Algoritması](https://burakbayramli.github.io/dersblog/vision/vision_85lk/piksel_takibi_optik_akis_lucas_kanade_algoritmasi.html)
@@ -10,8 +12,6 @@
 13/10 - [Arkaplan (Background) Tespiti](https://burakbayramli.github.io/dersblog/vision/vision_20bg/arkaplan__background__tespiti.html)
 
 8/10 - [Balonlar Ne Zaman Patlar?](https://burakbayramli.github.io/dersblog/tser/tser_131_bubble/balonlar_ne_zaman_patlar.html)
-
-29/9 - [Artımsal (Incremental) GMM](https://burakbayramli.github.io/dersblog/stat/stat_112_gmminc/artimsal__incremental__gmm.html)
 
 ## Konular, Referans
 

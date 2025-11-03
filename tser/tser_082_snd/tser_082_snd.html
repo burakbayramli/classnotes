@@ -13,7 +13,7 @@
     });
     </script>  
    
-  <title>Ses Verişi İşleme, Tanıma</title>
+  <title>Ses Verisi İşleme, Tanıma</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -80,67 +80,240 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
-<h1 id="ses-verişi-işleme-tanıma">Ses Verişi İşleme, Tanıma</h1>
+<h1 id="ses-verisi-işleme-tanıma">Ses Verisi İşleme, Tanıma</h1>
+<p>Sinüssel Regresyon (Sinusoidal Regression)</p>
+<p>Alttaki veriye bir veya birden fazla sinüs eğrisi uydurmak
+istiyoruz.</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io.wavfile</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">1.0</span>   </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, T, <span class="bu">int</span>(T<span class="op">*</span>fs), endpoint<span class="op">=</span><span class="va">False</span>) </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">440</span><span class="op">*</span>t)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>x_scaled <span class="op">=</span> x <span class="op">*</span> <span class="fl">32767.0</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x_int16 <span class="op">=</span> x_scaled.astype(np.int16)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out1.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;baltic.csv&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df.plot(x<span class="op">=</span><span class="st">&#39;toy&#39;</span>,y<span class="op">=</span><span class="st">&#39;degs&#39;</span>,kind<span class="op">=</span><span class="st">&#39;scatter&#39;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_sinreg_01.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_sinreg_01.png" /></p>
+<p>Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile, nasıl
+yana kaydırarak tam doğru noktayı bulacağız? Ayrıca eğrinin genliği
+(amplitude) önemli. Tüm bunları kapsayan formül</p>
+<p><span class="math display">\[ f(x) = A \sin (x+\varphi) \]</span></p>
+<p>Genlik <span class="math inline">\(A\)</span> ile faz ise <span
+class="math inline">\(\varphi\)</span> ile gösterilmiş, öyle bir <span
+class="math inline">\(A,\varphi\)</span> bulalım ki sonuç sinüs eğrisi
+tam veriye uysun. Veriye uydurma deyince akla lineer regresyon geliyor,
+fakat üstteki formülü olduğu gibi regresyona sokmak mümkün değil, çünkü
+faz kaydırmak için <span class="math inline">\(\sin\)</span> içindeki
+parametrenin değişmesi lazım, regresyon bunları yapamaz. Ama regresyona
+problemi `katsayı çarpı basit formül’’ şeklinde sunabilir miyiz acaba?
+Bir trigonometrik eşitlikten biliyoruz ki</p>
+<p><span class="math display">\[  A \sin (x+\varphi) = a\sin(x) +
+b\cos(x) \]</span></p>
+<p>ki <span class="math inline">\(\sin\varphi =
+\frac{b}{\sqrt{a^2+b^2}}\)</span>, ve <span class="math inline">\(A =
+\sqrt{a^2+b^2}\)</span> olacak sekilde.</p>
+<p>Bu eşitliğin doğru olduğunu kontrol edelim,</p>
+<p><span class="math display">\[ a \sin(x) + b \cos(x) = \sqrt{a^2+b^2}
+\left(\frac{a}{\sqrt{a^2+b^2}} \sin(x) + \frac{b}{\sqrt{a^2+b^2}}
+\cos(x)\right) \]</span></p>
+<p><span class="math display">\[  = A\left[\sin(x)\cos(\varphi) +
+\cos(x)\sin(\varphi)\right] \]</span></p>
+<p><span class="math display">\[ = A\sin(x+\varphi) \]</span></p>
+<p>O zaman <span class="math inline">\(a \sin(x) + b \cos(x)\)</span>
+için regresyon yapabiliriz. Regresyon iki toplam üzerinden tanımlı
+fonksiyonlar için en uygun <span class="math inline">\(a,b\)</span>
+katsayılarını hesaplayacak. Önce <span
+class="math inline">\(\sin\)</span> içinde <span
+class="math inline">\(2\pi x\)</span> ile başlarız,</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">1500</span><span class="op">*</span>t <span class="op">-</span> <span class="dv">100</span><span class="op">*</span>np.sin(<span class="dv">2</span><span class="op">*</span><span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x_scaled <span class="op">=</span> x <span class="op">*</span> <span class="fl">32767.0</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x_int16 <span class="op">=</span> x_scaled.astype(np.int16)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out2.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
-<p>Sinussoidal Regression</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io.wavfile</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>tmp, ow <span class="op">=</span> scipy.io.wavfile.read(<span class="st">&#39;/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav&#39;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(ow)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(df) <span class="co"># Number of samples</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">&#39;wav&#39;</span>]</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(N) <span class="op">/</span> fs</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>f_start <span class="op">=</span> <span class="fl">100.0</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>f_end <span class="op">=</span> <span class="fl">4000.0</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>frequencies_hz <span class="op">=</span> np.linspace(f_start, f_end, <span class="dv">500</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> frequencies_hz:</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>   df[<span class="st">&#39;sin</span><span class="sc">%f</span><span class="st">&#39;</span> <span class="op">%</span> f] <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> f <span class="op">*</span> t)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>   df[<span class="st">&#39;cos</span><span class="sc">%f</span><span class="st">&#39;</span> <span class="op">%</span> f] <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> f <span class="op">*</span> t)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(np.array(df.drop([<span class="st">&#39;wav&#39;</span>],axis<span class="op">=</span><span class="dv">1</span>)))</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> df.wav.astype(<span class="bu">float</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(Y,X)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> model.fit()</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;degs ~ np.sin(2*np.pi*toy) + np.cos(2*np.pi*toy)&#39;</span>, data<span class="op">=</span>df).fit()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<pre class="text"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   degs   R-squared:                       0.969
+Model:                            OLS   Adj. R-squared:                  0.968
+Method:                 Least Squares   F-statistic:                     704.3
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):           1.10e-34
+Time:                        12:37:22   Log-Likelihood:                -63.360
+No. Observations:                  48   AIC:                             132.7
+Df Residuals:                      45   BIC:                             138.3
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+===========================================================================================
+                              coef    std err          t      P&gt;|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                   8.2917      0.135     61.407      0.000       8.020       8.564
+np.sin(2 * np.pi * toy)    -5.9156      0.191    -30.979      0.000      -6.300      -5.531
+np.cos(2 * np.pi * toy)    -4.0463      0.191    -21.190      0.000      -4.431      -3.662
+==============================================================================
+Omnibus:                       28.673   Durbin-Watson:                   1.051
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):                4.298
+Skew:                          -0.158   Prob(JB):                        0.117
+Kurtosis:                       1.569   Cond. No.                         1.41
+==============================================================================</code></pre>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> df.drop(<span class="st">&#39;wav&#39;</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> results.params</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>filt <span class="op">=</span> df.columns[results.pvalues <span class="op">&lt;</span> <span class="fl">0.05</span>]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;tum&#39;</span>,<span class="bu">len</span>(df.columns), <span class="st">&#39;filtre sonrasi&#39;</span>,<span class="bu">len</span>(filt))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> left.loc[:,filt]</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> right[results.pvalues <span class="op">&lt;</span> <span class="fl">0.05</span>]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> np.zeros((<span class="dv">1</span>,<span class="bu">len</span>(right)))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>tmp[<span class="dv">0</span>,:] <span class="op">=</span> right</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>dff <span class="op">=</span> left.dot(tmp.T)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(dff).flatten() </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>y_int16 <span class="op">=</span> y.astype(np.int16)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out3.wav&#39;</span>, fs, y_int16)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> results.params[<span class="dv">1</span>],results.params[<span class="dv">2</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> (a<span class="op">**</span><span class="dv">2</span><span class="op">+</span>b<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (A, np.rad2deg(np.arcsin(b<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> A)))</span></code></pre></div>
+<pre class="text"><code>51.367286414382804 18.586661396939277</code></pre>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="op">=</span> results.params[<span class="dv">0</span>] <span class="op">+</span> results.params[<span class="dv">1</span>] <span class="op">*</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>       results.params[<span class="dv">2</span>] <span class="op">*</span> np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(df.toy,df.degs)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.plot(df.toy,fit1)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_sinreg_02.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_sinreg_02.png" /></p>
+<p>Uyum fena değil. Daha iyi uyum için daha fazla terim ekleyebiliriz,
+mesela <span class="math inline">\(\sin,\cos\)</span> içinde <span
+class="math inline">\(2 \pi x\)</span> kullandık, bir de <span
+class="math inline">\(4 \pi x\)</span>’li terimler ekleyerek,</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>formula <span class="op">=</span> <span class="st">&#39;degs ~ np.sin(2*np.pi*toy) + np.cos(2*np.pi*toy) + &#39;</span> <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>          <span class="st">&#39;       np.sin(4*np.pi*toy) + np.cos(4*np.pi*toy)&#39;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(formula, data<span class="op">=</span>df).fit()</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<pre class="text"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   degs   R-squared:                       0.999
+Model:                            OLS   Adj. R-squared:                  0.999
+Method:                 Least Squares   F-statistic:                     9519.
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):           9.48e-63
+Time:                        12:37:40   Log-Likelihood:                 16.130
+No. Observations:                  48   AIC:                            -22.26
+Df Residuals:                      43   BIC:                            -12.90
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+===========================================================================================
+                              coef    std err          t      P&gt;|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                   8.2917      0.026    314.450      0.000       8.238       8.345
+np.sin(2 * np.pi * toy)    -5.9156      0.037   -158.634      0.000      -5.991      -5.840
+np.cos(2 * np.pi * toy)    -4.0463      0.037   -108.506      0.000      -4.122      -3.971
+np.sin(4 * np.pi * toy)     1.2124      0.037     32.513      0.000       1.137       1.288
+np.cos(4 * np.pi * toy)     0.3333      0.037      8.939      0.000       0.258       0.409
+==============================================================================
+Omnibus:                        0.473   Durbin-Watson:                   2.983
+Prob(Omnibus):                  0.790   Jarque-Bera (JB):                0.338
+Skew:                          -0.200   Prob(JB):                        0.845
+Kurtosis:                       2.909   Cond. No.                         1.41
+==============================================================================
+</code></pre>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="op">=</span> results.params[<span class="dv">0</span>] <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>       results.params[<span class="dv">1</span>] <span class="op">*</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>       results.params[<span class="dv">2</span>]<span class="op">*</span>np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>       results.params[<span class="dv">3</span>] <span class="op">*</span> np.sin(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy) <span class="op">+</span> <span class="op">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>       results.params[<span class="dv">4</span>]<span class="op">*</span>np.cos(<span class="dv">4</span><span class="op">*</span>np.pi<span class="op">*</span>df.toy) </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.scatter(df.toy,df.degs)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.plot(df.toy, fit2)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_sinreg_03.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_sinreg_03.png" /></p>
+<p>Uyum daha iyi hale geldi.</p>
+<p>Bir tane de mutlak değer içeren bir fonksiyon.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">400</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.<span class="bu">abs</span>(np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>x)) <span class="op">+</span> np.random.random(<span class="bu">len</span>(x)) <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(x)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;y&#39;</span>] <span class="op">=</span> y</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">&#39;x&#39;</span>,<span class="st">&#39;y&#39;</span>]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df.plot(x<span class="op">=</span><span class="st">&#39;x&#39;</span>,y<span class="op">=</span><span class="st">&#39;y&#39;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_sinreg_04.png&#39;</span>)</span></code></pre></div>
+<p><img src="tser_sinreg_04.png" /></p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;y ~ np.abs(np.sin(2*np.pi*x)) + np.abs(np.cos(2*np.pi*x))&#39;</span>, data<span class="op">=</span>df).fit()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.summary())</span></code></pre></div>
+<pre class="text"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.830
+Model:                            OLS   Adj. R-squared:                  0.829
+Method:                 Least Squares   F-statistic:                     968.9
+Date:                Fri, 27 Jun 2025   Prob (F-statistic):          1.84e-153
+Time:                        12:38:04   Log-Likelihood:                 206.22
+No. Observations:                 400   AIC:                            -406.4
+Df Residuals:                     397   BIC:                            -394.5
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+=================================================================================================
+                                    coef    std err          t      P&gt;|t|      [0.025      0.975]
+-------------------------------------------------------------------------------------------------
+Intercept                         0.3500      0.074      4.719      0.000       0.204       0.496
+np.abs(np.sin(2 * np.pi * x))     0.9428      0.059     15.943      0.000       0.827       1.059
+np.abs(np.cos(2 * np.pi * x))    -0.0979      0.059     -1.650      0.100      -0.215       0.019
+==============================================================================
+Omnibus:                      292.929   Durbin-Watson:                   1.972
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               25.280
+Skew:                           0.035   Prob(JB):                     3.24e-06
+Kurtosis:                       1.770   Cond. No.                         20.5
+==============================================================================
+</code></pre>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io.wavfile</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">1.0</span>   </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, T, <span class="bu">int</span>(T<span class="op">*</span>fs), endpoint<span class="op">=</span><span class="va">False</span>) </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">440</span><span class="op">*</span>t)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>x_scaled <span class="op">=</span> x <span class="op">*</span> <span class="fl">32767.0</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>x_int16 <span class="op">=</span> x_scaled.astype(np.int16)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out1.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.sin(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span><span class="dv">1500</span><span class="op">*</span>t <span class="op">-</span> <span class="dv">100</span><span class="op">*</span>np.sin(<span class="dv">2</span><span class="op">*</span><span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>t))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>x_scaled <span class="op">=</span> x <span class="op">*</span> <span class="fl">32767.0</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>x_int16 <span class="op">=</span> x_scaled.astype(np.int16)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out2.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
+<p>Sinussoidal Regression</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io.wavfile</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>tmp, ow <span class="op">=</span> scipy.io.wavfile.read(<span class="st">&#39;/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav&#39;</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(ow)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(df) <span class="co"># Number of samples</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">&#39;wav&#39;</span>]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.arange(N) <span class="op">/</span> fs</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>f_start <span class="op">=</span> <span class="fl">100.0</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>f_end <span class="op">=</span> <span class="fl">4000.0</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>frequencies_hz <span class="op">=</span> np.linspace(f_start, f_end, <span class="dv">500</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> frequencies_hz:</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>   df[<span class="st">&#39;sin</span><span class="sc">%f</span><span class="st">&#39;</span> <span class="op">%</span> f] <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> f <span class="op">*</span> t)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>   df[<span class="st">&#39;cos</span><span class="sc">%f</span><span class="st">&#39;</span> <span class="op">%</span> f] <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> f <span class="op">*</span> t)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(np.array(df.drop([<span class="st">&#39;wav&#39;</span>],axis<span class="op">=</span><span class="dv">1</span>)))</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> df.wav.astype(<span class="bu">float</span>)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(Y,X)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> model.fit()</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fs <span class="op">=</span> <span class="dv">16000</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> df.drop(<span class="st">&#39;wav&#39;</span>,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> results.params</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>filt <span class="op">=</span> df.columns[results.pvalues <span class="op">&lt;</span> <span class="fl">0.05</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;tum&#39;</span>,<span class="bu">len</span>(df.columns), <span class="st">&#39;filtre sonrasi&#39;</span>,<span class="bu">len</span>(filt))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>left <span class="op">=</span> left.loc[:,filt]</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>right <span class="op">=</span> right[results.pvalues <span class="op">&lt;</span> <span class="fl">0.05</span>]</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> np.zeros((<span class="dv">1</span>,<span class="bu">len</span>(right)))</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>tmp[<span class="dv">0</span>,:] <span class="op">=</span> right</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>dff <span class="op">=</span> left.dot(tmp.T)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array(dff).flatten() </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>y_int16 <span class="op">=</span> y.astype(np.int16)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out3.wav&#39;</span>, fs, y_int16)</span></code></pre></div>
 <pre class="text"><code>tum 1001 filtre sonrasi 88</code></pre>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>./sk/2024/11/ses-tanima-isleme.html</p>
 <p>Sezonsallık, Periyotlar, ./tser/tser_017_seas/tser_017_seas.html</p>
+<p>Bayramli, Istatistik, Tahmin Edici Hesaplar (Estimators)</p>
+<p>Cross Validated, <em>How to find a good fit for semi­sinusoidal model
+in R?</em>, <a
+href="http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r">http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

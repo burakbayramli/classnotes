@@ -285,49 +285,6 @@ plt.savefig('ses_04.jpg')
 ![](ses_04.jpg)
 
 
-Sinüssel Regresyon ile Ayırmak
-
-```python
-import statsmodels.api as sm
-import pandas as pd
-
-df = pd.DataFrame(wav1)
-df.columns = ['wav']
-tt = np.linspace(0,1,len(df))
-for p in np.linspace(1,3,500):
-   df['sin%f' % p] = np.sin(p*np.pi*df.index.astype(float))
-   df['cos%f' % p] = np.cos(p*np.pi*df.index.astype(float))
-
-X = sm.add_constant(np.array(df.drop(['wav'],axis=1)))
-Y = df.wav.astype(float)
-model = sm.OLS(Y,X)
-results = model.fit()
-print (results.params[:5])
-print (results.pvalues[:5])
-print ('R^2', results.rsquared)
-print (len(df.columns[results.pvalues < 0.05]))
-print (len(df))
-```
-
-```text
-const   -1.746267e+00
-x1      -3.873460e+13
-x2       4.141772e+10
-x3       8.071563e+13
-x4      -9.792258e+12
-dtype: float64
-const    0.972714
-x1       0.893328
-x2       0.902068
-x3       0.343704
-x4       0.903365
-dtype: float64
-R^2 0.5121417785266622
-48
-2341
-```
-
-
 Kaynaklar
 
 [1] <a href="https://github.com/talcs/simpledtw">SimpleDTW</a>
@@ -339,8 +296,6 @@ Kaynaklar
 [4] Tavenard, <a href="https://rtavenar.github.io/blog/dtw.html">An introduction to Dynamic Time Warping</a>
     
 [5] Mishra, <a href="https://medium.com/walmartglobaltech/time-series-similarity-using-dynamic-time-warping-explained-9d09119e48ec">Time Series Similarity Using Dynamic Time Warping -Explained</a>
-
-[6] Bayramlı, Finans ve Zaman Serileri - Sezonsallık, Periyotlar
 
 [7] <a href="https://www.dropbox.com/scl/fi/7bjyicydyyurizi314qp8/google_voice_small.zip?rlkey=l5ibbx480jld79exvkwih3szr&st=ni9ibhbs&dl=1">Ufak Ses Komut Verisi</a>
 

@@ -636,11 +636,37 @@ $\mu$ katsayılarını eşitlemek:
 
 $$
 \frac{\mu_n}{\sigma_n^2} = \frac{n}{\sigma^2} m_n +
-\frac{\mu_0}{\sigma_0^2} \quad \text{(burada } m_n = \frac{1}{n}\sum
-x_k \text{)}
+\frac{\mu_0}{\sigma_0^2} 
 $$
 
-[devam edecek]
+ki $m_n = 1/n \sum x_k$.
+
+$\mu_n,\sigma_n$ bulmak icin
+
+$$
+\sigma_n^2 = \frac{1}{\frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}} =
+\frac{\sigma_0^2 \sigma^2}{n\sigma_0^2 + \sigma^2}
+$$
+
+$\mu_n$'yi bulmak için, üstteki denklemin her iki tarafını
+$\sigma_n^2$ ile çarpalım,
+
+$$
+\mu_n = \sigma_n^2 \left( \frac{n}{\sigma^2} m_n + \frac{\mu_0}{\sigma_0^2} \right)
+$$
+
+Şimdi yukarıdaki $\sigma_n^2$ ifadesini yerine koyalım,
+
+$$      
+\mu_n = \frac{\sigma_0^2 \sigma^2}{n\sigma_0^2 + \sigma^2} \left( \frac{n}{\sigma^2} m_n + \frac{\mu_0}{\sigma_0^2} \right) = \frac{n\sigma_0^2}{n\sigma_0^2 + \sigma^2} m_n + \frac{\sigma^2}{n\sigma_0^2 + \sigma^2} \mu_0
+$$ 
+
+Bunlar [4, sf. 53]'te görülen sonuçlardır. Bu formüller önsel bilginin
+veriyle nasıl birleştirildiğini ve böylece bir sonsal yoğunluk
+$P(\mu|x)$ elde edebileceğimizi gösteriyor. Kabaca ifade etmek
+gerekirse $\mu_n$ büyüklüğü $n$ veri noktası gözlemledikten sonra
+elimizdeki en iyi $\mu$ tahminidir ve $\sigma_n^2$ bu tahmin
+etrafındaki kararsızlığı gösterir.
 
 Kaynaklar
 

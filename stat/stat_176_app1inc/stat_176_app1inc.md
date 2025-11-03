@@ -178,7 +178,7 @@ d_n^2 =
 \sum_{i=1}^{n} \bar{x}_n^2
 $$
 
-Sabitleri disari cikartabiliriz,
+Sabitleri dışarı çıkartabiliriz,
 
 $$
 d_n^2 =
@@ -463,7 +463,6 @@ YC = 8.25 Standart =  8.25
 45 45
 ```
 
-
 Kaynaklar
 
 [1] Bayramlı, *Istatistik, Beklenti, Varyans, Kovaryans ve Korelasyon*
@@ -475,5 +474,4 @@ Kaynaklar
 
 [4] Nested Software, *Calculating Standard Deviation on Streaming Data*,
     [https://nestedsoftware.com/2018/03/27/calculating-standard-deviation-on-streaming-data-253l.23919.html](https://nestedsoftware.com/2018/03/27/calculating-standard-deviation-on-streaming-data-253l.23919.html)
-
 
