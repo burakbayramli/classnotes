@@ -415,6 +415,8 @@ verilmelidir.
 
 ### Ses Komut Tanıması, GMM-UBM
 
+
+
 [devam edecek]
 
 Kodlar

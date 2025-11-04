@@ -148,7 +148,7 @@ emin olmak istiyorsak, AIC kullanarak tek Poisson uyumu, daha sonra
 karışımın uyumu için ayrı ayrı AIC'leri hesaplayarak hangisinin daha düşük
 olduğuna göre bu kararı verebiliriz.
 
-Bayes ve MCMC 
+### Bayes ve MCMC 
 
 Bir değişik yöntem Bayes yaklaşımını kullanarak ve hesapsal olarak Markov
 Chain Monte Carlo (MCMC) tekniği. Kazaların sayısının tümünü iki Poisson
@@ -402,7 +402,149 @@ coal(1100, data, init=[1,1,30], a1=1,a2=1,b1=1,b2=1)
 
 Kodları işletince elimize k = 42 değeri geçecek, yani değişim anı 1851+42 = 1893
 senesidir. 
-Kaynaklar: 
+
+### PyMC
+
+PyMC ile kurulan model, daha önce el ile yazılmış Gibbs
+örnekleyicisiyle aynı Bayesyen değişim noktası (changepoint)
+formülasyonunu yeniden üretmektedir. Her iki yaklaşımda da veri,
+yıllık kömür madeni kazası sayılarından oluşur ve bu sayılar tek bir
+değişim noktasına sahip Poisson süreci olarak modellenir. Yani,
+veriler aşağıdaki gibi tanımlanır:
+
+$$
+y_i \sim
+\begin{array}{cc}
+Poisson(\theta), & i \le k \\
+Poisson(\lambda), & i > k
+\end{array}
+$$
+
+
+
+Burada $\theta$ ve $\lambda$ sırasıyla değişim noktasından önce ve
+sonra geçerli olan Poisson oranlarıdır. $k$ ise değişim noktasının
+konumudur. Parametreler için öncül dağılımlar bağımsız alınmıştır:
+$\theta$ ve $\lambda$ için Gamma öncülleri, $k$ için ise tüm olası
+yıllar üzerinde birörnek (uniform) ayrık bir öncül kullanılmıştır.
+
+El kodlu Gibbs örnekleyicisinde, her iterasyonda tam koşullu
+dağılımlardan örnekleme yapılmıştır:
+
+* $\theta$ ve $\lambda$, Poisson–Gamma eşlenik yapısı sayesinde
+  koşullu Gamma dağılımlarından örneklenmiştir,
+
+* $k$ ise her olası konum için koşullu olasılıklar hesaplanarak bu
+  olasılıklara göre rastgele seçilmiştir.
+
+Bu yaklaşım, koşullu dağılımların analitik biçimde elde edilmesine ve
+bu dağılımlar arasında dönüşümlü örnekleme yapılmasına dayanıyordu.
+
+PyMC ile kurulan modelde ise aynı yapının tamamı sembolik olarak
+tanımlanmıştır. Örneğin:
+
+```python
+theta = pm.Gamma("theta", alpha=a1, beta=b1)
+lam   = pm.Gamma("lam",   alpha=a2, beta=b2)
+k     = pm.DiscreteUniform("k", lower=0, upper=n-1)
+mu    = pm.math.switch(idx <= k, theta, lam)
+y     = pm.Poisson("y", mu=mu, observed=data)
+```
+
+Bu tanımlama sonrasında PyMC, ek bir kodlama gerektirmeden ortak
+olasılık (joint posterior) dağılımını kendisi kurar. Örnekleme
+aşamasında ise sürekli parametreler $( \theta, \lambda )$ için NUTS
+(No-U-Turn Sampler), ayrık değişken $k$ için ise Metropolis
+algoritmasını otomatik olarak kullanır. Böylece, Gibbs
+örnekleyicisinde elle yapılan koşullu örnekleme işlemleri PyMC
+tarafından dahili olarak yürütülür.
+
+Elde edilen sonuçlar yorum bakımından tamamen aynıdır: değişim noktası
+için ardıl dağılım yaklaşık olarak 1891 yılına karşılık gelir;
+$\theta$ ve $\lambda$ için ardıl ortalamalar sırasıyla yaklaşık 3.1 ve
+0.9 olarak bulunmuştur. Bu sonuçlar, el ile yazılmış Gibbs
+örnekleyicisinde elde edilen klasik kömür madeni kazası analizi
+sonuçlarıyla örtüşmektedir.
+
+Fark esasen uygulamadadır: PyMC modeli aynı Bayesyen yapıyı çok daha
+kısa, okunabilir bir şekilde ifade eder; örnekleme, yakınsama tanısı
+ve ardıl tahmin (posterior predictive) işlemleri ise otomatik olarak
+ve güvenilir biçimde yürütülür.
+
+```python
+import numpy as np
+import pymc as pm
+import arviz as az
+import matplotlib.pyplot as plt
+
+data = np.loadtxt("coal.txt", dtype=int)
+n = len(data)
+years = 1851 + np.arange(n)    # for reporting results
+
+# hiperparametreler
+a1 = a2 = 1.0
+b1 = b2 = 1.0
+
+with pm.Model() as model:
+    # Iki Poisson orani icin onseller
+    theta = pm.Gamma("theta", alpha=a1, beta=b1)   # before the changepoint
+    lam   = pm.Gamma("lam",   alpha=a2, beta=b2)   # after the changepoint
+
+    # Degisim noktasi k icin ayriksal birornek onsel  (indeks in 0..n-1)
+    k = pm.DiscreteUniform("k", lower=0, upper=n - 1)
+
+    idx = np.arange(n)                # numpy array of shape (n,)
+    mu = pm.math.switch(idx <= k, theta, lam)
+
+    y = pm.Poisson("y", mu=mu, observed=data)
+
+    nuts = pm.NUTS(vars=[theta, lam], target_accept=0.9)
+    metro = pm.Metropolis(vars=[k])
+
+    trace = pm.sample(
+        draws=3000,
+        tune=2000,
+        step=[nuts, metro],
+        cores=2,
+        random_seed=42,
+        return_inferencedata=True
+    )
+
+print(az.summary(trace, var_names=["theta", "lam", "k"], round_to=3))
+
+k_samples = trace.posterior["k"].values.flatten().astype(int)
+k_mode = np.bincount(k_samples).argmax()
+print(f"Sonsal modal k indeksi = {k_mode}, sene = {1851 + k_mode}")
+
+# plot posterior of k
+plt.figure()
+az.plot_posterior(trace, var_names=["k"], hdi_prob=0.95)
+plt.title("Degisim noktasi indek k icin sonsallik")
+plt.savefig('stat_coal_01.jpg')
+```
+
+```text
+                                                                                
+                       Step   Grad                 Acce…   Sam…                 
+  Pro…   Dra…   Div…   size   eva…   Tun…   Sca…   Rate    Spe…   Elap…   Rem…  
+ -------------------------------------------------------------------------------
+  ----   5000   0      1.0…   3      Fal…   4.59   0.30    183…   0:00…   0:0…  
+                                                           dra…                 
+  ----   5000   0      0.9…   3      Fal…   4.29   0.28    188…   0:00…   0:0…  
+                                                           dra…                 
+                                                                                
+         mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+theta   3.068  0.287   2.548    3.615  ...    0.004  4215.123  4360.194  1.001
+lam     0.923  0.115   0.714    1.139  ...    0.002  3573.253  3932.140  1.001
+k      39.084  2.408  34.000   43.000  ...    0.065   957.958  1031.041  1.005
+
+[3 rows x 9 columns]
+Sonsal modal k indeksi = 40, sene = 1891
+```
+
+![](stat_coal_01.jpg)
+
+Kaynaklar
 
 [1] Ioana A. Cosma, Ludger Evers, *Markov Chain Monte Carlo Methods (Lecture)*
 
