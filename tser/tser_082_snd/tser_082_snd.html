@@ -93,8 +93,8 @@ düşünebiliriz. Bir ses parçasını (phoneme) grafiklemek istesek alttaki
 gibi bir grafik elde ederdik.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>owfile <span class="op">=</span> <span class="st">&quot;/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>fs, ow <span class="op">=</span> scipy.io.wavfile.read(fname)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>owfile <span class="op">=</span> <span class="st">&quot;../../sk/2024/11/phonemes/ow.wav&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>fs, ow <span class="op">=</span> scipy.io.wavfile.read(owfile)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.plot(ow)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_082_snd_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="tser_082_snd_01.jpg" /></p>
@@ -166,12 +166,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out2.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
 <h3 id="sinüssel-regresyon-sinusoidal-regression">Sinüssel Regresyon
 (Sinusoidal Regression)</h3>
-<p>Ses tanima kavramina gelelim. Eger bir sesin birden fazla farkli
-sinus egrisi toplami oldugu dogru ise bu ses dalgasinin sinus
-bilesenlerini ayirabilirsek, ses tanima baglaminda saglam bir adim atmis
+<p>Ses tanıma kavramına gelelim. Eğer bir sesin birden fazla farklı
+sinüs eğrisi toplamı olduğu doğru ise bu ses dalgasının sinüs
+bileşenlerini ayırabilirsek, ses tanıma bağlamında sağlam bir adım atmış
 olurduk. Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile,
-nasıl genligini buyuterek, yana kaydırarak, frekansini arttirarak tam
-doğru uyum noktasini bulacağız? Yani veriye uydurmak istedigimiz
+nasıl genliğini büyüterek, yana kaydırarak, frekansını arttırarak tam
+doğru uyum noktasını bulacağız? Yani veriye uydurmak istediğimiz
 formül</p>
 <p><span class="math display">\[
 f(x) = A \sin (x+\varphi)
@@ -185,7 +185,7 @@ tam veriye uysun.</p>
 formülü olduğu gibi regresyona sokmak mümkün değil, çünkü faz kaydırmak
 için <span class="math inline">\(\sin\)</span> içindeki parametrenin
 değişmesi lazım, regresyon bunları yapamaz. Ama regresyona problemi
-`katsayı çarpı basit formül’’ formunda sunabilir miyiz acaba? Bir
+“katsayı çarpı basit formül” formunda sunabilir miyiz acaba? Bir
 trigonometrik eşitlikten biliyoruz ki</p>
 <p><span class="math display">\[  A \sin (x+\varphi) = a\sin(x) +
 b\cos(x) \]</span></p>
@@ -200,7 +200,7 @@ b\cos(x) \]</span></p>
 \cos(x)\sin(\varphi)\right] \]</span></p>
 <p><span class="math display">\[ = A\sin(x+\varphi) \]</span></p>
 <p>O zaman <span class="math inline">\(a \sin(x) + b \cos(x)\)</span>
-için regresyon yapmak (1) için regresyon yapmak ile aynı şeydir.
+için regresyon yapmak (1) için regresyon yapmak ile aynı şeydir [4].
 Regresyon iki toplam üzerinden tanımlı o formül için en uygun <span
 class="math inline">\(a,b\)</span> katsayılarını hesaplayacak.</p>
 <p>Eğer birden fazla farklı frekanstaki eğrileri uydurmak istersek, ana
@@ -311,6 +311,18 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_sinreg_03.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_sinreg_03.png" /></p>
 <p>Uyum daha iyi hale geldi.</p>
+<h3 id="regresyon-sesi-katsayılardan-tekrar-oluşturmak">Regresyon, Sesi
+Katsayılardan Tekrar Oluşturmak</h3>
+<p>Eğer bir sesi sinüssel bileşenlerine ayırabiliyorsak teorik olarak bu
+bileşenlerden en önemli olanlarını tutup, gerisini atabilirdik, ve bu
+azaltılmış kümeyi tekrar biraraya koyarak orijinal ses yakın bir ses
+elde etmek mümkün olurdu. Bunun faydası nerede? Çünkü eğer bu
+yapılabiliyorsa, o azaltılmış kümeyi arama algoritmalarında kullanmak
+mümkün olurdu, çünkü her sesi temsil eden bir nevi özet, “kodlama”
+bulmuş oluyoruz, ve bu özet üzerinden (ve eğer elimizde tüm mümkün
+seslerin özetinin kayıt edildiği bir veri tabanı var ise) sesin ne
+olduğunu arayıp bulmak rahatlaşabiliyor.</p>
+<p>Daha önce işlediğimiz ses parçası üzerinde görelim,</p>
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fs, ow <span class="op">=</span> scipy.io.wavfile.read(owfile)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -335,6 +347,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.OLS(Y, X_full)</span>
 <span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> model.fit()</span></code></pre></div>
+<p>Regresyon yapıldı, şimdi bu regresyon sonucundaki istatistik önemi
+fazla olan katsayıları tutalım, gerisini atalım, ve elde tutulan
+katsayılar ile ses verisini tekrar yaratalım.</p>
 <div class="sourceCode" id="cb16"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>basis_matrix_full <span class="op">=</span> X_full </span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_coeffs <span class="op">=</span> results.params</span>
@@ -356,15 +371,86 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>y_int16 <span class="op">=</span> y.astype(np.int16)</span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out3.wav&#39;</span>, fs, y_int16)</span></code></pre></div>
+<p>Üstteki tekrar oluşturulmuş sesi dinleyince orijinal ses yakın
+olduğunu duyabiliriz.</p>
+<h3 id="mfcc">MFCC</h3>
+<p>Mel Frekansı Kepstral Katsayıları (MFCC), ses işleme alanında,
+özellikle konuşma tanıma ve müzik sınıflandırma gibi uygulamalarda
+yaygın olarak kullanılan bir özellik çıkarma tekniği. Temelde, bir ses
+sinyalinin kısa süreli güç spektrumunun, insan kulağının frekans
+algısına (Mel ölçeği) yakından uyan doğrusal olmayan bir frekans ölçeği
+temel alınarak temsilidir. İnsan kulağı, düşük frekanslarda daha
+hassaşken, yüksek frekanslarda daha az hassastır. MFCC, bu doğal insan
+algısını taklit ederek, sesin spektral zarfını (tınısını) kısa ve
+verimli bir şekilde temsil eden bir dizi katsayı üretir. MFCC
+çıkarımının temel adımları,</p>
+<p>Ön Vurgulama (Pre-emphasis): Yüksek frekanslardaki enerjiyi artırarak
+spektral dengeyi sağlar.</p>
+<p>Çerçeveleme (Framing) ve Pencereleme (Windowing): Ses sinyali,
+genellikle örtüşen kısa zaman aralıklarına (çerçevelere) bölünür.</p>
+<p>Hızlı Fourier Dönüşümü (FFT): Her bir çerçeve, zaman domeninden
+frekans domenine dönüştürülür.</p>
+<p>Mel Filtre Bankası Uygulaması: Frekans spektrumuna, Mel ölçeğine göre
+aralıklandırılmış bir dizi üçgen filtre uygulanır. Bu, insan işitme
+sisteminin duyarlılığını taklit eder.</p>
+<p>Logaritma Alma: Filtre bankası enerjilerinin logaritması alınır.
+(İnsanların yüksek enerjideki küçük değişikliklere daha az duyarlı
+olmasıyla uyumludur.)</p>
+<p>Ayrık Kosinüs Dönüşümü (DCT): Son olarak, bu log enerjilerine DCT
+uygulanarak korelasyonları azaltılmış MFCC katsayıları elde edilir.</p>
+<p>Makine öğreniminde MFCC hesaplandığında, bir ses dosyası için zaman
+içinde değişen bir katsayılar listesi (bir matris) elde edersiniz. Bu
+matrisin her bir satırı farklı bir katsayıyı (spektral çözünürlüğü), her
+bir sütunu ise sesin farklı bir zaman dilimini (çerçeveyi) temsil eder.
+Bir ses dosyasından elde edilen her bir çerçeveye ait MFCC vektörü, o
+kısa zaman dilimindeki sesin ozgun bir özelliğini (parçasını) temsil
+eder. Makine öğrenimi sınıflandırıcıları için, bu çerçevelerin her biri,
+aynı ses dosyasından gelen, ancak farklı çözünürlüklerde veya anlarda
+yakalanmış ayrı birer veri noktası (özellik vektörü) olarak
+kullanılabilir. Örneğin, bir ses tanıma modelinde bu vektörler,
+konuşulan fonemi (ses birimini) sınıflandırmak için kullanılır.</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> librosa.display</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>y, sr <span class="op">=</span> librosa.load(owfile)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>mfccs <span class="op">=</span> librosa.feature.mfcc(y<span class="op">=</span>y, sr<span class="op">=</span>sr, n_mfcc<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>librosa.display.specshow(mfccs, x_axis<span class="op">=</span><span class="st">&#39;time&#39;</span>, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;MFCC Özellikleri&#39;</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;Zaman&#39;</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;MFCC Katsayıları&#39;</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_082_snd_03.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="tser_082_snd_03.jpg" /></p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (mfccs.shape)</span></code></pre></div>
+<pre><code>(20, 7)</code></pre>
+<p>Üstte görüldüğü gibi MFCC’ye 20 boyutunda özellik vermesini söyledik,
+ve sonuç olarak 7 tane 20 boyutlu vektör ortaya çıktı. Tekrar
+vurgulayalım, bu 7 vektörün her biri aynı ses dosyasını temsil etmek
+için ayrı ayrı birer veri noktası olarak sınıflayıcı algoritmalara
+verilmelidir.</p>
+<h3 id="ses-komut-tanıması-gmm-ubm">Ses Komut Tanıması, GMM-UBM</h3>
 <p>[devam edecek]</p>
+<p>Kodlar</p>
+<p><a href="gmmubm1.py">gmmubm1.py</a>, <a
+href="gmmubm2.py">gmmubm2.py</a>, <a
+href="gmmubm3.py">gmmubm3.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] <a href="../../sk/2018/01/speech-recognition.html">YSA ile
 Konuşma Tanıma (Speech Recognition)</a></p>
-<p>[2] ./sk/2024/11/ses-tanima-isleme.html</p>
+<p>[2] <a href="./sk/2024/11/ses-tanima-isleme.html">[Ses Tanıma
+İşleme</a></p>
 <p>[3] Bayramli, Istatistik, Tahmin Edici Hesaplar (Estimators)</p>
 <p>[4] Cross Validated, <em>How to find a good fit for semi­sinusoidal
 model in R?</em>, <a
 href="http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r">http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r</a></p>
+<p>[5] <a href="../../sk/2025/07/voice-command-ses-komut.html">Ses Komut
+Tanıma, Dikkat (Attention) Modeli</a></p>
+<p>[6] Gaussian Karışım Modeli (GMM) ile Kümelemek,
+stat_110_gmm/stat_110_gmm.html</p>
+<p>[7] Artımsal (Incremental) GMM,
+stat_112_gmminc/stat_112_gmminc.html</p>
 <p>
   <a href="..">Yukarı</a>
 </p>

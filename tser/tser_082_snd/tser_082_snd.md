@@ -6,8 +6,8 @@ gibi bir grafik elde ederdik.
 
 ```python
 import scipy
-owfile = "/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav"
-fs, ow = scipy.io.wavfile.read(fname)
+owfile = "../../sk/2024/11/phonemes/ow.wav"
+fs, ow = scipy.io.wavfile.read(owfile)
 plt.plot(ow)
 plt.savefig('tser_082_snd_01.jpg')
 ```
@@ -92,12 +92,12 @@ scipy.io.wavfile.write('/tmp/sound-out2.wav', fs, x_int16)
 
 ### Sinüssel Regresyon (Sinusoidal Regression)
 
-Ses tanima kavramina gelelim. Eger bir sesin birden fazla farkli sinus
-egrisi toplami oldugu dogru ise bu ses dalgasinin sinus bilesenlerini
-ayirabilirsek, ses tanima baglaminda saglam bir adim atmis olurduk.
+Ses tanıma kavramına gelelim. Eğer bir sesin birden fazla farklı sinüs
+eğrisi toplamı olduğu doğru ise bu ses dalgasının sinüs bileşenlerini
+ayırabilirsek, ses tanıma bağlamında sağlam bir adım atmış olurduk.
 Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile, nasıl
-genligini buyuterek, yana kaydırarak, frekansini arttirarak tam doğru
-uyum noktasini bulacağız? Yani veriye uydurmak istedigimiz formül
+genliğini büyüterek, yana kaydırarak, frekansını arttırarak tam doğru
+uyum noktasını bulacağız? Yani veriye uydurmak istediğimiz formül
 
 $$
 f(x) = A \sin (x+\varphi)
@@ -110,7 +110,7 @@ ki sonuç sinüs eğrisi tam veriye uysun.
 Veriye uydurma deyince akla lineer regresyon geliyor, fakat üstteki
 formülü olduğu gibi regresyona sokmak mümkün değil, çünkü faz
 kaydırmak için $\sin$ içindeki parametrenin değişmesi lazım, regresyon
-bunları yapamaz. Ama regresyona problemi `katsayı çarpı basit formül''
+bunları yapamaz. Ama regresyona problemi "katsayı çarpı basit formül"
 formunda sunabilir miyiz acaba? Bir trigonometrik eşitlikten biliyoruz
 ki
 
@@ -127,7 +127,7 @@ $$  = A\left[\sin(x)\cos(\varphi) + \cos(x)\sin(\varphi)\right] $$
 $$ = A\sin(x+\varphi) $$
 
 O zaman $a \sin(x) + b \cos(x)$ için regresyon yapmak (1) için
-regresyon yapmak ile aynı şeydir. Regresyon iki toplam üzerinden
+regresyon yapmak ile aynı şeydir [4]. Regresyon iki toplam üzerinden
 tanımlı o formül için en uygun $a,b$ katsayılarını hesaplayacak.
 
 Eğer birden fazla farklı frekanstaki eğrileri uydurmak istersek,
@@ -267,6 +267,20 @@ plt.savefig('tser_sinreg_03.png')
 
 Uyum daha iyi hale geldi.
 
+### Regresyon, Sesi Katsayılardan Tekrar Oluşturmak
+
+Eğer bir sesi sinüssel bileşenlerine ayırabiliyorsak teorik olarak bu
+bileşenlerden en önemli olanlarını tutup, gerisini atabilirdik, ve bu
+azaltılmış kümeyi tekrar biraraya koyarak orijinal ses yakın bir ses
+elde etmek mümkün olurdu. Bunun faydası nerede? Çünkü eğer bu
+yapılabiliyorsa, o azaltılmış kümeyi arama algoritmalarında kullanmak
+mümkün olurdu, çünkü her sesi temsil eden bir nevi özet, "kodlama"
+bulmuş oluyoruz, ve bu özet üzerinden (ve eğer elimizde tüm mümkün
+seslerin özetinin kayıt edildiği bir veri tabanı var ise) sesin ne
+olduğunu arayıp bulmak rahatlaşabiliyor.
+
+Daha önce işlediğimiz ses parçası üzerinde görelim,
+
 ```python
 fs, ow = scipy.io.wavfile.read(owfile)
 
@@ -293,6 +307,10 @@ model = sm.OLS(Y, X_full)
 results = model.fit()
 ```
 
+Regresyon yapıldı, şimdi bu regresyon sonucundaki istatistik önemi
+fazla olan katsayıları tutalım, gerisini atalım, ve elde tutulan
+katsayılar ile ses verisini tekrar yaratalım.
+
 ```python
 basis_matrix_full = X_full 
 all_coeffs = results.params
@@ -316,20 +334,108 @@ y_int16 = y.astype(np.int16)
 scipy.io.wavfile.write('/tmp/sound-out3.wav', fs, y_int16)
 ```
 
+Üstteki tekrar oluşturulmuş sesi dinleyince orijinal ses yakın
+olduğunu duyabiliriz.
 
+### MFCC
 
+Mel Frekansı Kepstral Katsayıları (MFCC), ses işleme alanında,
+özellikle konuşma tanıma ve müzik sınıflandırma gibi uygulamalarda
+yaygın olarak kullanılan bir özellik çıkarma tekniği. Temelde, bir ses
+sinyalinin kısa süreli güç spektrumunun, insan kulağının frekans
+algısına (Mel ölçeği) yakından uyan doğrusal olmayan bir frekans
+ölçeği temel alınarak temsilidir. İnsan kulağı, düşük frekanslarda
+daha hassaşken, yüksek frekanslarda daha az hassastır. MFCC, bu doğal
+insan algısını taklit ederek, sesin spektral zarfını (tınısını) kısa
+ve verimli bir şekilde temsil eden bir dizi katsayı üretir. MFCC
+çıkarımının temel adımları,
 
+Ön Vurgulama (Pre-emphasis): Yüksek frekanslardaki enerjiyi artırarak
+spektral dengeyi sağlar.
+
+Çerçeveleme (Framing) ve Pencereleme (Windowing): Ses sinyali,
+genellikle örtüşen kısa zaman aralıklarına (çerçevelere) bölünür.
+
+Hızlı Fourier Dönüşümü (FFT): Her bir çerçeve, zaman domeninden
+frekans domenine dönüştürülür.
+
+Mel Filtre Bankası Uygulaması: Frekans spektrumuna, Mel ölçeğine göre
+aralıklandırılmış bir dizi üçgen filtre uygulanır. Bu, insan işitme
+sisteminin duyarlılığını taklit eder.
+
+Logaritma Alma: Filtre bankası enerjilerinin logaritması
+alınır. (İnsanların yüksek enerjideki küçük değişikliklere daha az
+duyarlı olmasıyla uyumludur.)
+
+Ayrık Kosinüs Dönüşümü (DCT): Son olarak, bu log enerjilerine DCT
+uygulanarak korelasyonları azaltılmış MFCC katsayıları elde edilir.
+
+Makine öğreniminde MFCC hesaplandığında, bir ses dosyası için zaman
+içinde değişen bir katsayılar listesi (bir matris) elde edersiniz. Bu
+matrisin her bir satırı farklı bir katsayıyı (spektral çözünürlüğü),
+her bir sütunu ise sesin farklı bir zaman dilimini (çerçeveyi) temsil
+eder. Bir ses dosyasından elde edilen her bir çerçeveye ait MFCC
+vektörü, o kısa zaman dilimindeki sesin ozgun bir özelliğini
+(parçasını) temsil eder. Makine öğrenimi sınıflandırıcıları için, bu
+çerçevelerin her biri, aynı ses dosyasından gelen, ancak farklı
+çözünürlüklerde veya anlarda yakalanmış ayrı birer veri noktası
+(özellik vektörü) olarak kullanılabilir. Örneğin, bir ses tanıma
+modelinde bu vektörler, konuşulan fonemi (ses birimini) sınıflandırmak
+için kullanılır.
+
+```python
+import librosa.display
+y, sr = librosa.load(owfile)
+mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
+plt.figure(figsize=(10, 4))
+librosa.display.specshow(mfccs, x_axis='time', cmap='viridis')
+plt.colorbar()
+plt.title('MFCC Özellikleri')
+plt.xlabel('Zaman')
+plt.ylabel('MFCC Katsayıları')
+plt.tight_layout()
+plt.savefig('tser_082_snd_03.jpg')
+```
+
+![](tser_082_snd_03.jpg)
+
+```python
+print (mfccs.shape)
+```
+
+```
+(20, 7)
+```
+
+Üstte görüldüğü gibi MFCC'ye 20 boyutunda özellik vermesini söyledik,
+ve sonuç olarak 7 tane 20 boyutlu vektör ortaya çıktı. Tekrar
+vurgulayalım, bu 7 vektörün her biri aynı ses dosyasını temsil etmek
+için ayrı ayrı birer veri noktası olarak sınıflayıcı algoritmalara
+verilmelidir.
+
+### Ses Komut Tanıması, GMM-UBM
 
 [devam edecek]
+
+Kodlar
+
+[gmmubm1.py](gmmubm1.py),
+[gmmubm2.py](gmmubm2.py),
+[gmmubm3.py](gmmubm3.py)
 
 Kaynaklar
 
 [1] <a href="../../sk/2018/01/speech-recognition.html">YSA ile Konuşma Tanıma (Speech Recognition)</a>
 
-[2] ./sk/2024/11/ses-tanima-isleme.html
+[2] <a href="./sk/2024/11/ses-tanima-isleme.html">[Ses Tanıma İşleme</a>
 
 [3] Bayramli, Istatistik, Tahmin Edici Hesaplar (Estimators)
 
 [4] Cross Validated, *How to find a good fit for semi­sinusoidal model in  R?*,
 [http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r](http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r)
 
+[5] <a href="../../sk/2025/07/voice-command-ses-komut.html">Ses Komut Tanıma, Dikkat (Attention) Modeli</a>
+
+[6] Gaussian Karışım Modeli (GMM) ile Kümelemek, stat_110_gmm/stat_110_gmm.html
+
+[7] Artımsal (Incremental) GMM, stat_112_gmminc/stat_112_gmminc.html
