@@ -1,16 +1,87 @@
 # Ses Verisi İşleme, Tanıma
 
+Kulağımızla duyduğumuz sesleri tek boyutlu bir zaman serisi olarak
+düşünebiliriz. Bir ses parçasını (phoneme) grafiklemek istesek alttaki
+gibi bir grafik elde ederdik.
+
+```python
+import scipy
+owfile = "/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav"
+fs, ow = scipy.io.wavfile.read(fname)
+plt.plot(ow)
+plt.savefig('tser_082_snd_01.jpg')
+```
+
+![](tser_082_snd_01.jpg)
+
+Grafikte periyodik dalgalar görülebiliyor, fakat bir tane değil birden
+fazla var, yani üstteki ses birkaç periyodik zaman serisinin toplamı.
+Genel olarak bir ses dalgasının bir ve daha fazla sinüs eğrisi toplamı
+olduğunu farzedebiliriz. Sinüs derken tabii ki her bileşenin genliği,
+frekansı, ve fazı (phase) farklı olabilir.
+
+```python
+x = np.linspace(0,4,100)
+fig, axs = plt.subplots(2, 2, sharex=True)
+
+axs[0,0].plot(x,np.sin(2*np.pi*x))
+axs[0,0].set_ylim(-2,2)
+axs[0,0].grid(True)
+axs[0,0].set_title(r'$sin(2 \pi x)$')
+
+axs[0,1].plot(x,2*np.sin(2*np.pi*x))
+axs[0,0].set_ylim(-2,2)
+axs[0,1].grid(True)
+axs[0,1].set_title(r'$2 \cdot sin(2 \pi x)$')
+
+axs[1,0].plot(x,np.sin(2*np.pi*x))
+axs[1,0].plot(x,np.sin(4*np.pi*x))
+axs[1,0].set_ylim(-2,2)
+axs[1,0].grid(True)
+axs[1,0].set_title(r'$sin(2 \pi x)$ ve $sin(4 \pi x)$')
+
+axs[1,1].plot(x,np.sin(2*np.pi*x))
+axs[1,1].plot(x,np.sin(2*np.pi*x + 1.0))
+axs[1,1].set_ylim(-2,2)
+axs[1,1].grid(True)
+axs[1,1].set_title(r'$sin(2 \pi x)$ ve $sin(2 \pi x + 0.5)$')
+
+plt.savefig('tser_082_snd_02.jpg')
+```
+
+![](tser_082_snd_02.jpg)
+
+Üstteki grafiklerde birkaç farklı sinüs eğrilerine bakabiliriz. Üst
+solda bir $\sin(2 \pi x)$ eğrisi var. Onun genliğini (amplitude)
+arttırmak için bir sabit sayı ile çarpıyoruz, örnekte iki ile, bu bize
+sağ üstteki $2 \sin (2\pi x)$ sonucunu veriyor. Frekans arttırımı
+için, yani aynı periyot içinde daha fazla salınım için $\sin$ hesabına
+geçilen değer daha yüksek bir katsayı ile çarpılabilir, bunun sonucu
+sol altta. Eğer aynı eğriyi sadece kaydırmak isteseydik bunu $\sin$
+hesabına geçilen değere bir değer toplayarak yapardık, böylece
+kaydırım gerçekleşirdi, onun sonucu ise sağ altta.
+
+Simdi bu kavramlari kullanarak kendimiz iki tane ses dalgasi yaratalim.
 
 ```python
 import scipy.io.wavfile
-fs = 16000 
-T = 1.0   
+T = 1.0; fs = 16000
 t = np.linspace(0, T, int(T*fs), endpoint=False) 
+```
+
+Alttaki sürekli bir bip sesi verecek, telefonda meşgul veren sese
+benziyor. Bu sesi üretmek için tek bir sinüs eğrisi yeterli.
+
+```python
 x = np.sin(2*np.pi*440*t)
 x_scaled = x * 32767.0
 x_int16 = x_scaled.astype(np.int16)
 scipy.io.wavfile.write('/tmp/sound-out1.wav', fs, x_int16)
 ```
+
+Bir ambulans sirenine benzeyen sesi üretmek için iki tane sinüs eğrisi
+birleştirebiliriz, bu dalgaların ikisi farklı frekanslarda, ve
+karışımları bize sonuç sesi veriyor.
 
 ```python
 x = np.sin(2*np.pi*1500*t - 100*np.sin(2*2*np.pi*t))
@@ -19,41 +90,29 @@ x_int16 = x_scaled.astype(np.int16)
 scipy.io.wavfile.write('/tmp/sound-out2.wav', fs, x_int16)
 ```
 
-
-
-
-
-
-
-
-
-
-
 ### Sinüssel Regresyon (Sinusoidal Regression)
 
-Alttaki veriye bir veya birden fazla sinüs eğrisi uydurmak istiyoruz. 
+Ses tanima kavramina gelelim. Eger bir sesin birden fazla farkli sinus
+egrisi toplami oldugu dogru ise bu ses dalgasinin sinus bilesenlerini
+ayirabilirsek, ses tanima baglaminda saglam bir adim atmis olurduk.
+Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile, nasıl
+genligini buyuterek, yana kaydırarak, frekansini arttirarak tam doğru
+uyum noktasini bulacağız? Yani veriye uydurmak istedigimiz formül
 
-```python
-import pandas as pd
-df = pd.read_csv('baltic.csv')
-df.plot(x='toy',y='degs',kind='scatter')
-plt.savefig('tser_sinreg_01.png')
-```
-
-![](tser_sinreg_01.png)
-
-Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile, nasıl yana
-kaydırarak tam doğru noktayı bulacağız? Ayrıca eğrinin genliği (amplitude)
-önemli. Tüm bunları kapsayan formül
-
-$$ f(x) = A \sin (x+\varphi) $$
+$$
+f(x) = A \sin (x+\varphi)
+\qquad (1)
+$$
 
 Genlik $A$ ile faz ise $\varphi$ ile gösterilmiş, öyle bir $A,\varphi$ bulalım
-ki sonuç sinüs eğrisi tam veriye uysun. Veriye uydurma deyince akla lineer
-regresyon geliyor, fakat üstteki formülü olduğu gibi regresyona sokmak mümkün
-değil, çünkü faz kaydırmak için $\sin$ içindeki parametrenin değişmesi lazım,
-regresyon bunları yapamaz. Ama regresyona problemi `katsayı çarpı basit formül''
-şeklinde sunabilir miyiz acaba? Bir trigonometrik eşitlikten biliyoruz ki
+ki sonuç sinüs eğrisi tam veriye uysun.
+
+Veriye uydurma deyince akla lineer regresyon geliyor, fakat üstteki
+formülü olduğu gibi regresyona sokmak mümkün değil, çünkü faz
+kaydırmak için $\sin$ içindeki parametrenin değişmesi lazım, regresyon
+bunları yapamaz. Ama regresyona problemi `katsayı çarpı basit formül''
+formunda sunabilir miyiz acaba? Bir trigonometrik eşitlikten biliyoruz
+ki
 
 $$  A \sin (x+\varphi) = a\sin(x) + b\cos(x) $$
 
@@ -67,9 +126,38 @@ $$  = A\left[\sin(x)\cos(\varphi) + \cos(x)\sin(\varphi)\right] $$
 
 $$ = A\sin(x+\varphi) $$
 
-O zaman $a \sin(x) + b \cos(x)$ için regresyon yapabiliriz. Regresyon iki toplam
-üzerinden tanımlı fonksiyonlar için en uygun $a,b$ katsayılarını
-hesaplayacak. Önce $\sin$ içinde $2\pi x$ ile başlarız, 
+O zaman $a \sin(x) + b \cos(x)$ için regresyon yapmak (1) için
+regresyon yapmak ile aynı şeydir. Regresyon iki toplam üzerinden
+tanımlı o formül için en uygun $a,b$ katsayılarını hesaplayacak.
+
+Eğer birden fazla farklı frekanstaki eğrileri uydurmak istersek,
+ana formülü şu halde düşünebilirdik,
+
+$$
+A_1 \sin(2\pi x+\varphi_1) + A_2 \sin(4\pi x+\varphi_2) + ...
+$$
+
+Ve onun regresyona hazır açılımı
+
+$$
+a_1 \sin(2\pi x) + b_1 \cos(2\pi x) + a_1 \sin(4\pi x) + b_1 \cos(4\pi x) + ...
+$$
+
+formülünü regresyonda kullanırdık.
+
+Ses verisine gelmeden önce alttaki daha basit veri üzerinde görelim,
+orada bir veya birden fazla sinüs eğrisi uydurmak istiyoruz.
+
+```python
+import pandas as pd
+df = pd.read_csv('baltic.csv')
+df.plot(x='toy',y='degs',kind='scatter')
+plt.savefig('tser_sinreg_01.png')
+```
+
+![](tser_sinreg_01.png)
+
+Önce $\sin$ içinde $2\pi x$ ile başlarız, 
 
 ```python
 import statsmodels.formula.api as smf
@@ -179,58 +267,8 @@ plt.savefig('tser_sinreg_03.png')
 
 Uyum daha iyi hale geldi.
 
-Bir tane de mutlak değer içeren bir fonksiyon.
-
 ```python
-import pandas as pd
-x = np.linspace(0,10,400)
-y = np.abs(np.sin(2*np.pi*x)) + np.random.random(len(x)) * 0.5
-df = pd.DataFrame(x)
-df['y'] = y
-df.columns = ['x','y']
-df.plot(x='x',y='y')
-plt.savefig('tser_sinreg_04.png')
-```
-
-![](tser_sinreg_04.png)
-
-```python
-import statsmodels.formula.api as smf
-results = smf.ols('y ~ np.abs(np.sin(2*np.pi*x)) + np.abs(np.cos(2*np.pi*x))', data=df).fit()
-print (results.summary())
-```
-
-```text
-                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:                      y   R-squared:                       0.830
-Model:                            OLS   Adj. R-squared:                  0.829
-Method:                 Least Squares   F-statistic:                     968.9
-Date:                Fri, 27 Jun 2025   Prob (F-statistic):          1.84e-153
-Time:                        12:38:04   Log-Likelihood:                 206.22
-No. Observations:                 400   AIC:                            -406.4
-Df Residuals:                     397   BIC:                            -394.5
-Df Model:                           2                                         
-Covariance Type:            nonrobust                                         
-=================================================================================================
-                                    coef    std err          t      P>|t|      [0.025      0.975]
--------------------------------------------------------------------------------------------------
-Intercept                         0.3500      0.074      4.719      0.000       0.204       0.496
-np.abs(np.sin(2 * np.pi * x))     0.9428      0.059     15.943      0.000       0.827       1.059
-np.abs(np.cos(2 * np.pi * x))    -0.0979      0.059     -1.650      0.100      -0.215       0.019
-==============================================================================
-Omnibus:                      292.929   Durbin-Watson:                   1.972
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               25.280
-Skew:                           0.035   Prob(JB):                     3.24e-06
-Kurtosis:                       1.770   Cond. No.                         20.5
-==============================================================================
-
-```
-
-```python
-fname = "/home/burak/Documents/classnotes/sk/2024/11/phonemes/ow.wav"
-fs, ow = scipy.io.wavfile.read(fname)
-
+fs, ow = scipy.io.wavfile.read(owfile)
 
 N = len(ow) 
 t = np.arange(N) / fs
