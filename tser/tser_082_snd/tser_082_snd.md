@@ -337,6 +337,18 @@ scipy.io.wavfile.write('/tmp/sound-out3.wav', fs, y_int16)
 Üstteki tekrar oluşturulmuş sesi dinleyince orijinal ses yakın
 olduğunu duyabiliriz.
 
+Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası
+(fonem -phoneme-) üzerinde yaptık. Bu ufak sesin kendine has bir sinüs
+eğri karışımı vardı. Fakat insan konuşması, mesela ufak sayılabilecek
+bir birim, tek bir kelime telafuzunda bile birden fazla fonem
+içerebilir. Yani konuşma tanıma amacıyla bir kelimeyi alıp sinüs
+eğrilerine ayırmak ise yaramaz. Eğer tüm kelimeler, cümleler üzerinde
+regresyon uygulamak istersek bunu özyineli bir şekilde yapmalıyız, ve
+bu regresyon her zaman bir unutma faktörü içermelidir ki ses içinde
+bir fonemden diğerine geçildiğinde regresyon farklı harmoniklerin
+katsayılarını yakalamaya başlasın.
+
+
 ### MFCC
 
 Mel Frekansı Kepstral Katsayıları (MFCC), ses işleme alanında,
