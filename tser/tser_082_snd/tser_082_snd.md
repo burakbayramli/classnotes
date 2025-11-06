@@ -2,7 +2,7 @@
 
 Kulağımızla duyduğumuz sesleri tek boyutlu bir zaman serisi olarak
 düşünebiliriz. Bir ses parçasını (fonem -phoneme-) grafiklemek istesek
-alttaki gibi bir grafik elde ederdik. Ornek olarak altta /ow/ fonemini
+alttaki gibi bir grafik elde ederdik. Örnek olarak altta /ow/ fonemini
 kullandık.
 
 ```python
@@ -17,7 +17,9 @@ plt.savefig('tser_082_snd_01.jpg')
 
 Kelime sesleri fonem seslerinin birleşiminden oluşurlar. Mesela
 İngilizce kedi "cat" kelimesi /c/ /a/ /t/ fonemlerinden oluşur, "cow"
-kelimesi /c/ /ow/ fonemlerinden oluşur.
+kelimesi /c/ /ow/ fonemlerinden oluşur. Harfler ile fonemler arasında
+her zaman birebir eşlik yoktur, mesela İngiliz alfabesinde 26 harf
+vardır fakat 44 tane fonem mevcuttur.
 
 Grafiğe dönersek periyodik dalgalar görülebiliyor, fakat bir tane
 değil birden fazla var, yani üstteki ses birkaç periyodik zaman
@@ -68,7 +70,9 @@ aynı eğriyi sadece kaydırmak isteseydik bunu $\sin$ hesabına geçilen
 değere bir değer toplayarak yapardık, böylece kaydırım gerçekleşirdi,
 onun sonucu ise sağ altta.
 
-Simdi bu kavramlari kullanarak kendimiz iki tane ses dalgasi yaratalim.
+Bu kavramları kullanarak kendimiz de suni ses dalgaları
+yaratabilirdik, altta mesela iki tane ses dalgası yaratalım. Bazı
+tanımlar,
 
 ```python
 import scipy.io.wavfile
@@ -99,12 +103,13 @@ scipy.io.wavfile.write('/tmp/sound-out2.wav', fs, x_int16)
 
 ### Sinüssel Regresyon (Sinusoidal Regression)
 
-Ses tanıma kavramına gelelim. Eğer bir sesin birden fazla farklı sinüs
-eğrisi toplamı olduğu doğru ise bu ses dalgasının sinüs bileşenlerini
-ayırabilirsek, ses tanıma bağlamında sağlam bir adım atmış olurduk.
-Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile, nasıl
-genliğini büyüterek, yana kaydırarak, frekansını arttırarak tam doğru
-uyum noktasını bulacağız? Yani veriye uydurmak istediğimiz formül
+Şimdi ses tanıma konusuna gelelim. Eğer bir sesin birden fazla farklı
+sinüs eğrisi toplamı olduğu doğru ise, bu ses dalgasının sinüs
+bileşenlerini ayırabilirsek ses tanıma bağlamında sağlam bir adım
+atmış olurduk.  Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda
+bile, nasıl genliğini büyüterek, yana kaydırarak, frekansını
+arttırarak tam doğru uyum noktasını bulacağız? Yani veriye uydurmak
+istediğimiz formül
 
 $$
 f(x) = A \sin (x+\varphi)
@@ -123,9 +128,8 @@ ki
 
 $$  A \sin (x+\varphi) = a\sin(x) + b\cos(x) $$
 
-ki $\sin\varphi = \frac{b}{\sqrt{a^2+b^2}}$, ve $A = \sqrt{a^2+b^2}$ olacak  sekilde. 
-
-Bu eşitliğin doğru olduğunu kontrol edelim,
+ki $\sin\varphi = \frac{b}{\sqrt{a^2+b^2}}$, ve $A = \sqrt{a^2+b^2}$
+olacak sekilde. Bu eşitliğin doğru olduğunu kontrol edelim,
 
 $$ a \sin(x) + b \cos(x) = \sqrt{a^2+b^2} \left(\frac{a}{\sqrt{a^2+b^2}} \sin(x) + \frac{b}{\sqrt{a^2+b^2}} \cos(x)\right) $$
 
@@ -150,7 +154,7 @@ $$
 a_1 \sin(2\pi x) + b_1 \cos(2\pi x) + a_1 \sin(4\pi x) + b_1 \cos(4\pi x) + ...
 $$
 
-formülünü regresyonda kullanırdık.
+olurdu, ve üstteki formülünü regresyonda kullanırdık.
 
 Ses verisine gelmeden önce alttaki daha basit veri üzerinde görelim,
 orada bir veya birden fazla sinüs eğrisi uydurmak istiyoruz.
@@ -276,15 +280,16 @@ Uyum daha iyi hale geldi.
 
 ### Regresyon, Sesi Katsayılardan Tekrar Oluşturmak
 
-Eğer bir sesi sinüssel bileşenlerine ayırabiliyorsak teorik olarak bu
-bileşenlerden en önemli olanlarını tutup, gerisini atabilirdik, ve bu
-azaltılmış kümeyi tekrar biraraya koyarak orijinal ses yakın bir ses
-elde etmek mümkün olurdu. Bunun faydası nerede? Çünkü eğer bu
-yapılabiliyorsa, o azaltılmış kümeyi arama algoritmalarında kullanmak
-mümkün olurdu, çünkü her sesi temsil eden bir nevi özet, "kodlama"
-bulmuş oluyoruz, ve bu özet üzerinden (ve eğer elimizde tüm mümkün
-seslerin özetinin kayıt edildiği bir veri tabanı var ise) sesin ne
-olduğunu arayıp bulmak rahatlaşabiliyor.
+Üstte sinüs bileşenlerine ayırmayı başardık, o zaman ses verisi için
+de aynı şeyi yapabiliriz. Hatta eğer bir sesi sinüssel bileşenlerine
+ayırabiliyorsak, teorik olarak bu bileşenlerden en önemli olanlarını
+tutup, gerisini atabilirdik ve bu azaltılmış kümeyi tekrar biraraya
+koyarak orijinal ses yakın bir ses elde etmek mümkün olurdu. Bunun
+faydası nerede? Çünkü eğer bu yapılabiliyorsa, o azaltılmış kümeyi
+arama algoritmalarında kullanmak mümkün olurdu, çünkü her sesi temsil
+eden bir nevi özet, "kodlama" bulmuş oluyoruz, ve bu özet üzerinden
+(ve eğer elimizde tüm mümkün seslerin özetinin kayıt edildiği bir veri
+tabanı var ise) sesin ne olduğunu arayıp bulmak rahatlaşabiliyor.
 
 Daha önce işlediğimiz ses parçası üzerinde görelim,
 
@@ -306,7 +311,7 @@ for f in frequencies_hz:
 
 X_unaugmented = pd.DataFrame(basis_functions)
 
-Y = pd.Series(ow, name='wav').astype(np.float64) # Use the raw 'ow' array for Y
+Y = pd.Series(ow, name='wav').astype(np.float64) 
 
 X_full = sm.add_constant(X_unaugmented, prepend=True) 
 
@@ -344,16 +349,16 @@ scipy.io.wavfile.write('/tmp/sound-out3.wav', fs, y_int16)
 Üstteki tekrar oluşturulmuş sesi dinleyince orijinal ses yakın
 olduğunu duyabiliriz.
 
-Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası
-(fonem -phoneme-) üzerinde yaptık. Bu ufak sesin kendine has bir sinüs
-eğri karışımı vardı. Fakat insan konuşması, mesela ufak sayılabilecek
-bir birim, tek bir kelime telafuzunda bile birden fazla fonem
-içerebilir. Yani konuşma tanıma amacıyla bir kelimeyi alıp sinüs
-eğrilerine ayırmak ise yaramaz. Eğer tüm kelimeler, cümleler üzerinde
-regresyon uygulamak istersek bunu özyineli bir şekilde yapmalıyız, ve
-bu regresyon her zaman bir unutma faktörü içermelidir ki ses içinde
-bir fonemden diğerine geçildiğinde regresyon farklı harmoniklerin
-katsayılarını yakalamaya başlasın.
+Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası,
+bir fonem üzerinde yaptık. Bu ufak sesin kendine has bir sinüs eğri
+karışımı vardı. Fakat insan konuşmasındaki tek bir kelime telafuzunda
+birden fazla fonem olacaktır. Yani konuşma tanıma amacıyla bir
+kelimeyi alıp sinüs eğrilerine ayırmak ise yaramaz. Eğer kelime
+bazında regresyon uygulamak istersek bunu kelime boyunca regresyonun
+değişmesine izin veren, özyineli bir şekilde yapmalıyız, ve bu
+regresyon her zaman bir unutma faktörü içermelidir ki ses içinde bir
+fonemden diğerine geçildiğinde regresyon farklı harmoniklerin
+katsayılarını yakalayabilmeye başlasın.
 
 ### MFCC
 
@@ -433,9 +438,72 @@ verilmelidir.
 
 ### Ses Komut Tanıması, GMM-UBM
 
+Ses tanıma yaklaşımlarından bir tanesi her sesi bir Gaussian karışımı
+(GMM) olarak görür ve bir test ses verisini teker teker bu GMM'lere
+sorarak hangisinin daha yüksek ihtimalli olduğuna bakar. En yüksek
+ihtimalli olan aralarından seçilir.
 
+GMM-UBM yaklaşımı GMM eğitiminde ilginç bir teknik uygular. İlk fazda
+eğitim verisi, hangi komuttan geldiğine bakılmadan, birbirine
+karıştırılarak tek bir "evrensel" GMM'nin eğitimi için kullanılır
+(eğitim verisinin ne kadarının bu fazda kullanılacağı hiperparametre
+optimizasyonunun bir parçası olabilir). İlk faz tamamlandıktan sonra
+ikinci fazda komutlar için ayrı ayrı GMM eğitilme aşamasına
+gelinir. Fakat bu aşamada her komut başlangıç noktası olarak evrensel
+GMM'yi kullanarak ilerler, sıfırdan başlamaz. Yani mesela 'down'
+komutu için ayrı bir GMM gerekir, bu GMM için evrensel GMM'nin bir
+kopyası alınır, ve onun üzerinde güncelleme yapılarak istenen GMM
+hesaplanır.
 
-[devam edecek]
+Evrensel GMM eğitiminin amacı verideki tüm sesleri kullanarak bir "ses
+arkaplanı" oluşturmaktır, yani tüm mümkün veri ile bir akustik skala,
+baz seviye elde edilir, ve diğer tüm spesifik sesler bu baz seviyeden
+farklılıklar / onun üstüne inşa edilmiş güncellemeler olarak görülür.
+
+Güncelleme hesabı [3] yazısında gördüğümüz maksimum sonsal hesabı
+(maximum a posteriori / MAP) yöntemidir. Bu yazıda standart sapması
+bilinen bir Gaussian'ın sadece $\mu$ güncellemesinin nasıl yapıldığını
+görmüştük. GMM-UBM için aynı yaklaşım kullanılıyor, ortalaması ve
+standart sapması bilinen GMM'lerin sadece ortalaması yeni veriyle
+güncelleniyor.
+
+GMM-UBM MAP güncellemesi
+
+$$
+\mu_k^{(MAP)} = \frac{N_k \bar{x}_k + \tau \mu_k^{(UBM)}}{N_k + \tau}
+$$
+
+formunda verilir, ki $k$ bir GMM'yi oluşturan $k$'inci Gaussian. Bizim
+daha önce gördüğümüz [3] formülü
+
+$$
+\mu_n = \frac{n\sigma_0^2}{n\sigma_0^2 + \sigma^2} m_n +
+\frac{\sigma^2}{n\sigma_0^2 + \sigma^2} \mu_0
+$$
+
+şeklindeydi. Tekrar düzenlersek,
+
+$$
+\mu_n = \frac{n m_n + \frac{\sigma^2}{\sigma_0^2} \mu_0}{n +
+\frac{\sigma^2}{\sigma_0^2}}
+$$
+
+Birbirlerine eşlersek,
+
+- $n \to N_k$
+- $m_n \to \bar{x}_k$
+- $\mu_0 \to \mu_k^{(UBM)}$
+- $\frac{\sigma^2}{\sigma_0^2} \to \tau$
+
+Formüller aynı.
+
+Alttaki kodlar üç parça halinde , ilk kod evrensel GMM eğitimi için,
+ikincisi MAP güncellemesi yapıyor, üçüncü kod test verisi üzerinde
+başarıyı ölçüyor. Verilerin `/opt/Downloads/gvoice/train.zip` adlı bir
+dosyada olduğunu farzettik, bu zip dosyasının içeriği [8]
+bağlantısından indirilebilir. Biz eğitim/test verisi paylaşımını 90/10
+oranında yaptık, ve test işletildiğinde yüzde 95 doğru tanıma sonucunu
+elde ettik.
 
 Kodlar
 
@@ -449,13 +517,16 @@ Kaynaklar
 
 [2] <a href="./sk/2024/11/ses-tanima-isleme.html">[Ses Tanıma İşleme</a>
 
-[3] Bayramli, Istatistik, Tahmin Edici Hesaplar (Estimators)
+[3] Bayramlı, İstatistik, *Tahmin Edici Hesaplar (Estimators)*
 
 [4] Cross Validated, *How to find a good fit for semi­sinusoidal model in  R?*,
 [http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r](http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r)
 
 [5] <a href="../../sk/2025/07/voice-command-ses-komut.html">Ses Komut Tanıma, Dikkat (Attention) Modeli</a>
 
-[6] Gaussian Karışım Modeli (GMM) ile Kümelemek, stat_110_gmm/stat_110_gmm.html
+[6] Bayramlı, İstatistik, *Gaussian Karışım Modeli (GMM) ile Kümelemek*
 
-[7] Artımsal (Incremental) GMM, stat_112_gmminc/stat_112_gmminc.html
+[7] Bayramlı, İstatistik, *Artımsal (Incremental) GMM*
+
+[8] Kaggle, <a href="https://www.kaggle.com/datasets/neehakurelli/google-speech-commands">Google Speech Commands</a>
+    

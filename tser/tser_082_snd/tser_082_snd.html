@@ -90,7 +90,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 id="ses-verisi-işleme-tanıma">Ses Verisi İşleme, Tanıma</h1>
 <p>Kulağımızla duyduğumuz sesleri tek boyutlu bir zaman serisi olarak
 düşünebiliriz. Bir ses parçasını (fonem -phoneme-) grafiklemek istesek
-alttaki gibi bir grafik elde ederdik. Ornek olarak altta /ow/ fonemini
+alttaki gibi bir grafik elde ederdik. Örnek olarak altta /ow/ fonemini
 kullandık.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy</span>
@@ -101,7 +101,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <p><img src="tser_082_snd_01.jpg" /></p>
 <p>Kelime sesleri fonem seslerinin birleşiminden oluşurlar. Mesela
 İngilizce kedi “cat” kelimesi /c/ /a/ /t/ fonemlerinden oluşur, “cow”
-kelimesi /c/ /ow/ fonemlerinden oluşur.</p>
+kelimesi /c/ /ow/ fonemlerinden oluşur. Harfler ile fonemler arasında
+her zaman birebir eşlik yoktur, mesela İngiliz alfabesinde 26 harf
+vardır fakat 44 tane fonem mevcuttur.</p>
 <p>Grafiğe dönersek periyodik dalgalar görülebiliyor, fakat bir tane
 değil birden fazla var, yani üstteki ses birkaç periyodik zaman
 serisinin toplamı. Genel olarak bir ses dalgasının bir ve daha fazla
@@ -149,8 +151,9 @@ sadece kaydırmak isteseydik bunu <span
 class="math inline">\(\sin\)</span> hesabına geçilen değere bir değer
 toplayarak yapardık, böylece kaydırım gerçekleşirdi, onun sonucu ise sağ
 altta.</p>
-<p>Simdi bu kavramlari kullanarak kendimiz iki tane ses dalgasi
-yaratalim.</p>
+<p>Bu kavramları kullanarak kendimiz de suni ses dalgaları
+yaratabilirdik, altta mesela iki tane ses dalgası yaratalım. Bazı
+tanımlar,</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.io.wavfile</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span> fs <span class="op">=</span> <span class="dv">16000</span></span>
@@ -172,9 +175,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out2.wav&#39;</span>, fs, x_int16)</span></code></pre></div>
 <h3 id="sinüssel-regresyon-sinusoidal-regression">Sinüssel Regresyon
 (Sinusoidal Regression)</h3>
-<p>Ses tanıma kavramına gelelim. Eğer bir sesin birden fazla farklı
-sinüs eğrisi toplamı olduğu doğru ise bu ses dalgasının sinüs
-bileşenlerini ayırabilirsek, ses tanıma bağlamında sağlam bir adım atmış
+<p>Şimdi ses tanıma konusuna gelelim. Eğer bir sesin birden fazla farklı
+sinüs eğrisi toplamı olduğu doğru ise, bu ses dalgasının sinüs
+bileşenlerini ayırabilirsek ses tanıma bağlamında sağlam bir adım atmış
 olurduk. Fakat sinüs eğrisini, tek sinüs eğrisi olduğu durumda bile,
 nasıl genliğini büyüterek, yana kaydırarak, frekansını arttırarak tam
 doğru uyum noktasını bulacağız? Yani veriye uydurmak istediğimiz
@@ -197,8 +200,8 @@ trigonometrik eşitlikten biliyoruz ki</p>
 b\cos(x) \]</span></p>
 <p>ki <span class="math inline">\(\sin\varphi =
 \frac{b}{\sqrt{a^2+b^2}}\)</span>, ve <span class="math inline">\(A =
-\sqrt{a^2+b^2}\)</span> olacak sekilde.</p>
-<p>Bu eşitliğin doğru olduğunu kontrol edelim,</p>
+\sqrt{a^2+b^2}\)</span> olacak sekilde. Bu eşitliğin doğru olduğunu
+kontrol edelim,</p>
 <p><span class="math display">\[ a \sin(x) + b \cos(x) = \sqrt{a^2+b^2}
 \left(\frac{a}{\sqrt{a^2+b^2}} \sin(x) + \frac{b}{\sqrt{a^2+b^2}}
 \cos(x)\right) \]</span></p>
@@ -219,7 +222,7 @@ A_1 \sin(2\pi x+\varphi_1) + A_2 \sin(4\pi x+\varphi_2) + ...
 a_1 \sin(2\pi x) + b_1 \cos(2\pi x) + a_1 \sin(4\pi x) + b_1 \cos(4\pi
 x) + ...
 \]</span></p>
-<p>formülünü regresyonda kullanırdık.</p>
+<p>olurdu, ve üstteki formülünü regresyonda kullanırdık.</p>
 <p>Ses verisine gelmeden önce alttaki daha basit veri üzerinde görelim,
 orada bir veya birden fazla sinüs eğrisi uydurmak istiyoruz.</p>
 <div class="sourceCode" id="cb6"><pre
@@ -319,15 +322,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <p>Uyum daha iyi hale geldi.</p>
 <h3 id="regresyon-sesi-katsayılardan-tekrar-oluşturmak">Regresyon, Sesi
 Katsayılardan Tekrar Oluşturmak</h3>
-<p>Eğer bir sesi sinüssel bileşenlerine ayırabiliyorsak teorik olarak bu
-bileşenlerden en önemli olanlarını tutup, gerisini atabilirdik, ve bu
-azaltılmış kümeyi tekrar biraraya koyarak orijinal ses yakın bir ses
-elde etmek mümkün olurdu. Bunun faydası nerede? Çünkü eğer bu
-yapılabiliyorsa, o azaltılmış kümeyi arama algoritmalarında kullanmak
-mümkün olurdu, çünkü her sesi temsil eden bir nevi özet, “kodlama”
-bulmuş oluyoruz, ve bu özet üzerinden (ve eğer elimizde tüm mümkün
-seslerin özetinin kayıt edildiği bir veri tabanı var ise) sesin ne
-olduğunu arayıp bulmak rahatlaşabiliyor.</p>
+<p>Üstte sinüs bileşenlerine ayırmayı başardık, o zaman ses verisi için
+de aynı şeyi yapabiliriz. Hatta eğer bir sesi sinüssel bileşenlerine
+ayırabiliyorsak, teorik olarak bu bileşenlerden en önemli olanlarını
+tutup, gerisini atabilirdik ve bu azaltılmış kümeyi tekrar biraraya
+koyarak orijinal ses yakın bir ses elde etmek mümkün olurdu. Bunun
+faydası nerede? Çünkü eğer bu yapılabiliyorsa, o azaltılmış kümeyi arama
+algoritmalarında kullanmak mümkün olurdu, çünkü her sesi temsil eden bir
+nevi özet, “kodlama” bulmuş oluyoruz, ve bu özet üzerinden (ve eğer
+elimizde tüm mümkün seslerin özetinin kayıt edildiği bir veri tabanı var
+ise) sesin ne olduğunu arayıp bulmak rahatlaşabiliyor.</p>
 <p>Daha önce işlediğimiz ses parçası üzerinde görelim,</p>
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fs, ow <span class="op">=</span> scipy.io.wavfile.read(owfile)</span>
@@ -347,7 +351,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>X_unaugmented <span class="op">=</span> pd.DataFrame(basis_functions)</span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> pd.Series(ow, name<span class="op">=</span><span class="st">&#39;wav&#39;</span>).astype(np.float64) <span class="co"># Use the raw &#39;ow&#39; array for Y</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> pd.Series(ow, name<span class="op">=</span><span class="st">&#39;wav&#39;</span>).astype(np.float64) </span>
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>X_full <span class="op">=</span> sm.add_constant(X_unaugmented, prepend<span class="op">=</span><span class="va">True</span>) </span>
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
@@ -379,16 +383,16 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>scipy.io.wavfile.write(<span class="st">&#39;/tmp/sound-out3.wav&#39;</span>, fs, y_int16)</span></code></pre></div>
 <p>Üstteki tekrar oluşturulmuş sesi dinleyince orijinal ses yakın
 olduğunu duyabiliriz.</p>
-<p>Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası
-(fonem -phoneme-) üzerinde yaptık. Bu ufak sesin kendine has bir sinüs
-eğri karışımı vardı. Fakat insan konuşması, mesela ufak sayılabilecek
-bir birim, tek bir kelime telafuzunda bile birden fazla fonem
-içerebilir. Yani konuşma tanıma amacıyla bir kelimeyi alıp sinüs
-eğrilerine ayırmak ise yaramaz. Eğer tüm kelimeler, cümleler üzerinde
-regresyon uygulamak istersek bunu özyineli bir şekilde yapmalıyız, ve bu
-regresyon her zaman bir unutma faktörü içermelidir ki ses içinde bir
-fonemden diğerine geçildiğinde regresyon farklı harmoniklerin
-katsayılarını yakalamaya başlasın.</p>
+<p>Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası,
+bir fonem üzerinde yaptık. Bu ufak sesin kendine has bir sinüs eğri
+karışımı vardı. Fakat insan konuşmasındaki tek bir kelime telafuzunda
+birden fazla fonem olacaktır. Yani konuşma tanıma amacıyla bir kelimeyi
+alıp sinüs eğrilerine ayırmak ise yaramaz. Eğer kelime bazında regresyon
+uygulamak istersek bunu kelime boyunca regresyonun değişmesine izin
+veren, özyineli bir şekilde yapmalıyız, ve bu regresyon her zaman bir
+unutma faktörü içermelidir ki ses içinde bir fonemden diğerine
+geçildiğinde regresyon farklı harmoniklerin katsayılarını
+yakalayabilmeye başlasın.</p>
 <h3 id="mfcc">MFCC</h3>
 <p>Mel Frekansı Kepstral Katsayıları (MFCC), ses işleme alanında,
 özellikle konuşma tanıma ve müzik sınıflandırma gibi uygulamalarda
@@ -447,7 +451,63 @@ vurgulayalım, bu 7 vektörün her biri aynı ses dosyasını temsil etmek
 için ayrı ayrı birer veri noktası olarak sınıflayıcı algoritmalara
 verilmelidir.</p>
 <h3 id="ses-komut-tanıması-gmm-ubm">Ses Komut Tanıması, GMM-UBM</h3>
-<p>[devam edecek]</p>
+<p>Ses tanıma yaklaşımlarından bir tanesi her sesi bir Gaussian karışımı
+(GMM) olarak görür ve bir test ses verisini teker teker bu GMM’lere
+sorarak hangisinin daha yüksek ihtimalli olduğuna bakar. En yüksek
+ihtimalli olan aralarından seçilir.</p>
+<p>GMM-UBM yaklaşımı GMM eğitiminde ilginç bir teknik uygular. İlk fazda
+eğitim verisi, hangi komuttan geldiğine bakılmadan, birbirine
+karıştırılarak tek bir “evrensel” GMM’nin eğitimi için kullanılır
+(eğitim verisinin ne kadarının bu fazda kullanılacağı hiperparametre
+optimizasyonunun bir parçası olabilir). İlk faz tamamlandıktan sonra
+ikinci fazda komutlar için ayrı ayrı GMM eğitilme aşamasına gelinir.
+Fakat bu aşamada her komut başlangıç noktası olarak evrensel GMM’yi
+kullanarak ilerler, sıfırdan başlamaz. Yani mesela ‘down’ komutu için
+ayrı bir GMM gerekir, bu GMM için evrensel GMM’nin bir kopyası alınır,
+ve onun üzerinde güncelleme yapılarak istenen GMM hesaplanır.</p>
+<p>Evrensel GMM eğitiminin amacı verideki tüm sesleri kullanarak bir
+“ses arkaplanı” oluşturmaktır, yani tüm mümkün veri ile bir akustik
+skala, baz seviye elde edilir, ve diğer tüm spesifik sesler bu baz
+seviyeden farklılıklar / onun üstüne inşa edilmiş güncellemeler olarak
+görülür.</p>
+<p>Güncelleme hesabı [3] yazısında gördüğümüz maksimum sonsal hesabı
+(maximum a posteriori / MAP) yöntemidir. Bu yazıda standart sapması
+bilinen bir Gaussian’ın sadece <span class="math inline">\(\mu\)</span>
+güncellemesinin nasıl yapıldığını görmüştük. GMM-UBM için aynı yaklaşım
+kullanılıyor, ortalaması ve standart sapması bilinen GMM’lerin sadece
+ortalaması yeni veriyle güncelleniyor.</p>
+<p>GMM-UBM MAP güncellemesi</p>
+<p><span class="math display">\[
+\mu_k^{(MAP)} = \frac{N_k \bar{x}_k + \tau \mu_k^{(UBM)}}{N_k + \tau}
+\]</span></p>
+<p>formunda verilir, ki <span class="math inline">\(k\)</span> bir
+GMM’yi oluşturan <span class="math inline">\(k\)</span>’inci Gaussian.
+Bizim daha önce gördüğümüz [3] formülü</p>
+<p><span class="math display">\[
+\mu_n = \frac{n\sigma_0^2}{n\sigma_0^2 + \sigma^2} m_n +
+\frac{\sigma^2}{n\sigma_0^2 + \sigma^2} \mu_0
+\]</span></p>
+<p>şeklindeydi. Tekrar düzenlersek,</p>
+<p><span class="math display">\[
+\mu_n = \frac{n m_n + \frac{\sigma^2}{\sigma_0^2} \mu_0}{n +
+\frac{\sigma^2}{\sigma_0^2}}
+\]</span></p>
+<p>Birbirlerine eşlersek,</p>
+<ul>
+<li><span class="math inline">\(n \to N_k\)</span></li>
+<li><span class="math inline">\(m_n \to \bar{x}_k\)</span></li>
+<li><span class="math inline">\(\mu_0 \to \mu_k^{(UBM)}\)</span></li>
+<li><span class="math inline">\(\frac{\sigma^2}{\sigma_0^2} \to
+\tau\)</span></li>
+</ul>
+<p>Formüller aynı.</p>
+<p>Alttaki kodlar üç parça halinde , ilk kod evrensel GMM eğitimi için,
+ikincisi MAP güncellemesi yapıyor, üçüncü kod test verisi üzerinde
+başarıyı ölçüyor. Verilerin <code>/opt/Downloads/gvoice/train.zip</code>
+adlı bir dosyada olduğunu farzettik, bu zip dosyasının içeriği [8]
+bağlantısından indirilebilir. Biz eğitim/test verisi paylaşımını 90/10
+oranında yaptık, ve test işletildiğinde yüzde 95 doğru tanıma sonucunu
+elde ettik.</p>
 <p>Kodlar</p>
 <p><a href="gmmubm1.py">gmmubm1.py</a>, <a
 href="gmmubm2.py">gmmubm2.py</a>, <a
@@ -457,16 +517,19 @@ href="gmmubm3.py">gmmubm3.py</a></p>
 Konuşma Tanıma (Speech Recognition)</a></p>
 <p>[2] <a href="./sk/2024/11/ses-tanima-isleme.html">[Ses Tanıma
 İşleme</a></p>
-<p>[3] Bayramli, Istatistik, Tahmin Edici Hesaplar (Estimators)</p>
+<p>[3] Bayramlı, İstatistik, <em>Tahmin Edici Hesaplar
+(Estimators)</em></p>
 <p>[4] Cross Validated, <em>How to find a good fit for semi­sinusoidal
 model in R?</em>, <a
 href="http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r">http://stats.stackexchange.com/questions/60500/how-to-find-a-good-fit-for-semi-sinusoidal-model-in-r</a></p>
 <p>[5] <a href="../../sk/2025/07/voice-command-ses-komut.html">Ses Komut
 Tanıma, Dikkat (Attention) Modeli</a></p>
-<p>[6] Gaussian Karışım Modeli (GMM) ile Kümelemek,
-stat_110_gmm/stat_110_gmm.html</p>
-<p>[7] Artımsal (Incremental) GMM,
-stat_112_gmminc/stat_112_gmminc.html</p>
+<p>[6] Bayramlı, İstatistik, <em>Gaussian Karışım Modeli (GMM) ile
+Kümelemek</em></p>
+<p>[7] Bayramlı, İstatistik, <em>Artımsal (Incremental) GMM</em></p>
+<p>[8] Kaggle,
+<a href="https://www.kaggle.com/datasets/neehakurelli/google-speech-commands">Google
+Speech Commands</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
