@@ -100,7 +100,8 @@ parça doğru tanımlı değil. Sezonşallık benzer şekilde kontrol
 edilebilir, vs.</p>
 <p>Bu alanda pek cok yaklasim var. Pür istatistik bazlı bir Poisson
 tekniğini de [8]’de görmüştük.</p>
-<p>Chow Testi ve Yapısal Kopma (Structural Break)</p>
+<h3 id="chow-testi-ve-yapısal-kopma-structural-break">Chow Testi ve
+Yapısal Kopma (Structural Break)</h3>
 <p>Diyelim ki elimizdeki bir modelin bir verinin iki parçasında değişik
 sonuçlar verip vermeyeceğini merak ediyoruz. Önceki regresyon örneğinde
 bunu tek kesi ve değişken üzerinden gördük. Peki ya model daha çetrefil
@@ -355,7 +356,7 @@ küçük değerler gösterebilir. Her noktada F değeri hesaplayıp en büyüğ�
 bulmak ise yarar fakat tek bir noktaya bakıp “bu nokta ayraç olarak
 istatistiki öneme sahip mi?’’ sorusu her örneklem büyüklüğünde
 işlemeyebilir.</p>
-<p>Cusum</p>
+<h3 id="cusum">Cusum</h3>
 <p>Cusum yaklaşımı [5] makalesinde araştırılmış, özyineli (recursive),
 yani teker teker her yeni veri noktası üzerinde işlem yapan ve kopuşları
 o anda yakalamaya uğraşan bir yaklaşımdır. Özyineli regresyon konusunu
@@ -377,89 +378,72 @@ anda <span class="math inline">\(\sigma_t\)</span> varyasyonu için,</p>
 <p>Yani her anda katsayılar ve gürültünün varyasyonu sabit olmalı. Cusum
 <span class="math inline">\(\beta_t\)</span>’deki değişimi yakalamak
 için ayarlanmıştır, bunu yapmak için gürültü ortalamasının sıfırdan
-sapmasını yakalamaya uğraşır. Detayları için Cusum makalesine
-danışılabilir.</p>
-<p>Alttaki kod [2]’yi temel alıyor.</p>
+sapmasını yakalamaya uğraşır. Detaylar için makaleye danışılabilir.</p>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.linalg <span class="im">import</span> inv</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> detect_cusum(x, threshold<span class="op">=</span><span class="dv">1</span>, drift<span class="op">=</span><span class="dv">0</span>, ending<span class="op">=</span><span class="va">False</span>, show<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.atleast_1d(x).astype(<span class="st">&#39;float64&#39;</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    gp, gn <span class="op">=</span> np.zeros(x.size), np.zeros(x.size)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    ta, tai, taf <span class="op">=</span> np.array([[], [], []], dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    tap, tan <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    amp <span class="op">=</span> np.array([])</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, x.size):</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> x[i] <span class="op">-</span> x[i<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        gp[i] <span class="op">=</span> gp[i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> s <span class="op">-</span> drift  <span class="co"># cumulative sum for + change</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        gn[i] <span class="op">=</span> gn[i<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> s <span class="op">-</span> drift  <span class="co"># cumulative sum for - change</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> gp[i] <span class="op">&lt;</span> <span class="dv">0</span>:</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            gp[i], tap <span class="op">=</span> <span class="dv">0</span>, i</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> gn[i] <span class="op">&lt;</span> <span class="dv">0</span>:</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            gn[i], tan <span class="op">=</span> <span class="dv">0</span>, i</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> gp[i] <span class="op">&gt;</span> threshold <span class="kw">or</span> gn[i] <span class="op">&gt;</span> threshold:  <span class="co"># change detected!</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>            ta <span class="op">=</span> np.append(ta, i)    <span class="co"># alarm index</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>            tai <span class="op">=</span> np.append(tai, tap <span class="cf">if</span> gp[i] <span class="op">&gt;</span> threshold <span class="cf">else</span> tan)  <span class="co"># start</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>            gp[i], gn[i] <span class="op">=</span> <span class="dv">0</span>, <span class="dv">0</span>      <span class="co"># reset alarm</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tai.size <span class="kw">and</span> ending:</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>        _, tai2, _, _ <span class="op">=</span> detect_cusum(x[::<span class="op">-</span><span class="dv">1</span>], threshold, drift, show<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>        taf <span class="op">=</span> x.size <span class="op">-</span> tai2[::<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        tai, ind <span class="op">=</span> np.unique(tai, return_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        ta <span class="op">=</span> ta[ind]</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> tai.size <span class="op">!=</span> taf.size:</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> tai.size <span class="op">&lt;</span> taf.size:</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>                taf <span class="op">=</span> taf[[np.argmax(taf <span class="op">&gt;=</span> i) <span class="cf">for</span> i <span class="kw">in</span> ta]]</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>                ind <span class="op">=</span> [np.argmax(i <span class="op">&gt;=</span> ta[::<span class="op">-</span><span class="dv">1</span>])<span class="op">-</span><span class="dv">1</span> <span class="cf">for</span> i <span class="kw">in</span> taf]</span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>                ta <span class="op">=</span> ta[ind]</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>                tai <span class="op">=</span> tai[ind]</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>        ind <span class="op">=</span> taf[:<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> tai[<span class="dv">1</span>:] <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ind.<span class="bu">any</span>():</span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>            ta <span class="op">=</span> ta[<span class="op">~</span>np.append(<span class="va">False</span>, ind)]</span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>            tai <span class="op">=</span> tai[<span class="op">~</span>np.append(<span class="va">False</span>, ind)]</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>            taf <span class="op">=</span> taf[<span class="op">~</span>np.append(ind, <span class="va">False</span>)]</span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>        amp <span class="op">=</span> x[taf] <span class="op">-</span> x[tai]</span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ta, tai, taf, amp</span></code></pre></div>
-<p>Örnek bir zaman serisinde görelim,</p>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> recursive_cusum(y, X):</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    y, X <span class="op">=</span> np.asarray(y), np.asarray(X)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    n, k <span class="op">=</span> X.shape</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.zeros(n)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    S <span class="op">=</span> np.zeros((k, k))</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> np.zeros((k,))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(k, n):</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        X_t <span class="op">=</span> X[:t]</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        y_t <span class="op">=</span> y[:t]</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        S <span class="op">=</span> X_t.T <span class="op">@</span> X_t</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>        beta_t <span class="op">=</span> inv(S) <span class="op">@</span> X_t.T <span class="op">@</span> y_t</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        x_new <span class="op">=</span> X[t]</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> x_new <span class="op">@</span> beta_t</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        denom <span class="op">=</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> x_new <span class="op">@</span> inv(S) <span class="op">@</span> x_new)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        w[t] <span class="op">=</span> (y[t] <span class="op">-</span> y_pred) <span class="op">/</span> denom</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># drop initial k zeros</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> w[k:]</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    sigma_hat <span class="op">=</span> np.std(w, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    Wt <span class="op">=</span> np.cumsum(w <span class="op">/</span> sigma_hat)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Wt, w, sigma_hat</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_cusum(Wt, k, alpha<span class="op">=</span><span class="fl">0.05</span>):</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    T <span class="op">=</span> <span class="bu">len</span>(Wt) <span class="op">+</span> k</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> np.arange(k<span class="op">+</span><span class="dv">1</span>, T<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    boundary <span class="op">=</span> <span class="fl">0.948</span> <span class="op">*</span> np.sqrt(T <span class="op">-</span> k)  <span class="co"># for alpha=0.05</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    plt.plot(t, Wt, label<span class="op">=</span><span class="st">&quot;CUSUM of Recursive Residuals&quot;</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    plt.axhline(boundary, color<span class="op">=</span><span class="st">&#39;r&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;5% bounds&#39;</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    plt.axhline(<span class="op">-</span>boundary, color<span class="op">=</span><span class="st">&#39;r&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>)</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    plt.axhline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;k&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;:&#39;</span>)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    plt.xlabel(<span class="st">&#39;Observation index&#39;</span>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    plt.ylabel(<span class="st">&#39;CUSUM statistic&#39;</span>)</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    plt.title(<span class="st">&#39;CUSUM Test (Brown–Durbin–Evans, 1975)&#39;</span>)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    plt.legend()</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>    plt.savefig(<span class="st">&#39;tser_022_de_01.jpg&#39;</span>)</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> dfg[<span class="st">&#39;Ln_G_Pop&#39;</span>].values</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> dfg[[<span class="st">&#39;Ln_Income_Pop&#39;</span>,<span class="st">&#39;Ln_Pg&#39;</span>,<span class="st">&#39;Ln_Pnc&#39;</span>,<span class="st">&#39;Ln_Puc&#39;</span>]].values</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>Wt, w, sigma_hat <span class="op">=</span> recursive_cusum(y, X)</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>plot_cusum(Wt, k<span class="op">=</span>X.shape[<span class="dv">1</span>])</span></code></pre></div>
+<p><img src="tser_022_de_01.jpg" /></p>
 <div class="sourceCode" id="cb14"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.random.randn(<span class="dv">300</span>)<span class="op">/</span><span class="dv">5</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">100</span>:<span class="dv">200</span>] <span class="op">+=</span> np.arange(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">4</span><span class="op">/</span><span class="dv">100</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(y))</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(y,columns<span class="op">=</span>[<span class="st">&#39;y&#39;</span>])</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;x&#39;</span>] <span class="op">=</span> x</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.set_index(<span class="st">&#39;x&#39;</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>df.y.plot()</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_022_de_05.png&#39;</span>)</span></code></pre></div>
-<p><img src="tser_022_de_05.png" /></p>
-<p>Bu zaman serisinde bariz kopuşlar var, yaklaşık indeks 100 anında,
-sonra 200 anında. Cusum ile bunları yakalamaya uğraşalım,</p>
-<div class="sourceCode" id="cb15"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cusum</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ta, tai, taf, amp <span class="op">=</span> cusum.detect_cusum(df.y, <span class="dv">2</span>, <span class="fl">.02</span>, <span class="va">True</span>, <span class="va">True</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="bu">len</span>(ta))</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&#39;Baslangic =&#39;</span>, tai[<span class="dv">0</span>], <span class="st">&#39;Bitis =&#39;</span>, taf[<span class="dv">0</span>])</span></code></pre></div>
-<pre class="text"><code>2
-Baslangic = 102 Bitis = 195</code></pre>
-<p>Geri döndürülen <code>tai</code>, <code>taf</code> birer vektördür,
-ve sırasıyla kopuş noktasının başlangıç ve bitiş indisini verirler.
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (dfg.iloc[<span class="dv">14</span>].Year)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (dfg.iloc[<span class="dv">17</span>].Year)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>```e</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>```text</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fl">1974.0</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fl">1977.0</span></span></code></pre></div>
+<h3 id="page-hinkley-cusum">Page-Hinkley Cusum</h3>
+<p>Bu metot üstte tarif edilenden biraz farklı, regresyon veya artıklara
+bakılmıyor, sadece <span class="math inline">\(x_t = \mu_t +
+\epsilon_t\)</span>, <span class="math inline">\(\epsilon_t \sim
+N(0,\sigma^2)\)</span> farz ediliyor ve <span
+class="math inline">\(\mu_t\)</span> sapmaları tespil edilmeye
+uğraşılıyor. Alttaki kod [2]’yi temel alır.</p>
+<p><a href="phtcusum.py">phtcusum.py</a></p>
+<p>Ornek verideki zaman serisinde bariz kopuşlar var, yaklaşık indeks
+100 anında, sonra 200 anında. Cusum ile bunları yakalayabiliriz, geri
+döndürülen <code>tai</code>, <code>taf</code> birer vektördür, ve
+sırasıyla kopuş noktasının başlangıç ve bitiş indisini verirler.
 Yukarıda ilk kopuşun indisini görüyoruz.</p>
-<p>Grafiklersek,</p>
-<div class="sourceCode" id="cb17"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="bu">range</span>(df.y.size)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ax.plot(t, df.y, <span class="st">&#39;b-&#39;</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(ta):</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    ax.plot(tai, df.y[tai], <span class="st">&#39;&gt;&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;g&#39;</span>, mec<span class="op">=</span><span class="st">&#39;g&#39;</span>, ms<span class="op">=</span><span class="dv">10</span>, label<span class="op">=</span><span class="st">&#39;Start&#39;</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    ax.plot(taf, df.y[taf], <span class="st">&#39;&lt;&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;g&#39;</span>, mec<span class="op">=</span><span class="st">&#39;g&#39;</span>, ms<span class="op">=</span><span class="dv">10</span>, label<span class="op">=</span><span class="st">&#39;Ending&#39;</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    ax.plot(ta, df.y[ta], <span class="st">&#39;o&#39;</span>, mfc<span class="op">=</span><span class="st">&#39;r&#39;</span>, mec<span class="op">=</span><span class="st">&#39;r&#39;</span>, mew<span class="op">=</span><span class="dv">1</span>, ms<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="st">&#39;Alarm&#39;</span>)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_022_de_06.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_022_de_06.png" /></p>
 <p>Sağa dönük yeşil ok başlangıç, sola dönük bitiş demek. En tepede
 ikisi birbirinin üstüne bindi çünkü orada bir parça bitip diğeri

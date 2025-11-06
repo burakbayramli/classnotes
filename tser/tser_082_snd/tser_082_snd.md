@@ -348,7 +348,6 @@ bu regresyon her zaman bir unutma faktörü içermelidir ki ses içinde
 bir fonemden diğerine geçildiğinde regresyon farklı harmoniklerin
 katsayılarını yakalamaya başlasın.
 
-
 ### MFCC
 
 Mel Frekansı Kepstral Katsayıları (MFCC), ses işleme alanında,

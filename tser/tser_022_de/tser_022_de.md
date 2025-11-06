@@ -12,7 +12,7 @@ edilebilir, vs.
 Bu alanda pek cok yaklasim var. Pür istatistik bazlı bir Poisson tekniğini de
 [8]'de görmüştük.
 
-Chow Testi ve Yapısal Kopma (Structural Break)
+### Chow Testi ve Yapısal Kopma (Structural Break)
 
 Diyelim ki elimizdeki bir modelin bir verinin iki parçasında değişik
 sonuçlar verip vermeyeceğini merak ediyoruz. Önceki regresyon örneğinde
@@ -310,7 +310,7 @@ değeri hesaplayıp en büyüğünü bulmak ise yarar fakat tek bir noktaya bak�
 "bu nokta ayraç olarak istatistiki öneme sahip mi?'' sorusu her örneklem
 büyüklüğünde işlemeyebilir. 
 
-Cusum
+### Cusum
 
 Cusum yaklaşımı [5] makalesinde araştırılmış, özyineli (recursive), yani teker
 teker her yeni veri noktası üzerinde işlem yapan ve kopuşları o anda yakalamaya
@@ -333,107 +333,81 @@ $$
 $$
 
 Yani her anda katsayılar ve gürültünün varyasyonu sabit olmalı. Cusum
-$\beta_t$'deki değişimi yakalamak için ayarlanmıştır, bunu yapmak için gürültü
-ortalamasının sıfırdan sapmasını yakalamaya uğraşır. Detayları için Cusum
-makalesine danışılabilir.
-
-Alttaki kod [2]'yi temel alıyor. 
+$\beta_t$'deki değişimi yakalamak için ayarlanmıştır, bunu yapmak için
+gürültü ortalamasının sıfırdan sapmasını yakalamaya uğraşır. Detaylar
+için makaleye danışılabilir.
 
 ```python
-import numpy as np
+from numpy.linalg import inv
 
-def detect_cusum(x, threshold=1, drift=0, ending=False, show=True, ax=None):
+def recursive_cusum(y, X):
+    y, X = np.asarray(y), np.asarray(X)
+    n, k = X.shape
+    w = np.zeros(n)
+    S = np.zeros((k, k))
+    beta = np.zeros((k,))
+    for t in range(k, n):
+        X_t = X[:t]
+        y_t = y[:t]
+        S = X_t.T @ X_t
+        beta_t = inv(S) @ X_t.T @ y_t
+        x_new = X[t]
+        y_pred = x_new @ beta_t
+        denom = np.sqrt(1 + x_new @ inv(S) @ x_new)
+        w[t] = (y[t] - y_pred) / denom
+    # drop initial k zeros
+    w = w[k:]
+    sigma_hat = np.std(w, ddof=1)
+    Wt = np.cumsum(w / sigma_hat)
+    return Wt, w, sigma_hat
 
-    x = np.atleast_1d(x).astype('float64')
-    gp, gn = np.zeros(x.size), np.zeros(x.size)
-    ta, tai, taf = np.array([[], [], []], dtype=int)
-    tap, tan = 0, 0
-    amp = np.array([])
-    for i in range(1, x.size):
-        s = x[i] - x[i-1]
-        gp[i] = gp[i-1] + s - drift  # cumulative sum for + change
-        gn[i] = gn[i-1] - s - drift  # cumulative sum for - change
-        if gp[i] < 0:
-            gp[i], tap = 0, i
-        if gn[i] < 0:
-            gn[i], tan = 0, i
-        if gp[i] > threshold or gn[i] > threshold:  # change detected!
-            ta = np.append(ta, i)    # alarm index
-            tai = np.append(tai, tap if gp[i] > threshold else tan)  # start
-            gp[i], gn[i] = 0, 0      # reset alarm
+def plot_cusum(Wt, k, alpha=0.05):
+    T = len(Wt) + k
+    t = np.arange(k+1, T+1)
+    boundary = 0.948 * np.sqrt(T - k)  # for alpha=0.05
+    plt.figure(figsize=(8, 5))
+    plt.plot(t, Wt, label="CUSUM of Recursive Residuals")
+    plt.axhline(boundary, color='r', linestyle='--', label='5% bounds')
+    plt.axhline(-boundary, color='r', linestyle='--')
+    plt.axhline(0, color='k', linestyle=':')
+    plt.xlabel('Observation index')
+    plt.ylabel('CUSUM statistic')
+    plt.title('CUSUM Test (Brown–Durbin–Evans, 1975)')
+    plt.legend()
+    plt.savefig('tser_022_de_01.jpg')
 
-    if tai.size and ending:
-        _, tai2, _, _ = detect_cusum(x[::-1], threshold, drift, show=False)
-        taf = x.size - tai2[::-1] - 1
-        tai, ind = np.unique(tai, return_index=True)
-        ta = ta[ind]
-        if tai.size != taf.size:
-            if tai.size < taf.size:
-                taf = taf[[np.argmax(taf >= i) for i in ta]]
-            else:
-                ind = [np.argmax(i >= ta[::-1])-1 for i in taf]
-                ta = ta[ind]
-                tai = tai[ind]
-        ind = taf[:-1] - tai[1:] > 0
-        if ind.any():
-            ta = ta[~np.append(False, ind)]
-            tai = tai[~np.append(False, ind)]
-            taf = taf[~np.append(ind, False)]
-        amp = x[taf] - x[tai]
-
-    return ta, tai, taf, amp
+y = dfg['Ln_G_Pop'].values
+X = dfg[['Ln_Income_Pop','Ln_Pg','Ln_Pnc','Ln_Puc']].values
+Wt, w, sigma_hat = recursive_cusum(y, X)
+plot_cusum(Wt, k=X.shape[1])
 ```
 
-Örnek bir zaman serisinde görelim,
+![](tser_022_de_01.jpg)
 
 ```python
-import pandas as pd
-  
-y = np.random.randn(300)/5
-y[100:200] += np.arange(0, 4, 4/100)
-x = range(len(y))
-df = pd.DataFrame(y,columns=['y'])
-df['x'] = x
-df = df.set_index('x')
-df.y.plot()
-plt.savefig('tser_022_de_05.png')
-```
-
-![](tser_022_de_05.png)
-
-Bu zaman serisinde bariz kopuşlar var, yaklaşık indeks 100 anında, sonra
-200 anında. Cusum ile bunları yakalamaya uğraşalım,
-
-```python
-import cusum
-ta, tai, taf, amp = cusum.detect_cusum(df.y, 2, .02, True, True)
-
-print (len(ta))
-print ('Baslangic =', tai[0], 'Bitis =', taf[0])
-```
+print (dfg.iloc[14].Year)
+print (dfg.iloc[17].Year)
+```e
 
 ```text
-2
-Baslangic = 102 Bitis = 195
+1974.0
+1977.0
 ```
 
-Geri döndürülen `tai`, `taf` birer vektördür, ve sırasıyla kopuş
-noktasının başlangıç ve bitiş indisini verirler. Yukarıda ilk kopuşun
-indisini görüyoruz.
+### Page-Hinkley Cusum
 
-Grafiklersek,
+Bu metot üstte tarif edilenden biraz farklı, regresyon veya artıklara
+bakılmıyor, sadece $x_t = \mu_t + \epsilon_t$, $\epsilon_t \sim
+N(0,\sigma^2)$ farz ediliyor ve $\mu_t$ sapmaları tespil edilmeye
+uğraşılıyor. Alttaki kod [2]'yi temel alır.
 
-```python
-fig, ax = plt.subplots(1, 1)
-t = range(df.y.size)
-ax.plot(t, df.y, 'b-', lw=2)
-if len(ta):
-    ax.plot(tai, df.y[tai], '>', mfc='g', mec='g', ms=10, label='Start')
-    ax.plot(taf, df.y[taf], '<', mfc='g', mec='g', ms=10, label='Ending')
-    ax.plot(ta, df.y[ta], 'o', mfc='r', mec='r', mew=1, ms=5, label='Alarm')
-    
-plt.savefig('tser_022_de_06.png')
-```
+[phtcusum.py](phtcusum.py)
+
+Ornek verideki zaman serisinde bariz kopuşlar var, yaklaşık indeks 100
+anında, sonra 200 anında. Cusum ile bunları yakalayabiliriz, geri
+döndürülen `tai`, `taf` birer vektördür, ve sırasıyla kopuş noktasının
+başlangıç ve bitiş indisini verirler. Yukarıda ilk kopuşun indisini
+görüyoruz.
 
 ![](tser_022_de_06.png)
 
