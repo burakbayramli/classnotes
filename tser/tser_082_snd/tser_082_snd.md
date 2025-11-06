@@ -368,7 +368,7 @@ yaygın olarak kullanılan bir özellik çıkarma tekniği. Temelde, bir ses
 sinyalinin kısa süreli güç spektrumunun, insan kulağının frekans
 algısına (Mel ölçeği) yakından uyan doğrusal olmayan bir frekans
 ölçeği temel alınarak temsilidir. İnsan kulağı, düşük frekanslarda
-daha hassaşken, yüksek frekanslarda daha az hassastır. MFCC, bu doğal
+daha hassasken, yüksek frekanslarda daha az hassastır. MFCC, bu doğal
 insan algısını taklit ederek, sesin spektral zarfını (tınısını) kısa
 ve verimli bir şekilde temsil eden bir dizi katsayı üretir. MFCC
 çıkarımının temel adımları,
@@ -497,6 +497,12 @@ Birbirlerine eşlersek,
 
 Formüller aynı.
 
+Ses tanıma için kullanılan GMM tabii ki çok boyutlu Gaussian'ların
+karışımı, bizim kullandığımız ölçüler 16 boyutlu MFCC çıktısı, artı bu
+çıktıların birinci ve ikinci seviyedeki farklılık (delta) hesapları,
+toplam olarak her ses kaydı için 39 boyut elde ediyoruz. Karışımdaki
+Gaussian sayısı ise 64 tane.
+
 Alttaki kodlar üç parça halinde , ilk kod evrensel GMM eğitimi için,
 ikincisi MAP güncellemesi yapıyor, üçüncü kod test verisi üzerinde
 başarıyı ölçüyor. Verilerin `/opt/Downloads/gvoice/train.zip` adlı bir
@@ -530,3 +536,5 @@ Kaynaklar
 
 [8] Kaggle, <a href="https://www.kaggle.com/datasets/neehakurelli/google-speech-commands">Google Speech Commands</a>
     
+
+
