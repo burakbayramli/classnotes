@@ -104,6 +104,8 @@ def main():
                 audio, _ = librosa.load(io.BytesIO(zf.read()), sr=SR)
             frames = extract_frames(audio, SR)
             for x in frames:
+                # her MFCC ogesi icin ayri ayri guncelleme yapiliyor
+                # buraya dikkat
                 weights, means, covs, m_total = update_gmm_incremental(x, weights, means, covs, m_total, ALPHA)
             counts[label] += 1
             processed += 1
