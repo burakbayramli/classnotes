@@ -1,8 +1,9 @@
 # Ses Verisi İşleme, Tanıma
 
 Kulağımızla duyduğumuz sesleri tek boyutlu bir zaman serisi olarak
-düşünebiliriz. Bir ses parçasını (phoneme) grafiklemek istesek alttaki
-gibi bir grafik elde ederdik.
+düşünebiliriz. Bir ses parçasını (fonem -phoneme-) grafiklemek istesek
+alttaki gibi bir grafik elde ederdik. Ornek olarak altta /ow/ fonemini
+kullandık.
 
 ```python
 import scipy
@@ -14,11 +15,17 @@ plt.savefig('tser_082_snd_01.jpg')
 
 ![](tser_082_snd_01.jpg)
 
-Grafikte periyodik dalgalar görülebiliyor, fakat bir tane değil birden
-fazla var, yani üstteki ses birkaç periyodik zaman serisinin toplamı.
-Genel olarak bir ses dalgasının bir ve daha fazla sinüs eğrisi toplamı
-olduğunu farzedebiliriz. Sinüs derken tabii ki her bileşenin genliği,
-frekansı, ve fazı (phase) farklı olabilir.
+Kelime sesleri fonem seslerinin birleşiminden oluşurlar. Mesela
+İngilizce kedi "cat" kelimesi /c/ /a/ /t/ fonemlerinden oluşur, "cow"
+kelimesi /c/ /ow/ fonemlerinden oluşur.
+
+Grafiğe dönersek periyodik dalgalar görülebiliyor, fakat bir tane
+değil birden fazla var, yani üstteki ses birkaç periyodik zaman
+serisinin toplamı.  Genel olarak bir ses dalgasının bir ve daha fazla
+sinüs eğrisi toplamı olduğunu farzedebiliriz. Sinüs derken tabii ki
+her sinüs bileşeninin genliği, frekansı, ve fazi (phase) farklı
+olabilir. Bu parametrelerin periyodik grafiği nasıl etkilediğini
+görmek için alttaki şekle bakabiliriz.
 
 ```python
 x = np.linspace(0,4,100)
@@ -51,15 +58,15 @@ plt.savefig('tser_082_snd_02.jpg')
 
 ![](tser_082_snd_02.jpg)
 
-Üstteki grafiklerde birkaç farklı sinüs eğrilerine bakabiliriz. Üst
-solda bir $\sin(2 \pi x)$ eğrisi var. Onun genliğini (amplitude)
-arttırmak için bir sabit sayı ile çarpıyoruz, örnekte iki ile, bu bize
-sağ üstteki $2 \sin (2\pi x)$ sonucunu veriyor. Frekans arttırımı
-için, yani aynı periyot içinde daha fazla salınım için $\sin$ hesabına
-geçilen değer daha yüksek bir katsayı ile çarpılabilir, bunun sonucu
-sol altta. Eğer aynı eğriyi sadece kaydırmak isteseydik bunu $\sin$
-hesabına geçilen değere bir değer toplayarak yapardık, böylece
-kaydırım gerçekleşirdi, onun sonucu ise sağ altta.
+Üstteki grafiklerde farklı sinüs eğrileri var. Üst solda bir $\sin(2
+\pi x)$ eğrisi görülüyor. Onun genliğini (amplitude) arttırmak için
+bir sabit sayı ile çarpıyoruz, örnekte iki ile, bu bize sağ üstteki $2
+\sin (2\pi x)$ sonucunu veriyor. Frekans arttırımı için, yani aynı
+periyot içinde daha fazla salınım için $\sin$ hesabına geçilen değer
+daha yüksek bir katsayı ile çarpılabilir, bunun sonucu sol altta. Eğer
+aynı eğriyi sadece kaydırmak isteseydik bunu $\sin$ hesabına geçilen
+değere bir değer toplayarak yapardık, böylece kaydırım gerçekleşirdi,
+onun sonucu ise sağ altta.
 
 Simdi bu kavramlari kullanarak kendimiz iki tane ses dalgasi yaratalim.
 
