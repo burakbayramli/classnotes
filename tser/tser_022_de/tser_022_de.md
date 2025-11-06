@@ -387,7 +387,7 @@ plot_cusum(Wt, k=X.shape[1])
 ```python
 print (dfg.iloc[14].Year)
 print (dfg.iloc[17].Year)
-```e
+```
 
 ```text
 1974.0
@@ -404,7 +404,7 @@ uğraşılıyor. Alttaki kod [2]'yi temel alır.
 [phtcusum.py](phtcusum.py)
 
 Ornek verideki zaman serisinde bariz kopuşlar var, yaklaşık indeks 100
-anında, sonra 200 anında. Cusum ile bunları yakalayabiliriz, geri
+anında, sonra 200 anında. PHT cusum ile bunları yakalayabiliriz, geri
 döndürülen `tai`, `taf` birer vektördür, ve sırasıyla kopuş noktasının
 başlangıç ve bitiş indisini verirler. Yukarıda ilk kopuşun indisini
 görüyoruz.
