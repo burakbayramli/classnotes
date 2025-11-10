@@ -443,8 +443,8 @@ Ses tanıma yaklaşımlarından bir tanesi her sesi bir Gaussian karışımı
 sorarak hangisinin daha yüksek ihtimalli olduğuna bakar. En yüksek
 ihtimalli olan aralarından seçilir.
 
-GMM-UBM yaklaşımı GMM eğitiminde ilginç bir teknik uygular. İlk fazda
-eğitim verisi, hangi komuttan geldiğine bakılmadan, birbirine
+GMM-UBM yaklaşımı GMM [6,7] eğitiminde ilginç bir teknik uygular. İlk
+fazda eğitim verisi, hangi komuttan geldiğine bakılmadan, birbirine
 karıştırılarak tek bir "evrensel" GMM'nin eğitimi için kullanılır
 (eğitim verisinin ne kadarının bu fazda kullanılacağı hiperparametre
 optimizasyonunun bir parçası olabilir). İlk faz tamamlandıktan sonra
@@ -535,6 +535,3 @@ Kaynaklar
 [7] Bayramlı, İstatistik, *Artımsal (Incremental) GMM*
 
 [8] Kaggle, <a href="https://www.kaggle.com/datasets/neehakurelli/google-speech-commands">Google Speech Commands</a>
-    
-
-
