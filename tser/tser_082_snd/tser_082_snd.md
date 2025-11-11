@@ -353,7 +353,7 @@ Not: Dikkat edersek üstteki regresyonu en ufak konuşma ses parçası,
 bir fonem üzerinde yaptık. Bu ufak sesin kendine has bir sinüs eğri
 karışımı vardı. Fakat insan konuşmasındaki tek bir kelime telafuzunda
 birden fazla fonem olacaktır. Yani konuşma tanıma amacıyla bir
-kelimeyi alıp sinüs eğrilerine ayırmak ise yaramaz. Eğer kelime
+kelimeyi alıp sinüs eğrilerine ayırmak işe yaramaz. Eğer kelime
 bazında regresyon uygulamak istersek bunu kelime boyunca regresyonun
 değişmesine izin veren, özyineli bir şekilde yapmalıyız, ve bu
 regresyon her zaman bir unutma faktörü içermelidir ki ses içinde bir
@@ -434,7 +434,10 @@ print (mfccs.shape)
 ve sonuç olarak 7 tane 20 boyutlu vektör ortaya çıktı. Tekrar
 vurgulayalım, bu 7 vektörün her biri aynı ses dosyasını temsil etmek
 için ayrı ayrı birer veri noktası olarak sınıflayıcı algoritmalara
-verilmelidir.
+verilmelidir. Üstteki boyutlar üzerinden eğer elimizde iki tane 'cat'
+iki tane 'dog' ses veri satırı var ise, MFCC sonrası elimizde 14 tane
+'cat' satırı, 14 tane 'dog' satırı olacaktır, ve yapay öğrenme
+algoritmasi 28 veri satırı ile eğitilecektir.
 
 ### Ses Komut Tanıması, GMM-UBM
 
@@ -503,7 +506,7 @@ karışımı, bizim kullandığımız ölçüler 16 boyutlu MFCC çıktısı, ar
 toplam olarak her ses kaydı için 39 boyut elde ediyoruz. Karışımdaki
 Gaussian sayısı ise 64 tane.
 
-Alttaki kodlar üç parça halinde , ilk kod evrensel GMM eğitimi için,
+Alttaki kodlar üç parça halinde, ilk kod evrensel GMM eğitimi için,
 ikincisi MAP güncellemesi yapıyor, üçüncü kod test verisi üzerinde
 başarıyı ölçüyor. Verilerin `/opt/Downloads/gvoice/train.zip` adlı bir
 dosyada olduğunu farzettik, bu zip dosyasının içeriği [8]
