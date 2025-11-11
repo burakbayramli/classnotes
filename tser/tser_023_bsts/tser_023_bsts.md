@@ -1,48 +1,6 @@
-# Bayes Sistemi, PyMC, Bayes Yapısal Zaman Serisi Modelleri
-
-```python
-import pymc as pm, scipy.stats as stats
-import pandas as pd
-```
+# Bayes Yapısal Zaman Serisi Modelleri
 
 
-```python
-Y = stats.bernoulli(0.7).rvs(20)
-
-theta = 0.5
-with pm.Model() as model:
-     theta = pm.Beta("theta", alpha=1, beta=1)
-     y_obs = pm.Binomial("eta_obs", n=1, p=theta, observed=Y)
-     idata = pm.sample(1000, return_inferencedata=True)
-```
-
-```python
-theta_post = np.array(idata.posterior['theta'])
-print (np.mean(theta_post))
-plt.hist(theta_post[0],bins=10)
-plt.savefig('tser_023_bsts_03.jpg')
-```
-
-```text
-0.5952869333604922
-```
-
-![](tser_023_bsts_03.jpg)
-
-```python
-graphviz = pm.model_to_graphviz(model)
-graphviz.graph_attr.update(dpi="300")
-graphviz.render("tser_023_bsts_02", format="jpg")
-```
-
-```text
-Out[1]: 'tser_023_bsts_02.jpg'
-```
-
-<img width="200px" src="tser_023_bsts_02.jpg">
-
-
-### Zaman Serileri
 
 ```python
 co2_by_month = pd.read_csv("monthly_mauna_loa_co2.csv")
