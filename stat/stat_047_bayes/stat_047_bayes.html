@@ -80,12 +80,36 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="bayes-usulü-istatistiki-analiz">Bayes Usulü İstatistiki
 Analiz</h1>
+<p>Veri analizinde Bayes teorisi kullanımı sayesinde veri olasılığı,
+bilmediğimiz parametreler hakkındaki bazı bilgilerimizi formülasyona
+dahil edebiliyoruz. Bunun bir örneğini MAP hesaplarını işlerken gördük.
+Bu bölümde Bayes formüllerinin sonuçlarını bulmak için bazı hesapsal
+teknikleri işleyeceğiz, ve niye faydalı olduklarını anlamaya
+uğraşacağız.</p>
+<p>Temel olasılık teorisinden biliyoruz ki Bayes teorisi</p>
+<p><span class="math display">\[
+P(A | B) = \frac{P(B|A) P(A)}{P(B)}
+\]</span></p>
+<p>diye gider. Üstteki formülü veri analizine uyarlayabiliriz.
+İstatistiki modelin parametreleri <span
+class="math inline">\(\theta\)</span>’yi <span class="math inline">\(A =
+\theta\)</span> yaparız, <span class="math inline">\(B = veri\)</span>
+deriz, o zaman Bayes teorisi elde edilen verinin parametre hesabı <span
+class="math inline">\(\theta\)</span> için nasıl kullanılacağının
+formülünü gösterir,</p>
+<p><span class="math display">\[
+P(\theta | veri) = \frac{P(veri | \theta) \times P(\theta)}{P(veri)}
+\]</span></p>
+<p>Formül öğelerinin açıklamasını [4] yazısında bulabiliriz.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm, scipy.stats <span class="im">as</span> stats</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div>
@@ -110,7 +134,97 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>graphviz.render(<span class="st">&quot;tser_023_bsts_02&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;jpg&quot;</span>)</span></code></pre></div>
 <pre class="text"><code>Out[1]: &#39;tser_023_bsts_02.jpg&#39;</code></pre>
 <p><img width="200px" src="tser_023_bsts_02.jpg"></p>
+<h3 id="t-testi">T-Testi</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">250</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mu_A, std_A <span class="op">=</span> <span class="dv">30</span>, <span class="dv">4</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>mu_B, std_B <span class="op">=</span> <span class="dv">26</span>, <span class="dv">7</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>durations_A <span class="op">=</span> np.random.normal(mu_A, std_A, size<span class="op">=</span>N)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>durations_B <span class="op">=</span> np.random.normal(mu_B, std_B, size<span class="op">=</span>N)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (durations_A[:<span class="dv">8</span>])</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (durations_B[:<span class="dv">8</span>])</span></code></pre></div>
+<pre class="text"><code>[24.16407223 26.33809627 26.02574579 33.21505722 28.50448144 26.99996422
+ 30.76649221 30.59385573]
+[35.63522369 24.06562288 30.18425953 22.17136243 32.47047614 32.74779037
+ 33.07401654 34.0171137 ]</code></pre>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pool the data for priors</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pooled_mean <span class="op">=</span> np.r_[durations_A, durations_B].mean()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pooled_std <span class="op">=</span> np.r_[durations_A, durations_B].std()</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the model in modern PyMC</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Priors</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    mu_A <span class="op">=</span> pm.Normal(<span class="st">&quot;mu_A&quot;</span>, mu<span class="op">=</span>pooled_mean, sigma<span class="op">=</span><span class="dv">1000</span><span class="op">*</span>pooled_std)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    mu_B <span class="op">=</span> pm.Normal(<span class="st">&quot;mu_B&quot;</span>, mu<span class="op">=</span>pooled_mean, sigma<span class="op">=</span><span class="dv">1000</span><span class="op">*</span>pooled_std)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    std_A <span class="op">=</span> pm.Uniform(<span class="st">&quot;std_A&quot;</span>, lower<span class="op">=</span>pooled_std<span class="op">/</span><span class="fl">1000.</span>, upper<span class="op">=</span><span class="fl">1000.</span><span class="op">*</span>pooled_std)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    std_B <span class="op">=</span> pm.Uniform(<span class="st">&quot;std_B&quot;</span>, lower<span class="op">=</span>pooled_std<span class="op">/</span><span class="fl">1000.</span>, upper<span class="op">=</span><span class="fl">1000.</span><span class="op">*</span>pooled_std)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    nu_minus_1 <span class="op">=</span> pm.Exponential(<span class="st">&quot;nu_minus_1&quot;</span>, lam<span class="op">=</span><span class="fl">1.</span><span class="op">/</span><span class="dv">29</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    nu <span class="op">=</span> pm.Deterministic(<span class="st">&quot;nu&quot;</span>, nu_minus_1 <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Likelihood - using StudentT instead of NoncentralT</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    obs_A <span class="op">=</span> pm.StudentT(<span class="st">&quot;obs_A&quot;</span>, nu<span class="op">=</span>nu, mu<span class="op">=</span>mu_A, sigma<span class="op">=</span>std_A, observed<span class="op">=</span>durations_A)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    obs_B <span class="op">=</span> pm.StudentT(<span class="st">&quot;obs_B&quot;</span>, nu<span class="op">=</span>nu, mu<span class="op">=</span>mu_B, sigma<span class="op">=</span>std_B, observed<span class="op">=</span>durations_B)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Derived quantities (deterministic nodes)</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    diff_of_means <span class="op">=</span> pm.Deterministic(<span class="st">&quot;diff_of_means&quot;</span>, mu_A <span class="op">-</span> mu_B)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    diff_of_stds <span class="op">=</span> pm.Deterministic(<span class="st">&quot;diff_of_stds&quot;</span>, std_A <span class="op">-</span> std_B)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    effect_size <span class="op">=</span> pm.Deterministic(<span class="st">&quot;effect_size&quot;</span>, </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                                    (mu_A <span class="op">-</span> mu_B) <span class="op">/</span> pm.math.sqrt((std_A<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> std_B<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sample</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> pm.sample(<span class="dv">2000</span>, tune<span class="op">=</span><span class="dv">1000</span>, return_inferencedata<span class="op">=</span><span class="va">False</span>, cores<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<pre class="text"><code>                                                                                
+                              Step      Grad      Sampli…                       
+  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
+ 
+            3000    0         0.901     7         1955.03   0:00:01   0:00:00   
+                                                  draws/s                       
+            3000    0         0.982     7         962.38    0:00:03   0:00:00   
+                                                  draws/s                       
+                                                                                </code></pre>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>graphviz <span class="op">=</span> pm.model_to_graphviz(model)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>graphviz.graph_attr.update(dpi<span class="op">=</span><span class="st">&quot;300&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>graphviz.render(<span class="st">&quot;stat_047_bayes_02&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;jpg&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Out[1]: &#39;stat_047_bayes_02.jpg&#39;</code></pre>
+<p><img width="500" src="stat_047_bayes_02.jpg"/></p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>diff_means_trace <span class="op">=</span> trace[<span class="st">&#39;diff_of_means&#39;</span>]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>diff_stds_trace <span class="op">=</span> trace[<span class="st">&#39;diff_of_stds&#39;</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>effect_size_trace <span class="op">=</span> trace[<span class="st">&#39;effect_size&#39;</span>]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.hist(diff_means_trace, bins<span class="op">=</span><span class="dv">50</span>, histtype<span class="op">=</span><span class="st">&#39;stepfilled&#39;</span>, alpha<span class="op">=</span><span class="fl">0.85</span>, density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, label<span class="op">=</span><span class="st">&#39;Sifir (Null) Hipotezi&#39;</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&#39;μ_A - μ_B&#39;</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&#39;Yogunluk (Density)&#39;</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&#39;Ortalama Farki Sonsal Dagilimi&#39;</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Sifirdan buyuk olma yuzdesi</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>pct_greater <span class="op">=</span> (diff_means_trace <span class="op">&gt;</span> <span class="dv">0</span>).<span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(diff_means_trace) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>pct_less <span class="op">=</span> (diff_means_trace <span class="op">&lt;</span> <span class="dv">0</span>).<span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(diff_means_trace) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>plt.text(<span class="fl">0.7</span>, <span class="fl">0.9</span>, <span class="ss">f&#39;</span><span class="sc">{</span>pct_less<span class="sc">:.1f}</span><span class="ss">% &lt; 0 &lt; </span><span class="sc">{</span>pct_greater<span class="sc">:.1f}</span><span class="ss">%&#39;</span>, </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>         transform<span class="op">=</span>plt.gca().transAxes, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_047_bayes_01.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_047_bayes_01.jpg" /></p>
 <p>[devam edecek]</p>
+<p>Kaynaklar</p>
+<p>[1] Kruschke, <em>Bayesian Estimation Supersedes the t Test</em></p>
+<p>[2] Pillon, <em>Bayesian Method for Hackers</em></p>
+<p>[3] Gimenez,
+<a href="https://oliviergimenez.github.io/banana-book/crashcourse.html">
+Bayesian analysis of capture-recapture data with hidden Markov models
+</a></p>
+<p>[4] Bayramli, <em>Istatistik, Tahmin Edici Hesaplar
+(Estimators)</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
