@@ -102,14 +102,138 @@ P(A | B) = \frac{P(B|A) P(A)}{P(B)}
 <p>diye gider. Üstteki formülü veri analizine uyarlayabiliriz.
 İstatistiki modelin parametreleri <span
 class="math inline">\(\theta\)</span>’yi <span class="math inline">\(A =
-\theta\)</span> yaparız, <span class="math inline">\(B = veri\)</span>
-deriz, o zaman Bayes teorisi elde edilen verinin parametre hesabı <span
-class="math inline">\(\theta\)</span> için nasıl kullanılacağının
-formülünü gösterir,</p>
+\theta\)</span> yaparız, <span class="math inline">\(B =
+\textrm{veri}\)</span> deriz, o zaman Bayes teorisi elde edilen verinin
+parametre hesabı <span class="math inline">\(\theta\)</span> için nasıl
+kullanılacağının formülünü gösterir,</p>
 <p><span class="math display">\[
-P(\theta | veri) = \frac{P(veri | \theta) \times P(\theta)}{P(veri)}
+P(\theta | \textrm{veri}) =
+\frac{P(\textrm{veri} | \theta) \times
+P(\theta)}{P(\textrm{veri})}
 \]</span></p>
-<p>Formül öğelerinin açıklamasını [4] yazısında bulabiliriz.</p>
+<p>Formül öğelerinin açıklamasını [4] yazısında bulabiliriz. Tekrarlamak
+gerekirse, sol tarafta, veriyi gördükten sonra ne bildiğinizi temsil
+eden, sonsal dağılım olan <span class="math inline">\(P(\theta \mid
+\text{veri})\)</span> bulunur. Bu, çıkarımın temelini oluşturur ve
+açıkça aradığınız şeydir; eğer birden fazla parametreniz varsa,
+muhtemelen çok değişkenli bir dağılım. Sağ tarafta, olurluk olan <span
+class="math inline">\(P(\text{veri} \mid \theta)\)</span> bulunur. Bu
+miktar, En Yüksek Olurluk Tahmini (MLE) yaklaşımındaki ile aynıdır.
+Evet, Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk
+bulunur, bu da sonuçların genellikle neden çok farklı olmadığını büyük
+ölçüde açıklar. Olurluk, <span class="math inline">\(\theta\)</span> ile
+parametrelendirilmiş bir model verildiğinde, verinizdeki bilginin
+olasılığını gösterir.</p>
+<p>Ardından, önsel dağılım olan <span
+class="math inline">\(P(\theta)\)</span> gelir. Bu miktar, veriyi
+görmeden önce ne bildiğinizi temsil eder. Eğer <span
+class="math inline">\(\theta\)</span> hakkında hiçbir şey bilmiyorsanız,
+belirsiz olabilir. Ancak genellikle sıfırdan başlamazsınız ve
+önselinizin sahip olduğunuz bilgiyi yansıtmasını istersiniz.</p>
+<p>Son olarak, bazen ortalama olurluk olarak adlandırılan <span
+class="math inline">\(P(\text{veri})\)</span> bulunur, çünkü sonsalın
+standartlaştırılması, yani bir dağılım olması için bire entegre olması
+amacıyla, olurluk önsele göre entegre edilerek elde edilir: <span
+class="math inline">\(P(\text{veri}) = \int P(\text{veri} \mid \theta)
+P(\theta)d\theta\)</span>. Ortalama olurluk, tahmin etmeniz gereken
+<span class="math inline">\(\theta\)</span> parametrelerinin sayısı
+boyutunda bir integraldir. Bu, genel olarak hesaplanması imkansız olmasa
+da zordur. Bayesçi yöntemin yakın zamana kadar kullanılmamasının
+nedenlerinden biri de budur.</p>
+<p>Örneğin, ekolojide kullanilan bir yakalama-tekrar yakalama modelini,
+tespit olasılığı <span class="math inline">\(p\)</span> ve hayatta kalma
+olasılığı ile bir kovaryat arasındaki ilişkinin kesişim ve eğimi için
+regresyon parametreleri <span class="math inline">\(\alpha\)</span> ve
+<span class="math inline">\(\beta\)</span> ile uyarlamak istediğinizi
+düşünün. Bu durumda Bayes teoremi, her üç parametrenin birlikteki sonsal
+dağılımını size verir:</p>
+<p><span class="math display">\[P(\alpha, \beta, p \mid \text{veri}) =
+\frac{P(\text{veri} \mid
+\alpha, \beta, p) \times P(\alpha, \beta, p)}{\iiint P(\text{veri}
+\mid \alpha, \beta, p) P(\alpha, \beta, p)d\alpha d\beta
+dp}\]</span></p>
+<p>Bu formülde bir hesaplama zorluğu var. Bölende üç boyutlu bir
+integrali görüyoruz, bu entegral çok çetrefilli bir çözümdür, analitik
+çözüm çoğunlukla mümkün değildir, hesapsal yaklaşımlar gerekir. Bu
+entegralin her durumda hesaplanması gerekmeyebiliyor, mesela [4]’te
+gördük ki aranılan bir parametre maksimize edilmeye çalışılan büyüklükte
+bölen değerine ihtiyaç duymuyordu, bu sebeple onu yok sayabildik. Fakat
+bazen bölendeki entegral kesinlikle gerekir, mesela iki farklı Bayes
+modelini karşılaştırıyorsak, bölendeki değer iptal edilemez, ve
+hesaplanması gerekir.</p>
+<p>Fakat bölümdeki entegral lazım olmasa bile, yani normalize edici
+katsayıyı bilmeden yine de sonsal dağılıma “orantılı” bir sonuç elde
+edebilsek bile, orada da analitik sonuç alamayacağımız ortaya
+çıkabiliyor, ve orada için yine yaklaşık yöntemlere başvurmamız
+gerekiyor.</p>
+<p>Bir deneyde tepki süresi ölçümlerinden oluşan tek değişkenli verilere
+sahip olduğumuzu varsayalım. Bu veriyi modellemek için, Weibull
+dağılımının faydalı bir tanımlayıcı model olacağını varsayalım.</p>
+<p>Weibull için olasılık yoğunluk fonksiyonu şudur:</p>
+<p><span
+class="math display">\[p(y|a,b)=ba^{-b}y^{b-1}e^{-(\frac{y}{a})^{b}}I_{(0,inf)}(y)\]</span></p>
+<p>Bu dağılımın iki parametresi vardır: a dağılımın ölçeğini ve b ise
+dağılımın şeklini kontrol eder. Verilerimizin <span
+class="math inline">\(y_{i}\)</span> ile temsil edildiğini, <span
+class="math inline">\(i\in1..N\)</span> olduğunu ve <span
+class="math inline">\(N\)</span>’nin gözlem sayısını gösterdiğini
+varsayalım. Modelimizde, her gözlemin bir Weibull dağılımından bağımsız
+bir çekiliş olduğunu varsayalım.</p>
+<p>Bu varsayımlar göz önüne alındığında, verilerimiz için artık bir
+olurluk fonksiyonuna (likelihood function) sahibiz. Her gözlemin <span
+class="math inline">\(a\)</span> ve <span
+class="math inline">\(b\)</span> parametrelerine sahip bir Weibull’dan
+bağımsız bir çekiliş olduğu varsayılırsa, tüm gözlemlerin olasılığı şu
+şekilde verilir:</p>
+<p><span
+class="math display">\[p(y_{1},...,y_{N}|a,b)=p(y_{1}|a,b)p(y_{2}|a,b)...p(y_{N}|a,b)\]</span>
+<span class="math display">\[=\prod_{i}p(y_{i}|a,b)\]</span> <span
+class="math display">\[=\prod_{i}ba^{-b}y_{i}^{b-1}e^{-{(\frac{y_{i}}{a})}^{b}}I_{(0,inf)}(y_{i})\]</span></p>
+<p>Ancak model tanımımızla henüz tamamen işimiz bitmedi. Her Bayesci
+analizde, parametreler üzerinde önsel dağılımları (prior distributions)
+da belirtmemiz gerekir. <span class="math inline">\(a\)</span> ve <span
+class="math inline">\(b\)</span> parametrelerinin sırasıyla <span
+class="math inline">\(\lambda_{a}\)</span> ve <span
+class="math inline">\(\lambda_{b}\)</span> parametrelerine sahip bir
+üstel dağılıma (exponential distribution) göre bağımsız olarak
+dağıldığını varsayalım.</p>
+<p>Bu önsel dağılımların yogunluklari şunlardır</p>
+<p><span
+class="math display">\[p(a|\lambda_{a})=\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}}\]</span>
+<span
+class="math display">\[p(a|\lambda_{b})=\frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}\]</span></p>
+<p>Yukarıda ifade edilen modelin, örnekleme notasyonu (sampling
+notation) kullanılarak çok daha basit terimlerle açıklanabileceğini
+belirtmeliyiz:</p>
+<p><span class="math display">\[\begin{array}{l}y_{i}|a,b\sim
+Weibull(a,b)\\a\sim
+Exp(\lambda_{a})\\b\sim Exp(\lambda_{b})\end{array}\]</span></p>
+<p>Artık hem bir olurluk hem de tüm parametreler üzerinde bir önsel
+içeren, tamamen belirlenmiş bir modele sahibiz. Amaç, sonsal çıkarım
+(posterior inference) yapmak ve verilere koşullu olarak parametreler
+üzerindeki sonsal dağılımı bulmaktır.</p>
+<p>Daha önce şunu belirtmiştik:</p>
+<p><span class="math display">\[p(\theta|D)\propto
+p(D|\theta)p(\theta)\]</span></p>
+<p>Bizim durumumuzda, <span class="math inline">\(\theta=(a,b)\)</span>
+ve <span class="math inline">\(D=(y_{1},...,y_{N})\)</span>’dir. Bu
+nedenle, şunu yazabiliriz:</p>
+<p><span class="math display">\[p(a,b|y_{1},...,y_{N})\propto
+p(y_{1},...,y_{N}|a,b)p(a,b)\]</span></p>
+<p><span class="math inline">\(a\)</span> ve <span
+class="math inline">\(b\)</span> parametreleri üzerinde bağımsız önsel
+kullanmaya karar verdiğimize dikkat edin. Bu bize şunu yazma olanağı
+verir:</p>
+<p><span class="math display">\[
+p(a,b|y_{1},...,y_{N}) \propto p(y_{1},...,y_{N}|a,b)
+\]</span></p>
+<p>Bu sonsal dağılımın fonksiyonel biçiminin neye benzediğini görmek
+için açılımı yapalım,</p>
+<p><span class="math display">\[p(a,b|y_{1},...,y_{N}) \propto
+(\prod_{i}ba^{-b}y_{i}^{b-1}e^{-(\frac{y_{i}}{a})^{b}}I_{(0,inf)}(y_{i}))\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}}
+\frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}
+\]</span></p>
+<p>Bu ifade analitik tekniklere uygun değildir.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm, scipy.stats <span class="im">as</span> stats</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div>
@@ -223,8 +347,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <a href="https://oliviergimenez.github.io/banana-book/crashcourse.html">
 Bayesian analysis of capture-recapture data with hidden Markov models
 </a></p>
-<p>[4] Bayramli, <em>Istatistik, Tahmin Edici Hesaplar
+<p>[4] Bayramli, Istatistik, <em>Tahmin Edici Hesaplar
 (Estimators)</em></p>
+<p>[5] Bayramli, Istatistik, <em>Değişim Noktası Analizi (Changepoint
+Analysis)</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
