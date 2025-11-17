@@ -94,8 +94,7 @@ bilmediğimiz parametreler hakkındaki bazı bilgilerimizi formülasyona
 dahil edebiliyoruz. Bunun bir örneğini MAP hesaplarını işlerken gördük.
 Bu bölümde Bayes formüllerinin sonuçlarını bulmak için bazı hesapsal
 teknikleri işleyeceğiz, ve niye faydalı olduklarını anlamaya
-uğraşacağız.</p>
-<p>Temel olasılık teorisinden biliyoruz ki Bayes teorisi</p>
+uğraşacağız. Temel olasılık teorisinden biliyoruz ki Bayes teorisi</p>
 <p><span class="math display">\[
 P(A | B) = \frac{P(B|A) P(A)}{P(B)}
 \]</span></p>
@@ -103,9 +102,9 @@ P(A | B) = \frac{P(B|A) P(A)}{P(B)}
 İstatistiki modelin parametreleri <span
 class="math inline">\(\theta\)</span>’yi <span class="math inline">\(A =
 \theta\)</span> yaparız, <span class="math inline">\(B =
-\textrm{veri}\)</span> deriz, o zaman Bayes teorisi elde edilen verinin
+\textrm{veri}\)</span> diyelim, o zaman Bayes teorisi eldeki verinin
 parametre hesabı <span class="math inline">\(\theta\)</span> için nasıl
-kullanılacağının formülünü gösterir,</p>
+kullanılacağının formülünü gösterir [3, Chapter 1],</p>
 <p><span class="math display">\[
 P(\theta | \textrm{veri}) =
 \frac{P(\textrm{veri} | \theta) \times
@@ -123,13 +122,19 @@ Evet, Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk
 bulunur, bu da sonuçların genellikle neden çok farklı olmadığını büyük
 ölçüde açıklar. Olurluk, <span class="math inline">\(\theta\)</span> ile
 parametrelendirilmiş bir model verildiğinde, verinizdeki bilginin
-olasılığını gösterir.</p>
+olasılığını gösterir. Dikkat, <span
+class="math inline">\(P(\textrm{veri})\)</span> ve <span
+class="math inline">\(P(\theta)\)</span> tanımları ile bu iki öğeyi
+birer rasgele değişken olarak formülasyona dahil etmiş oluyoruz. Bunun
+ne anlama geldiğini [4]’te işledik.</p>
 <p>Ardından, önsel dağılım olan <span
 class="math inline">\(P(\theta)\)</span> gelir. Bu miktar, veriyi
 görmeden önce ne bildiğinizi temsil eder. Eğer <span
 class="math inline">\(\theta\)</span> hakkında hiçbir şey bilmiyorsanız,
 belirsiz olabilir. Ancak genellikle sıfırdan başlamazsınız ve
-önselinizin sahip olduğunuz bilgiyi yansıtmasını istersiniz.</p>
+önselinizin sahip olduğunuz bilgiyi yansıtmasını istersiniz, mesela bir
+zar atımında zarların 1 ve 3 arası gelmesi daha muhtemel ise bu bilgiyi
+bir onsel olasılık olarak modele dahil etmek mümkündür.</p>
 <p>Son olarak, bazen ortalama olurluk olarak adlandırılan <span
 class="math inline">\(P(\text{veri})\)</span> bulunur, çünkü sonsalın
 standartlaştırılması, yani bir dağılım olması için bire entegre olması
@@ -168,7 +173,8 @@ edebilsek bile, orada da analitik sonuç alamayacağımız ortaya
 gerekiyor.</p>
 <p>Bir deneyde tepki süresi ölçümlerinden oluşan tek değişkenli verilere
 sahip olduğumuzu varsayalım. Bu veriyi modellemek için, Weibull
-dağılımının faydalı bir tanımlayıcı model olacağını varsayalım.</p>
+dağılımının faydalı bir tanımlayıcı model olacağını varsayalım [6, sf.
+42].</p>
 <p>Weibull için olasılık yoğunluk fonksiyonu şudur:</p>
 <p><span
 class="math display">\[p(y|a,b)=ba^{-b}y^{b-1}e^{-(\frac{y}{a})^{b}}I_{(0,inf)}(y)\]</span></p>
@@ -234,6 +240,20 @@ için açılımı yapalım,</p>
 \frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}
 \]</span></p>
 <p>Bu ifade analitik tekniklere uygun değildir.</p>
+<p>Hangi durumlarda çetrefil entegral hesapları muhakkak şart oluyor?
+Mesela farklı modellerin olurluk oranı (likelihood ratio)
+karşılaştırılması gerektiğinde ekstra hesap şart. “Ama hem bölen hem
+bölünende aynı büyüklük / normalize edici sabit var ise birbirlerini
+iptal etmezler mi?”. Farklı Bayes modellerinin farklı sabit edicileri
+var ise, iptal mümkün olmaz. Örnek olarak <span
+class="math inline">\(M1\)</span> ve <span
+class="math inline">\(M2\)</span> modelleri var ise, bir entegral <span
+class="math inline">\(\int P_{M1}(\text{veri} \mid \theta)
+P(\theta)d\theta\)</span> digeri <span class="math inline">\(\int
+P_{M2}(\text{veri} \mid \theta) P(\theta)d\theta\)</span> olur, bu
+hesaplar farklı sonuçlar verecektir çünkü farklı yoğunluk fonksiyonları
+ve parametreleri kullanıyor olacaklar.</p>
+<h3 id="pymc">PyMC</h3>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm, scipy.stats <span class="im">as</span> stats</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div>
@@ -351,6 +371,7 @@ Bayesian analysis of capture-recapture data with hidden Markov models
 (Estimators)</em></p>
 <p>[5] Bayramli, Istatistik, <em>Değişim Noktası Analizi (Changepoint
 Analysis)</em></p>
+<p>[6] Stevyers, <em>Computational Statistics with Matlab</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

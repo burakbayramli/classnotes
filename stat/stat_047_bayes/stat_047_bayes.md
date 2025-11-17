@@ -13,9 +13,9 @@ $$
 
 diye gider. Üstteki formülü veri analizine uyarlayabiliriz.
 İstatistiki modelin parametreleri $\theta$'yi $A = \theta$ yaparız, $B
-= \textrm{veri}$ deriz, o zaman Bayes teorisi elde edilen verinin
+= \textrm{veri}$ diyelim, o zaman Bayes teorisi eldeki verinin
 parametre hesabı $\theta$ için nasıl kullanılacağının formülünü
-gösterir,
+gösterir [3, Chapter 1],
 
 $$
 P(\theta | \textrm{veri}) =
@@ -28,26 +28,30 @@ gerekirse, sol tarafta, veriyi gördükten sonra ne bildiğinizi temsil
 eden, sonsal dağılım olan $P(\theta \mid \text{veri})$ bulunur. Bu,
 çıkarımın temelini oluşturur ve açıkça aradığınız şeydir; eğer birden
 fazla parametreniz varsa, muhtemelen çok değişkenli bir dağılım. Sağ
-tarafta, olurluk olan $P(\text{veri} \mid \theta)$ bulunur. Bu
-miktar, En Yüksek Olurluk Tahmini (MLE) yaklaşımındaki ile
-aynıdır. Evet, Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı
-olurluk bulunur, bu da sonuçların genellikle neden çok farklı
-olmadığını büyük ölçüde açıklar. Olurluk, $\theta$ ile
-parametrelendirilmiş bir model verildiğinde, verinizdeki bilginin
-olasılığını gösterir.
+tarafta, olurluk olan $P(\text{veri} \mid \theta)$ bulunur. Bu miktar,
+En Yüksek Olurluk Tahmini (MLE) yaklaşımındaki ile aynıdır. Evet,
+Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk bulunur,
+bu da sonuçların genellikle neden çok farklı olmadığını büyük ölçüde
+açıklar. Olurluk, $\theta$ ile parametrelendirilmiş bir model
+verildiğinde, verinizdeki bilginin olasılığını gösterir. Dikkat,
+$P(\textrm{veri})$ ve $P(\theta)$ tanımları ile bu iki öğeyi birer
+rasgele değişken olarak formülasyona dahil etmiş oluyoruz. Bunun ne
+anlama geldiğini [4]'te işledik.
 
 Ardından, önsel dağılım olan $P(\theta)$ gelir. Bu miktar, veriyi
 görmeden önce ne bildiğinizi temsil eder. Eğer $\theta$ hakkında
 hiçbir şey bilmiyorsanız, belirsiz olabilir. Ancak genellikle sıfırdan
 başlamazsınız ve önselinizin sahip olduğunuz bilgiyi yansıtmasını
-istersiniz.
+istersiniz, mesela bir zar atımında zarların 1 ve 3 arası gelmesi daha
+muhtemel ise bu bilgiyi bir onsel olasılık olarak modele dahil etmek
+mümkündür.
 
 Son olarak, bazen ortalama olurluk olarak adlandırılan
 $P(\text{veri})$ bulunur, çünkü sonsalın standartlaştırılması, yani
-bir dağılım olması için bire entegre olması amacıyla, olurluk
-önsele göre entegre edilerek elde edilir: $P(\text{veri}) = \int
-P(\text{veri} \mid \theta) P(\theta)d\theta$. Ortalama olurluk,
-tahmin etmeniz gereken $\theta$ parametrelerinin sayısı boyutunda bir
+bir dağılım olması için bire entegre olması amacıyla, olurluk önsele
+göre entegre edilerek elde edilir: $P(\text{veri}) = \int
+P(\text{veri} \mid \theta) P(\theta)d\theta$. Ortalama olurluk, tahmin
+etmeniz gereken $\theta$ parametrelerinin sayısı boyutunda bir
 integraldir. Bu, genel olarak hesaplanması imkansız olmasa da
 zordur. Bayesçi yöntemin yakın zamana kadar kullanılmamasının
 nedenlerinden biri de budur.
@@ -81,7 +85,8 @@ gerekiyor.
 
 Bir deneyde tepki süresi ölçümlerinden oluşan tek değişkenli verilere
 sahip olduğumuzu varsayalım. Bu veriyi modellemek için, Weibull
-dağılımının faydalı bir tanımlayıcı model olacağını varsayalım. 
+dağılımının faydalı bir tanımlayıcı model olacağını varsayalım [6,
+sf. 42].
 
 Weibull için olasılık yoğunluk fonksiyonu şudur:
 
@@ -151,21 +156,18 @@ $$
 
 Bu ifade analitik tekniklere uygun değildir.
 
+Hangi durumlarda çetrefil entegral hesapları muhakkak şart oluyor?
+Mesela farklı modellerin olurluk oranı (likelihood ratio)
+karşılaştırılması gerektiğinde ekstra hesap şart. "Ama hem bölen hem
+bölünende aynı büyüklük / normalize edici sabit var ise birbirlerini
+iptal etmezler mi?". Farklı Bayes modellerinin farklı sabit edicileri
+var ise, iptal mümkün olmaz. Örnek olarak $M1$ ve $M2$ modelleri var
+ise, bir entegral $\int P_{M1}(\text{veri} \mid \theta) P(\theta)d\theta$
+digeri $\int P_{M2}(\text{veri} \mid \theta) P(\theta)d\theta$ olur, bu
+hesaplar farklı sonuçlar verecektir çünkü farklı yoğunluk fonksiyonları
+ve parametreleri kullanıyor olacaklar. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### PyMC
 
 ```python
 import pymc as pm, scipy.stats as stats
@@ -334,3 +336,4 @@ Kaynaklar
 
 [5] Bayramli, Istatistik, *Değişim Noktası Analizi (Changepoint Analysis)*
 
+[6] Stevyers, *Computational Statistics with Matlab*
