@@ -465,15 +465,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 örnekleyicisiyle aynı Bayesyen değişim noktası (changepoint)
 formülasyonunu yeniden üretmektedir. Her iki yaklaşımda da veri, yıllık
 kömür madeni kazası sayılarından oluşur ve bu sayılar tek bir değişim
-noktasına sahip Poisson süreci olarak modellenir. Yani, veriler
-aşağıdaki gibi tanımlanır:</p>
-<p><span class="math display">\[
-y_i \sim
-\begin{array}{cc}
-Poisson(\theta), &amp; i \le k \\
-Poisson(\lambda), &amp; i &gt; k
-\end{array}
-\]</span></p>
+noktasına sahip Poisson süreci olarak modellenir.</p>
 <p>Burada <span class="math inline">\(\theta\)</span> ve <span
 class="math inline">\(\lambda\)</span> sırasıyla değişim noktasından
 önce ve sonra geçerli olan Poisson oranlarıdır. <span
@@ -496,97 +488,97 @@ seçilmiştir.</p></li>
 <p>Bu yaklaşım, koşullu dağılımların analitik biçimde elde edilmesine ve
 bu dağılımlar arasında dönüşümlü örnekleme yapılmasına dayanıyordu.</p>
 <p>PyMC ile kurulan modelde ise aynı yapının tamamı sembolik olarak
-tanımlanmıştır. Örneğin:</p>
+tanımlanmıştır. Bu tanımlama sonrasında PyMC, ek bir kodlama
+gerektirmeden ortak olasılık (joint posterior) dağılımını kendisi kurar.
+Örnekleme aşamasında ise sürekli parametreler <span
+class="math inline">\(( \theta, \lambda )\)</span> için NUTS (No-U-Turn
+Sampler), ayrık değişken <span class="math inline">\(k\)</span> için ise
+Metropolis algoritmasını otomatik olarak kullanır. Böylece, Gibbs
+örnekleyicisinde elle yapılan koşullu örnekleme işlemleri PyMC
+tarafından dahili olarak yürütülür.</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> pm.Gamma(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span>a1, beta<span class="op">=</span>b1)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>lam   <span class="op">=</span> pm.Gamma(<span class="st">&quot;lam&quot;</span>,   alpha<span class="op">=</span>a2, beta<span class="op">=</span>b2)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>k     <span class="op">=</span> pm.DiscreteUniform(<span class="st">&quot;k&quot;</span>, lower<span class="op">=</span><span class="dv">0</span>, upper<span class="op">=</span>n<span class="op">-</span><span class="dv">1</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>mu    <span class="op">=</span> pm.math.switch(idx <span class="op">&lt;=</span> k, theta, lam)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>y     <span class="op">=</span> pm.Poisson(<span class="st">&quot;y&quot;</span>, mu<span class="op">=</span>mu, observed<span class="op">=</span>data)</span></code></pre></div>
-<p>Bu tanımlama sonrasında PyMC, ek bir kodlama gerektirmeden ortak
-olasılık (joint posterior) dağılımını kendisi kurar. Örnekleme
-aşamasında ise sürekli parametreler <span class="math inline">\((
-\theta, \lambda )\)</span> için NUTS (No-U-Turn Sampler), ayrık değişken
-<span class="math inline">\(k\)</span> için ise Metropolis algoritmasını
-otomatik olarak kullanır. Böylece, Gibbs örnekleyicisinde elle yapılan
-koşullu örnekleme işlemleri PyMC tarafından dahili olarak yürütülür.</p>
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&quot;coal.txt&quot;</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(data)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">1851</span> <span class="op">+</span> np.arange(n)    <span class="co"># for reporting results</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># hiperparametreler</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>a1 <span class="op">=</span> a2 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>b1 <span class="op">=</span> b2 <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Iki Poisson orani icin onseller</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Gamma(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span>a1, beta<span class="op">=</span>b1)   <span class="co"># before the changepoint</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    lam   <span class="op">=</span> pm.Gamma(<span class="st">&quot;lam&quot;</span>,   alpha<span class="op">=</span>a2, beta<span class="op">=</span>b2)   <span class="co"># after the changepoint</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Degisim noktasi k icin ayriksal birornek onsel  (indeks in 0..n-1)</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> pm.DiscreteUniform(<span class="st">&quot;k&quot;</span>, lower<span class="op">=</span><span class="dv">0</span>, upper<span class="op">=</span>n <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> np.arange(n)                <span class="co"># numpy array of shape (n,)</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> pm.math.switch(idx <span class="op">&lt;=</span> k, theta, lam)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> pm.Poisson(<span class="st">&quot;y&quot;</span>, mu<span class="op">=</span>mu, observed<span class="op">=</span>data)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    graphviz <span class="op">=</span> pm.model_to_graphviz(model)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    graphviz.graph_attr.update(dpi<span class="op">=</span><span class="st">&quot;300&quot;</span>)</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    graphviz.render(<span class="st">&quot;stat_coal_04&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;jpg&quot;</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    nuts <span class="op">=</span> pm.NUTS(<span class="bu">vars</span><span class="op">=</span>[theta, lam], target_accept<span class="op">=</span><span class="fl">0.9</span>)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    metro <span class="op">=</span> pm.Metropolis(<span class="bu">vars</span><span class="op">=</span>[k])</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> pm.sample(</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>       draws<span class="op">=</span><span class="dv">3000</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>       tune<span class="op">=</span><span class="dv">2000</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>       step<span class="op">=</span>[nuts, metro],</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>       random_seed<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>       return_inferencedata<span class="op">=</span><span class="va">True</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(az.summary(trace, var_names<span class="op">=</span>[<span class="st">&quot;theta&quot;</span>, <span class="st">&quot;lam&quot;</span>, <span class="st">&quot;k&quot;</span>], round_to<span class="op">=</span><span class="dv">3</span>))</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>k_samples <span class="op">=</span> trace.posterior[<span class="st">&quot;k&quot;</span>].values.flatten().astype(<span class="bu">int</span>)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>k_mode <span class="op">=</span> np.bincount(k_samples).argmax()</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Sonsal modal k indeksi = </span><span class="sc">{</span>k_mode<span class="sc">}</span><span class="ss">, sene = </span><span class="sc">{</span><span class="dv">1851</span> <span class="op">+</span> k_mode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co"># plot posterior of k</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>az.plot_posterior(trace, var_names<span class="op">=</span>[<span class="st">&quot;k&quot;</span>], hdi_prob<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Degisim noktasi indek k icin sonsallik&quot;</span>)</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_coal_01.jpg&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>                                                                                
+                       Step   Grad                 Acce…   Sam…                 
+  Pro…   Dra…   Div…   size   eva…   Tun…   Sca…   Rate    Spe…   Elap…   Rem…  
+ -----------------------------------------------------------------------------
+        5000   0      1.0…   3      Fal…   4.59   0.30    141…   0:00…   0:0…  
+                                                           dra…                 
+        5000   0      0.9…   3      Fal…   4.29   0.28    132…   0:00…   0:0…  
+                                                           dra…                 
+        5000   0      1.0…   7      Fal…   4.29   0.12    131…   0:00…   0:0…  
+                                                           dra…                 
+        5000   0      0.9…   7      Fal…   4.72   0.00    120…   0:00…   0:0…  
+                                                           dra…                 
+                                                                                
+         mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+theta   3.062  0.284   2.524    3.579  ...    0.002  7874.187  8317.128  1.000
+lam     0.923  0.115   0.716    1.145  ...    0.001  7809.059  7082.257  1.000
+k      39.162  2.423  34.000   43.000  ...    0.045  1977.323  1858.838  1.004
+
+[3 rows x 9 columns]
+Sonsal modal k indeksi = 40, sene = 1891</code></pre>
+<p><img width='400' src='stat_coal_04.jpg'/></p>
 <p>Elde edilen sonuçlar yorum bakımından tamamen aynıdır: değişim
 noktası için ardıl dağılım yaklaşık olarak 1891 yılına karşılık gelir;
 <span class="math inline">\(\theta\)</span> ve <span
 class="math inline">\(\lambda\)</span> için ardıl ortalamalar sırasıyla
-yaklaşık 3.1 ve 0.9 olarak bulunmuştur. Bu sonuçlar, el ile yazılmış
+yaklaşık 3.06 ve 0.92 olarak bulunmuştur. Bu sonuçlar, el ile yazılmış
 Gibbs örnekleyicisinde elde edilen klasik kömür madeni kazası analizi
 sonuçlarıyla örtüşmektedir.</p>
 <p>Fark esasen uygulamadadır: PyMC modeli aynı Bayesyen yapıyı çok daha
 kısa, okunabilir bir şekilde ifade eder; örnekleme, yakınsama tanısı ve
 ardıl tahmin (posterior predictive) işlemleri ise otomatik olarak ve
 güvenilir biçimde yürütülür.</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&quot;coal.txt&quot;</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(data)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> <span class="dv">1851</span> <span class="op">+</span> np.arange(n)    <span class="co"># for reporting results</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># hiperparametreler</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>a1 <span class="op">=</span> a2 <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>b1 <span class="op">=</span> b2 <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Iki Poisson orani icin onseller</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> pm.Gamma(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span>a1, beta<span class="op">=</span>b1)   <span class="co"># before the changepoint</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    lam   <span class="op">=</span> pm.Gamma(<span class="st">&quot;lam&quot;</span>,   alpha<span class="op">=</span>a2, beta<span class="op">=</span>b2)   <span class="co"># after the changepoint</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Degisim noktasi k icin ayriksal birornek onsel  (indeks in 0..n-1)</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> pm.DiscreteUniform(<span class="st">&quot;k&quot;</span>, lower<span class="op">=</span><span class="dv">0</span>, upper<span class="op">=</span>n <span class="op">-</span> <span class="dv">1</span>)</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> np.arange(n)                <span class="co"># numpy array of shape (n,)</span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> pm.math.switch(idx <span class="op">&lt;=</span> k, theta, lam)</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> pm.Poisson(<span class="st">&quot;y&quot;</span>, mu<span class="op">=</span>mu, observed<span class="op">=</span>data)</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    nuts <span class="op">=</span> pm.NUTS(<span class="bu">vars</span><span class="op">=</span>[theta, lam], target_accept<span class="op">=</span><span class="fl">0.9</span>)</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    metro <span class="op">=</span> pm.Metropolis(<span class="bu">vars</span><span class="op">=</span>[k])</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> pm.sample(</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>        draws<span class="op">=</span><span class="dv">3000</span>,</span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>        tune<span class="op">=</span><span class="dv">2000</span>,</span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>        step<span class="op">=</span>[nuts, metro],</span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        cores<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>        random_seed<span class="op">=</span><span class="dv">42</span>,</span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>        return_inferencedata<span class="op">=</span><span class="va">True</span></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(az.summary(trace, var_names<span class="op">=</span>[<span class="st">&quot;theta&quot;</span>, <span class="st">&quot;lam&quot;</span>, <span class="st">&quot;k&quot;</span>], round_to<span class="op">=</span><span class="dv">3</span>))</span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>k_samples <span class="op">=</span> trace.posterior[<span class="st">&quot;k&quot;</span>].values.flatten().astype(<span class="bu">int</span>)</span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>k_mode <span class="op">=</span> np.bincount(k_samples).argmax()</span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Sonsal modal k indeksi = </span><span class="sc">{</span>k_mode<span class="sc">}</span><span class="ss">, sene = </span><span class="sc">{</span><span class="dv">1851</span> <span class="op">+</span> k_mode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co"># plot posterior of k</span></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
-<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>az.plot_posterior(trace, var_names<span class="op">=</span>[<span class="st">&quot;k&quot;</span>], hdi_prob<span class="op">=</span><span class="fl">0.95</span>)</span>
-<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Degisim noktasi indek k icin sonsallik&quot;</span>)</span>
-<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_coal_01.jpg&#39;</span>)</span></code></pre></div>
-<pre class="text"><code>                                                                                
-                       Step   Grad                 Acce…   Sam…                 
-  Pro…   Dra…   Div…   size   eva…   Tun…   Sca…   Rate    Spe…   Elap…   Rem…  
- -------------------------------------------------------------------------------
-  ----   5000   0      1.0…   3      Fal…   4.59   0.30    183…   0:00…   0:0…  
-                                                           dra…                 
-  ----   5000   0      0.9…   3      Fal…   4.29   0.28    188…   0:00…   0:0…  
-                                                           dra…                 
-                                                                                
-         mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-theta   3.068  0.287   2.548    3.615  ...    0.004  4215.123  4360.194  1.001
-lam     0.923  0.115   0.714    1.139  ...    0.002  3573.253  3932.140  1.001
-k      39.084  2.408  34.000   43.000  ...    0.065   957.958  1031.041  1.005
-
-[3 rows x 9 columns]
-Sonsal modal k indeksi = 40, sene = 1891</code></pre>
 <p><img src="stat_coal_01.jpg" /></p>
 <p>Kaynaklar</p>
 <p>[1] Ioana A. Cosma, Ludger Evers, <em>Markov Chain Monte Carlo

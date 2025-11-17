@@ -409,18 +409,7 @@ PyMC ile kurulan model, daha önce el ile yazılmış Gibbs
 örnekleyicisiyle aynı Bayesyen değişim noktası (changepoint)
 formülasyonunu yeniden üretmektedir. Her iki yaklaşımda da veri,
 yıllık kömür madeni kazası sayılarından oluşur ve bu sayılar tek bir
-değişim noktasına sahip Poisson süreci olarak modellenir. Yani,
-veriler aşağıdaki gibi tanımlanır:
-
-$$
-y_i \sim
-\begin{array}{cc}
-Poisson(\theta), & i \le k \\
-Poisson(\lambda), & i > k
-\end{array}
-$$
-
-
+değişim noktasına sahip Poisson süreci olarak modellenir. 
 
 Burada $\theta$ ve $\lambda$ sırasıyla değişim noktasından önce ve
 sonra geçerli olan Poisson oranlarıdır. $k$ ise değişim noktasının
@@ -441,41 +430,17 @@ Bu yaklaşım, koşullu dağılımların analitik biçimde elde edilmesine ve
 bu dağılımlar arasında dönüşümlü örnekleme yapılmasına dayanıyordu.
 
 PyMC ile kurulan modelde ise aynı yapının tamamı sembolik olarak
-tanımlanmıştır. Örneğin:
-
-```python
-theta = pm.Gamma("theta", alpha=a1, beta=b1)
-lam   = pm.Gamma("lam",   alpha=a2, beta=b2)
-k     = pm.DiscreteUniform("k", lower=0, upper=n-1)
-mu    = pm.math.switch(idx <= k, theta, lam)
-y     = pm.Poisson("y", mu=mu, observed=data)
-```
-
-Bu tanımlama sonrasında PyMC, ek bir kodlama gerektirmeden ortak
-olasılık (joint posterior) dağılımını kendisi kurar. Örnekleme
-aşamasında ise sürekli parametreler $( \theta, \lambda )$ için NUTS
-(No-U-Turn Sampler), ayrık değişken $k$ için ise Metropolis
-algoritmasını otomatik olarak kullanır. Böylece, Gibbs
+tanımlanmıştır. Bu tanımlama sonrasında PyMC, ek bir kodlama
+gerektirmeden ortak olasılık (joint posterior) dağılımını kendisi
+kurar. Örnekleme aşamasında ise sürekli parametreler $( \theta,
+\lambda )$ için NUTS (No-U-Turn Sampler), ayrık değişken $k$ için ise
+Metropolis algoritmasını otomatik olarak kullanır. Böylece, Gibbs
 örnekleyicisinde elle yapılan koşullu örnekleme işlemleri PyMC
 tarafından dahili olarak yürütülür.
 
-Elde edilen sonuçlar yorum bakımından tamamen aynıdır: değişim noktası
-için ardıl dağılım yaklaşık olarak 1891 yılına karşılık gelir;
-$\theta$ ve $\lambda$ için ardıl ortalamalar sırasıyla yaklaşık 3.1 ve
-0.9 olarak bulunmuştur. Bu sonuçlar, el ile yazılmış Gibbs
-örnekleyicisinde elde edilen klasik kömür madeni kazası analizi
-sonuçlarıyla örtüşmektedir.
-
-Fark esasen uygulamadadır: PyMC modeli aynı Bayesyen yapıyı çok daha
-kısa, okunabilir bir şekilde ifade eder; örnekleme, yakınsama tanısı
-ve ardıl tahmin (posterior predictive) işlemleri ise otomatik olarak
-ve güvenilir biçimde yürütülür.
-
 ```python
-import numpy as np
 import pymc as pm
 import arviz as az
-import matplotlib.pyplot as plt
 
 data = np.loadtxt("coal.txt", dtype=int)
 n = len(data)
@@ -498,17 +463,20 @@ with pm.Model() as model:
 
     y = pm.Poisson("y", mu=mu, observed=data)
 
+    graphviz = pm.model_to_graphviz(model)
+    graphviz.graph_attr.update(dpi="300")
+    graphviz.render("stat_coal_04", format="jpg")
+    
     nuts = pm.NUTS(vars=[theta, lam], target_accept=0.9)
     metro = pm.Metropolis(vars=[k])
 
     trace = pm.sample(
-        draws=3000,
-        tune=2000,
-        step=[nuts, metro],
-        cores=2,
-        random_seed=42,
-        return_inferencedata=True
-    )
+       draws=3000,
+       tune=2000,
+       step=[nuts, metro],
+       random_seed=42,
+       return_inferencedata=True
+)
 
 print(az.summary(trace, var_names=["theta", "lam", "k"], round_to=3))
 
@@ -527,20 +495,38 @@ plt.savefig('stat_coal_01.jpg')
                                                                                 
                        Step   Grad                 Acce…   Sam…                 
   Pro…   Dra…   Div…   size   eva…   Tun…   Sca…   Rate    Spe…   Elap…   Rem…  
- -------------------------------------------------------------------------------
-  ----   5000   0      1.0…   3      Fal…   4.59   0.30    183…   0:00…   0:0…  
+ -----------------------------------------------------------------------------
+        5000   0      1.0…   3      Fal…   4.59   0.30    141…   0:00…   0:0…  
                                                            dra…                 
-  ----   5000   0      0.9…   3      Fal…   4.29   0.28    188…   0:00…   0:0…  
+        5000   0      0.9…   3      Fal…   4.29   0.28    132…   0:00…   0:0…  
+                                                           dra…                 
+        5000   0      1.0…   7      Fal…   4.29   0.12    131…   0:00…   0:0…  
+                                                           dra…                 
+        5000   0      0.9…   7      Fal…   4.72   0.00    120…   0:00…   0:0…  
                                                            dra…                 
                                                                                 
          mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-theta   3.068  0.287   2.548    3.615  ...    0.004  4215.123  4360.194  1.001
-lam     0.923  0.115   0.714    1.139  ...    0.002  3573.253  3932.140  1.001
-k      39.084  2.408  34.000   43.000  ...    0.065   957.958  1031.041  1.005
+theta   3.062  0.284   2.524    3.579  ...    0.002  7874.187  8317.128  1.000
+lam     0.923  0.115   0.716    1.145  ...    0.001  7809.059  7082.257  1.000
+k      39.162  2.423  34.000   43.000  ...    0.045  1977.323  1858.838  1.004
 
 [3 rows x 9 columns]
 Sonsal modal k indeksi = 40, sene = 1891
 ```
+
+<img width='400' src='stat_coal_04.jpg'/>
+
+Elde edilen sonuçlar yorum bakımından tamamen aynıdır: değişim noktası
+için ardıl dağılım yaklaşık olarak 1891 yılına karşılık gelir;
+$\theta$ ve $\lambda$ için ardıl ortalamalar sırasıyla yaklaşık 3.06
+ve 0.92 olarak bulunmuştur. Bu sonuçlar, el ile yazılmış Gibbs
+örnekleyicisinde elde edilen klasik kömür madeni kazası analizi
+sonuçlarıyla örtüşmektedir.
+
+Fark esasen uygulamadadır: PyMC modeli aynı Bayesyen yapıyı çok daha
+kısa, okunabilir bir şekilde ifade eder; örnekleme, yakınsama tanısı
+ve ardıl tahmin (posterior predictive) işlemleri ise otomatik olarak
+ve güvenilir biçimde yürütülür.
 
 ![](stat_coal_01.jpg)
 
