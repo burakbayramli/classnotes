@@ -169,6 +169,31 @@ ve parametreleri kullanıyor olacaklar.
 
 ### PyMC
 
+Programcıları üstte tarif edilen hesapsal yükten kurtarmaya uğraşan ve
+yapılan hesapların daha rahat programlanmasını sağlayan paketler
+var. Bu paketler onsel / sonsal rasgele değişkenlerin tanımlanmasını
+neredeyse tanımsal (declaratıve) konuma getirerek alt seviye kodlama
+detaylarını perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi
+hesapların çabuk gerçekleştirilmesini sağlıyorlar. Bu paketler
+sayesinde istenildiği kadar rasgele değişken bağlantısı yaratlım,
+çözücü kodlar sonsal dağılımdan örneklem alabiliyor. Bu tür paketler
+getirdikleri rahatlık sayesinde neredeyse bir dil yaratmış oldular, ve
+böylece terminolojiye yeni bir terim katıldı: olasılıksal programlama
+(proabılıştic programming).
+
+Bir örnek üzerinde görelim [7, sf. 8]. Standart istatistik
+örneklerinden bilindiği gibi arda atılan madeni paranın yazı mı tura
+mı geleceği Binom dağılımı ile temsil edilebilir. Eğer madeni paranın
+yanlılığı yok ise (her iki seçenek eşit ihtimalde) bunu $X \sim Bin(N,p)$
+ile gösterebiliriz, ki $X$ rasgele değişken yoğunluğu
+
+$$
+P(X = k) = {N \choose k} p^k (1-p)^{N-k}
+$$
+
+Burada $N$ tane deney içinde $k$ tane başarı elde etmeninin olasılık
+yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise $p=0.5$. 
+
 ```python
 import pymc as pm, scipy.stats as stats
 import pandas as pd
@@ -337,3 +362,5 @@ Kaynaklar
 [5] Bayramli, Istatistik, *Değişim Noktası Analizi (Changepoint Analysis)*
 
 [6] Stevyers, *Computational Statistics with Matlab*
+
+[7] Kumar, Bayesian Modeling and Computation in Python
