@@ -314,9 +314,10 @@ print (durations_B[:8])
 `std` bunu hemen gösterirdi), veriyi ona göre ürettik. Şimdi acaba
 birazdan göreceğimiz t-testi bu farkı yakalayabilecek mi?
 
+Verileri birlestirip (`np.r_` ile) bu birlesik verinin ortalama ve
+standart sapmasini hesapliyoruz. 
 
 ```python
-# Pool the data for priors
 pooled_mean = np.r_[durations_A, durations_B].mean()
 pooled_std = np.r_[durations_A, durations_B].std()
 
