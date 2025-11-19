@@ -236,7 +236,10 @@ p(a,b|y_{1},...,y_{N}) \propto p(y_{1},...,y_{N}|a,b)
 <p>Bu sonsal dağılımın fonksiyonel biçiminin neye benzediğini görmek
 için açılımı yapalım,</p>
 <p><span class="math display">\[p(a,b|y_{1},...,y_{N}) \propto
-(\prod_{i}ba^{-b}y_{i}^{b-1}e^{-(\frac{y_{i}}{a})^{b}}I_{(0,inf)}(y_{i}))\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}}
+\left(
+   \prod_{i}ba^{-b}y_{i}^{b-1}e^{-(\frac{y_{i}}{a})^{b}}I_{(0,inf)}(y_{i})
+\right)
+\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}}
 \frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}
 \]</span></p>
 <p>Bu ifade analitik tekniklere uygun değildir.</p>
@@ -248,50 +251,85 @@ iptal etmezler mi?”. Farklı Bayes modellerinin farklı sabit edicileri
 var ise, iptal mümkün olmaz. Örnek olarak <span
 class="math inline">\(M1\)</span> ve <span
 class="math inline">\(M2\)</span> modelleri var ise, bir entegral <span
-class="math inline">\(\int P_{M1}(\text{veri} \mid \theta)
-P(\theta)d\theta\)</span> digeri <span class="math inline">\(\int
-P_{M2}(\text{veri} \mid \theta) P(\theta)d\theta\)</span> olur, bu
+class="math inline">\(\int P_{a}(\text{veri} \mid \theta)
+P_b(\theta)d\theta\)</span> digeri <span class="math inline">\(\int
+P_{c}(\text{veri} \mid \theta) P_d(\theta)d\theta\)</span> olabilir, bu
 hesaplar farklı sonuçlar verecektir çünkü farklı yoğunluk fonksiyonları
-ve parametreleri kullanıyor olacaklar.</p>
+ve parametreleri kullanıyor olurlar.</p>
 <h3 id="pymc">PyMC</h3>
 <p>Programcıları üstte tarif edilen hesapsal yükten kurtarmaya uğraşan
-ve yapılan hesapların daha rahat programlanmasını sağlayan paketler var.
-Bu paketler onsel / sonsal rasgele değişkenlerin tanımlanmasını
-neredeyse tanımsal (declaratıve) konuma getirerek alt seviye kodlama
-detaylarını perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi
-hesapların çabuk gerçekleştirilmesini sağlıyorlar. Bu paketler sayesinde
-istenildiği kadar rasgele değişken bağlantısı yaratlım, çözücü kodlar
-sonsal dağılımdan örneklem alabiliyor. Bu tür paketler getirdikleri
-rahatlık sayesinde neredeyse bir dil yaratmış oldular, ve böylece
-terminolojiye yeni bir terim katıldı: olasılıksal programlama
-(proabılıştic programming).</p>
-<p>Bir ornek uzerinde gorelim [7, sf. 8]. Standart istatistik
-orneklerinden bilindigi gibi arda atilan madeni paranin yazi mi tura mi
-gelecegi Binom dagilimi ile temsil edilebilir. Eger madeni paranin
-yanliligi yok ise (her iki secenek esit ihtimalde) bunu <span
-class="math inline">\(X \sim Bin(N,p)\)</span> ile gosterebiliriz, ki
-<span class="math inline">\(X\)</span> rasgele degisken yogunlugu</p>
+ve hesapların daha rahat programlanmasını sağlayan paketler var. Bu
+paketler önsel / sonsal rasgele değişkenlerin tanımlanmasını neredeyse
+tanımsal (declarative) hale getirerek alt seviye kodlama detaylarını
+perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi hesapların çabuk
+gerçekleştirilmesini sağlıyorlar. Bu paketler sayesinde istenildiği
+kadar rasgele değişken bağlantısı yaratalım, çözücü kodlar sonsal
+dağılımdan örneklem alabiliyor. Bu tür paketler getirdikleri rahatlık
+sayesinde neredeyse bir dil yaratmış oluyorlar, ve bazıları
+terminolojiye yeni bir terim ekliyor: olasılıksal programlama
+(probabilistic programming).</p>
+<p>Bir örnek üzerinde görelim [7, sf. 8]. Standart istatistik
+örneklerinden bilindiği gibi arda atılan madeni paranın yazı mı tura mı
+geleceği Binom dağılımı ile temsil edilebilir. Eğer madeni paranın
+yanlılığı yok ise (her iki seçenek eşit ihtimalde) bunu <span
+class="math inline">\(X \sim Bin(N,p)\)</span> ile gösterebiliriz, ki
+<span class="math inline">\(X\)</span> rasgele değişken yoğunluğu</p>
 <p><span class="math display">\[
-P(X = k) = {N \choose k}
+P(X = k) = {N \choose k} p^k (1-p)^{N-k}
 \]</span></p>
+<p>Burada <span class="math inline">\(N\)</span> tane deney içinde <span
+class="math inline">\(k\)</span> tane başarı elde etmeninin olasılık
+yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise <span
+class="math inline">\(p=0.5\)</span>, var ise mesela <span
+class="math inline">\(p = 0.7\)</span>. Eğer yoğunluğu verilen ve
+bilinen <span class="math inline">\(p\)</span> yoğunluğundan rasgele
+örneklem toplamak istesek bunu yapabilirdik, yaygın kullanılan
+kütüphanelerde bile böyle kodlar mevcuttur.</p>
+<p>Eğer <span class="math inline">\(p\)</span> bilinmiyor olsaydı ve
+elde deney verisi olsaydı, bilinmeyen <span
+class="math inline">\(p\)</span>’yi bu veriden kestirmenin de yöntemleri
+mevcuttur.</p>
+<p>Modeli daha çetrefilleştirebilirdik. <span
+class="math inline">\(p\)</span>’nin bilinip bilinmedigi bir yana, onu
+tek bir sayı ile değil, <em>bir rasgele değişken</em>, mesela <span
+class="math inline">\(\theta\)</span> üzerinden tanımlıyor olabilirdik.
+Bu durumda,</p>
+<p><span class="math display">\[
+\theta \sim Beta(\alpha, \beta)
+\]</span></p>
+<p><span class="math display">\[
+Y \sim Bin(n = 1, p = \theta)
+\]</span></p>
+<p>Şimdi rasgele örneklem üretmek iki aşamalı oldu, önce bir Beta
+dağılımından örneklem alınacak, sonra bu alınan değer Bin dağılımından
+örneklem için kullanılacak.</p>
+<p>PyMC kodları burada devreye giriyor, Bayes yaklaşımı ile iki katmanlı
+bir yapı oluşturduk, bir rasgele değişken diğerine bağlı, ve biz mevcut
+veriyi de hesaba katan bir sonral dağılım <span
+class="math inline">\(\theta\)</span>’dan örneklem alabiliriz.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm, scipy.stats <span class="im">as</span> stats</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> stats.bernoulli(<span class="fl">0.7</span>).rvs(<span class="dv">20</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     theta <span class="op">=</span> pm.Beta(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span><span class="dv">1</span>, beta<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>     y_obs <span class="op">=</span> pm.Binomial(<span class="st">&quot;eta_obs&quot;</span>, n<span class="op">=</span><span class="dv">1</span>, p<span class="op">=</span>theta, observed<span class="op">=</span>Y)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>     idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, return_inferencedata<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     theta <span class="op">=</span> pm.Beta(<span class="st">&quot;theta&quot;</span>, alpha<span class="op">=</span><span class="dv">1</span>, beta<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     y_obs <span class="op">=</span> pm.Binomial(<span class="st">&quot;eta_obs&quot;</span>, n<span class="op">=</span><span class="dv">1</span>, p<span class="op">=</span>theta, observed<span class="op">=</span>Y)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>     idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, return_inferencedata<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>theta_post <span class="op">=</span> np.array(idata.posterior[<span class="st">&#39;theta&#39;</span>])</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.mean(theta_post))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.hist(theta_post[<span class="dv">0</span>],bins<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_023_bsts_03.jpg&#39;</span>)</span></code></pre></div>
-<pre class="text"><code>0.5952869333604922</code></pre>
-<p><img src="tser_023_bsts_03.jpg" /></p>
+<pre class="text"><code>0.7246428574887125</code></pre>
+<p><img width='300' src='tser_023_bsts_03.jpg'/></p>
+<p>Görüldüğü gibi 0.7 odaklı yanlı veriyi modele verince kodlar bunun
+sonsal <span class="math inline">\(\theta\)</span> dağılımına
+yansımasını saptadı, ortalama 0.72 çıktı. Ayrıca tek bir sayı değil,
+bütün bir dağılımı sonuç olarak aldığımız için çok daha çetrefil
+analizleri bu sonuçtan alabiliriz.</p>
+<p>Katmanlar alttaki gibi,</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>graphviz <span class="op">=</span> pm.model_to_graphviz(model)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>graphviz.graph_attr.update(dpi<span class="op">=</span><span class="st">&quot;300&quot;</span>)</span>
@@ -299,6 +337,20 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <pre class="text"><code>Out[1]: &#39;tser_023_bsts_02.jpg&#39;</code></pre>
 <p><img width="200px" src="tser_023_bsts_02.jpg"></p>
 <h3 id="t-testi">T-Testi</h3>
+<p>Bayeşçi yaklaşımın farkını üstteki örnekte görmeye başladık.
+Parametreler hatta veri bile bir anlamda bir rasgele değişken haline
+gelebiliyordu. Bu yaklaşım istatistiki analizin tüm yelpazesini etkiler,
+mesela hipotez testi kavramı da Bayeşçi bağlamda yenilenebilir. Standart
+müfredatta iyi bilinen t-testini örnek alalım mesela. Bu test örneklem
+ortalamasının önceden tanımlı bir değerden sapma durumunu kontrol eder.
+Bu testin Bayeşçi versiyonu Krusçke tarafından bulunmuştur, ona BEST
+(Bayesian Estimation Süpersedes the t-test) adını vermiştir [1].</p>
+<p>Mesela iki grubu birbiriyle karşılaştırıyoruz, pazarlamacıların iyi
+bildiği bir A/B testi yapmamız gerekiyor. Test edilen iki Web sayfası
+olabilir, ve kullanıcıların her sayfada ne kadar kaldığı verisi iki ayrı
+grupta. Merak ettiğimiz kullanıcıların hangi sayfada daha fazla kaldığı,
+A sayfasında mı, B sayfasında mı?</p>
+<p>Suni veri yaratalım, veri Gaussian bazlı olsun,</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">250</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mu_A, std_A <span class="op">=</span> <span class="dv">30</span>, <span class="dv">4</span></span>
@@ -309,10 +361,14 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (durations_A[:<span class="dv">8</span>])</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (durations_B[:<span class="dv">8</span>])</span></code></pre></div>
-<pre class="text"><code>[24.16407223 26.33809627 26.02574579 33.21505722 28.50448144 26.99996422
- 30.76649221 30.59385573]
-[35.63522369 24.06562288 30.18425953 22.17136243 32.47047614 32.74779037
- 33.07401654 34.0171137 ]</code></pre>
+<pre class="text"><code>[30.09406244 36.43862561 38.55121675 22.88904474 25.18860278 25.58463466
+ 26.26095514 29.65196647]
+[24.03905003 21.69379493 29.05057681 31.08319069 32.84439179 26.36658114
+ 23.38477673 27.86670832]</code></pre>
+<p>İki farklı grubun farklı ortalaması, ve standart sapması var
+(<code>mean</code>, <code>std</code> bunu hemen gösterirdi), veriyi ona
+göre ürettik. Şimdi acaba birazdan göreceğimiz t-testi bu farkı
+yakalayabilecek mi?</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pool the data for priors</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pooled_mean <span class="op">=</span> np.r_[durations_A, durations_B].mean()</span>

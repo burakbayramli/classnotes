@@ -151,7 +151,10 @@ $$
 Bu sonsal dağılımın fonksiyonel biçiminin neye benzediğini görmek için açılımı yapalım,
 
 $$p(a,b|y_{1},...,y_{N}) \propto
-(\prod_{i}ba^{-b}y_{i}^{b-1}e^{-(\frac{y_{i}}{a})^{b}}I_{(0,inf)}(y_{i}))\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}} \frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}
+\left(
+   \prod_{i}ba^{-b}y_{i}^{b-1}e^{-(\frac{y_{i}}{a})^{b}}I_{(0,inf)}(y_{i})
+\right)
+\frac{1}{\lambda_{a}}e^{-\frac{a}{\lambda_{a}}} \frac{1}{\lambda_{b}}e^{-\frac{b}{\lambda_{b}}}
 $$ 
 
 Bu ifade analitik tekniklere uygun değildir.
@@ -162,24 +165,24 @@ karşılaştırılması gerektiğinde ekstra hesap şart. "Ama hem bölen hem
 bölünende aynı büyüklük / normalize edici sabit var ise birbirlerini
 iptal etmezler mi?". Farklı Bayes modellerinin farklı sabit edicileri
 var ise, iptal mümkün olmaz. Örnek olarak $M1$ ve $M2$ modelleri var
-ise, bir entegral $\int P_{M1}(\text{veri} \mid \theta) P(\theta)d\theta$
-digeri $\int P_{M2}(\text{veri} \mid \theta) P(\theta)d\theta$ olur, bu
+ise, bir entegral $\int P_{a}(\text{veri} \mid \theta) P_b(\theta)d\theta$
+digeri $\int P_{c}(\text{veri} \mid \theta) P_d(\theta)d\theta$ olabilir, bu
 hesaplar farklı sonuçlar verecektir çünkü farklı yoğunluk fonksiyonları
-ve parametreleri kullanıyor olacaklar. 
+ve parametreleri kullanıyor olurlar. 
 
 ### PyMC
 
 Programcıları üstte tarif edilen hesapsal yükten kurtarmaya uğraşan ve
-yapılan hesapların daha rahat programlanmasını sağlayan paketler
-var. Bu paketler onsel / sonsal rasgele değişkenlerin tanımlanmasını
-neredeyse tanımsal (declaratıve) konuma getirerek alt seviye kodlama
-detaylarını perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi
-hesapların çabuk gerçekleştirilmesini sağlıyorlar. Bu paketler
-sayesinde istenildiği kadar rasgele değişken bağlantısı yaratlım,
-çözücü kodlar sonsal dağılımdan örneklem alabiliyor. Bu tür paketler
-getirdikleri rahatlık sayesinde neredeyse bir dil yaratmış oldular, ve
-böylece terminolojiye yeni bir terim katıldı: olasılıksal programlama
-(proabılıştic programming).
+hesapların daha rahat programlanmasını sağlayan paketler var. Bu
+paketler önsel / sonsal rasgele değişkenlerin tanımlanmasını neredeyse
+tanımsal (declarative) hale getirerek alt seviye kodlama detaylarını
+perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi hesapların çabuk
+gerçekleştirilmesini sağlıyorlar. Bu paketler sayesinde istenildiği
+kadar rasgele değişken bağlantısı yaratalım, çözücü kodlar sonsal
+dağılımdan örneklem alabiliyor. Bu tür paketler getirdikleri rahatlık
+sayesinde neredeyse bir dil yaratmış oluyorlar, ve bazıları
+terminolojiye yeni bir terim ekliyor: olasılıksal programlama
+(probabilistic programming).
 
 Bir örnek üzerinde görelim [7, sf. 8]. Standart istatistik
 örneklerinden bilindiği gibi arda atılan madeni paranın yazı mı tura
@@ -192,18 +195,43 @@ P(X = k) = {N \choose k} p^k (1-p)^{N-k}
 $$
 
 Burada $N$ tane deney içinde $k$ tane başarı elde etmeninin olasılık
-yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise $p=0.5$. 
+yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise $p=0.5$, var
+ise mesela $p = 0.7$.  Eğer yoğunluğu verilen ve bilinen $p$
+yoğunluğundan rasgele örneklem toplamak istesek bunu yapabilirdik,
+yaygın kullanılan kütüphanelerde bile böyle kodlar mevcuttur.
+
+Eğer $p$ bilinmiyor olsaydı ve elde deney verisi olsaydı, bilinmeyen
+$p$'yi bu veriden kestirmenin de yöntemleri mevcuttur.
+
+Modeli daha çetrefilleştirebilirdik. $p$'nin bilinip bilinmedigi bir
+yana, onu tek bir sayı ile değil, *bir rasgele değişken*, mesela
+$\theta$ üzerinden tanımlıyor olabilirdik. Bu durumda,
+
+$$
+\theta \sim Beta(\alpha, \beta)
+$$
+
+$$
+Y \sim Bin(n = 1, p = \theta)
+$$
+
+Şimdi rasgele örneklem üretmek iki aşamalı oldu, önce bir Beta
+dağılımından örneklem alınacak, sonra bu alınan değer Bin dağılımından
+örneklem için kullanılacak.
+
+PyMC kodları burada devreye giriyor, Bayes yaklaşımı ile iki katmanlı
+bir yapı oluşturduk, bir rasgele değişken diğerine bağlı, ve biz
+mevcut veriyi de hesaba katan bir sonral dağılım $\theta$'dan örneklem
+alabiliriz.
 
 ```python
 import pymc as pm, scipy.stats as stats
 import pandas as pd
 ```
 
-
 ```python
 Y = stats.bernoulli(0.7).rvs(20)
 
-theta = 0.5
 with pm.Model() as model:
      theta = pm.Beta("theta", alpha=1, beta=1)
      y_obs = pm.Binomial("eta_obs", n=1, p=theta, observed=Y)
@@ -218,10 +246,17 @@ plt.savefig('tser_023_bsts_03.jpg')
 ```
 
 ```text
-0.5952869333604922
+0.7246428574887125
 ```
 
-![](tser_023_bsts_03.jpg)
+<img width='300' src='tser_023_bsts_03.jpg'/>
+
+Görüldüğü gibi 0.7 odaklı yanlı veriyi modele verince kodlar bunun
+sonsal $\theta$ dağılımına yansımasını saptadı, ortalama 0.72
+çıktı. Ayrıca tek bir sayı değil, bütün bir dağılımı sonuç olarak
+aldığımız için çok daha çetrefil analizleri bu sonuçtan alabiliriz.
+
+Katmanlar alttaki gibi,
 
 ```python
 graphviz = pm.model_to_graphviz(model)
@@ -235,9 +270,25 @@ Out[1]: 'tser_023_bsts_02.jpg'
 
 <img width="200px" src="tser_023_bsts_02.jpg">
 
-
-
 ### T-Testi
+
+Bayeşçi yaklaşımın farkını üstteki örnekte görmeye
+başladık. Parametreler hatta veri bile bir anlamda bir rasgele
+değişken haline gelebiliyordu. Bu yaklaşım istatistiki analizin tüm
+yelpazesini etkiler, mesela hipotez testi kavramı da Bayeşçi bağlamda
+yenilenebilir. Standart müfredatta iyi bilinen t-testini örnek alalım
+mesela. Bu test örneklem ortalamasının önceden tanımlı bir değerden
+sapma durumunu kontrol eder. Bu testin Bayeşçi versiyonu Krusçke
+tarafından bulunmuştur, ona BEST (Bayesian Estimation Süpersedes the
+t-test) adını vermiştir [1].
+
+Mesela iki grubu birbiriyle karşılaştırıyoruz, pazarlamacıların iyi
+bildiği bir A/B testi yapmamız gerekiyor. Test edilen iki Web sayfası
+olabilir, ve kullanıcıların her sayfada ne kadar kaldığı verisi iki
+ayrı grupta. Merak ettiğimiz kullanıcıların hangi sayfada daha fazla
+kaldığı, A sayfasında mı, B sayfasında mı?
+
+Suni veri yaratalım, veri Gaussian bazlı olsun, 
 
 
 ```python
@@ -253,11 +304,16 @@ print (durations_B[:8])
 ```
 
 ```text
-[24.16407223 26.33809627 26.02574579 33.21505722 28.50448144 26.99996422
- 30.76649221 30.59385573]
-[35.63522369 24.06562288 30.18425953 22.17136243 32.47047614 32.74779037
- 33.07401654 34.0171137 ]
+[30.09406244 36.43862561 38.55121675 22.88904474 25.18860278 25.58463466
+ 26.26095514 29.65196647]
+[24.03905003 21.69379493 29.05057681 31.08319069 32.84439179 26.36658114
+ 23.38477673 27.86670832]
 ```
+
+İki farklı grubun farklı ortalaması, ve standart sapması var (`mean`,
+`std` bunu hemen gösterirdi), veriyi ona göre ürettik. Şimdi acaba
+birazdan göreceğimiz t-testi bu farkı yakalayabilecek mi?
+
 
 ```python
 # Pool the data for priors
