@@ -334,12 +334,38 @@ rasgele $\theta$ üret, sonra bu $\theta$ ile Binom üretimi yap".
 
 O zaman ziyaret zamanlarını iki ayrı Student-T dağılımından
 "ürettiğimizi" düşünelim. Bu dağılımlara gereken parametreler
-$\mu,\sigma,\nu$. Bayeşçi yaklaşımda $\mu_A,\sigma_A,\mu_A$,..
-değişkenlerinin de dağılımları var, $\mu_A,\mu_B$ Gaussian dağılımı
-olsun (başlangıç değerleri `pooled_mean`), $\sigma_A,\sigma_B$
-birörnek dağılımdan gelsin, ve `pooled_std`'yi temel alsın, ve oldukca
-geniş bir değer yelpazesini tanımlasın, fazla kısıtlama yapmaya gerek
-yok.
+$\mu,\sigma,\nu$ iki dağılım için $\mu_A,\sigma_A,\mu_A$,.. diye
+giderler. Bayesçi yaklaşımda bu değişkenlerin de dağılımları var,
+$\mu_A,\mu_B$ Gaussian dağılımı olsun (başlangıç değerleri
+`pooled_mean`), $\sigma_A,\sigma_B$ birörnek dağılımdan gelsin, ve
+`pooled_std`'yi temel alsın, ve oldukça geniş bir değer yelpazesini
+tanımlasın, fazla kısıtlama yapmaya gerek yok.
+
+$\nu_A,\nu_B$ için dikkat edilirse farklı bir önsel (prior) dağılım
+tanımladık, üstel (exponential) dağılım. Bunun sebebi $\nu$
+parametresinin Student-T üzerinde logaritmik skalada bir etki
+yaratmasıdır, kabaca $\nu = 1-10$ değerleri Student-T dağılımında
+"kabarık eteklere" tekabül eder, $\nu = 10-30$ arasında etekler
+ortalama olur, $\nu > 30$ ile dağılım Gaussian'a benzemeye başlar.
+Görüldüğü gibi bu aralıklar eşit bölünmüş değildir, bir logaritmik
+durum var. Bu sebeple eğer Student-T için birörnek'imsi bir önsel
+tanım yapmak istiyorsak bunu üstel dağılım üzerinden yapmamız gerekir.
+$\lambda = 1/29$ ile $\nu-1 = 29$ olur, ya da $\nu = 30$. Böylece
+Gaussian'a benzeyen Student-T ($\nu \ge 30$) ile etekleri daha kabarık
+bir Gaussian'imsi dağılım ($\nu < 30$) arasında bir denge kurmuş
+oluyoruz.
+
+Ve nihai analiz için gerekecek son tanım: analiz bize $\mu_A$ ve
+$\mu_B$ sonsal dağılımlarını verecek. Peki bu dağılımlardan hangisi
+"daha büyük". Bu hesabın kolay yolu var, bir dağılımı diğerinden
+çıkartırız. Ama bu çıkartma işlemini de PyMC üzerinden yapmamız
+gerekiyor, bir `Deterministic` değişken içinde iki dağılımın farkını
+$\mu_A - \mu_B$ hesaplatırız, böylece bu çıkartma işlemi simülasyonun
+parçası haline gelir, ve sonuç, ki o da bir rasgele değişkendir, en
+sonda alinip grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
+tamamı sıfır değerinin sağında oluyor ise (hep pozitif değerler) o
+zaman A dağılımından gelen değerler B sayfasındaki değerlerden
+büyüktür, yani A sayfasında daha fazla zaman geçirilmiştir.
 
 ```python
 # Build the model in modern PyMC
@@ -420,10 +446,10 @@ plt.savefig('stat_047_bayes_01.jpg')
 
 ![](stat_047_bayes_01.jpg)
 
-
-
-
-[devam edecek]
+Sonuç gösteriyor ki dağılımdaki değerler sıfırın sağında, yani
+kullanıcılar A sayfasında daha fazla zaman geçirmiş. Zaten suni
+yarattığımız rasgele veride bunun böyle olduğunu biliyorduk,
+analiz ile doğrulanması iyi oldu.
 
 Kaynaklar
 

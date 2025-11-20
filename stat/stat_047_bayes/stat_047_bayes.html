@@ -386,14 +386,45 @@ class="math inline">\(\theta\)</span> üret, sonra bu <span
 class="math inline">\(\theta\)</span> ile Binom üretimi yap”.</p>
 <p>O zaman ziyaret zamanlarını iki ayrı Student-T dağılımından
 “ürettiğimizi” düşünelim. Bu dağılımlara gereken parametreler <span
-class="math inline">\(\mu,\sigma,\nu\)</span>. Bayeşçi yaklaşımda <span
-class="math inline">\(\mu_A,\sigma_A,\mu_A\)</span>,.. değişkenlerinin
-de dağılımları var, <span class="math inline">\(\mu_A,\mu_B\)</span>
-Gaussian dağılımı olsun (başlangıç değerleri <code>pooled_mean</code>),
-<span class="math inline">\(\sigma_A,\sigma_B\)</span> birörnek
-dağılımdan gelsin, ve <code>pooled_std</code>’yi temel alsın, ve oldukca
-geniş bir değer yelpazesini tanımlasın, fazla kısıtlama yapmaya gerek
-yok.</p>
+class="math inline">\(\mu,\sigma,\nu\)</span> iki dağılım için <span
+class="math inline">\(\mu_A,\sigma_A,\mu_A\)</span>,.. diye giderler.
+Bayesçi yaklaşımda bu değişkenlerin de dağılımları var, <span
+class="math inline">\(\mu_A,\mu_B\)</span> Gaussian dağılımı olsun
+(başlangıç değerleri <code>pooled_mean</code>), <span
+class="math inline">\(\sigma_A,\sigma_B\)</span> birörnek dağılımdan
+gelsin, ve <code>pooled_std</code>’yi temel alsın, ve oldukça geniş bir
+değer yelpazesini tanımlasın, fazla kısıtlama yapmaya gerek yok.</p>
+<p><span class="math inline">\(\nu_A,\nu_B\)</span> için dikkat edilirse
+farklı bir önsel (prior) dağılım tanımladık, üstel (exponential)
+dağılım. Bunun sebebi <span class="math inline">\(\nu\)</span>
+parametresinin Student-T üzerinde logaritmik skalada bir etki
+yaratmasıdır, kabaca <span class="math inline">\(\nu = 1-10\)</span>
+değerleri Student-T dağılımında “kabarık eteklere” tekabül eder, <span
+class="math inline">\(\nu = 10-30\)</span> arasında etekler ortalama
+olur, <span class="math inline">\(\nu &gt; 30\)</span> ile dağılım
+Gaussian’a benzemeye başlar. Görüldüğü gibi bu aralıklar eşit bölünmüş
+değildir, bir logaritmik durum var. Bu sebeple eğer Student-T için
+birörnek’imsi bir önsel tanım yapmak istiyorsak bunu üstel dağılım
+üzerinden yapmamız gerekir. <span class="math inline">\(\lambda =
+1/29\)</span> ile <span class="math inline">\(\nu-1 = 29\)</span> olur,
+ya da <span class="math inline">\(\nu = 30\)</span>. Böylece Gaussian’a
+benzeyen Student-T (<span class="math inline">\(\nu \ge 30\)</span>) ile
+etekleri daha kabarık bir Gaussian’imsi dağılım (<span
+class="math inline">\(\nu &lt; 30\)</span>) arasında bir denge kurmuş
+oluyoruz.</p>
+<p>Ve nihai analiz için gerekecek son tanım: analiz bize <span
+class="math inline">\(\mu_A\)</span> ve <span
+class="math inline">\(\mu_B\)</span> sonsal dağılımlarını verecek. Peki
+bu dağılımlardan hangisi “daha büyük”. Bu hesabın kolay yolu var, bir
+dağılımı diğerinden çıkartırız. Ama bu çıkartma işlemini de PyMC
+üzerinden yapmamız gerekiyor, bir <code>Deterministic</code> değişken
+içinde iki dağılımın farkını <span class="math inline">\(\mu_A -
+\mu_B\)</span> hesaplatırız, böylece bu çıkartma işlemi simülasyonun
+parçası haline gelir, ve sonuç, ki o da bir rasgele değişkendir, en
+sonda alinip grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
+tamamı sıfır değerinin sağında oluyor ise (hep pozitif değerler) o zaman
+A dağılımından gelen değerler B sayfasındaki değerlerden büyüktür, yani
+A sayfasında daha fazla zaman geçirilmiştir.</p>
 <div class="sourceCode" id="cb10"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the model in modern PyMC</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
@@ -456,7 +487,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_047_bayes_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_047_bayes_01.jpg" /></p>
-<p>[devam edecek]</p>
+<p>Sonuç gösteriyor ki dağılımdaki değerler sıfırın sağında, yani
+kullanıcılar A sayfasında daha fazla zaman geçirmiş. Zaten suni
+yarattığımız rasgele veride bunun böyle olduğunu biliyorduk, analiz ile
+doğrulanması iyi oldu.</p>
 <p>Kaynaklar</p>
 <p>[1] Kruschke, <em>Bayesian Estimation Supersedes the t Test</em></p>
 <p>[2] Pillon, <em>Bayesian Method for Hackers</em></p>
