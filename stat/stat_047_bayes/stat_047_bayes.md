@@ -272,24 +272,24 @@ Out[1]: 'tser_023_bsts_02.jpg'
 
 ### T-Testi
 
-Bayeşçi yaklaşımın farkını üstteki örnekte görmeye
-başladık. Parametreler hatta veri bile bir anlamda bir rasgele
-değişken haline gelebiliyordu. Bu yaklaşım istatistiki analizin tüm
-yelpazesini etkiler, mesela hipotez testi kavramı da Bayeşçi bağlamda
-yenilenebilir. Standart müfredatta iyi bilinen t-testini örnek alalım
-mesela. Bu test örneklem ortalamasının önceden tanımlı bir değerden
-sapma durumunu kontrol eder. Bu testin Bayeşçi versiyonu Krusçke
-tarafından bulunmuştur, ona BEST (Bayesian Estimation Süpersedes the
-t-test) adını vermiştir [1].
+Bayesçi yaklaşımın farkını üstteki örnekte görmeye
+başladık. Parametreler hatta veri bile bir rasgele değişken haline
+gelebiliyordu.  Bu yaklaşım istatistiki analizin tüm alanlarında fark
+yaratabilir, mesela hipotez testi kavramına da Bayesci sekilde
+yaklasabiliriz. Standart müfredatta iyi bilinen t-testini örnek
+alalım, bu test örneklem ortalamasının önceden tanımlı bir değerden
+sapma durumunu kontrol eder. T-testinin Bayes versiyonu Kruscke
+tarafından bulunmuştur, BEST (Bayesian Estimation Supersedes the
+t-test) yontemi [1].
 
-Mesela iki grubu birbiriyle karşılaştırıyoruz, pazarlamacıların iyi
-bildiği bir A/B testi yapmamız gerekiyor. Test edilen iki Web sayfası
-olabilir, ve kullanıcıların her sayfada ne kadar kaldığı verisi iki
-ayrı grupta. Merak ettiğimiz kullanıcıların hangi sayfada daha fazla
-kaldığı, A sayfasında mı, B sayfasında mı?
+Diyelim ki iki grubu birbiriyle karşılaştırıyoruz, pazarlamacıların
+iyi bildiği bir A/B testi gerçekleştirmemiz gerekiyor. Test edilen iki
+Web sayfası olabilir, ve kullanıcıların her sayfada ne kadar kaldığı
+verisi iki ayrı grupta kaydedilmiş olsun. Merak ettiğimiz
+kullanıcıların hangi sayfada daha fazla kaldığı, A sayfasında mı, B
+sayfasında mı?
 
 Suni veri yaratalım, veri Gaussian bazlı olsun, 
-
 
 ```python
 N = 250
@@ -311,16 +311,37 @@ print (durations_B[:8])
 ```
 
 İki farklı grubun farklı ortalaması, ve standart sapması var (`mean`,
-`std` bunu hemen gösterirdi), veriyi ona göre ürettik. Şimdi acaba
-birazdan göreceğimiz t-testi bu farkı yakalayabilecek mi?
+`std` bunu hemen gösterirdi), veriyi ona göre ürettik. Doğal olarak
+bir sayfadaki (A) kullanıcı zamanı diğerinden (B) daha fazla. Şimdi
+acaba birazdan göreceğimiz t-testi bu farkı yakalayabilecek mi?
 
-Verileri birlestirip (`np.r_` ile) bu birlesik verinin ortalama ve
-standart sapmasini hesapliyoruz. 
+Verileri `np.r_` ile birleştirip bu birleşik verinin ortalama ve
+standart sapmasını hesaplıyoruz.
 
 ```python
 pooled_mean = np.r_[durations_A, durations_B].mean()
 pooled_std = np.r_[durations_A, durations_B].std()
+```
 
+Bunu yapmamızın sebebi analize verilecek başlangıç değeri olarak
+kabaca bir değeri saptamak. Şimdi modelin geri kalanını ortaya
+çıkartalım.
+
+Bayes veri analizi değişken bağlantılarını düşünürken iyi bir yöntem
+şudur, "acaba bu veriyi nasıl üretirdim" diye düşünmek. Mesela
+$\theta$ ile tanımlı madeni para atışlarında adımlar şöyledir, "önce
+rasgele $\theta$ üret, sonra bu $\theta$ ile Binom üretimi yap".
+
+O zaman ziyaret zamanlarını iki ayrı Student-T dağılımından
+"ürettiğimizi" düşünelim. Bu dağılımlara gereken parametreler
+$\mu,\sigma,\nu$. Bayeşçi yaklaşımda $\mu_A,\sigma_A,\mu_A$,..
+değişkenlerinin de dağılımları var, $\mu_A,\mu_B$ Gaussian dağılımı
+olsun (başlangıç değerleri `pooled_mean`), $\sigma_A,\sigma_B$
+birörnek dağılımdan gelsin, ve `pooled_std`'yi temel alsın, ve oldukca
+geniş bir değer yelpazesini tanımlasın, fazla kısıtlama yapmaya gerek
+yok.
+
+```python
 # Build the model in modern PyMC
 with pm.Model() as model:
     # Priors
