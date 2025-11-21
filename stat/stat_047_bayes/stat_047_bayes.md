@@ -30,7 +30,7 @@ eden, sonsal dağılım olan $P(\theta \mid \text{veri})$ bulunur. Bu,
 fazla parametreniz varsa, muhtemelen çok değişkenli bir dağılım. Sağ
 tarafta, olurluk olan $P(\text{veri} \mid \theta)$ bulunur. Bu miktar,
 En Yüksek Olurluk Tahmini (MLE) yaklaşımındaki ile aynıdır. Evet,
-Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk bulunur,
+Bayesçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk bulunur,
 bu da sonuçların genellikle neden çok farklı olmadığını büyük ölçüde
 açıklar. Olurluk, $\theta$ ile parametrelendirilmiş bir model
 verildiğinde, verinizdeki bilginin olasılığını gösterir. Dikkat,
@@ -175,9 +175,9 @@ olurlar.
 
 Programcıları üstte tarif edilen hesapsal yükten kurtarmaya uğraşan ve
 hesapların daha rahat programlanmasını sağlayan paketler var. Bu
-paketler önsel / sonsal rasgele değişkenlerin tanımlanmasını neredeyse
+paketler önsel / sonsal rasgele değişkenlerin kodlanmasını neredeyse
 tanımsal (declarative) hale getirerek alt seviye kodlama detaylarını
-perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi hesapların çabuk
+perde arkasına itebiliyorlar, ve bu şekilde Bayesçi hesapların çabuk
 gerçekleştirilmesini sağlıyorlar. Bu paketler sayesinde istenildiği
 kadar rasgele değişken bağlantısı yaratalım, çözücü kodlar sonsal
 dağılımdan örneklem alabiliyor. Bu tür paketler getirdikleri rahatlık
@@ -186,27 +186,26 @@ terminolojiye yeni bir terim ekliyor: olasılıksal programlama
 (probabilistic programming).
 
 Bir örnek üzerinde görelim [7, sf. 8]. Standart istatistik
-örneklerinden bilindiği gibi arda atılan madeni paranın yazı mı tura
-mı geleceği Binom dağılımı ile temsil edilebilir. Eğer madeni paranın
-yanlılığı yok ise (her iki seçenek eşit ihtimalde) bunu $X \sim Bin(N,p)$
-ile gösterebiliriz, ki $X$ rasgele değişken yoğunluğu
+örneklerinden bilindiği gibi art arda atılan madeni paranın yazı mı
+tura mı geleceği (daha doğrusu $N$ deney içinde $k$ başarı olasılığı)
+Binom dağılımı ile temsil edilebilir. Dağılım $X \sim Bin(N,p)$ ile
+gösterilebilir, ki $X$ rasgele değişken yoğunluğu
 
 $$
 P(X = k) = {N \choose k} p^k (1-p)^{N-k}
 $$
 
-Burada $N$ tane deney içinde $k$ tane başarı elde etmeninin olasılık
-yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise $p=0.5$, var
-ise mesela $p = 0.7$.  Eğer yoğunluğu verilen ve bilinen $p$
-yoğunluğundan rasgele örneklem toplamak istesek bunu yapabilirdik,
-yaygın kullanılan kütüphanelerde bile böyle kodlar mevcuttur.
-
-Eğer $p$ bilinmiyor olsaydı ve elde deney verisi olsaydı, bilinmeyen
-$p$'yi bu veriden kestirmenin de yöntemleri mevcuttur.
+Eğer yanlılık yok ise $p=0.5$, var ise mesela $p = 0.7$.  Eğer
+yoğunluğu verilen ve bilinen $p$ yoğunluğundan rasgele örneklem
+toplamak istesek bunu yapabilirdik, yaygın kullanılan kütüphanelerde
+bile böyle kodlar mevcuttur. Eğer $p$ bilinmiyor olsaydı ve elde deney
+verisi olsaydı, bilinmeyen $p$'yi bu veriden kestirmenin de yöntemleri
+mevcuttur.
 
 Modeli daha çetrefilleştirebilirdik. $p$'nin bilinip bilinmedigi bir
 yana, onu tek bir sayı ile değil, *bir rasgele değişken*, mesela
-$\theta$ üzerinden tanımlıyor olabilirdik. Bu durumda,
+$\theta$ üzerinden tanımlıyor olabilirdik. O zaman $\theta$'nın da
+ayrı bir dağılımı olurdu. 
 
 $$
 \theta \sim Beta(\alpha, \beta)
@@ -311,10 +310,10 @@ print (durations_B[:8])
  23.38477673 27.86670832]
 ```
 
-İki farklı grubun farklı ortalaması, ve standart sapması var (`mean`,
-`std` bunu hemen gösterirdi), veriyi ona göre ürettik. Doğal olarak
-bir sayfadaki (A) kullanıcı zamanı diğerinden (B) daha fazla. Şimdi
-acaba birazdan göreceğimiz t-testi bu farkı yakalayabilecek mi?
+İki farklı grubun farklı ortalaması, ve standart sapması var, veriyi
+ona göre ürettik. Doğal olarak bir sayfadaki (A) kullanıcı zamanı
+diğerinden (B) daha fazla. Şimdi acaba birazdan göreceğimiz t-testi bu
+farkı yakalayabilecek mi?
 
 Verileri `np.r_` ile birleştirip bu birleşik verinin ortalama ve
 standart sapmasını hesaplıyoruz.
@@ -326,12 +325,11 @@ pooled_std = np.r_[durations_A, durations_B].std()
 
 Bunu yapmamızın sebebi analize verilecek başlangıç değeri olarak
 kabaca bir değeri saptamak. Şimdi modelin geri kalanını ortaya
-çıkartalım.
-
-Bayes veri analizi değişken bağlantılarını düşünürken iyi bir yöntem
-şudur, "acaba bu veriyi nasıl üretirdim" diye düşünmek. Mesela
-$\theta$ ile tanımlı madeni para atışlarında adımlar şöyledir, "önce
-rasgele $\theta$ üret, sonra bu $\theta$ ile Binom üretimi yap".
+çıkartalım. Bayes veri analizi değişken bağlantılarını düşünürken iyi
+bir yöntem şudur, "acaba bu veriyi nasıl üretirdim" diye
+düşünmek. Mesela $\theta$ ile tanımlı madeni para atışlarında adımlar
+şöyledir, "önce rasgele $\theta$ üret, sonra bu $\theta$ ile Binom
+üretimi yap".
 
 O zaman ziyaret zamanlarını iki ayrı Student-T dağılımından
 "ürettiğimizi" düşünelim. Bu dağılımlara gereken parametreler
@@ -363,7 +361,7 @@ $\mu_B$ sonsal dağılımlarını verecek. Peki bu dağılımlardan hangisi
 gerekiyor, bir `Deterministic` değişken içinde iki dağılımın farkını
 $\mu_A - \mu_B$ hesaplatırız, böylece bu çıkartma işlemi simülasyonun
 parçası haline gelir, ve sonuç, ki o da bir rasgele değişkendir, en
-sonda alinip grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
+sonda alınıp grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
 tamamı sıfır değerinin sağında oluyor ise (hep pozitif değerler) o
 zaman A dağılımından gelen değerler B sayfasındaki değerlerden
 büyüktür, yani A sayfasında daha fazla zaman geçirilmiştir.

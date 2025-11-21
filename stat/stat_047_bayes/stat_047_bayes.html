@@ -118,7 +118,7 @@ açıkça aradığınız şeydir; eğer birden fazla parametreniz varsa,
 muhtemelen çok değişkenli bir dağılım. Sağ tarafta, olurluk olan <span
 class="math inline">\(P(\text{veri} \mid \theta)\)</span> bulunur. Bu
 miktar, En Yüksek Olurluk Tahmini (MLE) yaklaşımındaki ile aynıdır.
-Evet, Bayeşçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk
+Evet, Bayesçi ve frekansçı yaklaşımların çekirdeğinde aynı olurluk
 bulunur, bu da sonuçların genellikle neden çok farklı olmadığını büyük
 ölçüde açıklar. Olurluk, <span class="math inline">\(\theta\)</span> ile
 parametrelendirilmiş bir model verildiğinde, verinizdeki bilginin
@@ -259,9 +259,9 @@ ve parametreleri kullanıyor olurlar.</p>
 <h3 id="pymc">PyMC</h3>
 <p>Programcıları üstte tarif edilen hesapsal yükten kurtarmaya uğraşan
 ve hesapların daha rahat programlanmasını sağlayan paketler var. Bu
-paketler önsel / sonsal rasgele değişkenlerin tanımlanmasını neredeyse
+paketler önsel / sonsal rasgele değişkenlerin kodlanmasını neredeyse
 tanımsal (declarative) hale getirerek alt seviye kodlama detaylarını
-perde arkasına itebiliyorlar, ve bu şekilde Bayeşçi hesapların çabuk
+perde arkasına itebiliyorlar, ve bu şekilde Bayesçi hesapların çabuk
 gerçekleştirilmesini sağlıyorlar. Bu paketler sayesinde istenildiği
 kadar rasgele değişken bağlantısı yaratalım, çözücü kodlar sonsal
 dağılımdan örneklem alabiliyor. Bu tür paketler getirdikleri rahatlık
@@ -269,31 +269,29 @@ sayesinde neredeyse bir dil yaratmış oluyorlar, ve bazıları
 terminolojiye yeni bir terim ekliyor: olasılıksal programlama
 (probabilistic programming).</p>
 <p>Bir örnek üzerinde görelim [7, sf. 8]. Standart istatistik
-örneklerinden bilindiği gibi arda atılan madeni paranın yazı mı tura mı
-geleceği Binom dağılımı ile temsil edilebilir. Eğer madeni paranın
-yanlılığı yok ise (her iki seçenek eşit ihtimalde) bunu <span
-class="math inline">\(X \sim Bin(N,p)\)</span> ile gösterebiliriz, ki
-<span class="math inline">\(X\)</span> rasgele değişken yoğunluğu</p>
+örneklerinden bilindiği gibi art arda atılan madeni paranın yazı mı tura
+mı geleceği (daha doğrusu <span class="math inline">\(N\)</span> deney
+içinde <span class="math inline">\(k\)</span> başarı olasılığı) Binom
+dağılımı ile temsil edilebilir. Dağılım <span class="math inline">\(X
+\sim Bin(N,p)\)</span> ile gösterilebilir, ki <span
+class="math inline">\(X\)</span> rasgele değişken yoğunluğu</p>
 <p><span class="math display">\[
 P(X = k) = {N \choose k} p^k (1-p)^{N-k}
 \]</span></p>
-<p>Burada <span class="math inline">\(N\)</span> tane deney içinde <span
-class="math inline">\(k\)</span> tane başarı elde etmeninin olasılık
-yoğunluk fonksiyonunu görüyoruz. Eğer yanlılık yok ise <span
-class="math inline">\(p=0.5\)</span>, var ise mesela <span
-class="math inline">\(p = 0.7\)</span>. Eğer yoğunluğu verilen ve
-bilinen <span class="math inline">\(p\)</span> yoğunluğundan rasgele
-örneklem toplamak istesek bunu yapabilirdik, yaygın kullanılan
-kütüphanelerde bile böyle kodlar mevcuttur.</p>
-<p>Eğer <span class="math inline">\(p\)</span> bilinmiyor olsaydı ve
-elde deney verisi olsaydı, bilinmeyen <span
-class="math inline">\(p\)</span>’yi bu veriden kestirmenin de yöntemleri
-mevcuttur.</p>
+<p>Eğer yanlılık yok ise <span class="math inline">\(p=0.5\)</span>, var
+ise mesela <span class="math inline">\(p = 0.7\)</span>. Eğer yoğunluğu
+verilen ve bilinen <span class="math inline">\(p\)</span> yoğunluğundan
+rasgele örneklem toplamak istesek bunu yapabilirdik, yaygın kullanılan
+kütüphanelerde bile böyle kodlar mevcuttur. Eğer <span
+class="math inline">\(p\)</span> bilinmiyor olsaydı ve elde deney verisi
+olsaydı, bilinmeyen <span class="math inline">\(p\)</span>’yi bu veriden
+kestirmenin de yöntemleri mevcuttur.</p>
 <p>Modeli daha çetrefilleştirebilirdik. <span
 class="math inline">\(p\)</span>’nin bilinip bilinmedigi bir yana, onu
 tek bir sayı ile değil, <em>bir rasgele değişken</em>, mesela <span
 class="math inline">\(\theta\)</span> üzerinden tanımlıyor olabilirdik.
-Bu durumda,</p>
+O zaman <span class="math inline">\(\theta\)</span>’nın da ayrı bir
+dağılımı olurdu.</p>
 <p><span class="math display">\[
 \theta \sim Beta(\alpha, \beta)
 \]</span></p>
@@ -365,11 +363,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
  26.26095514 29.65196647]
 [24.03905003 21.69379493 29.05057681 31.08319069 32.84439179 26.36658114
  23.38477673 27.86670832]</code></pre>
-<p>İki farklı grubun farklı ortalaması, ve standart sapması var
-(<code>mean</code>, <code>std</code> bunu hemen gösterirdi), veriyi ona
-göre ürettik. Doğal olarak bir sayfadaki (A) kullanıcı zamanı diğerinden
-(B) daha fazla. Şimdi acaba birazdan göreceğimiz t-testi bu farkı
-yakalayabilecek mi?</p>
+<p>İki farklı grubun farklı ortalaması, ve standart sapması var, veriyi
+ona göre ürettik. Doğal olarak bir sayfadaki (A) kullanıcı zamanı
+diğerinden (B) daha fazla. Şimdi acaba birazdan göreceğimiz t-testi bu
+farkı yakalayabilecek mi?</p>
 <p>Verileri <code>np.r_</code> ile birleştirip bu birleşik verinin
 ortalama ve standart sapmasını hesaplıyoruz.</p>
 <div class="sourceCode" id="cb9"><pre
@@ -377,11 +374,10 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pooled_std <span class="op">=</span> np.r_[durations_A, durations_B].std()</span></code></pre></div>
 <p>Bunu yapmamızın sebebi analize verilecek başlangıç değeri olarak
 kabaca bir değeri saptamak. Şimdi modelin geri kalanını ortaya
-çıkartalım.</p>
-<p>Bayes veri analizi değişken bağlantılarını düşünürken iyi bir yöntem
-şudur, “acaba bu veriyi nasıl üretirdim” diye düşünmek. Mesela <span
-class="math inline">\(\theta\)</span> ile tanımlı madeni para
-atışlarında adımlar şöyledir, “önce rasgele <span
+çıkartalım. Bayes veri analizi değişken bağlantılarını düşünürken iyi
+bir yöntem şudur, “acaba bu veriyi nasıl üretirdim” diye düşünmek.
+Mesela <span class="math inline">\(\theta\)</span> ile tanımlı madeni
+para atışlarında adımlar şöyledir, “önce rasgele <span
 class="math inline">\(\theta\)</span> üret, sonra bu <span
 class="math inline">\(\theta\)</span> ile Binom üretimi yap”.</p>
 <p>O zaman ziyaret zamanlarını iki ayrı Student-T dağılımından
@@ -421,7 +417,7 @@ dağılımı diğerinden çıkartırız. Ama bu çıkartma işlemini de PyMC
 içinde iki dağılımın farkını <span class="math inline">\(\mu_A -
 \mu_B\)</span> hesaplatırız, böylece bu çıkartma işlemi simülasyonun
 parçası haline gelir, ve sonuç, ki o da bir rasgele değişkendir, en
-sonda alinip grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
+sonda alınıp grafiklenebilir. Eğer bu grafikteki dağılımın çoğu, hatta
 tamamı sıfır değerinin sağında oluyor ise (hep pozitif değerler) o zaman
 A dağılımından gelen değerler B sayfasındaki değerlerden büyüktür, yani
 A sayfasında daha fazla zaman geçirilmiştir.</p>
