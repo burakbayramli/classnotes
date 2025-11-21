@@ -2,7 +2,7 @@
 
 Veri analizinde Bayes teorisi kullanımı sayesinde veri olasılığı,
 bilmediğimiz parametreler hakkındaki bazı bilgilerimizi formülasyona
-dahil edebiliyoruz. Bunun bir örneğini MAP hesaplarını işlerken
+dahil edebiliyoruz. Bunun bir örneğini MAP hesaplarını [4] işlerken
 gördük.  Bu bölümde Bayes formüllerinin sonuçlarını bulmak için bazı
 hesapsal teknikleri işleyeceğiz, ve niye faydalı olduklarını anlamaya
 uğraşacağız. Temel olasılık teorisinden biliyoruz ki Bayes teorisi
@@ -43,10 +43,10 @@ görmeden önce ne bildiğinizi temsil eder. Eğer $\theta$ hakkında
 hiçbir şey bilmiyorsanız, belirsiz olabilir. Ancak genellikle sıfırdan
 başlamazsınız ve önselinizin sahip olduğunuz bilgiyi yansıtmasını
 istersiniz, mesela bir zar atımında zarların 1 ve 3 arası gelmesi daha
-muhtemel ise bu bilgiyi bir onsel olasılık olarak modele dahil etmek
+muhtemel ise bu bilgiyi bir önsel olasılık olarak modele dahil etmek
 mümkündür.
 
-Son olarak, bazen ortalama olurluk olarak adlandırılan
+Son olarak, bazen "ortalama olurluk" olarak adlandırılan
 $P(\text{veri})$ bulunur, çünkü sonsalın standartlaştırılması, yani
 bir dağılım olması için bire entegre olması amacıyla, olurluk önsele
 göre entegre edilerek elde edilir: $P(\text{veri}) = \int
@@ -163,12 +163,13 @@ Hangi durumlarda çetrefil entegral hesapları muhakkak şart oluyor?
 Mesela farklı modellerin olurluk oranı (likelihood ratio)
 karşılaştırılması gerektiğinde ekstra hesap şart. "Ama hem bölen hem
 bölünende aynı büyüklük / normalize edici sabit var ise birbirlerini
-iptal etmezler mi?". Farklı Bayes modellerinin farklı sabit edicileri
-var ise, iptal mümkün olmaz. Örnek olarak $M1$ ve $M2$ modelleri var
-ise, bir entegral $\int P_{a}(\text{veri} \mid \theta) P_b(\theta)d\theta$
-digeri $\int P_{c}(\text{veri} \mid \theta) P_d(\theta)d\theta$ olabilir, bu
-hesaplar farklı sonuçlar verecektir çünkü farklı yoğunluk fonksiyonları
-ve parametreleri kullanıyor olurlar. 
+iptal etmezler mi?". Ne yazik ki farklı Bayes modellerinin farklı
+sabit edicileri olur, bu durumda iptal mümkün olmaz. Yani $M1$ ve $M2$
+modelleri var ise, bir entegral $\int P_{a}(\text{veri} \mid \theta)
+P_b(\theta)d\theta$ digeri $\int P_{c}(\text{veri} \mid \theta)
+P_d(\theta)d\theta$ olabilir, bu hesaplar farklı sonuçlar verecektir
+çünkü farklı yoğunluk fonksiyonları ve parametreleri kullanıyor
+olurlar.
 
 ### PyMC
 
