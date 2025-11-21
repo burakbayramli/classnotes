@@ -3,6 +3,8 @@
 
 ## En Son
 
+21/11 - [Bayes Usulü İstatistiki Analiz](https://burakbayramli.github.io/dersblog/stat/stat_047_bayes/bayes_usulu_istatistiki_analiz.html)
+
 19/11 - [Değişim Noktası Analizi - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_100_coal/degisim_noktasi_analizi__changepoint_analysis_.html)
 
 06/11 - [Ses Verisi İşleme, Tanıma](https://burakbayramli.github.io/dersblog/tser/tser_082_snd/ses_verisi_isleme_tanima.html)
@@ -10,8 +12,6 @@
 03/11 - [Maksimum Sonsal Hesabı (Maximum a Posteriori / MAP)](https://burakbayramli.github.io/dersblog/stat/stat_022_est/tahmin_edici_hesaplar__estimators_.html)
 
 23/10 - [Çok Seviyeli Modeller - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_085_multlev/cok_seviyeli_modeller__multilevel_models_.html)
-
-23/10 - [Lucas Kanade Algoritması](https://burakbayramli.github.io/dersblog/vision/vision_85lk/piksel_takibi_optik_akis_lucas_kanade_algoritmasi.html)
 
 ## Konular, Referans
 
