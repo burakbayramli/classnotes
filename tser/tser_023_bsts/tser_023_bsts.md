@@ -1,6 +1,5 @@
 # Bayes Yapısal Zaman Serisi Modelleri
 
-
 Causal Impact
 
 ```
