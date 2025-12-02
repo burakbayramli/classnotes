@@ -1,12 +1,5 @@
 # Bayes Yapısal Zaman Serisi Modelleri
 
-Causal Impact
-
-```
-pip install tf_keras
-pip install git+https://github.com/google/tfp-causalimpact.git
-```
-
 ```python
 import pandas as pd
 
@@ -27,6 +20,12 @@ plt.savefig('tser_023_bsts_01.jpg')
 
 ![](tser_023_bsts_01.jpg)
 
+![](tser_023_bsts_02.jpg)
+
+![](tser_023_bsts_03.jpg)
+
+![](tser_023_bsts_04.jpg)
+
 
 
 
@@ -42,4 +41,6 @@ plt.savefig('tser_023_bsts_01.jpg')
 [devam edecek]
 
 Kaynaklar
+
+[1] Bayramli, Istatistik, *Bayes Usulü İstatistiki Analiz*
 
