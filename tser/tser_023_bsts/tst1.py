@@ -1,10 +1,10 @@
 # pip install pymc arviz matplotlib numpy pandas
-
+import matplotlib.pyplot as plt
 import numpy as np
+
 import pandas as pd
 import pymc as pm
 import arviz as az
-import matplotlib.pyplot as plt
 
 # --- Simulate data (same as before) ---
 np.random.seed(42)
@@ -47,13 +47,6 @@ with pm.Model() as bsts_model:
 gv = pm.model_to_graphviz(bsts_model)
 gv.format = 'jpg'
 gv.render(filename='tser_023_bsts_04')
-
-# --- Posterior predictive for pre-period (sanity check) ---
-with bsts_model:
-    ppc_pre = pm.sample_posterior_predictive(idata, var_names=["y_obs"])
-
-az.plot_ppc(ppc_pre)
-plt.savefig('tser_023_bsts_02.jpg')
 
 # --- Forecast (counterfactual) into post-period ---
 level_last = idata.posterior["level"][:, :, -1].values  # (chains, draws)

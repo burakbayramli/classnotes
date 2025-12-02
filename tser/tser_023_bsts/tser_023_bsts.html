@@ -102,9 +102,111 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>data[<span class="st">&#39;y&#39;</span>].plot()</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_023_bsts_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="tser_023_bsts_01.jpg" /></p>
-<p><img src="tser_023_bsts_02.jpg" /></p>
-<p><img src="tser_023_bsts_03.jpg" /></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into pre- and post-</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>y_pre <span class="op">=</span> y[:event_start]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>y_post <span class="op">=</span> y[event_start:]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>t_pre <span class="op">=</span> time[:event_start]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>t_post <span class="op">=</span> time[event_start:]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Build PyMC model for pre-period only ---</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> bsts_model:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    sigma_level <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma_level&quot;</span>, <span class="dv">5</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    sigma_y <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma_y&quot;</span>, <span class="dv">5</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Local level as a random walk</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    level <span class="op">=</span> pm.GaussianRandomWalk(<span class="st">&quot;level&quot;</span>, sigma<span class="op">=</span>sigma_level, shape<span class="op">=</span><span class="bu">len</span>(y_pre))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Seasonality using Fourier terms</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> pm.Normal(<span class="st">&quot;a&quot;</span>, <span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> pm.Normal(<span class="st">&quot;b&quot;</span>, <span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    seasonality <span class="op">=</span> a <span class="op">*</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> t_pre <span class="op">/</span> <span class="dv">12</span>) <span class="op">+</span> b <span class="op">*</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> t_pre <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> level <span class="op">+</span> seasonality</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Normal(<span class="st">&quot;y_obs&quot;</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma_y, observed<span class="op">=</span>y_pre)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1000</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>, random_seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>gv <span class="op">=</span> pm.model_to_graphviz(bsts_model)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>gv.<span class="bu">format</span> <span class="op">=</span> <span class="st">&#39;jpg&#39;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>gv.render(filename<span class="op">=</span><span class="st">&#39;tser_023_bsts_04&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>                                                                                
+                              Step      Grad      Sampli…                       
+  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
+
+     2000    0         0.157     63        195.34    0:00:10   0:00:00   
+                                                  draws/s                       
+     2000    0         0.088     31        196.31    0:00:10   0:00:00   
+                                                  draws/s                       
+     2000    0         0.140     31        186.91    0:00:10   0:00:00   
+                                                  draws/s                       
+     2000    0         0.120     63        172.06    0:00:11   0:00:00   
+                                                  draws/s                       
+                                                                                
+Out[1]: &#39;tser_023_bsts_04.jpg&#39;</code></pre>
 <p><img src="tser_023_bsts_04.jpg" /></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>level_last <span class="op">=</span> idata.posterior[<span class="st">&quot;level&quot;</span>][:, :, <span class="op">-</span><span class="dv">1</span>].values  <span class="co"># (chains, draws)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sigma_level_post <span class="op">=</span> idata.posterior[<span class="st">&quot;sigma_level&quot;</span>].values</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sigma_y_post <span class="op">=</span> idata.posterior[<span class="st">&quot;sigma_y&quot;</span>].values</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>a_post <span class="op">=</span> idata.posterior[<span class="st">&quot;a&quot;</span>].values</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>b_post <span class="op">=</span> idata.posterior[<span class="st">&quot;b&quot;</span>].values</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Flatten all posterior samples into a single dimension</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>level_last <span class="op">=</span> level_last.flatten()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>sigma_level_post <span class="op">=</span> sigma_level_post.flatten()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>sigma_y_post <span class="op">=</span> sigma_y_post.flatten()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>a_post <span class="op">=</span> a_post.flatten()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>b_post <span class="op">=</span> b_post.flatten()</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>n_post <span class="op">=</span> <span class="bu">len</span>(y_post)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> level_last.size</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast latent level paths</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>level_forecasts <span class="op">=</span> np.zeros((S, n_post))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_post):</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        level_forecasts[:, i] <span class="op">=</span> level_last <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_level_post)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        level_forecasts[:, i] <span class="op">=</span> level_forecasts[:, i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_level_post)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute seasonality for each posterior draw &amp; time point</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>sin_term <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> t_post <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>cos_term <span class="op">=</span> np.cos(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> t_post <span class="op">/</span> <span class="dv">12</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>seasonality_post <span class="op">=</span> (a_post[:, <span class="va">None</span>] <span class="op">*</span> sin_term[<span class="va">None</span>, :]) <span class="op">+</span> (b_post[:, <span class="va">None</span>] <span class="op">*</span> cos_term[<span class="va">None</span>, :])</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicted counterfactual observations</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>y_pred_post <span class="op">=</span> np.random.normal(level_forecasts <span class="op">+</span> seasonality_post, sigma_y_post[:, <span class="va">None</span>])</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Compute posterior effects ---</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Actual - predicted</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>diffs <span class="op">=</span> y_post <span class="op">-</span> y_pred_post</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>cum_effect <span class="op">=</span> diffs.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Posterior mean cumulative effect:&quot;</span>, np.mean(cum_effect))</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;95</span><span class="sc">% c</span><span class="st">redible interval:&quot;</span>, np.percentile(cum_effect, [<span class="fl">2.5</span>, <span class="fl">97.5</span>]))</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;P(effect &lt; 0):&quot;</span>, np.mean(cum_effect <span class="op">&lt;</span> <span class="dv">0</span>))</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Plot observed vs counterfactual mean ---</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>pred_mean <span class="op">=</span> y_pred_post.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>pred_ci <span class="op">=</span> np.percentile(y_pred_post, [<span class="fl">2.5</span>, <span class="fl">97.5</span>], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>plt.plot(time, y, <span class="st">&quot;k&quot;</span>, label<span class="op">=</span><span class="st">&quot;Observed&quot;</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>plt.plot(t_post, pred_mean, <span class="st">&quot;b&quot;</span>, label<span class="op">=</span><span class="st">&quot;Predicted counterfactual&quot;</span>)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>plt.fill_between(t_post, pred_ci[<span class="dv">0</span>], pred_ci[<span class="dv">1</span>], color<span class="op">=</span><span class="st">&quot;blue&quot;</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>plt.axvline(event_start, color<span class="op">=</span><span class="st">&quot;red&quot;</span>, linestyle<span class="op">=</span><span class="st">&quot;--&quot;</span>, label<span class="op">=</span><span class="st">&quot;Event&quot;</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_023_bsts_03.jpg&#39;</span>)</span></code></pre></div>
+<pre class="text"><code>Posterior mean cumulative effect: -652.3711999531328
+95% credible interval: [-851.94366581 -430.78138666]
+P(effect &lt; 0): 0.99975</code></pre>
+<p><img src="tser_023_bsts_03.jpg" /></p>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, Istatistik, <em>Bayes Usulü İstatistiki Analiz</em></p>
