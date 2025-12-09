@@ -1,0 +1,11 @@
+# İstatistiki Oransal Hesaplar
+
+
+
+
+
+
+
+
+
+
