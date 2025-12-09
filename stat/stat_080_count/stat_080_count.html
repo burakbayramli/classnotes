@@ -217,7 +217,7 @@ No. Iterations:                     7
 Intercept         5.5857      0.133     42.103      0.000         5.326     5.846
 median_income    -0.0608      0.002    -27.925      0.000        -0.065    -0.057
 =================================================================================</code></pre>
-<p>Titanik Verisi</p>
+<h3 id="titanik-verisi">Titanik Verisi</h3>
 <p>Daha ilginç bir veri batan Titanik gemisinin kayıtları. Bu kayıtlarda
 yolcuların sağ kurtulup kurtulmadığı onlar hakkında baz bilgi ile
 beraber kişi seviyesinde kaydedilmiş. Hangi sınıfta (whichclass) seyahat
@@ -344,7 +344,7 @@ C(whichclass)[T.3]    -0.7691      0.107     -7.185      0.000        -0.979    
 age                   -0.4830      0.146     -3.317      0.001        -0.768    -0.198
 sex                   -1.1657      0.095    -12.267      0.000        -1.352    -0.979
 ======================================================================================</code></pre>
-<p>Negatif Binom Modelleri</p>
+<h3 id="negatif-binom-modelleri">Negatif Binom Modelleri</h3>
 <p>Üstteki sonuçlar hiç fena değil. Fakat verinin kurtulan kişi
 sayısının dağılımının Poisson olduğu varsayımı her zaman doğru
 olmayabilir. Bu durumlarda Negatif Binom kullanımı daha doğru olabilir.
@@ -381,7 +381,7 @@ sex                   -0.8033      0.284     -2.825      0.005        -1.361    
 bir düşüş oldu, yani hata azaldı. Bu regresyon çıktısında bazı
 katsayılar Poisson GLM’dekiyle aynı olsa da bazıları değişti. Daha doğru
 olan değerler bunlar.</p>
-<p>Katsayıları Yorumlamak</p>
+<h3 id="katsayıları-yorumlamak">Katsayıları Yorumlamak</h3>
 <p>Elde edilen sonuçları pek çok şekilde yorumlamak mümkün, fakat en
 faydalı olanı kategorik değişkenler için hesaplanabilen bir Oluş Oran
 Hızıdır (İncidence Rate Ratio -IRR-). İsim biraz garip, evet,
@@ -401,7 +401,7 @@ class="math inline">\(\beta_1(0)\)</span> olacak), <span
 class="math display">\[ \theta_{children} / t = \exp ( \beta_0 +
 \beta_1(0) + \beta_2(sex) + \beta_2(whichclass=2) +
 \beta_2(whichclass=3)  \]</span></p>
-<p>Bu iki oranı bölersek İRR ortaya çıkar,</p>
+<p>Bu iki oranı bölersek IRR ortaya çıkar,</p>
 <p><span class="math display">\[
 \frac{\theta_{adults} / t}{\theta_{children} / t} =
 \frac
@@ -448,7 +448,97 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a h
 <pre><code>0.366197183099 0.522935779817 nihai sonuc 0.700271806276</code></pre>
 <p>0.70 sonucu üstteki 0.50’den oldukça farklı. Daha doğru olan GLM
 değeri.</p>
-<p>Tahmin Üretmek</p>
+<h3
+id="birden-fazla-gözlem-tek-bir-oranı-rate-ratio-nasıl-belirler">Birden
+Fazla Gözlem Tek Bir Oranı (rate ratio) Nasıl Belirler?</h3>
+<p>Poisson veya Negatif Binom regresyonuna girişlerde sıkça gözden kaçan
+bir nokta, tek bir katsayının (dolayısıyla tek bir oran parametresinin)
+nasıl olup da birçok ayrı gözlemden öğrenildiğidir. Log-link kullanan
+bir sayım modelinde genellikle şunu yazarız:</p>
+<p><span class="math display">\[
+\log(\mu_i) = \alpha + \beta x_i,
+\]</span></p>
+<p>Burada <span class="math inline">\(x_i\)</span> bir gösterge
+(indicator) değişkendir (örneğin yetişkin/çocuk, maruz kalan/maruz
+kalmayan, yakın/uzak).</p>
+<ul>
+<li><p><span class="math inline">\(x_i = 0\)</span> olduğunda beklenen
+değer: <span class="math display">\[
+\mu_i = e^{\alpha}
+\]</span></p></li>
+<li><p><span class="math inline">\(x_i = 1\)</span> olduğunda beklenen
+değer: <span class="math display">\[
+\mu_i = e^{\alpha + \beta}
+\]</span></p></li>
+</ul>
+<p>Dolayısıyla iki grup arasındaki oran (rate ratio):</p>
+<p><span class="math display">\[
+\frac{\mu(x=1)}{\mu(x=0)} = e^{\beta}
+\]</span></p>
+<p>olarak ortaya çıkar.</p>
+<p>Peki bu oran veriden nasıl “öğreniliyor”? Önemli nokta şudur: Model
+hiçbir zaman iki gözlem arasındaki oranı açıkça hesaplamaz. Bunun
+yerine, her bir veri satırı olabilirlik (likelihood) fonksiyonuna
+katkıda bulunur ve tüm satırlar birlikte aynı <span
+class="math inline">\(\beta\)</span> parametresini kısıtlar. Bunu görmek
+için aynı bağlamdan (örneğin aynı yıl) gelen iki gözlemi düşünelim:</p>
+<ul>
+<li>Biri (x = 0) olan (referans grup),</li>
+<li>Giğeri (x = 1) olan (karşılaştırılan grup).</li>
+</ul>
+<p>Bu iki gözlem:</p>
+<ul>
+<li><p>Aynı <span class="math inline">\(\alpha\)</span>’yı
+paylaşır,</p></li>
+<li><p>Varsa aynı offsetleri veya ortak etkileri paylaşır,</p></li>
+<li><p>Yalnızca <span class="math inline">\(\beta\)</span>’nin
+varlığı/yokluğu ile ayrılır.</p></li>
+</ul>
+<p>Bu iki satır aynı anda iyi bir şekilde modellenebilmesi için, modelin
+<span class="math inline">\(\beta\)</span>’yı öyle bir değerde seçmesi
+gerekir ki:</p>
+<p><span class="math display">\[
+\frac{e^{\alpha + \beta}}{e^{\alpha}}
+;\approx;
+\frac{\text{gözlenen sayı}*{x=1}}{\text{gözlenen sayı}*{x=0}}
+\]</span></p>
+<p>olabilsin.</p>
+<p>Yani her böyle gözlem çifti, aynı temel oran için gürültülü (noisy)
+bir tahmin üretir.</p>
+<p>Olurluk (likelihood) içindeki “çekişme” (tug-of-war)</p>
+<p>Her gözlem, <span class="math inline">\(\beta\)</span>’yı kendi
+uyumunu artıracak yönde “çekiştirir”:</p>
+<ul>
+<li><p><span class="math inline">\(x=1\)</span> olan gözlemler
+sistematik olarak daha büyükse → olabilirlik <span
+class="math inline">\(\beta &gt; 0\)</span> ister,</p></li>
+<li><p>Daha küçükse -&gt; olurluk <span class="math inline">\(\beta &lt;
+0\)</span> ister,</p></li>
+<li><p>Benzerse -&gt; olurluk <span class="math inline">\(\beta \approx
+0\)</span> ister.</p></li>
+</ul>
+<p>Ancak aynı <span class="math inline">\(\beta\)</span> tüm satırlarda
+yer aldığı için, model bu farklı çekişmeleri dengeleyecek tek bir değer
+bulmak zorundadır.</p>
+<p>Bu yüzden:</p>
+<ul>
+<li><p><span class="math inline">\(\beta\)</span> tek bir skalar
+katsayıdır,</p></li>
+<li><p><span class="math inline">\(e^{\beta}\)</span> küresel (global)
+bir rate ratio’yu temsil eder,</p></li>
+<li><p>Belirsizlik (confidence interval / sonsal aralık) gözlemler
+arasındaki tutarlılığı yansıtır.</p></li>
+</ul>
+<p>Offsetler ve ortak etkilerle bağlantı: Offsetler veya ortak etkiler
+(örneğin maruz kalma süresi, nüfus büyüklüğü, yıl etkileri) modele
+eklendiğinde, bunlar her iki grup için aynı şekilde yer alır ve bu
+nedenle oran içinde sadeleşerek yok olur.</p>
+<p>Sonuç olarak <span class="math inline">\(\beta\)</span>, gruplar
+arasındaki sistematik farkı temsil etmeye zorlanır.</p>
+<p>Bu anlamda: Oran doğrudan hesaplanmaz; modelin yapısı tarafından
+dolaylı olarak tanımlanır ve birçok veri satırının likelihood katkısı
+üzerinden zorlanarak öğrenilir.</p>
+<h3 id="tahmin-üretmek">Tahmin Üretmek</h3>
 <p>Katsayıları kullanarak tahmin nasıl üretiriz? Yeni veri noktasına
 tekabül eden katsayıları alıp çarpıp, toplarız, ve sonuç üzerine <span
 class="math inline">\(\exp\)</span> uygularız. Bu bize <span

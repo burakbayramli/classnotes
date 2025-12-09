@@ -155,7 +155,7 @@ median_income    -0.0608      0.002    -27.925      0.000        -0.065    -0.05
 =================================================================================
 ```
 
-Titanik Verisi 
+### Titanik Verisi 
 
 Daha ilginç bir veri batan Titanik gemisinin kayıtları. Bu kayıtlarda
 yolcuların sağ kurtulup kurtulmadığı onlar hakkında baz bilgi ile beraber
@@ -309,7 +309,7 @@ sex                   -1.1657      0.095    -12.267      0.000        -1.352    
 ======================================================================================
 ```
 
-Negatif Binom Modelleri 
+### Negatif Binom Modelleri 
 
 Üstteki sonuçlar hiç fena değil. Fakat verinin kurtulan kişi sayısının
 dağılımının Poisson olduğu varsayımı her zaman doğru olmayabilir. Bu
@@ -354,7 +354,7 @@ düşüş oldu, yani hata azaldı. Bu regresyon çıktısında bazı katsayılar
 Poisson GLM'dekiyle aynı olsa da bazıları değişti. Daha doğru olan değerler
 bunlar.
 
-Katsayıları Yorumlamak
+### Katsayıları Yorumlamak
 
 Elde edilen sonuçları pek çok şekilde yorumlamak mümkün, fakat en faydalı
 olanı kategorik değişkenler için hesaplanabilen bir Oluş Oran Hızıdır
@@ -371,7 +371,7 @@ $$ \theta_{adults} / t = \exp ( \beta_0 + \beta_1(1) + \beta_2(sex) + \beta_2(wh
 Çocuklar için oran (sadece üstteki $\beta_1(1)$ yerine $\beta_1(0)$ olacak),
 $$ \theta_{children} / t = \exp ( \beta_0 + \beta_1(0) + \beta_2(sex) + \beta_2(whichclass=2) + \beta_2(whichclass=3)  $$
 
-Bu iki oranı bölersek İRR ortaya çıkar, 
+Bu iki oranı bölersek IRR ortaya çıkar, 
 
 $$ 
 \frac{\theta_{adults} / t}{\theta_{children} / t} = 
@@ -428,7 +428,107 @@ print (ratea, ratec, 'nihai sonuc', ratea/ratec)
 
 0.70 sonucu üstteki 0.50'den oldukça farklı. Daha doğru olan GLM değeri.
 
-Tahmin Üretmek 
+### Birden Fazla Gözlem Tek Bir Oranı (rate ratio) Nasıl Belirler?
+
+Poisson veya Negatif Binom regresyonuna girişlerde sıkça gözden kaçan
+bir nokta, tek bir katsayının (dolayısıyla tek bir oran
+parametresinin) nasıl olup da birçok ayrı gözlemden
+öğrenildiğidir. Log-link kullanan bir sayım modelinde genellikle şunu
+yazarız:
+
+$$
+\log(\mu_i) = \alpha + \beta x_i,
+$$
+
+Burada $x_i$ bir gösterge (indicator) değişkendir (örneğin
+yetişkin/çocuk, maruz kalan/maruz kalmayan, yakın/uzak).
+
+* $x_i = 0$ olduğunda beklenen değer:
+  $$
+  \mu_i = e^{\alpha}
+  $$
+
+* $x_i = 1$ olduğunda beklenen değer:
+  $$
+  \mu_i = e^{\alpha + \beta}
+  $$
+
+Dolayısıyla iki grup arasındaki oran (rate ratio):
+
+$$
+\frac{\mu(x=1)}{\mu(x=0)} = e^{\beta}
+$$
+
+olarak ortaya çıkar.
+
+Peki bu oran veriden nasıl “öğreniliyor”? Önemli nokta şudur: Model
+hiçbir zaman iki gözlem arasındaki oranı açıkça hesaplamaz. Bunun
+yerine, her bir veri satırı olabilirlik (likelihood) fonksiyonuna
+katkıda bulunur ve tüm satırlar birlikte aynı $\beta$ parametresini
+kısıtlar. Bunu görmek için aynı bağlamdan (örneğin aynı yıl) gelen iki
+gözlemi düşünelim:
+
+* Biri (x = 0) olan (referans grup),
+* Giğeri (x = 1) olan (karşılaştırılan grup).
+
+Bu iki gözlem:
+
+* Aynı $\alpha$’yı paylaşır,
+
+* Varsa aynı offsetleri veya ortak etkileri paylaşır,
+
+* Yalnızca $\beta$’nin varlığı/yokluğu ile ayrılır.
+
+Bu iki satır aynı anda iyi bir şekilde modellenebilmesi için, modelin
+$\beta$’yı öyle bir değerde seçmesi gerekir ki:
+
+$$
+\frac{e^{\alpha + \beta}}{e^{\alpha}}
+;\approx;
+\frac{\text{gözlenen sayı}*{x=1}}{\text{gözlenen sayı}*{x=0}}
+$$
+
+olabilsin.
+
+Yani her böyle gözlem çifti, aynı temel oran için gürültülü (noisy)
+bir tahmin üretir.
+
+Olurluk (likelihood) içindeki “çekişme” (tug-of-war)
+
+Her gözlem, $\beta$’yı kendi uyumunu artıracak yönde “çekiştirir”:
+
+* $x=1$ olan gözlemler sistematik olarak daha büyükse → olabilirlik
+  $\beta > 0$ ister,
+
+* Daha küçükse -> olurluk $\beta < 0$ ister,
+
+* Benzerse -> olurluk $\beta \approx 0$ ister.
+
+Ancak aynı $\beta$ tüm satırlarda yer aldığı için, model bu farklı
+çekişmeleri dengeleyecek tek bir değer bulmak zorundadır.
+
+Bu yüzden:
+
+* $\beta$ tek bir skalar katsayıdır,
+
+* $e^{\beta}$ küresel (global) bir rate ratio’yu temsil eder,
+
+* Belirsizlik (confidence interval / sonsal aralık) gözlemler
+  arasındaki tutarlılığı yansıtır.
+
+Offsetler ve ortak etkilerle bağlantı: Offsetler veya ortak etkiler
+(örneğin maruz kalma süresi, nüfus büyüklüğü, yıl etkileri) modele
+eklendiğinde, bunlar her iki grup için aynı şekilde yer alır ve bu
+nedenle oran içinde sadeleşerek yok olur.
+
+Sonuç olarak $\beta$, gruplar arasındaki sistematik farkı temsil
+etmeye zorlanır.
+
+Bu anlamda: Oran doğrudan hesaplanmaz; modelin yapısı tarafından
+dolaylı olarak tanımlanır ve birçok veri satırının likelihood katkısı
+üzerinden zorlanarak öğrenilir.
+
+### Tahmin Üretmek 
 
 Katsayıları kullanarak tahmin nasıl üretiriz? Yeni veri noktasına tekabül
 eden katsayıları alıp çarpıp, toplarız, ve sonuç üzerine $\exp$
@@ -490,7 +590,4 @@ Kaynaklar
   ratios (with confidence intervals)}, [http://support.sas.com/kb/24/188.html](http://support.sas.com/kb/24/188.html)
 
 [3] Gelman, Hill, *Data Analysis Using Regression and Multilevel/Hierarchical Models*
-
-
-
 
