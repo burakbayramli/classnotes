@@ -20,3 +20,5 @@
 
 Kaynaklar
 
+[1] Bayramli, Istatistik, *Sayım, Poisson ve Negatif Binom Bazlı Genel Lineer Modelleri (GLM)*
+
