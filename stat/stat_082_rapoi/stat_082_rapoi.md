@@ -1,5 +1,7 @@
 # Coğrafi İstatistiki Hesaplar, Oranlar
 
+### Savaş Sırasında Londra
+
 Daha önce istatistik testler konusunda gördük, bir dağılım
 varlığlığını test için o dağılımın analitik yoğunluk fonksiyonunu
 veriden gelen tahmin ediciler üzerinden tanımlayıp, veriyi bu
@@ -49,11 +51,30 @@ yakın sayılar. Bir adım daha atılıp bunun üzerinde bir istatistik
 testi uygulanınca Poisson varlığı, ve dolaylı olarak kümelemenin
 olmadığı ispatlanmış oldu.
 
+### Zaman Serileri, Sayım Verisi
 
+Üstteki örnekte tek bir Poisson dağılımı modellendi. Peki ya zamana
+yayılmış (sene bazında), ve bir A grubu ile bir diğer B grubunun sayım
+verisini karşılaştırmak isteseydik? Problem şu şekilde ortaya
+çıkabilir, 
 
+Ülke bazında spesifik bir olaya bağlı bir sayım verisine bakıyoruz, bu
+veri sene bazında toplanıyor. Bir veri mesela yıllık "dört yol
+kavşaklarında olan kaza sayısı" olabilir. Kavşaklar tabii ki ülkenin
+her tarafında, hepsine bakıp her sene için orada olan kazaları
+topluyoruz. Sonra diyelim ki bu kazaların normal (!)  kazalardan daha
+yüksek / farklı olup olmadığını merak ediyoruz, o zaman diğer bir
+ölçüm sene bazlı dört yol kavşakları *dışındaki* kazalar olur.
 
+O zaman elimizde iki zaman serisi olacak, her sene için iki tane
+ölçüm. Her ölçüm rakamının, bir sayım olduğu için, Poisson
+dağılımınden geldiğini kabul edebiliriz. Fakat dikkat, her sene *aynı*
+Poisson dağılımından mı geliyor? Büyük ihtimalle hayır çünkü kaza
+sayılarında sene bazlı değişim olabilir: araç sayıları farklı
+olabilir, yol şartları değişmiş olabilir.
 
-
+Bir diger problem, ayni senedeki iki olcum karsilastirirken bile, bir
+olcekleme (scaling) problemi olabilir.
 
 
 
