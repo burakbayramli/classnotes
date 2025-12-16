@@ -67,6 +67,10 @@ with pm.Model() as model_synth:
 
     idata = pm.sample(1000, tune=1000, target_accept=0.9, return_inferencedata=True, random_seed=SEED)
 
+    graphviz = pm.model_to_graphviz(model_synth)
+    graphviz.graph_attr.update(dpi="100")
+    graphviz.render("stat_082_rapoi_03", format="jpg")
+    
 print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
 
 # Plot posterior of rate ratio

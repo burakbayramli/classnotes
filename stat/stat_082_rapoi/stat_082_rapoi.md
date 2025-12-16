@@ -76,13 +76,118 @@ olabilir, yol şartları değişmiş olabilir.
 Bir diger problem, ayni senedeki iki olcum karsilastirirken bile, bir
 olcekleme (scaling) problemi olabilir.
 
+```python
+import pandas as pd
+import pymc as pm
+import arviz as az
+import data
 
+years = np.arange(1950, 2011)
 
+sim = data.generate_synthetic(years=years,
+                              alpha_log=3.2,
+                              beta_log=np.log(1.05),   # ~5% higher near
+                              sigma_year=0.4,
+                              obs_model="poisson",
+                              trend=data.slow_trend)
 
+df = pd.DataFrame({
+    "year": sim["years"],
+    "near": sim["near"],
+    "far": sim["far"]
+})
 
+SEED = 123
+np.random.seed(SEED)
 
+# quick plot of generated counts
+plt.figure(figsize=(10,4))
+plt.plot(df.year, df.near, label="kavsak", marker="o")
+plt.plot(df.year, df.far, label="diger", marker="x")
+plt.xlabel("Sene"); plt.ylabel("Sayim")
+plt.title("Sentetik sayim (Poisson)")
+plt.legend()
+plt.tight_layout()
+plt.savefig('stat_082_rapoi_01.jpg')
+```
 
 ![](stat_082_rapoi_01.jpg)
+
+
+```python
+def build_stacked_arrays(simdict):
+    years = np.array(simdict["years"])
+    near = np.array(simdict["near"])
+    far  = np.array(simdict["far"])
+    n_years = len(years)
+    counts = np.concatenate([near, far])
+    group = np.concatenate([np.ones(n_years, dtype=int), np.zeros(n_years, dtype=int)])
+    year_idx = np.concatenate([np.arange(n_years), np.arange(n_years)])
+    return years, counts, group, year_idx, near, far
+
+years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
+n_years = len(years)
+
+with pm.Model() as model_synth:
+    sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
+    year_offset = pm.Normal("year_offset", 0.0, 1.0, shape=n_years)
+    year_effect = pm.Deterministic("year_effect", year_offset * sigma_year)
+
+    alpha = pm.Normal("alpha", 0.0, 2.0)
+    beta  = pm.Normal("beta", 0.0, 1.0)
+
+    log_mu = alpha + beta * group_pois + year_effect[year_idx_pois]
+    mu = pm.math.exp(log_mu)
+
+    obs = pm.Poisson("obs", mu=mu, observed=counts_pois)
+
+    rate_ratio = pm.Deterministic("rate_ratio", pm.math.exp(beta))
+
+    idata = pm.sample(1000, tune=1000, target_accept=0.9, return_inferencedata=True, random_seed=SEED)
+
+    graphviz = pm.model_to_graphviz(model_synth)
+    graphviz.graph_attr.update(dpi="100")
+    graphviz.render("stat_082_rapoi_03", format="jpg")
+    
+print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
+```
+
+```text
+                                                                                
+                              Step      Grad      Sampli…                       
+  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
+ ------------------------------------------------------------------------------  
+  -------   2000    0         0.221     15        666.79    0:00:02   0:00:00   
+                                                  draws/s                       
+  -------   2000    0         0.263     15        656.74    0:00:03   0:00:00   
+                                                  draws/s                       
+  -------   2000    0         0.241     15        645.92    0:00:03   0:00:00   
+                                                  draws/s                       
+  -------   2000    0         0.253     15        625.81    0:00:03   0:00:00   
+                                                  draws/s                       
+                                                                                
+             mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+alpha       3.231  0.070   3.089    3.354  ...    0.002   448.966   895.281  1.013
+beta        0.047  0.034  -0.016    0.112  ...    0.001  6444.508  2903.323  1.000
+sigma_year  0.498  0.052   0.405    0.596  ...    0.001   682.152  1494.371  1.006
+rate_ratio  1.049  0.036   0.985    1.119  ...    0.001  6444.508  2903.323  1.000
+
+[4 rows x 9 columns]
+```
+
+![](stat_082_rapoi_03.jpg)
+
+```python
+# Plot posterior of rate ratio
+rr_samples = idata.posterior["rate_ratio"].values.flatten()
+plt.figure(figsize=(6,3))
+az.plot_posterior(rr_samples, hdi_prob=0.95)
+plt.axvline(np.exp(sim["beta_log"]), color="red", linestyle="--", label="true ratio")
+plt.title("Recovered rate ratio (Poisson synthetic)")
+plt.legend()
+plt.tight_layout()
+plt.savefig('stat_082_rapoi_02.jpg')
+```
 
 ![](stat_082_rapoi_02.jpg)
 
