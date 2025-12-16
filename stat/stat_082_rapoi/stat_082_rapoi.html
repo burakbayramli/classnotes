@@ -148,9 +148,19 @@ yol kavşakları <em>dışındaki</em> kazalar olur.</p>
 geldiğini kabul edebiliriz. Fakat dikkat, her sene <em>aynı</em> Poisson
 dağılımından mı geliyor? Büyük ihtimalle hayır çünkü kaza sayılarında
 sene bazlı değişim olabilir: araç sayıları farklı olabilir, yol şartları
-değişmiş olabilir.</p>
-<p>Bir diger problem, ayni senedeki iki olcum karsilastirirken bile, bir
-olcekleme (scaling) problemi olabilir.</p>
+değişmiş olabilir. Karşılaştırma mekanizmasının bunu hesaba katması
+gerekir.</p>
+<p>Bir diğer problem ölçekleme (scaling) problemi olabilir, kavşaklar
+yolların ufak bir alanını temsil eder, kıyasla yolların tamamı fiziksel
+olarak daha fazla yer kaplar bu sebeple kavşak olmayan yol bölümünde
+olan kazaların sayıca daha fazla olması muhtemeldir. Bu fazlalık
+karşılaştırmayı yaniltabilir, elmalar ve armutları karşılaştırmış
+oluruz. Eğer elmalar ile elmaları karşılaştırmak istiyorsak kavşak
+dışındaki sayımları ölçekleyip diğer ölçüme skalasına yaklaştırmamız
+gerekir. Bu çok zor olmasa gerek, basit bir toplam ve bölme işlemi ile
+bunu başarabiliriz.</p>
+<p>Şimdi üzerinde karşılaştırma yapmak için sentetik veri üretelim. İlk
+veri birbirine yakın iki zaman serisi gösteriyor.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
@@ -185,6 +195,48 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_082_rapoi_01.jpg" /></p>
+<p>Verinin modeli nasil olacak? Her sene farkli bir Poisson dagilimi
+olsun demistik, ama bu dagilimlarin birbirine bazi yonlerden
+benzerlikleri de olmali. Acaba bir Poisson GLM (genel lineer model
+-generalized linear model-) yaratabilir miyiz? Her iki zaman serisindeki
+her senede farkli bir <span class="math inline">\(\lambda\)</span> ile
+uretiliyor olabilir, kavsak icin A digeri icin B dersek,</p>
+<p><span class="math display">\[
+\lambda_{A,t} = e^{\sigma + \beta + u_t}
+\]</span></p>
+<p><span class="math display">\[
+\lambda_{B,t} = e^{\sigma + u_t}
+\]</span></p>
+<p>Sonra ustteki parametreler ile <span class="math inline">\(y\)</span>
+verisinin su sekilde uretildigini farz edebiliriz,</p>
+<p><span class="math display">\[
+y_{A,t} \sim Poisson(\lambda_{A,t})
+\]</span></p>
+<p><span class="math display">\[
+y_{B,t} \sim Poisson(\lambda_{B,t})
+\]</span></p>
+<p>Denklemlerde <span class="math inline">\(\beta\)</span> 1 ya da 0
+değeri alıyor, eğer <span class="math inline">\(A\)</span> ise 1 <span
+class="math inline">\(B\)</span> ise sıfır. Bunun sebebini birazdan
+göreceğiz. Peki niye üstel <span class="math inline">\(e\)</span>
+kullanımı var? Eğer <span class="math inline">\(\log\)</span> alsaydık
+mesela ilk denklem için</p>
+<p><span class="math display">\[
+\log(\lambda_{A,t}) = \sigma + \beta + u_t
+\]</span></p>
+<p>elde ediyoruz, bu standart lineer regresyondan tanıdık bir format.
+Log bağlantının sebebi (ya da dolaylı <span
+class="math inline">\(e\)</span> kullanımı)</p>
+<p><span class="math display">\[
+\lambda_{A,t} = e^{\alpha} \cdot e^{\beta} \cdot e^{u_t}
+\]</span></p>
+<p>yapısına izin vermek / onu aktive etmek. Bunun birinci sebebi <span
+class="math inline">\(\lambda\)</span>’nin pozitif olmasını sağlamak
+(çünkü Poisson oran <span class="math inline">\(\lambda\)</span> pozitif
+olmalıdır, bir diğer sebep ise oran hesaplarının her zaman çarpımsal
+parametreler içermeleri. Tıpta bir ilaç uygulaması hastalık oranını
+katlayarak etkiler, hava kirliliği astim hastalığı oranını katlayarak
+arttırır, vb.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit_poisson_ratio(years, near_arr, far_arr, fout):</span>

@@ -71,10 +71,21 @@ O zaman elimizde iki zaman serisi olacak, her sene için iki tane
 dağılımınden geldiğini kabul edebiliriz. Fakat dikkat, her sene *aynı*
 Poisson dağılımından mı geliyor? Büyük ihtimalle hayır çünkü kaza
 sayılarında sene bazlı değişim olabilir: araç sayıları farklı
-olabilir, yol şartları değişmiş olabilir.
+olabilir, yol şartları değişmiş olabilir. Karşılaştırma mekanizmasının
+bunu hesaba katması gerekir.
 
-Bir diger problem, ayni senedeki iki olcum karsilastirirken bile, bir
-olcekleme (scaling) problemi olabilir.
+Bir diğer problem ölçekleme (scaling) problemi olabilir, kavşaklar
+yolların ufak bir alanını temsil eder, kıyasla yolların tamamı
+fiziksel olarak daha fazla yer kaplar bu sebeple kavşak olmayan yol
+bölümünde olan kazaların sayıca daha fazla olması muhtemeldir. Bu
+fazlalık karşılaştırmayı yaniltabilir, elmalar ve armutları
+karşılaştırmış oluruz. Eğer elmalar ile elmaları karşılaştırmak
+istiyorsak kavşak dışındaki sayımları ölçekleyip diğer ölçüme
+skalasına yaklaştırmamız gerekir. Bu çok zor olmasa gerek, basit bir
+toplam ve bölme işlemi ile bunu başarabiliriz.
+
+Şimdi üzerinde karşılaştırma yapmak için sentetik veri üretelim. İlk
+veri birbirine yakın iki zaman serisi gösteriyor.
 
 ```python
 import pandas as pd
@@ -112,6 +123,54 @@ plt.savefig('stat_082_rapoi_01.jpg')
 ```
 
 ![](stat_082_rapoi_01.jpg)
+
+Verinin modeli nasil olacak? Her sene farkli bir Poisson dagilimi
+olsun demistik, ama bu dagilimlarin birbirine bazi yonlerden
+benzerlikleri de olmali. Acaba bir Poisson GLM (genel lineer model
+-generalized linear model-) yaratabilir miyiz? Her iki zaman
+serisindeki her senede farkli bir $\lambda$ ile uretiliyor olabilir,
+kavsak icin A digeri icin B dersek,
+
+$$
+\lambda_{A,t} = e^{\sigma + \beta + u_t}
+$$
+
+$$
+\lambda_{B,t} = e^{\sigma + u_t}
+$$
+
+Sonra ustteki parametreler ile $y$ verisinin su sekilde uretildigini
+farz edebiliriz,
+
+$$
+y_{A,t} \sim Poisson(\lambda_{A,t})
+$$
+
+$$
+y_{B,t} \sim Poisson(\lambda_{B,t})
+$$
+
+Denklemlerde $\beta$ 1 ya da 0 değeri alıyor, eğer $A$ ise 1 $B$ ise
+sıfır. Bunun sebebini birazdan göreceğiz. Peki niye üstel $e$
+kullanımı var? Eğer $\log$ alsaydık mesela ilk denklem için
+
+$$
+\log(\lambda_{A,t}) = \sigma + \beta + u_t
+$$
+
+elde ediyoruz, bu standart lineer regresyondan tanıdık bir format. Log
+bağlantının sebebi (ya da dolaylı $e$ kullanımı)
+
+$$
+\lambda_{A,t} = e^{\alpha} \cdot e^{\beta} \cdot e^{u_t}
+$$
+
+yapısına izin vermek / onu aktive etmek. Bunun birinci sebebi
+$\lambda$'nin pozitif olmasını sağlamak (çünkü Poisson oran $\lambda$
+pozitif olmalıdır, bir diğer sebep ise oran hesaplarının her zaman
+çarpımsal parametreler içermeleri. Tıpta bir ilaç uygulaması hastalık
+oranını katlayarak etkiler, hava kirliliği astim hastalığı oranını
+katlayarak arttırır, vb.
 
 
 ```python
