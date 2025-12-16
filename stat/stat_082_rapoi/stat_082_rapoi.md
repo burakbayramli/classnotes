@@ -115,6 +115,32 @@ plt.savefig('stat_082_rapoi_01.jpg')
 
 
 ```python
+
+def fit_poisson_ratio(years, near_arr, far_arr):
+    n_years = len(years)
+    with pm.Model() as model_synth:
+        sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
+        year_offset = pm.Normal("year_offset", 0.0, 1.0, shape=n_years)
+        year_effect = pm.Deterministic("year_effect", year_offset * sigma_year)
+
+        alpha = pm.Normal("alpha", 0.0, 2.0)
+        beta  = pm.Normal("beta", 0.0, 1.0)
+
+        log_mu = alpha + beta * group_pois + year_effect[year_idx_pois]
+        mu = pm.math.exp(log_mu)
+
+        obs = pm.Poisson("obs", mu=mu, observed=counts_pois)
+
+        rate_ratio = pm.Deterministic("rate_ratio", pm.math.exp(beta))
+
+        idata = pm.sample(1000, tune=1000, target_accept=0.9, return_inferencedata=True, random_seed=SEED)
+
+        graphviz = pm.model_to_graphviz(model_synth)
+        graphviz.graph_attr.update(dpi="100")
+        graphviz.render("stat_082_rapoi_03", format="jpg")
+        print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
+        return idata
+	
 def build_stacked_arrays(simdict):
     years = np.array(simdict["years"])
     near = np.array(simdict["near"])
@@ -126,44 +152,21 @@ def build_stacked_arrays(simdict):
     return years, counts, group, year_idx, near, far
 
 years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
-n_years = len(years)
-
-with pm.Model() as model_synth:
-    sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
-    year_offset = pm.Normal("year_offset", 0.0, 1.0, shape=n_years)
-    year_effect = pm.Deterministic("year_effect", year_offset * sigma_year)
-
-    alpha = pm.Normal("alpha", 0.0, 2.0)
-    beta  = pm.Normal("beta", 0.0, 1.0)
-
-    log_mu = alpha + beta * group_pois + year_effect[year_idx_pois]
-    mu = pm.math.exp(log_mu)
-
-    obs = pm.Poisson("obs", mu=mu, observed=counts_pois)
-
-    rate_ratio = pm.Deterministic("rate_ratio", pm.math.exp(beta))
-
-    idata = pm.sample(1000, tune=1000, target_accept=0.9, return_inferencedata=True, random_seed=SEED)
-
-    graphviz = pm.model_to_graphviz(model_synth)
-    graphviz.graph_attr.update(dpi="100")
-    graphviz.render("stat_082_rapoi_03", format="jpg")
-    
-print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
+idata = fit_poisson_ratio(years, near_arr, far_arr)
 ```
 
 ```text
                                                                                 
                               Step      Grad      Sampli…                       
   Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
- ------------------------------------------------------------------------------  
-  -------   2000    0         0.221     15        666.79    0:00:02   0:00:00   
+ ────────────────────────────────────────────────────────────────────────────── 
+  ━━━━━━━   2000    0         0.221     15        667.20    0:00:02   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.263     15        656.74    0:00:03   0:00:00   
+  ━━━━━━━   2000    0         0.263     15        623.56    0:00:03   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.241     15        645.92    0:00:03   0:00:00   
+  ━━━━━━━   2000    0         0.241     15        641.13    0:00:03   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.253     15        625.81    0:00:03   0:00:00   
+  ━━━━━━━   2000    0         0.253     15        618.21    0:00:03   0:00:00   
                                                   draws/s                       
                                                                                 
              mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
@@ -174,6 +177,7 @@ rate_ratio  1.049  0.036   0.985    1.119  ...    0.001  6444.508  2903.323  1.0
 
 [4 rows x 9 columns]
 ```
+
 
 ![](stat_082_rapoi_03.jpg)
 
@@ -190,6 +194,24 @@ plt.savefig('stat_082_rapoi_02.jpg')
 ```
 
 ![](stat_082_rapoi_02.jpg)
+
+
+```python
+np.random.seed(42)
+years = np.arange(1980, 2020)
+T = len(years)
+u_t = np.random.normal(0, 0.4, size=T)
+alpha = 3.0
+beta_true = np.log(1.3)   # 30% higher near rate
+mu_far = np.exp(alpha + u_t)
+mu_near = np.exp(alpha + beta_true + u_t)
+far = np.random.poisson(mu_far)
+near = np.random.poisson(mu_near)
+
+sim = {"years": years, "near": near, "far": far}
+years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
+idata = fit_poisson_ratio(years, near_arr, far_arr)
+```
 
 
 [devam edecek]
