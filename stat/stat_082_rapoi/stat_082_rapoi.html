@@ -161,7 +161,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> data.generate_synthetic(years<span class="op">=</span>years,</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                              alpha_log<span class="op">=</span><span class="fl">3.2</span>,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                              beta_log<span class="op">=</span>np.log(<span class="fl">1.05</span>),   <span class="co"># ~5% higher near</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                              beta_log<span class="op">=</span><span class="dv">0</span>,</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                              sigma_year<span class="op">=</span><span class="fl">0.4</span>,</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                              obs_model<span class="op">=</span><span class="st">&quot;poisson&quot;</span>,</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                              trend<span class="op">=</span>data.slow_trend)</span>
@@ -172,7 +172,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;far&quot;</span>: sim[<span class="st">&quot;far&quot;</span>]</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>SEED <span class="op">=</span> <span class="dv">123</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>SEED <span class="op">=</span> <span class="dv">333</span></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>np.random.seed(SEED)</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># quick plot of generated counts</span></span>
@@ -186,61 +186,68 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_082_rapoi_01.jpg" /></p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_stacked_arrays(simdict):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    years <span class="op">=</span> np.array(simdict[<span class="st">&quot;years&quot;</span>])</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    near <span class="op">=</span> np.array(simdict[<span class="st">&quot;near&quot;</span>])</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    far  <span class="op">=</span> np.array(simdict[<span class="st">&quot;far&quot;</span>])</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    n_years <span class="op">=</span> <span class="bu">len</span>(years)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> np.concatenate([near, far])</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    group <span class="op">=</span> np.concatenate([np.ones(n_years, dtype<span class="op">=</span><span class="bu">int</span>), np.zeros(n_years, dtype<span class="op">=</span><span class="bu">int</span>)])</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    year_idx <span class="op">=</span> np.concatenate([np.arange(n_years), np.arange(n_years)])</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> years, counts, group, year_idx, near, far</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr <span class="op">=</span> build_stacked_arrays(sim)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>n_years <span class="op">=</span> <span class="bu">len</span>(years)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model_synth:</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    sigma_year <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma_year&quot;</span>, sigma<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    year_offset <span class="op">=</span> pm.Normal(<span class="st">&quot;year_offset&quot;</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, shape<span class="op">=</span>n_years)</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    year_effect <span class="op">=</span> pm.Deterministic(<span class="st">&quot;year_effect&quot;</span>, year_offset <span class="op">*</span> sigma_year)</span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fit_poisson_ratio(years, near_arr, far_arr, fout):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    n_years <span class="op">=</span> <span class="bu">len</span>(years)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> pm.Model() <span class="im">as</span> model_synth:</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        sigma_year <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma_year&quot;</span>, sigma<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        year_offset <span class="op">=</span> pm.Normal(<span class="st">&quot;year_offset&quot;</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, shape<span class="op">=</span>n_years)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        year_effect <span class="op">=</span> pm.Deterministic(<span class="st">&quot;year_effect&quot;</span>, year_offset <span class="op">*</span> sigma_year)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> pm.Normal(<span class="st">&quot;alpha&quot;</span>, <span class="fl">0.0</span>, <span class="fl">2.0</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        beta  <span class="op">=</span> pm.Normal(<span class="st">&quot;beta&quot;</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        log_mu <span class="op">=</span> alpha <span class="op">+</span> beta <span class="op">*</span> group_pois <span class="op">+</span> year_effect[year_idx_pois]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        mu <span class="op">=</span> pm.math.exp(log_mu)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        obs <span class="op">=</span> pm.Poisson(<span class="st">&quot;obs&quot;</span>, mu<span class="op">=</span>mu, observed<span class="op">=</span>counts_pois)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        rate_ratio <span class="op">=</span> pm.Deterministic(<span class="st">&quot;rate_ratio&quot;</span>, pm.math.exp(beta))</span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> pm.Normal(<span class="st">&quot;alpha&quot;</span>, <span class="fl">0.0</span>, <span class="fl">2.0</span>)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    beta  <span class="op">=</span> pm.Normal(<span class="st">&quot;beta&quot;</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    log_mu <span class="op">=</span> alpha <span class="op">+</span> beta <span class="op">*</span> group_pois <span class="op">+</span> year_effect[year_idx_pois]</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> pm.math.exp(log_mu)</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    obs <span class="op">=</span> pm.Poisson(<span class="st">&quot;obs&quot;</span>, mu<span class="op">=</span>mu, observed<span class="op">=</span>counts_pois)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    rate_ratio <span class="op">=</span> pm.Deterministic(<span class="st">&quot;rate_ratio&quot;</span>, pm.math.exp(beta))</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1000</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>, return_inferencedata<span class="op">=</span><span class="va">True</span>, random_seed<span class="op">=</span>SEED)</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    graphviz <span class="op">=</span> pm.model_to_graphviz(model_synth)</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    graphviz.graph_attr.update(dpi<span class="op">=</span><span class="st">&quot;100&quot;</span>)</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    graphviz.render(<span class="st">&quot;stat_082_rapoi_03&quot;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;jpg&quot;</span>)</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(az.summary(idata, var_names<span class="op">=</span>[<span class="st">&quot;alpha&quot;</span>, <span class="st">&quot;beta&quot;</span>, <span class="st">&quot;sigma_year&quot;</span>, <span class="st">&quot;rate_ratio&quot;</span>], round_to<span class="op">=</span><span class="dv">3</span>))</span></code></pre></div>
-<pre class="text"><code>                                                                                
-                              Step      Grad      Sampli…                       
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        idata <span class="op">=</span> pm.sample(<span class="dv">1000</span>, tune<span class="op">=</span><span class="dv">1000</span>, target_accept<span class="op">=</span><span class="fl">0.9</span>, return_inferencedata<span class="op">=</span><span class="va">True</span>, random_seed<span class="op">=</span>SEED)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        graphviz <span class="op">=</span> pm.model_to_graphviz(model_synth)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        graphviz.graph_attr.update(dpi<span class="op">=</span><span class="st">&quot;100&quot;</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        graphviz.render(fout, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;jpg&quot;</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(az.summary(idata, var_names<span class="op">=</span>[<span class="st">&quot;alpha&quot;</span>, <span class="st">&quot;beta&quot;</span>, <span class="st">&quot;sigma_year&quot;</span>, <span class="st">&quot;rate_ratio&quot;</span>], round_to<span class="op">=</span><span class="dv">3</span>))</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        rr_samples <span class="op">=</span> idata.posterior[<span class="st">&quot;rate_ratio&quot;</span>].values.flatten()</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>        p_gt_1 <span class="op">=</span> (rr_samples <span class="op">&gt;</span> <span class="fl">1.0</span>).mean()</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">P(rate_ratio &gt; 1) = </span><span class="sc">{</span>p_gt_1<span class="sc">:.3f}</span><span class="ss">&quot;</span>)    </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> idata</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_stacked_arrays(simdict):</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    years <span class="op">=</span> np.array(simdict[<span class="st">&quot;years&quot;</span>])</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    near <span class="op">=</span> np.array(simdict[<span class="st">&quot;near&quot;</span>])</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    far  <span class="op">=</span> np.array(simdict[<span class="st">&quot;far&quot;</span>])</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    n_years <span class="op">=</span> <span class="bu">len</span>(years)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> np.concatenate([near, far])</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    group <span class="op">=</span> np.concatenate([np.ones(n_years, dtype<span class="op">=</span><span class="bu">int</span>), np.zeros(n_years, dtype<span class="op">=</span><span class="bu">int</span>)])</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    year_idx <span class="op">=</span> np.concatenate([np.arange(n_years), np.arange(n_years)])</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> years, counts, group, year_idx, near, far</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr <span class="op">=</span> build_stacked_arrays(sim)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>idata <span class="op">=</span> fit_poisson_ratio(years, near_arr, far_arr, <span class="st">&quot;stat_082_rapoi_03&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>                              Step      Grad      Sampli…                       
   Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
- ------------------------------------------------------------------------------  
-  -------   2000    0         0.221     15        666.79    0:00:02   0:00:00   
+                                                                                
+            2000    0         0.294     15        608.92    0:00:03   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.263     15        656.74    0:00:03   0:00:00   
+            2000    0         0.311     15        566.95    0:00:03   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.241     15        645.92    0:00:03   0:00:00   
+            2000    0         0.319     15        615.70    0:00:03   0:00:00   
                                                   draws/s                       
-  -------   2000    0         0.253     15        625.81    0:00:03   0:00:00   
+            2000    0         0.294     15        585.16    0:00:03   0:00:00   
                                                   draws/s                       
                                                                                 
              mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-alpha       3.231  0.070   3.089    3.354  ...    0.002   448.966   895.281  1.013
-beta        0.047  0.034  -0.016    0.112  ...    0.001  6444.508  2903.323  1.000
-sigma_year  0.498  0.052   0.405    0.596  ...    0.001   682.152  1494.371  1.006
-rate_ratio  1.049  0.036   0.985    1.119  ...    0.001  6444.508  2903.323  1.000
+alpha       3.162  0.054   3.060    3.264  ...    0.001  1063.983  1799.608  1.001
+beta       -0.008  0.036  -0.078    0.056  ...    0.001  8788.097  2684.766  1.006
+sigma_year  0.365  0.040   0.299    0.448  ...    0.001  1283.107  1917.308  1.003
+rate_ratio  0.993  0.036   0.925    1.058  ...    0.001  8788.097  2684.766  1.006
 
-[4 rows x 9 columns]</code></pre>
+[4 rows x 9 columns]
+
+P(rate_ratio &gt; 1) = 0.419</code></pre>
 <p><img src="stat_082_rapoi_03.jpg" /></p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior of rate ratio</span></span>
@@ -253,6 +260,51 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_082_rapoi_02.jpg" /></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> np.arange(<span class="dv">1980</span>, <span class="dv">2020</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="bu">len</span>(years)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>u_t <span class="op">=</span> np.random.normal(<span class="dv">0</span>, <span class="fl">0.4</span>, size<span class="op">=</span>T)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>beta_true <span class="op">=</span> np.log(<span class="fl">1.3</span>)   <span class="co"># 30% higher near rate</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>mu_far <span class="op">=</span> np.exp(alpha <span class="op">+</span> u_t)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>mu_near <span class="op">=</span> np.exp(alpha <span class="op">+</span> beta_true <span class="op">+</span> u_t)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>far <span class="op">=</span> np.random.poisson(mu_far)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>near <span class="op">=</span> np.random.poisson(mu_near)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> {<span class="st">&quot;years&quot;</span>: years, <span class="st">&quot;near&quot;</span>: near, <span class="st">&quot;far&quot;</span>: far}</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr <span class="op">=</span> build_stacked_arrays(sim)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>idata <span class="op">=</span> fit_poisson_ratio(years, near_arr, far_arr, <span class="st">&quot;stat_082_rapoi_03&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>                              Step      Grad      Sampli…                       
+  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
+                                                                                
+            2000    0         0.346     7         628.98    0:00:03   0:00:00   
+                                                  draws/s                       
+            2000    0         0.305     15        669.16    0:00:02   0:00:00   
+                                                  draws/s                       
+            2000    0         0.314     15        687.65    0:00:02   0:00:00   
+                                                  draws/s                       
+            2000    0         0.278     15        634.85    0:00:03   0:00:00   
+                                                  draws/s                       
+                                                                                
+             mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+alpha       2.879  0.073   2.736    3.011  ...    0.001  1030.075  1813.990  1.002
+beta        0.317  0.047   0.229    0.408  ...    0.001  8153.224  2749.679  1.000
+sigma_year  0.379  0.053   0.277    0.474  ...    0.001  1173.341  1764.667  1.003
+rate_ratio  1.375  0.065   1.258    1.503  ...    0.001  8153.224  2749.679  1.000
+
+[4 rows x 9 columns]
+
+P(rate_ratio &gt; 1) = 1.000</code></pre>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rr_samples <span class="op">=</span> idata.posterior[<span class="st">&quot;rate_ratio&quot;</span>].values.flatten()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">3</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>az.plot_posterior(rr_samples, hdi_prob<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Recovered rate ratio (Poisson synthetic)&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_04.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_082_rapoi_04.jpg" /></p>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, Istatistik, <em>Sayım, Poisson ve Negatif Binom Bazlı

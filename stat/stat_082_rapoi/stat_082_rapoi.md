@@ -86,7 +86,7 @@ years = np.arange(1950, 2011)
 
 sim = data.generate_synthetic(years=years,
                               alpha_log=3.2,
-                              beta_log=np.log(1.05),   # ~5% higher near
+                              beta_log=0,
                               sigma_year=0.4,
                               obs_model="poisson",
                               trend=data.slow_trend)
@@ -97,7 +97,7 @@ df = pd.DataFrame({
     "far": sim["far"]
 })
 
-SEED = 123
+SEED = 333
 np.random.seed(SEED)
 
 # quick plot of generated counts
@@ -116,7 +116,7 @@ plt.savefig('stat_082_rapoi_01.jpg')
 
 ```python
 
-def fit_poisson_ratio(years, near_arr, far_arr):
+def fit_poisson_ratio(years, near_arr, far_arr, fout):
     n_years = len(years)
     with pm.Model() as model_synth:
         sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
@@ -137,8 +137,11 @@ def fit_poisson_ratio(years, near_arr, far_arr):
 
         graphviz = pm.model_to_graphviz(model_synth)
         graphviz.graph_attr.update(dpi="100")
-        graphviz.render("stat_082_rapoi_03", format="jpg")
+        graphviz.render(fout, format="jpg")
         print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
+        rr_samples = idata.posterior["rate_ratio"].values.flatten()
+        p_gt_1 = (rr_samples > 1.0).mean()
+        print(f"\nP(rate_ratio > 1) = {p_gt_1:.3f}")    
         return idata
 	
 def build_stacked_arrays(simdict):
@@ -152,32 +155,32 @@ def build_stacked_arrays(simdict):
     return years, counts, group, year_idx, near, far
 
 years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
-idata = fit_poisson_ratio(years, near_arr, far_arr)
+idata = fit_poisson_ratio(years, near_arr, far_arr, "stat_082_rapoi_03")
 ```
 
-```text
-                                                                                
+```text                                                                                
                               Step      Grad      Sampli…                       
   Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
- ────────────────────────────────────────────────────────────────────────────── 
-  ━━━━━━━   2000    0         0.221     15        667.20    0:00:02   0:00:00   
+                                                                                
+            2000    0         0.294     15        608.92    0:00:03   0:00:00   
                                                   draws/s                       
-  ━━━━━━━   2000    0         0.263     15        623.56    0:00:03   0:00:00   
+            2000    0         0.311     15        566.95    0:00:03   0:00:00   
                                                   draws/s                       
-  ━━━━━━━   2000    0         0.241     15        641.13    0:00:03   0:00:00   
+            2000    0         0.319     15        615.70    0:00:03   0:00:00   
                                                   draws/s                       
-  ━━━━━━━   2000    0         0.253     15        618.21    0:00:03   0:00:00   
+            2000    0         0.294     15        585.16    0:00:03   0:00:00   
                                                   draws/s                       
                                                                                 
              mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-alpha       3.231  0.070   3.089    3.354  ...    0.002   448.966   895.281  1.013
-beta        0.047  0.034  -0.016    0.112  ...    0.001  6444.508  2903.323  1.000
-sigma_year  0.498  0.052   0.405    0.596  ...    0.001   682.152  1494.371  1.006
-rate_ratio  1.049  0.036   0.985    1.119  ...    0.001  6444.508  2903.323  1.000
+alpha       3.162  0.054   3.060    3.264  ...    0.001  1063.983  1799.608  1.001
+beta       -0.008  0.036  -0.078    0.056  ...    0.001  8788.097  2684.766  1.006
+sigma_year  0.365  0.040   0.299    0.448  ...    0.001  1283.107  1917.308  1.003
+rate_ratio  0.993  0.036   0.925    1.058  ...    0.001  8788.097  2684.766  1.006
 
 [4 rows x 9 columns]
-```
 
+P(rate_ratio > 1) = 0.419
+```
 
 ![](stat_082_rapoi_03.jpg)
 
@@ -210,9 +213,44 @@ near = np.random.poisson(mu_near)
 
 sim = {"years": years, "near": near, "far": far}
 years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
-idata = fit_poisson_ratio(years, near_arr, far_arr)
+idata = fit_poisson_ratio(years, near_arr, far_arr, "stat_082_rapoi_03")
 ```
 
+```text                                                                                
+                              Step      Grad      Sampli…                       
+  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
+                                                                                
+            2000    0         0.346     7         628.98    0:00:03   0:00:00   
+                                                  draws/s                       
+            2000    0         0.305     15        669.16    0:00:02   0:00:00   
+                                                  draws/s                       
+            2000    0         0.314     15        687.65    0:00:02   0:00:00   
+                                                  draws/s                       
+            2000    0         0.278     15        634.85    0:00:03   0:00:00   
+                                                  draws/s                       
+                                                                                
+             mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+alpha       2.879  0.073   2.736    3.011  ...    0.001  1030.075  1813.990  1.002
+beta        0.317  0.047   0.229    0.408  ...    0.001  8153.224  2749.679  1.000
+sigma_year  0.379  0.053   0.277    0.474  ...    0.001  1173.341  1764.667  1.003
+rate_ratio  1.375  0.065   1.258    1.503  ...    0.001  8153.224  2749.679  1.000
+
+[4 rows x 9 columns]
+
+P(rate_ratio > 1) = 1.000
+```
+
+```python
+rr_samples = idata.posterior["rate_ratio"].values.flatten()
+plt.figure(figsize=(6,3))
+az.plot_posterior(rr_samples, hdi_prob=0.95)
+plt.title("Recovered rate ratio (Poisson synthetic)")
+plt.legend()
+plt.tight_layout()
+plt.savefig('stat_082_rapoi_04.jpg')
+```
+
+![](stat_082_rapoi_04.jpg)
 
 [devam edecek]
 
