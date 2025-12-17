@@ -39,10 +39,10 @@ N = 576.
 lam = 537/N
 d = N*np.exp(-lam)
 probs = [d*1, d*lam, d*lam**2/2, d*(lam**3)/(3*2), d*(lam**4)/(4*3*2)]
-list(map(lambda x: np.round(x,2), probs))
+list(map(lambda x: float(np.round(x,2)), probs))
 ```
 
-```
+```text
 Out[1]: [226.74, 211.39, 98.54, 30.62, 7.14]
 ```
 
@@ -78,7 +78,7 @@ Bir diğer problem ölçekleme (scaling) problemi olabilir, kavşaklar
 yolların ufak bir alanını temsil eder, kıyasla yolların tamamı
 fiziksel olarak daha fazla yer kaplar bu sebeple kavşak olmayan yol
 bölümünde olan kazaların sayıca daha fazla olması muhtemeldir. Bu
-fazlalık karşılaştırmayı yaniltabilir, elmalar ve armutları
+fazlalık karşılaştırmayı yanıltabilir, elmalar ve armutları
 karşılaştırmış oluruz. Eğer elmalar ile elmaları karşılaştırmak
 istiyorsak kavşak dışındaki sayımları ölçekleyip diğer ölçüme
 skalasına yaklaştırmamız gerekir. Bu çok zor olmasa gerek, basit bir
@@ -104,8 +104,8 @@ sim = data.generate_synthetic(years=years,
 
 df = pd.DataFrame({
     "year": sim["years"],
-    "near": sim["near"],
-    "far": sim["far"]
+    "A": sim["A"],
+    "B": sim["B"]
 })
 
 SEED = 333
@@ -113,8 +113,8 @@ np.random.seed(SEED)
 
 # quick plot of generated counts
 plt.figure(figsize=(10,4))
-plt.plot(df.year, df.near, label="kavsak", marker="o")
-plt.plot(df.year, df.far, label="diger", marker="x")
+plt.plot(df.year, df.A, label="kavsak", marker="o")
+plt.plot(df.year, df.B, label="diger", marker="x")
 plt.xlabel("Sene"); plt.ylabel("Sayim")
 plt.title("Sentetik sayim (Poisson)")
 plt.legend()
@@ -124,22 +124,22 @@ plt.savefig('stat_082_rapoi_01.jpg')
 
 ![](stat_082_rapoi_01.jpg)
 
-Verinin modeli nasil olacak? Her sene farkli bir Poisson dagilimi
-olsun demistik, ama bu dagilimlarin birbirine bazi yonlerden
-benzerlikleri de olmali. Acaba bir Poisson GLM (genel lineer model
--generalized linear model-) yaratabilir miyiz? Her iki zaman
-serisindeki her senede farkli bir $\lambda$ ile uretiliyor olabilir,
-kavsak icin A digeri icin B dersek,
+Verinin modeli ne olacak? Her sene farklı bir Poisson dağılımı olsun
+demiştik, ama bu dağılımların birbirine bazı yönlerden benzerlikleri
+de olmalı. Bir Poisson GLM (genel lineer model -generalized linear
+model-) yaratabiliriz, her iki zaman serisindeki her sene ölçümü
+farklı bir $\lambda$ ile üretiliyor olabilir, parametrelerde kavşak
+için A diğeri için B dersek,
 
 $$
-\lambda_{A,t} = e^{\sigma + \beta + u_t}
+\lambda_{A,t} = e^{\alpha + \beta + u_t}
 $$
 
 $$
-\lambda_{B,t} = e^{\sigma + u_t}
+\lambda_{B,t} = e^{\alpha + u_t}
 $$
 
-Sonra ustteki parametreler ile $y$ verisinin su sekilde uretildigini
+Üstteki parametreleri kullanarak $y$ verisinin şu şekilde üretildiğini
 farz edebiliriz,
 
 $$
@@ -150,12 +150,13 @@ $$
 y_{B,t} \sim Poisson(\lambda_{B,t})
 $$
 
-Denklemlerde $\beta$ 1 ya da 0 değeri alıyor, eğer $A$ ise 1 $B$ ise
-sıfır. Bunun sebebini birazdan göreceğiz. Peki niye üstel $e$
-kullanımı var? Eğer $\log$ alsaydık mesela ilk denklem için
+Denklemlerde $\beta$ dolaylı olarak $\lambda$ oranlarını hesaplayacak,
+dikkat edelim bir formülde var, diğerinde yok. Bunun sebebini birazdan
+göreceğiz. Peki niye üstel $e$ kullanımı var? Eğer $\log$ alsaydık
+mesela ilk denklem için
 
 $$
-\log(\lambda_{A,t}) = \sigma + \beta + u_t
+\log(\lambda_{A,t}) = \alpha + \beta + u_t
 $$
 
 elde ediyoruz, bu standart lineer regresyondan tanıdık bir format. Log
@@ -165,17 +166,105 @@ $$
 \lambda_{A,t} = e^{\alpha} \cdot e^{\beta} \cdot e^{u_t}
 $$
 
-yapısına izin vermek / onu aktive etmek. Bunun birinci sebebi
-$\lambda$'nin pozitif olmasını sağlamak (çünkü Poisson oran $\lambda$
-pozitif olmalıdır, bir diğer sebep ise oran hesaplarının her zaman
-çarpımsal parametreler içermeleri. Tıpta bir ilaç uygulaması hastalık
-oranını katlayarak etkiler, hava kirliliği astim hastalığı oranını
-katlayarak arttırır, vb.
+yapısına izin vermek / onu aktıve etmek. Böylece $\lambda$'nin pozitif
+olmasını sağlıyoruz (çünkü Poisson oran $\lambda$ pozitif olmalıdır),
+ayrıca oran hesapları çarpımsal parametreler içerdiği için bu
+varsayımı modele dahil etmiş oluyoruz. Tıpta bir ilaç uygulaması
+hastalık oranını katlayarak etkiler, hava kirliliği astim hastalığı
+oranını katlayarak arttırır, vb. Bu tür faraziyeler üstel hesap
+üzerinden formülasyona dahil edilmiş oldu.
 
+Peki aradığımız oran $\beta$ nasıl hesaplanacak? Bu hesap aslında
+*dolaylı* bir hesap. Biraz cebir ile $\beta$'nin neye eşit olduğunu
+görünce bunu anlayacağız, $\beta$'i bir eşitliğin sağında olacak
+şekilde bildiğimiz denklemleri düzenlersek,
+
+$$
+\lambda_{A,t} - \lambda_{B,t} = \alpha + \beta + u_t - (\alpha + u_t) 
+$$
+
+$$
+= \alpha + \beta + u_t - \alpha - u_t = \beta
+$$
+
+Yani,
+
+$$
+\lambda_{A,t} - \lambda_{B,t} = \beta
+$$
+
+Eğer iki tarafın üstelini alırsak
+
+$$
+\frac{e^{A,t}}{e^{B,t}} = e^{\beta}
+$$
+
+Yani $\beta$ parametresi otomatik olarak A ve B farklı iki Poisson
+$\lambda$ parametrelerinin oranını hesaplıyor! Dikkat bu hesabın
+yapılabilmesi için GLM hesabının spesifik bir oran hesabı yapması
+gerekli değil. Tek gereken GLM Poisson için gereken temel veri GLM
+regresyonuna, ya da Bayes MCMC hesabına verilirken, tüm verinin, yani
+A ve B birleşmiş olarak şu şekilde hesaplanarak sunulması,
+
+$$
+\log(\lambda_{A,t}) = \alpha + \beta \cdot g_t + u_t
+$$
+
+Tabii usttekinin hemen ardindan $\lambda$ kullanilarak bir Poisson
+uretimi yapildigini dusunuyoruz, geri yonde ise eldeki veri uzerinden
+MCMC ile sonsal -posterior- elde edip o dagilimdan orneklem
+aliyoruz, bunlar standart yaklasimlar.
+
+Konuya dönersek $\beta \cdot g_t$ ifadesindeki $g_t$'ye dikkat, bu
+parametre A grup verisi için 1 B grup verisi için 0 diyecek. Yani bu
+formülasyonun doğal sonucu olarak elde ettiğimiz $\beta$ iki $\lambda$
+parametresinin oranı haline gelecek. Her veri noktası $\beta$'yi kendi
+tarafına doğru çekmeye uğraşacak, bu al-ver itme-çekme arasında
+$\beta$'nin varacağı yer onun tüm zaman dilimleri için geçerli bir
+oran değerine ulaşmasıdır.
+
+Verinin nasıl oluşturulduğunu görelim,
 
 ```python
+def build_stacked_arrays(simdict):
+    years = np.array(simdict["years"])
+    A = np.array(simdict["A"])
+    B  = np.array(simdict["B"])
+    n_years = len(years)
+    counts = np.concatenate([A, B])
+    group = np.concatenate([np.ones(n_years, dtype=int), np.zeros(n_years, dtype=int)])
+    year_idx = np.concatenate([np.arange(n_years), np.arange(n_years)])
+    return years, counts, group, year_idx, A, B
 
-def fit_poisson_ratio(years, near_arr, far_arr, fout):
+years, counts_pois, group_pois, year_idx_pois, A_arr, B_arr = build_stacked_arrays(sim)
+print (len(A_arr), A_arr[:5], '..')
+print (len(B_arr), B_arr[:5], '..')
+print (len(counts_pois), counts_pois)
+print ('A mi B mi?')
+print (group_pois)
+```
+
+```text
+61 [14 24 38 15 13] ..
+61 [10 24 26 13 12] ..
+122 [14 24 38 15 13 47  7 17 28 13 14 22 43 19 26 18 53 46 30 25 33 44 14 37
+ 15 26 22 12 24 15 21  8 10 23 51 19 22 24 16 23 14 16 20 34 34 21 67 26
+ 44 57 20 16 54 18 26 49 35 51 50 25 18 10 24 26 13 12 39 10 22 41 15 15
+ 24 33 18 18 17 64 57 35 22 32 44 15 31  8 14 35 14 27 22 26 10 13 17 41
+ 27 31 42 11 27 19 12 31 27 28 25 69 36 30 69 20 17 52 15 33 53 38 51 44
+ 37 27]
+A mi B mi?
+[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0]
+```
+
+Şimdi oranın sonsal dağılımını PyMC ile ortaya çıkartalım ve ondan
+örneklem alalım.
+
+```python
+def fit_poisson_ratio(years, A_arr, B_arr, fout):
     n_years = len(years)
     with pm.Model() as model_synth:
         sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
@@ -185,10 +274,10 @@ def fit_poisson_ratio(years, near_arr, far_arr, fout):
         alpha = pm.Normal("alpha", 0.0, 2.0)
         beta  = pm.Normal("beta", 0.0, 1.0)
 
-        log_mu = alpha + beta * group_pois + year_effect[year_idx_pois]
-        mu = pm.math.exp(log_mu)
+        log_lambda = alpha + beta * group_pois + year_effect[year_idx_pois]
+        lambda_ = pm.math.exp(log_lambda)
 
-        obs = pm.Poisson("obs", mu=mu, observed=counts_pois)
+        obs = pm.Poisson("obs", mu=lambda_, observed=counts_pois)
 
         rate_ratio = pm.Deterministic("rate_ratio", pm.math.exp(beta))
 
@@ -203,59 +292,54 @@ def fit_poisson_ratio(years, near_arr, far_arr, fout):
         print(f"\nP(rate_ratio > 1) = {p_gt_1:.3f}")    
         return idata
 	
-def build_stacked_arrays(simdict):
-    years = np.array(simdict["years"])
-    near = np.array(simdict["near"])
-    far  = np.array(simdict["far"])
-    n_years = len(years)
-    counts = np.concatenate([near, far])
-    group = np.concatenate([np.ones(n_years, dtype=int), np.zeros(n_years, dtype=int)])
-    year_idx = np.concatenate([np.arange(n_years), np.arange(n_years)])
-    return years, counts, group, year_idx, near, far
-
-years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
-idata = fit_poisson_ratio(years, near_arr, far_arr, "stat_082_rapoi_03")
+idata = fit_poisson_ratio(years, A_arr, B_arr, "stat_082_rapoi_03")
 ```
 
-```text                                                                                
+```text
+                                                                                
                               Step      Grad      Sampli…                       
   Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
-                                                                                
-            2000    0         0.294     15        608.92    0:00:03   0:00:00   
-                                                  draws/s                       
-            2000    0         0.311     15        566.95    0:00:03   0:00:00   
-                                                  draws/s                       
-            2000    0         0.319     15        615.70    0:00:03   0:00:00   
-                                                  draws/s                       
-            2000    0         0.294     15        585.16    0:00:03   0:00:00   
+
+     2000    0         0.229     15        639.58    0:00:03   0:00:00   
+                                           draws/s                       
+     2000    0         0.306     15        676.39    0:00:02   0:00:00   
+                                           draws/s                       
+     2000    0         0.217     15        625.81    0:00:03   0:00:00   
+                                           draws/s                       
+     2000    0         0.278     15        660.10    0:00:03   0:00:00   
                                                   draws/s                       
                                                                                 
              mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-alpha       3.162  0.054   3.060    3.264  ...    0.001  1063.983  1799.608  1.001
-beta       -0.008  0.036  -0.078    0.056  ...    0.001  8788.097  2684.766  1.006
-sigma_year  0.365  0.040   0.299    0.448  ...    0.001  1283.107  1917.308  1.003
-rate_ratio  0.993  0.036   0.925    1.058  ...    0.001  8788.097  2684.766  1.006
+alpha       3.234  0.068   3.107    3.366  ...    0.002   480.667   818.932  1.012
+beta       -0.040  0.035  -0.107    0.023  ...    0.001  6166.596  2749.392  1.000
+sigma_year  0.489  0.050   0.397    0.582  ...    0.001   615.175  1211.197  1.011
+rate_ratio  0.961  0.033   0.899    1.024  ...    0.001  6166.596  2749.392  1.000
 
 [4 rows x 9 columns]
 
-P(rate_ratio > 1) = 0.419
+P(rate_ratio > 1) = 0.121
 ```
 
 ![](stat_082_rapoi_03.jpg)
 
+
 ```python
-# Plot posterior of rate ratio
 rr_samples = idata.posterior["rate_ratio"].values.flatten()
 plt.figure(figsize=(6,3))
 az.plot_posterior(rr_samples, hdi_prob=0.95)
-plt.axvline(np.exp(sim["beta_log"]), color="red", linestyle="--", label="true ratio")
-plt.title("Recovered rate ratio (Poisson synthetic)")
+plt.title("Hesaplanan oran (Poisson)")
 plt.legend()
 plt.tight_layout()
 plt.savefig('stat_082_rapoi_02.jpg')
 ```
 
 ![](stat_082_rapoi_02.jpg)
+
+Görüyoruz ki oranın dağılımı 1 etrafında kümelenmiş, o zaman iki sayım
+zaman serisinin birbirine yakın olduğuna karar verebiliriz çünkü
+oranları 1'e yakın.
+
+Şimdi yakın olmayan iki zaman serisi yaratalım,
 
 
 ```python
@@ -264,28 +348,29 @@ years = np.arange(1980, 2020)
 T = len(years)
 u_t = np.random.normal(0, 0.4, size=T)
 alpha = 3.0
-beta_true = np.log(1.3)   # 30% higher near rate
-mu_far = np.exp(alpha + u_t)
-mu_near = np.exp(alpha + beta_true + u_t)
-far = np.random.poisson(mu_far)
-near = np.random.poisson(mu_near)
+beta_true = np.log(1.3)   # 30% higher A rate
+mu_B = np.exp(alpha + u_t)
+mu_A = np.exp(alpha + beta_true + u_t)
+B = np.random.poisson(mu_B)
+A = np.random.poisson(mu_A)
 
-sim = {"years": years, "near": near, "far": far}
-years, counts_pois, group_pois, year_idx_pois, near_arr, far_arr = build_stacked_arrays(sim)
-idata = fit_poisson_ratio(years, near_arr, far_arr, "stat_082_rapoi_03")
+sim = {"years": years, "A": A, "B": B}
+years, counts_pois, group_pois, year_idx_pois, A_arr, B_arr = build_stacked_arrays(sim)
+idata = fit_poisson_ratio(years, A_arr, B_arr, "stat_082_rapoi_03")
 ```
 
-```text                                                                                
+```text
+                                                                                
                               Step      Grad      Sampli…                       
   Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
-                                                                                
-            2000    0         0.346     7         628.98    0:00:03   0:00:00   
-                                                  draws/s                       
-            2000    0         0.305     15        669.16    0:00:02   0:00:00   
-                                                  draws/s                       
-            2000    0         0.314     15        687.65    0:00:02   0:00:00   
-                                                  draws/s                       
-            2000    0         0.278     15        634.85    0:00:03   0:00:00   
+
+     2000    0         0.346     7         693.28    0:00:02   0:00:00   
+                                           draws/s                       
+     2000    0         0.305     15        707.15    0:00:02   0:00:00   
+                                           draws/s                       
+     2000    0         0.314     15        658.19    0:00:03   0:00:00   
+                                           draws/s                       
+     2000    0         0.278     15        651.81    0:00:03   0:00:00   
                                                   draws/s                       
                                                                                 
              mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
@@ -303,7 +388,7 @@ P(rate_ratio > 1) = 1.000
 rr_samples = idata.posterior["rate_ratio"].values.flatten()
 plt.figure(figsize=(6,3))
 az.plot_posterior(rr_samples, hdi_prob=0.95)
-plt.title("Recovered rate ratio (Poisson synthetic)")
+plt.title("Hesaplanan oran (Poisson)")
 plt.legend()
 plt.tight_layout()
 plt.savefig('stat_082_rapoi_04.jpg')
@@ -311,7 +396,8 @@ plt.savefig('stat_082_rapoi_04.jpg')
 
 ![](stat_082_rapoi_04.jpg)
 
-[devam edecek]
+Bu zaman serileri birbirine yakın değiller. Sonsal dağılımın
+kümelendiği yer 1'den çok uzakta. 
 
 Kaynaklar
 

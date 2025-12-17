@@ -254,7 +254,7 @@ plt.savefig('tser_023_bsts_03.jpg')
 Görüldüğü gibi 0.7 odaklı yanlı veriyi modele verince kodlar bunun
 sonsal $\theta$ dağılımına yansımasını saptadı, ortalama 0.72
 çıktı. Ayrıca tek bir sayı değil, bütün bir dağılımı sonuç olarak
-aldığımız için çok daha çetrefil analizleri bu sonuçtan alabiliriz.
+aldığımız için çok daha çetrefil analizleri bu sonuçta yapabiliriz.
 
 Katmanlar alttaki gibi,
 
