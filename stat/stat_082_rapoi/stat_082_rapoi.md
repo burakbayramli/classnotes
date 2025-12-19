@@ -56,7 +56,7 @@ olmadığı ispatlanmış oldu.
 Üstteki örnekte tek bir Poisson dağılımı modellendi. Peki ya zamana
 yayılmış (sene bazında), ve bir A grubu ile bir diğer B grubunun sayım
 verisini karşılaştırmak isteseydik? Problem şu şekilde ortaya
-çıkabilir, 
+çıkabilir:
 
 Ülke bazında spesifik bir olaya bağlı bir sayım verisine bakıyoruz, bu
 veri sene bazında toplanıyor. Bir veri mesela yıllık "dört yol
@@ -68,7 +68,7 @@ yüksek / farklı olup olmadığını merak ediyoruz, o zaman diğer bir
 
 O zaman elimizde iki zaman serisi olacak, her sene için iki tane
 ölçüm. Her ölçüm rakamının, bir sayım olduğu için, Poisson
-dağılımınden geldiğini kabul edebiliriz. Fakat dikkat, her sene *aynı*
+dağılımından geldiğini kabul edebiliriz. Fakat dikkat, her sene *aynı*
 Poisson dağılımından mı geliyor? Büyük ihtimalle hayır çünkü kaza
 sayılarında sene bazlı değişim olabilir: araç sayıları farklı
 olabilir, yol şartları değişmiş olabilir. Karşılaştırma mekanizmasının
@@ -201,27 +201,31 @@ $$
 
 Yani $\beta$ parametresi otomatik olarak A ve B farklı iki Poisson
 $\lambda$ parametrelerinin oranını hesaplıyor! Dikkat bu hesabın
-yapılabilmesi için GLM hesabının spesifik bir oran hesabı yapması
-gerekli değil. Tek gereken GLM Poisson için gereken temel veri GLM
+yapılabilmesi için GLM'in spesifik bir oran hesabı yapması gerekli
+değil. Tek gereken GLM Poisson için gereken temel veri GLM
 regresyonuna, ya da Bayes MCMC hesabına verilirken, tüm verinin, yani
-A ve B birleşmiş olarak şu şekilde hesaplanarak sunulması,
+A ve B birleşmiş olarak şu şekilde sunulması,
 
 $$
 \log(\lambda_{A,t}) = \alpha + \beta \cdot g_t + u_t
 $$
 
-Tabii usttekinin hemen ardindan $\lambda$ kullanilarak bir Poisson
-uretimi yapildigini dusunuyoruz, geri yonde ise eldeki veri uzerinden
-MCMC ile sonsal -posterior- elde edip o dagilimdan orneklem
-aliyoruz, bunlar standart yaklasimlar.
+Tabii üsttekinin hemen ardından $\lambda$ kullanılarak bir Poisson
+üretimi yapıldığını düşünüyoruz, geri yönde ise eldeki veri üzerinden
+MCMC ile sonsal -posterior- elde edip o dağılımdan örneklem
+alıyoruz, bunlar standart yaklaşımlar.
 
 Konuya dönersek $\beta \cdot g_t$ ifadesindeki $g_t$'ye dikkat, bu
-parametre A grup verisi için 1 B grup verisi için 0 diyecek. Yani bu
+parametre A grup verisi için 1, B grup verisi için 0 diyecek. Yani bu
 formülasyonun doğal sonucu olarak elde ettiğimiz $\beta$ iki $\lambda$
 parametresinin oranı haline gelecek. Her veri noktası $\beta$'yi kendi
 tarafına doğru çekmeye uğraşacak, bu al-ver itme-çekme arasında
 $\beta$'nin varacağı yer onun tüm zaman dilimleri için geçerli bir
-oran değerine ulaşmasıdır.
+orana ulaşmasıdır.
+
+Senesel farklar, eğer var ise, her sene için farklı olmasına izin
+verdiğimiz $u_t$ ile olabilir, bu parametre ile o farklılığı
+"yakalayabiliyoruz".
 
 Verinin nasıl oluşturulduğunu görelim,
 
