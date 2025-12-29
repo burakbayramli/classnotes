@@ -1,4 +1,4 @@
-# Obje Takibi
+# Obje Takibi, Filtreler
 
 Video görüntülerinde obje takibi için filtreleme kullanmak mümkün, bu
 teknik ile iki boyutlu yansımadan üç boyutlu konum bilgisini takip
@@ -9,160 +9,394 @@ etmemiz gerekir. Bulduğumuz, iki boyutlu kordinat değerleridir, yani
 ölçümsel büyüklüklerdir, ardından KF'in en son konumuna göre ürettiği
 tahmin ile aradaki fark KF'i düzeltmek için kullanılır.
 
-Parçacık filtreleri (PF) ile yine konum ve ölçüm fonksiyonu ikilisi var,
-fakat ölçüm ile konumdan üretilen tahmin arasındaki uyumu bir olasılık,
-olurluk (likelihood) olarak belirtmemiz gerekiyor, ki böylece PF tahminde
-başarılı olan parçacıklara daha fazla önem verebilsin, ve hipotezler o
-yönde devam etsin. 
-
-Alttaki örnekte OpenCV kütüphanesinden elde ettiğimiz 2 boyutlu değerleri
-ölçüm $y_t$ için kullanacağız. Değerler OpenCV'nin bir satranç tahtası
-şeklinin köşe noktalarını `cvFindChessboardCorners` ile buluyor (ve
-onları `cvDrawChessboardCorners` ile onları resimde gösteriyoruz).
-
-Elimizdeki "gürültülü'' ölçümler iki boyutlu noktasal değerler. Gürültülü çünkü
-kamera bize bu imajları aktarırken hata eklemiş olabilir, OpenCV fonksiyonu
-hesabı yaparken hata eklemiş olabilir, bir sürü olasılık var.
-
 Kalman Fitreleri
 
-Bu örnekte, ayrıca, ilk kez KF ortamında boyut değişikliği olasılığını net bir
-şekilde görebiliyoruz. Gizli konum bilgisi $x_t$ 3 boyutlu bir nokta, ama
-elimizdeki ölçüm 2 boyutlu bir "yansıma''. Yansıma sırasında kaçınılmaz olarak
-değer kaybediliyor, bir boyutun bilgisi ortadan yokoluyor. Ama tüm bu
-bilinmezlere rağmen Kalman filtresinin bizim için gizli bilgiyi hesaplamasını
-istiyoruz.
+Bu notlarda, düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik
+bir satranç tahtası deseni bulunan bir kartonun, video görüntülerinden
+üç boyutlu hareketinin nasıl takip edilebileceğini sistematik ve
+formel bir çerçevede açıklar. Amaç, daha önce kullanılan
+projeksiyon-matrisi ağırlıklı ve kararsız yaklaşımın yerine, geometrik
+olarak doğru ve istatistiksel olarak tutarlı bir yöntem koymaktır.
 
-Bu problemde $\Phi$ matrisi ne olacaktır? Obje takibi konularında $\Phi$'nin ne
-olduğunu hayal etmek daha kolay, $\Phi$ matrisi iki zaman dilimi arasındaki
-"hareketi'' temsil edecek. Bu problemdeki ek bir kolaylık bu hareketi önceden
-bildiğimiz, ve hareketin tek yönde olduğu. Yani resimde benim tuttuğum kartonu
-ne kadar hızla hareket ettirdiğimi ben önceden probleme bildiriyorum. Yer
-değişikliğini $d$ olarak tanımladım, ve $\Phi$ şöyle oldu:
+Ele alınan yöntem iki ana bileşenden oluşur:
 
-$$ 
-\Phi = 
-\left[\begin{array}{rrrr}
-1 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & d \\
-0 & 0 & 0 & 1
-\end{array}\right]
+1. Görsel poz kestirimi (pose estimation) — her karede nesnenin 3B konumu
+2. Durum uzayı modeli + Kalman Filtresi — bu konumların zaman içinde düzgünleştirilmesi
+
+1. Problem Tanımı ve Varsayımlar
+
+Fiziksel senaryo
+
+- Nesne: Üzerinde 4×4 karelik satranç tahtası baskısı olan düz bir karton
+- Hareket: Masa üzerinde, yaklaşık sabit hızla, yatay doğrultuda
+- Kamera: Sabit, tek kamera (monoküler)
+
+Temel varsayımlar
+
+1. Satranç tahtası düzdür (planar)
+2. Tahtanın gerçek dünya geometrisi biliniyor (kare aralıkları eşit)
+3. Kamera iç parametreleri (intrinsics) yaklaşık olarak biliniyor
+4. Hareket, kısa zaman aralıklarında sabit hız modeliyle iyi temsil edilebilir
+
+Bu varsayımlar, problemi hem iyi tanımlı hem de çözülebilir hale getirir.
+
+Geometri ve Dinamiğin Ayrılması
+
+Bu yaklaşımda kritik tasarım kararı şudur: Görüntü geometrisi ile
+zaman dinamiğini birbirinden ayırmak
+
+Bu ayrım sayesinde:
+
+- Görüntüden 3B poz kestirimi ayrı bir problem olarak ele alınır
+- Zaman içindeki hareket, durum uzayı modeli ile temsil edilir
+
+Bu mimari, hem matematiksel olarak tutarlı hem de pratikte kararlı bir çözüm sunar.
+
+Satranç Tahtası ve İç Köşeler (Önemli Detay)
+
+4×4 karelik bir satranç tahtası:
+
+- 4 × 4 kare
+- ama yalnızca 3 × 3 iç köşe içerir
+
+OpenCV’nin `findChessboardCorners` fonksiyonu kareleri değil, iç köşeleri bekler.
+
+Bu yüzden kullanılan boyut:
+
+```
+board_size = (3, 3)
+```
+
+Bu detay gözden kaçarsa:
+- Hiç köşe bulunmaz
+- Takip tamamen sessizce başarısız olur
+
+Poz Kestirimi (Pose Estimation) – solvePnP
+
+Temel ilke
+
+Elimizde şunlar var:
+
+- 3B noktalar: Satranç tahtasının gerçek dünyadaki köşe koordinatları
+- 2B noktalar: Görüntüde tespit edilen köşeler
+- Kamera matrisi: `K`
+
+Bu bilgilerle aşağıdaki geometrik problem çözülür:
+
+"Bilinen 3B noktaların, görüntü düzlemindeki 2B izdüşümlerinden,
+nesnenin kamera koordinat sistemindeki konum ve yöneliminin
+kestirilmesi"
+
+Sayısal çözüm (OpenCV)
+
+```python
+ok, rvec, tvec = cv2.solvePnP(object_points,
+                             image_points,
+                             K,
+                             distCoeffs)
+```
+
+Çözüm sonucunda elde edilen büyüklükler:
+
+- `rvec`: Nesnenin yönelimini temsil eden dönme vektörü (Rodrigues gösterimi)
+- `tvec`: Nesnenin kamera koordinat sistemindeki öteleme vektörü
+
+`tvec = [X, Y, Z]` doğrudan metrik 3B konumdur.
+
+Bu aşamadan sonra:
+
+- Projeksiyon matrisi tahmin etmeye
+- Homojen koordinatlarla oynamaya
+- Filtrenin içine kamera modeli sokmaya
+
+gerek yoktur.
+
+Neden X–Z Düzlemi Takip Edildi?
+
+Fiziksel senaryoda:
+
+- Y ekseni (yükseklik) neredeyse sabittir
+- Asıl bilgi:
+  - X → yatay hareket
+  - Z → kameraya uzaklık
+
+Bu yüzden Kalman filtresinin durumu şöyle tanımlandı:
+
+```
+x_t = [X, Z, dX, dZ]
+```
+
+Bu, problemi:
+
+- Daha düşük boyutlu
+- Daha kararlı
+- Daha yorumlanabilir
+
+hale getirir.
+
+Kalman Filtresi Modeli
+
+Durum geçiş modeli (sabit hız)
+
+$$
+X_{t+1} = X_t + dX_t · \Delta t
 $$
 
-Dikkat edersek $\Phi$ 4x4 boyutunda, 3x3 değil. 3 boyutlu kordinatları temsil
-etmek için homojen kordinat sistemini kullandığımız için böyle oldu, o sebeple
-zaten $x_t$ de 4x1 oldu, ona uymak için $\Phi$'nin değişmesi gerekiyordu. $\Phi
-x_t$ çarpımının hakikaten kartonu hareket ettirdiğini göstermek için bu çarpımı
-bir örnek üzerinde yapalım: Diyelim ki $x_t =
-\left[\begin{array}{cccc}a_1&a_2&a_3&a_4\end{array}\right]$ o zaman $\Phi x_t$
-ya da $x_{t+1}$ şu hale gelir:
-$\left[\begin{array}{cccc}a_1&a_2&a_3+d&a_4\end{array}\right]$.
+$$
+Z_{t+1} = Z_t + dZ_t · \Delta t
+$$
 
+Matris formunda:
 
-Bakıyoruz, hakikaten de d kadarlık bir yer değişimi z kordinatı, yani
-derinlik üzerinde eklenmiş. Test amaçlarımız için d = -0.5 aldık, yani
-satranç tahta kartonunun her zaman diliminde kameraya doğru 0.5 cm
-ilerlediğini belirttik. Tabii bu da kabaca bir tahmindi (her ne kadar
-hareketi yaptıran ben olsam bile!), ama filrelemenin gücünü burada
-görüyoruz. Benim tahminimde "gürültü'' yani "hata payı'' var, ölçümde
-gürültü var, tüm bunlar üst üste konsa bile filtre yine de gizli konumu
-bulacak.
-
-Ölçümsel dönüşümü temsil eden H'e ben onun temeli olan yansıtma
-(projection) kelimesinden gelen P matrisinden bahsedelim. Yansıma matrisi
-görüntü (vision) literatüründe iğne delik kamerası (pinhole camera)
-modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama /
-kalibrasyon (calibration) denen apayrı bir işlemin parçasıdır. OpenCV
-içinde kalibrasyon için fonksiyonlar var, biz de bunları denedik,
-kalibrasyon için kullandığımız resimlerle alakalı olmalı, elde edilen
-sonuçlardan memnun kalmadık. Alternatif olarak şunu yaptık; resimde görülen
-yeşil yüzey bizim programın oluşturduğu hayali bir yüzey. Filtrenin o anki
-tahminini P üzerinden görüntüye yansıtarak bu yüzeyi oluşturduk, böylece
-deneme / yanılma yöntemiyle pek çok P değerini deneyerek, yüzeyin resimde
-görülen masanın sonunda çıkacak şekilde olmasını sağladık. Yansıtma için
-kullanılan $K$ matrisi, yansıtma metotu ve başlangıç imajı altta:
-
-![](vision_60track_01.jpg)
-
-```python
-from numpy import *
-
-K = array([[700., 0., 300.],
-           [0., 700., 330.],
-           [0., 0., 1.]])
-
-def proj_board(im, xl, yl, z):
-    h,w = im.shape[:2]
-    for x in arange(xl-9, xl+9, 0.5):
-        for y in arange(yl-9, yl+9, 0.5):
-            X = array([x, y, z])
-            q = dot(K, X)
-            q = [int(q[0]/q[2]), int(q[1]/q[2])]           
-            if q[0] >= w: return
-            if h-q[1] >= h: return
-            if h-q[1] < 0: return
-            im[h-q[1], q[0]] = 255
+```
+F = [[1, 0, dt, 0],
+     [0, 1, 0, dt],
+     [0, 0, 1,  0],
+     [0, 0, 0,  1]]
 ```
 
-O noktaya gelince istediğimiz P değerini bulmuş oluyorduk. Yansıtma
-matrisleri 3x3 olur, KF buna bir dördüncü [0 0 0] satırı ekleyerek onu 4x3
-H haline getiriyor.
+Ölçüm modeli
 
-KF'in başlangıç noktası olarak P'yi bulmak için kullandığımız masa sonunu
-kullandık. Kararsızlık ölçütü Q için, ki bu değişken bir Gaussian
-kovaryansıdır, $Q = I \cdot 150 cm$ değerini kullandık, yani oldukça büyük bir
-kararsızlık değeri kullandık. Sebep başlangıç değeri olan masa ortasını
-seçtik, ve takip edeceğimiz satranç tahtasının nerede olduğunu bilmiyoruz,
-"emin değiliz''.  Bu kararsızlığı sayısal olarak programa bildirmiş olduk.
+Ölçüm, doğrudan PnP’den gelen konumdur:
+
+```
+z_t = [X, Z]
+```
+
+Bu nedenle ölçüm matrisi basittir:
+
+```
+H = [[1, 0, 0, 0],
+     [0, 1, 0, 0]]
+```
+
+Model tamamen doğrusal olduğu için klasik Kalman filtresi yeterlidir.
 
 ```python
-import sys; sys.path.append('../../tser/tser_083_kf')
-import util
-from kalman_3d import *
 import cv2
+import numpy as np
 
-dim = 3
-if __name__ == "__main__":    
-    fin = "/opt/Downloads/skdata/chessb-right.avi"
-    cap = cv2.VideoCapture(fin)
-    N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    kalman = Kalman(util.K, mu_init=array([1., 1., 165., 0.5]))
-    
-    for i in range(N):
+class KalmanXZ:
+    def __init__(self, dt):
+        self.dt = dt
+
+        # State: [X, Z, dX, dZ]
+        self.x = np.zeros((4, 1))
+        self.P = np.eye(4) * 10.0
+
+        self.F = np.array([
+            [1, 0, dt, 0],
+            [0, 1, 0, dt],
+            [0, 0, 1,  0],
+            [0, 0, 0,  1]
+        ])
+
+        self.H = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0]
+        ])
+
+        self.Q = np.eye(4) * 0.05
+        self.R = np.eye(2) * 2.0
+        self.I = np.eye(4)
+
+    def predict(self):
+        self.x = self.F @ self.x
+        self.P = self.F @ self.P @ self.F.T + self.Q
+
+    def update(self, z):
+        z = z.reshape(2, 1)
+        y = z - self.H @ self.x
+        S = self.H @ self.P @ self.H.T + self.R
+        K = self.P @ self.H.T @ np.linalg.inv(S)
+
+        self.x = self.x + K @ y
+        self.P = (self.I - K @ self.H) @ self.P
+
+def run_kf();
+
+    cap = cv2.VideoCapture("/opt/Downloads/skdata/chessb-left.avi")
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    dt = 1.0 / fps
+
+    # ---- Camera intrinsics ----
+    K = np.array([
+        [700.,   0., 300.],
+        [  0., 700., 330.],
+        [  0.,   0.,   1.]
+    ])
+    dist = np.zeros((5, 1))
+    board_size = (3, 3)
+    square_size = 1.0
+
+    objp = np.zeros((board_size[0] * board_size[1], 3), np.float32)
+    objp[:, :2] = np.mgrid[0:3, 0:3].T.reshape(-1, 2)
+    objp *= square_size
+
+    axis = np.float32([
+        [0, 0, 0],
+        [2, 0, 0],
+        [0, 2, 0],
+        [0, 0, -2]
+    ])
+
+    kf = KalmanXZ(dt)
+    initialized = False
+
+    raw_trace = []
+    kf_trace = []
+
+    frame_idx = 0
+
+    while True:
         ret, frame = cap.read()
-        h,w = frame.shape[:2]
-        #proj_board(frame, 1, 1, 160) # basla
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        status, corners = cv2.findChessboardCorners( gray, (dim,dim))
-        is_x = []; is_y = []
-        if status: 
-            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)
-            for p in corners:
-                is_x.append(p[0][0])
-                is_y.append(p[0][1])
+        if not ret:
+            break
 
-        if len(is_x) > 0 : 
-            kalman.update(array([is_x[5], h-is_y[5], 1.]))
-            util.proj_board(gray, 
-                            kalman.mu_hat[0], 
-                            kalman.mu_hat[1], 
-                            kalman.mu_hat[2])
-        if i % 10 == 0: 
-            cv2.imwrite('/tmp/kf-out-%d.jpg' % i, gray)
-        cv2.imshow('frame',gray)
-        cv2.waitKey(20)
-    
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        found, corners = cv2.findChessboardCorners(gray, board_size)
+
+        cv2.putText(frame,
+                    f"Frame {frame_idx} | found={found}",
+                    (20, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 255, 0) if found else (0, 0, 255),
+                    2)
+
+        if found:
+            corners = cv2.cornerSubPix(
+                gray, corners, (5, 5), (-1, -1),
+                (cv2.TERM_CRITERIA_EPS +
+                 cv2.TERM_CRITERIA_MAX_ITER, 30, 0.01)
+            )
+
+            ok, rvec, tvec = cv2.solvePnP(objp, corners, K, dist)
+
+            if ok:
+                X, Z = float(tvec[0]), float(tvec[2])
+
+                raw_trace.append((X, Z))
+
+                if not initialized:
+                    kf.x[0, 0] = X
+                    kf.x[1, 0] = Z
+                    initialized = True
+
+                kf.predict()
+                kf.update(np.array([X, Z]))
+
+                kf_trace.append((kf.x[0, 0], kf.x[1, 0]))
+
+                cv2.drawChessboardCorners(frame, board_size, corners, found)
+
+                imgpts, _ = cv2.projectPoints(axis, rvec, tvec, K, dist)
+                imgpts = imgpts.astype(int)
+                o = tuple(imgpts[0].ravel())
+
+                cv2.line(frame, o, tuple(imgpts[1].ravel()), (0, 0, 255), 3)
+                cv2.line(frame, o, tuple(imgpts[2].ravel()), (0, 255, 0), 3)
+                cv2.line(frame, o, tuple(imgpts[3].ravel()), (255, 0, 0), 3)
+
+        cv2.imshow("Chessboard KF Tracking", frame)
+        if cv2.waitKey(20) & 0xFF == 27:
+            break
+
+        frame_idx += 1
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+    with open("trajectory.csv", "w") as f:
+        f.write("frame,raw_X,raw_Z,kf_X,kf_Z\n")
+        for i, ((rx, rz), (kx, kz)) in enumerate(zip(raw_trace, kf_trace)):
+            f.write(f"{i},{rx},{rz},{kx},{kz}\n")
+
+    print(f"\nSaved trajectory.csv with {len(kf_trace)} samples")
+
+run_kf()
 ```
 
-Kalman filtreleri (KF), eğer kararsızlık Gaussian olarak gösterilebiliyorsa çok
-faydalı, ve hızlı bir yöntem. Bir KF bellekte çok az yer tutar, 3 boyutlu bir
-Gaussian için 3x1 boyutunda bir ortalama vektörü, ve 3x3 boyutunda bir kovaryans
-matrisi yeterlidir, yani 3 + 9 = 12 sayı.
+Notasyon ve Semboller
 
-![](kf-out-50.jpg)
-![](kf-out-70.jpg)
+| Sembol | Açıklama |
+|------|---------|
+| \(X, Y, Z\) | Nesnenin kamera koordinat sistemindeki 3B konumu (metrik birimler) |
+| \(X, Z\) | Bu çalışmada takip edilen yatay (X) ve derinlik (Z) bileşenleri |
+| \(dX, dZ\) | İlgili eksenlerde hız bileşenleri |
+| \(x_t\) | Kalman filtresinin \(t\) anındaki durum vektörü \([X, Z, dX, dZ]^T\) |
+| \(z_t\) | Ölçüm vektörü (PnP’den elde edilen \([X, Z]^T\)) |
+| \(rvec\) | Nesnenin yönelimini temsil eden Rodrigues dönme vektörü |
+| \(tvec\) | Nesnenin kamera koordinat sistemindeki öteleme vektörü \([X, Y, Z]^T\) |
+| \(K\) | Kamera iç parametrelerini içeren kamera matrisi |
+| \(F\) | Durum geçiş matrisi (sabit hız modeli) |
+| \(H\) | Ölçüm matrisi |
+| \(Q\) | Süreç gürültüsü kovaryans matrisi |
+| \(R\) | Ölçüm gürültüsü kovaryans matrisi |
+
+```python
+import pandas as pd
+
+df = pd.read_csv("trajectory.csv")
+print(df.head())
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.plot(df["kf_X"], df["kf_Z"], df["frame"],
+        label="Kalman trajectory")
+
+ax.scatter(df["raw_X"], df["raw_Z"], df["frame"],
+           s=5, alpha=0.4, label="Raw PnP")
+
+ax.set_xlabel("X (cm)")
+ax.set_ylabel("Z (cm)")
+ax.set_zlabel("Frame")
+
+ax.legend()
+plt.tight_layout()
+plt.savefig('vision_60track_02.jpg')
+```
+
+![](vision_60track_02.jpg)
+
+
+Başlangıç Salınımı (Zig-Zag) Neden Normal?
+
+Elde edilen sonuçlarda başta küçük bir zig-zag görülmesi doğaldır:
+
+- Başlangıçta hız bilinmiyor (0 varsayılıyor)
+- İlk ölçümlerle hız öğreniliyor
+- Filtre kısa bir “ısınma” (burn-in) süreci yaşıyor
+
+Bu, Kalman filtrelerinde beklenen ve sağlıklı bir davranıştır.
+
+İstenirse:
+- İlk iki ölçümden hız tahmin edilerek
+- ya da RTS smoother uygulanarak
+
+tamamen giderilebilir.
+
+
+8. Sonuç ve Değerlendirme
+
+Bu yaklaşım ile:
+
+- Görsel geometri doğru yerde çözüldü
+- Kalman filtresi yalnızca zaman dinamiğini üstlendi
+- Ayar gereksinimi ciddi şekilde azaldı
+- Elde edilen yörünge fiziksel olarak anlamlı hale geldi
+
+Özet olarak, kullanılan modelleme yaklaşımı hem geometrik hem de
+istatistiksel açıdan tutarlıdır ve uygulamada güvenilir sonuçlar
+üretir.
+
+Bu mimari, daha ileri çalışmalar (RTS smoothing, ivmeli hareket
+modelleri, faktör grafik tabanlı yaklaşımlar) için sağlam bir temel
+sunmaktadır.
 
 Parcaçık Filtreleri (Partıcle Filters)
 
