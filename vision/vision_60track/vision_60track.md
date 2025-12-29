@@ -9,21 +9,37 @@ etmemiz gerekir. Bulduğumuz, iki boyutlu kordinat değerleridir, yani
 ölçümsel büyüklüklerdir, ardından KF'in en son konumuna göre ürettiği
 tahmin ile aradaki fark KF'i düzeltmek için kullanılır.
 
+Ölçümsel dönüşümü temsil eden H'e ben onun temeli olan yansıtma
+(projection) kelimesinden gelen P matrisinden bahsedelim. Yansıma matrisi
+görüntü (vision) literatüründe iğne delik kamerası (pinhole camera)
+modelinden ileri gelen bir matristir ve bu matrisi hesaplamak ayarlama /
+kalibrasyon (calibration) denen apayrı bir işlemin parçasıdır. OpenCV
+içinde kalibrasyon için fonksiyonlar var, biz de bunları denedik,
+kalibrasyon için kullandığımız resimlerle alakalı olmalı, elde edilen
+sonuçlardan memnun kalmadık. Alternatif olarak şunu yaptık; resimde görülen
+yeşil yüzey bizim programın oluşturduğu hayali bir yüzey. Filtrenin o anki
+tahminini P üzerinden görüntüye yansıtarak bu yüzeyi oluşturduk, böylece
+deneme / yanılma yöntemiyle pek çok P değerini deneyerek, yüzeyin resimde
+görülen masanın sonunda çıkacak şekilde olmasını sağladık. Yansıtma için
+kullanılan $K$ matrisi, yansıtma metotu ve başlangıç imajı altta:
+
+![](vision_60track_01.jpg)
+
 Kalman Fitreleri
 
-Bu notlarda, düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik
-bir satranç tahtası deseni bulunan bir kartonun, video görüntülerinden
-üç boyutlu hareketinin nasıl takip edilebileceğini sistematik ve
-formel bir çerçevede açıklar. Amaç, daha önce kullanılan
-projeksiyon-matrisi ağırlıklı ve kararsız yaklaşımın yerine, geometrik
-olarak doğru ve istatistiksel olarak tutarlı bir yöntem koymaktır.
+Amacımız düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik bir
+satranç tahtası deseni bulunan bir kartonun, video görüntülerinden üç
+boyutlu hareketinin nasıl takip edilebileceğini sistematık ve formel
+bir çerçevede açıklamak. Geometrik olarak doğru ve istatistiksel
+olarak tutarlı bir yöntem kullanmak istiyoruz.
 
 Ele alınan yöntem iki ana bileşenden oluşur:
 
-1. Görsel poz kestirimi (pose estimation) — her karede nesnenin 3B konumu
-2. Durum uzayı modeli + Kalman Filtresi — bu konumların zaman içinde düzgünleştirilmesi
+1. Görsel poz kestirimi (pose estimation) — her karede nesnenin 3D
+konumu
 
-1. Problem Tanımı ve Varsayımlar
+2. Durum uzayı modeli + Kalman Filtresi — bu konumların zaman içinde
+düzgünleştirilmesi.
 
 Fiziksel senaryo
 
@@ -47,7 +63,7 @@ zaman dinamiğini birbirinden ayırmak
 
 Bu ayrım sayesinde:
 
-- Görüntüden 3B poz kestirimi ayrı bir problem olarak ele alınır
+- Görüntüden 3D poz kestirimi ayrı bir problem olarak ele alınır
 - Zaman içindeki hareket, durum uzayı modeli ile temsil edilir
 
 Bu mimari, hem matematiksel olarak tutarlı hem de pratikte kararlı bir çözüm sunar.
@@ -77,13 +93,13 @@ Temel ilke
 
 Elimizde şunlar var:
 
-- 3B noktalar: Satranç tahtasının gerçek dünyadaki köşe koordinatları
-- 2B noktalar: Görüntüde tespit edilen köşeler
+- 3D noktalar: Satranç tahtasının gerçek dünyadaki köşe koordinatları
+- 2D noktalar: Görüntüde tespit edilen köşeler
 - Kamera matrisi: `K`
 
 Bu bilgilerle aşağıdaki geometrik problem çözülür:
 
-"Bilinen 3B noktaların, görüntü düzlemindeki 2B izdüşümlerinden,
+"Bilinen 3D noktaların, görüntü düzlemindeki 2D izdüşümlerinden,
 nesnenin kamera koordinat sistemindeki konum ve yöneliminin
 kestirilmesi"
 
@@ -101,7 +117,7 @@ ok, rvec, tvec = cv2.solvePnP(object_points,
 - `rvec`: Nesnenin yönelimini temsil eden dönme vektörü (Rodrigues gösterimi)
 - `tvec`: Nesnenin kamera koordinat sistemindeki öteleme vektörü
 
-`tvec = [X, Y, Z]` doğrudan metrik 3B konumdur.
+`tvec = [X, Y, Z]` doğrudan metrik 3D konumdur.
 
 Bu aşamadan sonra:
 
@@ -321,7 +337,7 @@ Notasyon ve Semboller
 
 | Sembol | Açıklama |
 |------|---------|
-| \(X, Y, Z\) | Nesnenin kamera koordinat sistemindeki 3B konumu (metrik birimler) |
+| \(X, Y, Z\) | Nesnenin kamera koordinat sistemindeki 3D konumu (metrik birimler) |
 | \(X, Z\) | Bu çalışmada takip edilen yatay (X) ve derinlik (Z) bileşenleri |
 | \(dX, dZ\) | İlgili eksenlerde hız bileşenleri |
 | \(x_t\) | Kalman filtresinin \(t\) anındaki durum vektörü \([X, Z, dX, dZ]^T\) |
@@ -380,8 +396,7 @@ Bu, Kalman filtrelerinde beklenen ve sağlıklı bir davranıştır.
 
 tamamen giderilebilir.
 
-
-8. Sonuç ve Değerlendirme
+Sonuç ve Değerlendirme
 
 Bu yaklaşım ile:
 
@@ -397,6 +412,11 @@ istatistiksel açıdan tutarlıdır ve uygulamada güvenilir sonuçlar
 Bu mimari, daha ileri çalışmalar (RTS smoothing, ivmeli hareket
 modelleri, faktör grafik tabanlı yaklaşımlar) için sağlam bir temel
 sunmaktadır.
+
+Takip sirasinda daha onceki bazi kodlardan alinan ciktilar alttadir.
+
+![](kf-out-50.jpg)
+![](kf-out-70.jpg)
 
 Parcaçık Filtreleri (Partıcle Filters)
 
@@ -448,7 +468,8 @@ import util
 from PF import *
 
 dim = 3
-if __name__ == "__main__":    
+
+def run_pf():
 
     fin = "/opt/Downloads/skdata/chessb-right.avi"
     cap = cv2.VideoCapture(fin)
@@ -476,8 +497,9 @@ if __name__ == "__main__":
         cv2.imshow('frame',gray)
         if cv2.waitKey(20) & 0xFF == ord('q'):
             break        
-    
-      
+
+run_pf()
+
 ```
 
 Kaynaklar

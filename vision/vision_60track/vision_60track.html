@@ -96,20 +96,34 @@ olduğunu önceden biliyor olmamız gerekir, ve onu sonraki resimlerde
 takip etmemiz gerekir. Bulduğumuz, iki boyutlu kordinat değerleridir,
 yani ölçümsel büyüklüklerdir, ardından KF’in en son konumuna göre
 ürettiği tahmin ile aradaki fark KF’i düzeltmek için kullanılır.</p>
+<p>Ölçümsel dönüşümü temsil eden H’e ben onun temeli olan yansıtma
+(projection) kelimesinden gelen P matrisinden bahsedelim. Yansıma
+matrisi görüntü (vision) literatüründe iğne delik kamerası (pinhole
+camera) modelinden ileri gelen bir matristir ve bu matrisi hesaplamak
+ayarlama / kalibrasyon (calibration) denen apayrı bir işlemin
+parçasıdır. OpenCV içinde kalibrasyon için fonksiyonlar var, biz de
+bunları denedik, kalibrasyon için kullandığımız resimlerle alakalı
+olmalı, elde edilen sonuçlardan memnun kalmadık. Alternatif olarak şunu
+yaptık; resimde görülen yeşil yüzey bizim programın oluşturduğu hayali
+bir yüzey. Filtrenin o anki tahminini P üzerinden görüntüye yansıtarak
+bu yüzeyi oluşturduk, böylece deneme / yanılma yöntemiyle pek çok P
+değerini deneyerek, yüzeyin resimde görülen masanın sonunda çıkacak
+şekilde olmasını sağladık. Yansıtma için kullanılan <span
+class="math inline">\(K\)</span> matrisi, yansıtma metotu ve başlangıç
+imajı altta:</p>
+<p><img src="vision_60track_01.jpg" /></p>
 <p>Kalman Fitreleri</p>
-<p>Bu notlarda, düz bir yüzey üzerinde hareket eden, üzerinde 4×4
-karelik bir satranç tahtası deseni bulunan bir kartonun, video
-görüntülerinden üç boyutlu hareketinin nasıl takip edilebileceğini
-sistematik ve formel bir çerçevede açıklar. Amaç, daha önce kullanılan
-projeksiyon-matrisi ağırlıklı ve kararsız yaklaşımın yerine, geometrik
-olarak doğru ve istatistiksel olarak tutarlı bir yöntem koymaktır.</p>
+<p>Amacımız düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik
+bir satranç tahtası deseni bulunan bir kartonun, video görüntülerinden
+üç boyutlu hareketinin nasıl takip edilebileceğini sistematık ve formel
+bir çerçevede açıklamak. Geometrik olarak doğru ve istatistiksel olarak
+tutarlı bir yöntem kullanmak istiyoruz.</p>
 <p>Ele alınan yöntem iki ana bileşenden oluşur:</p>
 <ol type="1">
-<li><p>Görsel poz kestirimi (pose estimation) — her karede nesnenin 3B
+<li><p>Görsel poz kestirimi (pose estimation) — her karede nesnenin 3D
 konumu</p></li>
 <li><p>Durum uzayı modeli + Kalman Filtresi — bu konumların zaman içinde
-düzgünleştirilmesi</p></li>
-<li><p>Problem Tanımı ve Varsayımlar</p></li>
+düzgünleştirilmesi.</p></li>
 </ol>
 <p>Fiziksel senaryo</p>
 <ul>
@@ -134,7 +148,7 @@ getirir.</p>
 zaman dinamiğini birbirinden ayırmak</p>
 <p>Bu ayrım sayesinde:</p>
 <ul>
-<li>Görüntüden 3B poz kestirimi ayrı bir problem olarak ele alınır</li>
+<li>Görüntüden 3D poz kestirimi ayrı bir problem olarak ele alınır</li>
 <li>Zaman içindeki hareket, durum uzayı modeli ile temsil edilir</li>
 </ul>
 <p>Bu mimari, hem matematiksel olarak tutarlı hem de pratikte kararlı
@@ -155,13 +169,13 @@ başarısız olur</p>
 <p>Temel ilke</p>
 <p>Elimizde şunlar var:</p>
 <ul>
-<li>3B noktalar: Satranç tahtasının gerçek dünyadaki köşe
+<li>3D noktalar: Satranç tahtasının gerçek dünyadaki köşe
 koordinatları</li>
-<li>2B noktalar: Görüntüde tespit edilen köşeler</li>
+<li>2D noktalar: Görüntüde tespit edilen köşeler</li>
 <li>Kamera matrisi: <code>K</code></li>
 </ul>
 <p>Bu bilgilerle aşağıdaki geometrik problem çözülür:</p>
-<p>“Bilinen 3B noktaların, görüntü düzlemindeki 2B izdüşümlerinden,
+<p>“Bilinen 3D noktaların, görüntü düzlemindeki 2D izdüşümlerinden,
 nesnenin kamera koordinat sistemindeki konum ve yöneliminin
 kestirilmesi”</p>
 <p>Sayısal çözüm (OpenCV)</p>
@@ -177,7 +191,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <li><code>tvec</code>: Nesnenin kamera koordinat sistemindeki öteleme
 vektörü</li>
 </ul>
-<p><code>tvec = [X, Y, Z]</code> doğrudan metrik 3B konumdur.</p>
+<p><code>tvec = [X, Y, Z]</code> doğrudan metrik 3D konumdur.</p>
 <p>Bu aşamadan sonra:</p>
 <ul>
 <li>Projeksiyon matrisi tahmin etmeye</li>
@@ -383,7 +397,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
 <tbody>
 <tr class="odd">
 <td>(X, Y, Z)</td>
-<td>Nesnenin kamera koordinat sistemindeki 3B konumu (metrik
+<td>Nesnenin kamera koordinat sistemindeki 3D konumu (metrik
 birimler)</td>
 </tr>
 <tr class="even">
@@ -472,9 +486,7 @@ doğaldır:</p>
 <p>İstenirse: - İlk iki ölçümden hız tahmin edilerek - ya da RTS
 smoother uygulanarak</p>
 <p>tamamen giderilebilir.</p>
-<ol start="8" type="1">
-<li>Sonuç ve Değerlendirme</li>
-</ol>
+<p>Sonuç ve Değerlendirme</p>
 <p>Bu yaklaşım ile:</p>
 <ul>
 <li>Görsel geometri doğru yerde çözüldü</li>
@@ -488,6 +500,9 @@ istatistiksel açıdan tutarlıdır ve uygulamada güvenilir sonuçlar
 <p>Bu mimari, daha ileri çalışmalar (RTS smoothing, ivmeli hareket
 modelleri, faktör grafik tabanlı yaklaşımlar) için sağlam bir temel
 sunmaktadır.</p>
+<p>Takip sirasinda daha onceki bazi kodlardan alinan ciktilar
+alttadir.</p>
+<p><img src="kf-out-50.jpg" /> <img src="kf-out-70.jpg" /></p>
 <p>Parcaçık Filtreleri (Partıcle Filters)</p>
 <p>Parçacık filtreleri (PF) bir dağılımı ayrıksal olarak temsil
 edebilirler. Diyelim ki tek boyutlu bir dağılımı 100 öğe içeren bir
@@ -541,36 +556,37 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PF <span class="im">import</span> <span class="op">*</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>dim <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:    </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    fin <span class="op">=</span> <span class="st">&quot;/opt/Downloads/skdata/chessb-right.avi&quot;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv2.VideoCapture(fin)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FRAME_COUNT))</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    pf <span class="op">=</span> PF(util.K, <span class="dv">200</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        h,w <span class="op">=</span> frame.shape[:<span class="dv">2</span>]</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        status, corners <span class="op">=</span> cv2.findChessboardCorners( gray, (dim,dim))</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        is_x <span class="op">=</span> []<span class="op">;</span> is_y <span class="op">=</span> []</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> status: </span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> p <span class="kw">in</span> corners:</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                is_x.append(p[<span class="dv">0</span>][<span class="dv">0</span>])</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                is_y.append(p[<span class="dv">0</span>][<span class="dv">1</span>])</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(is_x) <span class="op">&gt;</span> <span class="dv">0</span>: </span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>            pf.update(array([is_x[<span class="dv">5</span>], h<span class="op">-</span>is_y[<span class="dv">5</span>], <span class="fl">1.</span>]))</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            mu_x <span class="op">=</span> pf.average()</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            util.proj_board(gray, mu_x[<span class="dv">0</span>], mu_x[<span class="dv">1</span>], mu_x[<span class="dv">2</span>])</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        cv2.imshow(<span class="st">&#39;frame&#39;</span>,gray)</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cv2.waitKey(<span class="dv">20</span>) <span class="op">&amp;</span> <span class="bn">0xFF</span> <span class="op">==</span> <span class="bu">ord</span>(<span class="st">&#39;q&#39;</span>):</span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span>        </span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>      </span></code></pre></div>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_pf():</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    fin <span class="op">=</span> <span class="st">&quot;/opt/Downloads/skdata/chessb-right.avi&quot;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv2.VideoCapture(fin)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FRAME_COUNT))</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    pf <span class="op">=</span> PF(util.K, <span class="dv">200</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        ret, frame <span class="op">=</span> cap.read()</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        h,w <span class="op">=</span> frame.shape[:<span class="dv">2</span>]</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        status, corners <span class="op">=</span> cv2.findChessboardCorners( gray, (dim,dim))</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        is_x <span class="op">=</span> []<span class="op">;</span> is_y <span class="op">=</span> []</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> status: </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> p <span class="kw">in</span> corners:</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                is_x.append(p[<span class="dv">0</span>][<span class="dv">0</span>])</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                is_y.append(p[<span class="dv">0</span>][<span class="dv">1</span>])</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(is_x) <span class="op">&gt;</span> <span class="dv">0</span>: </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            pf.update(array([is_x[<span class="dv">5</span>], h<span class="op">-</span>is_y[<span class="dv">5</span>], <span class="fl">1.</span>]))</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            mu_x <span class="op">=</span> pf.average()</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>            util.proj_board(gray, mu_x[<span class="dv">0</span>], mu_x[<span class="dv">1</span>], mu_x[<span class="dv">2</span>])</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        cv2.imshow(<span class="st">&#39;frame&#39;</span>,gray)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cv2.waitKey(<span class="dv">20</span>) <span class="op">&amp;</span> <span class="bn">0xFF</span> <span class="op">==</span> <span class="bu">ord</span>(<span class="st">&#39;q&#39;</span>):</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span>        </span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>run_pf()</span></code></pre></div>
 <p>Kaynaklar</p>
 <p>[1] Bayramlı, <a
 href="https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&amp;st=1y9rflqg&amp;raw=1">Sample
