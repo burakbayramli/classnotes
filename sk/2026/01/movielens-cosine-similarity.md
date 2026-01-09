@@ -1,5 +1,7 @@
 # Movielens Kosinus Benzerligi, Film Tavsiyesi
 
+
+
 ```python
 content = open("movrecom.py").read()
 print(content.replace('\n', '\r\n'))
@@ -91,7 +93,9 @@ if __name__ == "__main__":
 
 
 
+Kodlar
 
+[movprep.py](../../stat/stat_140_pmf/movprep.py)
 
 
 Kaynaklar
