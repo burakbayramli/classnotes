@@ -126,7 +126,7 @@ def gen_html_sk():
         
 def title_sk(to):
     d = "sk"
-    for year in range(2000,2026):
+    for year in range(2000,2027):
         if year == 2007: continue
         out = d + "/" + str(year) + "/index.md"
         fout = codecs.open(out,mode="w",encoding="utf-8")

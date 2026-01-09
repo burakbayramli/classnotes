@@ -193,36 +193,6 @@ Bizim beğenilerle bize en yakın seyircileri bulduktan sonra o seyircilerin
 en yüksek not verdiği filmleri tavsiye olarak listeleyebiliriz.
 
 
-JSON
-
-Bir diğer seyrek sayılabilecek format her satırda ayrı kullanıcı için
-o kullanıcının beğeni raporunu JSON olarak vermek. Böylece kişi bazlı
-veri satır satır okunabilir ve her satır üzerinde `json.loads`
-işletilerek veri Python sözlüğüne çevirilebilir.
-
-```python
-import json, csv
-
-fin = d + "/ratings.csv"
-fout = d + "/ratings-json.csv"
-curruser = 0
-row_dict = {}
-fout = open(fout, "w")
-with open(fin) as csvfile:   
-    rd = csv.reader(csvfile,delimiter=',')
-    headers = {k: v for v, k in enumerate(next(rd))}
-    for row in rd:
-        if row[headers['userId']] != curruser:
-            fout.write(str(curruser) + "|")
-            fout.write(json.dumps(row_dict))
-            fout.write("\n")
-            fout.flush()
-            curruser = row[headers['userId']]
-            row_dict = {}       
-        row_dict[int(row[headers['movieId']])] = float(row[headers['rating']])
-fout.close()
-```
-
 
 Kaynaklar
 
