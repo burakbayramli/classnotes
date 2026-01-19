@@ -3,6 +3,8 @@
 
 ## En Son
 
+19/1 - [Movielens Filmleri, Kosinüs Benzerliği, Tavsiyeler](https://burakbayramli.github.io/dersblog/sk/2026/01/movielens-cosine-similarity.html)
+
 17/12 - [Coğrafi İstatistiki Hesaplar, Oranlar](https://burakbayramli.github.io/dersblog/stat/stat_082_rapoi/cografi_istatistiki_hesaplar_oranlar.html)
 
 21/11 - [Bayes Usulü İstatistiki Analiz](https://burakbayramli.github.io/dersblog/stat/stat_047_bayes/bayes_usulu_istatistiki_analiz.html)
@@ -10,8 +12,6 @@
 19/11 - [Değişim Noktası Analizi - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_100_coal/degisim_noktasi_analizi__changepoint_analysis_.html)
 
 06/11 - [Ses Verisi İşleme, Tanıma](https://burakbayramli.github.io/dersblog/tser/tser_082_snd/ses_verisi_isleme_tanima.html)
-
-03/11 - [Maksimum Sonsal Hesabı (Maximum a Posteriori / MAP)](https://burakbayramli.github.io/dersblog/stat/stat_022_est/tahmin_edici_hesaplar__estimators_.html)
 
 ## Konular, Referans
 
