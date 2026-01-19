@@ -221,10 +221,14 @@ if __name__ == "__main__":
 
 ```
 
-
-
-
-[devam edecek]
+Üstteki kod Movielens 32M verisinin `rating.csv` dosyasından bir
+`user_movie.txt` dosyası üretilmiş olduğunu farz ediyor. Bu yeni dosya
+içeriği daha önce tarif ettiğimiz sözlük yapısının dosyalaşmış
+halidir, her satırda bir kullanıcı varır ve her kullanıcının verdiği
+notlar o satırda bir JSON formatında paylaşılır, {'film1': not,
+"film10': not}` şeklinde. Bildiğimiz gibi JSON formatı bir sözlüğün
+diske yazılması için kullanılabilmektedir. Değişim kodu alttaki
+bağlantıda paylaşılıyor.
 
 Kodlar
 
