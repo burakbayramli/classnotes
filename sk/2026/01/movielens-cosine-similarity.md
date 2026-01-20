@@ -52,12 +52,12 @@ float (np.sum([x*y for x,y in zip(a,b)]))
 Out[1]: 11.0
 ```
 
-Görüldüğü her iki vektörde de gibi bir sürü sıfır var. Noktasal
+Görüldüğü gibi her iki vektörde de bir sürü sıfır var. Noktasal
 çarpımda sıfır çarpı herhangi bir değer sıfır olduğu için, herhangi
 bir hücrede sıfır varsa o noktadaki hesap sıfır olur, toplama etkisi
 olmaz. Ve dikkat üstteki örnekte sıfır olmayan çoğu değer çakışmıyor
 (ancak o zaman toplama katkı olabilir), mesela `a` 1'inci öğe 2 ama
-`b` aynı öğe sıfır, 'b' 2'inci öğe 3 ama onun eşi `a` uzerinde sıfır,
+`b` aynı öğe sıfır, `b` 2'inci öğe 3 ama onun eşi `a` uzerinde sıfır,
 demek ki ilk iki öğenin toplama hiçbir katkısı olmayacak. Keşke sıfır
 olan hücreleri direk atlayabilseydik, değil mi? Seyrek matris
 formatları aslında bunu yapmamızı sağlar. Kütüphane `scipy.sparse`
@@ -93,7 +93,7 @@ print (res)
 
 Aynı sonucu aldık. Bir kodlama püf noktası, diğer sözlükte anahtar
 erişimi `.get` ile yaptık, ve bu `get` bir şey bulamadıysa sıfır
-döndürsün diye bir "yoklük olağan değerini" bu çağrıya bildirdik,
+döndürsün diye bir "yokluk olağan değerini" bu çağrıya bildirdik,
 çünkü
 
 
@@ -120,7 +120,7 @@ elde edilir, böylece olmama durumunu sıfır değerine çevirip nihai
 
 Kodun optimal olduğunu görebiliriz. Gezilen ana sözlükte olmayan
 değerler (verilmemiş notlar) hiç gezilmiyor, çünkü onlar sözlük içinde
-bile değiller. Eğer çakışma yoksa `get` sıfır donduruyor, toplama
+bile değiller. Eğer çakışma yoksa `get` sıfır döndürüyor, toplama
 etkisi olmuyor.  Hesapsal yük açısından `get` çağrısı çok hızlıdır,
 sabit zamanda işler. Gezilen değerlerin okunması aynı şekilde.
 
@@ -136,12 +136,12 @@ olacaktır. Bu durumda kendim için bir noktasal çarpım kodluyorsam,
 algoritmayi her zaman diğer kullanıcının vektörünü gezecek şekilde
 kodlamalıyım.
 
-Altta tarif edilen algoritmanin kodlaması var, bu algoritma büyük
+Altta tarif edilen algoritmanın kodlaması var, bu algoritma büyük
 Movielens tabanı [2] üzerinden film tavsiyeleri üretiyor. Benim şahsi
-seçimlerimin `movpicks.csv` içinde olduğu farz ediliyor. Kod benim
-seçimlerimi kullanarak bana en yakın kullanıcıları bulur ve o en yakın
-kullanıcıların 4 ve daha üzeri not verdiği notları toparlayarak benim
-için bir tavsiye listesi oluşturur. 
+seçimlerim `movpicks.csv` içinde. Kod benim seçimlerimi kullanarak
+bana en yakın kullanıcıları bulur ve o en yakın kullanıcıların 4 ve
+daha üzeri not verdiği filmleri toparlayarak benim için bir tavsiye
+listesi oluşturur.
 
 ```python
 content = open("movrecom.py").read()
@@ -224,8 +224,8 @@ if __name__ == "__main__":
 Üstteki kod Movielens 32M verisinin `rating.csv` dosyasından bir
 `user_movie.txt` dosyası üretilmiş olduğunu farz ediyor. Bu yeni dosya
 içeriği daha önce tarif ettiğimiz sözlük yapısının dosyalaşmış
-halidir, her satırda bir kullanıcı varır ve her kullanıcının verdiği
-notlar o satırda bir JSON formatında paylaşılır, {'film1': not,
+halidir, her satırda bir kullanıcı vardır ve her kullanıcının verdiği
+notlar o satırda bir JSON formatında paylaşılır, `{'film1': not,
 "film10': not}` şeklinde. Bildiğimiz gibi JSON formatı bir sözlüğün
 diske yazılması için kullanılabilmektedir. Değişim kodu alttaki
 bağlantıda paylaşılıyor.
