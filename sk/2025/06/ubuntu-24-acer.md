@@ -68,6 +68,19 @@ Shortcuts altında Copy ve Paste komutlarını biz Ctrl X ve Ctrl V
 yapmayı tercih ediyoruz, mevcut ayarı silmek için listeden seçip
 Delete tuşuna basılır, ve yeni ayar tuşlaması verilir.
 
+Çalışma Alanı (Workspace) Değişimi
+
+Gnome masaüstü idare sisteminde olağan ayarlardan biri eğer fare
+işleci sol kısımdaki uygulama ikon bölgesinde (dock) ise iki parmaklı
+touchpad aşağı ve yukarı hareketlerinin çalışma alanı değişimi
+yapmasıdır. Bunun olmamasını istiyorsak,
+
+```
+gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action 'do-nothing'
+```
+
+ile bu davranışı iptal edebiliriz.
+
 Python 
 
 Sistem için bile olsa sık kullanılan Python paketleri bir sanal

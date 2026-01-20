@@ -1,4 +1,4 @@
-# Olasılıksal Matris Ayrıştırması ve Film Tavsiyeleri (Probabilistic Matrix Factorization) 
+# Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri 
 
 
 
