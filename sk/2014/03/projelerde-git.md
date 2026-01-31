@@ -200,31 +200,50 @@ hala aynı kalır; alınan yıldızlar, takipçiler, vs. değişmez.
 
 ### Başka Kullanıcı İsmi ile Github'da Çalışmak
 
-Bazen çoğunlukla kullandığımızdan farklı bir kullanıcı üzerinden iş
-yapmamız gerekebilir. Belki ve ve iş kullanıcıları farklıdır
-mesela. Bu durumda, eğer ikinci kullanıcı için şifre girmek rahatsız
-etmiyorsa, en basit yol `git clone` komutunu `https` üzerinden
-yapmak. Alınan repo'ya bakın, `.git` içinde bir `config` dosyası olacak. O dosya
+Diyelim ki user1 Github kullanıcısı ile çalışıyoruz, `.ssh/id_rsa` ona
+göre ayarlanmış, `.ssh/id_rsa.pub` Github'a kopyalanmış ve şifresiz
+şekilde güzelce çalışabiliyoruz. Peki farklı bir Github kullanıcısı
+üzerinden çalışmamız gerekse ne yapardık?
+
+Önce bu ikinci kullanıcı için yeni anahtarlar yaratalım,
 
 ```
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = false
-	logallrefupdates = true
+ssh-keygen -t rsa -f ~/.ssh/id_user2
+```
+
+Şimdi `~/.ssh/id_user2` ve `~/.ssh/id_user2.pub` olarak iki yeni dosya
+göreceğiz. Bu dosyalardan `~/.ssh/id_user2.pub` dosyasını alıp
+Github'a anahtar olarak kayıtlarız.
+
+Şimdi bir `~/.ssh/config` dosyası yaratalım,
+
+```
+Host github.com
+    HostName github.com
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/id_rsa
+
+Host github2
+    HostName github.com
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/id_user2
+```
+
+Dikkat, `Host` diyen yerde farklı bir isim olması çok önemli.
+
+Şimdi o farklı ismi kullanan repo'ya gideriz, ve `.git/config` dosyasına
+bakarız, burada `remote` diyen kısımda
+
+```
 [remote "origin"]
-	url = https://github.com/[ikincikullanici]/[repo].git
-	fetch = +refs/heads/*:refs/remotes/origin/*
-[branch "master"]
-	remote = origin
-	merge = refs/heads/master
+	url = git@github2:user2/repo2.git
 ```
 
-gibi durmalı. Artık `git commit` yapınca ve `git push origin master`
-ile kodu yollamak istediğinizde ikinci kullanıcı ve şifre
-sorulmayacak. Dikkat url isminde `https` olmaması önemli, o yüzden
-kullanıcı / şifre soruluyor zaten. SSH üzerinden şifresiz commit için
-ayarlanan repo'larda bu url `git@github.com:...` diye gider.
+ifadesinin olması gerekli. Bu kadar. Artık ikinci repo dizini altında
+iki `git push` ve alakalı komutlar bir kullanıcıya, diğerleri öteki
+kullanıcıya gider.
 
 ### Belli Bir Tarihe Dönüş
 
