@@ -128,6 +128,8 @@ Aynı işlemi paralel, ve satır satır yaklaşımı ile yapalım, alttaki kod
 [4]'teki altyapıyı kullanmıştır,
 
 ```python
+from multiprocessing import Process
+
 class MultJob:
     def __init__(self,ci,bfile):
         self.afile = ""
