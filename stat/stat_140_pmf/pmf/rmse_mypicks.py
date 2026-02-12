@@ -2,17 +2,10 @@ import numpy as np
 import pandas as pd
 import os
 
-# 1 0.8429
-# 2 0.8427
-# 3 0.8435
-# 4 0.8427
-# 5 0.8447
-
 # --- Configuration ---
-#posterior_file = "bpmf_posterior.npz"
-posterior_file = "par/3/bpmf_posterior.npz"
-#d = "/opt/Downloads/ml-latest-small"
-d = "/opt/Downloads/ml-32m"
+d = "/opt/Downloads/ml-latest-small"
+#d = "/opt/Downloads/ml-32m"
+posterior_file = d + "/bpmf_posterior.npz"
 lambda_U = 5.0 
 global_mu = 3.5 
 
