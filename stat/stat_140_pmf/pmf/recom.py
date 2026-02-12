@@ -6,8 +6,8 @@ top_n = 1000
 # Should match lambda_U used in training
 lambda_U = 5.0 
 global_mu = 3.5
-d = "/opt/Downloads/ml-latest-small"
-#d = "/opt/Downloads/ml-32m"
+#d = "/opt/Downloads/ml-latest-small"
+d = "/opt/Downloads/ml-32m"
 posterior_file = d + "/bpmf_posterior.npz"
 
 # 1. Load the trained model parameters
