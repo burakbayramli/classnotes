@@ -91,22 +91,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 id="olasılıksal-matris-ayrıştırması-probabilistic-matrix-factorization-ve-film-tavsiyeleri">Olasılıksal
 Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film
 Tavsiyeleri</h1>
-<p>Posterior’dan örnekleme yapmak istiyoruz:</p>
+<p>Diyelim ki <span class="math inline">\(N\)</span> tane kullanıcı ve
+<span class="math inline">\(M\)</span> tane film var, ve <span
+class="math inline">\(i\)</span> kullanıcısının <span
+class="math inline">\(j\)</span> filmine verdiği not <span
+class="math inline">\(R_{ij}\)</span> üzerinde. Eğer kullanıcı ve film
+özelliklerini sıkıştırılmış, “gizil” bir uzay üzerinden temsil etmek
+istersek, ki bu <span class="math inline">\(N,M\)</span>’ye kıyasla
+boyutu daha küçük bir uzay olacaktır, şu şekilde olasılıksal bir tanım
+yapabilirdik [3],</p>
 <p><span class="math display">\[
-p(U, V \mid R)
+R_{ij}
+=
+\mu + U_i^\top V_j + \epsilon_{ij},
+\quad
+\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
 \]</span></p>
-<p>Gibbs örneklemesi kullanarak, yani koşullu dağılımlardan tekrarlı
-örnekleme yaparak:</p>
-<p><span class="math display">\[
-p(U_i \mid V, R)
-\]</span></p>
-<p>Bunu doğru yapmak için, tam genişletilmiş birleşik dağılımdan
-başlamalıyız.</p>
-<p>Rastgele değişkenler ve boyutlar</p>
 <ul>
 <li><span class="math inline">\(N\)</span>: kullanıcı sayısı</li>
 <li><span class="math inline">\(M\)</span>: film sayısı</li>
-<li><span class="math inline">\(K\)</span>: gizil boyut</li>
+<li><span class="math inline">\(K\)</span>: gizil (latent) boyut, yani
+sıkıştırılmış, <span class="math inline">\(U,V\)</span>’nin daraltılmış
+uzayı</li>
 </ul>
 <p>Değişkenler:</p>
 <ul>
@@ -117,20 +123,23 @@ class="math inline">\(j = 1, \dots, M\)</span> için</li>
 <li><span class="math inline">\(\mu \in \mathbb{R}\)</span> (global
 ortalama)</li>
 <li><span class="math inline">\(R_{ij} \in \mathbb{R}\)</span> (<span
-class="math inline">\(I_{ij}=1\)</span> ise gözlemlenir)</li>
+class="math inline">\(I_{ij}=1\)</span> ise bu kullanıcı o filme not
+vermiştir)</li>
 </ul>
-<p>Üretici model</p>
-<p>Her gözlemlenen derecelendirme <span
-class="math inline">\(R_{ij}\)</span> için:</p>
+<p>Amacımız alttaki dağılıma erişmek, yani bu “sonsal” dağılımdan
+örneklem alabilmek istiyoruz:</p>
 <p><span class="math display">\[
-R_{ij}
-=
-\mu + U_i^\top V_j + \epsilon_{ij},
-\quad
-\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
+p(U, V \mid R)
 \]</span></p>
-<p>Önsel dağılımlar</p>
-<p>Kullanıcı gizil vektörleri</p>
+<p>Bu dağılımdan örneklem alabilmek için Gibbs tekniği kullanarak, yani
+koşullu dağılımlardan tekrarlı örnekleme yaparak oraya erisebiliriz.
+Mesela bir adımda <span class="math inline">\(p(U_i \mid V, R)\)</span>
+örneklemesi alırız, o değerleri kullanarak sonrakinde <span
+class="math inline">\(p(V_i \mid U, R)\)</span> alırız, bunu ardı ardına
+yapınca üstteki nihai dağılıma erisebileceğimizi biliyoruz.</p>
+<p>Bu sebeple bize mesela <span class="math inline">\(p(U_i \mid V,
+R)\)</span> formülasyonu lazım, bunu doğru yapmak için, tam
+genişletilmiş birleşik dağılımdan başlamalıyız.</p>
 <p><span class="math display">\[
 p(U)
 =
@@ -146,8 +155,8 @@ p(V)
 \]</span></p>
 <p>Olurluk</p>
 <p>Gösterge <span class="math inline">\(I_{ij} = 1\)</span> eğer <span
-class="math inline">\(R_{ij}\)</span> gözlemlenirse, aksi halde 0 olarak
-tanımlanır.</p>
+class="math inline">\(R_{ij}\)</span> gözlemlenmis ise, yani not mevcut
+ise, aksi halde 0 olarak tanımlanır.</p>
 <p><span class="math display">\[
 p(R \mid U, V)
 =

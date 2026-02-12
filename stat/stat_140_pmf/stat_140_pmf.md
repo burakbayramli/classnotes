@@ -1,21 +1,19 @@
 # Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri 
 
-Sonsal dağılımdan örneklem almak istiyoruz:
+Diyelim ki $N$ tane kullanıcı ve $M$ tane film var, ve $i$
+kullanıcısının $j$ filmine verdiği not $R_{ij}$ üzerinde. Eğer
+kullanıcı ve film özelliklerini sıkıştırılmış, "gizil" bir uzay
+üzerinden temsil etmek istersek, ki bu $N,M$'ye kıyasla boyutu daha
+küçük bir uzay olacaktır, şu şekilde olasılıksal bir tanım
+yapabilirdik [3],
 
 $$
-p(U, V \mid R)
+R_{ij}
+=
+\mu + U_i^\top V_j + \epsilon_{ij},
+\quad
+\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
 $$
-
-Bunu Gibbs örneklemesi kullanarak, yani koşullu dağılımlardan tekrarlı
-örnekleme yaparak başarmayı umuyoruz,
-
-$$
-p(U_i \mid V, R)
-$$
-
-Bunu doğru yapmak için, tam genişletilmiş birleşik dağılımdan başlamalıyız.
-
-Rastgele değişkenler ve boyutlar
 
 * $N$: kullanıcı sayısı
 * $M$: film sayısı
@@ -28,21 +26,21 @@ Değişkenler:
 * $\mu \in \mathbb{R}$ (global ortalama)
 * $R_{ij} \in \mathbb{R}$ ($I_{ij}=1$ ise bu kullanıcı o filme not vermiştir)
 
-Üretici model
-
-Her gözlemlenen derecelendirme $R_{ij}$ için:
+Amacımız alttaki dağılıma erişmek, yani bu "sonsal" dağılımdan
+örneklem alabilmek istiyoruz:
 
 $$
-R_{ij}
-=
-\mu + U_i^\top V_j + \epsilon_{ij},
-\quad
-\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
+p(U, V \mid R)
 $$
 
-Önsel dağılımlar
+Bu dağılımdan örneklem alabilmek için Gibbs tekniği kullanarak, yani
+koşullu dağılımlardan tekrarlı örnekleme yaparak oraya
+erisebiliriz. Mesela bir adımda $p(U_i \mid V, R)$ örneklemesi alırız,
+o değerleri kullanarak sonrakinde $p(V_i \mid U, R)$ alırız, bunu ardı
+ardına yapınca üstteki nihai dağılıma erisebileceğimizi biliyoruz.
 
-Kullanıcı gizil vektörleri
+Bu sebeple bize mesela $p(U_i \mid V, R)$ formülasyonu lazım, bunu
+doğru yapmak için, tam genişletilmiş birleşik dağılımdan başlamalıyız.
 
 $$
 p(U)
