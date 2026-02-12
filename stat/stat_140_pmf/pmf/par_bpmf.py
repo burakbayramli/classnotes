@@ -42,12 +42,10 @@ def combine_matrices(prefix):
     
 class GibbsUserJob:
     def __init__(self, ci):
-        self.rng = np.random.default_rng()
-        # Load current global state
+        self.rng = np.random.default_rng() # tohumsuz, cunku her surec farkli olmali
         self.U = np.loadtxt(o + "/U.csv", delimiter=';')
         self.V = np.loadtxt(o + "/V.csv", delimiter=';')
         self.ci = ci
-        # Tracking bounds
         self.min_i = float('inf')
         self.max_i = -1
 
@@ -56,7 +54,6 @@ class GibbsUserJob:
         row = line.split('|')
         i = int(row[0])
         
-        # Track range
         if i < self.min_i: self.min_i = i
         if i > self.max_i: self.max_i = i
 
@@ -73,9 +70,7 @@ class GibbsUserJob:
 
         
     def post(self):
-        if self.max_i == -1: return # No data processed
-        
-        # Save specific slices
+        if self.max_i == -1: return # No data processed        
         np.savetxt(f"{o}/U-{self.ci}.csv", self.U[self.min_i : self.max_i + 1], delimiter=';', fmt='%1.6f')
 
 class GibbsMovieJob:
