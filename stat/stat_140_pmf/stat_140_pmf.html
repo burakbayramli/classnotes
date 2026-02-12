@@ -13,18 +13,817 @@
     });
     </script>  
    
-  <title>Olasılıksal Matris Ayrıştırması ve Film Tavsiyeleri (Probabilistic Matrix Factorization)</title>
+  <title>Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri</title>
   <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1
-id="olasılıksal-matris-ayrıştırması-ve-film-tavsiyeleri-probabilistic-matrix-factorization">Olasılıksal
-Matris Ayrıştırması ve Film Tavsiyeleri (Probabilistic Matrix
-Factorization)</h1>
+id="olasılıksal-matris-ayrıştırması-probabilistic-matrix-factorization-ve-film-tavsiyeleri">Olasılıksal
+Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film
+Tavsiyeleri</h1>
+<p>Posterior’dan örnekleme yapmak istiyoruz:</p>
+<p><span class="math display">\[
+p(U, V \mid R)
+\]</span></p>
+<p>Gibbs örneklemesi kullanarak, yani koşullu dağılımlardan tekrarlı
+örnekleme yaparak:</p>
+<p><span class="math display">\[
+p(U_i \mid V, R)
+\]</span></p>
+<p>Bunu doğru yapmak için, tam genişletilmiş birleşik dağılımdan
+başlamalıyız.</p>
+<p>Rastgele değişkenler ve boyutlar</p>
+<ul>
+<li><span class="math inline">\(N\)</span>: kullanıcı sayısı</li>
+<li><span class="math inline">\(M\)</span>: film sayısı</li>
+<li><span class="math inline">\(K\)</span>: gizil boyut</li>
+</ul>
+<p>Değişkenler:</p>
+<ul>
+<li><span class="math inline">\(U_i \in \mathbb{R}^K\)</span>, <span
+class="math inline">\(i = 1, \dots, N\)</span> için</li>
+<li><span class="math inline">\(V_j \in \mathbb{R}^K\)</span>, <span
+class="math inline">\(j = 1, \dots, M\)</span> için</li>
+<li><span class="math inline">\(\mu \in \mathbb{R}\)</span> (global
+ortalama)</li>
+<li><span class="math inline">\(R_{ij} \in \mathbb{R}\)</span> (<span
+class="math inline">\(I_{ij}=1\)</span> ise gözlemlenir)</li>
+</ul>
+<p>Üretici model</p>
+<p>Her gözlemlenen derecelendirme <span
+class="math inline">\(R_{ij}\)</span> için:</p>
+<p><span class="math display">\[
+R_{ij}
+=
+\mu + U_i^\top V_j + \epsilon_{ij},
+\quad
+\epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
+\]</span></p>
+<p>Önsel dağılımlar</p>
+<p>Kullanıcı gizil vektörleri</p>
+<p><span class="math display">\[
+p(U)
+=
+\prod_{i=1}^{N}
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\]</span></p>
+<p>Film gizil vektörleri</p>
+<p><span class="math display">\[
+p(V)
+=
+\prod_{j=1}^{M}
+\mathcal{N}(V_j \mid 0, \lambda_V^{-1} I)
+\]</span></p>
+<p>Olurluk</p>
+<p>Gösterge <span class="math inline">\(I_{ij} = 1\)</span> eğer <span
+class="math inline">\(R_{ij}\)</span> gözlemlenirse, aksi halde 0 olarak
+tanımlanır.</p>
+<p><span class="math display">\[
+p(R \mid U, V)
+=
+\prod_{i=1}^{N}
+\prod_{j=1}^{M}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)^{I_{ij}}
+\]</span></p>
+<p>Tam birleşik dağılım</p>
+<p><span class="math display">\[
+\begin{aligned}
+p(U, V, R)
+=
+p(R \mid U, V) \cdot p(U) \cdot p(V)
+=
+\left[
+\prod_{i=1}^{N}
+\prod_{j=1}^{M}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)^{I_{ij}}
+\right] \\
+\quad \times
+\left[
+\prod_{i=1}^{N}
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\right] \\
+\quad \times
+\left[
+\prod_{j=1}^{M}
+\mathcal{N}(V_j \mid 0, \lambda_V^{-1} I)
+\right]
+\end{aligned}
+\]</span></p>
+<p>Amaç: <span class="math inline">\(p(U_i \mid V, R)\)</span>
+türetmek</p>
+<p>Bayes kuralına göre (koşullu olasılığın tanımı):</p>
+<p><span class="math display">\[
+p(U_i \mid V, R)
+=
+\frac{p(U_i, V, R)}{p(V, R)}
+\]</span></p>
+<p>Not: Tek bir kullanıcı vektörü <span
+class="math inline">\(U_i\)</span> üzerine koşullandırdığımızı
+vurgulamak için <span class="math inline">\(p(U, V, R)\)</span> yerine
+<span class="math inline">\(p(U_i, V, R)\)</span> yazıyoruz. Daha kesin
+olarak:</p>
+<p><span class="math display">\[
+p(U_i \mid U_{-i}, V, R)
+=
+\frac{p(U_i, U_{-i}, V, R)}{p(U_{-i}, V, R)}
+\]</span></p>
+<p>burada <span class="math inline">\(U_{-i} = \{U_1, \dots, U_{i-1},
+U_{i+1}, \dots, U_N\}\)</span>, <span class="math inline">\(U_i\)</span>
+hariç tüm kullanıcı vektörlerini gösterir.</p>
+<p>Payda <span class="math inline">\(U_i\)</span>’ye bağlı değildir, bu
+nedenle onu bir normalizasyon sabiti olarak ele alabiliriz.</p>
+<p><span class="math inline">\(U_i\)</span> içeren tüm terimleri izole
+et</p>
+<p>Adım 1: Birleşik dağılımı genişlet</p>
+<p>Tam birleşik dağılımdan başlayarak:</p>
+<p><span class="math display">\[
+p(U_i, U_{-i}, V, R)
+=
+p(R \mid U_i, U_{-i}, V) \cdot p(U_i) \cdot p(U_{-i}) \cdot p(V)
+\]</span></p>
+<p><span class="math inline">\(U_i\)</span> üzerindeki önseli geri
+kalanından ayır:</p>
+<p><span class="math display">\[
+p(U_i, U_{-i}, V, R)
+=
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\times
+\left[
+\prod_{k \neq i} \mathcal{N}(U_k \mid 0, \lambda_U^{-1} I)
+\right]
+\times
+p(V)
+\times
+p(R \mid U_i, U_{-i}, V)
+\qquad (1)
+\]</span></p>
+<p>Adım 2: Şimdi (1) içindeki <span class="math inline">\(p(R \mid U_i,
+U_{-i}, V)\)</span> terimine dikkat et. Bunu nasıl genişletebiliriz?
+İşte nasıl.</p>
+<p><span class="math inline">\(U_i\)</span> içeren olabilirlik
+terimlerini izole et</p>
+<p>Olabilirlik tüm gözlemlenen derecelendirmeler üzerinden çarpanlara
+ayrılır:</p>
+<p><span class="math display">\[
+p(R \mid U_i, U_{-i}, V)
+=
+\prod_{i=1}^{N}
+\prod_{j=1}^{M}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)^{I_{ij}}
+\]</span></p>
+<p>Sadece kullanıcı <span class="math inline">\(i\)</span>’den gelen
+derecelendirmeler <span class="math inline">\(U_i\)</span>’ye
+bağlıdır.</p>
+<p>Tanım: <span class="math display">\[
+\Omega_i = \{ j \mid I_{ij} = 1 \}
+\]</span> (kullanıcı <span class="math inline">\(i\)</span> tarafından
+derecelendirilen filmlerin kümesi)</p>
+<p>O zaman ayırabiliriz:</p>
+<p><span class="math display">\[
+p(R \mid U_i, U_{-i}, V)
+=
+\left[
+\prod_{j \in \Omega_i}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)
+\right]
+\times
+\left[
+\prod_{k \neq i} \prod_{j=1}^M
+\mathcal{N}
+\left(
+R_{kj}
+\mid
+\mu + U_k^\top V_j,
+\sigma^2
+\right)^{I_{kj}}
+\right]
+\qquad{(2)}
+\]</span></p>
+<p>İkinci çarpım <span class="math inline">\(U_i\)</span>’ye bağlı
+değildir.</p>
+<p>Bayes’i tekrar uygulayalım</p>
+<p><span class="math display">\[
+p(U_i \mid U_{-i}, V, R) = \frac{p(U_i, U_{-i}, V, R)}{p(U_{-i}, V, R)}
+\]</span></p>
+<p>Payda <span class="math inline">\(U_i\)</span>’ye bağlı olmadığından,
+sadece bir normalizasyon sabitidir, dolayısıyla:</p>
+<p><span class="math display">\[
+p(U_i \mid U_{-i}, V, R) \propto p(U_i, U_{-i}, V, R)
+\]</span></p>
+<p>Sağ taraf (1)’dir,</p>
+<p><span class="math display">\[
+p(U_i, U_{-i}, V, R)
+=
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\times
+\left[
+\prod_{k \neq i} \mathcal{N}(U_k \mid 0, \lambda_U^{-1} I)
+\right]
+\times
+p(V)
+\times
+p(R \mid U_i, U_{-i}, V)
+\]</span></p>
+<p>Ve onu (2) ile genişletiyoruz</p>
+<p><span class="math display">\[
+= \mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\times
+\left[
+\prod_{k \neq i} \mathcal{N}(U_k \mid 0, \lambda_U^{-1} I)
+\right]
+\times
+p(V)
+\times
+\left[
+\prod_{j \in \Omega_i}
+\mathcal{N}(R_{ij} \mid \mu + U_i^\top V_j, \sigma^2)
+\right]
+\times
+\left[
+\prod_{k \neq i} \prod_{j=1}^M
+\mathcal{N}(R_{kj} \mid \mu + U_k^\top V_j, \sigma^2)^{I_{kj}}
+\right]
+\]</span></p>
+<p>Ve şimdi bundan sadece <span class="math inline">\(U_i\)</span>’ye
+bağlı terimleri topluyoruz,</p>
+<p><span class="math display">\[
+\begin{aligned}
+p(U_i \mid U_{-i}, V, R)
+&amp;\propto
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\times
+\prod_{j \in \Omega_i}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)
+\end{aligned}
+\]</span></p>
+<p>Bu doğru olur, değil mi? Çünkü (1)’de <span
+class="math inline">\(U_i\)</span>’ye bağlı olmayan terimler</p>
+<ul>
+<li><span class="math inline">\(\prod_{k \neq i} \mathcal{N}(U_k \mid 0,
+\lambda_U^{-1} I)\)</span> — sadece diğer kullanıcılara bağlı</li>
+<li><span class="math inline">\(p(V)\)</span> — sadece filmlere
+bağlı</li>
+<li><span class="math inline">\(p(R \mid U_i, U_{-i}, V, R)\)</span>’nin
+çoğu — sadece kullanıcı <span class="math inline">\(i\)</span>’den gelen
+derecelendirmeler <span class="math inline">\(U_i\)</span>’ye bağlı</li>
+</ul>
+<p><span class="math inline">\(U_i\)</span>’ye bağlı olan terimler</p>
+<ul>
+<li><span class="math inline">\(\mathcal{N}(U_i \mid 0, \lambda_U^{-1}
+I)\)</span> — <span class="math inline">\(U_i\)</span> üzerindeki
+önsel</li>
+<li><span class="math inline">\(\prod_{j \in \Omega_i}
+\mathcal{N}(R_{ij} \mid \mu + U_i^\top V_j, \sigma^2)\)</span> —
+kullanıcı <span class="math inline">\(i\)</span>’nin
+derecelendirmelerinin olabilirliği</li>
+</ul>
+<p><span class="math inline">\(p(V)\)</span> gibi terimler <span
+class="math inline">\(U_i\)</span>’ye bağlı değildir, <span
+class="math inline">\(U_i\)</span> ne olursa olsun aynıdırlar, bu
+nedenle sadece normalizasyon sabitine katkıda bulunabilirler (eşitlikten
+<span class="math inline">\(\propto\)</span>’ya geçişe dikkat edin),
+dolayısıyla atılırlar.</p>
+<p>Devam edelim. <span class="math inline">\(U_{-i}\)</span> üzerine
+koşullandırdığımız için, şunu yazabiliriz:</p>
+<p><span class="math display">\[
+p(U_i \mid V, R)
+\propto
+\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+\prod_{j \in \Omega_i}
+\mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)
+\]</span></p>
+<p>Not: Gibbs örneklemesinde, <span
+class="math inline">\(U_i\)</span>’yi örneklediğimizde, diğer tüm
+değişkenler (<span class="math inline">\(U_{-i}, V\)</span>) sabit
+tutulur, bu nedenle gösterim basitliği için <span
+class="math inline">\(U_{-i}\)</span> üzerine koşullandırmayı
+atıyoruz.</p>
+<p>Log-yoğunluğa dönüştür</p>
+<p>Normalize edilmemiş yoğunluğun logaritmasını alarak:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\log p(U_i \mid V, R)
+&amp;=
+\log \mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
++
+\sum_{j \in \Omega_i}
+\log \mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)
++ \text{const}
+\end{aligned}
+\]</span></p>
+<p>Gauss log-yoğunluklarını genişlet:</p>
+<p><span class="math display">\[
+\log \mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)
+=
+-\frac{1}{2} U_i^\top (\lambda_U I) U_i + \text{const}
+=
+-\frac{\lambda_U}{2} U_i^\top U_i + \text{const}
+\]</span></p>
+<p><span class="math display">\[
+\log \mathcal{N}
+\left(
+R_{ij}
+\mid
+\mu + U_i^\top V_j,
+\sigma^2
+\right)
+=
+-\frac{1}{2\sigma^2}
+\left(
+R_{ij} - \mu - U_i^\top V_j
+\right)^2
++ \text{const}
+\]</span></p>
+<p>Birleştir:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\log p(U_i \mid \cdot)
+&amp;=
+-\frac{\lambda_U}{2} U_i^\top U_i
+\\
+&amp;\quad
+-\frac{1}{2\sigma^2}
+\sum_{j \in \Omega_i}
+\left(
+R_{ij} - \mu - U_i^\top V_j
+\right)^2
++ \text{const}
+\end{aligned}
+\]</span></p>
+<p>Karesel terimi genişlet</p>
+<p>Artığı tanımla:</p>
+<p><span class="math display">\[
+\tilde{R}_{ij} = R_{ij} - \mu
+\]</span></p>
+<p>O zaman:</p>
+<p><span class="math display">\[
+\left(\tilde{R}_{ij} - U_i^\top V_j\right)^2
+=
+\tilde{R}_{ij}^2
+- 2 \tilde{R}_{ij} U_i^\top V_j
++ (U_i^\top V_j)^2
+\]</span></p>
+<p>Not: <span class="math inline">\((U_i^\top V_j)^2 = (U_i^\top
+V_j)(V_j^\top U_i) = U_i^\top V_j V_j^\top U_i\)</span></p>
+<p>Yani:</p>
+<p><span class="math display">\[
+\left(\tilde{R}_{ij} - U_i^\top V_j\right)^2
+=
+\tilde{R}_{ij}^2
+- 2 \tilde{R}_{ij} U_i^\top V_j
++ U_i^\top V_j V_j^\top U_i
+\]</span></p>
+<p><span class="math inline">\(j \in \Omega_i\)</span> üzerinden
+toplayarak:</p>
+<p><span class="math display">\[
+\sum_{j \in \Omega_i}
+\left(\tilde{R}_{ij} - U_i^\top V_j\right)^2
+=
+\sum_{j \in \Omega_i} \tilde{R}_{ij}^2
+- 2 U_i^\top \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}
++ U_i^\top \left(\sum_{j \in \Omega_i} V_j V_j^\top\right) U_i
+\]</span></p>
+<p><span class="math inline">\(U_i\)</span> içindeki kuadratik ve lineer
+terimleri topla</p>
+<p>Log-yoğunluğa geri koyarak:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\log p(U_i \mid \cdot)
+&amp;=
+-\frac{\lambda_U}{2} U_i^\top U_i
+-\frac{1}{2\sigma^2}
+\left[
+U_i^\top \left(\sum_{j \in \Omega_i} V_j V_j^\top\right) U_i
+- 2 U_i^\top \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}
++ \sum_{j \in \Omega_i} \tilde{R}_{ij}^2
+\right]
++ \text{const}
+\end{aligned}
+\]</span></p>
+<p>Kuadratik terimleri grupla:</p>
+<p><span class="math display">\[
+-\frac{\lambda_U}{2} U_i^\top U_i
+-\frac{1}{2\sigma^2} U_i^\top \left(\sum_{j \in \Omega_i} V_j
+V_j^\top\right) U_i
+=
+-\frac{1}{2} U_i^\top
+\left(
+\lambda_U I + \frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j V_j^\top
+\right)
+U_i
+\]</span></p>
+<p>Lineer terimleri grupla:</p>
+<p><span class="math display">\[
+\frac{1}{\sigma^2} U_i^\top \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}
+\]</span></p>
+<p>Sabit terim <span class="math inline">\(\sum_{j \in \Omega_i}
+\tilde{R}_{ij}^2\)</span>, <span class="math inline">\(U_i\)</span>’ye
+bağlı değildir.</p>
+<p>Gauss sonsalı tanımlayalım. Şimdi elimizde:</p>
+<p><span class="math display">\[
+\log p(U_i \mid \cdot)
+=
+-\frac{1}{2} U_i^\top \Sigma_i^{-1} U_i
++
+U_i^\top \Sigma_i^{-1} \mu_i
++ \text{const}
+\]</span></p>
+<p>Bu, çok değişkenli bir Gauss’un kanonik formudur:</p>
+<p><span class="math display">\[
+\log \mathcal{N}(x \mid \mu, \Sigma)
+=
+-\frac{1}{2}(x - \mu)^\top \Sigma^{-1} (x - \mu) + \text{const}
+=
+-\frac{1}{2} x^\top \Sigma^{-1} x + x^\top \Sigma^{-1} \mu +
+\text{const}
+\]</span></p>
+<p>Kesinliği (kovaryansın tersini) tanımla:</p>
+<p><span class="math display">\[
+\Sigma_i^{-1}
+=
+\lambda_U I + \frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j V_j^\top
+\]</span></p>
+<p>Ortalamayı tanımla (lineer terimden):</p>
+<p><span class="math inline">\(U_i^\top \Sigma_i^{-1} \mu_i =
+\frac{1}{\sigma^2} U_i^\top \sum_{j \in \Omega_i} V_j
+\tilde{R}_{ij}\)</span>’den:</p>
+<p><span class="math display">\[
+\Sigma_i^{-1} \mu_i
+=
+\frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}
+\]</span></p>
+<p>Dolayısıyla:</p>
+<p><span class="math display">\[
+\mu_i
+=
+\Sigma_i
+\left(
+\frac{1}{\sigma^2}
+\sum_{j \in \Omega_i}
+V_j
+\left(
+R_{ij} - \mu
+\right)
+\right)
+\]</span></p>
+<p>Nihai sonuç:</p>
+<p><span class="math display">\[
+p(U_i \mid V, R)
+=
+\mathcal{N}(U_i \mid \mu_i, \Sigma_i)
+\]</span></p>
+<p>Özet: <span class="math inline">\(U_i\)</span> için koşullu
+posterior</p>
+<p><span class="math display">\[
+\begin{aligned}
+\Sigma_i^{-1}
+&amp;=
+\lambda_U I + \frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j V_j^\top
+\\[1em]
+\mu_i
+&amp;=
+\Sigma_i
+\left(
+\frac{1}{\sigma^2}
+\sum_{j \in \Omega_i}
+V_j
+(R_{ij} - \mu )
+\right)
+\end{aligned}
+\]</span></p>
+<p>burada <span class="math inline">\(\Omega_i = \{j : I_{ij} =
+1\}\)</span>, kullanıcı <span class="math inline">\(i\)</span>
+tarafından derecelendirilen filmlerin kümesidir.</p>
+<p>Simetri: <span class="math inline">\(V_j\)</span> için koşullu
+posterior</p>
+<p>Simetri ile (kullanıcı/film indekslerini değiştirerek):</p>
+<p><span class="math display">\[
+p(V_j \mid U, R) = \mathcal{N}(V_j \mid \hat{\mu}_j, \hat{\Sigma}_j)
+\]</span></p>
+<p>burada:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{\Sigma}_j^{-1}
+&amp;=
+\lambda_V I + \frac{1}{\sigma^2} \sum_{i \in \Omega_j} U_i U_i^\top
+\\[1em]
+\hat{\mu}_j
+&amp;=
+\hat{\Sigma}_j
+\left(
+\frac{1}{\sigma^2}
+\sum_{i \in \Omega_j}
+U_i
+(R_{ij} - \mu )
+\right)
+\end{aligned}
+\]</span></p>
+<p>burada <span class="math inline">\(\Omega_j = \{i : I_{ij} =
+1\}\)</span>, film <span class="math inline">\(j\)</span>’yi
+derecelendiren kullanıcıların kümesidir.</p>
+<p>Gibbs örneklemesi neden işe yarar</p>
+<ul>
+<li>Tüm koşullu posterior’lar Gauss’tur (kapalı form)</li>
+<li>Örnekleme, normalizasyon sabitlerini hesaplamayı gerektirmez</li>
+<li>Her güncelleme sadece yerel veriyi kullanır (o kullanıcı/filmi
+içeren derecelendirmeler)</li>
+<li>Tekrarlı taramalar bilgiyi gizil uzayda global olarak yayar</li>
+<li>Hafif koşullar altında gerçek posterior’a yakınsama
+garantilidir</li>
+</ul>
+<p>Gibbs Örnekleme Algoritması</p>
+<p>Başlat: <span class="math inline">\(U^{(0)}, V^{(0)}\)</span>’ı
+rastgele değerlere</p>
+<p><span class="math inline">\(t = 1, 2, \dots, T\)</span> için:</p>
+<ol type="1">
+<li>Her kullanıcı <span class="math inline">\(i = 1, \dots, N\)</span>
+için:
+<ul>
+<li><span class="math inline">\(U_i^{(t)} \sim p(U_i \mid V^{(t-1)},
+R)\)</span> örnekle</li>
+</ul></li>
+<li>Her film <span class="math inline">\(j = 1, \dots, M\)</span> için:
+<ul>
+<li><span class="math inline">\(V_j^{(t)} \sim p(V_j \mid U^{(t)},
+R)\)</span> örnekle</li>
+</ul></li>
+</ol>
+<p>Isınma (burn-in) sonrasında, tahmin için örnekleri kullan.</p>
+<p><span class="math inline">\(R_{ij}\)</span> hem <span
+class="math inline">\(\epsilon_{ij}\)</span> nedeniyle hem de <span
+class="math inline">\(U_i, V_j\)</span>’nin kendilerinin önsel
+dağılımlara sahip rastgele değişkenler olması nedeniyle bir rastgele
+değişkendir.</p>
+<p>Burada aslında iki seviye rastgelelik var:</p>
+<p>1 - Gözlem seviyesi rastgelelik (<span
+class="math inline">\(\epsilon_{ij}\)</span>’den)</p>
+<p><span class="math inline">\(U_i, V_j\)</span>’nin sabit değerleri
+verildiğinde, derecelendirme <span class="math inline">\(R_{ij}\)</span>
+hala rastgeledir çünkü:</p>
+<p><span class="math display">\[
+R_{ij} \mid U_i, V_j \sim \mathcal{N}(\mu + U_i^\top V_j, \sigma^2)
+\]</span></p>
+<p>Bu, ölçüm gürültüsünü veya derecelendirme sürecindeki doğal
+stokastikliği temsil eder. Gerçek gizil özellikleri bilsek bile, bir
+kullanıcı aynı filmi farklı günlerde farklı derecelendirebilir.</p>
+<p>2 - Parametre seviyesi rastgelelik (<span class="math inline">\(U,
+V\)</span> üzerindeki önsellerden)</p>
+<p>Bayesçi çerçevede, <span class="math inline">\(U_i, V_j\)</span>
+sabit parametreler değil, önsel dağılımlara sahip rastgele
+değişkenlerdir:</p>
+<p><span class="math display">\[
+\begin{aligned}
+U_i &amp;\sim \mathcal{N}(0, \lambda_U^{-1} I) \\
+V_j &amp;\sim \mathcal{N}(0, \lambda_V^{-1} I)
+\end{aligned}
+\]</span></p>
+<p>Dolayısıyla herhangi bir veri gözlemlemeden önce, <span
+class="math inline">\(R_{ij}\)</span> rastgeledir çünkü parametrelerin
+kendileri rastgeledir.</p>
+<p>Bayesçi perspektiften, <span
+class="math inline">\(R_{ij}\)</span>’nin koşulsuz dağılımı (hiçbir şey
+gözlemlemeden önce):</p>
+<p><span class="math display">\[
+p(R_{ij}) = \int p(R_{ij} \mid U_i, V_j) \cdot p(U_i, V_j) \, dU_i \,
+dV_j
+\]</span></p>
+<p>Bu, her iki rastgelelik kaynağı üzerinden integral alır: -
+Olabilirlik <span class="math inline">\(p(R_{ij} \mid U_i,
+V_j)\)</span>, <span class="math inline">\(\epsilon_{ij}\)</span>
+gürültüsünü yakalar - Önsel <span class="math inline">\(p(U_i,
+V_j)\)</span>, parametreler hakkındaki belirsizliğimizi yakalar</p>
+<p>Pratikte:</p>
+<p>Gibbs örneklemesi yaptığımızda:</p>
+<ol type="1">
+<li>Bazı derecelendirmeleri <span class="math inline">\(R_{ij}\)</span>
+gözlemliyoruz (onları sabit veri olarak ele alıyoruz)</li>
+<li>Bu gözlemler verildiğinde <span class="math inline">\(U,
+V\)</span>’nin posterior dağılımını çıkarıyoruz</li>
+<li><span class="math inline">\(\epsilon_{ij}\)</span> terimleri
+olabilirlik yoluyla örtük olarak “integral alınarak çıkarılır”</li>
+</ol>
+<p>Yani model şunu söyler:</p>
+<ul>
+<li>Veri görmeden önce: Her şey (<span class="math inline">\(U, V,
+R\)</span>) rastgeledir</li>
+<li>Veri gördükten sonra: Gözlemlenen <span
+class="math inline">\(R_{ij}\)</span> üzerine koşullandırır ve <span
+class="math inline">\(U, V\)</span> için dağılımları çıkarırız</li>
+<li>Tahmin için: Yeni <span class="math inline">\(R_{ij}^*\)</span>’yi
+tahmin etmek için posterior örneklerini kullanırız, bu hem parametre
+belirsizliğini hem de <span class="math inline">\(\epsilon\)</span>
+gürültüsünü içerir</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, sys, csv, json, os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>csv.field_size_limit(sys.maxsize)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">25</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>N_ITERS <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>BURN_IN <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>THIN <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>lambda_U <span class="op">=</span> <span class="fl">5.0</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>lambda_V <span class="op">=</span> <span class="fl">5.0</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>lambda_b <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>lambda_c <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#d = &quot;/opt/Downloads/ml-32m&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="st">&quot;/opt/Downloads/ml-latest-small&quot;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>USER_MOVIE_FILE <span class="op">=</span> d <span class="op">+</span> <span class="st">&quot;/user_movie.txt&quot;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>MOVIE_USER_FILE <span class="op">=</span> d <span class="op">+</span> <span class="st">&quot;/movie_user.txt&quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>n_users, n_movies, global_mu <span class="op">=</span> <span class="dv">611</span>, <span class="dv">9742</span>, <span class="fl">3.5</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#n_users, n_movies, mu = 200948, 87584, 3.54</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>U <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.standard_normal((n_users, K))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>V <span class="op">=</span> <span class="fl">0.1</span> <span class="op">*</span> rng.standard_normal((n_movies, K))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.zeros(n_users)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.zeros(n_movies)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>U_mean <span class="op">=</span> np.zeros_like(U)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>V_mean <span class="op">=</span> np.zeros_like(V)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>b_mean <span class="op">=</span> np.zeros_like(b)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>c_mean <span class="op">=</span> np.zeros_like(c)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>n_kept <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>eyeK <span class="op">=</span> np.eye(K)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, N_ITERS <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> (<span class="st">&#39;iteration&#39;</span>, it)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(USER_MOVIE_FILE, newline<span class="op">=</span><span class="st">&quot;&quot;</span>) <span class="im">as</span> csvfile:</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        rd <span class="op">=</span> csv.reader(csvfile, delimiter<span class="op">=</span><span class="st">&quot;|&quot;</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> rd:</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            i <span class="op">=</span> <span class="bu">int</span>(row[<span class="dv">0</span>])</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>            ratings <span class="op">=</span> json.loads(row[<span class="dv">1</span>])</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>            tsum <span class="op">=</span> np.zeros((K,K))</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j,rating <span class="kw">in</span> ratings.items(): tsum <span class="op">+=</span> np.dot(V[<span class="bu">int</span>(j)].reshape(K,<span class="dv">1</span>), <span class="op">\</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>                                                            V[<span class="bu">int</span>(j)].reshape(<span class="dv">1</span>,K) )</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>            invsigma <span class="op">=</span> lambda_U<span class="op">*</span>eyeK <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">/</span> sigma2) <span class="op">*</span> tsum</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            sigma <span class="op">=</span> np.linalg.inv(invsigma)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            mutmp <span class="op">=</span> np.array([ V[<span class="bu">int</span>(j)]<span class="op">*</span>(rating<span class="op">-</span>global_mu) <span class="cf">for</span> j,rating <span class="kw">in</span> ratings.items()]).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            mu <span class="op">=</span> np.dot(sigma, <span class="fl">1.0</span><span class="op">/</span>sigma2 <span class="op">*</span> mutmp)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>            U[i, :] <span class="op">=</span> rng.multivariate_normal(mu, sigma)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(MOVIE_USER_FILE, newline<span class="op">=</span><span class="st">&quot;&quot;</span>) <span class="im">as</span> csvfile:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        rd <span class="op">=</span> csv.reader(csvfile, delimiter<span class="op">=</span><span class="st">&quot;|&quot;</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> rd:</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>            j <span class="op">=</span> <span class="bu">int</span>(row[<span class="dv">0</span>])</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>            ratings <span class="op">=</span> json.loads(row[<span class="dv">1</span>])</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>            tsum <span class="op">=</span> np.zeros((K,K))            </span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i,rating <span class="kw">in</span> ratings.items(): tsum <span class="op">+=</span> np.dot(U[<span class="bu">int</span>(i)].reshape(K,<span class="dv">1</span>), <span class="op">\</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                                                            U[<span class="bu">int</span>(i)].reshape(<span class="dv">1</span>,K) )</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>            invsigma <span class="op">=</span> lambda_V<span class="op">*</span>eyeK <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">/</span> sigma2) <span class="op">*</span> tsum</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>            sigma <span class="op">=</span> np.linalg.inv(invsigma)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>            mutmp <span class="op">=</span> np.array([ U[<span class="bu">int</span>(i)]<span class="op">*</span>(rating<span class="op">-</span>global_mu) <span class="cf">for</span> i,rating <span class="kw">in</span> ratings.items()]).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>            mu <span class="op">=</span> np.dot(sigma, <span class="fl">1.0</span><span class="op">/</span>sigma2 <span class="op">*</span> mutmp)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>            V[j, :] <span class="op">=</span> rng.multivariate_normal(mu, sigma)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> it <span class="op">&gt;=</span> BURN_IN <span class="kw">and</span> it <span class="op">%</span> THIN <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>        n_kept <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> n_kept</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>        U_mean <span class="op">+=</span> alpha <span class="op">*</span> (U <span class="op">-</span> U_mean)</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>        V_mean <span class="op">+=</span> alpha <span class="op">*</span> (V <span class="op">-</span> V_mean)        </span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>np.savez(</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;bpmf_posterior.npz&quot;</span>,</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    U<span class="op">=</span>U_mean,</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>    V<span class="op">=</span>V_mean,</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    mu<span class="op">=</span>mu,</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    user_ids<span class="op">=</span>np.arange(n_users),</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>    movie_ids<span class="op">=</span>np.arange(n_movies),</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Saved bpmf_posterior.npz&quot;</span>)</span></code></pre></div>
+<p>[devam edecek]</p>
 <p>Kodlar</p>
-<p><a href="movprep.py">movprep.py</a></p>
+<p><a href="par_bpmf.py">par_bpmf.py</a>, <a
+href="prep1.py">prep1.py</a>, <a href="prep2.py">prep2.py</a>, <a
+href="prep3.py">prep3.py</a>, <a href="prep4.py">prep4.py</a>, <a
+href="recom.py">recom.py</a>, <a
+href="rmse_mypicks.py">rmse_mypicks.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] Netflix,
 <a href="https://grouplens.org/datasets/movielens/latest/">MovieLens
