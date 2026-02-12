@@ -1,12 +1,13 @@
 # Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri 
 
-Posterior'dan örnekleme yapmak istiyoruz:
+Sonsal dağılımdan örneklem almak istiyoruz:
 
 $$
 p(U, V \mid R)
 $$
 
-Gibbs örneklemesi kullanarak, yani koşullu dağılımlardan tekrarlı örnekleme yaparak:
+Bunu Gibbs örneklemesi kullanarak, yani koşullu dağılımlardan tekrarlı
+örnekleme yaparak başarmayı umuyoruz,
 
 $$
 p(U_i \mid V, R)
@@ -18,14 +19,14 @@ Rastgele değişkenler ve boyutlar
 
 * $N$: kullanıcı sayısı
 * $M$: film sayısı
-* $K$: gizil boyut
+* $K$: gizil (latent) boyut, yani sıkıştırılmış, $U,V$'nin daraltılmış uzayı
 
 Değişkenler:
 
 * $U_i \in \mathbb{R}^K$, $i = 1, \dots, N$ için
 * $V_j \in \mathbb{R}^K$, $j = 1, \dots, M$ için
 * $\mu \in \mathbb{R}$ (global ortalama)
-* $R_{ij} \in \mathbb{R}$ ($I_{ij}=1$ ise gözlemlenir)
+* $R_{ij} \in \mathbb{R}$ ($I_{ij}=1$ ise bu kullanıcı o filme not vermiştir)
 
 Üretici model
 
@@ -61,7 +62,8 @@ $$
 
 Olurluk
 
-Gösterge $I_{ij} = 1$ eğer $R_{ij}$ gözlemlenirse, aksi halde 0 olarak tanımlanır.
+Gösterge $I_{ij} = 1$ eğer $R_{ij}$ gözlemlenmis ise, yani not mevcut
+ise, aksi halde 0 olarak tanımlanır.
 
 $$
 p(R \mid U, V)
