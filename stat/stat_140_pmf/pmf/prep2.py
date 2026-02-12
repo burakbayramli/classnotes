@@ -1,7 +1,7 @@
 import csv
 
-#d = "/opt/Downloads/ml-latest-small"
-d = "/opt/Downloads/ml-32m"
+d = "/opt/Downloads/ml-latest-small"
+#d = "/opt/Downloads/ml-32m"
 
 def remap_movielens_ids(movies_input, ratings_input):
     # Dictionaries to store {old_id: new_id}

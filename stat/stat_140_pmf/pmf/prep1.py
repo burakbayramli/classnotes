@@ -1,7 +1,7 @@
 import pandas as pd
 
-#d = "/opt/Downloads/ml-latest-small"
-d = "/opt/Downloads/ml-32m"
+d = "/opt/Downloads/ml-latest-small"
+#d = "/opt/Downloads/ml-32m"
 
 def preprocess_movielens(rating_file, movie_file, threshold=100):
     """

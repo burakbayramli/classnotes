@@ -2,8 +2,8 @@ import numpy as np, re, pandas as pd
 import os
 
 # --- Configuration ---
-#d = "/opt/Downloads/ml-latest-small"
-d = "/opt/Downloads/ml-32m"
+d = "/opt/Downloads/ml-latest-small"
+#d = "/opt/Downloads/ml-32m"
 
 # 3. Load personal ratings, mappings, and popularity data
 mov_df = pd.read_csv(d + "/movies3.csv",index_col="title")
