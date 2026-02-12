@@ -2,19 +2,12 @@ import os, numpy as np, json, util
 from multiprocessing import Process
 import glob, shutil
 
-# Configuration
-# Set this to your dataset
-DATASET = "large"  # "small" or "large"
-
-if DATASET == "small":
-    n_users, n_movies, global_mu = 610, 9742, 3.5019
-    d = "/opt/Downloads/ml-latest-small"
-else:
-    #n_users, n_movies, global_mu = 200948, 87584, 3.5
-    n_users, n_movies, global_mu = 200948, 40404, 3.5
-    d = "/opt/Downloads/ml-32m"
-
-o = "/dev/shm"
+#n_users, n_movies, global_mu = 610, 9742, 3.5019
+#d = "/opt/Downloads/ml-latest-small"
+#n_users, n_movies, global_mu = 200948, 87584, 3.5
+n_users, n_movies, global_mu = 200948, 40404, 3.5
+d = "/opt/Downloads/ml-32m"
+o = "/dev/shm" # Ubuntu uzerinde bu dizin ram diskidir, /tmp kullanilabilir
 USER_MOVIE_FILE = d + "/user_movie.txt"
 MOVIE_USER_FILE = d + "/movie_user.txt"
 
@@ -168,7 +161,7 @@ for iteration in range(N_ITER):
     print()  # Just newline
     
 np.savez(
-    o + "/bpmf_posterior.npz",
+    d + "/bpmf_posterior.npz",
     U=U_mean,
     V=V_mean,
     mu=global_mu,
