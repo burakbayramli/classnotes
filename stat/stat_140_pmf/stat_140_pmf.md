@@ -2,10 +2,18 @@
 
 Diyelim ki $N$ tane kullanıcı ve $M$ tane film var, ve $i$
 kullanıcısının $j$ filmine verdiği not $R_{ij}$ üzerinde. Eğer
-kullanıcı ve film özelliklerini sıkıştırılmış, "gizil" bir uzay
-üzerinden temsil etmek istersek, ki bu $N,M$'ye kıyasla boyutu daha
-küçük bir uzay olacaktır, şu şekilde olasılıksal bir tanım
+kullanıcı ve film özelliklerini azaltılmış, sıkıştırılmış, "gizil" bir
+uzay üzerinden temsil etmek istersek, ki bu $N,M$'ye kıyasla boyutu
+daha küçük bir uzay olacaktır, şu şekilde olasılıksal bir tanım
 yapabilirdik [1],
+
+* $N$: kullanıcı sayısı
+* $M$: film sayısı
+* $K$: gizil (latent) boyut, yani sıkıştırılmış, $U,V$'nin daraltılmış uzayı
+* $U_i \in \mathbb{R}^K$, $i = 1, \dots, N$ için
+* $V_j \in \mathbb{R}^K$, $j = 1, \dots, M$ için
+* $\mu \in \mathbb{R}$ (global ortalama)
+* $R_{ij} \in \mathbb{R}$ ($I_{ij}=1$ ise bu kullanıcı o filme not vermiştir)
 
 $$
 R_{ij}
@@ -16,19 +24,16 @@ R_{ij}
 \qquad (3)
 $$
 
-* $N$: kullanıcı sayısı
-* $M$: film sayısı
-* $K$: gizil (latent) boyut, yani sıkıştırılmış, $U,V$'nin daraltılmış uzayı
+Bir tavsiye sisteminin eğitmek demek üstteki daha az boyutlu $U,V$
+matrislerinin optimal değerlerini bulmak demektir. Bu değerleri
+bulunca bir tür özet temsil elde etmiş olacağız, bu temsil bize
+kullanıcının seyretmediği filmlere verebileceği notu tahmin etmemizi
+sağlayacak.
 
-Değişkenler:
+### Hesap Yöntemi
 
-* $U_i \in \mathbb{R}^K$, $i = 1, \dots, N$ için
-* $V_j \in \mathbb{R}^K$, $j = 1, \dots, M$ için
-* $\mu \in \mathbb{R}$ (global ortalama)
-* $R_{ij} \in \mathbb{R}$ ($I_{ij}=1$ ise bu kullanıcı o filme not vermiştir)
-
-Amacımız alttaki dağılıma erişmek, yani bu "sonsal" dağılımdan
-örneklem alabilmek istiyoruz:
+Hesapsal baglamda amacımız alttaki dağılıma erişmek, yani bu "sonsal"
+dağılımdan örneklem alabilmek istiyoruz:
 
 $$
 p(U, V \mid R)
@@ -38,16 +43,16 @@ Bu dağılımdan örneklem alabilmek için Gibbs tekniği kullanarak, yani
 koşullu dağılımlardan tekrarlı örnekleme yaparak oraya
 erisebiliriz. Mesela bir adımda $p(U_i \mid V, R)$ örneklemesi alırız,
 o değerleri kullanarak sonrakinde $p(V_i \mid U, R)$ alırız, bunu ardı
-ardına yapınca üstteki nihai dağılıma erisebileceğimizi biliyoruz.
+ardına yapınca üstteki nihai dağılıma erisebileceğimizi
+biliyoruz. Tabii $R$ verisine uyan $U,V$ değerlerine erişmek demek,
+kavramsal olarak bir dağılım elde etmektir, uygulama bağlamında mesela
+bir kullanıcının daha not vermediği filme not vermek için (1)
+formülünü direk kullanmak mümkündür, $U,V$ ile düz matris çarpımı
+yaparak bir tahmin hesaplayabiliriz.
 
-Tabii $R$ verisine uyan $U,V$ değerlerine erişmek demek, kavramsal
-olarak bir dağılım elde etmektir, fakat uygulama bağlamında mesela bir
-kullanıcının daha not vermediği filme not vermek için (1) formülünü
-direk kullanmak mümkündür, $U,V$ ile düz matris çarpımı yaparak bir
-tahmin hesaplayabiliriz.
-
-Bu sebeple bize mesela $p(U_i \mid V, R)$ formülasyonu lazım, bunu
-doğru yapmak için, tam genişletilmiş birleşik dağılımdan başlamalıyız.
+Yani bize, kullanıcılar için, $p(U_i \mid V, R)$ formülasyonu lazım,
+bunu cebirsel olarak elde etmek için tam genişletilmiş birleşik
+dağılımdan başlamalıyız.
 
 $$
 p(U)
@@ -621,9 +626,11 @@ $R_{ij}$ hem $\epsilon_{ij}$ nedeniyle hem de $U_i, V_j$'nin
 kendilerinin önsel dağılımlara sahip rastgele değişkenler olması
 nedeniyle bir rastgele değişkendir.
 
+### Genel Sorular
+
 Burada aslında iki seviye rastgelelik var:
 
-1 - Gözlem seviyesi rastgelelik ($\epsilon_{ij}$'den)
+1] Gözlem seviyesi rastgelelik ($\epsilon_{ij}$'den)
 
 $U_i, V_j$'nin sabit değerleri verildiğinde, derecelendirme $R_{ij}$
 hala rastgeledir çünkü:
@@ -636,7 +643,7 @@ Bu, ölçüm gürültüsünü veya derecelendirme sürecindeki doğal
 stokastikliği temsil eder. Gerçek gizil özellikleri bilsek bile, bir
 kullanıcı aynı filmi farklı günlerde farklı derecelendirebilir.
 
-2 - Parametre seviyesi rastgelelik ($U, V$ üzerindeki önsellerden)
+2] Parametre seviyesi rastgelelik ($U, V$ üzerindeki önsellerden)
 
 Bayesçi çerçevede, $U_i, V_j$ sabit parametreler değil, önsel
 dağılımlara sahip rastgele değişkenlerdir:
@@ -666,9 +673,9 @@ Pratikte:
 
 Gibbs örneklemesi yaptığımızda:
 
-1. Bazı derecelendirmeleri $R_{ij}$ gözlemliyoruz (onları sabit veri olarak ele alıyoruz)
-2. Bu gözlemler verildiğinde $U, V$'nin posterior dağılımını çıkarıyoruz
-3. $\epsilon_{ij}$ terimleri olabilirlik yoluyla örtük olarak "integral alınarak çıkarılır"
+- Bazı derecelendirmeleri $R_{ij}$ gözlemliyoruz (onları sabit veri olarak ele alıyoruz)
+- Bu gözlemler verildiğinde $U, V$'nin posterior dağılımını çıkarıyoruz
+- $\epsilon_{ij}$ terimleri olabilirlik yoluyla örtük olarak "integral alınarak çıkarılır"
 
 Yani model şunu söyler:
 
@@ -676,7 +683,190 @@ Yani model şunu söyler:
 - Veri gördükten sonra: Gözlemlenen $R_{ij}$ üzerine koşullandırır ve $U, V$ için dağılımları çıkarırız
 - Tahmin için: Yeni $R_{ij}^*$'yi tahmin etmek için posterior örneklerini kullanırız, bu hem parametre belirsizliğini hem de $\epsilon$ gürültüsünü içerir
 
-[devam edecek]
+### Yeni Kullanıcı
+
+Sistemi eğitip $U,V$ elde ettikten sonra mesela mevcut 100'uncu
+kullanıcı için tavsiye üretmek basit olurdu. $U$ matrisinin 100'uncu
+satırına gideriz, bu satır $1 \times K$ boyutundadır, sonra o satır
+ile $V$ matrisini çarparız, $1 \times K$ çarpı $K \times M$ bize $1
+\times M$ boyutunda bir vektör veriyor, $\mu$ ile toplayınca tüm
+filmlere verilmiş tahmini notlar böylece hesaplanmış olur.
+
+Fakat ya eğer tavsiye üretmek istediğimiz kullanıcı yeni bir kullanıcı
+ise, yani verisi eğitim fazına dahil edilmemiş bir kişi ise? Bu
+durumda bu kişinin $U$ matrisinde satırı yoktur. O zaman bu kişi $U$
+matrisinde olsaydı nasıl bir satır verisi, diyelim $u_{ben}$'e, sahip
+olurdu sorusunu cevaplamak gerekir, yani bu amaç için bir hesap
+yöntemi bulmak gerekir.
+
+Şöyle bir yaklaşım olabilir, öyle bir $u_{\textrm{ben}}$ bul ki onun
+$V$ ile çarpımı artı global ortalama kullanıcının oylamış olduğu
+filmler için verilen nota yakın bir değer versin. Bu bir tür regresyon
+hesabı olabilir aslında. Herhangi bir $j$ filmi için
+
+$$
+\hat{r}_j = \mu + u_{ben}^T v_j
+$$
+
+diyebiliriz. En iyi $u_{ben}$ vektörünü bulmak için karesi alınmış
+hataların toplamını minimize edebiliriz, bu hatalar benim gerçekten
+verdiğim notlar $r_j$ ile tahmin edilen notlar $\hat{r}_j$ arasında
+olur, bir de regülarize edici terim ekleriz ki aşırı öğrenme
+(overfitting) engellenmiş olsun. Yani amac $J(u_{ben})$'nin
+minizasyonu.
+
+$$
+J(u_{self}) = \sum_{j \in \Omega_j} (r_j - (\mu + u_{self}^T
+v_j))^2 + \lambda_U \|u_{self}\|^2
+$$
+
+Basitleştirmek için global ortalamayı notlardan çıkartabiliriz, $y_j =
+r_j - \mu$. Formül şöyle olur,
+
+$$
+J(u_{self}) = \sum_{j \in \text{Rated}} (y_j - u_{self}^T v_j)^2 +
+\lambda_U \|u_{self}\|^2
+$$
+
+Formülü matrisler kullanacak şekilde adapte edebiliriz, diyelim ki
+$V$'nin alt kümesi olan bir $V_{rated}$ yarattım bu matris $V$'nin
+benim oy verdiğim satırlarını içeriyor, eğer $B$ tane film oylamışsam,
+$V_{rated}$ matrisi $B \times K$ olur.
+
+$$
+J(u_{ben}) = \|y - V_{rated}u_{self}\|^2 + \lambda_U u_{ben}^T u_{ben}
+$$
+
+$$
+J(u_{ben}) = (y - V_{rated}u_{ben})^T (y - V_{rated}u_{ben}) + \lambda_U u_{ben}^T u_{ben}
+$$
+
+Şu terimi açalım, $(y - V_{rated}u_{self})^T (y - V_{rated}u_{self})$,
+
+$$
+J(u_{self}) = (y^T - u_{self}^T V_{rated}^T) (y - V_{rated}u_{self})
++ \lambda_U u_{self}^T u_{self}
+$$
+
+Çarpımı yapalım,
+
+$$
+J(u_{self}) = y^T y - y^T V_{rated} u_{self} - u_{self}^T
+V_{rated}^T y + u_{self}^T V_{rated}^T V_{rated} u_{self} + \lambda_U
+u_{self}^T u_{self}
+$$
+
+Üstte görülen $y^T V_{rated} u_{self}$ bir tek sayı olduğu için kendi
+devriğine eşittir, o yüzden ortadaki terimleri birleştirebiliriz,
+
+$$
+J(u_{self}) = y^T y - 2u_{self}^T V_{rated}^T y + u_{self}^T
+V_{rated}^T V_{rated} u_{self} + \lambda_U u_{self}^T u_{self}
+$$
+
+Şimdi $J(u_{ben})$'in $u_{self}$'a göre türevini alalım, ve minizasyon
+için sıfıra eşitleyelim. Matris Calculus kurallarından biliyoruz ki
+
+$\frac{\partial}{\partial u} (u^T A u) = 2Au$ (eger $A$ simetrik ise)
+
+$\frac{\partial}{\partial u} (u^T b) = b$
+
+O zaman 
+
+$$
+\frac{\partial J}{\partial u_{self}} =
+0 - 2V_{rated}^T y + 2V_{rated}^T V_{rated} u_{self} + 2\lambda_U u_{self} = 0
+$$
+
+2 ile bölelim ve $u_{ben}$ sol tarafta kalacak şekilde tekrar düzenleyelim,
+
+$$
+V_{rated}^T V_{rated} u_{self} + \lambda_U u_{self} = V_{rated}^T
+y$$
+
+$u_{self}$'i dışarı çekelim,
+
+$$
+(V_{rated}^T V_{rated} + \lambda_U I) u_{self} = V_{rated}^T y
+$$
+
+$$
+u_{self} = (V_{rated}^T V_{rated} + \lambda_U I)^{-1} V_{rated}^T
+y$$
+
+$$(V_{rated}^T V_{rated} + \lambda_U I)u_{self} = V_{rated}^T y$$
+
+$u_{ben}$ için çözelim,
+
+$$
+u_{ben} = (V_{rated}^T V_{rated} + \lambda_U I)^{-1} V_{rated}^T y
+$$
+
+Üstteki bir Sırt (Ridge) Regresyon tanımıdır [5]. 
+
+### Kodlama
+
+Ekteki kodlar arasında `sng_bpmf.py` dosyası tek islemci ile Gibbs
+örneklemesi yapar, `par_bpmf.py` ise aynı işlemi paralel şekilde
+yapar. Detaylar için kodlara bakılabilir.  Veri olarak [2],[3]
+kullanmak mümkün, bu verilerin dizin olarak `/opt/Downloads` altında
+olduğunu farz ediyoruz. Verinin hazırlanması için `pmf/prep1.py`,
+`pmf/prep2.py`, `pmf/prep3.py`, `pmf/prep4.py` script'leri o sırada
+işletilmeli. Bu scriptler ile kullanıcı ve film kimlikleri tekrar
+üretiliyor, tüm film ve kullanıcılar sıfırdan başlayıp birer birer
+artacak şekilde tekrar kimlikleniyor. Bunun yapılmasının sebebi bu
+kimlik değerlerinin $U,V$ üzerinde direk satır erişimi için
+kullanılabilmesi.. Daha sonra `user_movie.txt` ve `movie_user.txt`
+dosyaları yaratılıyor, bu dosyalarda her satır, mesela
+`user_movie.txt` için diyelim, satır başında kullanıcı kimliği
+ardından aynı satırda o kullanıcının verdiği film notlarını içerir. Bu
+şekilde tek bir satır okuması ile o kullanıcı hakkında tüm bilgileri
+alabilmiş oluyoruz (filmler için benzer şekilde). Movielens verisine
+bakanlar farketmiş olabilir, oradaki `ratings.csv` içinde bu tür bir
+satırsal temsil yoktur.
+
+Gibbs işlemi bitince sonuçlar, sonsal dağılımlar, bir `.npz` dosyasına
+yazılır, ve `recom.py` koduyla bu çıktılar kullanılarak taviyeler
+üretilebilir. Tavsiye kodu kullanıcının beğendiği filmleri, notlar
+okumak için su anda `~/Documents/kod/movpicks.csv` dosyasını
+kullanıyor, burada benim kendi seçimlerim var, mesela
+
+```
+movie,rating
+..
+Swordfish (2001),5
+Dunkirk (2017),2
+Tombstone (1993),5
+..
+```
+
+diye notlar vermişim. Bu notlar kullanılarak ve üstteki matematik
+kullanılarak tavsiyeler üretiliyor.
+
+Paralellik
+
+Üstte görülen Gibbs örnekleme algoritmasında dikkat edersek
+kullanıcılar için bir döngü var, onun içinde kullanıcı 1,2,3.. diye
+giden ve o kullanıcıların $U$ satırlarını örnekleyen (yani mevcut
+satırın üzerine yazan) bir yaklaşım var. Bu yaklaşıma göre
+kullanıcıların satırlarının örneklenmesi birbirinden bağımsız, yani
+kullanıcı 100 örneklenmesi için kullanıcı 99'un işinin bitmiş olmasını
+beklemiyoruz. Bu demektir ki örneklem işlemi kullanıcı ve film bazında
+paralel şekilde işletilebilir.
+
+Kullanıcılar için 10 tane paralel süreç başlatırız, bu süreçler
+kullanıcıları ve onun verdiği notları 10 parçaya böler, her biri kendi
+içinde örneklem işini yapar, kendi $U$ parçasını üretir, tümü bitince
+$U$ parçaları birleştirilip yeni $U$ oluşturulur ve filmler için aynı
+işlem yapılır, 10 parçaya bölünür, orneklenip birlestirilir vs. Bu bir
+dongu (iteration) olur.
+
+Bölme işlemini `user_movie.txt` ve `movie_user.txt` üzerinden basit
+bir şekilde yapabiliriz, kullanıcı ve film kimlik değerleri artık
+direk $U,V$ satırlarına tekabül ettiği için erişimde zorluk
+çıkmaz. Her süreç kendi verisine odaklanır, ama $U,V$ verisinin her
+süreç içinde kopyalanması problem değil, çünkü bunlar nispeten ufak
+matrislerdir, bellek için yük oluşturmazlar.
 
 Kodlar
 
@@ -698,4 +888,6 @@ Kaynaklar
 [3] Netflix, <a href="https://grouplens.org/datasets/movielens/32m/">MovieLens 32M, (ml-32m)</a>
 
 [4] Anton Gerber Sort, <a href="https://research-api.cbs.dk/ws/portalfiles/portal/98731723/1641765_Thesis_Anton_Sort.pdf">Probabilistic Matrix Factorisation in Collaborative Filtering, Thesis</a>
+
+[5] Bayramli, <a href="../stat_120_regular/stat_120_regular.html">Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek</a>
 

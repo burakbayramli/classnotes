@@ -10,7 +10,6 @@ test_set = defaultdict(dict)
 
 def user_movie():
     output_file = dir + '/user_movie.txt'
-    output_test_file = dir + '/user_movie_test.txt'
     user_ratings = defaultdict(dict)
     barx = 3    
     with open(input_file, 'r', encoding='utf-8') as f:
