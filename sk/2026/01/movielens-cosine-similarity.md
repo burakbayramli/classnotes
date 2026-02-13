@@ -144,7 +144,7 @@ daha üzeri not verdiği filmleri toparlayarak benim için bir tavsiye
 listesi oluşturur.
 
 ```python
-content = open("movrecom.py").read()
+content = open("simrecom.py").read()
 print(content.replace('\n', '\r\n'))
 ```
 
@@ -232,7 +232,7 @@ bağlantıda paylaşılıyor.
 
 Kodlar
 
-[movprep.py](../../stat/stat_140_pmf/movprep.py)
+[movprep.py](movprep.py)
 
 
 Kaynaklar
