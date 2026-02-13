@@ -3,6 +3,8 @@
 
 ## En Son
 
+13/2 - [Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri](https://burakbayramli.github.io/dersblog/stat/stat_140_pmf/olasiliksal_matris_ayristirmasi__probabilistic_matrix_factorization__ve_film_tavsiyeleri.html)
+
 10/2 - [Matris Tersi, Cholesky Ayrıştırması](https://burakbayramli.github.io/dersblog/linear/linear_app02/matris_tersi_cholesky_ayristirmasi.html)
 
 19/1 - [Movielens Filmleri, Kosinüs Benzerliği, Tavsiyeler](https://burakbayramli.github.io/dersblog/sk/2026/01/movielens-cosine-similarity.html)
@@ -10,8 +12,6 @@
 17/12 - [Coğrafi İstatistiki Hesaplar, Oranlar](https://burakbayramli.github.io/dersblog/stat/stat_082_rapoi/cografi_istatistiki_hesaplar_oranlar.html)
 
 21/11 - [Bayes Usulü İstatistiki Analiz](https://burakbayramli.github.io/dersblog/stat/stat_047_bayes/bayes_usulu_istatistiki_analiz.html)
-
-19/11 - [Değişim Noktası Analizi - Ekler - PyMC](https://burakbayramli.github.io/dersblog/stat/stat_100_coal/degisim_noktasi_analizi__changepoint_analysis_.html)
 
 ## Konular, Referans
 

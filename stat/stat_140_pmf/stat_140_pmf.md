@@ -1,11 +1,13 @@
 # Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri 
 
-Diyelim ki $N$ tane kullanıcı ve $M$ tane film var, ve $i$
-kullanıcısının $j$ filmine verdiği not $R_{ij}$ üzerinde. Eğer
-kullanıcı ve film özelliklerini azaltılmış, sıkıştırılmış, "gizil" bir
-uzay üzerinden temsil etmek istersek, ki bu $N,M$'ye kıyasla boyutu
-daha küçük bir uzay olacaktır, şu şekilde olasılıksal bir tanım
-yapabilirdik [1],
+Tavsiye sistemleri film, şarkı gibi ürünler üzerinde yapılan beğeni
+notları üzerinden o kullanıcının not vermediği filmler, şarkılar
+üzerinde bir tahmin üretmeye uğraşır. Diyelim ki $N$ tane kullanıcı ve
+$M$ tane film var, ve $i$ kullanıcısının $j$ filmine verdiği not
+$R_{ij}$ üzerinde. Eğer kullanıcı ve film özelliklerini azaltılmış,
+sıkıştırılmış, "gizil" bir uzay üzerinden temsil etmek istersek, ki bu
+$N,M$'ye kıyasla boyutu daha küçük bir uzay olacaktır, şu şekilde
+olasılıksal bir tanım yapabilirdik [1],
 
 * $N$: kullanıcı sayısı
 * $M$: film sayısı
@@ -32,8 +34,8 @@ sağlayacak.
 
 ### Hesap Yöntemi
 
-Hesapsal baglamda amacımız alttaki dağılıma erişmek, yani bu "sonsal"
-dağılımdan örneklem alabilmek istiyoruz:
+Hesapsal baglamda amacımız alttaki dağılıma erişmek, yani bu "sonsal
+(posterior)" dağılımdan örneklem alabilmek istiyoruz:
 
 $$
 p(U, V \mid R)
@@ -512,9 +514,9 @@ $$
 \lambda_U I + \frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j V_j^\top
 $$
 
-Ortalamayı tanımla (lineer terimden):
-
-$U_i^\top \Sigma_i^{-1} \mu_i = \frac{1}{\sigma^2} U_i^\top \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}$'den:
+Ortalamayı tanımla (lineer terimden), $U_i^\top \Sigma_i^{-1} \mu_i =
+\frac{1}{\sigma^2} U_i^\top \sum_{j \in \Omega_i} V_j
+\tilde{R}_{ij}$'den:
 
 $$
 \Sigma_i^{-1} \mu_i
@@ -547,7 +549,7 @@ p(U_i \mid V, R)
 $$
 
 
-Özet: $U_i$ için koşullu posterior
+Özet: $U_i$ için koşullu sonsal
 
 $$
 \begin{aligned}
@@ -570,7 +572,7 @@ $$
 burada $\Omega_i = \{j : I_{ij} = 1\}$, kullanıcı $i$ tarafından
 derecelendirilen filmlerin kümesidir.
 
-Simetri: $V_j$ için koşullu posterior
+Simetri: $V_j$ için koşullu sonsal
 
 Simetri ile (kullanıcı/film indekslerini değiştirerek):
 
@@ -602,11 +604,11 @@ burada $\Omega_j = \{i : I_{ij} = 1\}$, film $j$'yi derecelendiren kullanıcıla
 
 Gibbs örneklemesi neden işe yarar
 
-* Tüm koşullu posterior'lar Gauss'tur (kapalı form)
+* Tüm koşullu sonsallar Gauss'tur (kapalı form)
 * Örnekleme, normalizasyon sabitlerini hesaplamayı gerektirmez
 * Her güncelleme sadece yerel veriyi kullanır (o kullanıcı/filmi içeren derecelendirmeler)
 * Tekrarlı taramalar bilgiyi gizil uzayda global olarak yayar
-* Hafif koşullar altında gerçek posterior'a yakınsama garantilidir
+* Hafif koşullar altında gerçek sonsala yakınsama garantilidir
 
 Gibbs Örnekleme Algoritması
 
@@ -628,7 +630,8 @@ nedeniyle bir rastgele değişkendir.
 
 ### Genel Sorular
 
-Burada aslında iki seviye rastgelelik var:
+Sistemdeki rasgelelik nereden geliyor? $U,V$ rasgele değişken
+midirler? Burada aslında iki seviye rastgelelik var:
 
 1] Gözlem seviyesi rastgelelik ($\epsilon_{ij}$'den)
 
@@ -674,14 +677,14 @@ Pratikte:
 Gibbs örneklemesi yaptığımızda:
 
 - Bazı derecelendirmeleri $R_{ij}$ gözlemliyoruz (onları sabit veri olarak ele alıyoruz)
-- Bu gözlemler verildiğinde $U, V$'nin posterior dağılımını çıkarıyoruz
+- Bu gözlemler verildiğinde $U, V$'nin sonsal dağılımını çıkarıyoruz
 - $\epsilon_{ij}$ terimleri olabilirlik yoluyla örtük olarak "integral alınarak çıkarılır"
 
 Yani model şunu söyler:
 
 - Veri görmeden önce: Her şey ($U, V, R$) rastgeledir
 - Veri gördükten sonra: Gözlemlenen $R_{ij}$ üzerine koşullandırır ve $U, V$ için dağılımları çıkarırız
-- Tahmin için: Yeni $R_{ij}^*$'yi tahmin etmek için posterior örneklerini kullanırız, bu hem parametre belirsizliğini hem de $\epsilon$ gürültüsünü içerir
+- Tahmin için: Yeni $R_{ij}^*$'yi tahmin etmek için sonsal örneklerini kullanırız, bu hem parametre belirsizliğini hem de $\epsilon$ gürültüsünü içerir
 
 ### Yeni Kullanıcı
 

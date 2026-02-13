@@ -26,8 +26,11 @@
 id="olasılıksal-matris-ayrıştırması-probabilistic-matrix-factorization-ve-film-tavsiyeleri">Olasılıksal
 Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film
 Tavsiyeleri</h1>
-<p>Diyelim ki <span class="math inline">\(N\)</span> tane kullanıcı ve
-<span class="math inline">\(M\)</span> tane film var, ve <span
+<p>Tavsiye sistemleri film, şarkı gibi ürünler üzerinde yapılan beğeni
+notları üzerinden o kullanıcının not vermediği filmler, şarkılar
+üzerinde bir tahmin üretmeye uğraşır. Diyelim ki <span
+class="math inline">\(N\)</span> tane kullanıcı ve <span
+class="math inline">\(M\)</span> tane film var, ve <span
 class="math inline">\(i\)</span> kullanıcısının <span
 class="math inline">\(j\)</span> filmine verdiği not <span
 class="math inline">\(R_{ij}\)</span> üzerinde. Eğer kullanıcı ve film
@@ -65,8 +68,8 @@ bulmak demektir. Bu değerleri bulunca bir tür özet temsil elde etmiş
 olacağız, bu temsil bize kullanıcının seyretmediği filmlere verebileceği
 notu tahmin etmemizi sağlayacak.</p>
 <h3 id="hesap-yöntemi">Hesap Yöntemi</h3>
-<p>Hesapsal baglamda amacımız alttaki dağılıma erişmek, yani bu “sonsal”
-dağılımdan örneklem alabilmek istiyoruz:</p>
+<p>Hesapsal baglamda amacımız alttaki dağılıma erişmek, yani bu “sonsal
+(posterior)” dağılımdan örneklem alabilmek istiyoruz:</p>
 <p><span class="math display">\[
 p(U, V \mid R)
 \]</span></p>
@@ -509,10 +512,9 @@ U_i^\top \Sigma_i^{-1} \mu_i
 =
 \lambda_U I + \frac{1}{\sigma^2} \sum_{j \in \Omega_i} V_j V_j^\top
 \]</span></p>
-<p>Ortalamayı tanımla (lineer terimden):</p>
-<p><span class="math inline">\(U_i^\top \Sigma_i^{-1} \mu_i =
-\frac{1}{\sigma^2} U_i^\top \sum_{j \in \Omega_i} V_j
-\tilde{R}_{ij}\)</span>’den:</p>
+<p>Ortalamayı tanımla (lineer terimden), <span
+class="math inline">\(U_i^\top \Sigma_i^{-1} \mu_i = \frac{1}{\sigma^2}
+U_i^\top \sum_{j \in \Omega_i} V_j \tilde{R}_{ij}\)</span>’den:</p>
 <p><span class="math display">\[
 \Sigma_i^{-1} \mu_i
 =
@@ -539,7 +541,7 @@ p(U_i \mid V, R)
 \mathcal{N}(U_i \mid \mu_i, \Sigma_i)
 \]</span></p>
 <p>Özet: <span class="math inline">\(U_i\)</span> için koşullu
-posterior</p>
+sonsal</p>
 <p><span class="math display">\[
 \begin{aligned}
 \Sigma_i^{-1}
@@ -561,7 +563,7 @@ V_j
 1\}\)</span>, kullanıcı <span class="math inline">\(i\)</span>
 tarafından derecelendirilen filmlerin kümesidir.</p>
 <p>Simetri: <span class="math inline">\(V_j\)</span> için koşullu
-posterior</p>
+sonsal</p>
 <p>Simetri ile (kullanıcı/film indekslerini değiştirerek):</p>
 <p><span class="math display">\[
 p(V_j \mid U, R) = \mathcal{N}(V_j \mid \hat{\mu}_j, \hat{\Sigma}_j)
@@ -589,13 +591,12 @@ U_i
 derecelendiren kullanıcıların kümesidir.</p>
 <p>Gibbs örneklemesi neden işe yarar</p>
 <ul>
-<li>Tüm koşullu posterior’lar Gauss’tur (kapalı form)</li>
+<li>Tüm koşullu sonsallar Gauss’tur (kapalı form)</li>
 <li>Örnekleme, normalizasyon sabitlerini hesaplamayı gerektirmez</li>
 <li>Her güncelleme sadece yerel veriyi kullanır (o kullanıcı/filmi
 içeren derecelendirmeler)</li>
 <li>Tekrarlı taramalar bilgiyi gizil uzayda global olarak yayar</li>
-<li>Hafif koşullar altında gerçek posterior’a yakınsama
-garantilidir</li>
+<li>Hafif koşullar altında gerçek sonsala yakınsama garantilidir</li>
 </ul>
 <p>Gibbs Örnekleme Algoritması</p>
 <p>Başlat: <span class="math inline">\(U^{(0)}, V^{(0)}\)</span>’ı
@@ -621,7 +622,9 @@ class="math inline">\(U_i, V_j\)</span>’nin kendilerinin önsel
 dağılımlara sahip rastgele değişkenler olması nedeniyle bir rastgele
 değişkendir.</p>
 <h3 id="genel-sorular">Genel Sorular</h3>
-<p>Burada aslında iki seviye rastgelelik var:</p>
+<p>Sistemdeki rasgelelik nereden geliyor? <span
+class="math inline">\(U,V\)</span> rasgele değişken midirler? Burada
+aslında iki seviye rastgelelik var:</p>
 <p>1] Gözlem seviyesi rastgelelik (<span
 class="math inline">\(\epsilon_{ij}\)</span>’den)</p>
 <p><span class="math inline">\(U_i, V_j\)</span>’nin sabit değerleri
@@ -665,7 +668,7 @@ V_j)\)</span>, parametreler hakkındaki belirsizliğimizi yakalar</p>
 <li>Bazı derecelendirmeleri <span class="math inline">\(R_{ij}\)</span>
 gözlemliyoruz (onları sabit veri olarak ele alıyoruz)</li>
 <li>Bu gözlemler verildiğinde <span class="math inline">\(U,
-V\)</span>’nin posterior dağılımını çıkarıyoruz</li>
+V\)</span>’nin sonsal dağılımını çıkarıyoruz</li>
 <li><span class="math inline">\(\epsilon_{ij}\)</span> terimleri
 olabilirlik yoluyla örtük olarak “integral alınarak çıkarılır”</li>
 </ul>
@@ -677,7 +680,7 @@ R\)</span>) rastgeledir</li>
 class="math inline">\(R_{ij}\)</span> üzerine koşullandırır ve <span
 class="math inline">\(U, V\)</span> için dağılımları çıkarırız</li>
 <li>Tahmin için: Yeni <span class="math inline">\(R_{ij}^*\)</span>’yi
-tahmin etmek için posterior örneklerini kullanırız, bu hem parametre
+tahmin etmek için sonsal örneklerini kullanırız, bu hem parametre
 belirsizliğini hem de <span class="math inline">\(\epsilon\)</span>
 gürültüsünü içerir</li>
 </ul>
