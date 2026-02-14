@@ -5,17 +5,17 @@ import glob, shutil
 #n_users, n_movies, global_mu = 610, 9742, 3.5019
 #d = "/opt/Downloads/ml-latest-small"
 #n_users, n_movies, global_mu = 200948, 87584, 3.5
-n_users, n_movies, global_mu = 200948, 40404, 3.5
+n_users, n_movies, global_mu = 200948, 30521, 3.5
 d = "/opt/Downloads/ml-32m"
 o = "/dev/shm" # Ubuntu uzerinde bu dizin ram diskidir, /tmp kullanilabilir
 USER_MOVIE_FILE = d + "/user_movie.txt"
 MOVIE_USER_FILE = d + "/movie_user.txt"
 
 N_WORKERS = 6
-N_ITER = 250
-K = 25
-BURN_IN = 10
-THIN = 3
+N_ITER = 100
+K = 30
+BURN_IN = 5
+THIN = 2
 
 rng = np.random.default_rng()
 

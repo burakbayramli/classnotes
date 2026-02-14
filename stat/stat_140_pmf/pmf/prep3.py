@@ -2,8 +2,8 @@ import csv
 import json
 from collections import defaultdict
 
-#dir = "/opt/Downloads/ml-32m"
-dir = "/opt/Downloads/ml-latest-small"
+dir = "/opt/Downloads/ml-32m"
+#dir = "/opt/Downloads/ml-latest-small"
 input_file = dir + '/ratings3.csv'
 
 test_set = defaultdict(dict)
