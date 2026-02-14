@@ -719,16 +719,16 @@ olur, bir de regülarize edici terim ekleriz ki aşırı öğrenme
 minizasyonu.
 
 $$
-J(u_{self}) = \sum_{j \in \Omega_j} (r_j - (\mu + u_{self}^T
-v_j))^2 + \lambda_U \|u_{self}\|^2
+J(u_{ben}) = \sum_{j \in \Omega_j} (r_j - (\mu + u_{ben}^T
+v_j))^2 + \lambda_U \|u_{ben}\|^2
 $$
 
 Basitleştirmek için global ortalamayı notlardan çıkartabiliriz, $y_j =
 r_j - \mu$. Formül şöyle olur,
 
 $$
-J(u_{self}) = \sum_{j \in \text{Rated}} (y_j - u_{self}^T v_j)^2 +
-\lambda_U \|u_{self}\|^2
+J(u_{ben}) = \sum_{j \in \text{Rated}} (y_j - u_{ben}^T v_j)^2 +
+\lambda_U \|u_{ben}\|^2
 $$
 
 Formülü matrisler kullanacak şekilde adapte edebiliriz, diyelim ki
@@ -737,37 +737,37 @@ benim oy verdiğim satırlarını içeriyor, eğer $B$ tane film oylamışsam,
 $V_{rated}$ matrisi $B \times K$ olur.
 
 $$
-J(u_{ben}) = \|y - V_{rated}u_{self}\|^2 + \lambda_U u_{ben}^T u_{ben}
+J(u_{ben}) = \|y - V_{rated}u_{ben}\|^2 + \lambda_U u_{ben}^T u_{ben}
 $$
 
 $$
 J(u_{ben}) = (y - V_{rated}u_{ben})^T (y - V_{rated}u_{ben}) + \lambda_U u_{ben}^T u_{ben}
 $$
 
-Şu terimi açalım, $(y - V_{rated}u_{self})^T (y - V_{rated}u_{self})$,
+Şu terimi açalım, $(y - V_{rated}u_{ben})^T (y - V_{rated}u_{ben})$,
 
 $$
-J(u_{self}) = (y^T - u_{self}^T V_{rated}^T) (y - V_{rated}u_{self})
-+ \lambda_U u_{self}^T u_{self}
+J(u_{ben}) = (y^T - u_{ben}^T V_{rated}^T) (y - V_{rated}u_{ben})
++ \lambda_U u_{ben}^T u_{ben}
 $$
 
 Çarpımı yapalım,
 
 $$
-J(u_{self}) = y^T y - y^T V_{rated} u_{self} - u_{self}^T
-V_{rated}^T y + u_{self}^T V_{rated}^T V_{rated} u_{self} + \lambda_U
-u_{self}^T u_{self}
+J(u_{ben}) = y^T y - y^T V_{rated} u_{ben} - u_{ben}^T
+V_{rated}^T y + u_{ben}^T V_{rated}^T V_{rated} u_{ben} + \lambda_U
+u_{ben}^T u_{ben}
 $$
 
-Üstte görülen $y^T V_{rated} u_{self}$ bir tek sayı olduğu için kendi
+Üstte görülen $y^T V_{rated} u_{ben}$ bir tek sayı olduğu için kendi
 devriğine eşittir, o yüzden ortadaki terimleri birleştirebiliriz,
 
 $$
-J(u_{self}) = y^T y - 2u_{self}^T V_{rated}^T y + u_{self}^T
-V_{rated}^T V_{rated} u_{self} + \lambda_U u_{self}^T u_{self}
+J(u_{ben}) = y^T y - 2u_{ben}^T V_{rated}^T y + u_{ben}^T
+V_{rated}^T V_{rated} u_{ben} + \lambda_U u_{ben}^T u_{ben}
 $$
 
-Şimdi $J(u_{ben})$'in $u_{self}$'a göre türevini alalım, ve minizasyon
+Şimdi $J(u_{ben})$'in $u_{ben}$'a göre türevini alalım, ve minizasyon
 için sıfıra eşitleyelim. Matris Calculus kurallarından biliyoruz ki
 
 $\frac{\partial}{\partial u} (u^T A u) = 2Au$ (eger $A$ simetrik ise)
@@ -777,27 +777,27 @@ $\frac{\partial}{\partial u} (u^T b) = b$
 O zaman 
 
 $$
-\frac{\partial J}{\partial u_{self}} =
-0 - 2V_{rated}^T y + 2V_{rated}^T V_{rated} u_{self} + 2\lambda_U u_{self} = 0
+\frac{\partial J}{\partial u_{ben}} =
+0 - 2V_{rated}^T y + 2V_{rated}^T V_{rated} u_{ben} + 2\lambda_U u_{ben} = 0
 $$
 
 2 ile bölelim ve $u_{ben}$ sol tarafta kalacak şekilde tekrar düzenleyelim,
 
 $$
-V_{rated}^T V_{rated} u_{self} + \lambda_U u_{self} = V_{rated}^T
+V_{rated}^T V_{rated} u_{ben} + \lambda_U u_{ben} = V_{rated}^T
 y$$
 
-$u_{self}$'i dışarı çekelim,
+$u_{ben}$'i dışarı çekelim,
 
 $$
-(V_{rated}^T V_{rated} + \lambda_U I) u_{self} = V_{rated}^T y
+(V_{rated}^T V_{rated} + \lambda_U I) u_{ben} = V_{rated}^T y
 $$
 
 $$
-u_{self} = (V_{rated}^T V_{rated} + \lambda_U I)^{-1} V_{rated}^T
+u_{ben} = (V_{rated}^T V_{rated} + \lambda_U I)^{-1} V_{rated}^T
 y$$
 
-$$(V_{rated}^T V_{rated} + \lambda_U I)u_{self} = V_{rated}^T y$$
+$$(V_{rated}^T V_{rated} + \lambda_U I)u_{ben}  = V_{rated}^T y$$
 
 $u_{ben}$ için çözelim,
 
