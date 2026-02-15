@@ -3,7 +3,7 @@ import pandas as pd
 #d = "/opt/Downloads/ml-latest-small"
 d = "/opt/Downloads/ml-32m"
 
-def preprocess_movielens(rating_file, movie_file, threshold=100):
+def preprocess_movielens(rating_file, movie_file, threshold):
     """
     Filters Movielens data to keep only movies with more than 'threshold' ratings.
     """
