@@ -3,10 +3,10 @@ import pandas as pd
 import os
 
 # --- Configuration ---
-d = "/opt/Downloads/ml-latest-small"
-#d = "/opt/Downloads/ml-32m"
+#d = "/opt/Downloads/ml-latest-small"
+d = "/opt/Downloads/ml-32m"
 posterior_file = d + "/bpmf_posterior.npz"
-lambda_U = 5.0 
+lambda_U = 5.0
 global_mu = 3.5 
 
 # 1. Load the trained model parameters

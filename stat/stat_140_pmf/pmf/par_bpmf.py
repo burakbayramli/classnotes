@@ -13,13 +13,13 @@ MOVIE_USER_FILE = d + "/movie_user.txt"
 
 N_WORKERS = 6
 N_ITER = 100
-K = 20
+K = 25
 BURN_IN = 5
 THIN = 2
 
 rng = np.random.default_rng()
 
-lambda_U, lambda_V = 0.1, 0.1
+lambda_U, lambda_V = 5.0, 5.0
 sigma2 = 1.0                 
 
 eyeK = np.eye(K)
