@@ -7,7 +7,7 @@ import os
 d = "/opt/Downloads/ml-32m"
 posterior_file = d + "/bpmf_posterior.npz"
 lambda_U = 5.0
-global_mu = 3.5 
+global_mu = 3.5
 
 # 1. Load the trained model parameters
 data = np.load(posterior_file)
