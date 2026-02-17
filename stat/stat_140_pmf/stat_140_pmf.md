@@ -72,7 +72,13 @@ p(V)
 \mathcal{N}(V_j \mid 0, \lambda_V^{-1} I)
 $$
 
-Olurluk
+Dikkat: Bu yazıdaki yaklaşımda, [1]'den farklı olarak, $\lambda_U$ ve
+$\lambda_V$ bir hiperparametre, rasgele değişken değiller, sabit tek
+sayı değerleri var. Ve bu durumda aynen diğer yapay öğrenim
+yaklaşımlarında olduğu gibi optimal değerlerinin bulunması gerekli, bu
+deneme / yanılma ya da diğer otomize teknikler ile olabilir.
+
+Olurluk (Likelihood)
 
 Gösterge $I_{ij} = 1$ eğer $R_{ij}$ gözlemlenmis ise, yani not mevcut
 ise, aksi halde 0 olarak tanımlanır.
@@ -179,9 +185,9 @@ $$
 Adım 2: Şimdi (1) içindeki $p(R \mid U_i, U_{-i}, V)$ terimine dikkat et.
 Bunu nasıl genişletebiliriz? İşte nasıl.
 
-$U_i$ içeren olabilirlik terimlerini izole et
+$U_i$ içeren olurluk terimlerini izole et
 
-Olabilirlik tüm gözlemlenen derecelendirmeler üzerinden çarpanlara ayrılır:
+Olurluk tüm gözlemlenen derecelendirmeler üzerinden çarpanlara ayrılır:
 
 $$
 p(R \mid U_i, U_{-i}, V)
@@ -314,9 +320,14 @@ Bu doğru olur, değil mi? Çünkü (1)'de $U_i$'ye bağlı olmayan terimler
 $U_i$'ye bağlı olan terimler
 
 - $\mathcal{N}(U_i \mid 0, \lambda_U^{-1} I)$ — $U_i$ üzerindeki önsel
-- $\prod_{j \in \Omega_i} \mathcal{N}(R_{ij} \mid \mu + U_i^\top V_j, \sigma^2)$ — kullanıcı $i$'nin derecelendirmelerinin olabilirliği
 
-$p(V)$ gibi terimler $U_i$'ye bağlı değildir, $U_i$ ne olursa olsun aynıdırlar, bu nedenle sadece normalizasyon sabitine katkıda bulunabilirler (eşitlikten $\propto$'ya geçişe dikkat edin), dolayısıyla atılırlar.
+- $\prod_{j \in \Omega_i} \mathcal{N}(R_{ij} \mid \mu + U_i^\top V_j,
+  \sigma^2)$ — kullanıcı $i$'nin derecelendirmelerinin olurlugu
+
+$p(V)$ gibi terimler $U_i$'ye bağlı değildir, $U_i$ ne olursa olsun
+aynıdırlar, bu nedenle sadece normalizasyon sabitine katkıda
+bulunabilirler (eşitlikten $\propto$'ya geçişe dikkat edin),
+dolayısıyla atılırlar.
 
 Devam edelim. $U_{-i}$ üzerine koşullandırdığımız için, şunu yazabiliriz:
 
@@ -669,7 +680,7 @@ p(R_{ij}) = \int p(R_{ij} \mid U_i, V_j) \cdot p(U_i, V_j) \, dU_i \, dV_j
 $$
 
 Bu, her iki rastgelelik kaynağı üzerinden integral alır:
-- Olabilirlik $p(R_{ij} \mid U_i, V_j)$, $\epsilon_{ij}$ gürültüsünü yakalar
+- Olurluk $p(R_{ij} \mid U_i, V_j)$, $\epsilon_{ij}$ gürültüsünü yakalar
 - Önsel $p(U_i, V_j)$, parametreler hakkındaki belirsizliğimizi yakalar
 
 Pratikte:
@@ -678,7 +689,7 @@ Gibbs örneklemesi yaptığımızda:
 
 - Bazı derecelendirmeleri $R_{ij}$ gözlemliyoruz (onları sabit veri olarak ele alıyoruz)
 - Bu gözlemler verildiğinde $U, V$'nin sonsal dağılımını çıkarıyoruz
-- $\epsilon_{ij}$ terimleri olabilirlik yoluyla örtük olarak "integral alınarak çıkarılır"
+- $\epsilon_{ij}$ terimleri olurluk yoluyla örtük olarak "integral alınarak çıkarılır"
 
 Yani model şunu söyler:
 
@@ -857,12 +868,14 @@ kullanıcı 100 örneklenmesi için kullanıcı 99'un işinin bitmiş olmasını
 beklemiyoruz. Bu demektir ki örneklem işlemi kullanıcı ve film bazında
 paralel şekilde işletilebilir.
 
-Kullanıcılar için 10 tane paralel süreç başlatırız, bu süreçler
-kullanıcıları ve onun verdiği notları 10 parçaya böler, her biri kendi
-içinde örneklem işini yapar, kendi $U$ parçasını üretir, tümü bitince
-$U$ parçaları birleştirilip yeni $U$ oluşturulur ve filmler için aynı
-işlem yapılır, 10 parçaya bölünür, orneklenip birlestirilir vs. Bu bir
-dongu (iteration) olur.
+Kullanıcılar için $P$ tane paralel süreç başlatırız (5, 10 olabilir0,
+bu süreçler kullanıcıları ve onun verdiği notları $P$ parçaya böler,
+her biri kendi içinde örneklem işini yapar, kendi $U$ parçasını
+üretir, tümü bitince $U$ parçaları birleştirilip yeni $U$ oluşturulur
+ve filmler için aynı işlem yapılır, $P$ parçaya bölünür, orneklenip
+birlestirilir vs. Bu bir dongu (iteration) olur.
+
+Paralel isletme altyapisi [6]'da tarif edilen yaklasimdir.
 
 Bölme işlemini `user_movie.txt` ve `movie_user.txt` üzerinden basit
 bir şekilde yapabiliriz, kullanıcı ve film kimlik değerleri artık
@@ -893,5 +906,7 @@ Kaynaklar
 
 [4] Anton Gerber Sort, <a href="https://research-api.cbs.dk/ws/portalfiles/portal/98731723/1641765_Thesis_Anton_Sort.pdf">Probabilistic Matrix Factorisation in Collaborative Filtering, Thesis</a>
 
-[5] Bayramli, <a href="../stat_120_regular/stat_120_regular.html">Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek</a>
+[5] Bayramlı, <a href="../stat_120_regular/stat_120_regular.html">Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek</a>
+
+[6] Bayramlı, [Paralel, Satır Bazlı Dosya İşlemek](../../sk/2016/02/toptan-islemler-paralelizasyon.html)
 
