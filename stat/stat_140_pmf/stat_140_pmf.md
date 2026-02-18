@@ -43,14 +43,14 @@ $$
 
 Bu dağılımdan örneklem alabilmek için Gibbs tekniği kullanarak, yani
 koşullu dağılımlardan tekrarlı örnekleme yaparak oraya
-erisebiliriz. Mesela bir adımda $p(U_i \mid V, R)$ örneklemesi alırız,
-o değerleri kullanarak sonrakinde $p(V_i \mid U, R)$ alırız, bunu ardı
-ardına yapınca üstteki nihai dağılıma erisebileceğimizi
-biliyoruz. Tabii $R$ verisine uyan $U,V$ değerlerine erişmek demek,
-kavramsal olarak bir dağılım elde etmektir, uygulama bağlamında mesela
-bir kullanıcının daha not vermediği filme not vermek için (1)
-formülünü direk kullanmak mümkündür, $U,V$ ile düz matris çarpımı
-yaparak bir tahmin hesaplayabiliriz.
+erisebiliriz. Mesela bir adımda $p(U_i \mid V, R)$ örneklemesi alırız
+ki $i=1,2,..,N$, o değerleri kullanarak sonrakinde $p(V_j \mid U, R)$
+alırız ki $j=1,2,..,M$, bunu ardı ardına yapınca üstteki nihai
+dağılıma erisebileceğimizi biliyoruz. Tabii $R$ verisine uyan $U,V$
+değerlerine erişmek demek, kavramsal olarak bir dağılım elde etmektir,
+uygulama bağlamında mesela bir kullanıcının daha not vermediği filme
+not vermek için (1) formülünü direk kullanmak mümkündür, $U,V$ ile düz
+matris çarpımı yaparak bir tahmin hesaplayabiliriz.
 
 Yani bize, kullanıcılar için, $p(U_i \mid V, R)$ formülasyonu lazım,
 bunu cebirsel olarak elde etmek için tam genişletilmiş birleşik
