@@ -552,11 +552,12 @@ $$ \rho \le 1 $$
 Multinom Dağılımın Kovaryansı
 
 Kovaryansı multinom dağılımı bağlamında ele alalım, bildiğimiz gibi
-multinom dağılımı bir vektördür [ve binom dağılımının daha yüksek boyuttaki
-halidir, binom dağılımı bildiğimiz gibi $n$ deney içinde kaç tane başarı
-sayısı olduğunu verir], ve vektörün her hücresinde "vs. kategorisinde kaç
-tane vs var'' gibi bir değer taşınır, ki bu her hücre bağlamında "o
-kategori için zar atılsa kaç tane başarı elde edilir'' gibi okunabilir. 
+multinom dağılımı bir vektördür [ve binom dağılımının daha yüksek
+boyuttaki halidir, binom dağılımı bildiğimiz gibi $n$ deney içinde kaç
+tane başarı sayısı olduğunu verir], ve vektörün her hücresinde "X
+kategorisinde kaç tane Y var'' gibi bir değer taşınır, ki bu her hücre
+bağlamında "o kategori için zar atılsa kaç tane başarı elde edilir''
+gibi okunabilir.
 
 Biz ise bu hücrelerden iki tanesini alıp aralarındaki kovaryasyona bakmak
 istiyoruz. Gayet doğal bir istek. 

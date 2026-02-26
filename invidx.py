@@ -1,11 +1,17 @@
-import re, json, glob, string, os, util
+import re, json, glob, string, os, util, codecs
 from collections import defaultdict
 from unidecode import unidecode
 
 WORD = re.compile(r'\w+')
 #target_dir = "/home/burak/Documents/repos/burakbayramli.github.com"    
-target_dir = "/tmp"    
+target_dir = "/opt/Downloads/alldata/skidx"    
 topdirs = ['algs','calc_multi','chaos','compscieng','func_analysis','linear','ode', 'stat','tser','vision','phy']
+
+def get_title_from_md(f):
+    fin = codecs.open(f, encoding='utf8')
+    line = fin.readline()
+    fin.close()
+    return line[2:].strip()
 
 def clean_text(text):
     text = text.replace("\n"," ").replace("\r"," ")
@@ -27,15 +33,15 @@ def index_dir():
     basedir = os.getcwd()
     tex_html_map = {}
     files1 = glob.glob(basedir + "/**/**/**/*.md")
+    print (files1)
     files2 = []
     for dir in topdirs:
         for subdir in sorted(os.listdir(dir)):
             if not os.path.isdir(dir + "/" + subdir): continue
             if "cover" in subdir or "000" in subdir: continue
             # read tex file, get header
-            ftex = subdir + ".tex"
-            if ftex=='dict.tex': continue
-            title = util.get_title_from_tex(dir + "/" + subdir + "/" + ftex)
+            ftex = subdir + ".md"
+            title = get_title_from_md(dir + "/" + subdir + "/" + ftex)
             html =  "/dersblog/" + dir + "/" + subdir + "/" + util.filename_from_title(title) + ".html"
             tex = dir + "/" + subdir + "/" + ftex
             tex_html_map[tex] = html
@@ -48,8 +54,7 @@ def index_dir():
         for word in reg_tokenize(open(file[1]).read()):
             word = unidecode(word).lower()
             if len(word) < 2: continue
-            if ".tex" in doc: doc = tex_html_map[doc]
-            if ".md" in doc: doc = '/dersblog' + doc.replace(".md",".html")
+            if ".md" in doc: doc = '/dersblog/' + doc.replace(".md",".html")
             invidx[word][doc] += 1
         print (doc)
 

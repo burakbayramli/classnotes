@@ -54,7 +54,7 @@ konu başka bir yazıda işlenecek.
 
 ```python
 import pandas as pd
-data = data = pd.read_csv("synthetic2.txt",names=['a','b'],sep=';')
+data = pd.read_csv("synthetic2.txt",names=['a','b'],sep=';')
 print (data.shape)
 data = np.array(data)
 ```
