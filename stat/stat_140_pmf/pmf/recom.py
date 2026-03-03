@@ -3,7 +3,7 @@ import os
 
 def recommend():
 
-    top_n = 1000
+    top_n = 3000
     lambda_U = 5.0 
     global_mu = 3.5
     #d = "/opt/Downloads/ml-latest-small"
