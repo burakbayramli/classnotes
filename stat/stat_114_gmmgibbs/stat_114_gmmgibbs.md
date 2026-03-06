@@ -411,11 +411,11 @@ $$\underbrace{p(Z \mid X, \mu, \sigma^2, \pi)}_{\text{Kategorik}}
 Bunların her biri adı bilinen, örneklenebilir bir dağılımdır. Bunları
 hiçbir zaman birbirleriyle çarpmıyoruz — yalnızca her seferinde diğer
 her şeyin en güncel değerleri koşullanarak birinden örneklem alıyoruz.
-Eşlenik önseller, tam olarak her koşullunun adlandırılmış bir ailede
+Eşlenik onseller, tam olarak her koşullunun adlandırılmış bir ailede
 yer almasını güvence altına almak için seçilmiştir. Önsellerin
-göründükleri biçimde görünmelerinin tek nedeni budur — bu bir inanç
-ifadesinden çok, her koşulluyu hesaplanabilir tutmaya yönelik
-mühendislik bir karardır.
+göründükleri biçimde olmalarının tek nedeni budur — bu bir "önsel
+inanç" ifadesinden çok, her koşulluyu hesaplanabilir tutmaya yönelik
+bir mühendislik kararıdır.
 
 ---
 
@@ -569,7 +569,7 @@ plt.savefig('gibbs1.jpg')
 
 ---
 
-Örnek 2: Film Beğenleri Üzerinden Kullanıcı Kümelemek
+Örnek 2: Film Beğenileri Üzerinden Kullanıcı Kümelemek
 
 Bir diğer örnek Movielens verisinde kullanıcıların verdiği notlar
 üzerinden kullanıcıları kümelemek, ki ardından işleyecek tavsiye
@@ -579,20 +579,21 @@ kullanıcıya sunabilir.
 
 Eğer her kullanıcıyı bir veri satırı olarak kabul edersek, ki 1-5
 arası beğeni verileri kolona tekabül eden filmler için olacaktır, bu
-çok boyutlu veri rahat bir şekilde kümelenebilir. Bir problem GMM'in
-iç yapısındaki Gaussian'lar sebebiyle kullandığı olağan mesafe
-hesabıdır, bu mesafe Öklitseldir. Öklitsel mesafe çok seyrek olan ve
-kordinatsal bağlamda pek anlam ifade etmeyebilecek film beğeni
-vektörleri için kullanışlı olmayabilir. Bu tür veriler üzeinden
-kosinüs mesafesinin daha iyi işlediğini biliyoruz.
+çok boyutlu veri rahat bir şekilde kümelenebilir. Tek potansiyel
+problem GMM'in iç yapısındaki Gaussian'lar sebebiyle kullandığı olağan
+mesafe hesabıdır, bu mesafe Oklitselliği farz eder. Fakat oklitsel
+mesafe çok seyrek olan vektörler arasında iyi işlemeyeceği için film
+beğeni vektörleri için kullanışlı olmayabilir. Bu tür veriler üzerinde
+kosinüs benzerlik / mesafesinin daha iyi işlediğini biliyoruz.
 
-Bu sebeple bir önişlem üzerinden beğeni vektörlerini Öklitsel olarak
-anlam ifade eden başka bir uzaya yansıtmak daha iyi olabilir. Bu
-yansıtma işlemini kosinüs mesafesini göz önüne alacak şekilde
-seçersek, elde edilen yeni uzay içinde bildiğimiz GMM kümelemesini
-yapabiliriz.
+Bu sebeple bir önişlem ile beğeni vektörlerini içinde Oklitsel
+uzaklığın işleyeceği başka bir uzaya yansıtmak daha iyi olabilir. Bu
+yansıtma işlemini baslangic verisinde kosinüs mesafesini göz önüne
+alacak şekilde seçersek, elde edilen yeni uzay içinde bildiğimiz GMM
+kümelemesini yapabiliriz.
 
-Yansıtma için iyi bir yöntem `umap`. Ekteki kodlar bu yaklaşımı kullanıyor.
+Yansıtma için iyi bir yöntem `umap`. Ekteki kodlar bu yaklaşımı
+kullanıyor.
 
 Kodlar
 
