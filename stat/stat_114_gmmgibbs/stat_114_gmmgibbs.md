@@ -409,23 +409,22 @@ $$\underbrace{p(Z \mid X, \mu, \sigma^2, \pi)}_{\text{Kategorik}}
 \underbrace{p(\sigma_k^2 \mid X, Z, \mu_k)}_{\text{Ters-Gamma}}$$
 
 Bunların her biri adı bilinen, örneklenebilir bir dağılımdır. Bunları
-hiçbir zaman birbirleriyle çarpmıyorsunuz — yalnızca her seferinde
-diğer her şeyin en güncel değerleri koşullanarak aralarında döngü
-kuruyorsunuz.
-
+hiçbir zaman birbirleriyle çarpmıyoruz — yalnızca her seferinde diğer
+her şeyin en güncel değerleri koşullanarak birinden örneklem alıyoruz.
 Eşlenik önseller, tam olarak her koşullunun adlandırılmış bir ailede
 yer almasını güvence altına almak için seçilmiştir. Önsellerin
 göründükleri biçimde görünmelerinin tek nedeni budur — bu bir inanç
-ifadesinden çok, her koşulluyu işlenebilir tutmaya yönelik mühendislik
-bir karardır.
+ifadesinden çok, her koşulluyu hesaplanabilir tutmaya yönelik
+mühendislik bir karardır.
+
+---
+
+Örnek 1: İki Boyutta Kümeleme
 
 Yukarıdaki türetme netlik için 1B Gauss'lar kullandı. Aşağıdaki kod
 bunu 2B'ye genelleştirir: $\sigma_k^2$, bir kovaryans matrisi
 $\Sigma_k$'ya dönüşür ve Ters-Gamma önseli Ters-Wishart olur.
 
----
-
-Örnek 1: İki Boyutta Kümeleme
 
 ```python
 import numpy as np
