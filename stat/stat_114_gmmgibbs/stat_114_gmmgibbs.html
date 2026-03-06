@@ -1,0 +1,661 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+      });
+    });
+    </script>  
+   
+  <title>Gauss Karışım Modelleri için Gibbs Örneklemesi</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1 id="gauss-karışım-modelleri-için-gibbs-örneklemesi">Gauss Karışım
+Modelleri için Gibbs Örneklemesi</h1>
+<p>Kümeleme yapmak için klasik yaklaşımlar var, mesela K-Means, ya da
+Beklenti-Maksimizasyon (EM) yöntemi ile Gaussian Karışım Modelleri. Bu
+yazıda farklı olarak K-Means yerine GMM, ve GMM hesaplaması için Gibbs
+örneklemesi kullanacağız.</p>
+<p>GMM neden K-Means’e tercih edilir? K-Means, sezgisel açıdan çekici
+bir algoritma: her noktayı en yakın merkeze ata, merkezleri güncelle,
+tekrarla. Ancak bu yöntem hiçbir olasılıksal modele dayanmaz. Her
+kümenin eşit büyüklükte ve küresel olduğunu örtük olarak varsayar, çünkü
+yalnızca Oklid mesafesini optimize eder. Bunun ötesinde, K-Means size
+yalnızca nokta tahminleri verir: her küme için tek bir merkez, her nokta
+için tek bir atama. Belirsizliği ölçmenin hiçbir yolu yoktür. İki
+kümenin sınırındaki bir noktanın %60 küme 1’e, %40 küme 2’ye ait
+olduğunu söyleyemezsiniz — K-Means onu birbirine zıt iki seçenekten
+birine zorla atar. Gauss Karışım Modeli ise tam olarak bir olasılıksal
+modelden başlar: her noktanın gözlemlenebilir bir kümeden değil, gizli
+bir değişken tarafından belirlenen bir bileşenden geldiğini açıkça ifade
+eder. Bu sayede küme şekilleri esnek olabilir, her atama bir olasılık
+taşır ve belirsizlik modelin doğal bir parçası haline gelir.</p>
+<p>Gibbs örneklemesi neden Beklenti-Maksimizasyona (EM) tercih edilir?
+EM, GMM’yi veriye uydurmak (fıtting) için klasik yaklaşımdır ve oldukca
+verimlidir: her döngüde gizli değişkenler üzerindeki dağılımı hesaplar
+(E adımı), ardından bu dağılım altında log-olurluğu (log-likelihood)
+maksimize edecek parametreleri günceller (M adımı). Ancak EM nihayetinde
+bir maksimizasyon algoritmasidir — log-olurluğun bir yerel maksimumuna
+yakınsar ve size tek bir nokta tahmini verir: <span
+class="math inline">\(\hat{\mu}_k\)</span>, <span
+class="math inline">\(\hat{\sigma}_k^2\)</span>, <span
+class="math inline">\(\hat{\pi}\)</span>. Parametreler üzerindeki
+belirsizlik hakkında hiçbir şey söylemez. Eğer veri azsa ya da kümeler
+birbirine yakınsa, EM’in bulduğu çözüme ne kadar güvenilmesi gerektiğini
+bilmek imkânsizdir. Gibbs örneklemesi ise tam Bayeşçi çıkarım yapar:
+parametrelerin tek bir tahmini yerine tüm sonsal dağılımını örnekler. Bu
+sayede her parametre için güven aralıkları elde edersiniz, küme sayısı
+veya karışım oranları üzerindeki belirsizliği ifade edebilirsiniz ve
+verinin gerçekten birden fazla makul yorumu varsa bu durum örneklerde
+kendiliğinden ortaya çıkar. Hesaplama maliyeti daha yüksektir, ancak
+ödül, modelin bildiğini ve bilmediğini dürüstçe yansıtan bir sonsal
+dağılımdır.</p>
+<p>Problemi net olarak tanımlayalım. <span
+class="math inline">\(N\)</span> veri noktamız var: <span
+class="math inline">\(X = \{x_1, x_2, \ldots, x_N\}\)</span>, her <span
+class="math inline">\(x_i \in \mathbb{R}^D\)</span>. Bu verinin <span
+class="math inline">\(K\)</span> Gauss kümesi tarafından üretildiğine
+inanıyoruz; ancak hangi noktanın hangi kümeye ait olduğunu, ya da küme
+parametrelerini bilmiyoruz. Amacımız tüm bunları veriden çıkarmak.</p>
+<p>Verinin nasıl üretilmiş olabileceğini düşünmek yardımcı olur:</p>
+<p><span class="math inline">\(\pi = (\pi_1, \ldots, \pi_K)\)</span>
+şeklinde karışım oranları seçin; burada <span
+class="math inline">\(\pi_k \geq 0\)</span> ve <span
+class="math inline">\(\sum_k \pi_k = 1\)</span>. <span
+class="math inline">\(\pi_k\)</span>’yı “rastgele bir noktanın <span
+class="math inline">\(k\)</span> kümesine ait olma olasılığı” olarak
+düşünün.</p>
+<p>Her <span class="math inline">\(i = 1, \ldots, N\)</span> veri
+noktası için:</p>
+<ul>
+<li><p>Bir küme ataması örnekleyin: <span class="math inline">\(z_i \sim
+\text{Categorical}(\pi_1, \ldots, \pi_K)\)</span>, yani <span
+class="math inline">\(P(z_i = k) = \pi_k\)</span></p></li>
+<li><p>Veri noktasını o kümenin Gauss dağılımından örnekleyin: <span
+class="math inline">\(x_i \mid z_i = k \sim \mathcal{N}(\mu_k,
+\sigma_k^2)\)</span></p></li>
+</ul>
+<p>Basitlik için burada tek sayısal (1D) Gauss’lar kullanıyoruz;
+dolayısıyla <span class="math inline">\(\mu_k \in \mathbb{R}\)</span> ve
+<span class="math inline">\(\sigma_k^2 \in \mathbb{R}^+\)</span>.</p>
+<p><span class="math inline">\(z_i\)</span>’lere gizli değişkenler denir
+— modelde var olurlar ama hiçbir zaman gözlemlenemezler. Biz yalnızca
+<span class="math inline">\(X\)</span>’i görürüz.</p>
+<p>Ne İstiyoruz</p>
+<p>Verilen veri için tüm bilinmeyenler üzerindeki sonsal dağılımı
+istiyoruz:</p>
+<p><span class="math display">\[p(\mu, \sigma^2, \pi, Z \mid
+X)\]</span></p>
+<p>burada <span class="math inline">\(Z = \{z_1, \ldots, z_N\}\)</span>,
+<span class="math inline">\(\mu = \{\mu_1, \ldots, \mu_K\}\)</span>,
+<span class="math inline">\(\sigma^2 = \{\sigma_1^2, \ldots,
+\sigma_K^2\}\)</span>.</p>
+<p>Bayes teoremi ile:</p>
+<p><span class="math display">\[p(\mu, \sigma^2, \pi, Z \mid X) =
+\frac{p(X \mid Z, \mu, \sigma^2)\,
+p(Z \mid \pi)\, p(\pi)\, p(\mu)\, p(\sigma^2)}{p(X)}\]</span></p>
+<p>Paydaki <span class="math inline">\(p(X)\)</span>’i hesaplamak son
+derece güçtür (tüm olası <span class="math inline">\(Z, \mu, \sigma^2,
+\pi\)</span> üzerinden integral almayı gerektirir). İşte bu yüzden Gibbs
+örneklemesine başvuruyoruz — bu yöntem, sonsal dağılımdan doğrudan
+hesaplamadan örneklememize olanak tanır.</p>
+<p>Gibbs Örneklemesinin Arkasındaki Fikir</p>
+<p>Gibbs örneklemesi basit bir gözleme dayanır: karmaşık bir ortak
+dağılım <span class="math inline">\(p(A, B, C)\)</span>’den doğrudan
+örnekleyemeseniz bile, çoğunlukla koşullu dağılımlardan <span
+class="math inline">\(p(A \mid B, C)\)</span>, <span
+class="math inline">\(p(B \mid A, C)\)</span>, <span
+class="math inline">\(p(C \mid A, B)\)</span> sırayla
+örnekleyebilirsiniz. Bu döngüyü yeterince uzun sürdürürseniz, örnekler
+ilgilendiğimiz ortak dağılıma yakınsar.</p>
+<p>Dolayısıyla her bilinmeyen için birer tane olmak üzere dört koşullu
+dağılım türetmemiz gerekiyor:</p>
+<p><span class="math display">\[p(Z \mid X, \mu, \sigma^2, \pi),\quad
+p(\pi \mid Z),\quad p(\mu_k \mid X, Z, \sigma_k^2),\quad p(\sigma_k^2
+\mid X, Z, \mu_k)\]</span></p>
+<p>Önsel Dağılımların Seçimi</p>
+<p>Koşulluları işlenebilir kılmak için eşlenik önsel dağılımlar
+seçiyoruz — olurlukla çarpıldığında aynı aileden bir sonsal veren
+önseller. Bu, koşulluların kapalı formda elde edilmesini sağlayan
+matematiksel bir kolaylıktır.</p>
+<p><span class="math inline">\(\pi\)</span> için — karışım oranları bir
+simpleks üzerinde yaşar (negatif değildir ve toplamları 1’dir), bu
+yüzden doğal bir önsel Dirichlet’tir:</p>
+<p><span class="math display">\[\pi \sim \text{Dirichlet}(\alpha_1,
+\ldots, \alpha_K)\]</span></p>
+<p>Simetrik bir önsel kullanacağız: tüm <span
+class="math inline">\(k\)</span> için <span
+class="math inline">\(\alpha_k = \alpha\)</span>. <span
+class="math inline">\(\alpha = 1\)</span> seçmek, tüm olası karışım
+oranları üzerinde düzgün bir dağılım verir.</p>
+<p><span class="math inline">\(\mu_k\)</span> için — Gauss önsel
+kullanıyoruz:</p>
+<p><span class="math display">\[\mu_k \sim \mathcal{N}(\mu_0,
+\tau^2)\]</span></p>
+<p>burada <span class="math inline">\(\mu_0\)</span> küme ortalamasının
+nerede olabileceğine dair önceki inancımız, <span
+class="math inline">\(\tau^2\)</span> ise ne kadar emin
+olmadığımızdır.</p>
+<p><span class="math inline">\(\sigma_k^2\)</span> için — Varyans
+pozitif olmalıdır, bu yüzden Gauss olurluğuyla eşlenik olan Ters-Gamma
+onselini kullanıyoruz:</p>
+<p><span class="math display">\[\sigma_k^2 \sim \text{Inverse-Gamma}(a,
+b)\]</span></p>
+<p>burada <span class="math inline">\(a\)</span> ve <span
+class="math inline">\(b\)</span> önceden belirlediğimiz
+hiperparametrelerdir.</p>
+<p>Dört Koşullunun Türetilmesi</p>
+<p>Küme Atamalarının Örneklenmesi <span
+class="math inline">\(z_i\)</span></p>
+<p>Her <span class="math inline">\(i\)</span> noktası için <span
+class="math inline">\(p(z_i = k \mid x_i, \mu, \sigma^2, \pi)\)</span>
+ifadesini istiyoruz.</p>
+<p>Bayes teoremi ve <span class="math inline">\(z_i = k\)</span>
+verildiğinde <span class="math inline">\(x_i\)</span>’nin yalnızca <span
+class="math inline">\(\mu_k\)</span> ve <span
+class="math inline">\(\sigma_k^2\)</span>’ye bağlı olduğu gerçeğini
+kullanarak:</p>
+<p><span class="math display">\[p(z_i = k \mid x_i, \mu, \sigma^2, \pi)
+= \frac{p(x_i \mid z_i = k,
+\mu_k, \sigma_k^2)\, p(z_i = k \mid \pi)}{\sum_{j=1}^{K} p(x_i \mid
+z_i = j, \mu_j, \sigma_j^2)\, p(z_i = j \mid \pi)}\]</span></p>
+<p>Yerine koyarsak:</p>
+<p><span class="math display">\[= \frac{\pi_k \cdot \mathcal{N}(x_i \mid
+\mu_k,
+\sigma_k^2)}{\sum_{j=1}^{K} \pi_j \cdot \mathcal{N}(x_i \mid \mu_j,
+\sigma_j^2)}\]</span></p>
+<p>Bu, küme başına <span class="math inline">\(K\)</span> olasılıklı bir
+kategorik dağılımdan başka bir şey değildir. Her veri noktası için bu
+<span class="math inline">\(K\)</span> değeri hesaplıyoruz, toplamlarını
+1’e normalize ediyoruz ve elde edilen kategorik dağılımdan bir atama
+örnekliyoruz. Bu en sezgisel adımdır — “mevcut parametreler göz önünde
+bulundurulduğunda bu nokta en muhtemelen hangi kümeye aittir?” diye
+soruyoruz, ardından bu dağılımdan keskin bir atama örnekliyoruz.</p>
+<p>Açıklık için <span class="math inline">\(p(z_i \mid x_i, \mu,
+\sigma^2, \pi)\)</span>’yi <span class="math inline">\(Z\)</span> için
+daha önceki bir ifadeyle ilişkilendirelim:</p>
+<p><span class="math display">\[p(Z \mid X, \mu, \sigma^2, \pi) =
+\prod_{i=1}^{N} p(z_i \mid x_i,
+\mu, \sigma^2, \pi) \tag{2}\]</span></p>
+<p>Temel gözlem şudur: her <span class="math inline">\(z_i\)</span>
+yalnızca kendi <span class="math inline">\(x_i\)</span>’sine bağlıdır,
+başka herhangi bir noktanın atamasına veya verisine bağlı değildir.
+Parametreler <span class="math inline">\(\mu, \sigma^2, \pi\)</span>
+verildiğinde, atamalar birbirinden koşullu bağımsızdır. Tüm atamalar
+üzerindeki ortak dağılım, <span class="math inline">\(N\)</span> adet
+bireysel kategorik dağılımın — her nokta için bir tane — sadece bir
+çarpımıdır. Bu yüzden Gibbs örnekleyicisinde noktalar üzerinde döngü
+kuruyor ve her <span class="math inline">\(z_i\)</span>’yi bağımsız
+olarak örnekliyoruz.</p>
+<p>Kodda, ters CDF numarasını dahili olarak kullanan vektörleştirilmiş
+kategorik örnekleme kullanılabilir.</p>
+<p>Herhangi bir ayrık dağılımdan örneklemenin standart yolu ters CDF
+yöntemidir (ters dönüşüm örneklemesi olarak da adlandırılır). Fikir
+şudur:</p>
+<ol type="1">
+<li><p>Kümülatif toplamı oluşturun: <span class="math inline">\(C_{ik} =
+\sum_{j=1}^{k} p_{ij}\)</span>, böylece <span
+class="math inline">\(C_i\)</span>, <span
+class="math inline">\(K\)</span> adımda 0’dan 1’e gider</p></li>
+<li><p>Düzgün bir rastgele sayı çekin: <span class="math inline">\(u_i
+\sim \text{Uniform}(0, 1)\)</span></p></li>
+<li><p><span class="math inline">\(u_i \leq C_{ik}\)</span> koşulunu
+sağlayan ilk <span class="math inline">\(k\)</span>’yı seçin</p></li>
+</ol>
+<p>Görsel olarak <span class="math inline">\([0,1]\)</span> üzerinde
+düzgün biçimde dart atıyorsunuz ve hangi kovaya düştüğünü görüyorsunuz —
+daha geniş kovalar (daha yüksek olasılık) daha sık isabet alır.</p>
+<pre><code>| pi1 |    | pi2 |    | pi3 |   ...
+  Ci1        Ci2        Ci3</code></pre>
+<p>Aşağıdaki kod <span class="math inline">\(N\)</span> adet düzgün
+değer oluşturur ve <code>&gt;</code> karşılaştırmasını <span
+class="math inline">\(N\)</span> kez çalıştırır:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cumprobs <span class="op">=</span> probs.cumsum(axis<span class="op">=</span><span class="dv">1</span>)  <span class="co"># (N, K) — her satır C_i</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.random.rand(N, <span class="dv">1</span>)         <span class="co"># (N, 1) — her nokta için bir dart</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> (u <span class="op">&gt;</span> cumprobs).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<p>Bu hızlı çalışır. <code>np.random.multinomial</code>’ı <span
+class="math inline">\(N\)</span> kez çağırabilirdik ama bu yavaş
+olurdu.</p>
+<p>Karışım Oranlarının Örneklenmesi <span
+class="math inline">\(\pi\)</span></p>
+<p><span class="math inline">\(p(\pi \mid Z)\)</span> ifadesini
+istiyoruz. <span class="math inline">\(Z\)</span> bilindiğinde <span
+class="math inline">\(\pi\)</span>’nin artık doğrudan <span
+class="math inline">\(X\)</span>’e bağlı olmadığına dikkat edin — veri,
+<span class="math inline">\(\pi\)</span>’yi yalnızca atamalar
+aracılığıyla etkiler.</p>
+<p>Bunun için <span class="math inline">\(p(Z \mid \pi)\)</span>’ye
+ihtiyacımız olacak. Bu ifadenin herhangi bir <span
+class="math inline">\(X\)</span> verisi görülmeden önce, yalnızca <span
+class="math inline">\(\pi\)</span> bilindiğinde <span
+class="math inline">\(Z\)</span> üzerindeki önsel olduğuna dikkat edin.
+Karşılaştırma için (2), <span class="math inline">\(Z\)</span>
+üzerindeki sonsal dağılımdır.</p>
+<p><span class="math inline">\(n_k = \sum_{i=1}^{N} \mathbf{1}[z_i =
+k]\)</span> ifadesi, şu anda <span class="math inline">\(k\)</span>
+kümesine atanan nokta sayısı olsun. Buradaki <span
+class="math inline">\(\mathbf{1}[\cdot]\)</span> gösterge
+fonksiyonudur:</p>
+<p><span class="math display">\[\mathbf{1}[\text{koşul}] = \begin{cases}
+1 &amp; \text{koşul doğruysa}
+\\ 0 &amp; \text{koşul yanlışsa} \end{cases}\]</span></p>
+<p>Bu yalnızca “koşul sağlanıyorsa say, sağlanmıyorsa yoksay” ifadesinin
+bir yazım biçimidir.</p>
+<p><span class="math inline">\(K = 3\)</span>, <span
+class="math inline">\(N = 6\)</span> ve mevcut atamalar <span
+class="math inline">\(Z = [2, 1, 3, 1, 2, 1]\)</span> olsun; yani 1.
+nokta 2. kümede, 2. nokta 1. kümede vb. O zaman:</p>
+<p><span class="math display">\[n_1 = \sum_{i=1}^{6} \mathbf{1}[z_i = 1]
+= \mathbf{1}[2=1] +
+\mathbf{1}[1=1] + \mathbf{1}[3=1] + \mathbf{1}[1=1] + \mathbf{1}[2=1]
++ \mathbf{1}[1=1] = 0+1+0+1+0+1 = 3\]</span></p>
+<p>Kodda bu şöyle yazılır:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nk <span class="op">=</span> np.array([(Z <span class="op">==</span> k).<span class="bu">sum</span>() <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)])</span></code></pre></div>
+<p>Türetmeye devam edelim. <span class="math inline">\(Z\)</span>’nin
+<span class="math inline">\(\pi\)</span> verildiğinde olurluğu:</p>
+<p><span class="math display">\[p(Z \mid \pi) = \prod_{i=1}^{N}
+\pi_{z_i} = \prod_{k=1}^{K}
+\pi_k^{n_k} \tag{1}\]</span></p>
+<p>Gösterge fonksiyonunun faydasını burada görüyoruz: bir çarpımı üs
+haline getirebildik. Onsuz, olurluk tüm <span
+class="math inline">\(N\)</span> nokta üzerinde hantal bir çarpım
+olurdu. Gösterge fonksiyonu, çarpımı noktalar yerine kümeler üzerinden
+yeniden indekslememizi sağlar:</p>
+<p><span class="math display">\[\prod_{i=1}^{N} \pi_{z_i} =
+\prod_{k=1}^{K} \pi_k^{n_k}, \quad n_k =
+\sum_{i=1}^{N} \mathbf{1}[z_i = k]\]</span></p>
+<p>Devam edelim. Denklem (1) bir multinomial olurluk. Dirichlet önselle
+birlikte sonsal şöyle olur:</p>
+<p><span class="math display">\[p(\pi \mid Z) \propto p(Z \mid \pi)\,
+p(\pi) = \prod_{k=1}^{K}
+\pi_k^{n_k} \cdot \prod_{k=1}^{K} \pi_k^{\alpha-1} = \prod_{k=1}^{K}
+\pi_k^{n_k + \alpha - 1}\]</span></p>
+<p>Bu yine bir Dirichlet dağılımıdır:</p>
+<p><span class="math display">\[\pi \mid Z \sim \text{Dirichlet}(n_1 +
+\alpha,\; n_2 + \alpha,\;
+\ldots,\; n_K + \alpha)\]</span></p>
+<p>Sezgisel olarak: sonsal Dirichlet, gözlemlenen küme sayılarını önsel
+sözde-sayılara <span class="math inline">\(\alpha\)</span> ekler.</p>
+<p>Küme Ortalamalarının Örneklenmesi <span
+class="math inline">\(\mu_k\)</span></p>
+<p><span class="math inline">\(p(\mu_k \mid X, Z, \sigma_k^2)\)</span>
+ifadesini istiyoruz. Burada yalnızca <span
+class="math inline">\(k\)</span> kümesine atanan veri noktaları
+ilgilidir. <span class="math inline">\(X_k = \{x_i : z_i = k\}\)</span>
+bu alt küme olsun; <span class="math inline">\(n_k = |X_k|\)</span> ve
+örneklem ortalaması <span class="math inline">\(\bar{x}_k =
+\frac{1}{n_k} \sum_{i: z_i = k} x_i\)</span>.</p>
+<p><span class="math inline">\(\mu_k\)</span> verildiğinde <span
+class="math inline">\(X_k\)</span>’nin olurluğu:</p>
+<p><span class="math display">\[p(X_k \mid \mu_k, \sigma_k^2) =
+\prod_{i: z_i = k} \mathcal{N}(x_i
+\mid \mu_k, \sigma_k^2) \propto \exp\!\left(-\frac{1}{2\sigma_k^2}
+\sum_{i: z_i = k} (x_i - \mu_k)^2\right)\]</span></p>
+<p>Toplamı açarak:</p>
+<p><span class="math display">\[\sum_{i: z_i = k} (x_i - \mu_k)^2 =
+\sum_{i: z_i = k} x_i^2 - 2\mu_k
+\sum_{i: z_i = k} x_i + n_k \mu_k^2\]</span></p>
+<p>Önsel: <span class="math inline">\(p(\mu_k) \propto
+\exp\!\left(-\frac{(\mu_k - \mu_0)^2}{2\tau^2}\right)\)</span>.</p>
+<p>Olurluğu onselle çarpıp <span class="math inline">\(\mu_k\)</span>’da
+kareyi tamamlayarak bir Gauss sonsal elde ederiz. Yalnızca <span
+class="math inline">\(\mu_k\)</span>’ya bağlı terimleri toplayarak:</p>
+<p><span class="math display">\[p(\mu_k \mid X_k, \sigma_k^2) \propto
+\exp\!\left(-\frac{1}{2}\left[\left(\frac{n_k}{\sigma_k^2} +
+\frac{1}{\tau^2}\right)\mu_k^2 - 2\left(\frac{n_k
+\bar{x}_k}{\sigma_k^2} +
+\frac{\mu_0}{\tau^2}\right)\mu_k\right]\right)\]</span></p>
+<p>Bu, <span class="math inline">\(\mu_k\)</span>’da bir Gauss’tur.</p>
+<p><span class="math inline">\(\exp\!\left(-\frac{(\mu_k -
+\mu_n)^2}{2\tau_n^2}\right)\)</span> biçimindeki bir Gauss, <span
+class="math inline">\(\exp\!\left(-\frac{1}{2\tau_n^2}\mu_k^2 +
+\frac{\mu_n}{\tau_n^2}\mu_k + \text{sabit}\right)\)</span> şeklinde
+açılır. <span class="math inline">\(\mu_k^2\)</span> katsayısını
+eşleştirerek <span class="math inline">\(\frac{1}{\tau_n^2}\)</span>’yi,
+<span class="math inline">\(\mu_k\)</span> katsayısını eşleştirerek
+<span class="math inline">\(\mu_n\)</span>’yi buluruz.</p>
+<p>Standart formla eşleştirerek sonsal varyans ve sonsal ortalamayı
+buluruz:</p>
+<p><span class="math display">\[\frac{1}{\tau_n^2} =
+\frac{n_k}{\sigma_k^2} + \frac{1}{\tau^2},
+\qquad \mu_n = \tau_n^2\left(\frac{n_k \bar{x}_k}{\sigma_k^2} +
+\frac{\mu_0}{\tau^2}\right)\]</span></p>
+<p>Dolayısıyla:</p>
+<p><span class="math display">\[\mu_k \mid X, Z, \sigma_k^2 \sim
+\mathcal{N}(\mu_n,\; \tau_n^2)\]</span></p>
+<p>Sezgi açıktır: sonsal ortalama <span
+class="math inline">\(\mu_n\)</span>, önsel ortalama <span
+class="math inline">\(\mu_0\)</span> ile veri ortalaması <span
+class="math inline">\(\bar{x}_k\)</span>’nın kesinlik ağırlıklı
+ortalamasıdır. Çok fazla verimiz varsa (<span
+class="math inline">\(n_k\)</span> büyükse) veri baskın gelir. Az
+verimiz varsa önsel, tahmini <span
+class="math inline">\(\mu_0\)</span>’a çeker.</p>
+<p>Küme Varyanslarının Örneklenmesi <span
+class="math inline">\(\sigma_k^2\)</span></p>
+<p><span class="math inline">\(p(\sigma_k^2 \mid X, Z, \mu_k)\)</span>
+ifadesini istiyoruz. Yine yalnızca <span
+class="math inline">\(X_k\)</span> önemlidir.</p>
+<p>Olurluk:</p>
+<p><span class="math display">\[p(X_k \mid \mu_k, \sigma_k^2) \propto
+(\sigma_k^2)^{-n_k/2}
+\exp\!\left(-\frac{1}{2\sigma_k^2} \sum_{i: z_i = k} (x_i -
+\mu_k)^2\right)\]</span></p>
+<p><span class="math inline">\(S_k = \sum_{i: z_i = k} (x_i -
+\mu_k)^2\)</span> sapmalar kareler toplamı olsun. Ters-Gamma önseli:</p>
+<p><span class="math display">\[p(\sigma_k^2) \propto
+(\sigma_k^2)^{-(a+1)}
+\exp\!\left(-\frac{b}{\sigma_k^2}\right)\]</span></p>
+<p>Olurluğu önselle çarparak:</p>
+<p><span class="math display">\[p(\sigma_k^2 \mid X, Z, \mu_k) \propto
+(\sigma_k^2)^{-(a + n_k/2 +
+1)} \exp\!\left(-\frac{b + S_k/2}{\sigma_k^2}\right)\]</span></p>
+<p>Bu yine bir Ters-Gamma’dır:</p>
+<p><span class="math display">\[\sigma_k^2 \mid X, Z, \mu_k \sim
+\text{Inverse-Gamma}\!\left(a +
+\frac{n_k}{2},\; b + \frac{S_k}{2}\right)\]</span></p>
+<p>Güncelleme, atanan nokta sayısını şekil parametresine ve sapmalar
+kareler toplamını ölçek parametresine ekler.</p>
+<p>Tam Algoritma</p>
+<p>Hepsini bir araya getirirsek:</p>
+<p>Başlangıç: Her <span class="math inline">\(z_i \in \{1, \ldots,
+K\}\)</span>’yi rastgele ata, başlangıç <span
+class="math inline">\(\mu_k\)</span>, <span
+class="math inline">\(\sigma_k^2\)</span>, <span
+class="math inline">\(\pi\)</span> değerlerini belirle.</p>
+<p>Yakınsayana kadar tekrarla:</p>
+<ol type="1">
+<li>Her <span class="math inline">\(i = 1, \ldots, N\)</span> için
+örnekle:</li>
+</ol>
+<p><span class="math display">\[z_i \sim
+\text{Categorical}\!\left(\frac{\pi_k\, \mathcal{N}(x_i
+\mid \mu_k, \sigma_k^2)}{\sum_j \pi_j\, \mathcal{N}(x_i \mid \mu_j,
+\sigma_j^2)}\right)_{k=1}^{K}\]</span></p>
+<ol start="2" type="1">
+<li>Her küme için <span class="math inline">\(n_k\)</span> ve <span
+class="math inline">\(\bar{x}_k\)</span>’yı hesapla. Örnekle:</li>
+</ol>
+<p><span class="math display">\[\pi \sim \text{Dirichlet}(n_1 +
+\alpha,\; \ldots,\; n_K + \alpha)\]</span></p>
+<ol start="3" type="1">
+<li>Her <span class="math inline">\(k = 1, \ldots, K\)</span> için
+örnekle:</li>
+</ol>
+<p><span class="math display">\[\mu_k \sim
+\mathcal{N}\!\left(\tau_n^2\left(\frac{n_k
+\bar{x}_k}{\sigma_k^2} + \frac{\mu_0}{\tau^2}\right),\;
+\tau_n^2\right), \qquad \frac{1}{\tau_n^2} = \frac{n_k}{\sigma_k^2} +
+\frac{1}{\tau^2}\]</span></p>
+<ol start="4" type="1">
+<li>Her <span class="math inline">\(k = 1, \ldots, K\)</span> için <span
+class="math inline">\(S_k\)</span>’yı hesapla ve örnekle:</li>
+</ol>
+<p><span class="math display">\[\sigma_k^2 \sim
+\text{Inverse-Gamma}\!\left(a + \frac{n_k}{2},\; b +
+\frac{S_k}{2}\right)\]</span></p>
+<p>Bir ısınma döneminden sonra (zincir henüz yakınsarken elde edilen
+erken örnekleri atarak), toplanan örnekler tam sonsal dağılımın <span
+class="math inline">\(p(\mu, \sigma^2, \pi, Z \mid X)\)</span> ampirik
+bir yaklaşımını oluşturur.</p>
+<p>Türetmenin ardından <span class="math inline">\(p(\mu, \sigma^2, \pi,
+Z \mid X)\)</span> için gereken bileşenleri elde ettiğimize dikkat edin:
+<span class="math inline">\(p(X \mid Z, \mu, \sigma^2)\)</span>, <span
+class="math inline">\(p(Z \mid \pi)\)</span>, <span
+class="math inline">\(p(\pi)\)</span>, <span
+class="math inline">\(p(\mu)\)</span>, <span
+class="math inline">\(p(\sigma^2)\)</span>. Kategorik, Dirichlet, Gauss,
+hepsi bir arada. Ama bu çarpımı hesaplamamıza gerek yoktu, değil mi? Her
+bileşenden sırayla örnekledik ve sonsal dağılımdan örneklemiş olduk.
+Ortak sonsal <span class="math inline">\(p(\mu, \sigma^2, \pi, Z \mid
+X)\)</span> hiçbir zaman açıkça hesaplanmadı.</p>
+<p>Gibbs’in dediği şudur: “Ortak dağılımdan örneklemek için onu
+hesaplamana gerek yok.” Her koşulludan sırayla örnekleyebildiğiniz
+sürece, döngüyü tekrar tekrar çevirerek örnekler yapı gereği ortak
+sonsal dağılıma yakınsar. Bu, algoritmanın ardındaki teorik güvencedir —
+örneklerin durağan dağılımı tam olarak önemsediğiniz ortak sonsal olan
+bir Markov zinciri oluşturmasının bir sonucudur.</p>
+<p><span class="math display">\[\underbrace{p(Z \mid X, \mu, \sigma^2,
+\pi)}_{\text{Kategorik}}
+\;\to\; \underbrace{p(\pi \mid Z)}_{\text{Dirichlet}} \;\to\;
+\underbrace{p(\mu_k \mid X, Z, \sigma_k^2)}_{\text{Gauss}} \;\to\;
+\underbrace{p(\sigma_k^2 \mid X, Z,
+\mu_k)}_{\text{Ters-Gamma}}\]</span></p>
+<p>Bunların her biri adı bilinen, örneklenebilir bir dağılımdır. Bunları
+hiçbir zaman birbirleriyle çarpmıyorsunuz — yalnızca her seferinde diğer
+her şeyin en güncel değerleri koşullanarak aralarında döngü
+kuruyorsunuz.</p>
+<p>Eşlenik önseller, tam olarak her koşullunun adlandırılmış bir ailede
+yer almasını güvence altına almak için seçilmiştir. Önsellerin
+göründükleri biçimde görünmelerinin tek nedeni budur — bu bir inanç
+ifadesinden çok, her koşulluyu işlenebilir tutmaya yönelik mühendislik
+bir karardır.</p>
+<p>Yukarıdaki türetme netlik için 1B Gauss’lar kullandı. Aşağıdaki kod
+bunu 2B’ye genelleştirir: <span
+class="math inline">\(\sigma_k^2\)</span>, bir kovaryans matrisi <span
+class="math inline">\(\Sigma_k\)</span>’ya dönüşür ve Ters-Gamma önseli
+Ters-Wishart olur.</p>
+<hr />
+<p>Kod</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.cm <span class="im">as</span> cm</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> invwishart, dirichlet</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Ellipse</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../../algs/algs_080_kmeans/synthetic2.txt&#39;</span>, names<span class="op">=</span>[<span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>], sep<span class="op">=</span><span class="st">&#39;;&#39;</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df.values.astype(<span class="bu">float</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>N, D <span class="op">=</span> X.shape</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">20</span>        <span class="co"># küme sayısı (görsel olarak ~20 blob)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>n_iter <span class="op">=</span> <span class="dv">400</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">150</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Sayısal kararlılık için sıfır ortalama / birim varyansa normalize et</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>X_mean <span class="op">=</span> X.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>X_std  <span class="op">=</span> X.std(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>X_norm <span class="op">=</span> (X <span class="op">-</span> X_mean) <span class="op">/</span> X_std</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>alpha  <span class="op">=</span> <span class="fl">1.0</span>                     <span class="co"># Dirichlet yoğunluğu</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>mu0    <span class="op">=</span> X_norm.mean(axis<span class="op">=</span><span class="dv">0</span>)     <span class="co"># önsel ortalama = verinin merkezi</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>kappa0 <span class="op">=</span> <span class="fl">0.01</span>                    <span class="co"># ortalama üzerinde zayıf önsel</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>nu0    <span class="op">=</span> D <span class="op">+</span> <span class="dv">2</span>                   <span class="co"># minimum IW serbestlik derecesi</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>Psi0   <span class="op">=</span> np.eye(D) <span class="op">*</span> <span class="fl">0.1</span>         <span class="co"># IW ölçeği (küçük, veri normalize)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># K rastgele nokta seçerek başlangıç merkezlerini dağıt</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>idx <span class="op">=</span> np.random.choice(N, K, replace<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>mu  <span class="op">=</span> X_norm[idx].copy()</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>Sigma <span class="op">=</span> np.array([np.eye(D) <span class="op">*</span> <span class="fl">0.5</span> <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(K)])</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>pi    <span class="op">=</span> np.ones(K) <span class="op">/</span> K</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Her noktayı en yakın merkeze ata</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> assign_nearest(X, mu):</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    dists <span class="op">=</span> np.array([np.<span class="bu">sum</span>((X <span class="op">-</span> mu[k])<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)]).T</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> dists.argmin(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> assign_nearest(X_norm, mu)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mvn_logpdf(X, mu_k, Sigma_k):</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    diff      <span class="op">=</span> X <span class="op">-</span> mu_k</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    sign, logdet <span class="op">=</span> np.linalg.slogdet(Sigma_k)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    inv_S     <span class="op">=</span> np.linalg.inv(Sigma_k)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    maha      <span class="op">=</span> np.einsum(<span class="st">&#39;nd,dd,nd-&gt;n&#39;</span>, diff, inv_S, diff)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (D <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi) <span class="op">+</span> logdet <span class="op">+</span> maha)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>samples_mu    <span class="op">=</span> []</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>samples_Sigma <span class="op">=</span> []</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>samples_pi    <span class="op">=</span> []</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>samples_Z     <span class="op">=</span> []</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> iteration <span class="kw">in</span> <span class="bu">range</span>(n_iter):</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># z_i&#39;yi örnekle</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>    log_probs <span class="op">=</span> np.column_stack([</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        np.log(pi[k] <span class="op">+</span> <span class="fl">1e-300</span>) <span class="op">+</span> mvn_logpdf(X_norm, mu[k], Sigma[k])</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    ])  <span class="co"># (N, K)</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    log_probs <span class="op">-=</span> log_probs.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)  <span class="co"># sayısal kararlılık</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    probs      <span class="op">=</span> np.exp(log_probs)</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    probs     <span class="op">/=</span> probs.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Vektörleştirilmiş kategorik örnekleme</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>    cumprobs <span class="op">=</span> probs.cumsum(axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    u        <span class="op">=</span> np.random.rand(N, <span class="dv">1</span>)</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>    Z        <span class="op">=</span> np.clip((u <span class="op">&gt;</span> cumprobs).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>), <span class="dv">0</span>, K <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Küme sayıları ve ortalamalar</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>    nk   <span class="op">=</span> np.array([(Z <span class="op">==</span> k).<span class="bu">sum</span>() <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>    xbar <span class="op">=</span> np.array([X_norm[Z <span class="op">==</span> k].mean(axis<span class="op">=</span><span class="dv">0</span>) <span class="cf">if</span> nk[k] <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>                     <span class="cf">else</span> mu0 <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)])</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    <span class="co"># pi&#39;yi örnekle</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>    pi <span class="op">=</span> dirichlet.rvs(nk <span class="op">+</span> alpha)[<span class="dv">0</span>]</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Adım 3 &amp; 4: mu_k ve Sigma_k&#39;yı örnekle</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> nk[k] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>            Sigma[k] <span class="op">=</span> invwishart.rvs(df<span class="op">=</span>nu0, scale<span class="op">=</span>Psi0)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>            mu[k]    <span class="op">=</span> np.random.multivariate_normal(mu0, Sigma[k] <span class="op">/</span> kappa0)</span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>        Xk       <span class="op">=</span> X_norm[Z <span class="op">==</span> k]</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>        kappa_n  <span class="op">=</span> kappa0 <span class="op">+</span> nk[k]</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>        diff_mean <span class="op">=</span> xbar[k] <span class="op">-</span> mu0</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>        S_k      <span class="op">=</span> (Xk <span class="op">-</span> xbar[k]).T <span class="op">@</span> (Xk <span class="op">-</span> xbar[k])</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>        Psi_n    <span class="op">=</span> (Psi0</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>                    <span class="op">+</span> S_k</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>                    <span class="op">+</span> (kappa0 <span class="op">*</span> nk[k]) <span class="op">/</span> kappa_n <span class="op">*</span> np.outer(diff_mean, diff_mean))</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>        nu_n     <span class="op">=</span> nu0 <span class="op">+</span> nk[k]</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>        Sigma[k] <span class="op">=</span> invwishart.rvs(df<span class="op">=</span>nu_n, scale<span class="op">=</span>Psi_n)</span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>        mu_n  <span class="op">=</span> (kappa0 <span class="op">*</span> mu0 <span class="op">+</span> nk[k] <span class="op">*</span> xbar[k]) <span class="op">/</span> kappa_n</span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>        mu[k] <span class="op">=</span> np.random.multivariate_normal(mu_n, Sigma[k] <span class="op">/</span> kappa_n)</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Isınma sonrası sakla</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> iteration <span class="op">&gt;=</span> burn_in:</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>        samples_mu.append(mu.copy())</span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>        samples_Sigma.append(Sigma.copy())</span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>        samples_pi.append(pi.copy())</span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>        samples_Z.append(Z.copy())</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Sonsal özetler (orijinal ölçeğe geri dönüştürülmüş)</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>post_mu_norm    <span class="op">=</span> np.mean(samples_mu,    axis<span class="op">=</span><span class="dv">0</span>)  <span class="co"># (K, D)</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>post_Sigma_norm <span class="op">=</span> np.mean(samples_Sigma, axis<span class="op">=</span><span class="dv">0</span>)  <span class="co"># (K, D, D)</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>post_pi         <span class="op">=</span> np.mean(samples_pi,    axis<span class="op">=</span><span class="dv">0</span>)  <span class="co"># (K,)</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a><span class="co"># Ortalamaları orijinal ölçeğe geri dönüştür</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>post_mu_orig <span class="op">=</span> post_mu_norm <span class="op">*</span> X_std <span class="op">+</span> X_mean</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="co"># Kovaryansları geri dönüştür: Sigma_orig = diag(std) @ Sigma_norm @ diag(std)</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> np.diag(X_std)</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>post_Sigma_orig <span class="op">=</span> np.array([S <span class="op">@</span> post_Sigma_norm[k] <span class="op">@</span> S <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)])</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a><span class="co"># Her nokta için en sık atama</span></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>Z_samples <span class="op">=</span> np.array(samples_Z)  <span class="co"># (n_samples, N)</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>Z_final   <span class="op">=</span> np.apply_along_axis(</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> col: np.bincount(col, minlength<span class="op">=</span>K).argmax(), <span class="dv">0</span>, Z_samples)</span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a><span class="co"># Daha temiz bir açıklama için kümeleri karışım oranına göre sırala</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>order    <span class="op">=</span> np.argsort(post_pi)[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>active_k <span class="op">=</span> [k <span class="cf">for</span> k <span class="kw">in</span> order <span class="cf">if</span> post_pi[k] <span class="op">&gt;</span> <span class="fl">0.005</span>]  <span class="co"># önemsiz kümeleri gösterme</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> cm.tab20(np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, K))</span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a><span class="co"># Şekil 1: Son kümeleme</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx_k, k <span class="kw">in</span> <span class="bu">enumerate</span>(active_k):</span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> Z_final <span class="op">==</span> k</span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X_norm[mask, <span class="dv">0</span>], X_norm[mask, <span class="dv">1</span>],</span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>               s<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span>colors[idx_k <span class="op">%</span> K], alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>    ax.scatter(<span class="op">*</span>post_mu_norm[k], marker<span class="op">=</span><span class="st">&#39;X&#39;</span>, s<span class="op">=</span><span class="dv">120</span>,</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>               color<span class="op">=</span>colors[idx_k <span class="op">%</span> K], edgecolors<span class="op">=</span><span class="st">&#39;black&#39;</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;gibbs1.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="gibbs1.jpg" /></p>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
