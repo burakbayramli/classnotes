@@ -425,7 +425,7 @@ $\Sigma_k$'ya dönüşür ve Ters-Gamma önseli Ters-Wishart olur.
 
 ---
 
-Kod
+Örnek 1: İki Boyutta Kümeleme
 
 ```python
 import numpy as np
@@ -567,4 +567,40 @@ plt.savefig('gibbs1.jpg')
 ```
 
 ![](gibbs1.jpg)
+
+---
+
+Örnek 2: Film Beğenleri Üzerinden Kullanıcı Kümelemek
+
+Bir diğer örnek Movielens verisinde kullanıcıların verdiği notlar
+üzerinden kullanıcıları kümelemek, ki ardından işleyecek tavsiye
+algoritması yeni bir kullanıcının en yakın olduğu kümeyi bulur ve o
+kümedeki kişilerin en yüksek oy verdiği filmleri tavsiye olarak yeni
+kullanıcıya sunabilir.
+
+Eğer her kullanıcıyı bir veri satırı olarak kabul edersek, ki 1-5
+arası beğeni verileri kolona tekabül eden filmler için olacaktır, bu
+çok boyutlu veri rahat bir şekilde kümelenebilir. Bir problem GMM'in
+iç yapısındaki Gaussian'lar sebebiyle kullandığı olağan mesafe
+hesabıdır, bu mesafe Öklitseldir. Öklitsel mesafe çok seyrek olan ve
+kordinatsal bağlamda pek anlam ifade etmeyebilecek film beğeni
+vektörleri için kullanışlı olmayabilir. Bu tür veriler üzeinden
+kosinüs mesafesinin daha iyi işlediğini biliyoruz.
+
+Bu sebeple bir önişlem üzerinden beğeni vektörlerini Öklitsel olarak
+anlam ifade eden başka bir uzaya yansıtmak daha iyi olabilir. Bu
+yansıtma işlemini kosinüs mesafesini göz önüne alacak şekilde
+seçersek, elde edilen yeni uzay içinde bildiğimiz GMM kümelemesini
+yapabiliriz.
+
+Yansıtma için iyi bir yöntem `umap`. Ekteki kodlar bu yaklaşımı kullanıyor.
+
+Kodlar
+
+[movgibbscl.py](movgibbscl.py),
+[movgibbsrecom.py](movgibbsrecom.py)
+
+Kaynaklar
+
+[1] <a href="https://umap-learn.readthedocs.io/en/latest/">UMap</a>
 
