@@ -1,6 +1,7 @@
 import pandas as pd, numpy as np, os, sys
 import re, pickle, csv, json, random
 from scipy.special import gammaln
+from collections import defaultdict
 
 csv.field_size_limit(sys.maxsize)
 
@@ -106,16 +107,15 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
     cluster3_users = [users[i] for i in range(len(users)) if z_map[i] == best_k]
 
     recoms = []
-    rnums = list(range(300))
+    total_top_d = defaultdict(int)
+    
     with open(USER_MOVIE_FILE) as csvfile:   
         rd = csv.reader(csvfile,delimiter='|')
         for i,row in enumerate(rd):
-            if random.choice(rnums)!=0: continue
             jrow = json.loads(row[1])
             # if the user exists in the closest users list
             if int(row[0]) in cluster3_users:
                 # get this person's movie ratings
-                ri = 0
                 for movid,rating in jrow.items():
                     if int(movid) not in mov_id_title: continue 
                     fres = re.findall('\((\d\d\d\d)\)', mov_id_title[int(movid)])
@@ -125,9 +125,17 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
                        'Animation' not in genre[int(movid)] and \
                        'Documentary' not in genre[int(movid)] and \
                        len(fres)>0 and int(fres[0]) > 2010: \
-                       print (i,mov_id_title[int(movid)]); break
+                       total_top_d[mov_id_title[int(movid)]] += 1
 
+    print ("Done collecting.. Writing.. ")
+    df = pd.DataFrame(list(total_top_d.items()), columns=['Item', 'Count'])
+    df = df.sort_values(by='Count', ascending=False)
+    df = df.head(2000)
+    df.to_csv("/opt/Downloads/movierecom5.csv",index=None)
+                    
 def recommend():
     MY_RATINGS = dict((mov[p],float(picks[p]['rating'])) for p in picks if p in mov)
     assign_cluster(MY_RATINGS)
     
+if __name__ == "__main__": 
+    recommend()
