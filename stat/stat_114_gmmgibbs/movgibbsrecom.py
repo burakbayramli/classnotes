@@ -106,7 +106,6 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
 
     cluster3_users = [users[i] for i in range(len(users)) if z_map[i] == best_k]
 
-    recoms = []
     total_top_d = defaultdict(int)
     
     with open(USER_MOVIE_FILE) as csvfile:   
@@ -125,6 +124,8 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
                        'Animation' not in genre[int(movid)] and \
                        'Documentary' not in genre[int(movid)] and \
                        len(fres)>0 and int(fres[0]) > 2010: \
+                       # count the number of times a movie is picked, the
+                       # highest sum will be recommended at the top
                        total_top_d[mov_id_title[int(movid)]] += 1
 
     print ("Done collecting.. Writing.. ")

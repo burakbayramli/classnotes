@@ -9,6 +9,7 @@ from scipy.sparse import csr_matrix
 import scipy.sparse.linalg, json
 import pandas as pd, numpy as np
 import os, sys, re, csv
+from collections import defaultdict
 
 csv.field_size_limit(sys.maxsize)
 
@@ -36,34 +37,35 @@ def recommend():
           
 
     df = pd.DataFrame(res).set_index(0)
-    df = df.sort_values(by=1,ascending=False).head(400)
+    df = df.sort_values(by=1,ascending=False).head(500)
     df = df.to_dict()[1] # the final list of close users
 
-    recoms = []
+    total_top_d = defaultdict(int)
     with open(fin) as csvfile:   
         rd = csv.reader(csvfile,delimiter='|')
         for i,row in enumerate(rd):
             jrow = json.loads(row[1])
             # if the user exists in the closest users list
             if str(row[0]) in df:
-                # get this person's movie ratings
                 for movid,rating in jrow.items():
                     if int(movid) not in mov_id_title: continue 
                     fres = re.findall('\((\d\d\d\d)\)', mov_id_title[int(movid)])
-                    if rating >= 4 and \
+                    if rating == 5 and \
                        mov_id_title[int(movid)] not in picks and \
                        mov_id_title[int(movid)] not in skips and \
                        'Animation' not in genre[int(movid)] and \
                        'Documentary' not in genre[int(movid)] and \
                        len(fres)>0 and int(fres[0]) > 2010: \
-                       # add the picks of this user multiplied by his closeness
-                       recoms.append([mov_id_title[int(movid)],rating*df[row[0]]])
+                       # count the number of times a movie is picked, the
+                       # highest sum will be recommended at the top
+                       total_top_d[mov_id_title[int(movid)]] += 1
 
-    df = pd.DataFrame(recoms)
-    df = df.sort_values(1,ascending=False)
-    df = df.drop_duplicates(0)
-    df.to_csv("/opt/Downloads/movierecom3.csv",index=None,header=False)
-        
+    print ("Done collecting.. Writing.. ")
+    df = pd.DataFrame(list(total_top_d.items()), columns=['Item', 'Count'])
+    df = df.sort_values(by='Count', ascending=False)
+    df = df.head(2000)
+    df.to_csv("/opt/Downloads/movierecom3.csv",index=None)
+                               
 if __name__ == "__main__":      
     recommend()
                 
