@@ -37,7 +37,7 @@ def recommend():
           
 
     df = pd.DataFrame(res).set_index(0)
-    df = df.sort_values(by=1,ascending=False).head(500)
+    df = df.sort_values(by=1,ascending=False).head(1000)
     df = df.to_dict()[1] # the final list of close users
 
     total_top_d = defaultdict(int)
@@ -50,11 +50,12 @@ def recommend():
                 for movid,rating in jrow.items():
                     if int(movid) not in mov_id_title: continue 
                     fres = re.findall('\((\d\d\d\d)\)', mov_id_title[int(movid)])
-                    if rating == 5 and \
+                    if rating >= 4 and \
                        mov_id_title[int(movid)] not in picks and \
                        mov_id_title[int(movid)] not in skips and \
                        'Animation' not in genre[int(movid)] and \
                        'Documentary' not in genre[int(movid)] and \
+                       'Horror' not in genre[int(movid)] and \
                        len(fres)>0 and int(fres[0]) > 2010: \
                        # count the number of times a movie is picked, the
                        # highest sum will be recommended at the top

@@ -75,7 +75,7 @@ print("Embedding via UMAP …")
 
 reducer = umap.UMAP(
     metric="cosine",
-    n_components=2,
+    n_components=7,
     n_neighbors=30,       # reduce from 50, still fine for 200k
     n_epochs=200,         # default is 500 for large datasets, halving saves ~40%
     low_memory=True,      # trades some speed for memory, but avoids swapping

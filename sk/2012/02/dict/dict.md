@@ -24132,7 +24132,7 @@ sürtünme friction
 
 stability kalimlilik
 
-stability kararlılık
+stability istikrar, kararlılık
 
 stability of a linear system doğrusal bir sistemin kararlılığı
 
