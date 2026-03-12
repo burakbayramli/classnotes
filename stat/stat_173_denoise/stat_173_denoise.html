@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+      });
+    });
+    </script>  
+   
+  <title>Markov Rasgele Alanları (Markov Random Fields), Gürültü Giderme</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1
+id="markov-rasgele-alanları-markov-random-fields-gürültü-giderme">Markov
+Rasgele Alanları (Markov Random Fields), Gürültü Giderme</h1>
+<p>Görüntü gürültü giderme matematiğini türetmek için görüntüyü yalnızca
+bir sayı izgarası olarak değil, rastgele değişkenlerden oluşan bir küme
+olarak ele aldığımız olasılıksal bir çerçeve ele alıyoruz. İki bilgi
+parçasıyla başlıyoruz:</p>
+<ul>
+<li>X: Gözlemlediğimiz gürültülü görüntü.</li>
+<li>Y: Bulmak istediğimiz “gerçek” temiz görüntü.</li>
+</ul>
+<p>Bayes Teoremi’ne göre, gördüğümüz gürültü verildiğinde bir görüntünün
+“doğru” temiz görüntü olma olasılığı şöyledir:</p>
+<p><span class="math display">\[P(Y | X) = \frac{P(X | Y)\,
+P(Y)}{P(X)}\]</span></p>
+<p>X ve Y, temelde bir ızgara üzerinde düzenlenmiş bireysel rastgele
+değişkenlerden oluşan koleksiyonlar olan Rastgele Alanlardır. Görüntü
+<span class="math inline">\(N \times N\)</span> boyutundaysa, Y yalnızca
+tek bir rastgele değişken değil, <span
+class="math inline">\(N^2\)</span> rastgele değişkenden oluşan bir
+kümedir: <span class="math inline">\(Y = \{y_{1,1}, y_{1,2}, \ldots,
+y_{N,N}\}\)</span>. Her <span class="math inline">\(y_{i,j}\)</span>,
+<span class="math inline">\(L = \{0, 1, \ldots, 255\}\)</span>
+kümesindeki herhangi bir tam sayı değerini alabilen ayrık bir rastgele
+değişkendir.</p>
+<p><span class="math display">\[P(Y | X) \propto P(X | Y)\,
+P(Y)\]</span></p>
+<p>Olurluk — gürültü piksel bazında bağımsızdır:</p>
+<p><span class="math display">\[P(X | Y) = \prod_{i,j} P(x_{i,j} |
+y_{i,j})\]</span></p>
+<p>Ön dağılım — her piksel yalnızca komşularına bağlıdır (MRF
+varsayımı):</p>
+<p><span class="math display">\[P(Y) = \prod_{i,j} P(y_{i,j} |
+\mathcal{N}(y_{i,j}))\]</span></p>
+<p>burada <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span>
+uzamsal komşulardır.</p>
+<p>Kanıt — tüm Y için yalnızca bir normalleştirme sabiti:</p>
+<p><span class="math display">\[P(X) = \text{sabit}\]</span></p>
+<p>Dolayısıyla piksel düzeyindeki tam Bayes ifadesi şöyledir:</p>
+<p><span class="math display">\[
+P(Y | X) \propto \prod_{i,j} P(x_{i,j} | y_{i,j}) \cdot \prod_{i,j}
+P(y_{i,j} | \mathcal{N}(y_{i,j}))
+\]</span></p>
+<p>Gibbs sayesinde, tüm pikseller üzerindeki bu devasa birleşik
+dağılımdan örnekleme yapmak yerine, her piksel kendi yerel koşullu
+dağılımından örneklenir — bu, Hammersley-Clifford teoremi sayesinde
+yalnızca <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve
+<span class="math inline">\(x_{i,j}\)</span>’ye ihtiyaç duyar. Çarpımlar
+tek bir pikselin terimlerine indirgenir ve <span
+class="math inline">\(P(y_{i,j} | \mathcal{N}(y_{i,j}),
+x_{i,j})\)</span>’ye geri dönersiniz. Bir piksel ile görüntüdeki diğer
+tüm pikseller arasında bir ilişki olabilir, ancak Hammersley-Clifford
+teoremi bunu yalnızca bir piksel ile komşuları arasındaki ilişkiye
+indirgemize yardımcı olur. Temelde şunu söyleyebiliriz:</p>
+<p><span class="math display">\[P(y_{i,j} | Y_{-(i,j)}, X) = P(y_{i,j} |
+\mathcal{N}(y_{i,j}), x_{i,j})\]</span></p>
+<p>Devam ederek, Hammersley-Clifford sayesinde Y üzerindeki birleşik
+dağılım yerel terimlerin çarpımına indirgenir; böylece tek bir piksel
+için şunu yazabiliriz:</p>
+<p><span class="math display">\[
+P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} |
+y_{i,j})\, P(y_{i,j} | \mathcal{N}(y_{i,j}))
+\]</span></p>
+<p>Piksel bazında bağımsız gürültü varsayımıyla (her <span
+class="math inline">\(x_{i,j}\)</span> bağımsız olarak bozulur):</p>
+<p><span class="math display">\[P(x_{i,j} | y_{i,j}) \propto
+\exp(-\lambda|y_{i,j} - x_{i,j}|)\]</span></p>
+<p>Düzgün bir ön dağılım varsayımıyla (bir piksel komşularıyla
+uyuşmalıdır):</p>
+<p><span class="math display">\[
+P(y_{i,j} | \mathcal{N}(y_{i,j})) \propto \exp\!\left(-\sum_{z \in
+\mathcal{N}(y_{i,j})} |y_{i,j} - z|\right) \tag{2}
+\]</span></p>
+<p>İkisini çarpıp <span class="math inline">\(-\log\)</span> alarak:</p>
+<p><span class="math display">\[P(y_{i,j} | \mathcal{N}(y_{i,j}),
+x_{i,j}) \propto \exp(-E(y_{i,j}))\]</span></p>
+<p>burada:</p>
+<p><span class="math display">\[
+E(y_{i,j}) = \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z| +
+\lambda|y_{i,j} - x_{i,j}|
+\]</span></p>
+<p>Fiziğe dayalı modellerde olasılığı Enerji (E) ile ilişkilendiririz.
+(2)’de <span class="math inline">\(\propto\)</span> kullandık; bu
+normalleştiricinin düşürüldüğü anlamına gelir. Tam ifade şöyledir:</p>
+<p><span class="math display">\[P(y_{i,j} | \mathcal{N}(y_{i,j}),
+x_{i,j}) = \frac{1}{Z} \exp(-E(y_{i,j}))\]</span></p>
+<p>burada <span class="math inline">\(Z = \sum_{k=0}^{255}
+\exp(-E(k))\)</span>, bölme fonksiyonudur — olasılıkların toplamının 1
+olmasını sağlamak üzere seçilmiş, tüm 256 olası piksel değeri üzerinden
+<span class="math inline">\(\exp(-E)\)</span>’nin toplamıdır.</p>
+<p>Enerji, birbiriyle rekabet eden iki terimden oluşur:</p>
+<ul>
+<li><p>Ön Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel
+ile komşuları arasındaki farkları cezalandırır. Bu açıdan “ön dağılım”
+salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin yerel olarak
+düzgün olduğu inancını kodlar; bir pikselin mutlak anlamda hangi değeri
+alması gerektiğine dair hiçbir taahhütte bulunmaz.</p></li>
+<li><p>Kayıp Terimi (L): Gerçeğin çok uzağına sapmamamızı sağlamak için
+gürültü giderilen piksel ile orijinal gürültülü gözlem arasındaki farkı
+cezalandırır.</p></li>
+</ul>
+<p>Kod</p>
+<pre><code># z aday piksel değeridir -sözde kod-
+# L1 Ön Dağılım: toplam|komşular - değer|
+prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - z), axis=1)
+# L1 Kayıp: lambda |gürültülü - değer|
+loss = lam * np.abs(target_noisy[:, np.newaxis] - z)</code></pre>
+<p><span class="math inline">\(\sum_{z \in \mathcal{N}(y_{i,j})}
+|y_{i,j} - z|\)</span> olasılıksal bir nicelik olarak garip görünebilir,
+ama neyi ölçtüğünü düşünün — bir aday piksel değeri <span
+class="math inline">\(k\)</span>’nın komşularıyla olan toplam
+uyuşmazlığını ölçüyor. Bu toplam:</p>
+<ul>
+<li><p>Küçük olduğunda: <span class="math inline">\(k\)</span>
+komşularına yakındır → düşük enerji → yüksek olasılık. Piksel “uyum
+sağlar.”</p></li>
+<li><p>Büyük olduğunda: <span class="math inline">\(k\)</span>
+komşularından çok farklıdır → yüksek enerji → düşük olasılık. Piksel
+“öne çıkar.”</p></li>
+</ul>
+<p>Karşılaştırmak gerekirse, Gaussian dağılımı da bir şeyden uzaklığı
+ölçer — bu durumda bir değer ile ortalama arasındaki uzaklığı.
+Ortalamadan uzaklaştıkça ceza artar (düşük olasılık); yaklaştıkça ödül
+büyür (yüksek olasılık). L1 ön dağılımı aynı şekilde çalışır; yalnızca
+‘ortalama’, yerel komşuluk uzlaşısıyla değiştirilir — sabit bir hedef
+yoktur, yalnızca yakın piksellerin anlaşması vardır.</p>
+<p><span class="math inline">\(\exp(-E)\)</span> neden düşük enerji =
+yüksek olasılık sağlar? <span class="math inline">\(E\)</span> arttıkça
+<span class="math inline">\(-E\)</span> azalır ve dolayısıyla <span
+class="math inline">\(\exp(-E)\)</span> monoton biçimde azalır. Üstel
+fonksiyonun özellikle seçilmesi, bunu istatistiksel fiziğe (Boltzmann
+dağılımı) bağlayan ve olasılıkların her zaman pozitif olmasını güvence
+altına alan şeydir.</p>
+<p>Maskeleri (dama tahtası deseni) kullanmamızın nedeni bu rastgele
+değişkenlerin bağımsızlığıyla ilgilidir. Bir MRF’de iki rastgele
+değişken <span class="math inline">\(y_a\)</span> ve <span
+class="math inline">\(y_b\)</span>, komşu değillerse koşullu olarak
+bağımsızdır. Bu, vektörleştirilmiş kodda Gibbs örneklemesinin
+kurallarını ihlal etmeden binlerce pikseli aynı anda örneklememizi
+sağlayan “boşluktur.”</p>
+<p>Amacımız bu olasılığı maksimize eden Y’yi bulmaktır (MAP tahmini).
+<span class="math inline">\(P(X)\)</span> herhangi bir gürültülü görüntü
+için sabit olduğundan, payı maksimize etmeye odaklanırız: <span
+class="math inline">\(P(X | Y)\, P(Y)\)</span>.</p>
+<p>Kodda bu, her hedef piksel için 8 çevreleyen pikseli (3×3 pencere)
+toplayan doldurulmuş görüntü ve komşular yığını tarafından işlenir.</p>
+<p>Örnekleme</p>
+<p>Bu enerji değerlerini piksel değeri için bir “seçime” dönüştürmek
+amacıyla Gibbs dağılımını kullanırız.</p>
+<p>Sayısal İstikrar (Stability): <span
+class="math inline">\(\exp(-E)\)</span> hesaplanırken bilgisayar
+hatalarını (NaN) önlemek için üs almadan önce minimum enerjiyi
+çıkarırız:</p>
+<p><span class="math display">\[
+\frac{e^{-E_i}}{\sum_j e^{-E_j}} = \frac{e^{-(E_i - \min E)}}{\sum_j
+e^{-(E_j - \min E)}}
+\]</span></p>
+<p>Kod</p>
+<pre><code># min(energy) çıkarmak exp()&#39;nin çok küçük olmasını engeller (alt taşma)
+probs = np.exp(np.min(energy, axis=1, keepdims=True) - energy)
+probs /= np.sum(probs, axis=1, keepdims=True)  # Toplamı 1 olacak şekilde normalleştir</code></pre>
+<p>Koddaki örnekleme adımı, <span class="math inline">\(P(y_{i,j} |
+\mathcal{N}(y_{i,j}), x_{i,j})\)</span> koşullu olasılık dağılımına
+uygulanan Ters Dönüşüm Örneklemesinin doğrudan bir uygulamasıdır. Bu,
+hesaplanması imkânsız olan global normalleştirme sabitini hesaplamadan
+görüntü uzayını keşfetmemizi sağlayan Gibbs Örnekleyicisinin temel
+mekanizmasıdır.</p>
+<p>Koşullu Dağılım</p>
+<p>Bir Markov Rastgele Alanında, komşuluğu <span
+class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve gözlemlenen veri
+<span class="math inline">\(x_{i,j}\)</span> verildiğinde tek bir
+pikselin olasılığı şöyledir:</p>
+<p><span class="math display">\[
+P(y_{i,j} = k \mid \mathcal{N}(y_{i,j}),\, x_{i,j}) =
+\frac{\exp(-E(k))}{\sum_{m=0}^{255} \exp(-E(m))} \tag{1}
+\]</span></p>
+<p>Burada <span class="math inline">\(E(k)\)</span>, piksel <span
+class="math inline">\(k \in \{0, \ldots, 255\}\)</span> değerini
+aldığındaki enerjidir. Kodda <code>probs</code> değişkeni, geçerli
+maskedeki her piksel için bu ayrık olasılık dağılımını temsil eder.
+Paydayı değerlendirmek için aynı anda tüm 256 aday için <span
+class="math inline">\(E(k)\)</span>’ya ihtiyacımız vardır. Kodda <span
+class="math inline">\(z\)</span>,
+<code>possible_vals = np.arange(256)</code> ile değiştirilir; bu da
+yukarıdaki skaler hesaplamayı tüm adaylar üzerinde vektörleştirilmiş bir
+hesaplamaya dönüştürür:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>prior <span class="op">=</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(target_neighbors[:, :, np.newaxis] <span class="op">-</span> possible_vals), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> lam <span class="op">*</span> np.<span class="bu">abs</span>(target_noisy[:, np.newaxis] <span class="op">-</span> possible_vals)</span></code></pre></div>
+<p>Yukarıdaki satırlar, her komşu <span class="math inline">\(z\)</span>
+ve her aday değer <span class="math inline">\(k \in \{0, \ldots,
+255\}\)</span> için <span class="math inline">\(|z - k|\)</span>’yı
+hesaplıyor. “Bu pikselin alabileceği 256 olası değerin her biri için,
+komşular bu değerden ne kadar uzakta?” sorusunu soran vektörleştirilmiş
+bir yoldur. Şekiller daha açık hale getirir:</p>
+<ul>
+<li><code>target_neighbors</code> şekli <span class="math inline">\((K,
+8)\)</span>’dir — geçerli maskede <span class="math inline">\(K\)</span>
+piksel, her birinin 8 komşusu</li>
+<li><code>[:, :, np.newaxis]</code> sonrasında <span
+class="math inline">\((K, 8, 1)\)</span> olur</li>
+<li><code>possible_vals</code> şekli <span
+class="math inline">\((256,)\)</span>’dır, <span
+class="math inline">\((1, 1, 256)\)</span>’ya yayınlanır</li>
+<li>sonuç <span class="math inline">\((K, 8, 256)\)</span>’dır — <span
+class="math inline">\(K\)</span> pikselin her biri için, 8 komşunun her
+biri için, 256 aday değerden mutlak fark</li>
+<li><code>np.sum(..., axis=1)</code> ise 8 komşu üzerinde toplar ve
+<span class="math inline">\((K, 256)\)</span> şeklini verir</li>
+</ul>
+<p>Dolayısıyla nihai <code>prior</code> dizisi, tüm <span
+class="math inline">\(K\)</span> piksel ve <span
+class="math inline">\(k\)</span>’nın tüm 256 değeri için eşzamanlı
+olarak değerlendirilen <span class="math inline">\(\sum_{z \in
+\mathcal{N}(y_{i,j})} |k - z|\)</span>’dir. Yayınlama, matematikte her
+aday <span class="math inline">\(k\)</span> için komşular üzerindeki
+toplam olarak yazacağınız işi yapıyor.</p>
+<p>Birikimli Dağılım Fonksiyonu (CDF)</p>
+<p><code>probs</code>’daki olasılıklara göre bir <span
+class="math inline">\(k\)</span> değeri seçmek için Birikimli Dağılım
+Fonksiyonunu (CDF) kullanırız. <span class="math inline">\(F(k)\)</span>
+olarak tanımlanan CDF, <span class="math inline">\(k\)</span>’ya kadar
+tüm değerlerin olasılıklarının toplamıdır:</p>
+<p><span class="math display">\[F(k) = P(Y \leq k) = \sum_{m=0}^{k} P(y
+= m)\]</span></p>
+<p>Kod: <code>cum_probs = np.cumsum(probs, axis=1)</code></p>
+<p>Bu satır, olasılık kütle fonksiyonunu (toplamı 1 olan) 0’dan başlayıp
+1’de biten bir “merdiven” fonksiyonuna dönüştürür.</p>
+<p>Ters Dönüşüm Örneklemesi</p>
+<p>Örneklemenin temel teoremi şunu belirtir: <span
+class="math inline">\(U\)</span>, <span class="math inline">\([0,
+1]\)</span> üzerinde düzgün dağılımlı bir rastgele değişkense, <span
+class="math inline">\(X = F^{-1}(U)\)</span>, <span
+class="math inline">\(F\)</span> dağılımına sahiptir.</p>
+<p>Bunu uygulamak için: <span class="math inline">\(r \in [0,
+1]\)</span> aralığında düzgün bir rastgele sayı üretilir. Kod:
+<code>random_vals = np.random.rand(len(target_noisy), 1)</code>. <span
+class="math inline">\(F(k) \geq r\)</span> koşulunu sağlayan en küçük
+<span class="math inline">\(k\)</span> indeksi bulunur. Kod:
+<code>Y[mask] = np.argmax(cum_probs &gt; random_vals, axis=1)</code>.</p>
+<p>Parçalar Hâlinde Gibbs ve <span
+class="math inline">\(P(Y)\)</span></p>
+<p>Gibbs Örneklemesi bir Markov Zinciri Monte Carlo (MCMC) yöntemidir.
+<span class="math inline">\(P(y_1, y_2, \ldots, y_n)\)</span> birleşik
+olasılığını hesaplamak yerine — bu <span
+class="math inline">\(256^{\text{Yükseklik} \times
+\text{Genişlik}}\)</span> kombinasyonu gerektirir — yerel koşullu
+dağılımlardan örnekleme yaparsınız. Matematik, her pikselin yerel
+koşullu dağılımından yeterince uzun süre örnekleme yaparsanız, elde
+edilen Y görüntüsünün nihayetinde gerçek, global posterior dağılımından
+<span class="math inline">\(P(Y | X)\)</span> bir örnek olacağını
+garanti eder.</p>
+<p>Özet Tablo: Matematikten Koda</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Matematiksel Adım</th>
+<th>Formül</th>
+<th>Kod Satırı</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Yerel Koşullu</td>
+<td><span class="math inline">\(P(y_{i,j} \mid \mathcal{N}(y_{i,j}),
+x_{i,j})\)</span></td>
+<td><code>probs = np.exp(...) / sum(...)</code></td>
+</tr>
+<tr class="even">
+<td>CDF Hesabı</td>
+<td><span class="math inline">\(F(k) = \sum P(m)\)</span></td>
+<td><code>np.cumsum(probs, ...)</code></td>
+</tr>
+<tr class="odd">
+<td>Düzgün Rastgele</td>
+<td><span class="math inline">\(U \sim \text{Unif}(0,1)\)</span></td>
+<td><code>np.random.rand(...)</code></td>
+</tr>
+<tr class="even">
+<td>Ters Eşleme</td>
+<td><span class="math inline">\(k^* = \min\{k : F(k) \geq
+U\}\)</span></td>
+<td><code>np.argmax(cum_probs &gt; random_vals, ...)</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>np.argmax</code>’ı bir boolean dizi üzerinde kullanarak
+(<code>cum_probs &gt; random_vals</code>), NumPy koşulun doğru olduğu
+ilk indeksi belirler; bu da vektörleştirilmiş maskedeki her piksel için
+eşzamanlı olarak <span class="math inline">\(F^{-1}(U)\)</span> işlemini
+gerçekleştirir.</p>
+<p>Vektörleştirme (Dama Tahtası)</p>
+<p>Standart bir döngüde bir pikseli güncelleyip ardından bir sonrakine
+geçersiniz. Ancak bir piksel yalnızca komşularına ve <span
+class="math inline">\(x_{i,j}\)</span>’ye bağlı olduğundan, tüm “Çift”
+pikselleri aynı anda güncelleyebilirsiniz; çünkü hiçbiri birbirinin
+komşusu değildir.</p>
+<p>Matematik: Görüntüyü bağımsız kümelere (4 maske) bölerek, bir <span
+class="math inline">\(y_{i,j}\)</span> değerleri grubunu güncellerken
+<span class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve <span
+class="math inline">\(x_{i,j}\)</span> kanıtının sabit kaldığını garanti
+ederiz.</p>
+<p>Kod: İşte bu yüzden <code>for mask in masks:</code> vardır ve
+ardından binlerce piksel için aynı anda 256 olası gri düzeyin tümü için
+enerjiyi hesaplayan devasa bir NumPy yayını gelir.</p>
+<p>MAP ile Tam Posterior Çıkarım Karşılaştırması</p>
+<p>Kesin olarak söylemek gerekirse, MAP (Maksimum A Posteriori) ve Gibbs
+Örneklemesi iki farklı çıkarım felsefesini temsil eder; ancak bu makale
+ve MRF bağlamında genellikle aynı madalyonun iki yüzü olarak
+tartışılırlar. Bu, bir çelişkiden çok optimizasyondan simülasyona bir
+geçiştir.</p>
+<ul>
+<li><p>MAP (Optimizasyon): <span class="math inline">\(P(Y |
+X)\)</span>’i maksimize eden tek en olası Y görüntüsünü bulur.
+Genellikle gradyan inişi veya graf kesmeleri kullanılarak
+çözülür.</p></li>
+<li><p>Tam Posterior (Örnekleme): Ortalamayı, varyansı veya belirsizliği
+anlamak için <span class="math inline">\(P(Y | X)\)</span>’ten pek çok
+görüntü örneklenir.</p></li>
+</ul>
+<p>MAP için neden Gibbs kullanılır?</p>
+<p>Gradyan yükselişi gibi yöntemler sıklıkla yerel maksimumda takılı
+kalır. Gibbs Örneklemesi, enerji yüzeyinde daha sağlam biçimde gezinir:
+yalnızca “tepeyi tırmanmak” yerine örnekleme yaparak algoritma yerel
+minimumlardan çıkabilir. <span class="math inline">\(\beta\)</span>’yı
+(ters sıcaklık) artırdıkça, <span class="math inline">\(P(Y |
+X)\)</span> dağılımı mod etrafında çok “sivri” hale gelir ve yüksek
+<span class="math inline">\(\beta\)</span>’da posteriordan örnekleme
+MAP’i bulmakla eşdeğer hale gelir. Makale, olasılıksal çıkarım aracını
+(Gibbs) optimizasyon problemini (MAP) çözmek için kullanır; çünkü
+dağınık, gürültülü verilere karşı daha dayanıklıdır.</p>
+<p>MAP size tek bir yanıt verir — tek en olası temiz görüntü. Gibbs
+örneklemesi ise prensipte makul temiz görüntülerin bir dağılımını verir.
+Pratikte burada, yeterli sayıda iterasyondan ve yüksek <span
+class="math inline">\(\beta\)</span>’dan sonra, örnekleyici zamanının
+neredeyse tamamını MAP çözümünün yakınında geçirir; dolayısıyla zincirin
+son karesi gürültü giderilmiş çıktı olarak kullanılır. Yani Gibbs
+kullanarak MAP sonucuna erişmiş oluyoruz, örnekleme sonsal dağılımı
+geziyor, fakat o zincirin ortalamasını almak yerine son varılan noktayı
+raporlayarak bir optimal nokta hesabı yapmış oluyoruz.</p>
+<p>Kod</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage <span class="im">import</span> io</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vectorized_gibbs_l1(noisy_img, iterations<span class="op">=</span><span class="dv">12</span>, lam<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    M, N <span class="op">=</span> noisy_img.shape</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> noisy_img.copy().astype(np.float32)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    possible_vals <span class="op">=</span> np.arange(<span class="dv">256</span>, dtype<span class="op">=</span>np.float32)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    masks <span class="op">=</span> [</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        (np.arange(M)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>)[:, <span class="va">None</span>] <span class="op">&amp;</span> (np.arange(N)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        (np.arange(M)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>)[:, <span class="va">None</span>] <span class="op">&amp;</span> (np.arange(N)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        (np.arange(M)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>)[:, <span class="va">None</span>] <span class="op">&amp;</span> (np.arange(N)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        (np.arange(M)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>)[:, <span class="va">None</span>] <span class="op">&amp;</span> (np.arange(N)<span class="op">%</span><span class="dv">2</span> <span class="op">==</span> <span class="dv">1</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> it <span class="kw">in</span> <span class="bu">range</span>(iterations):</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> mask <span class="kw">in</span> masks:</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            padded <span class="op">=</span> np.pad(Y, <span class="dv">1</span>, mode<span class="op">=</span><span class="st">&#39;edge&#39;</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            neighbors <span class="op">=</span> np.stack([</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                padded[<span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>, <span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>], padded[<span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>], padded[<span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>:],</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                padded[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>], padded[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>:],</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                padded[<span class="dv">2</span>:, <span class="dv">0</span>:<span class="op">-</span><span class="dv">2</span>], padded[<span class="dv">2</span>:, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>], padded[<span class="dv">2</span>:, <span class="dv">2</span>:]</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>            ], axis<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>            target_neighbors <span class="op">=</span> neighbors[mask]</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>            target_noisy <span class="op">=</span> noisy_img[mask]</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>            prior <span class="op">=</span> np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(target_neighbors[:, :, np.newaxis] <span class="op">-</span> possible_vals), axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> lam <span class="op">*</span> np.<span class="bu">abs</span>(target_noisy[:, np.newaxis] <span class="op">-</span> possible_vals)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            energy <span class="op">=</span> prior <span class="op">+</span> loss</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>            probs <span class="op">=</span> np.exp(np.<span class="bu">min</span>(energy, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>) <span class="op">-</span> energy)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>            probs <span class="op">/=</span> np.<span class="bu">sum</span>(probs, axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>            cum_probs <span class="op">=</span> np.cumsum(probs, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>            random_vals <span class="op">=</span> np.random.rand(<span class="bu">len</span>(target_noisy), <span class="dv">1</span>)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>            Y[mask] <span class="op">=</span> np.argmax(cum_probs <span class="op">&gt;</span> random_vals, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>img_noisy <span class="op">=</span> io.imread(<span class="st">&#39;../../func_analysis/func_70_tvd/lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> img_noisy.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    img_noisy <span class="op">=</span> (img_noisy <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> vectorized_gibbs_l1(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(denoised_img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&#39;Gürültü Giderilmiş&#39;</span>)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;lena1.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="lena1.jpg" /></p>
+<p>[devam edecek]</p>
+<p>Kaynaklar</p>
+<p>[1] Yue,
+https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf</p>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
