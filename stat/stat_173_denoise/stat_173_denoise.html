@@ -97,9 +97,9 @@ sormaktır: elimizdeki bozulmuş piksellerden yola çıkarak, altta yatan
 gerçeği nasıl kurtarabiliriz?</p>
 <p><img src="stat_173_denoise_01.jpg" /></p>
 <p>Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her <span
-class="math inline">\(X_{i,j}\)</span> düğümü (ki bir olasılıksal
+class="math inline">\(x_{i,j}\)</span> düğümü (ki bir olasılıksal
 değişken), doğrudan gözlemlediğimiz gürültülü pikseli temsil eder. Her
-<span class="math inline">\(Y_{i,j}\)</span> düğümü ise bulmak
+<span class="math inline">\(y_{i,j}\)</span> düğümü ise bulmak
 istediğimiz gizli, temiz pikseli temsil eder. İki katman ayrı
 tutulmuştur: X düğümleri bağımsız gürültü kanalları aracılığıyla
 karşılık gelen Y düğümlerine bağlanırken, Y düğümleri kendi aralarında
@@ -147,7 +147,7 @@ varsayımı):</p>
 <p><span class="math display">\[P(Y) = \prod_{i,j} P(y_{i,j} |
 \mathcal{N}(y_{i,j}))\]</span></p>
 <p>burada <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span>
-uzamsal komşulardır.</p>
+konum bağlamındaki komşulardır.</p>
 <p>Kanıt — tüm Y için yalnızca bir normalleştirme sabiti:</p>
 <p><span class="math display">\[P(X) = \text{sabit}\]</span></p>
 <p>Dolayısıyla piksel düzeyindeki tam Bayes ifadesi şöyledir:</p>
@@ -156,24 +156,35 @@ P(Y | X) \propto \prod_{i,j} P(x_{i,j} | y_{i,j}) \cdot \prod_{i,j}
 P(y_{i,j} | \mathcal{N}(y_{i,j}))
 \]</span></p>
 <p>Gibbs sayesinde, tüm pikseller üzerindeki bu devasa birleşik
-dağılımdan örnekleme yapmak yerine, her piksel kendi yerel koşullu
-dağılımından örneklenir — bu, Hammersley-Clifford teoremi sayesinde
-yalnızca <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve
-<span class="math inline">\(x_{i,j}\)</span>’ye ihtiyaç duyar. Çarpımlar
-tek bir pikselin terimlerine indirgenir ve <span
-class="math inline">\(P(y_{i,j} | \mathcal{N}(y_{i,j}),
-x_{i,j})\)</span>’ye geri dönersiniz. Bir piksel ile görüntüdeki diğer
-tüm pikseller arasında bir ilişki olabilir, ancak Hammersley-Clifford
-teoremi bunu yalnızca bir piksel ile komşuları arasındaki ilişkiye
-indirgemize yardımcı olur. Temelde şunu söyleyebiliriz:</p>
-<p><span class="math display">\[P(y_{i,j} | Y_{-(i,j)}, X) = P(y_{i,j} |
-\mathcal{N}(y_{i,j}), x_{i,j})\]</span></p>
-<p>Devam edelim, Hammersley-Clifford sayesinde Y üzerindeki birleşik
-dağılım yerel terimlerin çarpımına indirgenir; böylece tek bir piksel
-için şunu yazabiliriz:</p>
+dağılımdan tek seferde örnekleme yapmak yerine, her pikseli kendi yerel
+koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize tüm pikseller
+üzerindeki birleşik sonsalı aynı anda verir. Tek bir piksel <span
+class="math inline">\(y_{i,j}\)</span> için koşullu dağılımı elde etmek
+için <span class="math inline">\(P(y_{i,j} \mid Y_{-(i,j)},
+X)\)</span>’i, yani diğer her şey sabit tutulduğunda tek bir pikselin
+dağılımını hesaplamamız gerekir. Bunu, <span
+class="math inline">\(y_{i,j}\)</span>’yi içermeyen tüm terimleri sabit
+olarak ele alarak yaparız.</p>
+<p>Çarpımları gözden geçirip “<span
+class="math inline">\(y_{i,j}\)</span>’ye gerçekten bağlı olan terimler
+hangileri?” diye sorduğumuzda yalnızca ikisi hayatta kalır: olabilirlik
+çarpımından <span class="math inline">\(P(x_{i,j} \mid y_{i,j})\)</span>
+ve ön dağılım çarpımından <span class="math inline">\(P(y_{i,j} \mid
+\mathcal{N}(y_{i,j}))\)</span> (<span
+class="math inline">\(y_{i,j}\)</span>’nin komşularına ait MRF terimleri
+de <span class="math inline">\(y_{i,j}\)</span>’yi içerir, ancak
+Hammersley-Clifford teoremi kapsamında bunlar önsel dağılım teriminin
+kodladığı yerele indirgenir). Dolayısıyla <span
+class="math inline">\((k,l) \neq (i,j)\)</span> olan tüm <span
+class="math inline">\(y_{k,l}\)</span>’leri sabitler, sabit olan her
+şeyi atarız ve geriye kalan <span class="math inline">\(P(x_{i,j} \mid
+y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))\)</span> ile
+orantılıdır. “Odaklanma” adımı aslında diğer tüm pikselleri onlara
+koşullanarak dışarı marjinalleştirmektir — ki bu da Gibbs adımıdır.</p>
+<p>Artık tek bir piksel için şunu yazabiliriz:</p>
 <p><span class="math display">\[
-P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} |
-y_{i,j})\, P(y_{i,j} | \mathcal{N}(y_{i,j}))
+P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} \mid
+y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
 \]</span></p>
 <p>Piksel bazında bağımsız gürültü varsayımıyla (her <span
 class="math inline">\(x_{i,j}\)</span> bağımsız olarak bozulmaya uğramış

@@ -8,9 +8,9 @@ gerçeği nasıl kurtarabiliriz?
 
 ![](stat_173_denoise_01.jpg)
 
-Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her $X_{i,j}$ düğümü (ki
+Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her $x_{i,j}$ düğümü (ki
 bir olasılıksal değişken), doğrudan gözlemlediğimiz gürültülü pikseli
-temsil eder. Her $Y_{i,j}$ düğümü ise bulmak istediğimiz gizli, temiz
+temsil eder. Her $y_{i,j}$ düğümü ise bulmak istediğimiz gizli, temiz
 pikseli temsil eder. İki katman ayrı tutulmuştur: X düğümleri bağımsız
 gürültü kanalları aracılığıyla karşılık gelen Y düğümlerine
 bağlanırken, Y düğümleri kendi aralarında yatay ve dikey komşuluklar
@@ -18,7 +18,7 @@ boyunca birbirine bağlıdır. Bu ikinci bağlantı kümesi kritiktir —
 doğal görüntülerin yerel olarak düzgün olma eğiliminde olduğu, yani
 komşu piksellerin birbirine yakın değerler alması gerektiği inancını
 kodlar. Olasılıksal açıdan düğüm (değişken) arasındaki bağlantılar bir
-koşulsal olasılık ilişkisini ima eder. 
+koşulsal olasılık ilişkisini ima eder.
 
 Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak şunu
 söylememizi sağlar: her $Y_{i,j}$, tüm görüntü verildiğinde yalnızca
@@ -58,7 +58,7 @@ $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
 $$P(Y) = \prod_{i,j} P(y_{i,j} | \mathcal{N}(y_{i,j}))$$
 
-burada $\mathcal{N}(y_{i,j})$ uzamsal komşulardır.
+burada $\mathcal{N}(y_{i,j})$ konum bağlamındaki komşulardır.
 
 Kanıt — tüm Y için yalnızca bir normalleştirme sabiti:
 
@@ -72,25 +72,31 @@ P(y_{i,j} | \mathcal{N}(y_{i,j}))
 $$
 
 Gibbs sayesinde, tüm pikseller üzerindeki bu devasa birleşik
-dağılımdan örnekleme yapmak yerine, her piksel kendi yerel koşullu
-dağılımından örneklenir — bu, Hammersley-Clifford teoremi sayesinde
-yalnızca $\mathcal{N}(y_{i,j})$ ve $x_{i,j}$'ye ihtiyaç
-duyar. Çarpımlar tek bir pikselin terimlerine indirgenir ve $P(y_{i,j}
-| \mathcal{N}(y_{i,j}), x_{i,j})$'ye geri dönersiniz. Bir piksel ile
-görüntüdeki diğer tüm pikseller arasında bir ilişki olabilir, ancak
-Hammersley-Clifford teoremi bunu yalnızca bir piksel ile komşuları
-arasındaki ilişkiye indirgemize yardımcı olur. Temelde şunu
-söyleyebiliriz:
+dağılımdan tek seferde örnekleme yapmak yerine, her pikseli kendi
+yerel koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize tüm
+pikseller üzerindeki birleşik sonsalı aynı anda verir. Tek bir piksel
+$y_{i,j}$ için koşullu dağılımı elde etmek için $P(y_{i,j} \mid
+Y_{-(i,j)}, X)$'i, yani diğer her şey sabit tutulduğunda tek bir
+pikselin dağılımını hesaplamamız gerekir. Bunu, $y_{i,j}$'yi içermeyen
+tüm terimleri sabit olarak ele alarak yaparız.
 
-$$P(y_{i,j} | Y_{-(i,j)}, X) = P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j})$$
+Çarpımları gözden geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler
+hangileri?" diye sorduğumuzda yalnızca ikisi hayatta kalır:
+olabilirlik çarpımından $P(x_{i,j} \mid y_{i,j})$ ve ön dağılım
+çarpımından $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ($y_{i,j}$'nin
+komşularına ait MRF terimleri de $y_{i,j}$'yi içerir, ancak
+Hammersley-Clifford teoremi kapsamında bunlar önsel dağılım teriminin
+kodladığı yerele indirgenir). Dolayısıyla $(k,l) \neq (i,j)$ olan tüm
+$y_{k,l}$'leri sabitler, sabit olan her şeyi atarız ve geriye kalan
+$P(x_{i,j} \mid y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile
+orantılıdır. "Odaklanma" adımı aslında diğer tüm pikselleri onlara
+koşullanarak dışarı marjinalleştirmektir — ki bu da Gibbs adımıdır.
 
-Devam edelim, Hammersley-Clifford sayesinde Y üzerindeki birleşik
-dağılım yerel terimlerin çarpımına indirgenir; böylece tek bir piksel
-için şunu yazabiliriz:
+Artık tek bir piksel için şunu yazabiliriz:
 
 $$
-P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} |
-y_{i,j})\, P(y_{i,j} | \mathcal{N}(y_{i,j}))
+P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} \mid
+y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
 $$
 
 Piksel bazında bağımsız gürültü varsayımıyla (her $x_{i,j}$ bağımsız
@@ -406,3 +412,5 @@ Kaynaklar
 
 [1] Yue, <a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
          Markov Random Fields and Gibbs Sampling for Image Denoising</a>
+
+
