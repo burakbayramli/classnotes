@@ -91,11 +91,6 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
     print(f"  Assigned cluster : {best_k}")
     print(f"  Cluster size     : {mask_k.sum()} users")
     print()
-    print("  Cluster probabilities:")
-    for k in range(K):
-        bar = "█" * int(probs[k] * 30)
-        print(f"    C{k}  {probs[k]:.3f}  {bar}")
-    print()
     print("  5 nearest neighbours in your cluster:")
     for rank, idx in enumerate(nn_order, 1):
         uid  = users_k[idx]
@@ -117,7 +112,7 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
                 for movid,rating in jrow.items():
                     if int(movid) not in mov_id_title: continue 
                     fres = re.findall('\((\d\d\d\d)\)', mov_id_title[int(movid)])
-                    if rating == 5 and \
+                    if rating >= 4 and \
                        mov_id_title[int(movid)] not in picks and \
                        mov_id_title[int(movid)] not in skips and \
                        'Animation' not in genre[int(movid)] and \
