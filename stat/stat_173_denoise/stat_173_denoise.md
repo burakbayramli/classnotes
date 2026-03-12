@@ -27,7 +27,7 @@ Olurluk — gürültü piksel bazında bağımsızdır:
 
 $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
-Ön dağılım — her piksel yalnızca komşularına bağlıdır (MRF varsayımı):
+Önsel (prior) dağılım — her piksel yalnızca komşularına bağlıdır (MRF varsayımı):
 
 $$P(Y) = \prod_{i,j} P(y_{i,j} | \mathcal{N}(y_{i,j}))$$
 
@@ -57,7 +57,7 @@ söyleyebiliriz:
 
 $$P(y_{i,j} | Y_{-(i,j)}, X) = P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j})$$
 
-Devam ederek, Hammersley-Clifford sayesinde Y üzerindeki birleşik
+Devam edelim, Hammersley-Clifford sayesinde Y üzerindeki birleşik
 dağılım yerel terimlerin çarpımına indirgenir; böylece tek bir piksel
 için şunu yazabiliriz:
 
@@ -67,11 +67,11 @@ y_{i,j})\, P(y_{i,j} | \mathcal{N}(y_{i,j}))
 $$
 
 Piksel bazında bağımsız gürültü varsayımıyla (her $x_{i,j}$ bağımsız
-olarak bozulur):
+olarak bozulmaya uğramış kabul ediyoruz):
 
 $$P(x_{i,j} | y_{i,j}) \propto \exp(-\lambda|y_{i,j} - x_{i,j}|)$$
 
-Düzgün bir ön dağılım varsayımıyla (bir piksel komşularıyla
+Düzgün bir önsel dağılım varsayımıyla (bir piksel komşularıyla
 uyuşmalıdır):
 
 $$
@@ -92,21 +92,22 @@ $$
 
 Fiziğe dayalı modellerde olasılığı Enerji (E) ile
 ilişkilendiririz. (2)'de $\propto$ kullandık; bu normalleştiricinin
-düşürüldüğü anlamına gelir. Tam ifade şöyledir:
+atıldığı anlamına gelir. Tam ifade şöyledir:
 
 $$P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) = \frac{1}{Z} \exp(-E(y_{i,j}))$$
 
-burada $Z = \sum_{k=0}^{255} \exp(-E(k))$, bölme fonksiyonudur —
-olasılıkların toplamının 1 olmasını sağlamak üzere seçilmiş, tüm 256
+$Z = \sum_{k=0}^{255} \exp(-E(k))$, bölme fonksiyonudur —
+olasılıkların toplamının 1 olmasını sağlamak üzere seçilmiştir, tüm 256
 olası piksel değeri üzerinden $\exp(-E)$'nin toplamıdır.
 
 Enerji, birbiriyle rekabet eden iki terimden oluşur:
 
-- Ön Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel ile
-  komşuları arasındaki farkları cezalandırır. Bu açıdan "ön dağılım"
-  salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin yerel olarak
-  düzgün olduğu inancını kodlar; bir pikselin mutlak anlamda hangi
-  değeri alması gerektiğine dair hiçbir taahhütte bulunmaz.
+- Önsel Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel
+  ile komşuları arasındaki farkları cezalandırır. Bu açıdan "önsel
+  dağılım" salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin
+  yerel olarak düzgün olduğu inancını kodlar; bir pikselin mutlak
+  anlamda hangi değeri alması gerektiğine dair hiçbir taahhütte
+  bulunmaz.
 
 - Kayıp Terimi (L): Gerçeğin çok uzağına sapmamamızı sağlamak için
   gürültü giderilen piksel ile orijinal gürültülü gözlem arasındaki
@@ -115,7 +116,7 @@ Enerji, birbiriyle rekabet eden iki terimden oluşur:
 Kod
 ```
 # z aday piksel değeridir -sözde kod-
-# L1 Ön Dağılım: toplam|komşular - değer|
+# L1 Önsel Dağılım: toplam|komşular - değer|
 prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - z), axis=1)
 # L1 Kayıp: lambda |gürültülü - değer|
 loss = lam * np.abs(target_noisy[:, np.newaxis] - z)
@@ -132,9 +133,10 @@ $\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z|$ olasılıksal bir nicelik olar
 Karşılaştırmak gerekirse, Gaussian dağılımı da bir şeyden uzaklığı
 ölçer — bu durumda bir değer ile ortalama arasındaki
 uzaklığı. Ortalamadan uzaklaştıkça ceza artar (düşük olasılık);
-yaklaştıkça ödül büyür (yüksek olasılık). L1 ön dağılımı aynı şekilde
-çalışır; yalnızca 'ortalama', yerel komşuluk uzlaşısıyla değiştirilir
-— sabit bir hedef yoktur, yalnızca yakın piksellerin anlaşması vardır.
+yaklaştıkça ödül büyür (yüksek olasılık). L1 önsel dağılımı aynı
+şekilde çalışır; yalnızca 'ortalama', yerel komşuluk uzlaşısıyla
+değiştirilir — sabit bir hedef yoktur, yalnızca yakın piksellerin
+anlaşması vardır.
 
 $\exp(-E)$ neden düşük enerji = yüksek olasılık sağlar? $E$ arttıkça
 $-E$ azalır ve dolayısıyla $\exp(-E)$ monoton biçimde azalır. Üstel
@@ -147,14 +149,13 @@ değişkenlerin bağımsızlığıyla ilgilidir. Bir MRF'de iki rastgele
 değişken $y_a$ ve $y_b$, komşu değillerse koşullu olarak
 bağımsızdır. Bu, vektörleştirilmiş kodda Gibbs örneklemesinin
 kurallarını ihlal etmeden binlerce pikseli aynı anda örneklememizi
-sağlayan "boşluktur."
+sağlayan kaldıraç / mekanizmadır.
 
 Amacımız bu olasılığı maksimize eden Y'yi bulmaktır (MAP
 tahmini). $P(X)$ herhangi bir gürültülü görüntü için sabit olduğundan,
-payı maksimize etmeye odaklanırız: $P(X | Y)\, P(Y)$.
-
-Kodda bu, her hedef piksel için 8 çevreleyen pikseli (3×3 pencere)
-toplayan doldurulmuş görüntü ve komşular yığını tarafından işlenir.
+payı maksimize etmeye odaklanırız: $P(X | Y)\, P(Y)$. Kodda bu, her
+hedef piksel için 8 çevreleyen pikseli (3×3 pencere) toplayan
+doldurulmuş görüntü ve komşular yığını tarafından işlenir.
 
 Örnekleme
 
@@ -220,9 +221,9 @@ değeri için eşzamanlı olarak değerlendirilen $\sum_{z \in
 \mathcal{N}(y_{i,j})} |k - z|$'dir. Yayınlama, matematikte her aday
 $k$ için komşular üzerindeki toplam olarak yazacağınız işi yapıyor.
 
-Birikimli Dağılım Fonksiyonu (CDF)
+Kümülatif Dağılım Fonksiyonu (CDF)
 
-`probs`'daki olasılıklara göre bir $k$ değeri seçmek için Birikimli
+`probs`'daki olasılıklara göre bir $k$ değeri seçmek için Kümülatif
 Dağılım Fonksiyonunu (CDF) kullanırız. $F(k)$ olarak tanımlanan CDF,
 $k$'ya kadar tüm değerlerin olasılıklarının toplamıdır:
 
@@ -237,12 +238,11 @@ Ters Dönüşüm Örneklemesi
 
 Örneklemenin temel teoremi şunu belirtir: $U$, $[0, 1]$ üzerinde
 düzgün dağılımlı bir rastgele değişkense, $X = F^{-1}(U)$, $F$
-dağılımına sahiptir.
-
-Bunu uygulamak için: $r \in [0, 1]$ aralığında düzgün bir rastgele
-sayı üretilir. Kod: `random_vals = np.random.rand(len(target_noisy),
-1)`. $F(k) \geq r$ koşulunu sağlayan en küçük $k$ indeksi
-bulunur. Kod: `Y[mask] = np.argmax(cum_probs > random_vals, axis=1)`.
+dağılımına sahiptir. Bunu uygulamak için: $r \in [0, 1]$ aralığında
+düzgün bir rastgele sayı üretilir. Kod: `random_vals =
+np.random.rand(len(target_noisy), 1)`. $F(k) \geq r$ koşulunu sağlayan
+en küçük $k$ indeksi bulunur. Kod: `Y[mask] = np.argmax(cum_probs >
+random_vals, axis=1)`.
 
 Parçalar Hâlinde Gibbs ve $P(Y)$
 
@@ -252,8 +252,8 @@ yerine — bu $256^{\text{Yükseklik} \times \text{Genişlik}}$
 kombinasyonu gerektirir — yerel koşullu dağılımlardan örnekleme
 yaparsınız. Matematik, her pikselin yerel koşullu dağılımından
 yeterince uzun süre örnekleme yaparsanız, elde edilen Y görüntüsünün
-nihayetinde gerçek, global posterior dağılımından $P(Y | X)$ bir örnek
-olacağını garanti eder.
+nihayetinde gerçek, global sonsal (posterior) dağılımından $P(Y | X)$
+bir örnek olacağını garanti eder.
 
 Özet Tablo: Matematikten Koda
 
@@ -281,7 +281,7 @@ Kod: İşte bu yüzden `for mask in masks:` vardır ve ardından binlerce
 piksel için aynı anda 256 olası gri düzeyin tümü için enerjiyi
 hesaplayan devasa bir NumPy yayını gelir.
 
-MAP ile Tam Posterior Çıkarım Karşılaştırması
+MAP ile Tam Sonsal Çıkarım Karşılaştırması
 
 Kesin olarak söylemek gerekirse, MAP (Maksimum A Posteriori) ve Gibbs
 Örneklemesi iki farklı çıkarım felsefesini temsil eder; ancak bu
@@ -293,7 +293,7 @@ geçiştir.
   görüntüsünü bulur. Genellikle gradyan inişi veya graf kesmeleri
   kullanılarak çözülür.
 
-- Tam Posterior (Örnekleme): Ortalamayı, varyansı veya belirsizliği
+- Tam Sonsal (Örnekleme): Ortalamayı, varyansı veya belirsizliği
   anlamak için $P(Y | X)$'ten pek çok görüntü örneklenir.
 
 MAP için neden Gibbs kullanılır?
@@ -303,20 +303,20 @@ kalır. Gibbs Örneklemesi, enerji yüzeyinde daha sağlam biçimde
 gezinir: yalnızca "tepeyi tırmanmak" yerine örnekleme yaparak
 algoritma yerel minimumlardan çıkabilir. $\beta$'yı (ters sıcaklık)
 artırdıkça, $P(Y | X)$ dağılımı mod etrafında çok "sivri" hale gelir
-ve yüksek $\beta$'da posteriordan örnekleme MAP'i bulmakla eşdeğer
-hale gelir. Makale, olasılıksal çıkarım aracını (Gibbs) optimizasyon
+ve yüksek $\beta$'da sonsaldan örnekleme MAP'i bulmakla eşdeğer hale
+gelir. Makale, olasılıksal çıkarım aracını (Gibbs) optimizasyon
 problemini (MAP) çözmek için kullanır; çünkü dağınık, gürültülü
 verilere karşı daha dayanıklıdır.
 
 MAP size tek bir yanıt verir — tek en olası temiz görüntü. Gibbs
 örneklemesi ise prensipte makul temiz görüntülerin bir dağılımını
-verir. Pratikte burada, yeterli sayıda iterasyondan ve yüksek
-$\beta$'dan sonra, örnekleyici zamanının neredeyse tamamını MAP
-çözümünün yakınında geçirir; dolayısıyla zincirin son karesi gürültü
-giderilmiş çıktı olarak kullanılır. Yani Gibbs kullanarak MAP sonucuna
-erişmiş oluyoruz, örnekleme sonsal dağılımı geziyor, fakat o zincirin
+verir. Pratikte, yeterli sayıda iterasyondan ve yüksek $\beta$'dan
+sonra örnekleyici zamanının neredeyse tamamını MAP çözümünün yakınında
+geçirir; dolayısıyla zincirin son karesi gürültü giderilmiş çıktı
+olarak kullanılır. Yani Gibbs kullanarak MAP sonucuna erişmiş
+oluyoruz, örnekleme sonsal dağılımı geziyor, fakat o zincirin
 ortalamasını almak yerine son varılan noktayı raporlayarak bir optimal
-nokta hesabı yapmış oluyoruz.
+tek nokta hesabı yapmış oluyoruz.
 
 Kod
 ```python
@@ -360,7 +360,7 @@ if img_noisy.max() <= 1.0:
 
 denoised_img = vectorized_gibbs_l1(img_noisy, iterations=10, lam=2.5)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 2)
 axes[0].imshow(img_noisy, cmap='gray')
 axes[0].set_title('Gürültülü')
 axes[0].axis('off')
@@ -377,4 +377,5 @@ plt.savefig('lena1.jpg')
 
 Kaynaklar
 
-[1] Yue, https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf
+[1] Yue, <a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
+         Markov Random Fields and Gibbs Sampling for Image Denoising</a>

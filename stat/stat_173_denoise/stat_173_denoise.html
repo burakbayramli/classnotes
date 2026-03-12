@@ -117,7 +117,7 @@ P(Y)\]</span></p>
 <p>Olurluk — gürültü piksel bazında bağımsızdır:</p>
 <p><span class="math display">\[P(X | Y) = \prod_{i,j} P(x_{i,j} |
 y_{i,j})\]</span></p>
-<p>Ön dağılım — her piksel yalnızca komşularına bağlıdır (MRF
+<p>Önsel (prior) dağılım — her piksel yalnızca komşularına bağlıdır (MRF
 varsayımı):</p>
 <p><span class="math display">\[P(Y) = \prod_{i,j} P(y_{i,j} |
 \mathcal{N}(y_{i,j}))\]</span></p>
@@ -143,7 +143,7 @@ teoremi bunu yalnızca bir piksel ile komşuları arasındaki ilişkiye
 indirgemize yardımcı olur. Temelde şunu söyleyebiliriz:</p>
 <p><span class="math display">\[P(y_{i,j} | Y_{-(i,j)}, X) = P(y_{i,j} |
 \mathcal{N}(y_{i,j}), x_{i,j})\]</span></p>
-<p>Devam ederek, Hammersley-Clifford sayesinde Y üzerindeki birleşik
+<p>Devam edelim, Hammersley-Clifford sayesinde Y üzerindeki birleşik
 dağılım yerel terimlerin çarpımına indirgenir; böylece tek bir piksel
 için şunu yazabiliriz:</p>
 <p><span class="math display">\[
@@ -151,10 +151,11 @@ P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) \propto P(x_{i,j} |
 y_{i,j})\, P(y_{i,j} | \mathcal{N}(y_{i,j}))
 \]</span></p>
 <p>Piksel bazında bağımsız gürültü varsayımıyla (her <span
-class="math inline">\(x_{i,j}\)</span> bağımsız olarak bozulur):</p>
+class="math inline">\(x_{i,j}\)</span> bağımsız olarak bozulmaya uğramış
+kabul ediyoruz):</p>
 <p><span class="math display">\[P(x_{i,j} | y_{i,j}) \propto
 \exp(-\lambda|y_{i,j} - x_{i,j}|)\]</span></p>
-<p>Düzgün bir ön dağılım varsayımıyla (bir piksel komşularıyla
+<p>Düzgün bir önsel dağılım varsayımıyla (bir piksel komşularıyla
 uyuşmalıdır):</p>
 <p><span class="math display">\[
 P(y_{i,j} | \mathcal{N}(y_{i,j})) \propto \exp\!\left(-\sum_{z \in
@@ -170,27 +171,28 @@ E(y_{i,j}) = \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z| +
 \]</span></p>
 <p>Fiziğe dayalı modellerde olasılığı Enerji (E) ile ilişkilendiririz.
 (2)’de <span class="math inline">\(\propto\)</span> kullandık; bu
-normalleştiricinin düşürüldüğü anlamına gelir. Tam ifade şöyledir:</p>
+normalleştiricinin atıldığı anlamına gelir. Tam ifade şöyledir:</p>
 <p><span class="math display">\[P(y_{i,j} | \mathcal{N}(y_{i,j}),
 x_{i,j}) = \frac{1}{Z} \exp(-E(y_{i,j}))\]</span></p>
-<p>burada <span class="math inline">\(Z = \sum_{k=0}^{255}
+<p><span class="math inline">\(Z = \sum_{k=0}^{255}
 \exp(-E(k))\)</span>, bölme fonksiyonudur — olasılıkların toplamının 1
-olmasını sağlamak üzere seçilmiş, tüm 256 olası piksel değeri üzerinden
-<span class="math inline">\(\exp(-E)\)</span>’nin toplamıdır.</p>
+olmasını sağlamak üzere seçilmiştir, tüm 256 olası piksel değeri
+üzerinden <span class="math inline">\(\exp(-E)\)</span>’nin
+toplamıdır.</p>
 <p>Enerji, birbiriyle rekabet eden iki terimden oluşur:</p>
 <ul>
-<li><p>Ön Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel
-ile komşuları arasındaki farkları cezalandırır. Bu açıdan “ön dağılım”
-salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin yerel olarak
-düzgün olduğu inancını kodlar; bir pikselin mutlak anlamda hangi değeri
-alması gerektiğine dair hiçbir taahhütte bulunmaz.</p></li>
+<li><p>Önsel Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel
+ile komşuları arasındaki farkları cezalandırır. Bu açıdan “önsel
+dağılım” salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin yerel
+olarak düzgün olduğu inancını kodlar; bir pikselin mutlak anlamda hangi
+değeri alması gerektiğine dair hiçbir taahhütte bulunmaz.</p></li>
 <li><p>Kayıp Terimi (L): Gerçeğin çok uzağına sapmamamızı sağlamak için
 gürültü giderilen piksel ile orijinal gürültülü gözlem arasındaki farkı
 cezalandırır.</p></li>
 </ul>
 <p>Kod</p>
 <pre><code># z aday piksel değeridir -sözde kod-
-# L1 Ön Dağılım: toplam|komşular - değer|
+# L1 Önsel Dağılım: toplam|komşular - değer|
 prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - z), axis=1)
 # L1 Kayıp: lambda |gürültülü - değer|
 loss = lam * np.abs(target_noisy[:, np.newaxis] - z)</code></pre>
@@ -210,9 +212,9 @@ komşularından çok farklıdır → yüksek enerji → düşük olasılık. Pik
 <p>Karşılaştırmak gerekirse, Gaussian dağılımı da bir şeyden uzaklığı
 ölçer — bu durumda bir değer ile ortalama arasındaki uzaklığı.
 Ortalamadan uzaklaştıkça ceza artar (düşük olasılık); yaklaştıkça ödül
-büyür (yüksek olasılık). L1 ön dağılımı aynı şekilde çalışır; yalnızca
-‘ortalama’, yerel komşuluk uzlaşısıyla değiştirilir — sabit bir hedef
-yoktur, yalnızca yakın piksellerin anlaşması vardır.</p>
+büyür (yüksek olasılık). L1 önsel dağılımı aynı şekilde çalışır;
+yalnızca ‘ortalama’, yerel komşuluk uzlaşısıyla değiştirilir — sabit bir
+hedef yoktur, yalnızca yakın piksellerin anlaşması vardır.</p>
 <p><span class="math inline">\(\exp(-E)\)</span> neden düşük enerji =
 yüksek olasılık sağlar? <span class="math inline">\(E\)</span> arttıkça
 <span class="math inline">\(-E\)</span> azalır ve dolayısıyla <span
@@ -226,13 +228,13 @@ değişken <span class="math inline">\(y_a\)</span> ve <span
 class="math inline">\(y_b\)</span>, komşu değillerse koşullu olarak
 bağımsızdır. Bu, vektörleştirilmiş kodda Gibbs örneklemesinin
 kurallarını ihlal etmeden binlerce pikseli aynı anda örneklememizi
-sağlayan “boşluktur.”</p>
+sağlayan kaldıraç / mekanizmadır.</p>
 <p>Amacımız bu olasılığı maksimize eden Y’yi bulmaktır (MAP tahmini).
 <span class="math inline">\(P(X)\)</span> herhangi bir gürültülü görüntü
 için sabit olduğundan, payı maksimize etmeye odaklanırız: <span
-class="math inline">\(P(X | Y)\, P(Y)\)</span>.</p>
-<p>Kodda bu, her hedef piksel için 8 çevreleyen pikseli (3×3 pencere)
-toplayan doldurulmuş görüntü ve komşular yığını tarafından işlenir.</p>
+class="math inline">\(P(X | Y)\, P(Y)\)</span>. Kodda bu, her hedef
+piksel için 8 çevreleyen pikseli (3×3 pencere) toplayan doldurulmuş
+görüntü ve komşular yığını tarafından işlenir.</p>
 <p>Örnekleme</p>
 <p>Bu enerji değerlerini piksel değeri için bir “seçime” dönüştürmek
 amacıyla Gibbs dağılımını kullanırız.</p>
@@ -304,9 +306,9 @@ olarak değerlendirilen <span class="math inline">\(\sum_{z \in
 \mathcal{N}(y_{i,j})} |k - z|\)</span>’dir. Yayınlama, matematikte her
 aday <span class="math inline">\(k\)</span> için komşular üzerindeki
 toplam olarak yazacağınız işi yapıyor.</p>
-<p>Birikimli Dağılım Fonksiyonu (CDF)</p>
+<p>Kümülatif Dağılım Fonksiyonu (CDF)</p>
 <p><code>probs</code>’daki olasılıklara göre bir <span
-class="math inline">\(k\)</span> değeri seçmek için Birikimli Dağılım
+class="math inline">\(k\)</span> değeri seçmek için Kümülatif Dağılım
 Fonksiyonunu (CDF) kullanırız. <span class="math inline">\(F(k)\)</span>
 olarak tanımlanan CDF, <span class="math inline">\(k\)</span>’ya kadar
 tüm değerlerin olasılıklarının toplamıdır:</p>
@@ -320,9 +322,9 @@ tüm değerlerin olasılıklarının toplamıdır:</p>
 class="math inline">\(U\)</span>, <span class="math inline">\([0,
 1]\)</span> üzerinde düzgün dağılımlı bir rastgele değişkense, <span
 class="math inline">\(X = F^{-1}(U)\)</span>, <span
-class="math inline">\(F\)</span> dağılımına sahiptir.</p>
-<p>Bunu uygulamak için: <span class="math inline">\(r \in [0,
-1]\)</span> aralığında düzgün bir rastgele sayı üretilir. Kod:
+class="math inline">\(F\)</span> dağılımına sahiptir. Bunu uygulamak
+için: <span class="math inline">\(r \in [0, 1]\)</span> aralığında
+düzgün bir rastgele sayı üretilir. Kod:
 <code>random_vals = np.random.rand(len(target_noisy), 1)</code>. <span
 class="math inline">\(F(k) \geq r\)</span> koşulunu sağlayan en küçük
 <span class="math inline">\(k\)</span> indeksi bulunur. Kod:
@@ -336,9 +338,9 @@ class="math inline">\(256^{\text{Yükseklik} \times
 \text{Genişlik}}\)</span> kombinasyonu gerektirir — yerel koşullu
 dağılımlardan örnekleme yaparsınız. Matematik, her pikselin yerel
 koşullu dağılımından yeterince uzun süre örnekleme yaparsanız, elde
-edilen Y görüntüsünün nihayetinde gerçek, global posterior dağılımından
-<span class="math inline">\(P(Y | X)\)</span> bir örnek olacağını
-garanti eder.</p>
+edilen Y görüntüsünün nihayetinde gerçek, global sonsal (posterior)
+dağılımından <span class="math inline">\(P(Y | X)\)</span> bir örnek
+olacağını garanti eder.</p>
 <p>Özet Tablo: Matematikten Koda</p>
 <table>
 <colgroup>
@@ -397,7 +399,7 @@ ederiz.</p>
 <p>Kod: İşte bu yüzden <code>for mask in masks:</code> vardır ve
 ardından binlerce piksel için aynı anda 256 olası gri düzeyin tümü için
 enerjiyi hesaplayan devasa bir NumPy yayını gelir.</p>
-<p>MAP ile Tam Posterior Çıkarım Karşılaştırması</p>
+<p>MAP ile Tam Sonsal Çıkarım Karşılaştırması</p>
 <p>Kesin olarak söylemek gerekirse, MAP (Maksimum A Posteriori) ve Gibbs
 Örneklemesi iki farklı çıkarım felsefesini temsil eder; ancak bu makale
 ve MRF bağlamında genellikle aynı madalyonun iki yüzü olarak
@@ -408,7 +410,7 @@ geçiştir.</p>
 X)\)</span>’i maksimize eden tek en olası Y görüntüsünü bulur.
 Genellikle gradyan inişi veya graf kesmeleri kullanılarak
 çözülür.</p></li>
-<li><p>Tam Posterior (Örnekleme): Ortalamayı, varyansı veya belirsizliği
+<li><p>Tam Sonsal (Örnekleme): Ortalamayı, varyansı veya belirsizliği
 anlamak için <span class="math inline">\(P(Y | X)\)</span>’ten pek çok
 görüntü örneklenir.</p></li>
 </ul>
@@ -419,19 +421,19 @@ yalnızca “tepeyi tırmanmak” yerine örnekleme yaparak algoritma yerel
 minimumlardan çıkabilir. <span class="math inline">\(\beta\)</span>’yı
 (ters sıcaklık) artırdıkça, <span class="math inline">\(P(Y |
 X)\)</span> dağılımı mod etrafında çok “sivri” hale gelir ve yüksek
-<span class="math inline">\(\beta\)</span>’da posteriordan örnekleme
-MAP’i bulmakla eşdeğer hale gelir. Makale, olasılıksal çıkarım aracını
-(Gibbs) optimizasyon problemini (MAP) çözmek için kullanır; çünkü
-dağınık, gürültülü verilere karşı daha dayanıklıdır.</p>
+<span class="math inline">\(\beta\)</span>’da sonsaldan örnekleme MAP’i
+bulmakla eşdeğer hale gelir. Makale, olasılıksal çıkarım aracını (Gibbs)
+optimizasyon problemini (MAP) çözmek için kullanır; çünkü dağınık,
+gürültülü verilere karşı daha dayanıklıdır.</p>
 <p>MAP size tek bir yanıt verir — tek en olası temiz görüntü. Gibbs
 örneklemesi ise prensipte makul temiz görüntülerin bir dağılımını verir.
-Pratikte burada, yeterli sayıda iterasyondan ve yüksek <span
-class="math inline">\(\beta\)</span>’dan sonra, örnekleyici zamanının
+Pratikte, yeterli sayıda iterasyondan ve yüksek <span
+class="math inline">\(\beta\)</span>’dan sonra örnekleyici zamanının
 neredeyse tamamını MAP çözümünün yakınında geçirir; dolayısıyla zincirin
 son karesi gürültü giderilmiş çıktı olarak kullanılır. Yani Gibbs
 kullanarak MAP sonucuna erişmiş oluyoruz, örnekleme sonsal dağılımı
 geziyor, fakat o zincirin ortalamasını almak yerine son varılan noktayı
-raporlayarak bir optimal nokta hesabı yapmış oluyoruz.</p>
+raporlayarak bir optimal tek nokta hesabı yapmış oluyoruz.</p>
 <p>Kod</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -474,7 +476,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> vectorized_gibbs_l1(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
 <span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
 <span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
@@ -487,7 +489,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a hr
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Yue,
-https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf</p>
+<a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
+Markov Random Fields and Gibbs Sampling for Image Denoising</a></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
