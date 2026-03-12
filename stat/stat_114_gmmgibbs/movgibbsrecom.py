@@ -33,7 +33,6 @@ def assign_cluster(my_ratings: dict, model_path: str = MODEL_FILE):
     z_map          = m["z_map"]           # (N,)
     users          = m["users"]           # list len N
     movie_idx      = m["movie_idx"]       # {movie_id -> col}
-    reducer        = m["reducer"]         # fitted UMAP
     cluster_params = m["cluster_params"]  # list of K dicts
     K              = m["K"]
 

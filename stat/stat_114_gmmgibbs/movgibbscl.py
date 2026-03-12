@@ -38,6 +38,7 @@ all_movies = sorted(all_movies_set)
 movie_idx  = {m: i for i, m in enumerate(all_movies)}
 del all_movies_set, user_rating_counts
 
+N_UMAP_COMPONENTS = 6
 N = len(users)
 M = len(all_movies)
 print(f"  {N} users, {M} movies")
@@ -75,7 +76,7 @@ print("Embedding via UMAP …")
 
 reducer = umap.UMAP(
     metric="cosine",
-    n_components=7,
+    n_components=N_UMAP_COMPONENTS,
     n_neighbors=30,       # reduce from 50, still fine for 200k
     n_epochs=200,         # default is 500 for large datasets, halving saves ~40%
     low_memory=True,      # trades some speed for memory, but avoids swapping
@@ -93,7 +94,7 @@ else:
 
 
 K      = N_CLUSTERS
-D      = 2
+D = N_UMAP_COMPONENTS
 alpha0 = 1.0 / K
 m0     = np.zeros(D)
 kappa0 = 0.01
@@ -193,8 +194,7 @@ to_save = {
     "z_map":     z_map,        # (N,)   MAP cluster per user
     "users":     users,        # list of user ids (index alignment)
     "movie_idx": movie_idx,    # {movie_id -> col index}
-    "K":         K,
-    "reducer":   reducer,      # fitted UMAP (for inference)
+    "K":         K
 }
 
 # cluster_params: use final sampled mu/Sigma (post burn-in mean would be better
