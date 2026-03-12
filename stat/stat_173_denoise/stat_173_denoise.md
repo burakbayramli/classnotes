@@ -1,22 +1,24 @@
 # Markov Rasgele Alanları (Markov Random Fields -MRF-), Gürültü Giderme
 
-MRF formulasyona soyle der: Bir görüntüyü gözlemlediğimizde, aslında
+MRF formülasyonu şöyle der: Bir görüntüyü gözlemlediğimizde, aslında
 gözlemleyemediğimiz bir şeyin — temiz, gerçek sahnenin — gürültülü bir
-versiyonunu görürüz. Gürültü giderme problemi özünde şu soruyu
+versiyonunu görüyoruz. Gürültü giderme problemi özünde şu soruyu
 sormaktır: elimizdeki bozulmuş piksellerden yola çıkarak, altta yatan
 gerçeği nasıl kurtarabiliriz?
 
 ![](stat_173_denoise_01.jpg)
 
-Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her $X_{i,j}$ düğümü,
-doğrudan gözlemlediğimiz gürültülü pikseli temsil eder. Her $Y_{i,j}$
-düğümü ise bulmak istediğimiz gizli, temiz pikseli temsil eder. İki
-katman ayrı tutulmuştur: X düğümleri bağımsız gürültü kanalları
-aracılığıyla karşılık gelen Y düğümlerine bağlanırken, Y düğümleri
-kendi aralarında yatay ve dikey komşuluklar boyunca birbirine
-bağlıdır. Bu ikinci bağlantı kümesi kritiktir — doğal görüntülerin
-yerel olarak düzgün olma eğiliminde olduğu, yani komşu piksellerin
-birbirine yakın değerler alması gerektiği inancını kodlar.
+Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her $X_{i,j}$ düğümü (ki
+bir olasılıksal değişken), doğrudan gözlemlediğimiz gürültülü pikseli
+temsil eder. Her $Y_{i,j}$ düğümü ise bulmak istediğimiz gizli, temiz
+pikseli temsil eder. İki katman ayrı tutulmuştur: X düğümleri bağımsız
+gürültü kanalları aracılığıyla karşılık gelen Y düğümlerine
+bağlanırken, Y düğümleri kendi aralarında yatay ve dikey komşuluklar
+boyunca birbirine bağlıdır. Bu ikinci bağlantı kümesi kritiktir —
+doğal görüntülerin yerel olarak düzgün olma eğiliminde olduğu, yani
+komşu piksellerin birbirine yakın değerler alması gerektiği inancını
+kodlar. Olasılıksal açıdan düğüm (değişken) arasındaki bağlantılar bir
+koşulsal olasılık ilişkisini ima eder. 
 
 Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak şunu
 söylememizi sağlar: her $Y_{i,j}$, tüm görüntü verildiğinde yalnızca
