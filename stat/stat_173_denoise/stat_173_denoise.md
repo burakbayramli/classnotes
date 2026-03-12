@@ -1,9 +1,34 @@
-# Markov Rasgele Alanları (Markov Random Fields), Gürültü Giderme
+# Markov Rasgele Alanları (Markov Random Fields -MRF-), Gürültü Giderme
+
+MRF formulasyona soyle der: Bir görüntüyü gözlemlediğimizde, aslında
+gözlemleyemediğimiz bir şeyin — temiz, gerçek sahnenin — gürültülü bir
+versiyonunu görürüz. Gürültü giderme problemi özünde şu soruyu
+sormaktır: elimizdeki bozulmuş piksellerden yola çıkarak, altta yatan
+gerçeği nasıl kurtarabiliriz?
+
+![](stat_173_denoise_01.jpg)
+
+Yukarıdaki grafik bu ilişkiyi özetlemektedir. Her $X_{i,j}$ düğümü,
+doğrudan gözlemlediğimiz gürültülü pikseli temsil eder. Her $Y_{i,j}$
+düğümü ise bulmak istediğimiz gizli, temiz pikseli temsil eder. İki
+katman ayrı tutulmuştur: X düğümleri bağımsız gürültü kanalları
+aracılığıyla karşılık gelen Y düğümlerine bağlanırken, Y düğümleri
+kendi aralarında yatay ve dikey komşuluklar boyunca birbirine
+bağlıdır. Bu ikinci bağlantı kümesi kritiktir — doğal görüntülerin
+yerel olarak düzgün olma eğiliminde olduğu, yani komşu piksellerin
+birbirine yakın değerler alması gerektiği inancını kodlar.
+
+Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak şunu
+söylememizi sağlar: her $Y_{i,j}$, tüm görüntü verildiğinde yalnızca
+doğrudan komşularına bağlıdır. Bu yerel bağımsızlık özelliği,
+hesaplanamaz görünen küresel bir olasılık problemini yönetilebilir
+yerel bir probleme dönüştürür ve aşağıda türetilen gürültü giderme
+algoritmasının temelidir.
 
 Görüntü gürültü giderme matematiğini türetmek için görüntüyü yalnızca
-bir sayı izgarası olarak değil, rastgele değişkenlerden oluşan bir
-küme olarak ele aldığımız olasılıksal bir çerçeve ele alıyoruz. İki
-bilgi parçasıyla başlıyoruz:
+bir sayı ızgarası olarak değil, rastgele değişkenlerden oluşan bir
+küme olarak ele alıyoruz, ve olasılıksal bir çerçeveden probleme
+bakıyoruz. İki bilgi parçasıyla başlıyoruz:
 
 - X: Gözlemlediğimiz gürültülü görüntü.
 - Y: Bulmak istediğimiz "gerçek" temiz görüntü.
