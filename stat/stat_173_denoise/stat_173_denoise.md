@@ -21,7 +21,7 @@ kodlar. Olasılıksal açıdan düğüm (değişken) arasındaki bağlantılar b
 koşulsal olasılık ilişkisini ima eder.
 
 Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak şunu
-söylememizi sağlar: her $Y_{i,j}$, tüm görüntü verildiğinde yalnızca
+söylememizi sağlar: her $y_{i,j}$, tüm görüntü verildiğinde yalnızca
 doğrudan komşularına bağlıdır. Bu yerel bağımsızlık özelliği,
 hesaplanamaz görünen küresel bir olasılık problemini yönetilebilir
 yerel bir probleme dönüştürür ve aşağıda türetilen gürültü giderme
@@ -50,7 +50,7 @@ rastgele değişkendir.
 
 $$P(Y | X) \propto P(X | Y)\, P(Y)$$
 
-Olurluk — gürültü piksel bazında bağımsızdır:
+Olurluk — gürültü piksel bazında bağımsızdır
 
 $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
@@ -71,26 +71,27 @@ P(Y | X) \propto \prod_{i,j} P(x_{i,j} | y_{i,j}) \cdot \prod_{i,j}
 P(y_{i,j} | \mathcal{N}(y_{i,j}))
 $$
 
-Gibbs sayesinde, tüm pikseller üzerindeki bu devasa birleşik
-dağılımdan tek seferde örnekleme yapmak yerine, her pikseli kendi
-yerel koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize tüm
-pikseller üzerindeki birleşik sonsalı aynı anda verir. Tek bir piksel
-$y_{i,j}$ için koşullu dağılımı elde etmek için $P(y_{i,j} \mid
+Gibbs örneklemesi sayesinde tüm pikseller üzerindeki bu devasa
+birleşik dağılımdan tek seferde örnekleme yapmak yerine, her pikseli
+kendi yerel koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize
+tüm pikseller üzerindeki birleşik sonsalı aynı anda verir.
+
+Tek bir piksel $y_{i,j}$ için koşullu dağılım $P(y_{i,j} \mid
 Y_{-(i,j)}, X)$'i, yani diğer her şey sabit tutulduğunda tek bir
 pikselin dağılımını hesaplamamız gerekir. Bunu, $y_{i,j}$'yi içermeyen
-tüm terimleri sabit olarak ele alarak yaparız.
-
-Çarpımları gözden geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler
-hangileri?" diye sorduğumuzda yalnızca ikisi hayatta kalır:
-olabilirlik çarpımından $P(x_{i,j} \mid y_{i,j})$ ve ön dağılım
-çarpımından $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$, tabii
-$y_{i,j}$'nin komşularına ait MRF terimleri de $y_{i,j}$'yi içerir,
-ancak Hammersley-Clifford teoremi kapsamında bunlar önsel dağılım
-teriminin kodladığı yerele indirgenir. Dolayısıyla $(k,l) \neq (i,j)$
-olan tüm $y_{k,l}$'leri sabitler, sabit olan her şeyi atarız ve geriye
-kalan $P(x_{i,j} \mid y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$
-ile orantılıdır. Bu odaklama adımı aslında diğer tüm pikselleri onlara
-koşullanarak dışarı marjinalleştirmektir — ki bu da Gibbs adımıdır.
+tüm terimleri sabit olarak ele alarak yaparız. Çarpımları gözden
+geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler hangileri?" diye
+sorduğumuzda yalnızca ikisi hayatta kalır: olabilirlik çarpımından
+$P(x_{i,j} \mid y_{i,j})$ ve on dağılım çarpımından $P(y_{i,j} \mid
+\mathcal{N}(y_{i,j}))$, tabii $y_{i,j}$'nin komşularına ait MRF
+terimleri de $y_{i,j}$'yi içerir, ancak Hammersley-Clifford teoremi
+kapsamında (ki yakın komşulara bağlılık uzak olanlarla eşdeğerdir der)
+bunlar önsel dağılım teriminin kodladığı yerele
+indirgenir. Dolayısıyla $(k,l) \neq (i,j)$ olan tüm $y_{k,l}$'leri
+sabitler, sabit olan her şeyi atarız ve geriye kalan $P(x_{i,j} \mid
+y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile orantılıdır. Bu
+odaklama adımı aslında diğer tüm pikselleri onlara koşullanarak dışarı
+marjinalleştirmektir — ki bu da Gibbs adımıdır.
 
 Artık tek bir piksel için şunu yazabiliriz:
 
@@ -129,9 +130,7 @@ atıldığı anlamına gelir. Tam ifade şöyledir:
 
 $$P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) = \frac{1}{Z} \exp(-E(y_{i,j}))$$
 
-$Z = \sum_{k=0}^{255} \exp(-E(k))$, bölme fonksiyonudur —
-olasılıkların toplamının 1 olmasını sağlamak üzere seçilmiştir, tüm 256
-olası piksel değeri üzerinden $\exp(-E)$'nin toplamıdır.
+$Z$ hakkında daha detaylı açıklama için belge sonuna danışılabilir.
 
 Enerji, birbiriyle rekabet eden iki terimden oluşur:
 
@@ -241,18 +240,23 @@ prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - possible_vals), axis=
 loss = lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)
 ```
 
-Yukarıdaki satırlar, her komşu $z$ ve her aday değer $k \in \{0, \ldots, 255\}$ için $|z - k|$'yı hesaplıyor. "Bu pikselin alabileceği 256 olası değerin her biri için, komşular bu değerden ne kadar uzakta?" sorusunu soran vektörleştirilmiş bir yoldur. Şekiller daha açık hale getirir:
+Yukarıdaki satırlar, her komşu $z$ ve her aday değer $k \in \{0,
+\ldots, 255\}$ için $|z - k|$'yı hesaplıyor. "Bu pikselin alabileceği
+256 olası değerin her biri için, komşular bu değerden ne kadar
+uzakta?" sorusunu soran vektörleştirilmiş bir yoldur. Boyutlar daha
+açık hale getirir:
 
-- `target_neighbors` şekli $(K, 8)$'dir — geçerli maskede $K$ piksel, her birinin 8 komşusu
+- `target_neighbors` boyutu $(K, 8)$'dir — geçerli maskede $K$ piksel, her birinin 8 komşusu
 - `[:, :, np.newaxis]` sonrasında $(K, 8, 1)$ olur
-- `possible_vals` şekli $(256,)$'dır, $(1, 1, 256)$'ya yayınlanır
-- sonuç $(K, 8, 256)$'dır — $K$ pikselin her biri için, 8 komşunun her biri için, 256 aday değerden mutlak fark
-- `np.sum(..., axis=1)` ise 8 komşu üzerinde toplar ve $(K, 256)$ şeklini verir
+- `possible_vals` boyutu $(256,)$'dir, $(1, 1, 256)$'ya "vektöre yayınlanır (broadcast)" 
+- sonuç $(K, 8, 256)$'dir — $K$ pikselin her biri için, 8 komşunun her biri için, 256 aday değerden mutlak fark
+- `np.sum(..., axis=1)` ise 8 komşu üzerinde toplar ve $(K, 256)$ boyutunu verir
 
-Dolayısıyla nihai `prior` dizisi, tüm $K$ piksel ve $k$'nın tüm 256
+Dolayısıyla nihai `prior` dizisi, tüm $K$ piksel ve $k$'nin tüm 256
 değeri için eşzamanlı olarak değerlendirilen $\sum_{z \in
-\mathcal{N}(y_{i,j})} |k - z|$'dir. Yayınlama, matematikte her aday
-$k$ için komşular üzerindeki toplam olarak yazacağınız işi yapıyor.
+\mathcal{N}(y_{i,j})} |k - z|$'dir. Vektörsel yayınlama,
+matematikte her aday $k$ için komşular üzerindeki toplam olarak
+yazacağınız işi yapıyor.
 
 Kümülatif Dağılım Fonksiyonu (CDF)
 
@@ -312,7 +316,7 @@ $x_{i,j}$ kanıtının sabit kaldığını garanti ederiz.
 
 Kod: İşte bu yüzden `for mask in masks:` vardır ve ardından binlerce
 piksel için aynı anda 256 olası gri düzeyin tümü için enerjiyi
-hesaplayan devasa bir NumPy yayını gelir.
+hesaplayan devasa bir NumPy vektörsel yayını gelir.
 
 MAP ile Tam Sonsal Çıkarım Karşılaştırması
 
@@ -351,13 +355,49 @@ oluyoruz, örnekleme sonsal dağılımı geziyor, fakat o zincirin
 ortalamasını almak yerine son varılan noktayı raporlayarak bir optimal
 tek nokta hesabı yapmış oluyoruz.
 
-Kod
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage import io
+Normalize Edici Sabit $Z$
 
-def vectorized_gibbs_l1(noisy_img, iterations=12, lam=1.0):
+$Z = \sum_{k=0}^{255} \exp(-E(k))$, bölme fonksiyonudur —
+olasılıkların toplamının 1 olmasını sağlamak üzere seçilmiştir, tüm
+256 olası piksel değeri üzerinden $\exp(-E)$'nin toplamıdır.
+
+Örnekleme kodu $Z$'yi hiçbir zaman açıkça hesaplamaz; `probs /=
+np.sum(probs, axis=1, keepdims=True)` satırı normalizasyonu analitik
+olarak değil, 256 aday değer üzerinden örtük biçimde
+gerçekleştirir. Başka bir deyişle, kod normalizasyonu yapar, yalnızca
+$Z = \sum_{k=0}^{255} \exp(-E(k))$'yı softmax benzeri adımın bir
+parçası olarak örtük biçimde hesaplar.
+
+Dolayısıyla $\propto$ ifadesi dağılımın formunu türetmek için
+yeterlidir, ancak $Z$ kodda olasılık normalizasyon adımının paydası
+kılığında belirir. Bu, özet tabloda doğrudan karşılık bulur:
+
+$$P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) =
+\frac{\exp(-E(k))}{\sum_{m=0}^{255} \exp(-E(m))}$$
+
+Bu payda $Z$'nin ta kendisidir; `probs /= np.sum(...)` bölme işlemi
+$Z$'yi yerel olarak hesaplar. `probs.shape`'e bakıldığında bizim örnek
+için `(12769, 256)` sonucu görüyoruz; buradaki 256, toplama işleminin
+gerçekleştirildiği 256 aday değere karşılık gelir.
+
+`(12769, 256)` dizisinin her satırı, bir pikselin 256 aday değer
+üzerindeki tam dağılımını temsil eder. `probs /= np.sum(probs, axis=1,
+keepdims=True)` işleminde `axis=1` boyunca, yani o 256 sütun üzerinden
+toplama yapılır; bu da maskedeki 12769 pikselin her biri için $Z =
+\sum_{k=0}^{255} \exp(-E(k))$'yı bağımsız olarak hesaplamak anlamına
+gelir. Böylece, piksel başına bir tane olmak üzere, 12769 ayrı
+bölümleme fonksiyonu tek bir vektörleştirilmiş adımda elde edilir.
+
+12769 sayısı bir doğruluk kontrolü işlevi görüyor aslında: görüntü $113
+\times 113 = 12769$ piksel boyutundaysa, her seferinde piksellerin
+yaklaşık dörtte biri dama tahtası maskelerinden birine düşer.
+
+Kod
+
+```python
+import numpy as np, skimage
+
+def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
     M, N = noisy_img.shape
     Y = noisy_img.copy().astype(np.float32)
     possible_vals = np.arange(256, dtype=np.float32)
@@ -387,11 +427,11 @@ def vectorized_gibbs_l1(noisy_img, iterations=12, lam=1.0):
             Y[mask] = np.argmax(cum_probs > random_vals, axis=1)
     return Y
 
-img_noisy = io.imread('../../func_analysis/func_70_tvd/lena-noise.jpg', as_gray=True)
+img_noisy = skimage.io.imread('../../func_analysis/func_70_tvd/lena-noise.jpg', as_gray=True)
 if img_noisy.max() <= 1.0:
     img_noisy = (img_noisy * 255).astype(np.uint8)
 
-denoised_img = vectorized_gibbs_l1(img_noisy, iterations=10, lam=2.5)
+denoised_img = denoise_mrf_gibbs(img_noisy, iterations=10, lam=2.5)
 
 fig, axes = plt.subplots(1, 2)
 axes[0].imshow(img_noisy, cmap='gray')
@@ -406,11 +446,7 @@ plt.savefig('lena1.jpg')
 
 ![](lena1.jpg)
 
-[devam edecek]
-
 Kaynaklar
 
 [1] Yue, <a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
          Markov Random Fields and Gibbs Sampling for Image Denoising</a>
-
-
