@@ -83,13 +83,13 @@ tüm terimleri sabit olarak ele alarak yaparız.
 Çarpımları gözden geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler
 hangileri?" diye sorduğumuzda yalnızca ikisi hayatta kalır:
 olabilirlik çarpımından $P(x_{i,j} \mid y_{i,j})$ ve ön dağılım
-çarpımından $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ($y_{i,j}$'nin
-komşularına ait MRF terimleri de $y_{i,j}$'yi içerir, ancak
-Hammersley-Clifford teoremi kapsamında bunlar önsel dağılım teriminin
-kodladığı yerele indirgenir). Dolayısıyla $(k,l) \neq (i,j)$ olan tüm
-$y_{k,l}$'leri sabitler, sabit olan her şeyi atarız ve geriye kalan
-$P(x_{i,j} \mid y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile
-orantılıdır. "Odaklanma" adımı aslında diğer tüm pikselleri onlara
+çarpımından $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$, tabii
+$y_{i,j}$'nin komşularına ait MRF terimleri de $y_{i,j}$'yi içerir,
+ancak Hammersley-Clifford teoremi kapsamında bunlar önsel dağılım
+teriminin kodladığı yerele indirgenir. Dolayısıyla $(k,l) \neq (i,j)$
+olan tüm $y_{k,l}$'leri sabitler, sabit olan her şeyi atarız ve geriye
+kalan $P(x_{i,j} \mid y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$
+ile orantılıdır. Bu odaklama adımı aslında diğer tüm pikselleri onlara
 koşullanarak dışarı marjinalleştirmektir — ki bu da Gibbs adımıdır.
 
 Artık tek bir piksel için şunu yazabiliriz:
