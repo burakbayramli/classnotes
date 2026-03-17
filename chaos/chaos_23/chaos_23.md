@@ -380,21 +380,22 @@ Sonsuz katmanların birleşmesi nasıl oluyor?
 
 Cevap
 
-Hayal etmesi zor değil mi? Bu konu hakkında Lorenz'in yazdıklarına bakmak
-iyi olabilir. Bir makalesinde [2] diyor ki ".. fakat bir çelişki gibi
-gözüken kavramın daha yakından incelenmesi kanımca iyi olur. Her ikisi de
-bir sarmal içeren iki yüzeyin birbirinin içine geçmesini bu teorilerde bir
-yere koymak zor çünkü iki gidiş yolunun birbirinin içine geçmesi mümkün
-değil''. Burada Rössler çekicisinden bahsetmiyor çünkü o daha keşfedilmedi,
-onun örneğinde garip çekicinin gözünde olan gidişatın sonra diğer sarmala
-geçmesi, sonra geri, vs. durumu var. Devam ediyor "ama birleşmiş {\em gibi
-  duran} yüzeyleri bir yere koymak, anlatmak zor değil''. Yani sorduğu bu
-birleşmişlik görüntüsü nerede geliyor?  Niye olduğunu açıklıyor, başlangıç
-şartları üzerinden bir hacim hesabı yapıyor, daha önce de gördük, Lorenz
-sisteminde hacimler üstel hızda küçülürler. Lorenz'in tanımladığı zaman
-adımları üzerinden 70 adımda sarmal etrafında bir tur atılıyor, bunun
-ardından hacim $7 x 10^{-5}$ kadar küçülmüş. Yani iki parçacık çok hızlı
-bir şekilde birleşebilirler.
+Hayal etmesi zor değil mi? Bu konu hakkında Lorenz'in yazdıklarına
+bakmak iyi olabilir. Bir makalesinde [2] diyor ki ".. fakat bir
+çelişki gibi gözüken kavramın daha yakından incelenmesi kanımca iyi
+olur. Her ikisi de bir sarmal içeren iki yüzeyin birbirinin içine
+geçmesini bu teorilerde bir yere koymak zor çünkü iki gidiş yolunun
+birbirinin içine geçmesi mümkün değil''. Burada Rössler çekicisinden
+bahsetmiyor çünkü o daha keşfedilmedi, onun örneğinde garip çekicinin
+gözünde olan gidişatın sonra diğer sarmala geçmesi, sonra geri,
+vs. durumu var. Devam ediyor "ama birleşmiş *gibi duran* yüzeyleri bir
+yere koymak, anlatmak zor değil''. Yani sorduğu bu birleşmişlik
+görüntüsü nerede geliyor?  Niye olduğunu açıklıyor, başlangıç şartları
+üzerinden bir hacim hesabı yapıyor, daha önce de gördük, Lorenz
+sisteminde hacimler üstel hızda küçülürler. Lorenz'in tanımladığı
+zaman adımları üzerinden 70 adımda sarmal etrafında bir tur atılıyor,
+bunun ardından hacim $7 x 10^{-5}$ kadar küçülmüş. Yani iki parçacık
+çok hızlı bir şekilde birleşebilirler.
 
 Ama benim favorim şimdi gelen bölüm. Diyor ki "iki yüzey sadece birleşiyormuş
 gibi gözüküyor, ama aslında ayrı duruyorlar. Bir gidiş yoluna paralel olarak bir

@@ -1341,11 +1341,12 @@ u(x,t) =  \frac{ 1}{2\sqrt{\pi kt}}
 \int_{-\infty}^{\infty} e^{-(x-y)^2 / 4kt} \phi(y) \mathrm{d} y
 $$
 
-$S(x,t)$ literatürde *kaynak fonksiyonu* (source function), {\em Green'in
-fonksiyonu}, *temel çözüm* (fundamental solution), *gaussian*, ya
-da *aktarıcı / yayıcı* (propagatör) ya da *yayılım* (diffusion) denklemi
-olarak bilinir. Ya da basitçe yayılım çekirdeği (diffusion kernel). Formül
-sadece $t>0$ için bir çözüm verir, $t=0$ için anlamsızdır. 
+$S(x,t)$ literatürde *kaynak fonksiyonu* (source function), *Green'in
+fonksiyonu*, *temel çözüm* (fundamental solution), *gaussian*, ya da
+*aktarıcı / yayıcı* (propagatör) ya da *yayılım* (diffusion) denklemi
+olarak bilinir. Ya da basitçe yayılım çekirdeği (diffusion
+kernel). Formül sadece $t>0$ için bir çözüm verir, $t=0$ için
+anlamsızdır.
 
 
 Analitik PDE - Ders 1

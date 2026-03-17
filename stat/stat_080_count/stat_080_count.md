@@ -586,8 +586,8 @@ Kaynaklar
 
 [1] Zwilling, *Negative Binomial Regression*, [http://www.mathematica-journal.com/2013/06/negative-binomial-regression](http://www.mathematica-journal.com/2013/06/negative-binomial-regression)
 
-[2] SAS, {\em Usage Note 24188: Modeling rates and estimating rates and rate
-  ratios (with confidence intervals)}, [http://support.sas.com/kb/24/188.html](http://support.sas.com/kb/24/188.html)
+[2] SAS, *Usage Note 24188: Modeling rates and estimating rates and rate
+  ratios (with confidence intervals)*, [http://support.sas.com/kb/24/188.html](http://support.sas.com/kb/24/188.html)
 
 [3] Gelman, Hill, *Data Analysis Using Regression and Multilevel/Hierarchical Models*
 

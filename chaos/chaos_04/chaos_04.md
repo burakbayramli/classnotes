@@ -424,8 +424,8 @@ uyumlanan ateş böceği, uyumlanan böcek kendi frekansında etkilendiğinde, {
 (b) figüründe $0 < \mu < 1$ için (a)'daki eğri yukarı çıkar, ve stabil ve
 gayrı-stabil sabit noktalar birbirine yaklaşır. Tüm gidiş yolları hala stabil
 bir noktaya doğru çekilirler, ama şimdi $\phi^\ast>0$. Faz farkı bir sabite
-yaklaştığı için bu duruma ateş böceği ritminin etkileyiciye {\em fazsal kitlenmiş
-  olduğu} adı verilir.
+yaklaştığı için bu duruma ateş böceği ritminin etkileyiciye *fazsal kitlenmiş
+olduğu* adı verilir.
 
 Faz kitlenmesi, etkileyen ve etkilenen böceğin aynı anlık frekansta
 flaşladığıdır, ama artık aynı *anda* flaşlamazlar. $\phi^\ast>0$ sonucu

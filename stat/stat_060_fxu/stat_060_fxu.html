@@ -130,9 +130,9 @@ değil. Çünkü eğer</p>
 <p>ise</p>
 <p><span class="math display">\[ X = F_X^{-1}(U) \]</span></p>
 <p>de doğrudur; O zaman birörnek dağılımdan örneklem alırız, bu örneklem
-içindeki sayıları teker teker üretmek istediğimiz dağılımın cdf’inin {}
-geçeriz, ve elimizdeki sonuçlar otomatik olarak hedeflediğimiz
-dağılımdan gelen sayılar olur!</p>
+içindeki sayıları teker teker üretmek istediğimiz dağılımın cdf’inin
+<em>tersine</em> geçeriz, ve elimizdeki sonuçlar otomatik olarak
+hedeflediğimiz dağılımdan gelen sayılar olur!</p>
 <p>Not: Tabii <span class="math inline">\(F^{-1}\)</span> hesabının
 yapılabilmesi için bu fonksiyonun bir analitik formu olması gerekir;
 bazı durumlarda bu mümkün olmayabilir. Mesela normal (gaussian)
@@ -450,6 +450,84 @@ chi kare 11.0704976935</code></pre>
 <p>Görüldüğü gibi Öğrenci t reddedildi, normal kabul edildi, üstel çok
 ciddi şekilde reddedildi. Öğrenci t dağılımı normal dağılıma çok benzer
 bu arada, buna rağmen arada büyük fark dikkate değer.</p>
+<p>Ayrıksal Durum</p>
+<p>Makalenin başında sürekli dağılımlar için <span
+class="math inline">\(X = F^{-1}(U)\)</span> formülünü gördük. Ancak
+bilgisayar biliminde ve görüntü işleme gibi alanlarda (örneğin
+piksellerde), dağılımlar genellikle süreksizdir (discrete). Bu durumda
+cdf tersini cebirsel olarak hesaplayamayız; onun yerine bir arama
+problemi çözeriz.</p>
+<p>Mantık şöyledir: Olasılık Kütle Fonksiyonu (pmf) birer basamak
+oluşturur. cdf ise bu basamakların birikerek yükseldiği bir “merdiven”
+gibidir.</p>
+<p>Örnek: 10 Hücreli Bir Dağılım</p>
+<p>Elimizde 10 farklı sonuç (0’dan 9’a kadar) ve bunların olasılıkları
+(pmf) olsun.</p>
+<ol type="1">
+<li><p>Biriktir (Integrate): Önce olasılıkları toplayarak cdf dizisini
+oluştururuz.</p></li>
+<li><p>Üret (Generate): <span class="math inline">\(U \sim
+\text{Unif}(0, 1)\)</span> olacak şekilde rastgele bir sayı
+seçeriz.</p></li>
+<li><p>Tersine Eşle (Invert): <span class="math inline">\(U\)</span>
+değerinden sağa doğru bir çizgi çektiğimizi hayal edelim. Bu çizginin
+“merdivene” çarptığı ilk basamak bizim örneklemimizdir. Matematiksel
+olarak: <span class="math display">\[k^* = \min
+\{ k : F(k) \geq U \}\]</span></p></li>
+</ol>
+<p>Kod Uygulaması: <code>argmax</code> Numarası</p>
+<p>NumPy kullanarak bu arama işlemini döngüye girmeden,
+vektörleştirilmiş bir şekilde yapabiliriz. Gürültü giderme (denoising)
+makalesinde kullanılan yöntem tam olarak budur:</p>
+<p>Örnek</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. PMF Tanımla ve CDF hesapla (Merdiveni inşa et)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>pmf <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>])</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>cdf <span class="op">=</span> np.cumsum(pmf)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Rastgele bir sayı üret (Yüksekliği belirle)</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> np.random.rand()  <span class="co"># Örn: 0.25</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Ters Dönüşüm (Merdivene çarpma anı)</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># cdf &gt; u işlemi bize [False, False, True, True, ...] gibi bir dizi verir.</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># np.argmax bu dizideki İLK &#39;True&#39; değerinin indeksini döndürür.</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>sample <span class="op">=</span> np.argmax(cdf <span class="op">&gt;</span> u)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Rastgele sayı: </span><span class="sc">{</span>u<span class="sc">:.2f}</span><span class="ss"> -&gt; Seçilen İndeks: </span><span class="sc">{</span>sample<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Rastgele sayı: 0.55 -&gt; Seçilen İndeks: 5</code></pre>
+<p>Neden <code>argmax</code>? Normalde <code>argmax</code> en büyük
+değeri bulur. Ancak Boolean (True/False) dizilerinde <code>True</code>
+değeri 1, <code>False</code> değeri 0 kabul edilir. NumPy’ın
+<code>argmax</code> fonksiyonu, karşılaştığı ilk<br />
+maksimum değeri (yani ilk <code>True</code>yu) döndürmeyi garanti eder.
+Bu da bizi matematiksel olarak aradığımız “şartı sağlayan en küçük
+indeks” değerine götürür.</p>
+<p>Örnek</p>
+<p>Bu örnekte bir ayrıksal dağılımın ayrıksal ters kumulatif fonsiyonunu
+kullanarak rasgele sayılar üreteceğiz, ve her iki dağılımın da histogram
+grafiğini yanyana göstereceğiz.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>pmf <span class="op">=</span> np.array([<span class="fl">0.1</span>, <span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>])</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> np.arange(<span class="bu">len</span>(pmf))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>cdf <span class="op">=</span> np.cumsum(pmf)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="dv">10000</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>u_vals <span class="op">=</span> np.random.rand(n_samples)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> np.argmax(cdf <span class="op">&gt;</span> u_vals[:, <span class="va">None</span>], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].bar(categories, pmf, color<span class="op">=</span><span class="st">&#39;skyblue&#39;</span>, edgecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Hedef Dagilim&#39;</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xticks(categories)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].hist(samples, bins<span class="op">=</span>np.arange(<span class="dv">11</span>)<span class="op">-</span><span class="fl">0.5</span>, density<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">&#39;salmon&#39;</span>, edgecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>, rwidth<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="ss">f&#39;Simule Edilen Dagilim (</span><span class="sc">{</span>n_samples<span class="sc">}</span><span class="ss"> Ornek)&#39;</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xticks(categories)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_fxu_03.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_fxu_03.jpg" /></p>
 <p>Kaynaklar</p>
 <p>[1] Goldsman, D., <em>ISyE 6644 - Simulation Lecture</em>, <a
 href="http://www2.isye.gatech.edu/~sman/courses/6644/">http://www2.isye.gatech.edu/~sman/courses/6644/</a></p>

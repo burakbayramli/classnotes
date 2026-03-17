@@ -54,11 +54,11 @@ Bu hesapların sayısal olarak yapılmasının detayları [5]'te bulunabilir.
 
 İvme, hızın vektörel kullanımı hakkında detaylar için [6].
 
-[6] Bayramlı, {\em Çok Boyutlu Calculus - Ders 6}
+[6] Bayramlı, *Çok Boyutlu Calculus - Ders 6*
 
-[3] Grewal, {\em Global navigation Satellite Systems, Inertial Navigation, and Integration, 3rd Edition}
+[3] Grewal, *Global navigation Satellite Systems, Inertial Navigation, and Integration, 3rd Edition*
 
-[5] Bayramlı, Hesapsal Bilim, {\em Sayısal Fonksiyonları Sayısal Entegre Etmek}
+[5] Bayramlı, Hesapsal Bilim, *Sayısal Fonksiyonları Sayısal Entegre Etmek*
 
 
 

@@ -781,8 +781,8 @@ Kodlar [dhmm.py](dhmm.py).
 
 Kaynaklar 
 
-[1] Rabiner, {\em A Tutorial on Hidden Markov Models and Selected Applications in Speech
-Recoognition}
+[1] Rabiner, *A Tutorial on Hidden Markov Models and Selected Applications in Speech
+Recoognition*
 
 [2] Shalizi, *Statistics, Chaos, Complexity and Inference Lecture*
 

@@ -922,6 +922,6 @@ Kaynaklar
 [4] Feng, *Lasso*, 
     [https://github.com/fengcls/Lasso](https://github.com/fengcls/Lasso)
 
-[5] Bayramlı, {\em Istatistik, Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek
+[5] Bayramlı, *Istatistik, Regresyon, Ridge, Lasso, Çapraz Sağlama, Regülarize Etmek*
 
 

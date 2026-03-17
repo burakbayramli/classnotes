@@ -474,17 +474,16 @@ Bu küreyi kullanarak küre dışındaki herhangi bir nokta $q$'nun küredeki
 
 $$ |x-y| \le |x-z| + |z-y| $$
 
-Operatör $|
-|$ norm anlamına gelir ve uzaklık hesabının
-genelleştirilmiş halidir. Konu hakkında daha fazla detay {\em Fonksiyonel
-  Analiz} ders notlarında. Kısaca söylenmek istenen iki nokta arasında
-direk gitmek yerine yolu uzatırsak, mesafenin artacağıdır. Tabii uzaklık,
-yol, nokta gibi kavramlar tamamen soyut matematiksel ortamda da işleyecek
-şekilde ayarlanmıştır. Mesela mesafe (norm) kavramını değiştirebiliriz,
-Öklitsel yerine Manhattan mesafesi kullanırız (blok mesafesi, binalar
-etrafından dolaşılıyor, direk gidiş yok), fakat bu kavram bir norm olduğu
-ve belirttiğimiz uzayda geçerli olduğu için üçgensel eşitsizlik üzerine
-kurulmuş tüm diğer kurallar geçerli olur.
+Operatör $| |$ norm anlamına gelir ve uzaklık hesabının
+genelleştirilmiş halidir. Konu hakkında daha fazla detay *Fonksiyonel
+Analiz* ders notlarında. Kısaca söylenmek istenen iki nokta arasında
+direk gitmek yerine yolu uzatırsak, mesafenin artacağıdır. Tabii
+uzaklık, yol, nokta gibi kavramlar tamamen soyut matematiksel ortamda
+da işleyecek şekilde ayarlanmıştır. Mesela mesafe (norm) kavramını
+değiştirebiliriz, Öklitsel yerine Manhattan mesafesi kullanırız (blok
+mesafesi, binalar etrafından dolaşılıyor, direk gidiş yok), fakat bu
+kavram bir norm olduğu ve belirttiğimiz uzayda geçerli olduğu için
+üçgensel eşitsizlik üzerine kurulmuş tüm diğer kurallar geçerli olur.
 
 ![](tri1.jpg)
 
@@ -960,8 +959,8 @@ form_tree(points,tree,points)
 
 Kaynaklar
 
-[1] Liu, Moore, Gray, {\em New Algorithms for Efficient High Dimensional
-  Non-parametric Classification}
+[1] Liu, Moore, Gray,
+    *New Algorithms for Efficient High Dimensional Non-parametric Classification*
 
 [2] Alpaydın, *Introduction to Machine Learning*
 

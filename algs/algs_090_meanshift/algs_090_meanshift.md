@@ -71,7 +71,7 @@ olarak buluyor (gerçek küme sayısı 20, bkz [7]  yazısı).
 
 Alternatif bir kod `meanshift_alternatıve.py` dosyasında
 bulunabilir, bu kod pencereler kaydırırken onların üzerinden geçtiği
-noktaları "sahiplenen" türden bir kod. Yani [encere hareketini
+noktaları "sahiplenen" türden bir kod. Yani pencere hareketini
 durdurduğunda hem küme merkezini hem de o kümenin altındaki noktaları
 bulmuş oluyoruz.  Tabii sonraki pencereler bazı noktaları önceki
 kümelerden çalabilirler. Neyse, işlemin normal işleyişine göre bir
@@ -216,7 +216,3 @@ Kaynaklar
 [6] Gingold, [http://yotamgingold.com/code/MeanShiftCluster.py](http://yotamgingold.com/code/MeanShiftCluster.py)
 
 [7] Bayramlı, Istatistik, *GMM ile Kümelemek*
-
-
-
-

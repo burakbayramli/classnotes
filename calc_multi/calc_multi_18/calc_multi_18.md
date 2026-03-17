@@ -445,8 +445,9 @@ sayesinde yerine geçirme işlemi çok kolaylaştı, ve sonuca ulaştık.
 
 Kaynaklar
 
-[1] Christine Breiner, {\em Integral of $exp(-x^2)$ | MIT 18.02SC Multivariable
-  Calculus, Fall 2010}, [http://www.youtube.com/watch?v=fWOGfzC3IeY](http://www.youtube.com/watch?v=fWOGfzC3IeY)
+[1] Christine Breiner,
+    *Integral of $exp(-x^2)$ | MIT 18.02SC Multivariable Calculus, Fall 2010*,
+    [http://www.youtube.com/watch?v=fWOGfzC3IeY](http://www.youtube.com/watch?v=fWOGfzC3IeY)
 
 
 

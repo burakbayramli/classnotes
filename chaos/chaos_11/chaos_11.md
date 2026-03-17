@@ -638,8 +638,8 @@ sağlıyor.
 
 Kaynaklar
 
-[1] Guckenheimer, Holmes , {\em Nonlinear Oscillations, Dynamical Systems, and
-Bifurcations of Vector Fields}, 1983
+[1] Guckenheimer, Holmes, 
+    *Nonlinear Oscillations, Dynamical Systems, and Bifurcations of Vector Fields*, 1983
 
 
 

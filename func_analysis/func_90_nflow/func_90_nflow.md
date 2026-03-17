@@ -619,11 +619,12 @@ $$
 \end{array}\right]
 $$
 
-olurdu, tabii ki $b = [1,1,-1,-1]$. Üstteki matriste kalıp belli oluyor
-herhalde, satırların müşteri kısmında her ürün başına tamamen birler var,
-ürünler kısmında blok blok yanyana birim matrisleri.. Üstteki matrisi
-ötomatik olarak yaratmak mümkün. Hatta şimdi {\em Lineer Programlar,
- Örnekler} yazısındaki problemi ağ mantığı çözelim, 
+olurdu, tabii ki $b = [1,1,-1,-1]$. Üstteki matriste kalıp belli
+oluyor herhalde, satırların müşteri kısmında her ürün başına tamamen
+birler var, ürünler kısmında blok blok yanyana birim
+matrisleri.. Üstteki matrisi ötomatik olarak yaratmak mümkün. Hatta
+şimdi *Lineer Programlar, Örnekler* yazısındaki problemi ağ mantığı
+çözelim,
 
 ```python
 C = [[17,10,12],[9,8,10], [14,4,7]]

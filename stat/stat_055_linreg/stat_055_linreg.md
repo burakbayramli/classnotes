@@ -704,8 +704,8 @@ Model oldukça basit, 3 değişken ile tahmin yapılıyor, fakat bu basitlik ald
 olabilir. Modele neyin dahil edildiği yanında neyin dahil edilmediği de
 önemlidir, mesela.. ham petrol fiyatı, işsizlik, seçim yılındaki suç oranı,
 iklim vs kullanılmamış, sadece bu 3 değişken kullanılmış. Ya da model,
-Cumhuriyetçiler için ayrı, Demokratlar için ayrı bir tahmin üretmiyor, {\em o an
-  başta hangi parti varsa} onun başarısını tahmin etmeye uğraşıyor. Yani bir
+Cumhuriyetçiler için ayrı, Demokratlar için ayrı bir tahmin üretmiyor, *o an
+başta hangi parti varsa* onun başarısını tahmin etmeye uğraşıyor. Yani bir
 bakıma iddiası şu, insanlar aslında başta olan partiye göre oy verirler, bir
 süre sonra (2 dönem ardından) onu değiştirmeye meyilli olurlar, ve o anda başta
 olan başkanın popülaritesi ve genel bir ekonomik performansını kullanarak onun
@@ -762,8 +762,8 @@ Kaynaklar
 
 [2] The Yhat Blog ,*Fitting \& Interpreting Linear Models in R*, [http://blog.yhathq.com/posts/r-lm-summary.html](http://blog.yhathq.com/posts/r-lm-summary.html)
 
-[3] Abramowitz, {\em Fasten Your Seat Belts: Polarization, Weak Economy Forecast
-Very Close Election}, [http://www.centerforpolitics.org/crystalball/articles/abramowitzpolarizationmodel/](http://www.centerforpolitics.org/crystalball/articles/abramowitzpolarizationmodel/)
+[3] Abramowitz, *Fasten Your Seat Belts: Polarization, Weak Economy Forecast
+    Very Close Election*, [http://www.centerforpolitics.org/crystalball/articles/abramowitzpolarizationmodel/](http://www.centerforpolitics.org/crystalball/articles/abramowitzpolarizationmodel/)
 
 [4] Gelman, A., *Bayesian Data Analysis*
 

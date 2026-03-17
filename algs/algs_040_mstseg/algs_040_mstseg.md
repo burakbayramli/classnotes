@@ -403,13 +403,12 @@ cluster 95
 
 Kaynaklar
 
-[1] Pedro F. Felzenszwalb and Daniel P. Huttenlocher, {\em Efficient
-  Graph-Based Image Segmentation}, [http://cs.brown.edu/~pff/segment/](http://cs.brown.edu/~pff/segment/)
+[1] Pedro F. Felzenszwalb and Daniel P. Huttenlocher,
+    *Efficient Graph-Based Image Segmentation*, [http://cs.brown.edu/~pff/segment/](http://cs.brown.edu/~pff/segment/)
 
 [2] Github, [https://github.com/burakbayramli/kod/felzenszwalb](https://github.com/burakbayramli/kod/felzenszwalb)
 
-[3] Mihai-Cotizo Sima, {\em An extension of Felzenszwalb-Huttenlocher
-  segmentation to 3D point clouds}, 2012
+[3] Mihai-Cotizo Sima, *An extension of Felzenszwalb-Huttenlocher segmentation to 3D point clouds*, 2012
 
 [4] Bayramlı, Lineer Cebir, *SVD ile Kümeleme*
 

@@ -530,6 +530,6 @@ z
 
 Kaynaklar
 
-[1] Gullickson, {\em Sociology G4075: Introduction to Social Data Analysis
-  II}, [https://web.archive.org/web/20160312151715/http://pages.uoregon.edu/aarong/teaching/G4075_Outline/node13.html](https://web.archive.org/web/20160312151715/http://pages.uoregon.edu/aarong/teaching/G4075_Outline/node13.html)
+[1] Gullickson, *Sociology G4075: Introduction to Social Data Analysis II*,
+    [https://web.archive.org/web/20160312151715/http://pages.uoregon.edu/aarong/teaching/G4075_Outline/node13.html](https://web.archive.org/web/20160312151715/http://pages.uoregon.edu/aarong/teaching/G4075_Outline/node13.html)
 

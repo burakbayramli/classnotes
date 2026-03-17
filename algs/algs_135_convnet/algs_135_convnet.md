@@ -552,19 +552,20 @@ noktalardan birini bulduğunda iş bitmiş sayılabiliyor. Ayrıca çok boyut
 olunca yerel minima'da takılıp kalmadan bir yan boyuta atlayıp önümüzdeki
 tepenin etrafından dolaşabilme şansı ortaya çıkıyor [4].
 
-Ek bir gelişme herhangi bir yazılım fonksiyonun türevinin alınabilmesini
-sağlayan otomatik türev alma (automatic differentiation) tekniğinin
-yaygınlaşması, ki bu teknik çetrefil nöron fonksiyonları içerebilen
-convnet'ler için faydalı oldu. Not: dikkat otomatik türev ile {\em her
-  türlü} fonksiyon hatta `if, while` komutları içeren bir kod
-parçasının bile türevi alınabiliyor (bkz [2] yazısı). Türevler önemli çünkü
-gradyan inişi minimuma gidebilmek için türev kullanmalı. Üstteki kodda
-dikkat çekmiş olabilir, sinir ağında aslında yaptığımız tek hesap ileri
-doğru beslemeli (feed-forward) olan hesap; her veri noktası için ağın
-başından başlayarak girdi / işlem / sonuçları ardı ardına bir sonraki
-katmana aktarıyoruz, otomatik türev pek çok katmanlı bu işlemlerin türevini
-alarak bize o gidişin yaptığı tahminlerin hatasını düzeltmek için gidilmesi
-gereken gradyan yönünü veriyor.
+Ek bir gelişme herhangi bir yazılım fonksiyonun türevinin
+alınabilmesini sağlayan otomatik türev alma (automatic
+differentiation) tekniğinin yaygınlaşması, ki bu teknik çetrefil nöron
+fonksiyonları içerebilen convnet'ler için faydalı oldu. Not: dikkat
+otomatik türev ile *her türlü* fonksiyon hatta `if, while` komutları
+içeren bir kod parçasının bile türevi alınabiliyor (bkz [2]
+yazısı). Türevler önemli çünkü gradyan inişi minimuma gidebilmek için
+türev kullanmalı. Üstteki kodda dikkat çekmiş olabilir, sinir ağında
+aslında yaptığımız tek hesap ileri doğru beslemeli (feed-forward) olan
+hesap; her veri noktası için ağın başından başlayarak girdi / işlem /
+sonuçları ardı ardına bir sonraki katmana aktarıyoruz, otomatik türev
+pek çok katmanlı bu işlemlerin türevini alarak bize o gidişin yaptığı
+tahminlerin hatasını düzeltmek için gidilmesi gereken gradyan yönünü
+veriyor.
 
 Bazı negatifler: Convnet'lerin eğitimi hızlı değildir, ciddi kullanımlar
 için GPU, ya da paralel CPU kullanmak şart. Ayrıca convnet'lerin bir fark

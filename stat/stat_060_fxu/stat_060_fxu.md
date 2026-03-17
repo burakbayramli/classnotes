@@ -54,9 +54,9 @@ ise
 $$ X = F_X^{-1}(U) $$
 
 de doğrudur; O zaman birörnek dağılımdan örneklem alırız, bu örneklem
-içindeki sayıları teker teker üretmek istediğimiz dağılımın cdf'inin {\em
-  tersine} geçeriz, ve elimizdeki sonuçlar otomatik olarak hedeflediğimiz
-dağılımdan gelen sayılar olur!
+içindeki sayıları teker teker üretmek istediğimiz dağılımın cdf'inin
+*tersine* geçeriz, ve elimizdeki sonuçlar otomatik olarak
+hedeflediğimiz dağılımdan gelen sayılar olur!
 
 Not: Tabii $F^{-1}$ hesabının yapılabilmesi için bu fonksiyonun bir
 analitik formu olması gerekir; bazı durumlarda bu mümkün
@@ -401,6 +401,99 @@ chi kare 11.0704976935
 Görüldüğü gibi Öğrenci t reddedildi, normal kabul edildi, üstel çok ciddi
 şekilde reddedildi. Öğrenci t dağılımı normal dağılıma çok benzer bu arada,
 buna rağmen arada büyük fark dikkate değer.
+
+Ayrıksal Durum
+
+
+Makalenin başında sürekli dağılımlar için $X = F^{-1}(U)$ formülünü
+gördük. Ancak bilgisayar biliminde ve görüntü işleme gibi alanlarda
+(örneğin piksellerde), dağılımlar genellikle süreksizdir
+(discrete). Bu durumda cdf tersini cebirsel olarak hesaplayamayız;
+onun yerine bir arama problemi çözeriz.
+
+Mantık şöyledir: Olasılık Kütle Fonksiyonu (pmf) birer basamak
+oluşturur. cdf ise bu basamakların birikerek yükseldiği bir "merdiven"
+gibidir.
+
+Örnek: 10 Hücreli Bir Dağılım
+
+Elimizde 10 farklı sonuç (0'dan 9'a kadar) ve bunların olasılıkları
+(pmf) olsun.
+
+1.  Biriktir (Integrate): Önce olasılıkları toplayarak cdf dizisini oluştururuz.
+
+2.  Üret (Generate): $U \sim \text{Unif}(0, 1)$ olacak şekilde rastgele bir sayı seçeriz.
+
+3.  Tersine Eşle (Invert): $U$ değerinden sağa doğru bir çizgi
+    çektiğimizi hayal edelim. Bu çizginin "merdivene" çarptığı ilk
+    basamak bizim örneklemimizdir. Matematiksel olarak: $$k^* = \min
+    \{ k : F(k) \geq U \}$$
+
+Kod Uygulaması: `argmax` Numarası
+
+NumPy kullanarak bu arama işlemini döngüye girmeden, vektörleştirilmiş
+bir şekilde yapabiliriz. Gürültü giderme (denoising) makalesinde
+kullanılan yöntem tam olarak budur:
+
+Örnek
+
+```python
+import numpy as np
+
+# 1. PMF Tanımla ve CDF hesapla (Merdiveni inşa et)
+pmf = np.array([0.1, 0.05, 0.2, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
+cdf = np.cumsum(pmf)
+
+# 2. Rastgele bir sayı üret (Yüksekliği belirle)
+u = np.random.rand()  # Örn: 0.25
+
+# 3. Ters Dönüşüm (Merdivene çarpma anı)
+# cdf > u işlemi bize [False, False, True, True, ...] gibi bir dizi verir.
+# np.argmax bu dizideki İLK 'True' değerinin indeksini döndürür.
+sample = np.argmax(cdf > u)
+
+print(f"Rastgele sayı: {u:.2f} -> Seçilen İndeks: {sample}")
+```
+
+```text
+Rastgele sayı: 0.55 -> Seçilen İndeks: 5
+```
+
+Neden `argmax`? Normalde `argmax` en büyük değeri bulur. Ancak
+Boolean (True/False) dizilerinde `True` değeri 1, `False` değeri 0
+kabul edilir. NumPy'ın `argmax` fonksiyonu, karşılaştığı ilk    
+maksimum değeri (yani ilk `True`yu) döndürmeyi garanti eder. Bu da
+bizi matematiksel olarak aradığımız "şartı sağlayan en küçük indeks"
+değerine götürür.
+
+Örnek
+
+Bu örnekte bir ayrıksal dağılımın ayrıksal ters kumulatif fonsiyonunu
+kullanarak rasgele sayılar üreteceğiz, ve her iki dağılımın da
+histogram grafiğini yanyana göstereceğiz.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+pmf = np.array([0.1, 0.05, 0.2, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
+categories = np.arange(len(pmf))
+cdf = np.cumsum(pmf)
+n_samples = 10000
+u_vals = np.random.rand(n_samples)
+samples = np.argmax(cdf > u_vals[:, None], axis=1)
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+axes[0].bar(categories, pmf, color='skyblue', edgecolor='black')
+axes[0].set_title('Hedef Dagilim')
+axes[0].set_xticks(categories)
+axes[1].hist(samples, bins=np.arange(11)-0.5, density=True, color='salmon', edgecolor='black', rwidth=0.8)
+axes[1].set_title(f'Simule Edilen Dagilim ({n_samples} Ornek)')
+axes[1].set_xticks(categories)
+plt.tight_layout()
+plt.savefig('stat_fxu_03.jpg')
+```
+
+![](stat_fxu_03.jpg)
 
 Kaynaklar
 

@@ -252,17 +252,18 @@ Fakat işimiz bitti mi? Hayır. Şimdi KMeans bu tür veriyle acaba düzgün
 veri satırları arasında uzaklık hesabı yapmak ise yarar mı?
 
 Yapay Öğrenim literatüründe bu tür veriler üzerinde kosinüs benzerliği
-(cosine similarity) kullanmak daha yaygındır. Bu konuyu {\em SVD, Toplu
-  Tavsiye} yazısında daha iyi görülebilir. Kosinüs benzerliği bize 0 ile 1
-arasında bir değer döndürür. Benzerliği uzaklığa çevirmek için basit bir
-şekilde 1-benzerlik formülünü kullanabiliriz. O zaman şöyle bir çözüm
-kullanabilir: normal sayısal değerler için Öklitsel, kategorik 1-hot
-kodlanmış kolonlar için Kosinüs uzaklığı kullanılır, bu uzaklıklar bazı
-ağırlıklar üzerinden birleştirilir, ve KMeans bu uzaklık ile iş
-yapar. Teknik olarak imkansız değil; KMeans merkez bulmak için ortalama
-alır ve Kosinüs uzaklığının verdiği aradaki açı, ortalama alma işlemi ile
-uyumludur. Yani içinde hem Öklitsel hem 1-hot kodlanmış verilerin olduğu
-vektörlerin ortalamasını alabiliriz, demek ki KMeans işleyebilir.
+(cosine similarity) kullanmak daha yaygındır. Bu konuyu *SVD, Toplu
+Tavsiye* yazısında daha iyi görülebilir. Kosinüs benzerliği bize 0 ile
+1 arasında bir değer döndürür. Benzerliği uzaklığa çevirmek için basit
+bir şekilde 1-benzerlik formülünü kullanabiliriz. O zaman şöyle bir
+çözüm kullanabilir: normal sayısal değerler için Öklitsel, kategorik
+1-hot kodlanmış kolonlar için Kosinüs uzaklığı kullanılır, bu
+uzaklıklar bazı ağırlıklar üzerinden birleştirilir, ve KMeans bu
+uzaklık ile iş yapar. Teknik olarak imkansız değil; KMeans merkez
+bulmak için ortalama alır ve Kosinüs uzaklığının verdiği aradaki açı,
+ortalama alma işlemi ile uyumludur. Yani içinde hem Öklitsel hem 1-hot
+kodlanmış verilerin olduğu vektörlerin ortalamasını alabiliriz, demek
+ki KMeans işleyebilir.
 
 ![](kmeans_5.jpg)
 
@@ -354,10 +355,10 @@ print (float(match)/len(df), 1-float(match)/len(df))
 ```
 
 Başarı yüzde \%78. Çok iyi. Üstteki örnek küme sayısının (dikkat SVD
-$k$'sinden farklı) bilindiğini farz etti. Bazı durumlarda küme sayısını
-grafiksel olarak görmek mümkündür (ama en iyisi Gaussian Karışım Modeli
-kullanıp mümkün K'leri AIC ile test etmek, bkz {\em İstatistik, GMM ile
-  Kümelemek} yazısı). 
+$k$'sinden farklı) bilindiğini farz etti. Bazı durumlarda küme
+sayısını grafiksel olarak görmek mümkündür (ama en iyisi Gaussian
+Karışım Modeli kullanıp mümkün K'leri AIC ile test etmek, bkz
+*İstatistik, GMM ile Kümelemek* yazısı).
 
 Mesela üstteki veri seti için ortalamayı çıkartıp varyansa bölersek ve SVD
 işletirsek en büyük iki $U$ kolonun grafiği alttaki gibi çıkıyor,

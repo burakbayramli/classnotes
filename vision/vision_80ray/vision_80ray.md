@@ -38,8 +38,8 @@ Problem öyle ki bu piksellerin yolu temsil eden pikseller olduğunu
 biliyorum. Bu bilgiyi nasıl elde ettim? Renksel bazlı, ya da iki boyutta
 imajı parçalara bölmeyi çok iyi yapan bir algoritmam var belki, vs. ve bu
 sayede o piksellerin caddeye ait oldugunu biliyorum. O zaman, bu bilgi elde
-varsa, bu bana bir şey kazandırdı: üç boyutta bu piksellerin {\em hangi
-  düzlemden} geldiğini biliyorum artık. Bu düzlem $xy$ düzlemidir, orada
+varsa, bu bana bir şey kazandırdı: üç boyutta bu piksellerin *hangi
+düzlemden* geldiğini biliyorum artık. Bu düzlem $xy$ düzlemidir, orada
 $z=0$.
 
 Bir numara daha: bir piksele bakarak onun kesin üç boyutlu yerini

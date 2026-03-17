@@ -502,8 +502,9 @@ Kaynaklar
 
 [3] Gutman, *Technion, Linear Systems Lecture*, [http://leo.technion.ac.il/Courses/LS/](http://leo.technion.ac.il/Courses/LS/)
 
-[4] Suhm, {\em LQR Control Tutorial For An Inverted Pendulum With Octave /
-  Matlab}, [https://www.youtube.com/watch?v=KqdP0DVZ-lQ](https://www.youtube.com/watch?v=KqdP0DVZ-lQ)
+[4] Suhm,
+    *LQR Control Tutorial For An Inverted Pendulum With Octave / Matlab*,
+    [https://www.youtube.com/watch?v=KqdP0DVZ-lQ](https://www.youtube.com/watch?v=KqdP0DVZ-lQ)
 
 [5] Bayramlı, *Animasyon*, [https://github.com/burakbayramli/classnotes/blob/master/phy/phy_050_cont5/frames1/cart.gif](https://github.com/burakbayramli/classnotes/blob/master/phy/phy_050_cont5/frames1/cart.gif)
 

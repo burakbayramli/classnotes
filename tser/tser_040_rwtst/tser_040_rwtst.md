@@ -472,6 +472,5 @@ Kaynaklar
 
 [4] Verbeek, *A Guide to Modern Econometrics*
 
-[5] Dickey D., Fuller W., {\em Likelihood Ratio Statistics for Autoregressive
-Time Series with Unit Root}, 1981
+[5] Dickey D., Fuller W., *Likelihood Ratio Statistics for Autoregressive Time Series with Unit Root*, 1981
 

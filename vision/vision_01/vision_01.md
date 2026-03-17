@@ -1,7 +1,7 @@
 # Ders 1
 
-Ders kitabımız Ma, Soatto, Kosecka, ve Sastry'nin {\em An Invitation to 3-D
-  Vision} kitabıdır. Videolar [1] adresinde. Dersin ana odağı kameradan
+Ders kitabımız Ma, Soatto, Kosecka, ve Sastry'nin *An Invitation to 3-D
+Vision* kitabıdır. Videolar [1] adresinde. Dersin ana odağı kameradan
 gelen iki boyuttaki görüntüleri birleştirerek o görüntülerin geldiği
 dünyanın 3 boyutlu modelini oluşturmak. 
 

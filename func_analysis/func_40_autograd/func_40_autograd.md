@@ -100,14 +100,15 @@ fonksiyon $f$ iki kez türevi alınabilir haldeyse $x^\ast$'in yerel minimum
 olduğunu ispatlamak daha kolaylaşır, $\nabla f(x^\ast)$ ve Hessian $\nabla^2
 f(x^\ast)$'e bakarak bunu yapabiliriz.
 
-Minimallik için 1. ve 2. derece şartlar var. 1. derece gerekli şart (ama
-yeterli değil) $\nabla f = 0$ olması. Bu standard Calculus'tan bildiğimiz
-bir şey, minimum ya da maksimumda birinci türev sıfırdır. Ama türevin sıfır
-olup minimum ya da maksimum olmadığı durum da olabilir, mesela
-$f(x) = x^3$. $f'(0) = 0$'dir fakat $x=0$ ne maksimum ne de
-minimumdur. Daha iyi bir termioloji $\nabla f = 0$ noktalarını {\em kritik
-  nokta} olarak tanımlamaktır. $x=0$ noktasında bir değişim oluyor, bu
-değişim kritik bir değişim, her ne kadar minimum ya da maksimum olmasa da.
+Minimallik için 1. ve 2. derece şartlar var. 1. derece gerekli şart
+(ama yeterli değil) $\nabla f = 0$ olması. Bu standard Calculus'tan
+bildiğimiz bir şey, minimum ya da maksimumda birinci türev
+sıfırdır. Ama türevin sıfır olup minimum ya da maksimum olmadığı durum
+da olabilir, mesela $f(x) = x^3$. $f'(0) = 0$'dir fakat $x=0$ ne
+maksimum ne de minimumdur. Daha iyi bir termioloji $\nabla f = 0$
+noktalarını *kritik nokta* olarak tanımlamaktır. $x=0$ noktasında bir
+değişim oluyor, bu değişim kritik bir değişim, her ne kadar minimum ya
+da maksimum olmasa da.
 
 ```python
 x = np.linspace(-3,3,100)

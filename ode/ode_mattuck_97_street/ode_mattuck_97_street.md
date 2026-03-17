@@ -64,8 +64,9 @@ Kaynaklar
 
 [2] Mahajan, *Street Fighting Mathematics*
 
-[3] Stack Exchange, {\em Mental Math: Finding Square Roots to 1 Decimal
-  Point}, [http://math.stackexchange.com/a/469440/6786](http://math.stackexchange.com/a/469440/6786)
+[3] Stack Exchange,
+    *Mental Math: Finding Square Roots to 1 Decimal Point*,
+    [http://math.stackexchange.com/a/469440/6786](http://math.stackexchange.com/a/469440/6786)
 
 
 

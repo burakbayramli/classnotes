@@ -201,8 +201,8 @@ kombinasyonlarını kullanarak bir alt uzayı yaratabiliriz.
 
 Tanım
 
-Diyelim ki $S$ vektör uzayı $X$'in bir alt kümesi. {\em S tarafından
-  üretilen alt uzay} yani $[S]$, $S$'teki elemanların lineer
-kombinasyonu olan $X$'teki vektörlerden oluşur. 
+Diyelim ki $S$ vektör uzayı $X$'in bir alt kümesi. *S tarafından
+üretilen alt uzay* yani $[S]$, $S$'teki elemanların lineer
+kombinasyonu olan $X$'teki vektörlerden oluşur.
 
 

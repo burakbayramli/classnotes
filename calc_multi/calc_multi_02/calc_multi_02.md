@@ -555,8 +555,8 @@ $$
 
 Kaynaklar
 
-[1] Anton, Rorres, {\em Elementary Linear Algebra with Applications, 9th 
-Edition}
+[1] Anton, Rorres,
+    *Elementary Linear Algebra with Applications, 9th Edition*
 
 [2] Michael Corral, *Vector Calculus, sf. 21*
 

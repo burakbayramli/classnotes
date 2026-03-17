@@ -584,9 +584,9 @@ Kaynaklar
 
 [1] Stack Exchange, *Expected Utility Method and a Repeated Game Solution*, [http://math.stackexchange.com/questions/1366279/expected-utility-method-and-a-repeated-game-solution](http://math.stackexchange.com/questions/1366279/expected-utility-method-and-a-repeated-game-solution)
 
-[2] Bueno De Mesquita BB (1994) {\em Political forecasting: an expected utility
-method}. In: Stockman F (ed.) *European Community Decision Making*. Yale, CT:
-Yale University Press, Chapter 4, 71-104.
+[2] Bueno De Mesquita BB (1994)
+    *Political forecasting: an expected utility method*.
+    In: Stockman F (ed.) *European Community Decision Making*. Yale, CT: Yale University Press, Chapter 4, 71-104.
 
 [3] Scholz, *Unravelling Bueno De Mesquita's group decision model*,
 [https://oficiodesociologo.files.wordpress.com/2012/03/scholz-et-all-unravelling-bueno-de-mesquita-s-group-decision-model.pdf](https://oficiodesociologo.files.wordpress.com/2012/03/scholz-et-all-unravelling-bueno-de-mesquita-s-group-decision-model.pdf)

@@ -120,11 +120,12 @@ değerinden daha büyük herhangi bir $N$ de kullanabiliriz. Yani üstteki
 tanım bize herhangi bir $N$ bulmamızı söyler, illa ki "en küçük'' $N$'i
 bulmamız gerekmez. 
 
-Tanım bunu söylemiyor olsa bile ibarenin asıl gücü $N$'nin {\em $\epsilon$
-  ne kadar küçük olursa olsun bulunabiliyor olmasıdır}. Eğer $\epsilon$
-büyük bir sayı ise $N$'i bulmak kolay olur. Eğer $\epsilon = 0.1$ için (ki
-bu sayı $\epsilon$ türü sayılar için büyük sayılır) işleyen bir $N$
-bulursak, aynı $N$ daha büyük  $\epsilon$ değerleri için de işleyecektir. 
+Tanım bunu söylemiyor olsa bile ibarenin asıl gücü $N$'nin *$\epsilon$
+ne kadar küçük olursa olsun bulunabiliyor olmasıdır*. Eğer $\epsilon$
+büyük bir sayı ise $N$'i bulmak kolay olur. Eğer $\epsilon = 0.1$ için
+(ki bu sayı $\epsilon$ türü sayılar için büyük sayılır) işleyen bir
+$N$ bulursak, aynı $N$ daha büyük $\epsilon$ değerleri için de
+işleyecektir.
 
 Örnek 
 

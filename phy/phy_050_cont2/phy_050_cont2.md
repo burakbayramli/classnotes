@@ -46,8 +46,8 @@ sürekli frene basıp yavaşlayabilirdiniz, belki bazen geri giderdiniz, sonra
 ileri, vs. Fakat sabit hız dışında herhangi bir şekilde giderseniz bazen
 çok bazen az hızlı gitmiş olurdunuz. Bir ortalama etrafında sürekli sapma
 gösteren bir değişkenin karesinin ortalaması her zaman ortalamanın
-karesinden fazladır. Bunu {\em İstatistik, Beklenti, Varyans, Kovaryans ve
-  Korelasyon} yazından gördük,
+karesinden fazladır. Bunu *İstatistik, Beklenti, Varyans, Kovaryans ve
+Korelasyon* yazından gördük,
 
 $$ Var(Y) = E( Y^2  - 2YE(Y) + (E(Y)^2) )$$
 

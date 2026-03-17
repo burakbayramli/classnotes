@@ -856,8 +856,9 @@ Kaynaklar
 
 [2] Jebara, T., *Columbia Machine Learning Course*
 
-[3] Aaron A. D'Souza, {\em Using EM To Estimate A Probability Density With A
-Mixture Of Gaussians}, [http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf](http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf)
+[3] Aaron A. D'Souza,
+    *Using EM To Estimate A Probability Density With A Mixture Of Gaussians*,
+    [http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf](http://www-clmc.usc.edu/~adsouza/notes/mix_gauss.pdf)
 
 [4] *Expectation-Maximization (Python Recipe)*, [http://code.activestate.com/recipes/577735-expectation-maximization](http://code.activestate.com/recipes/577735-expectation-maximization)
 
