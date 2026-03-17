@@ -174,7 +174,7 @@ da geçerli oluyor, bu sebeple Monte Carlo yöntemleri yüksek boyutta klasik
 sayısal entegral yöntemlerinden daha iyi performans gösteriyor.
 
 Kıyasla eksenleri eşit parçalara bölerek entegre hesaplayan yöntemler
-(quadratüre) boyutlar yükseldikça problem yaşarlar. Diyelim ki tek boyutta
+(quadrature) boyutlar yükseldikça problem yaşarlar. Diyelim ki tek boyutta
 sayısal entegral hesap için başlangıç ve bitiş sınırları arasını 10 parçaya
 bölüyoruz. Boyutlar ikiye çıkarsa ve aynı yöntemle devam edersek 10 çarpı 10 =
 100 noktalı bir izgara (grid) elde ederiz. Bir sonraki boyut için benzer büyüme,
@@ -194,7 +194,4 @@ Kaynaklar
 [2] Gezerlis, *Numerical Methods in Physics with Python*
     
 [3] Pharr, *Physically Based Rendering 3rd Ed*
-
-
-
 
