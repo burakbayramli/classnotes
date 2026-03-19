@@ -81,6 +81,18 @@ gsettings set org.gnome.shell.extensions.dash-to-dock scroll-action 'do-nothing'
 
 ile bu davranışı iptal edebiliriz.
 
+Aydınlık (Brightness)
+
+Her nedense (bazı sonuçları çekirdek -kernel- uyumsuzluğu diyor) ekran
+aydınlığını belli bir seviyeden aşağı indirmek mümkün değil, ekran
+sürekli aydınlık kalıyor. Bu durumu telafi etmek için bir seçenek
+Gnome `Extension Manager` programını kurmak, oradan `Soft Brightness
+Plus` ekini kurmak. Kurulunca artık sağ üst köşede ikinci bir
+kaydırıcı (slider) göreceğiz, bu ikinci "yazılımsal (soft)" aydınlık
+ayarı. Onu mesela tam sola çekince ekran tam kararabiliyor. Bu tabii
+bir yazılımsal numara olduğu için ekranda yan etkileri olabilir,
+mesela fare imleci (pointer) bazen garip davranabiliyor.
+
 Python 
 
 Sistem için bile olsa sık kullanılan Python paketleri bir sanal
