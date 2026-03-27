@@ -5,7 +5,7 @@ değerlendirebildiğimiz (evaluate) ama doğrudan örnekleyemediğimiz
 karmaşık bir olasılık dağılımı elimizde var. MH'nin büyük fikri şu:
 doğrudan örneklemek yerine, uzun vadeli davranışı $\pi(x)$'i taklit
 eden bir Markov zinciri inşa et. Sonra zinciri çalıştırıp konum
-bilgisini toplayalım.
+bilgisini topla [1].
 
 "$\pi$'yi değerlendirebiliyoruz ama örnekleyemiyoruz" gibi ifadeler
 ilk duyulduğunda sezgiye aykırı gelebilir. Peki değerlendirmesi kolay
@@ -86,7 +86,9 @@ $\pi$'nin kendisinden örneklem vermesi.
 
 $\alpha$ yapısı ayrıntılı dengeyi güvence altına alır. Gaussian öneri
 ile reddet/yerinde-kal mekanizması, indirgenemezliği ve aperiyodikliği
-neredeyse bedavaya güvence altına alır.
+neredeyse bedavaya güvence altına alır (bu sebeple [1] yazısında bu
+konuya çok vurgu yapıldığını görmüyoruz, arka planda sessizce işlerini
+yapıyorlar)
 
 Durağanlık
 
@@ -367,3 +369,6 @@ eşlenik olduğu durumlarda çözülebilirdir.
 
 Gibbs örneklemesini yalnızca Metropolis-Hastings algoritmasının özel bir durumu olarak görebiliriz. Her iki algoritmanın da kavramsal açıdan zor kısmı, geri dönüşlülük kısıtının doğruluğunu ve örtük bir Markov zincirinin durağan dağılımı olması garantili bir dağılımı nasıl belirleyebileceğimizi anlamaktır. Bu bilgiyle Gibbs örneklemesinin doğruluğunu yalnızca biraz cebirle görebiliriz.
 
+Kaynaklar
+
+[1] Gundersen, <a href="https://gregorygundersen.com/blog/2019/11/02/metropolis-hastings/">Why Metropolis–Hastings Works</a>
