@@ -257,88 +257,54 @@ plt.savefig('stat_097_mcmc_01.jpg')
 
 ![](stat_097_mcmc_01.jpg)
 
-
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
 from numpy.random import multivariate_normal as mvn
 from mpl_toolkits.mplot3d import Axes3D
 
-n_iters = 1000          # number of Metropolis steps
-proposal_var = 0.1      # proposal variance
-burn_in = 100           # discard early samples
-
+n_iters = 1000          # Metropolis adımlarının sayısı
+proposal_var = 0.1      # öneri varyansı
+burn_in = 100           # erken örnekleri at
 a,b = 1,4
-def rosen(x, y):
-    return np.exp(
-        -((a - x)**2 + b*(y - x**2)**2) / 20
-    )
 
+def rosen(x, y): return np.exp( -((a - x)**2 + b*(y - x**2)**2) / 20)
+    
 samples = np.empty((n_iters, 2))
 
-# Random starting point
-samples[0] = np.random.uniform(
-    low=[-3, -3],
-    high=[3, 10],
-    size=2
-)
+# Rastgele başlangıç noktası
+samples[0] = np.random.uniform(low=[-3, -3],high=[3, 10],size=2 )
 
 for i in range(1, n_iters):
-
     curr = samples[i - 1]
-
-    # Propose new point
-    prop = curr + mvn(
-        mean=np.zeros(2),
-        cov=np.eye(2) * proposal_var
-    )
-
-    # Acceptance probability
-    alpha = min(
-        1,
-        rosen(*prop) / rosen(*curr)
-    )
-
-    # Accept or reject
+    # Yeni nokta öner
+    prop = curr + mvn(mean=np.zeros(2),cov=np.eye(2) * proposal_var)
+    
+    # Kabul olasılığı
+    alpha = min(1, rosen(*prop) / rosen(*curr))
+    
+    # Kabul et ya da reddet
     if np.random.uniform() < alpha:
         curr = prop
-
     samples[i] = curr
-
-# Remove burn-in
+    
+# Burn-in'i çıkar
 samples = samples[burn_in:]
-
 x = np.linspace(-3, 3, 60)
 y = np.linspace(-3, 10, 60)
-
 X, Y = np.meshgrid(x, y)
 Z = rosen(X, Y)
 
-# Sample heights
-Z_samples = rosen(
-    samples[:, 0],
-    samples[:, 1]
-)
-
+# Örnek yükseklikleri
+Z_samples = rosen(samples[:, 0], samples[:, 1])
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-# Surface (wireframe)
+# Yüzey
 ax.plot_surface(X, Y, Z, cmap='viridis', linewidth=0, antialiased=True,alpha=0.4)
-
-ax.plot(
-    samples[:, 0],
-    samples[:, 1],
-    Z_samples,
-    linewidth=1
-)
-
+ax.plot(samples[:, 0],samples[:, 1],Z_samples,linewidth=1)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_zlabel("Density")
-
-plt.title("Metropolis Sampling on Rosenbrock Density")
-
+plt.title("Rosenbrock Yogunlugu Uzerinde Metropolis Orneklemesi")
 plt.savefig('stat_097_mcmc_02.jpg')
 ```
 

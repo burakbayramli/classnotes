@@ -158,47 +158,10 @@ if __name__ == "__main__":
 
     fr = os.getcwd()
     to = os.environ['HOME'] + "/Documents/dersblog"
-    
-    if sys.argv[1] == "test":
-        if sys.argv[2] != "all": dirs = [sys.argv[2]]
-        tmpto = "/tmp/cltest"
-        if os.path.exists(tmpto) == False:            
-            os.mkdir(tmpto)
             
-        py_ignore_list = ['algs_045_probsolve','algs_135_convnet','compscieng_bpp40sph',
-                          'compscieng_bpp80radio','phy_005_basics_05','stat_055_linreg',
-                          'stat_085_multlev','tser_020_ar','tser_040_rwtst','vision_60track']
-        
-        frdirs, todirs = copy_files_and_dirs(fr, tmpto, ".git,.pdf,zwork")
-        os.chdir(tmpto)
-        for topdir in dirs:
-            print (topdir)
-            for subdir in sorted(os.listdir(to + "/" + topdir)):
-                if not os.path.isdir(to + "/" + topdir + "/" + subdir): continue
-                if "cover" in subdir or "000" in subdir : continue
-                mdfile = tmpto + "/" + topdir + "/" + subdir + "/" + subdir + ".md"
-                print (mdfile)
-                foutname = tmpto + "/" + topdir + "/" + subdir + "/pout1111.py"
-                print (foutname)
-                fout = open(foutname,"w")
-                fout.write("import numpy as np\nimport matplotlib.pyplot as plt\n")
-                fname = sys.argv[1]
-                content = open(mdfile).read()
-                res = re.findall("```python(.*?)```", content, re.DOTALL)
-                for x in res: fout.write(x)
-                fout.close()
-                os.chdir(tmpto + "/" + topdir + "/" + subdir)
-                ignores = [x in subdir for x in py_ignore_list]
-                if np.any(ignores):
-                    print ("ignoring", subdir)
-                    continue
-                result = subprocess.run(['/home/burak/Documents/env3/bin/python', 'pout1111.py'], capture_output=True)
-                if result.returncode != 0:
-                    print (result)
-                    exit()
-                
-    if sys.argv[1] == "doc":
+    if sys.argv[1] == "doc": # doc all for all
         if len(sys.argv) < 3:
+            # for all, run doc all
             # for single file, command run inside working dir
             currfile = os.path.basename(os.getcwd())
             currdir = os.path.dirname(os.getcwd())
@@ -214,6 +177,7 @@ if __name__ == "__main__":
             shutil.copy("/tmp/out.pdf", pdffile) 
             shutil.copy("/tmp/out.html", htmlfile)
             exit()
+            
         if sys.argv[2] == "all":
             # for all documents
             doc_dirs(dirs)
