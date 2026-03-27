@@ -145,7 +145,7 @@ $$
 \delta S = \int_{t_1}^{t_2} \left[ 
 m \frac{\mathrm{d}\underline{x}}{\mathrm{d} t} \frac{\mathrm{d}\eta}{\mathrm{d} t} - \eta V'(\underline{x})
 \right] \mathrm{d} t 
-\qquad (5)
+\tag{5}
 $$
 
 Artık diyebilirim ki $\underline{x}$'in ne olduğunu bilmiyorum, ama her ne

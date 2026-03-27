@@ -286,7 +286,7 @@ biliyoruz,
 
 $$ 
 \vec{E}_1 = \frac{1}{4\pi\epsilon_0} \frac{q_1}{r^2}\hat{r} 
-\qquad (1)
+\tag{1}
 $$
 
 2. Adım: Atom kutuplaşarak bu olanlara cevap veriyor.

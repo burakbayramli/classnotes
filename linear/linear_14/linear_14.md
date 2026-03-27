@@ -37,7 +37,7 @@ $y$ uzunluğunun karesi, $x+y$ uzunluğunun karesine eşit ise $x,y$ diktir''.
 
 $$ 
 ||x||^2 + ||y||^2 = ||x+y||^2 
-\qquad (1)
+\tag{1}
 $$
 
 Tabii üstteki eşitlik dik olmayan üçgenler için doğru değildir. 

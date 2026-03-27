@@ -446,7 +446,7 @@ toplam $m$ kere çarpmış olalım,
 $$
 A^m v_o = \mu_1 A^m v_1 + .. + \mu_n A^m v_n =
 \mu_1\lambda_1^mv_1 + ... + \mu_n\lambda_n^mv_n
-\qquad (1)
+\tag{1}
 $$
 
 En sağda niye $\lambda_i^m$ ifadeleri elde ettik? Mesela $\mu_1\lambda_1v_1$

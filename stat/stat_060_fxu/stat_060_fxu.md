@@ -243,7 +243,7 @@ Ayrıca büyüklüğü (yani karesi) normalize edilmiş olmalı
 
 $$ 
 \int_{0}^{1} h_j(y)^2 \mathrm{d} y = 1 
-\qquad (1)
+\tag{1}
 $$
 
 Bu şartları tatmin eden hangi fonksiyonlar vardır? Aklımıza gelen her

@@ -265,7 +265,7 @@ diferansiyel denklem sistemi,
 
 $$ 
 \dot{R}(t) = \hat{w} R(t) 
-\qquad (4)
+\tag{4}
 $$
 
 $$ R(0) = I $$
@@ -381,18 +381,18 @@ genelleştirebiliriz, ve su özdeşlikleri (identity) elde ederiz,
 
 $$ 
 A^{2i+1} = (-1)^i \theta^{2i} A 
-\qquad (2) 
+\tag{2} 
 $$
 
 $$ 
 A^{2i+2} = (-1)^i \theta^{2i} A^2 
-\qquad (3) 
+\tag{3} 
 $$
 
 Matris üstel açılımından biliyoruz ki,
 
 $$ e^{A} =  I + A + \frac{1}{2}A^2 + \frac{1}{3!}A^3 + ...
-\qquad (1)
+\tag{1}
 $$
 
 Ayrıca

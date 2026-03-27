@@ -23,7 +23,7 @@ $$ P(E|F) $$
 olarak gösterilir. Bu formülün açılımı
 
 $$ P(E|F) = \frac{P(EF)}{P(F)}
-\qquad (1)$$
+\tag{1}$$
 
 $P(EF)$ hem $E$ hem $F$ olaylarının aynı anda olma olasılığı, yani $E$ kümesi ve
 $F$ kümesinin kesişimi. Bölendeki $P(F)$ bir anlamda $P(E|F)$ hesabını $F$
@@ -88,7 +88,7 @@ $$ P(D|E) = \frac{P(DE)}{P(E)} $$
 $$
 = \frac{P(E|D)P(D)}
 {P(E|D)P(D) + P(E|D^c)P(D^c)}
-\qquad (2)
+\tag{2}
 $$
 
 $$
@@ -278,7 +278,7 @@ $$
 
 $$
 E(X) = \frac{1}{3} \big( E(X | Y=1)  + E(X | Y=2) +E(X | Y=3) \big)
-\qquad (3)
+\tag{3}
 $$
 
 Buraya kadar basit: Fakat sorudaki puf noktaya dikkat, eger kapi 2 ay da 3

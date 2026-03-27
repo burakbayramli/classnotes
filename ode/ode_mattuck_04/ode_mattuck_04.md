@@ -316,7 +316,7 @@ Homojen lineer denklem
 
 $$
 x' + p(t) x = 0 
-\qquad (1)
+\tag{1}
 $$
 
 ayırılabilir (seperable) bir denklemdir. Önce ayır:

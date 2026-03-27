@@ -4,7 +4,7 @@ $Ax = b$ denklem sistemini çözmek için
 
 $$ 
 x = (A^TA)^{-1}A^Tb  
-\qquad (1) 
+\tag{1} 
 $$ 
 
 formülü en az kareler çözümü olarak biliniyor, bkz [2]. Bu çözüm iyi işler,
@@ -43,7 +43,7 @@ basitleşir. Devam edelim, eğer (1)'i üstteki format için uyarlarsak,
 
 $$ 
 x_k = (A_k^TA_k)^{-1}A_k^T b_k 
-\qquad (5) 
+\tag{5} 
 $$
 
 Yani elde $k$ tane veri var, üstteki formülü uyguladık ve bir çözüm
@@ -51,7 +51,7 @@ bulduk. Şimdi diyelim ki yeni ölçümler $(t_{k+1}, B_{k+1})$ aldık, ve
 
 $$ 
 x_{k+1} = (A_{k+1}^TA_{k+1})^{-1}A_{k+1}^T b_{k+1} 
-\qquad (3) 
+\tag{3} 
 $$
 
 hesabını yapmamız lazım. Ek notasyon;
@@ -67,7 +67,7 @@ b_{k+1} = \left[\begin{array}{c}
 b_k \\ B_{k+1}
 \end{array}\right], \quad 
 P_k = (A_k^TA_k)^{-1}
-\qquad (4)
+\tag{4}
 $$
 
 Matris tersi $P_k$'nin yeni veri noktası gelince nasıl güncellendiğini
@@ -85,7 +85,7 @@ Eşitliğin sağındaki matris çarpımını yaparsak, ve $P_k$'yi yerine koyars
 
 $$ = [ A_k^TA_k + a_{k+1}a_{k+1}^T ]^{-1} 
 = [ P_k + a_{k+1}a_{k+1}^T ]^{-1} 
-\qquad (2)
+\tag{2}
 $$
 
 Üstte yine sağdaki formül $(A+BCD)^{-1}$ formunda bir ters alma işlemi gibi
@@ -104,7 +104,7 @@ Parantez içindeki büyük çarpım bir tek sayı olduğu için $I$ değeri 1
 yapılabilir,
 
 $$ P_{k+1} = P_k - P_k a_{k+1}(1 + a_{k+1}^T P_k a_{k+1})^{-1} a_{k+1}^TP_k  
-\qquad (6)
+\tag{6}
 $$
 
 Bu durumda tersi alınan parantez içindeki tüm ifade de tek sayı demektir,
@@ -147,7 +147,7 @@ $$ x_{k+1} = x_k + P_{k+1}a_{k+1}a_{k+1}^Tx_k  + P_{k+1}a_{k+1}B_{k+1}  $$
 
 $$ 
 x_{k+1} = x_k + P_{k+1}a_{k+1}(a_{k+1}^Tx_k  + B_{k+1})  
-\qquad (7)
+\tag{7}
 $$
 
 Şimdi $P_{k+1}$'yi özyineli olarak temsil etmek şunları yapalım. $K_{k+1} =

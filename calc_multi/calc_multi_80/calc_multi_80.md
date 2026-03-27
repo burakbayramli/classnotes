@@ -156,7 +156,7 @@ $$
 &
 \frac{\partial (a^Tx)}{\partial x_n} 
 \end{array}\right] 
-\qquad (1)
+\tag{1}
 $$
 
 $$ =
@@ -254,7 +254,7 @@ $$
 
 $$ 
 \frac{\partial (x^TA^T)}{\partial x} = A^T 
-\qquad (2) 
+\tag{2} 
 $$
 
 Başka bir türev: Diyelim ki $x \in \mathbb{R}^n, z \in \mathbb{R}^m$. 

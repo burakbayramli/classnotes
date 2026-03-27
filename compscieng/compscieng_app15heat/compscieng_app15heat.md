@@ -48,7 +48,7 @@ $$
 
 $$
 = \frac{u_{j,i+1}-2u_{j,i}+u_{j,i-1}}{h^2} 
-\qquad (1)
+\tag{1}
 $$
 
 Bu çarpımı tüm $i$ değerleri için ve matris üzerinden temsil etmenin yolu
@@ -87,7 +87,7 @@ ayrıksal olarak yazalım:
 
 $$
 \frac{U_{j+1}-U_j}{\Delta t} = AU_j 
-\qquad (2)
+\tag{2}
 $$
 
 $\frac{\partial^2u}{\partial x^2} \approx AU_j$, ve $\frac{\partial

@@ -17,7 +17,7 @@ Alttaki gibi bir denklem düşünelim,
 
 $$
 E I \frac{\mathrm{d}^4 y}{\mathrm{d} X_1^4} = q
-\qquad (1)
+\tag{1}
 $$
 
 Biraz düzenleme sonrası
@@ -80,7 +80,7 @@ olsun istiyorsak ve aradaki değişim lineer ise,
 
 $$
 \phi' = \left( \frac{\phi'_{2x} - \phi'_{1x}}{L}  \right) x' + \phi'_{1x}
-\qquad (2)
+\tag{2}
 $$
 
 Eğer şekil fonksiyonu $N_1,N_2$ kullanmak istersek ki her iki fonksiyon
@@ -126,7 +126,7 @@ $$
 \gamma =
 \frac{r \mathrm{d} \phi'}{\mathrm{d} x'} =
 \frac{r}{L} ( \phi'_{2x} - \phi'_{1x}  )
-\qquad (3)
+\tag{3}
 $$
 
 [2] dersinde görmüştük ki Burulma Formülü (Torsion Formula)
@@ -202,7 +202,7 @@ m'_{1x} \\ m'_{2x}
 \left[\begin{array}{c}
 \phi'_{1x} \\ \phi'_{2x} 
 \end{array}\right]
-\qquad (5)
+\tag{5}
 $$
 
 Demek ki direngenlik matrisi eşitliğin sağındaki ortada kalan bölümdür. Bu
@@ -221,7 +221,7 @@ $$
 -12 & -6L & 12 & -6L \\
 6L & 2L^2 & -6L & 4L^2
 \end{array}\right]
-\qquad (4)
+\tag{4}
 $$
 
 Matris bir değişken listesini referans alıyor muhakkak, bu liste daha

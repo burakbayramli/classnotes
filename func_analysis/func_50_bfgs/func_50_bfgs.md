@@ -73,7 +73,7 @@ $$
 
 $$
 H_{k+1}^{-1} y_k = s_k
-\qquad (1)
+\tag{1}
 $$
 
 Özyineli bağlamda bir $H_0$'dan başlayarak ufak değişimlerle sonuca

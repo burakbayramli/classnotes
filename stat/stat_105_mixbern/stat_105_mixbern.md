@@ -55,7 +55,7 @@ $$ \ell(\theta) = \sum_{i=1}^{N} \log f(x_i;\theta) $$
 Karışımları da dahil edersek,
 
 $$ = \sum_{i=1}^{N} \log \sum_{k=1}^{K} \lambda_k f(x_i;\theta_k) 
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi log olurluğun mesela $\theta_j$'ye göre türevini almayı deneyelim,
@@ -111,7 +111,7 @@ $$
  w_{ij} 
 = \frac{\lambda_j f(x_i;\theta_j)}{\sum_{k=1}^{K} \lambda_k f(x_i;\theta_k)} 
 = P(Z=j | X=x_i;\theta)
-\qquad (1)
+\tag{1}
 $$
 
 O zaman 
@@ -194,7 +194,7 @@ Yani
 $$ 
 E[l(\theta)] = \sum_{i=1}^{N} \sum_{k=1}^{K} w_{ik}
 \big( \ln f(x_i;\theta_j) + \ln(\lambda_j) \big) 
-\qquad (4)
+\tag{4}
 $$
 
 EM Hesap Adımları
@@ -328,7 +328,7 @@ Yerine koyalım,
 
 $$
 \sum_{i=1}^{N} w_{ij} = - \alpha \lambda_j 
-\qquad (3) 
+\tag{3} 
 $$
 
 Şimdi tüm öğeler / kümeler üzerinden bir toplam alalım (yani $\sum_k$'yi her iki

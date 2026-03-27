@@ -32,17 +32,17 @@ hakkında biraz kafa yormamız gerekli.
 
 $$ 
 \dot{a_1} = 0 \implies a_1 = \frac{\omega b_1}{K}  
-\qquad (1) 
+\tag{1} 
 $$
 
 $$ 
 \dot{b_1} = 0 \implies \omega a_1 = q_1 - K b_1 
-\qquad (2) 
+\tag{2} 
 $$
 
 $$ 
 \dot{\omega} = 0 \implies a_1 = \frac{v \omega}{\pi gr} 
-\qquad (3)
+\tag{3}
 $$
 
 $a_1,b_1,\omega$'yi bulmak istiyoruz, o zaman üstteki denklemlerde biraz
@@ -52,7 +52,7 @@ bulalım, sonuç
 
 $$ 
 b_1 = \frac{K q_1}{\omega^2 + K^2}  
-\qquad (4) 
+\tag{4} 
 $$
 
 $a_1,b_1$ için yıldız kullanabilirdim, $a_1^\ast,b_1^\ast$ gibi ama sabit nokta
@@ -66,7 +66,7 @@ $\omega$ ile böleriz, ve
 
 $$ 
 b_1 = \frac{K v}{\pi gr} 
-\qquad (5) 
+\tag{5} 
 $$
 
 elde ederiz. Bu iki durumu biraz düşünelim, $\omega=0$ durumu ne demektir?
@@ -178,7 +178,7 @@ Lorenz denklemleri,
 
 $$ 
 \dot{x} = \sigma (y - x) 
-\qquad (6) 
+\tag{6} 
 $$
 
 $$ \dot{y} = rx - y - xz $$

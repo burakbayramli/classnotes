@@ -420,14 +420,14 @@ değer problemi (initial value problem -IVP-) ile başlayalım.
 
 $$
 y' = f(x,y), \quad y(x_0) = y_0
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki IVP yerine alttaki gibi, ona eşit bir entegral formülü geçirebiliriz,
 
 $$
 y(x) = y_0 + \int_{x_0}^{x} f[t, y(t)] \mathrm{d} t
-\qquad (2)
+\tag{2}
 $$
 
 Bu formülü (1)'in entegralini alarak elde ettik, bu bariz, başlangıç şartını
@@ -536,14 +536,14 @@ fonksiyonların entegrali, o zaman
 
 $$
 |y(x)-u(x)| < C, \quad \forall \in [a-r,a+r]
-\qquad (3)
+\tag{3}
 $$
 
 Şimdi $|y(x)-u(x)|$ işlemini entegral formunda açalım,
 
 $$
 |y(x)-u(x)| = \bigg| \int _{a}^{x}  F(x,y(s)) - F(x,u(s)) \bigg|
-\qquad (4)
+\tag{4}
 $$
 
 Lipschitz tanımını hatırlarsak, $\big| F(x,y) - F(x,\tilde{x}) \big| \le k |y-\tilde{y}|$.
@@ -551,7 +551,7 @@ Bu ifadeyi üstteki formülün sağ tarafına sokarsak,
 
 $$
 \le \int _{a}^{x} k|y(s)-u(s) | \mathrm{d} s
-\qquad (5)
+\tag{5}
 $$
 
 (3) eşitsizliğini kullanınca

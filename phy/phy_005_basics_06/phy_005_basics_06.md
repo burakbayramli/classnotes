@@ -177,7 +177,7 @@ bu zaman sonrası toplam dönüş $q'$ ne olurdu? Bu durumda formül,
 
 $$
 q' = q + \frac{\Delta t}{2} \omega q
-\qquad (1)
+\tag{1}
 $$
 
 olur, ki $\omega$ yine kuaterniyon olarak gösterilen açısal hız.

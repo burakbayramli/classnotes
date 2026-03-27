@@ -340,7 +340,7 @@ için [4, sf. 713],
 
 $$
 y_{i+1} = y_i + f(x_i,y_i) h + \frac{f'(x_i,y_i)}{2!} h^2 + ...
-\qquad (1)
+\tag{1}
 $$
 
 ya da
@@ -354,7 +354,7 @@ $y_i$ sonrası $f$ bazında bir formül olacak, türev içermeyecek [4, sf. 730]
 
 $$
 y_{i+1} = y_i + (a_1 k_1 + a_2 k_2) h
-\qquad (2)
+\tag{2}
 $$
 
 ki
@@ -381,7 +381,7 @@ $$
 $$
 y_{i+1} = y_i + f(x_i,y_i) h +
 \left( \frac{\partial f(x,y)}{\partial y} \frac{\mathrm{d} y}{\mathrm{d} x}  \right) \frac{h^2}{2}
-\qquad (3)
+\tag{3}
 $$
 
 Şimdi $k_2$'nin açılımına gelelim, burada iki değişkenli Taylor açılımı gerekli,
@@ -525,7 +525,7 @@ $$
 t \ge 0, \theta(0)=\theta_0,
 \quad
 \dot{\theta} = \dot{\theta}_0
-\qquad (1)
+\tag{1}
 $$
 
 olarak verilebilir. Bu denklemi ODE sistemi olarak çözmek için yeni değişken

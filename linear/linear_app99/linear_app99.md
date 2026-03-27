@@ -176,7 +176,7 @@ Bu formülün temeli şu eşitlikten başlıyor [1, sf. 124],
 
 $$
 (I+cd^T)^{-1} = I - \frac{cd^T}{1+d^Tc}
-\qquad (1)
+\tag{1}
 $$
 
 ki $c,d$ birer vektör, ve $1+d^Tc \ne 0$ olacak şekilde, üstteki eşitliğin

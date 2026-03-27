@@ -110,7 +110,7 @@ CM'nin $O$'ya göre yeri $R$, $m_i$'nin CM'ye izafi olarak yeri $r_i'$. Yani
 
 $$
 r_i = R + r_i'
-\qquad (7)
+\tag{7}
 $$
 
 doğru olacak. Şimdi $O$'ya göre parçacık $i$ için açısal momentum hesaplarsak
@@ -160,7 +160,7 @@ L = R \times M\dot{R} +
 R \times \sum m_i \dot{r}_i' +
 (\sum r_i' m_i) \times \dot{R} +
 \sum r_i' \times m_i \dot{r}_i'
-\qquad (8)
+\tag{8}
 $$
 
 Bu son denklem üzerinde oldukca fazla basitleştirme mümkün. Mesela üçüncü
@@ -280,7 +280,7 @@ ki $L,r,v$ vektör. $v = \omega \times r$ eşitliğini üste sokarsak,
 
 $$
 L = \sum m_i r_i \times (\omega \times r_i)
-\qquad (1)
+\tag{1}
 $$
 
 Şimdi bu son ifadenin her vektörü öğelerini kullanarak açılımını yapalım böylece

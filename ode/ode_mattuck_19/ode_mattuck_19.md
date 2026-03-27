@@ -20,7 +20,7 @@ gibi bir genel tanımla gösterilir, biz burada gelenekten biraz kopacağız,
 toplamın $a$ ile ilişkisini iyice belli etmek için $A(x)$ kullanacağız. 
 
 $$ \sum_{0}^{\infty} a_n x^n = A(x)
-\qquad (1)
+\tag{1}
 $$
 
 Bir değişiklik daha: $a_n$ aslında bir ayrıksal dizin içindeki belli $a$
@@ -359,7 +359,7 @@ Sonra (eksi işaretinden sonra) her ikisi de yanyana yapılır.
 $$
 t^n \frac{e^{-st}}{-s} \bigg]_{0}^{\infty}  - 
 \int_{0}^{\infty} nt^{n-1} \frac{e^{-st}}{-s} \mathrm{d} t
-\qquad (3)
+\tag{3}
 $$ 
 
 Bu parçaları teker teker inceleyelim, $s>0$ olsun

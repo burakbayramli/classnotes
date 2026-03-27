@@ -143,7 +143,7 @@ Daha detaylı hali,
 $$
 \rho \frac{D \bar{u}}{D t} = 
 - \nabla p + \mu \nabla \cdot \nabla \bar{u} + \rho \bar{g}
-\qquad (1)
+\tag{1}
 $$
 
 Simulasyon için bize ivme gerekli. Kütle ve kuvvetten ivme, oradan sayısal

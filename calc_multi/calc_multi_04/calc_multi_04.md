@@ -315,7 +315,7 @@ $$
 
 $$
 \frac{ | A(x_1-x_0) + B(y_1-y_0) + C(z_1-z_0) | }{ \sqrt{ A^2 + B^2 + C^2 } }
-\qquad (1)
+\tag{1}
 $$
 
 $\sqrt{ A^2 + B^2 + C^2 }$ hesabı normal vektörü birimselleştirmek için yapıldı.

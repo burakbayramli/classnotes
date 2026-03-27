@@ -140,7 +140,7 @@ bir arada olursa,
 
 $$
 \frac{\partial \Phi}{\partial t} + v \cdot \mathrm{grad} \Phi = 0 
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki formülasyonun detaylı türetilmesi için bkz [3].

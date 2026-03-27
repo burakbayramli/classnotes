@@ -107,7 +107,7 @@ $$
 
 $$ 
  = \frac{\kappa(1 - \omega - rd) }{v}- \delta 
-\qquad (1)
+\tag{1}
 $$
 
 O zaman 
@@ -142,21 +142,21 @@ Sonuç olarak şu ODE denklem sistemine erişiyoruz,
 
 $$ 
 \dot{\omega} = \omega [ \Phi(\lambda)-\alpha ] 
-\qquad (2)
+\tag{2}
 $$ 
 
 $$ 
 \dot{\lambda}=  \lambda \bigg[ 
 \frac{\kappa(1-\omega-rd)}{v} - \alpha - \beta - \delta
 \bigg]
-\qquad (3)
+\tag{3}
 $$
 
 $$ 
 \dot{d} = d \bigg[
 r - \frac{\kappa(1-\omega-rd)}{v} + \alpha 
 \bigg] + \kappa(1-\omega-rd) - (1-\omega)
-\qquad (4)
+\tag{4}
 $$
 
 Stabil Noktalar
@@ -215,7 +215,7 @@ bahsedilen $\overline{\lambda}_1 = 0.9686$ değeri.
 
 $$ 
 \kappa(1-\omega-rd)= v (\alpha + \beta + \delta) 
-\qquad (5)
+\tag{5}
 $$
 
 ile başlarız. Yine ters alma operasyonu uygularsak,

@@ -143,7 +143,7 @@ e_1 \\ e_2 \\ e_3 \\ e_4
 \left[\begin{array}{c}
 u_1 \\ u_2 \\ u_3 
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 Matrise $A$ ismi verirsek, üstteki denklem $e = A u $ olarak belirtilebilir.
@@ -202,7 +202,7 @@ w_1 \\ w_2 \\ w_3 \\ w_4
 \left[\begin{array}{c}
 f_1 \\ f_2 \\ f_3
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 ki $f_i = m_i g$. 
@@ -221,12 +221,12 @@ O zaman ona sadece $A^T$ diyeceğiz.
 
 $$
 e = Au
-\qquad (3)
+\tag{3}
 $$
 
 $$
 w = Ce 
-\qquad (4)
+\tag{4}
 $$
 
 $$
@@ -297,7 +297,7 @@ c_1 & & & \\  & c_2 & & \\  & & c_3 & \\ & & & c_4
 \left[\begin{array}{rrrr}
 1 & -1 & 0 & 0 \\ 0 & 1 & -1 & 0 \\ 0 & 0 & 1 & -1 
 \end{array}\right]
-\qquad (5)
+\tag{5}
 $$
 
 Biz altta bu çarpımı hemen `sympy` ile yapalım
@@ -349,7 +349,7 @@ c1 + c2   &     -c2 &       0 \\
 -c2       & c2 + c3 &     -c3 \\
 0         & -c3     &      c3 + c4
 \end{array}\right]
-\qquad (6)
+\tag{6}
 $$
 
 Tüm yay sabitleri bu matris içinde. Üstteki matris hakkında önemli bilgileri

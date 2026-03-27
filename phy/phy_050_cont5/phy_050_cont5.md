@@ -109,7 +109,7 @@ M+m & m l \cos\theta \\ \cos\theta & l
   1 \\ 0
   \end{array}\right] F
 \right)
-\qquad (1)
+\tag{1}
 $$
 
 Örneğe dönelim; Noktalı kısımları atarsak 1. dereceden bir yaklaşıksallama
@@ -201,7 +201,7 @@ x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}}{M \sin^{2}{\left(x_{2} \right
 x_{4}^{2} \sin{\left(x_{2} \right)} - \mu x_{3}\right) \cos{\left(x_{2} \right
 )}}{l \left(M \sin^{2}{\left(x_{2} \right)} + m\right)}
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 Bir gayrı-lineer ODE elde etmiş olduk. Şimdi yapmak istediğimiz bu sistemi 

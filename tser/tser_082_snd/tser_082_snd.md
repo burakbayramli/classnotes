@@ -113,7 +113,7 @@ istediğimiz formül
 
 $$
 f(x) = A \sin (x+\varphi)
-\qquad (1)
+\tag{1}
 $$
 
 Genlik $A$ ile faz ise $\varphi$ ile gösterilmiş, öyle bir $A,\varphi$ bulalım

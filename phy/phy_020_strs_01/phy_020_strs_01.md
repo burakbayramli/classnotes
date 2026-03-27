@@ -25,7 +25,7 @@ adı verilir ve çoğunlukla ona $E$ sembolü verilir. Formülsel olarak belirti
 
 $$
 E = \frac{P/A}{\delta / L}
-\qquad (1)
+\tag{1}
 $$
 
 $E$ formülüne Young'in Genliği (Young's Modulus) ismi de verilir. 
@@ -195,7 +195,7 @@ Daha önce gördüğümüz üzere bir normal gerinim $\epsilon$'nin baz tanımı
 
 $$
 \epsilon = \Delta L / L
-\qquad (2)
+\tag{2}
 $$
 
 ki $L$ mevcut uzunluk, $\Delta L$ uygulanan kuvvet sonucu elde edilen uzama [2].
@@ -255,7 +255,7 @@ $\sigma = E \epsilon$ üzerinden,
 
 $$
 \sigma = -E y / \rho
-\qquad (4)
+\tag{4}
 $$
 
 Kirişte Bükülme Momenti (Elastik Durum)
@@ -370,7 +370,7 @@ Yani
 
 $$
 \frac{\mathrm{d} V}{\mathrm{d} x} = -q
-\qquad (3)
+\tag{3}
 $$
 
 Böylece kirişin üzerindeki dağıtık yük ile aynı kiriş üzerindeki kesme
@@ -414,7 +414,7 @@ $\mathrm{d} X \to 0$ iken limiti alırsak, eşitliğin solundaki ikinci terim yo
 
 $$
 V = \frac{\mathrm{d} M}{\mathrm{d} X}
-\qquad (4)
+\tag{4}
 $$
 
 Böylece bir eşitlik daha elde ettim, teğetsel / kesme kuvveti $X$'e göre

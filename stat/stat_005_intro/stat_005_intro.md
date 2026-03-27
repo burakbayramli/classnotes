@@ -542,7 +542,7 @@ Tanım
 $x_1,..,x_n$ verilerini içeren örneklemin (sample) ortalaması 
 
 $$ \bar{x} = \frac{1}{n} \sum x_i
-\qquad (1)
+\tag{1}
 $$
 
 Dikkat bu örneklemdeki verinin ortalaması. Hiçbir dağılım hakkında hiçbir
@@ -1096,7 +1096,7 @@ $$
 f_Y(y) = \int_{0}^{1}(x+y) \mathrm{d} x = 
 \int_{0}^{1}x \mathrm{d} x + \int_{0}^{1}y \mathrm{d} x  = 
 \frac{ 1}{2} + y 
-\qquad (1)
+\tag{1}
 $$
 
 Tanım 

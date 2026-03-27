@@ -133,7 +133,7 @@ derece serbestliğe sahip bir F dağılımına sahiptir.
 
 İspatı burada vermiyoruz.
 
-Teori $\qquad (1)$
+Teori $\tag{1}$
 
 $Y_1,..,Y_n$ ortalaması $\mu$, varyansı $\sigma^2$ olan bir normal dağılımdan
 alınan $n$ örneklem olsun. O zaman
@@ -156,7 +156,7 @@ bir chi kare rasgele değişken olsun. O zaman $n$ derece serbestliği olan
 
 $$ 
 T_n = \frac{Z}{\sqrt{ \frac{U}{n}}} 
-\qquad (2) 
+\tag{2} 
 $$
 
 olarak belirtilir.

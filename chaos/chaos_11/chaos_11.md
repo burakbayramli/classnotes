@@ -25,7 +25,7 @@ Sistemimize dönersek, onu
 
 $$
 \dot{x} = y 
-\qquad (1) 
+\tag{1} 
 $$
 
 $$\dot{y} = -x - \epsilon h(x,y)$$
@@ -64,7 +64,7 @@ $$ x(t) = r(t) \cos (t+\phi(t)) $$
 
 $$ 
 y(t) = -r(t) \sin (t+\phi(t)) 
-\qquad (2) 
+\tag{2} 
 $$
 
 Burada karışık gelen su: ilk bakışta sanki yanlış Calculus kullanıyormuşum gibi
@@ -80,7 +80,7 @@ $$ r(t) = \sqrt{x^2(t) + y^2(t)} $$
 
 $$ 
 \tan(t + \phi(t)) = -\frac{y(t)}{x(t)} 
-\qquad (3) 
+\tag{3} 
 $$
 
 Bu tanımları yapmama izin var.
@@ -260,7 +260,7 @@ görmek istiyoruz. Birazdan göreceğiz ki bu denklemler gayet temiz çıkacak.
 $$
 \bar{\dot{r}} =
 \dot{\bar{r}} = \bigl\langle \epsilon h \sin(t + \phi) \bigr\rangle_t
-\qquad (4)
+\tag{4}
 $$
 
 $$
@@ -363,7 +363,7 @@ $\bar{r}$ sabit çünkü o çok yavaş değişiyor. O zaman $\bar{r}$'i averaj d
 $$ = -\epsilon \bar{r} \bigg(
 \langle \sin^2\cos^2 \rangle - \langle \sin^2 \rangle 
 \bigg) + O(\epsilon^2)
-\qquad (5)
+\tag{5}
 $$
 
 Üstte $\sin^2\cos^2$ yazdım ama onlara geçilen değerleri niye yazmadım? Çünkü
@@ -464,7 +464,7 @@ $$ \dot{\bar{r}} = \frac{\epsilon \bar{r}}{8} (4-\bar{r}^2) + O(\epsilon^2) $$
 $O(\epsilon^2)$' atalım, çünkü formüldeki diğer $\epsilon$'a göre çok küçük, 
 
 $$ \dot{\bar{r}} = \frac{\epsilon \bar{r}}{8} (4-\bar{r}^2)
-\qquad (6)
+\tag{6}
 $$
 
 Üstteki formülü grafiksel olarak analiz edebiliriz artık,
@@ -601,7 +601,7 @@ bu hakikaten böyle, birazdan hesaplayacağız.
 
 $$
 \dot{\phi} = \langle \epsilon \frac{h}{r} \cos (t+\phi) \rangle
-\qquad (7)
+\tag{7}
 $$
 
 $h = r^3 \cos^3(t+\phi)$ demiştik, o sayede $r^3$'un bir faktörünü iptal

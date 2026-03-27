@@ -51,7 +51,7 @@ gerginlik-yer değişim (strain-displacement) denklemi
 
 $$
 \gamma = \gamma(x,\rho) = \rho \frac{\mathrm{d} \phi}{\mathrm{d} x}
-\qquad (1)
+\tag{1}
 $$
 
 $\phi$'in $x$'e göre türevi alınabildi çünkü formülü $x$'e bağlıdır, bunu
@@ -72,7 +72,7 @@ $G$ sabiti kesme modülüsü. Üstteki formüle (1)'i sokarsak,
 
 $$
 \tau = G \rho \frac{\mathrm{d} \phi}{\mathrm{d} x}
-\qquad (3)
+\tag{3}
 $$
 
 Bu formül bize bir kesitteki kesme streslerinin dağılımını veriyor. Eğer
@@ -99,7 +99,7 @@ Eğer $G$ değişkeni $\rho$'dan bağımsız ise,
 
 $$
 T = G \frac{\mathrm{d} \phi}{\mathrm{d} x} \int_A \rho^2 \mathrm{d} A
-\qquad (2)
+\tag{2}
 $$
 
 Entegral içinde kalan kısım $\int_A \rho^2 \mathrm{d} A$ aslında her şekil için belli

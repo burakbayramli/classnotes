@@ -243,7 +243,7 @@ Ax = b
 $$
 $$
 Gx \le h
-\qquad (1)
+\tag{1}
 $$
 
 İkiz Problem
@@ -256,7 +256,7 @@ $$
 $$
 $$
 v \ge 0
-\qquad (2)
+\tag{2}
 $$
 
 İkizi nasıl elde ettik? 

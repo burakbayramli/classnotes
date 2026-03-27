@@ -116,7 +116,7 @@ $$
 $$ 
 Var(\bar{X}_n) = \frac{1}{n^2}\sum_{i=1}^n \sigma^2 = 
 \frac{1}{n^2}n\sigma^2 = \frac{\sigma^2}{n} 
-\qquad (3)
+\tag{3}
 $$
 
 Artık Çebişev kuramını kullanmaya hazırız. Ispatlamaya calistigimiz neydi?

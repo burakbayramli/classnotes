@@ -176,7 +176,7 @@ için hepsine ihtiyacımız olmaz. Özyineli $x$ formülünü kullanabiliriz,
 
 $$
 x_{k+1} = x_k + \alpha_k d_{k+1} 
-\qquad (1)
+\tag{1}
 $$
 
 Bu formül niye mantıklı? Eğer çözüm $x_*$ dikgen $d_k$ vektörlerinin bir
@@ -194,7 +194,7 @@ $$r_{k+1} = r_k + \alpha_k A d_{k} $$
 
 $$
 r_{k+1} = r_k + \alpha_k A d_{k} 
-\qquad (8)
+\tag{8}
 $$
 
 Şimdi hata terimini hesaplayalım. $e_i$, yani $i$'inci tahminin hatası, 
@@ -211,7 +211,7 @@ Sağ taraf $r_i$ tanımının aynısı değil mi? O zaman
 
 $$
 Ae_i = r_i 
-\qquad (5)
+\tag{5}
 $$
 
 $e$'yi özyineli olarak temsil etmek te mümkündür, (1)'nin her iki
@@ -220,7 +220,7 @@ tarafından $x$ çıkartırsam,
 $$ x_{k+1} - x = x_k - x + \alpha_k d_{k} $$
 
 $$ e_{k+1} = e_k + \alpha_k d_k 
-\qquad (2)
+\tag{2}
 $$
 
 Bu her adımı $\alpha_k$'ye bağlı özyineli bir tanımdır. 
@@ -243,7 +243,7 @@ $$ d_i^Tr_i + \alpha_i d_i^TA d_i   = 0$$
 
 $$ 
 \alpha_i = -\frac{ d_i^Tr_i}{d_i^T A d_i} 
-\qquad (6)
+\tag{6}
 $$
 
 Şimdi hata terimine dönelim, diyelim ki $e_0$ vektörü, bu vektör, diğer
@@ -263,7 +263,7 @@ Yine aynı dikgenlik numarası, toplam içinde $j$ olmayan tüm diğer $p$
 $$ d_k^T A e_0 =  \delta_j d_j^T A d_j $$
 
 $$ \delta_j = \frac{ d_k^T A e_0}{ d_j^T A d_j } 
-\qquad (4)
+\tag{4}
 $$
 
 Şimdi $e_0$'in yerine (2)'teki özyineli tanımdan türeteceğim bir şey koymak
@@ -314,7 +314,7 @@ $$ e_0 = -\sum_{ j=0}^{n-1} \alpha_j d_j $$
 Hataların özyineli denklemi (2)'yi üste uygularsak, 
 
 $$ e_i = -\sum_{ j=i}^{n-1} \alpha_j d_j 
-\qquad (3)
+\tag{3}
 $$
 
 Şimdi artıkların ve önceki gidiş yönlerinin dikgen olduklarını
@@ -329,7 +329,7 @@ $$
 $d$'ler arasındaki A-ortogonallik sayesinde ve $k < i$ için 
 
 $$ d_k^Tr_i = 0
-\qquad (9)
+\tag{9}
 $$
 
 Madem ki eski yönler ve artıklar birbirine dikgen, Gram-Schmidt
@@ -338,7 +338,7 @@ kullanabiliriz. Her artığı alıp, içinden ona dikgen bir yön çıkartmak
 mümkün.
 
 $$ d_i = r_i + \sum_{ j=0}^{i-1} \beta_{i,j}d_j 
-\qquad (10)
+\tag{10}
 $$
 
 $$ \beta_{i,j} = - \frac{ r_i^TAd_j}{d_j^TAd_j} $$

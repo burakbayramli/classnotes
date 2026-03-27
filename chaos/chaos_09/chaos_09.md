@@ -382,7 +382,7 @@ Neyse; kullanılan bir model altta, onu çok ciddiye almayın, çok basitleştir
 bir model, daha çetrefil olanları var bu günlerde.
 
 $$ \dot{x} = -x + ay + x^2y 
-\qquad (1) $$
+\tag{1} $$
 
 $$ \dot{y} = b - ay - x^2y $$
 
@@ -499,7 +499,7 @@ $$
 
 $$ 
 \tau = -\bigg[ \frac{b^4 + (2a-1)b^2 + (a+a^2) }{(a+b)^2} \bigg] 
-\qquad (2)
+\tag{2}
 $$
 
 $\tau$'da bölünen $b^2$ bağlamında karesel. $\tau,\Delta$ diyagramımızı

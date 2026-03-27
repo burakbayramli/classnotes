@@ -243,7 +243,7 @@ $$
 $$ =
 \lim_{x \to a } \frac
 {f(x) - f(a) }{g(x)-g(a)}
-\qquad (1)
+\tag{1}
 $$
 
 $x \to a$ iken $g(a)$ ve $f(a)$'nin sıfıra gittiğini biliyoruz, tüm bu

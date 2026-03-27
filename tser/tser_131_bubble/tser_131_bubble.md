@@ -20,7 +20,7 @@ Model alttaki formüldür:
 
 $$ \ln(p(t)) = A + B(t_c - t)^\beta 
 \big[ 1 + C \cos (\omega \ln(t_c-t) + \phi )  \big] 
-\qquad (1)
+\tag{1}
 $$
 
 Türetmek

@@ -6,7 +6,7 @@ başlangıç değer problemi (initial value problem -IVP-) ile başlayalım,
 $$
 \frac{\partial u}{\partial t} =
 c \frac{\partial u}{\partial x}
-\qquad (1)
+\tag{1}
 $$
 
 Buna tek yön dalga denklemi diyebiliriz, iki yönlü dalga denklemi için üstteki

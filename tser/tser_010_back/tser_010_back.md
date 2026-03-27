@@ -67,7 +67,7 @@ $\hat{\mu},\hat{\sigma}$, böylece $SR$ için tahmin edici $\hat{SR}$ olur,
 
 $$ 
 \hat{SR} = \frac{\hat{\mu} - R_f}{\hat{\sigma}} 
-\qquad (1) 
+\tag{1} 
 $$
 
 Üstteki ifade standardizasyon, Z testine benzemesi raslantı değil, hatta bu

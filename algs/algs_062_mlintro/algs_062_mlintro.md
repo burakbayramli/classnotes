@@ -41,7 +41,7 @@ eğriliği ve başlangıç noktasını bilmediğimiz bir doğru olan f(x)'i öğ
 
 $$
   f(x;\theta) = \sum_{i=1}^N \theta_{1}x_{i} + \theta_{0}
-  \qquad (1)
+  \tag{1}
 $$
 
 ki $\theta_{0}$ ve $\theta_{1}$ bilinmeyen değişkenleri temsil ediyorlar. Birçok
@@ -63,7 +63,7 @@ $$
       \theta_{0} \\
       \theta_{1}
   \end{array} \right]
-  \qquad (2)
+  \tag{2}
 $$
 
 $$
@@ -77,7 +77,7 @@ $$
       \theta_{0} \\
       \theta_{1}
   \end{array} \right]
-  \qquad (3)
+  \tag{3}
 $$
 
 (2)'de gösterilen toplama dikkat edersek, (3) formülünden kaybolduğunu
@@ -213,7 +213,7 @@ $$
       \vdots & \vdots & \vdots & \vdots \\
       1 & x_{N} & \cdots & x_{N}(D) \\
   \end{array} \right] 
-  \qquad (7)
+  \tag{7}
 $$
 
 $$ 
@@ -388,7 +388,7 @@ X'leri temsil etmek için Gaussian dağılımını seçeceğiz.
 
 $$
 p(x_{i}|y_{i},\mu,\Sigma)=N(x_{i}|\mu_{y},\Sigma_{y})  
-\qquad (11)
+\tag{11}
 $$
 
 Ortak dağılım da alttaki gibi gözükecektir. 
@@ -401,7 +401,7 @@ getirildi. Grafiğe bakarak cebirsel ortak dağılımı $p(x,y,\mu,\alpha,\Sigma
 
 $$
 p(y|\alpha)p(x|y,\mu,\Sigma)p(\Sigma)p(\mu)p(\alpha) 
-\qquad (12)
+\tag{12}
 $$
 
 Sınıflandırma amacımıza erişebilmek için (12) formülünü,
@@ -413,7 +413,7 @@ $$
 p(x,y|\alpha,\mu,\Sigma) =
 \frac{p(x,y,\alpha,\mu,\Sigma)}
      {p(\alpha)p(\mu)p(\Sigma)} 
-\qquad (13)
+\tag{13}
 $$
 
 Şimdi (13)'deki bölüneni, grafik modelden gelen ortak dağılım (12) ile
@@ -424,7 +424,7 @@ p(x,y|\alpha,\mu,\Sigma) =
 \frac{p(y|x)p(x|y,\mu,\Sigma)p(\alpha)p(\mu)p(\Sigma)}
      {p(\alpha)p(\mu)p(\Sigma)} \nonumber \\
 = p(y|x)p(x|y,\mu,\Sigma) 
-\qquad (14)
+\tag{14}
 $$
 
 Eğitim (hâm) verisine en uygun olan parametreleri bulmak için, En Büyük
@@ -435,7 +435,7 @@ dağılımın en yüksek olduğu noktada bulunabilir.
 
 $$
 Olurluk = \prod_{i=1}^N p(y|x)p(x|y,\mu,\Sigma)
-\qquad (15)
+\tag{15}
 $$
 
 Olurluğun en yüksek olduğu nokta, olurluk formülünün türevinin sıfır olduğu
@@ -459,7 +459,7 @@ $$
 l = \sum_{i=1}^N \log(p(y_{i}|\alpha)) + 
 \sum_{y_{i}\in 0} \log(p(x_{i}|\mu_{0},\Sigma_{0})) + 
 \sum_{y_{i}\in 1} \log(p(x_{i}|\mu_{1},\Sigma_{1}))
-\qquad (16)
+\tag{16}
 $$
 
 Şimdi, olurluğun gradyanını $\alpha, \Sigma, \mu$'a göre (ayrı ayrı)

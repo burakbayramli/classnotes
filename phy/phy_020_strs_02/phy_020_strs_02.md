@@ -139,7 +139,7 @@ ki $b$ kesme stresinin uygulandığı noktadaki kiriş derinliğidir.
 
 $$
 -\mathrm{d} P/\mathrm{d} x = \tau b
-\qquad (1)
+\tag{1}
 $$
 
 ![](phy_020_strs_02_10.jpg)

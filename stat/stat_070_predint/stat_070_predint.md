@@ -21,7 +21,7 @@ $$ \hat{\beta} = (A^TA)^{-1}A^T(A\beta + \epsilon) $$
 
 $$ 
 \hat{\beta} = \beta  + (A^TA)^{-1}A^T \epsilon 
-\qquad (1)
+\tag{1}
 $$
 
 Eğer $E( \hat{\beta} )$ hesaplamak istersek, 
@@ -47,7 +47,7 @@ E \big[
 (\hat{\beta} - \beta)  
 (\hat{\beta} - \beta)^T 
 \big]
-\qquad (2)
+\tag{2}
 $$
 
 olur. Üstte $\hat{\beta} - \beta$ var, bu (1)'den $\beta$ çıkartılıyor
@@ -79,7 +79,7 @@ $$  = E[\epsilon \epsilon^T]  (A^TA)^{-1} $$
 
 $$ 
 Var(\hat{\beta})  = \sigma^2  (A^TA)^{-1} 
-\qquad (3)
+\tag{3}
 $$
 
 Yeni bir tahmin $a$ için 

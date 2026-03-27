@@ -101,7 +101,7 @@ Farz ediyoruz ki bu zaman serisi şu şekilde temsil edilebiliyor,
 
 $$ 
 y_t = \beta_0 + \beta_1 t + \alpha_1 y_{t-1} + \alpha_2 (y_{t-1} - y_{t-2}) + e_t 
-\qquad (1)
+\tag{1}
 $$
 
 Şimdi mesela $\phi_2$ testi için bir regresyon işleteceğiz, bunun için
@@ -114,7 +114,7 @@ $$
 
 $$ 
 \Delta y_t =  \alpha_2 \Delta y_{t-1}  + e_t  
-\qquad (2)
+\tag{2}
 $$
 
 Bu durumda kısıtlanmış regresyon (2)'yi kullanacaktır, kısıtlanmamış ise
@@ -126,7 +126,7 @@ var, yani her iki tarafta da $\beta_0$ mevcut.
 
 $$ 
 \Delta y_t =  \beta_0 + \alpha_2 \Delta y_{t-1}  + e_t  
-\qquad (3)
+\tag{3}
 $$
 
 Tabii ana formül (1)'i de $\Delta y_t$ bazında göstermek iyi olur, iki

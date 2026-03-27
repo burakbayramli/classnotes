@@ -77,7 +77,7 @@ P \bigg(
 \le \mu
 \le \bar{X} + z_{\alpha/2}\frac{\sigma}{\sqrt{n}}
 \bigg) = 1-\alpha
-\qquad (1)
+\tag{1}
 $$
 
 Güven aralığı ifadesine aslına erişmiş olduk. Eğer \%95 kesinlikten

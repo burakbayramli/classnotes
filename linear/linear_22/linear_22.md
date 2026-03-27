@@ -173,7 +173,7 @@ Teori
 
 $$
 A^k \to 0 \textrm{ , ki } k \to \infty  
-\qquad (1)
+\tag{1}
 $$ 
 
 Ne zaman bu doğru olur? $A$ matrisinin içinde bir yerlerde bu bilgi var. Bu

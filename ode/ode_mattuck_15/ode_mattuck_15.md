@@ -146,7 +146,7 @@ Fourier transformu Fourier serilerinin özel bir şartı olarak türetilebilir
 
 $$ 
 x(t) = \sum_{-\infty}^{\infty} c_n e^{jnw_0t} 
-\qquad (1) 
+\tag{1} 
 $$
 
 üstte $i$ yerine $j$ kullandık, $\omega_0 = 2\pi / T$ ve $T = 2\pi$. $c_n$'lerin
@@ -154,7 +154,7 @@ $$
 
 $$ 
 c_n = \frac{1}{T} \int_{T} x(t) e^{-jn\omega_0t} \mathrm{d} t 
-\qquad (2) 
+\tag{2} 
 $$
 
 Şimdi, $T \to \infty$ olduğunu durumu düşünelim, bu durumda temel frekans

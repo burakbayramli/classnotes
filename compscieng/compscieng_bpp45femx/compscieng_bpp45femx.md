@@ -288,7 +288,7 @@ Euler-Bernoulli kirişlerini tanımlayan denklemi hatırlayalım,
 
 $$
 E I \frac{\mathrm{d}^4 y}{\mathrm{d} X_1^4} = q
-\qquad (1)
+\tag{1}
 $$
 
 Galerkin ve şekil fonksiyonlarını gördük. Metotun dayandığı ana prensip şudur;
@@ -469,7 +469,7 @@ Parantez içindeki ikinci terimi sağ tarafa taşıyabiliriz,
 $$
 = \int_{0}^{L} W_i \left( \frac{\mathrm{d}^2 u_{approx}}{\mathrm{d} X_1^2} \right) \mathrm{d} X_1 =
 \int_{0}^{L} - W_i  \left( \frac{c X_1}{EA} \right) \mathrm{d} X_1
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi eşitliğin sol tarafına Parçalı Entegral tekniğini uygulayacağım,
@@ -839,7 +839,7 @@ $$
 \left( \frac{\mathrm{d} N_i}{\mathrm{d} X_1} \right) 
 \left( \frac{\mathrm{d} u}{\mathrm{d} X_1} \right) \mathrm{d} X_1
 = \int_{0}^{L} N_i c X_1 \mathrm{d} X_1
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki formülü kullanarak 4 tane denklem ortaya çıkartabiliriz.
@@ -1149,7 +1149,7 @@ N_1 & 0 & N_2 & 0 & \dots & N_n & 0 \\
 \left[\begin{array}{c}
 u_1 \\ v_1 \\ u_2 \\ v_2 \\ \dots \\ u_n \\ v_n
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 Daha kısa olarak
@@ -1174,7 +1174,7 @@ $$
 \dfrac{\partial v}{\partial X_2} \\
 \dfrac{\partial u}{\partial X_2} + \dfrac{\partial v}{\partial X_1} 
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 Üstteki degerler nereden geldi? Sonsuz Küçük Gerinim Tensörünü hatırlarsak,

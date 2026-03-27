@@ -36,7 +36,7 @@ Mesela skalar alan
 
 $$
 U(x,y) = \frac{1}{3} (x^4 + y^4)
-\qquad (1)
+\tag{1}
 $$
 
 olsun,

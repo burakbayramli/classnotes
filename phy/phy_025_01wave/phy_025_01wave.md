@@ -47,7 +47,7 @@ $u(x,t)$ tanımlarız [6, sf. 420], ve
 
 $$
 u(x,t) = (x - ct)
-\qquad (3)
+\tag{3}
 $$
 
 $t=0$ anında dalganın "profili'' $f(x)$, bu sağa taşınan şekildir, "bozulmadır

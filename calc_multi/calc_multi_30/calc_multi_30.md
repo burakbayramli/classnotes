@@ -232,7 +232,7 @@ $$
 \dfrac{\partial F_1}{\partial z} - \dfrac{\partial F_3}{\partial x} & 
 \dfrac{\partial F_2}{\partial x} - \dfrac{\partial F_1}{\partial y} 
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 Bu hesap, isminin çağrıştırabileceği üzere bir vektör alanının döndürme etkisini

@@ -258,7 +258,7 @@ Bu fonksiyonu
 
 $$
 v(x) = a_1 x^3 + a_2 x^2 + a_3 x + a_4
-\qquad (7)
+\tag{7}
 $$
 
 küpsel polinom ile temsil edebiliriz, bu uygun çünkü 4 derece serbestlik var
@@ -324,7 +324,7 @@ v =
   -\frac{3}{L^2} (v_1 - v_2) - \frac{1}{L} (2\phi_1 + \phi_2)
 \right] x^2 +
 \phi_1 x + v_1
-\qquad (8)
+\tag{8}
 $$
 
 Bu nihai formül kullanılarak kiriş öğe direngenlik matrisi elde
@@ -545,7 +545,7 @@ gerekli.
 
 $$
 EI v' = M_B x + P_B Lx - P_B \left( \frac{x}{2} \right)^2 + C_1
-\qquad (4)
+\tag{4}
 $$
 
 $$
@@ -553,7 +553,7 @@ EIv = M_B \left( \frac{x^2}{2} \right) +
 P_B L  \left( \frac{x^2}{2} \right) -
 P_B \left( \frac{x^3}{6} \right) +
 C_1 x + C_2
-\qquad (5)
+\tag{5}
 $$
 
 ![](phy_020_strs_05_05.jpg)

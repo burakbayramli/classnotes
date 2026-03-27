@@ -374,7 +374,7 @@ böceği $\omega$ frekansında normal flaşını veriyor, yani $\theta = \omega$
 Şimdi dışarıdan
 
 $$\Theta = \Omega 
-\qquad (1)$$
+\tag{1}$$
 
 fazında ile başka etkileyici bir flaşın görüldüğünü farzedelim, ki $\Theta=0$ o
 diğer flaşın verildiği anı temsil ediyor. Modelimize göre eğer bu etki eğer
@@ -383,7 +383,7 @@ olmaya uğraşacak, ya da geride ise yavaşlayıp yine uyumlanmaya çabalayacak.
 durumu
 
 $$ \dot{\theta} = \omega + A \sin(\Theta - \theta) 
-\qquad (2) $$
+\tag{2} $$
 
 ile modelleyebiliriz, ki $A > 0$. Mesela eğer $\Theta$, $\theta$'nin ilerisinde
 ise, $0 < \Theta - \theta < \pi$ gibi, o zaman ateş böceği hızlanacak
@@ -395,7 +395,7 @@ dinamiklerine bakalım. (1)'den (2)'yi çıkartırsak,
 
 $$
 \dot{\phi} = \dot{\Theta} - \dot{\theta} = \Omega - \omega - A\sin\phi
-\qquad (3)
+\tag{3}
 $$
 
 Denklem $\phi(t)$ birörnek olmayan titreşir denklemidir. Üstteki denklemi

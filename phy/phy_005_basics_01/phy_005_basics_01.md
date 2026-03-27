@@ -171,7 +171,7 @@ Bir kez daha
 
 $$ 
 x(t) = x_0 + v_0t + \frac{1}{2}gt^2
-\qquad (1)
+\tag{1}
 $$
 
 $x_0,v_0$ sabitler, ama deneyimizde başlangıç hızı $v_0=0$ alacağız, ayrıca
@@ -304,7 +304,7 @@ $$
 
 $$
 v^2 = v_0^2 + 2a (x-x_0)  
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi kinetik enerjiden başlayarak iş formülünü türetelim. Mesela bir
@@ -312,7 +312,7 @@ ipteki boncuğa kuvvet uyguladık, boncuk $x$ yönünde $d$ kadar kaydı.
 
 $$
 F_x = m a_x
-\qquad (3)
+\tag{3}
 $$
 
 Kuvvet sabit ise o zaman ivme de sabittir, o zaman (2) formülünü

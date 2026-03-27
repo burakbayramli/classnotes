@@ -123,7 +123,7 @@ matris doğurur),
 
 $$ 
 R(M,x) = \frac{x^TMx}{x^Tx} 
-\qquad (1) 
+\tag{1} 
 $$
 
 ifadesi de doğru olmalı. $R$'ye Rayleigh bölümü adı veriliyor, ve eşitliğin sağı

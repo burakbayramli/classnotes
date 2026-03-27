@@ -78,7 +78,7 @@ koşullarında bir sarsım olarak görebiliyorduk, şu ifadelerde
 
 $$
 \nabla f(x) + \sum_{i=1}^{m} u_i\nabla h_i + A^T v = 0
-\qquad (1)
+\tag{1}
 $$
 
 $$
@@ -97,7 +97,7 @@ Normal sartlarda bloktaki ikinci ifade yerine
 
 $$
 u_i \cdot h_i(x) = 0, \quad i=1,..,m
-\qquad (2)
+\tag{2}
 $$
 
 olacaktı. Değişen tamamlayıcı gevşeklik yani.
@@ -135,7 +135,7 @@ Denklemler ayrı ayrı olarak
 
 $$
 r_{dual}= \nabla f(x) + Dh(x)^T u + A^T v 
-\qquad (6)
+\tag{6}
 $$
 
 $$
@@ -156,7 +156,7 @@ r(x,u,v) =
 -\mathrm{diag}(u)h(x) - 1/t \\
 Ax - b
 \end{array}\right]
-\qquad (3)
+\tag{3}
 $$
 
 ki
@@ -173,7 +173,7 @@ D h_1(x)^T \\
 \dots \\
 D h_m(x)^T
 \end{array}\right]
-\qquad (4)
+\tag{4}
 $$
 
 $r(x,u,v)$'yu sıfıra eşitliyoruz, yani bir anlamda 
@@ -249,7 +249,7 @@ A & 0 & 0
 \left[\begin{array}{c}
 r_{dual} \\ r_{cent} \\ r_{prim}
 \end{array}\right]  
-\qquad (5)
+\tag{5}
 $$
 
 Büyük Jacobian'ı nasıl elde ettik? Mesela (3)'ün ilk satırına bakalım, 

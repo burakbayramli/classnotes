@@ -104,7 +104,7 @@ ki
 
 $$ 
 w^i_t = \frac{p(x^i_{0:t}|y_{1:t})}{h(x^i_{0:t})} 
-\qquad (1) 
+\tag{1} 
 $$
 
 ve bağımsız özdeşçe dağılmış (i.i.d.) $x^1_{0:t}, .., x^N_{0:t} \sim h$
@@ -120,7 +120,7 @@ Bu mümkün. Mesela önemsel dağılım $h$ için,
 
 $$ 
 h(x_{0:t}) = h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) 
-\qquad (2)
+\tag{2}
 $$
 
 Üstteki ifade koşulsal olasılığın doğal bir sonucu. Peki ağırlıklar özyineli
@@ -131,7 +131,7 @@ $$
 w_t =
 \frac{p(x_{0:t}|y_{1:t})}{h(x_{0:t})} =
 \frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_{0:t})p(y_{1:t}) }
-\qquad (3)
+\tag{3}
 $$
 
 çünkü hatırlarsak $P(A|B) = P(B|A)P(A) / P(B)$, teknik işliyor çünkü

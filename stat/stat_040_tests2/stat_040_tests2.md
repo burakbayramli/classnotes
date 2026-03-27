@@ -306,7 +306,7 @@ Korelasyon $\rho$'yu daha önce gördük, tahmin edicisi $r$'dir,
 
 $$ 
 \hat{\rho} = r = \frac{S_{xy}}{\sqrt{S_{xx}S_{yy}}} 
-\qquad (1) 
+\tag{1} 
 $$
 
 ki örneklem hesapları $S_{xx},S_{xy},S_{yy}$ 

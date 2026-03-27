@@ -141,7 +141,7 @@ ya da
 
 $$
  e^{-pt} A \cos (\omega_1 t - \phi) 
-\qquad (1)
+\tag{1}
 $$
 
 ve böylece $\omega_1$'in yarı-frekans olduğunu görüyoruz. Niye? Çözümün t

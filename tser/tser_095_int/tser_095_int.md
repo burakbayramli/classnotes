@@ -145,7 +145,7 @@ sonunda $Pe^{rt}$ borçlanmışız demektir, çünkü süre sonunda etkili olan 
 faiz $rt$'dir, yani
 
 $$ P \lim_{n \to \infty} (1 + rt / n)^n = Pe^{rt}
-\qquad (1)
+\tag{1}
 $$
 
 İkiye Katlama Kuralı (The Doubling Rule)

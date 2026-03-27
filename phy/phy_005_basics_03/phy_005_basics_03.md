@@ -34,12 +34,12 @@ vektörünün büyüklüğünü $P$ ile gösterirsek,
 
 $$
 \vec{v}_1' = \vec{v}_1 - (P / m_1) \vec{n}
-\qquad (1)
+\tag{1}
 $$
 
 $$
 \vec{v}_2' = \vec{v}_2 + (P / m_2) \vec{n}
-\qquad (2)
+\tag{2}
 $$
 
 Eğer $P$ skalar büyüklüğünü bulabilirsek, çarpışma sonrası yeni hızı elde
@@ -52,12 +52,12 @@ $v_1,v_1',v_2,v_2'$ şöyle temsil edilebilir,
 
 $$
 \vec{v}_1 = a_1 \vec{n} + b_1 \vec{q}, \qquad \vec{v}_2 = a_2 \vec{n} + b_2 \vec{q}
-\qquad (3)
+\tag{3}
 $$
 
 $$
 \vec{v}_1' = a_1' \vec{n} + b_1' \vec{q}, \qquad v_2' = a_2' \vec{n} + b_2' \vec{q}
-\qquad (4)
+\tag{4}
 $$
 
 $a_1,a_2,b_1,b_2$ tek sayı değerleridir. 
@@ -87,12 +87,12 @@ tekabül eden kısımlara bakarak
 
 $$
 a_1' = a_1 - (P/m_1), \qquad b_1' = b_1
-\qquad (5)
+\tag{5}
 $$
 
 $$
 a_2' = a_2 + (P/m_2), \qquad b_2' = b_2
-\qquad (6)
+\tag{6}
 $$
 
 Şimdi $P$ tek sayı değerini bulmak için enerji muhafazası formülünü

@@ -136,7 +136,7 @@ ve ona $f(x)$ eklersek acaba $f(y)$'den büyük bir değer elde eder miyiz?
 $$
 (\alpha g_1 + (1-\alpha) g_2)^T (y-x) + f(x) 
 \underbrace{\le}_{?} f(y) \quad \forall y
-\qquad (1)
+\tag{1}
 $$
 
 Üsttekini ispatlayabilirsek $\partial f(x)$'in bir dışbükey küme olduğunu
@@ -264,7 +264,7 @@ gerekir. Mesela gösterge fonksiyonu $I$'nin uç noktalarında mevcut değildir.
 
 $$
 \min_x f(x) \quad \textrm{öyle ki} \quad x \in C
-\qquad (3)
+\tag{3}
 $$
 
 problemini çözmek istiyoruz, diyelim $f$ dışbükey ve türevi alınabilir. Bu
@@ -295,7 +295,7 @@ haline getirerek bunu yapabiliriz,
 
 $$
 \min_x f(x) + I_C(x)
-\qquad (2)
+\tag{2}
 $$
 
 ki $I_C(x) = 0$ eğer $x$, $C$ kümesi içindeyse, dışındaysa sonsuzluk. Şimdi
@@ -380,7 +380,7 @@ dahil etmek,
 
 $$
 \min_\beta \frac{1}{2} || y - X \beta ||_2^2 + \lambda ||\beta||_1
-\qquad (5)
+\tag{5}
 $$
 
 ki $\lambda \ge 0$. Altgradyan optimalliğinde sadece ve sadece alttaki şart
@@ -403,7 +403,7 @@ $$
 
 $$
 \iff X^T (y - X\beta) = \lambda v 
-\qquad (4)
+\tag{4}
 $$
 
 herhangi bir $v \in \partial ||\beta||_1$ için. L1 norm'un altgradyanı için

@@ -164,7 +164,7 @@ Bunu özel durumumuza nasıl uygularız? $y$ sabit, o zaman $dy = 0$. Yani
 
 $$
 df = f_xdx + f_zdz  
-\qquad (1)
+\tag{1}
 $$
 
 Devam edelim, aslında $dx$'den de kurtulmak istiyoruz, çünkü o bağımlı bir

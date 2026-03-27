@@ -462,7 +462,7 @@ hesabından daha kolay. Denklemsel olarak
 $$ f(f(p)) = r f(p) \left[ 1- f(p) \right] $$
 
 $$ = r \left( rp (1-p) \right) \left[ 1-rp(1-p)\right] 
-\qquad (1)$$
+\tag{1}$$
 
 elde ederdim, eşitliğin sağ tarafında $p$'nin 4 kuvveti ortaya çıkıyor, bu
 şaşırtıcı değil lojistik denklem karesel, o zaman içiçe iki $f$ üstel 4

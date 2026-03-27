@@ -12,12 +12,12 @@ işlediğini görebiliriz. Diyelim ki bir sabit nokta $(x^\ast,y^\ast)$ var, ve 
 
 $$
 \dot{x} = f(x,y) 
-\qquad (1)
+\tag{1}
 $$
 
 $$
 \dot{y} = g(x,y) 
-\qquad (2)
+\tag{2}
 $$
 
 Hatırlarsak iki boyutta sabit nokta olması icin hem $\dot{x}=0$, hem de
@@ -38,12 +38,12 @@ gözönüne alabiliriz,
 
 $$ 
 u(t) = x(t) - x^\ast 
-\qquad (3)
+\tag{3}
 $$
 
 $$ 
 v(t) = y(t) - y^\ast 
-\qquad (4)
+\tag{4}
 $$
 
 Üstteki işlemlerle kordinat sistemimizin orijinini sabit noktaya doğru kaydırmış
@@ -340,7 +340,7 @@ muhakkak, çünkü yarım koyun, çeyrek tavşan olamaz.
 
 $$ 
 \dot{x} = x(3-x-2y) 
-\qquad (5) 
+\tag{5} 
 $$
 
 $$ \dot{y} = y(2-x-y) $$

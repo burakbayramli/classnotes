@@ -794,7 +794,7 @@ ortaya çıkmasını sağlar.
 Her $i=0,..,n+1$ için 
 
 $$ p(x) = p_i(x) = a_i + b_i(x-x_i) + c_i(x-x_i)^2 + d_i(x-x_i)^3
-\qquad (1)
+\tag{1}
 $$
 
 kullanalım. Noktalar $x_i$ olarak gösteriliyor, ve her noktada aktif olan
@@ -857,7 +857,7 @@ $$ y_2 = p_1(x_2) = y_1 + b_1h_1 + c_1h_1^2 + d_1h_1^3 $$
 haline gelir. Hepsini birarada yazıyoruz ($y$'yi sağ tarafa aldık)
 
 $$ y_1 + b_1h_1 + c_1h_1^2 + d_1h_1^3 = y_2 
-\qquad (2) 
+\tag{2} 
 $$
 
 $$ y_2 + b_2h_2 + c_2h_2^2 + d_2h_2^3 = y_3 $$
@@ -945,7 +945,7 @@ $$  p_2'(x_2) = b_2 $$
 geçerli, geriye sadece $b_2$ kaldı. Hepsi bir arada
 
 $$  b_1 + 2c_1h_1 + 3d_1h_1^2  = b_2 
-\qquad (3)$$
+\tag{3}$$
 
 $$  b_2 + 2c_2h_2 + 3d_2h_2^2 = b_3 $$
 
@@ -957,7 +957,7 @@ $$  b_{n-1} + 2c_{n-1}h_{n-1} + 3d_{n-1}h_{n-1}^2 =  b_n $$
 yokoluyor, 
 
 $$ 2c_1 + 6d_1h_1 = 2c_2 
-\qquad (4) $$
+\tag{4} $$
 
 $$ 2c_2 + 6d_2h_2 = 2c_3 $$
 
@@ -978,7 +978,7 @@ $$ 6d_1(x_1-x_1) $$ sıfır olur
 Denklem (4)'den başlayan bölümü tekrar düzenlersek, 
 
 $$ d_1 = \frac{ c_2 - c_1}{3h_1} 
-\qquad (5) $$
+\tag{5} $$
 
 $$ d_2 = \frac{ c_3 - c_2}{3h_2} $$
 
@@ -989,7 +989,7 @@ $$ d_n = \frac{ c_{n+1} - c_n}{3h_n} $$
 Üstteki denklemleri (2) ve (3)'e geri koyarsak,
 
 $$ b_1 + \frac{ c_2 + 2c_1}{3}h_1 = s_1 
-\qquad (7) $$
+\tag{7} $$
 
 $$ b_2 + \frac{ c_3 + 2c_2}{3}h_1 = s_2 $$
 
@@ -1021,7 +1021,7 @@ $$  (c_1 + c_2) h_1  = b_2 - b_1$$
 Bu ifade tüm $i$ noktaları için geçerli, hepsi bir arada
 
 $$  (c_1 + c_2) h_1  = b_2 - b_1 
-\qquad (6)$$
+\tag{6}$$
 
 $$  (c_2 + c_3) h_2  = b_3 - b_2$$
 

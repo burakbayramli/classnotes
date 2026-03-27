@@ -5,7 +5,7 @@ Bükülen bir çubuğun formüllerine bir giriş [3]'te yapıldı. Orada moment-
 
 $$
 M(x) = \frac{E(x)I(x)}{\rho(x)} = \frac{EI}{\rho}
-\qquad (1)
+\tag{1}
 $$
 
 Şimdi bu formülü genişletelim, ve bir ikinci derece türeve eşitleyelim.
@@ -39,7 +39,7 @@ daha da ufalır, geriye sadece 1 kalır, 1 ile bölümü yok sayarız, geriye ka
 
 $$
 \frac{1}{\rho} \approx \frac{\mathrm{d}^2 v}{\mathrm{d} x^2}
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi (1) formülünü tekrar düzenlersek,
@@ -67,7 +67,7 @@ $$
 
 $$
 EI v'' = M
-\qquad (3)
+\tag{3}
 $$
 
 Bir formül daha, sonra faydalı olacak, hatırlarsak,
@@ -86,7 +86,7 @@ Yani [5, sf. 683]
 
 $$
 v = EI v''' = EI \frac{\mathrm{d}^3 v}{\mathrm{d} x^3}
-\qquad (6)
+\tag{6}
 $$
 
 Ayrıca [4]'de gösterilmişti, $\mathrm{d} v / \mathrm{d} x = -q$ olduğu için
@@ -224,7 +224,7 @@ bulabilirim,
 $$
 \sigma_{11} = -\frac{M X_2}{I}, \quad
 \sigma_{12} = -\frac{VQ}{I b}
-\qquad (2)
+\tag{2}
 $$
 
 Çözüm
@@ -413,7 +413,7 @@ kullanabiliriz. Bu denklemi hatırlarsak
 
 $$
 EI v'' = M
-\qquad (4)
+\tag{4}
 $$
 
 Kullanacağımız test yapısı iki ucunden pimlenmiş sütun olacak. Üstteki denklem

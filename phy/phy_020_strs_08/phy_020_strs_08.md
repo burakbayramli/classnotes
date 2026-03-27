@@ -25,7 +25,7 @@ f'_{1x} \\ f'_{2x}
 \left[\begin{array}{c}
 u'_1 \\ u'_2
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 olarak göstermiştik. Üstteki formül kirişin yerel, kendisine has kordinat
@@ -44,7 +44,7 @@ C & S \\ -S & C
 \left[\begin{array}{c}
 u \\ v
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 ile yapılır, ki $C = \cos\theta$, $S = \sin\theta$.
@@ -213,7 +213,7 @@ C_1 & 0 & 0 & -C_1 & 0 & 0 \\
 \left[\begin{array}{c}
 u'_1 \\ v'_1 \\ \phi'_1 \\ u'_2 \\ v'_2 \\ \phi'_2
 \end{array}\right]
-\qquad (4)
+\tag{4}
 $$
 
 elde edilir, ki $C_1 = \dfrac{AE}{L}$ ve $C_2 = \dfrac{EI}{L^3}$ olmak
@@ -237,7 +237,7 @@ C & S & 0 & 0 & 0 & 0 \\
 \left[\begin{array}{ccc}
 u_1 \\ v_1 \\ \phi_1 \\ u_2 \\ v_2 \\ \phi_2 
 \end{array}\right]
-\qquad (5)
+\tag{5}
 $$
 
 Ortadaki matris yerel öğeler için etkili $T$ matrisi. Dikkat edersek dönüş
@@ -282,7 +282,7 @@ $$
 k = 
 \frac{E}{L} \times 
 \left[\begin{matrix}A C^{2} + \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & - \frac{6 I S}{L} & - A C^{2} - \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - \frac{6 I S}{L}\\\frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & A S^{2} + \frac{12 C^{2} I}{L^{2}} & \frac{6 C I}{L} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - A S^{2} - \frac{12 C^{2} I}{L^{2}} & \frac{6 C I}{L}\\- \frac{6 I S}{L} & \frac{6 C I}{L} & 4 I & \frac{6 I S}{L} & - \frac{6 C I}{L} & 2 I\\- A C^{2} - \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & \frac{6 I S}{L} & A C^{2} + \frac{12 I S^{2}}{L^{2}} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & \frac{6 I S}{L}\\\frac{C S \left(- A L^{2} + 12 I\right)}{L^{2}} & - A S^{2} - \frac{12 C^{2} I}{L^{2}} & - \frac{6 C I}{L} & \frac{C S \left(A L^{2} - 12 I\right)}{L^{2}} & A S^{2} + \frac{12 C^{2} I}{L^{2}} & - \frac{6 C I}{L}\\- \frac{6 I S}{L} & \frac{6 C I}{L} & 2 I & \frac{6 I S}{L} & - \frac{6 C I}{L} & 4 I\end{matrix}\right]
-\qquad (3)
+\tag{3}
 $$
 
 Bu sonuç [1]'deki sonuca benziyor, cebirsel olarak eşit.

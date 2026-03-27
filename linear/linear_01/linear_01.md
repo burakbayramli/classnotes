@@ -776,7 +776,7 @@ $$
 ||\vec{a}-\vec{b}||^2 =
 ||\vec{a}||^2 + ||\vec{b}||^2 -
 2 ||\vec{a}|| ||\vec{b}|| \cos\theta
-\qquad (1)
+\tag{1}
 $$
 
 Norm açılımından hareketle

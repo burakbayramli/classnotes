@@ -504,7 +504,7 @@ $$
 
 $$
 r_i(x) = ||x-x_i|| = \sqrt{(x-x_i)^T(x-x_i)} 
-\qquad (1)
+\tag{1}
 $$
 
 Ayrıca
@@ -528,7 +528,7 @@ $$
 \phi'(r_i) I + \bigg[\phi''(r_i) - \frac{\phi'(r_i)}{r_i(x)} \bigg] 
 (x-x_i) \frac{\partial r_i}{\partial x}
 \bigg\}
-\qquad (2)
+\tag{2}
 $$
 
 Türetmek için, radyal vektörler $\,w_k = (x - x_k)\in{\mathbb R}^n\,$

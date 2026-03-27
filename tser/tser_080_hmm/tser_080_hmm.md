@@ -129,7 +129,7 @@ için bir vektör $S_1 = \{1,4,2,2,1,4\}$ gibi.. Şimdi görünen herhangi bir
 dizinin olasılığını hesaplayalım,
 
 $$ P(V) = \sum_{r}^{c^n} P(V | S_r) P(S_r) 
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki formüldeki $P(S_r)$'in açılımını MZ'lerden zaten biliyoruz, 
@@ -667,7 +667,7 @@ Devam edelim, $\xi$'i tanımlayalım,
 
 $$
 \xi_t(i,j) = P(X_t = i, X_{t+1}= j | V; \lambda) 
-\qquad (2)
+\tag{2}
 $$
 
 $\xi$ ile $t$ anında $i$ konumunda $t+1$ anında $j$ konumunda olma
@@ -709,7 +709,7 @@ $$ \sum_{t=1}^{T-1} \xi_t(i,j) = \textrm{ i'den j'ye geçiş beklentisi} $$
 tahminsel hesaplamak mümkündür. 
 
 $$ \overline{\pi} = \textrm{t=1 anında i konumunda olma frekansı} = \gamma_1(i)
-\qquad (3)
+\tag{3}
 $$
 
 $$ \overline{a_{ij}} = \frac{\textrm{i konumundan j konumuna geçiş beklentisi}}
@@ -717,7 +717,7 @@ $$ \overline{a_{ij}} = \frac{\textrm{i konumundan j konumuna geçiş beklentisi}
 $$
 
 $$  = \frac{ \sum_{t=1}^{T-1}\xi_t(i,j) }{ \sum_{t=1}^{T-1} \gamma_t(i) } 
-\qquad (4)
+\tag{4}
 $$
 
 $$ 
@@ -727,7 +727,7 @@ $$
 $$
 
 $$ = \frac{\sum_{t=1}^{T-1} \gamma_t(j) 1(V_t=k) }{\sum_{t=1}^{T-1}\gamma_t(j) } 
-\qquad (5)
+\tag{5}
 $$
 
 Tüm bunları kullanarak eğitim yaklaşımını şöyle belirleyebiliriz: bir

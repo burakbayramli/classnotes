@@ -6,7 +6,7 @@ uğraşır. Bu yapı
 
 $$
 f(x) = g(x) + h(x) 
-\qquad (1)
+\tag{1}
 $$
 
 formundadır [1, 45:59]. $g,h$'in ikisi de dışbükey. $g$'nin pürüzsüz,
@@ -79,7 +79,7 @@ Bir $h$ fonksiyonu için bir $\mathrm{prox}$ operatörü tanımlıyoruz,
 
 $$
 \mathrm{prox}_{t} (x) = \arg\min_z \frac{1}{2t} ||x-z||_2^2 + h(z)
-\qquad (3)
+\tag{3}
 $$
 
 Üstteki $x$'in bir fonksiyonu olarak $\arg\min$'de gösterilen kriteri
@@ -104,7 +104,7 @@ $$
 x^{(k)} = \mathrm{prox}_{t_k} \big( 
 x^{(k-1)} - t_k \nabla g(x^{(k-1)})
 \big), \quad k=1,2,...
-\qquad (2)
+\tag{2}
 $$
 
 Güncelleme adımını tanıdık şekilde yazmak için 
@@ -278,7 +278,7 @@ bir açıdan. Problem,
 
 $$
 \min_B \frac{1}{2} \sum_{(i,j) \in \omega} (Y_{ij} - B_{ij})^2 + \lambda ||B||_{tr}
-\qquad (4)
+\tag{4}
 $$
 
 ki $||B||_{tr}$ iz (ya da nükleer) normudur, 
@@ -360,7 +360,7 @@ operatörünü hesaplayabilmek. Gradyan oldukca basit,
 
 $$
 \nabla g(B) = -(  P_\Omega (Y) - P_\Omega(B) ) 
-\qquad (8)
+\tag{8}
 $$
 
 Sadece işaretleri biraz değiştirdim çünkü onu sonra gradyandan
@@ -369,7 +369,7 @@ faydalı. Şimdi ikinci terim için prox operatörünü görelim.
 
 $$
 \mathrm{prox}_t(B) = \arg\min_Z \frac{1}{2t} || B - Z ||_F^2 + \lambda ||Z||_{tr}
-\qquad (5)
+\tag{5}
 $$
 
 Tüm mümkün $Z$ matrisleri üzerinden minimizasyon yapıyoruz, ve $B_i$ ile
@@ -416,14 +416,14 @@ bulmayacağımızı kontrol edeceğiz.
 
 $$
 0 \in Z - B + \lambda t \cdot \partial ||Z||_{tr} 
-\qquad (7)
+\tag{7}
 $$
 
 İz normunun altgradyanını gösterelim, 
 
 $$
 \partial ||Z||_{tr} = \{  UV^T + W : ||W||_{op} < 1, U^TW = 0, WV = 0 \}
-\qquad (6)
+\tag{6}
 $$
 
 Üstteki notasyon diyor ki aradığımız $W$'ler en büyük eşsiz değeri 1'den

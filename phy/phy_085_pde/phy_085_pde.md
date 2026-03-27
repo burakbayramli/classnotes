@@ -686,13 +686,13 @@ Bunları $u_x$ ve $u_t$ içinde yerlerine geçirirsek,
 $$ u_x = 
 \frac{\partial u}{\partial \alpha} a +
 \frac{\partial u}{\partial \beta} c
-\qquad (1)
+\tag{1}
 $$
 
 $$ u_t = 
 \frac{\partial u}{\partial \alpha} b +
 \frac{\partial u}{\partial \beta} d
-\qquad (2)
+\tag{2}
 $$
 
 Üstteki iki kısmi türevi ana PDE'de yerine koyarsak
@@ -751,7 +751,7 @@ eder. PDE şu formdadır
 
 $$ \frac{\partial u}{\partial x} + 
 p(x,y) \frac{\partial u}{\partial y} = 0 
-\qquad (1)
+\tag{1}
 $$
 
 ve $p(x,y)$, $x,y$ değişkenlerinin bir fonksiyonudur. 
@@ -778,7 +778,7 @@ $$ \frac{dy}{dx} = \frac{p(x,y)}{1} $$
 ya da
 
 $$ \frac{dy}{dx} = p(x,y) 
-\qquad (2)
+\tag{2}
 $$
 
 Bu ODE bir yön alanı (direction field) oluşturur, bkz [1].
@@ -862,7 +862,7 @@ $$ u_{tt} - c^2 u_{xx} =
 \bigg( \frac{\partial }{\partial t} - c \frac{\partial }{\partial x} \bigg)
 \bigg( \frac{\partial }{\partial t} + c \frac{\partial }{\partial x} \bigg)
 u = 0
-\qquad (3)
+\tag{3}
 $$
 
 Eşitliğin sağ tarafındaki operatörler hakikaten dalga denklemine tekabül
@@ -979,7 +979,7 @@ $u(x,t) = \sin x \cos ct$.
 Kontrol edelim. Çözüm şöyleydi:
 
 $$ u(x,t) = f(x+ct) + g(x-ct)  
-\qquad (5)
+\tag{5}
 $$
 
 $t=0$ dersek 
@@ -989,7 +989,7 @@ $$ u(x,0)  = f(x) + g(x) $$
 $u(x,0) = \phi(x)$ demiştik
 
 $$ \phi(x) = f(x) + g(x) 
-\qquad (1) 
+\tag{1} 
 $$
 
 Zincirleme Kanunu kullanarak $t$'ye göre türev alalım ve $t=0$ diyelim
@@ -999,7 +999,7 @@ $$ u_t(x,0) = cf' - cg' $$
 $u_t(x,0) = \psi(x)$ demiştik
 
 $$ \psi(x) = cf'(x) - cg'(x) 
-\qquad (2) $$
+\tag{2} $$
 
 Formül (1) ve (2)'yi bir denklem sistemi olarak görebiliriz, ve aynı anda
 çözmeye uğraşabiliriz. (1)'in türevini alalım, ve (2)'yi $c$'ye bölelim
@@ -1024,13 +1024,13 @@ $$ \int f' = \int \frac{1}{2} \bigg( \phi' + \frac{\psi}{c}  \bigg) $$
 $$ f = \frac{1}{2}\phi(s) + \frac{1}{2}\int_0^s \frac{\psi(x)}{c} + A$$
 
 $$ f = \frac{1}{2}\phi(s) + \frac{1}{2c} \int_0^s \psi(x) + A 
-\qquad (3)
+\tag{3}
 $$
 
 $g'$'nin entegrali
 
 $$ g = \frac{1}{2}\phi(s) - \frac{1}{2c} \int_0^s \psi(x) + B
-\qquad (4)
+\tag{4}
 $$
 
 
@@ -1141,7 +1141,7 @@ vereceğimiz  bir fonksiyon ve bizim tanımladığımız özel başlangıç
 şartları şöyle:
 
 $$
-Q(x,0) = 1, \ x>0 \textit{ için } \qquad (7)
+Q(x,0) = 1, \ x>0 \textit{ için } \tag{7}
 $$
 
 $$ Q(x,0)=0, \ x<0 \textit{ için }  $$
@@ -1156,7 +1156,7 @@ $Q$'yu üç adımda bulacağız.
 Çözümün şu özel formda olacağını söylüyoruz. 
 
 $$ Q(x,t) = g(p), \ p = \frac{x}{\sqrt{4kt}} 
-\qquad (6) $$
+\tag{6} $$
 
 
 $g$ tek değişkenli bir fonksiyon, fonksiyonun ne olduğunu sonra
@@ -1292,7 +1292,7 @@ yapalım. (b) özelliği üzerinden $S$'nin aynı zamanda ana denklemin bir
 da tanımlıyoruz. 
 
 $$
-u(x,t) = \int_{-\infty}^{\infty} S(x-y,t) \phi(y) \mathrm{d} y  \qquad (8)
+u(x,t) = \int_{-\infty}^{\infty} S(x-y,t) \phi(y) \mathrm{d} y  \tag{8}
 $$
 
 $t>0$ için. (d) özelliği üzerinden $u$, PDE için yeni bir çözümdür. Biz ek

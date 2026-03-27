@@ -90,22 +90,22 @@ formülleri bir daha alta alta yazalım,
 
 $$ 
 \hat{x}_k^+  = K_k' \hat{x}_k^- + K_kz_k  
-\qquad (1)  
+\tag{1}  
 $$
 
 $$ 
 z_k = H_k x_k + v_k 
-\qquad (2) 
+\tag{2} 
 $$
 
 $$ 
 \hat{x}_k^+ = x_k + \tilde{x_k}^+ 
-\qquad (3) 
+\tag{3} 
 $$
 
 $$ 
 \hat{x}_k^- = x_k + \tilde{x_k}^- 
-\qquad (4)
+\tag{4}
 $$
 
 (1) içine (2)
@@ -198,7 +198,7 @@ Yani
 $$ 
 = E \bigg[ (I - K_kH_k)\tilde{x_k}^- \big( \tilde{x_k}^{-T}(I - H_k^TK_k^T)
 + v_k^TK_k^T \big) + 
-\qquad (5)
+\tag{5}
 $$
 
 $$ K_kv_k \big( \tilde{x_k}^{-T}(I - H_k^TK_k^T) + v_k^TK_k^T  \big) \bigg] $$
@@ -218,7 +218,7 @@ Tüm bunları (5)'i basitleştirmek için kullanırsak,
 
 $$ 
 P_k^{+} =  (I - K_kH_k)P_k^-(I - H_k^TK_k^T) + K_kR_kK_k^T 
-\qquad (6)
+\tag{6}
 $$
 
 En optimal $K_k$'yi nasıl buluruz? Amaç $P_k^+$ matrisinin çaprazındaki

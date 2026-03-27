@@ -50,7 +50,7 @@ tüm eşitlik yerine
 $$
 \int \int_S < 0,0,R > \cdot \hat{n} \mathrm{d} S =
 \int \int \int_D R_z \mathrm{d} V
-\qquad (1)
+\tag{1}
 $$
 
 eşitliğinin ispatını yapacağım. Buradan hareketle daha genel eşitliği
@@ -99,7 +99,7 @@ Bu bize $R$'yi geri vermez mi? Evet. O zaman
 $$
 \iiint_D R_z \mathrm{d} V = \iint_U \bigg[ R(x,y,z_2(x,y)) - R(x,y,z_1(x,y))  \bigg]
 \mathrm{d} x \mathrm{d} y
-\qquad (2)
+\tag{2}
 $$
 
 Elde net formül olmadan daha fazla ilerleyemem, şimdi çift entegrale dönüyorum.
@@ -271,7 +271,7 @@ orantısal olarak kurabiliriz, bir sabit üzerinden mesela,
 
 $$
 \vec{F} = -k \nabla u
-\qquad (3)
+\tag{3}
 $$
 
 Bir diğer ilişki değişimin nasıl halledileceği, eğer konsantrasyon farkı

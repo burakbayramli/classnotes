@@ -43,7 +43,7 @@ geçişlerini hesaplamak için bize bir yöntem sağlıyoar. Bu denklemler,
 $$
 P_{ij}^{n+m} = \sum_{k=0}^{\infty} P_{ik}^n P_{kj}^m,
 \quad \forall n,m \ge 0, \quad \forall i,j
-\qquad (1)
+\tag{1}
 $$
 
 $P_{ij}^{n+m}$ formülü şunu söylüyor, $i$'de başlayan süreç $n+m$ geçiş sonrası

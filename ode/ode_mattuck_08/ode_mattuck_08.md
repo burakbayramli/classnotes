@@ -14,14 +14,14 @@ böylece. Bunu yaptık çünkü üstel sayıların entegralini almak kolay. Çö
 
 $$
 \tilde{y} = \frac{1}{1+i(w/k)} e^{i\omega t} 
-\qquad (1)
+\tag{1}
 $$
 
 ölmüştü, yani çözüm şunun reel bölümü olacaktı:
 
 $$
 \frac{1}{\sqrt{1+(w/k)^2}} \cos(\omega t - \phi) 
-\qquad (2)
+\tag{2}
 $$
 
 Bu metotu kutupsal metot olarak nitelemiştik. 
@@ -121,7 +121,7 @@ olacak.
 
 $$
 (a - bi) (\cos \theta + i\sin \theta) 
-\qquad (3)
+\tag{3}
 $$
 
 Soldaki eksi işaretinin sebebi bariz, çünkü sağdaki eksi ile çarpılınca

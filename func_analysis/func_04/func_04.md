@@ -137,7 +137,7 @@ Teori
 Norm edilmiş bir lineer uzayda 
 
 $$ ||x|| - ||y|| \le ||x-y|| 
-\qquad (1)
+\tag{1}
 $$
 
 İspat

@@ -44,7 +44,7 @@ mesafesi. Vektörel olarak
 
 $$ 
 \vec{F}  = \frac{1}{4\pi \epsilon_0} \frac{Q_1Q_2}{r^2} \hat{r} 
-\qquad (1)
+\tag{1}
 $$
 
 $\hat{r}$ kuvvetin etki yönü için eklenmiş, bu yön
@@ -128,7 +128,7 @@ tanımıdır.
 
 $$ 
 \vec{F} = q \vec{E} 
-\qquad (2)
+\tag{2}
 $$
 
 İki tarafı $q$ ile bölersem,

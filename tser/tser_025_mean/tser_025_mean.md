@@ -68,7 +68,7 @@ $$ \Delta y_t = \lambda y_{t-1} +
 \mu + \beta t +  
 \alpha_1 \Delta y_{t-1} + 
 \epsilon_t 
-\qquad (1)
+\tag{1}
 $$
 
 Formül nereden geliyor? Anlamak için önce Rasgele Yürüyüş (random walk) zaman
@@ -114,7 +114,7 @@ $$ \Delta y_t  = \cancel{\lambda y_{t-1}} + \mu + \epsilon_t $$
 olurdu. Ayrıca zamana bağlı lineer kaydırma da (linear drift) eklenebilir, 
 
 $$ \Delta y_t  = \lambda y_{t-1} + \mu + \beta t + \epsilon_t
-\qquad (2)
+\tag{2}
 $$
 
 Görüldüğü gibi neredeyse (1) ile tamamen aynı. Üstteki ifade $y_t$ farkları

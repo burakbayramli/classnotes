@@ -133,7 +133,7 @@ bir yansıtma var. İkinci kamera için rotasyon ve yer değiştirme sonrası ar
 bir yansıtma var. Yani,
 
 $$ \lambda_1 x_1 = X, \qquad \lambda_2 x_2 = RS + T 
-\qquad (1)
+\tag{1}
 $$
 
 Resim üzerinde

@@ -158,7 +158,7 @@ f_i(x) = f(x;\mu_i,\Sigma_i) =
 \bigg\{
 -\frac{(x-\mu)^T\Sigma_i^{-1}(x-\mu_i)}{2} 
 \bigg\} 
-\qquad (1)
+\tag{1}
 $$
 
 olur, $x$ çok boyutlu veri noktasıdır, ve kümeleme başlamadan önce
@@ -250,7 +250,7 @@ $$
 (2\pi)^{-d/2} |\Sigma_i^{-1}|^{1/2} \exp\big[ 
 g(\mu_i,\Sigma_i) \big] P(C_i)
 \big) \bigg)
-\qquad (3)
+\tag{3}
 $$
 
 $\mu_i$ için maksimum-olurluk kestirme hesabı yapmak için log olurluğun
@@ -262,7 +262,7 @@ $$
 \frac{\partial }{\partial \theta_i} \exp \big[ g(\mu_i,\Sigma_i) \big] =
 \exp \big[ g(\mu_i,\Sigma_i) \big] \cdot 
 \frac{\partial }{\partial \theta_i} g(\mu_i,\Sigma_i)
-\qquad (2)
+\tag{2}
 $$
 
 ve
@@ -423,7 +423,7 @@ $$
 
 $$ 
 \sum_{j=1}^{n} w_{ij} = -\alpha P(C_i)
-\qquad (4)
+\tag{4}
 $$
 
 Üstteki toplamı tüm kümeler üzerinden alırsak

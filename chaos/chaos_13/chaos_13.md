@@ -85,7 +85,7 @@ Kutupsal kordinatta altkritik için bir örnek görelim,
 
 $$ 
 \dot{r} = ar + r^3 -r^5 
-\qquad (1) 
+\tag{1} 
 $$
 
 $$ \dot{\theta} = 1 $$

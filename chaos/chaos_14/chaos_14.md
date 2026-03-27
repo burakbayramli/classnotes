@@ -378,7 +378,7 @@ seçiyor, ikinci açı o çember üzerindeki bir noktayı gösteriyor.
 
 $$l
 \dot{\theta_1} = \omega_1 
-\qquad (1)
+\tag{1}
 $$
 
 $$ \dot{\theta_2} = \omega_2 $$
@@ -392,7 +392,7 @@ daha iyi olur, bağlaşımlı titreşirler konusunu işleyeceğimizi söylemişt
 
 $$ 
 \dot{\theta_1} = \omega_1 + K \sin(\theta_2-\theta_1) 
-\qquad (2)$$
+\tag{2}$$
 
 $$ \dot{\theta_2} = \omega_2 + K \sin(\theta_1-\theta_2)$$
 

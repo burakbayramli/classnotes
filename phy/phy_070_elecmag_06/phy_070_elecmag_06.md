@@ -71,7 +71,7 @@ $$
 
 $$ 
 = \frac{1}{4\pi\epsilon_0 }  \frac{q}{(a^2 + z^2)^{3/2}}  < a,0,z > 
-\qquad (5)
+\tag{5}
 $$ 
 
 Üzerinde nokta yükleri olan halkaya dönersek, bu halkanın ortasından $z$
@@ -95,7 +95,7 @@ toplamıdır.
 
 $$
 \vec{E}_{tot} = \sum_{\textrm{halkanın etrafında}} \Delta E_z \hat{z} 
-\qquad (2)
+\tag{2}
 $$
 
 Bize lazım olan $E$'nin $z$ yönündeki bileşenleri. 
@@ -104,7 +104,7 @@ $$
 \Delta E_z =
 \frac{1}{4\pi\epsilon_0 }
 \frac{z \Delta Q}{(a^2 + z^2)^{3/2}}
-\qquad (3)
+\tag{3}
 $$
 
 Görüldüğü gibi $Q$ yerine $\Delta Q$ kullandık çünkü halkanın tek bir parçasına
@@ -138,7 +138,7 @@ alınan toplamına (entegraline) geçmeliyiz. Yani toplam alırken değiştirile
 mesafe olmalı, yük değil.
 
 $$
-\Delta Q = \frac{q}{L}\Delta L = \frac{q}{2\pi L}\Delta L \qquad (1)
+\Delta Q = \frac{q}{L}\Delta L = \frac{q}{2\pi L}\Delta L \tag{1}
 $$
 
 Üstteki $\Delta L$'yi $\theta$'lar bazında istiyoruz.  Üstteki örnek için ufak
@@ -294,7 +294,7 @@ olacak, ve bu toplam birim yük (tüm yük bölü tüm alan çarpı entegrasyon
 üzerinden hesapladığımız tüm alan olarak gösterilebilir.
 
 $$
-\sum \Delta q \to \frac{Q}{\pi R^2} \int \mathrm{d} a \int a \mathrm{d}\theta \qquad (4)
+\sum \Delta q \to \frac{Q}{\pi R^2} \int \mathrm{d} a \int a \mathrm{d}\theta \tag{4}
 $$
 
 İlerlemeden önce alan entegralinın işleyip işlemdiğini kontrol edelim [benzer

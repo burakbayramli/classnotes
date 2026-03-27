@@ -23,7 +23,7 @@ R_{ij}
 \mu + U_i^\top V_j + \epsilon_{ij},
 \quad
 \epsilon_{ij} \sim \mathcal{N}(0, \sigma^2)
-\qquad (3)
+\tag{3}
 $$
 
 Bir tavsiye sisteminin eğitmek demek üstteki daha az boyutlu $U,V$
@@ -179,7 +179,7 @@ p(U_i, U_{-i}, V, R)
 p(V) 
 \times
 p(R \mid U_i, U_{-i}, V)
-\qquad (1)
+\tag{1}
 $$
 
 Adım 2: Şimdi (1) içindeki $p(R \mid U_i, U_{-i}, V)$ terimine dikkat et.

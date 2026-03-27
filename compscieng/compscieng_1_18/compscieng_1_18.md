@@ -20,7 +20,7 @@ $$
 $$
 \int_{0}^{1} c \frac{\mathrm{d} u}{\mathrm{d} x} \frac{\mathrm{d} v}{\mathrm{d} x} \mathrm{d} x =
 \int_{0}^{1} f(x) v(x) \mathrm{d} x
-\qquad (1)
+\tag{1}
 $$
 
 ki eğer $u(1)=0$ ise $v(1) = 0$ (sınır şartı).
@@ -62,7 +62,7 @@ bir kombinasyonu olmasını istiyorum.
 
 $$
 U(x) = U_0 \phi_0(x) + ... + U_4 \phi_4(x)
-\qquad (2)
+\tag{2}
 $$
 
 $U_0,..,U_4$ değerleri skalar, tek sayı.. onlar ilk başta bilinmeyen "ağırlık''
@@ -110,7 +110,7 @@ karar veriyorum. Böylece,
 $$
 \int_{0}^{1} c(x) \frac{\mathrm{d} U}{\mathrm{d} x} \frac{\mathrm{d} V_i}{\mathrm{d} x} \mathrm{d} x =
 \int_{0}^{1} f(x) V_i(x) \mathrm{d} x
-\qquad (3)
+\tag{3}
 $$
 
 ki $i=0,1,2,3,4$. Böylece 5 tane denklem elde ediyorum, 5 tane $V$ ile ana

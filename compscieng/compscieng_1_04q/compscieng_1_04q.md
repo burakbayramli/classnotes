@@ -185,7 +185,7 @@ T_n = (geri)(-ileri) =
    & \ddots & \ddots & -1 \\
    &        &    0  & 1 
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 $$
@@ -205,7 +205,7 @@ T_n^{-1} =
 \left[\begin{array}{r}
 1 \\ 1 \\ \vdots \\ 1
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 (1)'deki geriye doğru farklar matrisi $\Delta_{-}$ tersinin (2)'deki

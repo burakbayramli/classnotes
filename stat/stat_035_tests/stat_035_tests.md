@@ -177,7 +177,7 @@ kadar yakınında olmasını istiyoruz. O zaman alttaki denklemi tatmin eden en
 ufak $n$'i bulduğumuz anda problemimizi çözdük demektir, 
 
 $$ P\bigg( -d \le \frac{X}{n} - p \le d \bigg)  = 1-\alpha
-\qquad (1)
+\tag{1}
 $$
 
 Tahmin edici $X/n$'nin kendisi de bir rasgele değişkendir. Bu değişken

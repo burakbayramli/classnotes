@@ -17,12 +17,12 @@ Problemi çözmek için hareket denklemlerini yazalım,
 
 $$
 \dot{x} = V \cos\theta + u(x,y)
-\qquad (4)
+\tag{4}
 $$
 
 $$
 \dot{y} = V \sin\theta + v(x,y)
-\qquad (5)
+\tag{5}
 $$
 
 $\theta$ geminin burnunu hangi yöne doğru tuttuğumuzu kontrol ediyor,
@@ -55,7 +55,7 @@ $$
 \mathcal{H} = 
 \lambda_x (V \cos \theta + u ) + 
 \lambda_y (V \sin \theta + v ) + 1
-\qquad (1)
+\tag{1}
 $$
 
 Devam edersek, Euler-Lagrange denklemleri
@@ -64,14 +64,14 @@ $$
 \dot{\lambda}_x = -\frac{\partial H}{\partial x }  = 
 -\lambda_x \frac{\partial u}{\partial x} - 
  \lambda_y \frac{\partial v}{\partial x}
-\qquad (2)
+\tag{2}
 $$
 
 $$
 \dot{\lambda}_y = -\frac{\partial H}{\partial y}  = 
 -\lambda_x \frac{\partial y}{\partial y} - 
  \lambda_y \frac{\partial u}{\partial y}
-\qquad (3)
+\tag{3}
 $$
 
 $$
@@ -159,7 +159,7 @@ $$
 
 $$
 \lambda_x = \frac{-\cos\theta}{V + u\cos\theta + v\sin\theta} 
-\qquad (7)
+\tag{7}
 $$
 
 Benzer işlemler sonrası 
@@ -176,7 +176,7 @@ $$
 \dot{\theta} = \sin^2\theta \frac{\partial v}{\partial x} + 
 \sin\theta \cos\theta \left( \frac{\partial u}{\partial x} - \frac{\partial v}{\partial y} \right)-
 \cos^2 \theta \frac{\partial u}{\partial y}
-\qquad (6)
+\tag{6}
 $$
 
 Bu son denklemi bir ODE sisteminin parçası olarak (4) ve (5) ile
@@ -220,7 +220,7 @@ rahat. Elimizde bir $y(\theta)$ var,
 
 $$
 \frac{y}{h} = \sec\theta - \sec\theta_f 
-\qquad (8)
+\tag{8}
 $$
 
 (6) şu hale gelir, 
@@ -228,7 +228,7 @@ $$
 $$
 \frac{\mathrm{d} t}{\mathrm{d} \theta} = \frac{h}{V} \sec^2\theta \to
 \frac{V(t_f-t)}{h} = \tan\theta - \tan\theta_f 
-\qquad (9)
+\tag{9}
 $$
 
 Bu nasıl oldu? (6)'nin son terimi haricinde tüm diğer 
@@ -375,7 +375,7 @@ Yere kıyasla uçağın toplam hızı
 
 $$
 \dot{r} = V \hat{u} + w
-\qquad (11)
+\tag{11}
 $$
 
 ki $\hat{u}$ uçağın yönünü gösteren birim vektör, $\hat{u} \cdot
@@ -397,7 +397,7 @@ Euler-Lagrange denklemleri
 
 $$
 \dot{\lambda} = - \frac{\partial H}{\partial r} = - \nabla (\lambda \cdot w)
-\qquad (10)
+\tag{10}
 $$
 
 $$
@@ -479,7 +479,7 @@ $$
 
 $$
 = (\lambda \cdot \nabla) w + \lambda \times (\nabla \times w) 
-\qquad (12)
+\tag{12}
 $$
 
 Ana denklemleri artık ortaya koyabiliriz. Eğer $\hat{u} = -\hat{\lambda}$

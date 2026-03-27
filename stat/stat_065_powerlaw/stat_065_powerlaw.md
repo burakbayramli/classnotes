@@ -73,7 +73,7 @@ bu grafik negatif eğimli düz çizgi olarak ortaya çıkmıştır. Yani
 
 $$ 
 \ln p(x) = -\alpha \ln x + c 
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki yaklaşımla grafiği nasıl oluşturuz? Bunun için `hist`

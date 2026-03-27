@@ -198,12 +198,12 @@ durumdaki mol spesifik ısı.
 
 $$
 Q = n C_P \Delta T
-\qquad (2)
+\tag{2}
 $$
 
 $$
 Q = n C_V \Delta T
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki $C_V$ sabit hacimdeki mol spesifik ısı, $C_P$ sabit basınçtaki.
@@ -245,7 +245,7 @@ sokarsak,
 
 $$
 n C_V \Delta T = Q - W
-\qquad (5)
+\tag{5}
 $$
 
 Yapılan iş $W$ hesaplamak için üstteki resmi düşünelim, alt bölmedeki gaz
@@ -293,14 +293,14 @@ Ya da
 
 $$
 C_P - C_V = R
-\qquad (4)
+\tag{4}
 $$
 
 Bir diğer kullanışlı ilginç sabit
 
 $$
 \gamma = C_P / C_V
-\qquad (3)
+\tag{3}
 $$
 
 oranıdır. Bu oran, politropik (polytrophic) gazlar denen, sabit hacimdeki
@@ -380,7 +380,7 @@ zaman
 
 $$
 R_m = \rho R_v = \rho A v = \textrm{sabit}
-\qquad (3)
+\tag{3}
 $$
 
 sonucuna da varılabilir [9, sf. 399].
@@ -403,7 +403,7 @@ $y_2,v_2,p_2$ diyelim, bu değişkenler
 $$
 p_1 + \frac{1}{2} \rho v_1^2 + \rho g y_1 =
 p_2 + \frac{1}{2} \rho v_2^2 + \rho g y_2 
-\qquad (1)
+\tag{1}
 $$
 
 formülü ile birbiriyle bağlıdır, ki $\rho$ sıvı yoğunluk
@@ -411,7 +411,7 @@ sabiti. Üstteki denklemi
 
 $$
 p + \frac{1}{2} \rho v^2 + \rho g y = \textrm{bir sabit}
-\qquad (2)
+\tag{2}
 $$
 
 olarak ta yazabiliriz. Bu son formül Bernoulli'nin formülüdür, onun
@@ -590,7 +590,7 @@ Basitleştirince,
 
 $$
 p_2 - p_1 = \frac{1}{2} \rho (V_s^2 - V^2)
-\qquad (4)
+\tag{4}
 $$
 
 Devam edelim, daha önce (3)'te gördük ki, eğer alan için $S$, hız için
@@ -638,7 +638,7 @@ $$
 
 $$
 V_0 = \frac{1}{2} (V_s + V)  
-\qquad (5)
+\tag{5}
 $$
 
 Helikopter Asılı Dururken
@@ -682,7 +682,7 @@ Ya da
 
 $$
 V_0 = \sqrt{W / 2 \rho A} 
-\qquad (6)
+\tag{6}
 $$
 
 Şimdi uygulananması gereken gücü düşünelim, güç tanımı birim zamandaki
@@ -928,7 +928,7 @@ $$
 \left( \frac{\partial \rho}{\partial y}  \right)_1 \frac{(y_2-y_1)}{t_2-t_1} +
 \left( \frac{\partial \rho}{\partial z}  \right)_1 \frac{(z_2-z_1)}{t_2-t_1} +
 \left( \frac{\partial \rho}{\partial t}  \right)_1
-\qquad (3)
+\tag{3}
 $$
 
 Eşitliğin sol tarafına dikkat edersek bu sıvının 1 noktasından 2 noktasına
@@ -1059,7 +1059,7 @@ Literatürde çoğunlukla şu formda gösterilir,
 
 $$
 \frac{\partial \rho}{\partial t}  + \nabla \cdot (\rho \bar{u} ) = 0
-\qquad (1)
+\tag{1}
 $$
 
 Bu denkleme süreklilik formülü (continuity equation) ya da kütle muhafaza kanunu
@@ -1080,7 +1080,7 @@ formülünden geri kalan
 
 $$
 \nabla \cdot \bar{u} = 0
-\qquad (2)
+\tag{2}
 $$
 
 olacaktır. $\nabla \cdot$ sembolünün uzaklaşım, ya da $\mathrm{div}$ olduğunu
@@ -1233,7 +1233,7 @@ $$
 \int_{x_1}^{x_2} \rho(x,t_2) \mathrm{d} x -
 \int_{t_1}^{t_2}  \rho(x_2,t) u(x_2,t) \mathrm{d} t -
 \int_{t_1}^{t_2} \rho(x_1,t) u(x_1,t) \mathrm{d} t = 0
-\qquad (4)
+\tag{4}
 $$
 
 olarak görelim. Eğer Calculus'un Temel Teorisi ile ilk iki terime
@@ -1262,7 +1262,7 @@ $$
 \frac{\partial }{\partial t} \rho(x,t)  +
 \frac{\partial }{\partial x} (\rho(x,t)u(x,t))
 \right\} \mathrm{d} x \mathrm{d} t = 0
-\qquad (5)
+\tag{5}
 $$
 
 elde ediyoruz. Bu ifadenin $[x_1,x_2]$ ve $[t_1,t_2]$ arasındaki tüm değerlerde
@@ -1467,7 +1467,7 @@ $$
 
 $$
 \implies \rho_t + \rho_x u + \rho u_x = 0
-\qquad (3)
+\tag{3}
 $$
 
 Öyle değil mi? Tek yaptığımız parantez içindeki türevi açmak oldu. 
@@ -1494,7 +1494,7 @@ ile bölersek,
 
 $$
 u_t + u u_x + \frac{1}{\rho} p_x = 0
-\qquad (2)
+\tag{2}
 $$
 
 Enerji
@@ -1502,7 +1502,7 @@ denklemine gelelim; enerji çoğunlukla
 
 $$
 E = \rho e + \frac{1}{2} \rho u^2
-\qquad (1)
+\tag{1}
 $$
 
 şeklinde ayrıstılır, ki $e$ iç enerji, $\frac{1}{2}\rho u^2$ ise kinetik
@@ -1796,7 +1796,7 @@ Ya da
 
 $$
 \frac{\partial \rho}{\partial t} + \mathrm{div} (\rho u ) = 0
-\qquad (1)
+\tag{1}
 $$
 
 Bu $\epsilon = 1$ durumudur, daha genel $\epsilon$ için
@@ -1839,7 +1839,7 @@ $$
 \right) \mathrm{d} V =
 \iiint_V \rho \frac{\partial \phi}{\partial t} +
 \oint \oint_S \phi u \cdot n \mathrm{d} S
-\qquad (2)
+\tag{2}
 $$
 
 Reynolds nakletme teorisi budur. Eşitliğin sağ tarafının sıfıra eşit olduğunu
@@ -1868,7 +1868,7 @@ $$
 \iiint_V \rho \frac{\partial u}{\partial t} \mathrm{d} V +
 \oint \oint_S \rho u u \cdot n \mathrm{d} S =
 \iiint_V F \mathrm{d} V
-\qquad (3)
+\tag{3}
 $$
 
 Kaynaklar

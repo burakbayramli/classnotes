@@ -31,7 +31,7 @@ limitler ile türetebiliriz. Genel bir $x^n$ için türetelim, aradığımız or
 
 $$
 \frac{\Delta f}{\Delta x} = \frac{(x_0-\Delta x)^n - x_0^n}{\Delta x}
-\qquad (1)
+\tag{1}
 $$
 
 Son ifadede $x_0$ yerine $x$ kullandık, notasyonu basitleştirmek için. Devam

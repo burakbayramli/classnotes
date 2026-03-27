@@ -5,7 +5,7 @@ Alttaki ifade bir Boltmann dağılımını gösterir,
 $$  
 P(x;W) = \frac{1}{Z(W)} 
 \exp \bigg[ \frac{1}{2} x^T W x \bigg]
-\qquad (3)
+\tag{3}
 $$
 
 ki $x$ çok boyutlu ve -1,+1 değerleri içeren bir vektör, $W$ simetrik ve
@@ -29,7 +29,7 @@ Log olurluk
 $$  
 \mathcal{L} = \ln \big( \prod_{n=1}^{N} P(x^{(n)};W) \big) = 
 \sum_{n=1}^{N} \bigg[ \frac{1}{2} x^{(n)^T} W x^{(n)} - \ln Z(W) \bigg]
-\qquad (1)
+\tag{1}
 $$
 
 Birazdan $\frac{\partial \mathcal L}{\partial w_{ij}}$ türevini alacağız, o
@@ -64,7 +64,7 @@ $$
 \frac{\partial}{\partial w_{ij}} \exp \big( \frac{1}{2} x^T W x \big)  = 
 \frac{1}{2}  \exp \big( \frac{1}{2} x^T W x \big) 
 \frac{\partial}{\partial w_{ij}}x^T W x
-\qquad (2)
+\tag{2}
 $$
 
 (2)'in içindeki bölümü açalım,
@@ -100,7 +100,7 @@ $$
 
 $$ 
 \sum_x P(x;W) x_i x_j =  < x_i,x_j >_{P(x;W)}
-\qquad (4)
+\tag{4}
 $$
 
 Artık $\ln Z(W)$'nin türevini biliyoruz. O zaman tüm log olurluğun türevine

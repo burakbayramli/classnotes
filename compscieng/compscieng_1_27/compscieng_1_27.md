@@ -81,7 +81,7 @@ ve tüm alan üzerinden entegralini alıyorum,
 $$
 \int \int (-u_{xx} - u_{yy}) v(x,y) \mathrm{d} x \mathrm{d} y =
 \int \int f(x,y) v(x,y)  \mathrm{d} x \mathrm{d} y
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki "tüm mümkün (admissable)'' $v(x,y)$'ler için yapılır. Ana fikir şu eğer
@@ -108,7 +108,7 @@ oluyor,
 
 $$
 = \int \int (\mathrm{grad} u) (\mathrm{grad} v) \mathrm{d} x \mathrm{d} y  + \oint (\mathrm{grad} u \cdot n) v
-\qquad (2)
+\tag{2}
 $$
 
 Ya da farklı bir formda şöyle yazabilirim, 

@@ -215,7 +215,7 @@ Tabii daha önceden hatırlıyoruz ki $u(X) = (x - X)$ o zaman
 
 $$
 \mathrm{d} x = \mathrm{d} X + u(X+\mathrm{d} X) - u(X)
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki ifade tanıdık bir kavrama dönüşmeye başladı, eşitliğin sağ tarafı kısmen
@@ -242,7 +242,7 @@ Bir basitleştirme daha,
 
 $$
 \mathrm{d} x = (I + \nabla u) \mathrm{d} X
-\qquad (2)
+\tag{2}
 $$
 
 $I + \nabla u$ ifadesine şu şekilde erişmek mümkün, hatırlarsak
@@ -420,7 +420,7 @@ $$
 
 $$
 \epsilon_{Green} = \frac{1}{2} (\nabla u + \nabla u^T + \nabla u^T \nabla u )
-\qquad (3)
+\tag{3}
 $$
 
 Not: $C$ içinde 2 ile çarpım var $\epsilon_{Green}$ içinde 1/2 bunlar birbirini
@@ -647,7 +647,7 @@ $$
 0 & 0 & 0 \\
 0 & 0 & 0 
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 Bize gerekli diferansiyel denklemi kuvvet dengelerine bakarak ortaya

@@ -140,7 +140,7 @@ $j$ ise hayali sayı $j = \sqrt{-1}$.  Euler ilişkisi $e^{-j\phi} =
 hareketle üstteki ayrıksal denklem alttakine eşittir,
 
 $$ X(m) = \sum_{n=0}^{N-1} x(n) [ \cos(2\pi nm / N) - j \sin(2\pi nm / N)] 
-\qquad (1)
+\tag{1}
 $$
 
 $X(m)$: $m$'inci DFT bileşeni / katsayısı - $X(0),X(1),..$ diye gidiyor

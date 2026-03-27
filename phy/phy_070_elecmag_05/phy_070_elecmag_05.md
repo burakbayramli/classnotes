@@ -130,7 +130,7 @@ var, önce
 
 $$ 
 \Delta E_{i,x} = |\Delta E_i| \cos (\theta)  
-\qquad (1) 
+\tag{1} 
 $$
 
 Önce $\Delta E_i$'in büyüklüğünü aldım, ama bu büyüklüğün kendisini değil x
@@ -172,7 +172,7 @@ Calculus yapma zamanı geldi, toplamı entegrale çevireceğiz.
 $$ 
 = \frac{1}{4\pi\epsilon_0} \frac{Q x}{L} \int_{-L/2}^{L/2}
 \left(\frac{\mathrm{d} y}{(x^2+y^2)^{3/2}} \right) \hat{x} 
-\qquad (2) 
+\tag{2} 
 $$
 
 Peki $x$ nasıl $\mathrm{d} y$'a dönüştü? Çünkü önceki örnekte çubuk x
@@ -192,7 +192,7 @@ noktasında üst noktası $L/2$ noktasında. Entegrali çözüp basitleştirince
 
 $$ 
 = \frac{1}{4\pi\epsilon_0} \frac{Q}{x \sqrt{x^2 + (L/2)^2}}\hat{x} 
-\qquad (3)
+\tag{3}
 $$
 
 ki bu $\hat{x}$ yönünde.. 

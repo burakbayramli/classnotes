@@ -22,7 +22,7 @@ Dolaylı yoldan evet. Transformların çarpımı, fonksiyonların çarpımının
 
 $$
 F(s)G(s) =  \int_0^{\infty} e^{-st} (f*g) \mathrm{d} t 
-\qquad (1)
+\tag{1}
 $$
 
 Peki niye böyle bir kısayolun olması iyi bir şey? Faydayı belirttik ama sebebini

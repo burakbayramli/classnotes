@@ -259,7 +259,7 @@ aynısını veriyor.
 Bunu formüllere çevirelim şimdi. Resme göre
 
 $$ f(x, R_0) \approx \alpha f^2(\frac{x}{\alpha}, R_1) 
-\qquad (2)$$
+\tag{2}$$
 
 Yani $\alpha$'lar hem yatay hem dikey ölçeklenmeyi hallediyorlar. 
 
@@ -290,7 +290,7 @@ Feigenbaum'un üstteki hesabın limitine baktı, yani
 
 $$ 
 \lim_{n \to \infty}  \alpha^n f^{2^n}(\frac{x}{\alpha^{n}}, R_n) = g_0(x) 
-\qquad (1)
+\tag{1}
 $$
 
 Ve bu limitin yakınsadığını gördü, yani limit mevcuttu. Yakınsama $g_0(x)$ diye
@@ -523,7 +523,7 @@ serisini pat diye koyarız oraya, ve ise koyuluruz. Şunu denkleme sokarız,
 
 $$
 g(x) = 1 + c_2 x^2 + c_4 x^4 + ... 
-\qquad (3)
+\tag{3}
 $$
 
 Seri 1 ile başlıyor çünkü $g(0)=1$ olduğunu biliyoruz. Tüm bu şeyler [döngüler

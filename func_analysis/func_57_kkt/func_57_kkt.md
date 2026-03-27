@@ -85,7 +85,7 @@ halinden daha fazla ufaltmam mümkün değil,
 
 $$
 \le f(x^\ast) + \sum_{i=1}^{m} u_i{^\ast} h_i(x^\ast) + \sum_{j=1}^{r} v_j{^\ast} l_j(x^\ast) 
-\qquad (1)
+\tag{1}
 $$
 
 Devam edersek, $u_i^\ast$ olurlu, o zaman üstteki ortadaki terim $\ge 0$,
@@ -94,7 +94,7 @@ $f(x^\ast)$'den daha az olmalı.
 
 $$
 \le f(x^\ast) 
-\qquad (2)
+\tag{2}
 $$
 
 Sonuç olarak 
@@ -131,7 +131,7 @@ gerektiğini.. Eğer $x^\ast,u^\ast,v^\ast$ KKT şartlarına uygunsa, durağanl�
 
 $$
 g(u^\ast,v^\ast) = f(x^\ast) + \sum_{i=1}^{m} u_i{^\ast} h_i(x^\ast) + \sum_{j=1}^{r} v_j{^\ast} l_j(x^\ast) 
-\qquad (3)
+\tag{3}
 $$
 
 Bu tabii $g$ tanımı ile bağlı,

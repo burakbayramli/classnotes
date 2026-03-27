@@ -180,7 +180,7 @@ ise
 
 $$
 \vec{A} \cdot \vec{B} = \sum a_ib_i = a_1b_1 + a_2b_2 + a_3b_3 
-\qquad (1)
+\tag{1}
 $$
 
 şeklindedir.
@@ -194,7 +194,7 @@ $\theta$ iki vektör arasındaki açı olmak üzere;
 
 $$
 \vec{A} \cdot \vec{B} = |\vec{A}||\vec{B}| \cos \theta 
-\qquad (2)
+\tag{2}
 $$
 
 gibi bir eşitlik sağlanabilir.

@@ -5,17 +5,17 @@ Formüllerimizin tekrar üzerinden geçelim,
 $$
 \frac{\partial u}{\partial t} +
 \frac{\partial }{\partial x} f(u) = 0
-\qquad (1)
+\tag{1}
 $$
 
 $$
 \frac{\mathrm{d}}{\mathrm{d} t} \int_{x_L}^{x_R} u \mathrm{d} x + f(u_R) - f(u_L) = 0
-\qquad (2)
+\tag{2}
 $$
 
 $$
 u(x,t) = u(x - f'(u) t, 0)
-\qquad (3)
+\tag{3}
 $$
 
 İki formül tek sayısal, tek boyutta muhafaza kanununu gösteriyor. Yer tek

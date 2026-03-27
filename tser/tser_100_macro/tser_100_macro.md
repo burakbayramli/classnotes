@@ -46,7 +46,7 @@ yaptıklarını kapsar. Satılan her şey tanım itibariyle alınmış olduğuna
 
 $$ 
 M \cdot V = P \cdot Y 
-\qquad (1)
+\tag{1}
 $$
 
 doğru olmalıdır. Tabii üstteki formüldeki değişkenlerin nasıl ölçülmesi
@@ -372,14 +372,14 @@ sektörü etkileyen kısmı ile ilgilenelim,
 
 $$ 
 P_R Y = V_R C_R 
-\qquad (4)
+\tag{4}
 $$
 
 ki $C_R$ reel sektöre giden kredi (para arzı). Farklılıklara bakarsak, 
 
 $$ 
 \Delta (P_R Y) = V_R \Delta C_R 
-\qquad (2)
+\tag{2}
 $$
 
 $P_rY$ reel GSYH. Farklılık operatörünü $V_R$ üzerinde uygulamadık çünkü
@@ -398,7 +398,7 @@ Ve
 
 $$ 
 \Delta (P_RY) = \Delta c + \Delta i + \Delta g + \Delta nx 
-\qquad (3)
+\tag{3}
 $$ 
 
 olarak ayırıyoruz. (2)'yi üstteki denkleme sokunca, 

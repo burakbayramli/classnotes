@@ -47,12 +47,12 @@ Harita şöyle,
 
 $$ 
 x_{n+1} = y_n + 1 - a x_n^2  
-\qquad (1)
+\tag{1}
 $$
 
 $$ 
 y_{n+1} = b x_n 
-\qquad (2) 
+\tag{2} 
 $$
 
 Parametre $a,b$ dışarıdan kontrol edilebilen parametreler. Gördüğümüz gibi

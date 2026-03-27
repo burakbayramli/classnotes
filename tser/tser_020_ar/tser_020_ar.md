@@ -11,7 +11,7 @@ AR(1)'dır [1, sf. 23],
 
 $$ 
 y_t = c + \phi y_{t-1} + \epsilon_t  
-\qquad (1) 
+\tag{1} 
 $$
 
 Daha yüksek seviyeler AR(p) olarak gösterilir, 

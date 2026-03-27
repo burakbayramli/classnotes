@@ -183,7 +183,7 @@ faydalı olabilir. Formülün tamamı şöyle
 $$
 c\rho A  \int_{ x}^{x+\Delta x} u_t(s,t) \mathrm{d} s =
 kA [ u_x(x+\Delta x,t) - u_x(x,t)] A \int_{x}^{x+\Delta x} f(s,t) \mathrm{d} s 
-\qquad (1)
+\tag{1}
 $$
 
 Bu noktada üstteki formülde entegrallerden kurtulmak istiyoruz. Ne

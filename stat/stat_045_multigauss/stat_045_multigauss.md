@@ -256,7 +256,7 @@ I & 0 \\
 E-FH^{-1}G & 0 \\
 0 & H
 \end{array}\right] 
-\qquad (2)
+\tag{2}
 $$
 
 Bu çarpımın doğruluğu çarpım elle yapılarak kontrol edilebilir.
@@ -343,7 +343,7 @@ I & 0 \\
 I & -FH^{-1} \\
 0 & I
 \end{array}\right] 
-\qquad (3)
+\tag{3}
 $$
 
 Eşitliğin sağ tarafındaki çarpımı gerçekleştirirsek, 
@@ -385,7 +385,7 @@ $$ \det(AB) = \det(A)\det(B) $$
 O zaman (2)'nin determinantını alırsak, $\det$ yerine $||$ kullandık, 
 
 $$ |M| = |M/H||H| 
-\qquad (4)
+\tag{4}
 $$
 
 Bu ifade gayet doğal duruyor (bir raslantı herhalde, ya da Schur tamamlayıcısı 

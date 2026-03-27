@@ -210,7 +210,7 @@ buradaki normal.
 
 $$
 \oint_C -Q \mathrm{d} x + P \mathrm{d} y = \int \int_R (P_x + Q_y) \mathrm{d} A 
-\qquad (1)
+\tag{1}
 $$
 
 Bu formülü bir önceki derste kullandığımız ispattaki forma indirgemeye
@@ -231,7 +231,7 @@ $$ N = P $$
 
 $$
 \oint_C M \mathrm{d} x + N \mathrm{d} y = \int \int_R (N_x - M_y) \mathrm{d} A 
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi (1) içindeki $P_x$ ve $Q_y$ nedir, onları bulalım. 

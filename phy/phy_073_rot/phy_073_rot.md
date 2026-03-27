@@ -104,7 +104,7 @@ $$
 
 $$
 v' = \cos \theta (v - (v \cdot n) n) + \sin \theta (n \times v) + (v \cdot n) n
-\qquad (5)
+\tag{5}
 $$
 
 Eğer (5) formülünü matris formunda göstermek istiyorsak, baz vektörleri
@@ -122,7 +122,7 @@ n_x^2(1-\cos\theta)+\cos\theta & n_x n_y (1-\cos\theta)+n_x \sin\theta & n_x n_z
 n_x n_y (1-\cos\theta)-n_z\sin\theta & n_y^2(1-\cos\theta)+\cos\theta & n_y n_z (1-\cos\theta)n_x\sin\theta\\
 n_x n_z (1-\cos\theta)+n_y \sin\theta & n_y n_z (1-\cos\theta)-n_x \sin\theta & n_z^2 (1-\cos\theta)+\cos\theta
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 ```python
@@ -599,7 +599,7 @@ Burada $\mathbf{q}$ bir kuaterniyondur:
 $$
 \mathbf{q} = \cos\left(\frac{\theta}{2}\right) +
 \vec{u}\sin\left(\frac{\theta}{2}\right) 
-\qquad (1)
+\tag{1}
 $$
 
 Ancak, bu hesaplamanın böyle bir döndürmeyle sonuçlanması hiç de bariz
@@ -611,7 +611,7 @@ yapılacaktır. (1)'in döndürmesi Rodrigues'in formülü kullanılarak şu
 
 $$
 \vec{v} \cos(\theta) + (\vec{u} \times \vec{v}) \sin(\theta) + \vec{u}(\vec{u} \cdot \vec{v})(1 - \cos(\theta))
-\qquad (2)
+\tag{2}
 $$
 
 Denklem (2)'nin neden istediğimiz döndürmeyle sonuçlandığı çok daha
@@ -686,7 +686,7 @@ görüldüğünde, zarif bir sonuç ortaya çıkar:
 $$
 (a + \vec{v})(e + \vec{w}) = (ae - \vec{v} \cdot \vec{w}) + (e\vec{v}
 + a \vec{w} + \vec{v}\times\vec{w})
-\qquad (3)
+\tag{3}
 $$
 
 Böylece kuaterniyon çarpımının skalar kısmı $(ae - \vec{v} \cdot

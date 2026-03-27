@@ -329,7 +329,7 @@ diyelim),
 
 $$ 
 A^{\dagger} = V \Sigma^{\dagger} U^T  
-\qquad (1)
+\tag{1}
 $$
 
 Bu noktaya nasıl geldiğimize dikkat, eğer SVD sonucunun pür tersini

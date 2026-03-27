@@ -33,7 +33,7 @@ $$ = w_1 E(R_1) + w_2 E(R_2) $$
 Portföyün varyansı için [5, sf. 73], 
 
 $$Var(w_1 R_1 + w_2 R_2) = w_1^2Var(R_1) + w_2^2 Var(R_2) + w_1w_2Cov(R_1,R_2)
- \qquad (1)$$
+ \tag{1}$$
 
 Diyelim ki $w_1,w_2$ eşit; O zaman formülden açık bir şekilde görülüyor ki
 üstteki varyansın azalacağı durumlardan biri iki enstrümanın hiç ilintili
@@ -76,7 +76,7 @@ $$ Var(R_p) =
 \left[\begin{array}{r}
 w_1 \\ w_2
 \end{array}\right] 
-\qquad (2)
+\tag{2}
 $$
 
 $$ = \left[\begin{array}{cc} 

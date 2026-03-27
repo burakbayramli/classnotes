@@ -182,7 +182,7 @@ $$ \log xy = \log x + \log y $$
 Bölüm log'u, logların çıkartılması olur.
 
 $$ \log x/y = \log x - \log y  
-\qquad (1)
+\tag{1}
 $$
 
 Aynı baz kullanan çarpımlar, tek baza indirilip üstleri toplanabilir.

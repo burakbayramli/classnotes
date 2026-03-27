@@ -85,7 +85,7 @@ bu etki sistemin ivmesine lineer bir etki uyguluyor yani.
 
 $$
 \ddot{q} = f_1 (q, \dot{q}, t) + f_2 (q, \dot{q}, t) u 
-\qquad (1)
+\tag{1}
 $$
 
 Pek yeni bir şey söylemişim olmadım aslında, $f_1$ ile bir takım gayrı
@@ -114,7 +114,7 @@ erisemezdim.
 Daha az kumandalı nedir? Eğer 
 
 $$\mathrm{rank} [f_2(q,\dot{q},t)] < \mathrm{dim} [q] 
-\qquad (2)$$ 
+\tag{2}$$ 
 
 ise. 
 
@@ -378,14 +378,14 @@ $$
 
 $$ 
 \dot{q}(t) = u t + \dot{q}(0) 
-\qquad (1)
+\tag{1}
 $$
 
 Bir daha entegre
 
 $$ 
 q(t) = q(0) + \dot{q}(0) t + \frac{1}{2} u t^2 
-\qquad (2)
+\tag{2}
 $$
 
 Formüle bakalım ve $u=1$ ile bizi bir nihai $t$'de $q(t)=0$ ve
@@ -395,13 +395,13 @@ $\dot{q}(t)=0$ formülünü (1)'e sokarsak,
 
 $$
 \dot{q}(0) = - u t 
-\qquad (3)
+\tag{3}
 $$
 
 Üstteki formülü (2)'ye sokarsak, ve $q(t)=0$ olduğu için (2) formülü
 
 $$
-q(0) = \frac{1}{2} ut^2 \qquad (4)
+q(0) = \frac{1}{2} ut^2 \tag{4}
 $$
 
 $t$ için çözelim, $u=1$ demiştik, o zaman (3)

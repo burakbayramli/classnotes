@@ -344,7 +344,7 @@ $e^{-x^2}$ Nasıl Entegre Edilir?
 
 $$ 
 \int_{-\infty}^{\infty} e^{-x^2} \mathrm{d} x 
-\qquad (1) 
+\tag{1} 
 $$
 
 ifadesi özellikle olasılık matematiğinde çokça görülen bir ifadedir. Bu
@@ -412,7 +412,7 @@ Entegralı yazalım
 
 $$
 \int_{0}^{\infty} \int_{0}^{2\pi} e^{-r^2} r \mathrm{d} \theta \mathrm{d} r 
-\qquad (2)
+\tag{2}
 $$
 
 Niye entegral sırasında $\theta$'yi önce yazdım? Çünkü entegral içindeki

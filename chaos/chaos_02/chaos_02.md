@@ -381,13 +381,13 @@ diyebiliriz. Bu ne demektir? O kesişme noktasında hem düz çizginin hem de
 eğrinin eğimi aynıdır demektir, yani hem
 
 $$ r + x = \ln(1+x) 
-\qquad (1) $$
+\tag{1} $$
 
 eşitliği doğru, hem de
 
 $$
 \frac{d}{dx} (r + x) = \frac{d}{dx} \bigg( \ln (1+x) \bigg)
-\qquad (2)
+\tag{2}
 $$
 
 eşitliği doğru olmalı. Türev aldık çünkü türev bize belli bir noktada eğimi

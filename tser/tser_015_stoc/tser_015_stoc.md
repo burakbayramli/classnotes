@@ -139,7 +139,7 @@ Wiener süreci $\{ X_t; t>0\}$'i şöyle gösterebiliriz [4, sf. 64],
 
 $$ 
 X_t = \mu \cdot t + \sigma \cdot W_t, \qquad t>0 
-\qquad (1)
+\tag{1}
 $$
 
 Bu süreç $t$ anında $N(\mu,\sigma^2t)$ dağılımına sahip olacaktır. Ufak bir
@@ -199,7 +199,7 @@ tekrar düzenleyelim,
 $$ e^{-\lambda t}dy_t = e^{-\lambda t}(\lambda y_t + \mu)dt + e^{-\lambda t} dW_t  $$
 
 $$ e^{-\lambda t}dy_t - e^{-\lambda t}(\lambda y_t + \mu)dt =  e^{-\lambda t} dW_t 
-\qquad (2)
+\tag{2}
 $$
 
 Şimdi $e^{-\lambda t}(\lambda y_t + \mu)$'in diferansiyeline bakalım, bu
@@ -268,7 +268,7 @@ gidip yokolacak, geri kalanlar,
 
 $$ 
 E[y_t] = y_0 e^{\lambda t} - \frac{\mu}{\lambda} ( 1 - e^{\lambda t}) 
-\qquad (3)
+\tag{3}
 $$
 
 Zaman Yarılaması

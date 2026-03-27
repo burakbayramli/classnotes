@@ -539,7 +539,7 @@ $$
 \frac{d}{dt}\vec{a} \cdot \vec{b} =  
 \frac{d\vec{a}}{dt} \cdot \vec{b} +
 \vec{a} \cdot \frac{d\vec{b}}{dt} 
-\qquad (1)
+\tag{1}
 $$
 
 olduğunu ispatlayin. 

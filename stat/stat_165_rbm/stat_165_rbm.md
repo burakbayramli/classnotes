@@ -56,7 +56,7 @@ Devam edelim, ana formülden hareketle cebirsel olarak şunlar da doğrudur,
 $$ p(x,h;W) = \exp (-E(x,h)) / Z $$
 
 $$ 
-\qquad (2)
+\tag{2}
 = \exp (h^TWx + c^Tx + b^Th ) / Z $$
 
 $$ = \exp (h^TWx) \exp (c^Tx) \exp(b^Th) / Z $$
@@ -112,7 +112,7 @@ $$
 
 
 $$  
-\qquad (1)
+\tag{1}
 P(x;W) = \frac{1}{Z(W)}  \sum_h \exp 
 \bigg[ 
 \frac{1}{2} y^T W y
@@ -166,7 +166,7 @@ $$
 \frac{\partial \mathcal{L} }{\partial w_{ij}} = 
 \sum_{n=1}^{N}  \big( \frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}}
 - \frac{\partial \ln Z }{\partial w_{ij}} \big)
-\qquad (3)
+\tag{3}
 $$
 
 Parantez içindeki 1. türevi alalım,
@@ -242,7 +242,7 @@ $$
 \sum_{n=1}^{N}  \big( \frac{\partial \ln Z_{x^{(n)}} }{\partial w_{ij}} - 
 \frac{\partial \ln Z }{\partial w_{ij}} \big)
 = \sum_{n=1}^{N}  < y_iy_j >_{P(h|x^n;W)} - < y_iy_j >_{P(y;W)}
-\qquad (4)
+\tag{4}
 $$
 
 Bu formülü de BM için yaptığımız gibi bir gradyan güncelleme formülüne

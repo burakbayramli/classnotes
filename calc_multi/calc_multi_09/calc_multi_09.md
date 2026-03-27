@@ -29,7 +29,7 @@ yaklaşıksal değişim şöyle olur
 
 $$
 \Delta z \approx f_x\Delta x + f_y \Delta f_y
-\qquad (1)
+\tag{1}
 $$
 
 Tekrar vurgulamak gerekirse bu yaklaşıksal bir formül, daha "doğru'' bir temsil
@@ -101,7 +101,7 @@ oluşturur. Bu formül
 
 $$
 z = z_0 + a(x-x_0) + b(y-y_0) 
-\qquad (2)
+\tag{2}
 $$
 
 formülüdür. 

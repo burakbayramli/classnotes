@@ -109,7 +109,7 @@ $$
 $$
 \frac{y_{i,j+1}+y_{i,j-1}-2 y_{i,j}} {c^2 (\Delta t)^2}  =
 \frac{y_{i+1,j}+y_{i-1,j}-2 y_{i,j}} {(\Delta x)^2}
-\qquad (2)
+\tag{2}
 $$
 
 Tabii dikkat edersek geçmiş $j-1$ ve gelecek $j+1$ birbirine karışmış durumda,
@@ -120,7 +120,7 @@ $$
 y_{i,j+1}  = 2 y_{i,j}-y_{i,j-1}+ \frac{c^2 } {c'^{2}}
 \left [ y_{i+1,j}+y_{i-1,j}-2 y_{i,j}\right], \quad c' { = }
 \frac {\Delta x}{\Delta t}
-\qquad (1)
+\tag{1}
 $$
 
 Hesap için üstteki resmi hatırlayalım, $i,j+1$ hücresine dört diğer hücreden ok
@@ -198,7 +198,7 @@ düzenlersek,
 
 $$
 \cos(x) = \frac{1}{2} (e^{ix} + e^{-ix})
-\qquad (3)
+\tag{3}
 $$
 
 Benzer bir eşitliği $e^{ix} - e^{-ix}$ üzerinden elde edebiliriz,
@@ -341,7 +341,7 @@ Herşeyi 2 ile bölelim,
 $$
 \cos(\omega \Delta t) - 1 = c^2 \frac{\Delta t^2}{\Delta x^2}
 (\cos(k\Delta x) - 1)
-\qquad (4)
+\tag{4}
 $$
 
 Şimdi bir diğer trigonometrik eşitliği kullanacağız [4],
@@ -452,7 +452,7 @@ ufak denklemin bize ne kadar çok şey öğreteceğini görmek bizi
 $$
 \frac{\partial u}{\partial t} +
 c \frac{\partial u}{\partial x}  = 0
-\qquad (2)
+\tag{2}
 $$
 
 Dikkat bu bir dalga denklemi olarak bilinir, fakat esas dalga denkleminin kısmi
@@ -495,7 +495,7 @@ düzenlersek bilinmeyen için yeni bir formül elde edebiliriz,
 
 $$
 u_i^{n+1} = u_i^n - c \frac{\Delta t}{\Delta x} ( u_i^n - u_{i-1}^n )
-\qquad (1)
+\tag{1}
 $$
 
 Yeri temsil eden $x$ eksenini eşit aralıklı parçalara böleceğiz, bir tek boyutlu

@@ -183,7 +183,7 @@ doğru olmalı.
 Ilk formülü $x$'e göre entegre edelim. 
 
 $$ f = \frac{4}{3}x^3 + 4x^2y + g(y)
-\qquad (1)$$
+\tag{1}$$
 
 Burada $g(y)$ entegrasyon sabiti gibi, ama tam değil, çünkü $y$ değişkenine
 bağlı. Ama yine de ilerleme kaydetmiş sayılırız çünkü $g(y)$ en azından $x$'e

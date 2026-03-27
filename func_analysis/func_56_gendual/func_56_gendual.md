@@ -166,7 +166,7 @@ Lagrangian için öğrendiğimiz tarifi uygularsak,
 
 $$
 L(x,u,v) = \frac{1}{2} x^T Q x + c^Tx  - u^T x + v^T (Ax - b)
-\qquad (2)
+\tag{2}
 $$
 
 İkiz fonksiyonu bulalım şimdi. $x$, üzerinden minimizasyon yapılan değişken
@@ -180,7 +180,7 @@ $x$'ler üzerinden ufak bir gruplama sonrası
 
 $$
 = \min_x \frac{1}{2} x^T Q x + (c - u + A^T v)^T x - b^T v  
-\qquad (1)
+\tag{1}
 $$
 
 Bu minimumu nasıl buluruz? Gradyanı alıp sıfıra eşitleriz değil mi? Tabii
@@ -225,7 +225,7 @@ Lagrange ikiz fonksiyonu elde ediyoruz,
 
 $$
 g(u,v) = -\frac{1}{2} (c - u + A^Tv)^T Q^{-1}  (c - u + A^Tv) - b^Tv
-\qquad (3)
+\tag{3}
 $$
 
 Yani bana verilen her $u \ge 0$ ve herhangi $v$ için hesaplayacağım üstteki
@@ -246,7 +246,7 @@ Bu durumda yine Lagrangian'in gradyanını alıp sıfıra eşitlerdik, vs. ve
 
 $$
 Qx = -(c-u+A^Tv) 
-\qquad (4)
+\tag{4}
 $$
 
 elde ederdik, fakat $Q$'nun tersini alıp $x$'i elde edemezdik çünkü $Q$
@@ -536,7 +536,7 @@ zaman $f(x)$'in optimale yakınlığına bir üst sınır oluşturur,
 
 $$
 f(x) - f^\ast \le f(x) - g(u,v) 
-\qquad (5)
+\tag{5}
 $$
 
 Nasıl türetildi? $g(u,v) \le f^\ast$ olduğunu biliyoruz, ya da

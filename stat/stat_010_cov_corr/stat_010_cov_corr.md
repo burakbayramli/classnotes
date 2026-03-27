@@ -123,7 +123,7 @@ $y_1,..,y_n$ örnekleminin varyansı (literatürde $S^2$ olarak geçebiliyor,
 $$ 
 S^2 = 
 \frac{1}{n} \sum (y_i - \bar{y})^2
-\qquad (2)
+\tag{2}
 $$
 
 Standart sapma veri noktaların "ortalamadan farkının ortalamasını"
@@ -147,7 +147,7 @@ $$ = \frac{ 1}{n} \sum_i y_i^2 - \bar{y}^2 $$
 ya da 
 
 $$ = \sum_{i=1}^{n} y_i^2 - \frac{1}{n} \bigg( \sum_{i=1}^{n} y_i \bigg)^2  
-\qquad (5)
+\tag{5}
 $$
 
 Bu arada standard sapma varyansın kareköküdür, ve biz karekök olan versiyon
@@ -176,7 +176,7 @@ Tanım
 
 $$ 
 Cov(X,Y) = E((X-E(X))(Y-E(Y))) 
-\qquad (1) 
+\tag{1} 
 $$
 
 Burada $X,Y$ aynı uzayda tanımlanmış herhangi iki rasgele değişken. Üstteki
@@ -438,7 +438,7 @@ Korelasyon
 Tanım
 
 $$ Corr(X,Y) = \frac{Cov(X,Y)}{SD(X)SD(Y)} 
-\qquad (2)
+\tag{2}
 $$
 
 Bu arada hatırlarsak üstte SD ile gösterilen standart sapma, varyansın
@@ -452,7 +452,7 @@ tanımlayabiliriz,
 
 $$ Corr(X,Y) = Cov \bigg( \frac{X-E(X)}{SD(X)}, \frac{Y-E(Y)}{SD(Y)}
 \bigg) 
-\qquad (3)
+\tag{3}
 $$
 
 Yani korelasyonun anlamı aslında şudur: $X,Y$ değişkenlerini standardize
@@ -514,7 +514,7 @@ elde ediyorum, yani bir şey farketmiyor.
 $Var(X+Y)$'i hesaplayalım. 
 
 $$ Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y) 
-\qquad (4)
+\tag{4}
 $$
 
 Şimdi sembol olarak $\rho = Corr(X,Y)$ kullanalım,
@@ -791,7 +791,7 @@ Phi korelasyon katsayısı
 $$ 
 \phi = \frac{n_{11}n - n_{1\bullet}n_{\bullet 1}}
 {\sqrt{n_{0\bullet} n_{1\bullet} n_{\bullet 0} n_{\bullet 1}}} 
-\qquad (6)
+\tag{6}
 $$
 
 ile hesaplanır. Bu ifadeyi türetmek için iki rasgele değişken arasındaki
@@ -963,7 +963,7 @@ için kareler toplamı
 
 $$
 S_P = \sum_{i=1}^{n} x_i^2
-\qquad (7)
+\tag{7}
 $$
 
 Gruplar $D_1,D_2,D_3$ için toplamlar $S_1,S_2,S_3$ benzer şekilde tanımlanıyor,
@@ -1001,7 +1001,7 @@ $$
 
 $$
 v_P = S_p / n  -  a_p^2
-\qquad (8)
+\tag{8}
 $$
 
 Bu durumda parçaların ayrı varyans formülleri de üstteki gibi yazılabilir,
@@ -1010,7 +1010,7 @@ $$
 v_1 = S_1 / j  -  a_1^2, \quad
 v_2 = S_2 / k  -  a_2^2, \quad
 v_3 = S_3 / m  -  a_3^2
-\qquad (9)
+\tag{9}
 $$
 
 Amacımız $v_p$'yi ufak parçaların varyansları $v_1,v_2,v_3$ üzerinden hesaplamak.
@@ -1031,7 +1031,7 @@ Açarsak
 
 $$
 n v_p = j (v_1 + a_1)^2 + k (v_2 + a_2)^2 + m (v_3 + a_3)^2 - n a_p^2
-\qquad (10)
+\tag{10}
 $$
 
 Şu da söylenebilir,
@@ -1047,7 +1047,7 @@ Varyansların ortalamasını
 
 $$
 a_v = (j v_1 + k v_2 + m v_3) / n
-\qquad (11)
+\tag{11}
 $$
 
 ve ortalamaların varyansını

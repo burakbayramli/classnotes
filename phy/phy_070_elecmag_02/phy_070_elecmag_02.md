@@ -231,7 +231,7 @@ itmeyi ya da çekmeyi bekliyor. Bu durum şu denklemde idi
 $$
 \vec{F}_2 = q_2 \vec{E}_1 \quad
 \vec{E}_1 = \frac{1}{4\pi \epsilon_0} \frac{q_1}{r^2} \hat{r}
-\qquad (1)
+\tag{1}
 $$
 
 ![](02_05.png)

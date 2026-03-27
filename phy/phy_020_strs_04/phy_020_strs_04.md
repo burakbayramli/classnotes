@@ -138,7 +138,7 @@ $$
 
 $$
 U = \frac{P^2 L}{2 E A}
-\qquad (4)
+\tag{4}
 $$
 
 olur.

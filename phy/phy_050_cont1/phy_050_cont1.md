@@ -48,7 +48,7 @@ olabilir. Şimdi bir $Y(x)$ tanımlıyoruz,
 
 $$
 Y(x) = y(x) + \epsilon \eta(x) 
-\qquad (3)
+\tag{3}
 $$
 
 ki $\epsilon$ bir parametre. $\eta(x)$ herhangi bir şey olabileceği için
@@ -57,7 +57,7 @@ eğri olabilir. Biz tüm bu eğriler içinden
 
 $$
 I = \int_{x_1}^{x_2} \sqrt{ 1 + Y'^2} \mathrm{d} x 
-\qquad (2)
+\tag{2}
 $$
 
 formülünü minimal yapanı istiyoruz. Üstteki tanım sayesinde $I$ fonksiyonu
@@ -85,7 +85,7 @@ $$
 
 $$
 Y'(x) = y'(x) + \epsilon \eta'(x) 
-\qquad (4)
+\tag{4}
 $$
 
 Şimdi üsttekinin $\epsilon$'a göre türevi alınabilir,
@@ -426,7 +426,7 @@ zaman açmak istediğimiz entegrali hatırlayalım ve sırabağımsız işlemi u
 $$
 \int_{a}^{b} \frac{\partial F}{\partial \phi_x}\delta\phi_x \mathrm{d} x =
 \int_{a}^{b} \frac{\partial F}{\partial \phi_x} \frac{d}{\mathrm{d} x}(\delta \phi) \mathrm{d} x 
-\qquad (1)
+\tag{1}
 $$
 
 Parçalayarak entegral alma tekniği için parçaların ne olduğunu tanımlayalım:

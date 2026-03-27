@@ -368,7 +368,7 @@ $$
 
 $$
 = V(x, u, t) +  \lambda^T \big\{ f(x, u, t) - \dot{x} \big\}
-\qquad (4)
+\tag{4}
 $$
 
 
@@ -389,7 +389,7 @@ o zaman Lagrangian $\mathcal{H}$ formu da şu hale gelir,
 $$
 \mathcal{L}( x, \dot{x}, u, \lambda, t) = 
 \mathcal{H}(x, u, \lambda, t) - \lambda^T \dot{x}
-\qquad (5)
+\tag{5}
 $$
 
 Bu aslında (4)'ün açılmış hali, ve o ilk bölümün $\mathcal{H}$ olarak tanımlanması,
@@ -745,21 +745,21 @@ $$
 \left( \frac{\partial \mathcal{L}}{\partial x_1} \right) -
 \frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{x}_1} \right) =
 0 \to 2 x(t) + \lambda(t) - \dot{\lambda}(t) = 0
-\qquad (1)
+\tag{1}
 $$
 
 $$
 \left( \frac{\partial \mathcal{L}}{\partial u} \right) -
 \frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{u}} \right) =
 0 \to 2u(t) - \lambda(t) = 0
-\qquad (2)
+\tag{2}
 $$
 
 $$
 \left( \frac{\partial \mathcal{L}}{\partial \lambda} \right) -
 \frac{\mathrm{d}}{dt} \left( \frac{\partial \mathcal{L}}{\partial \dot{\lambda}} \right) =
 0 \to \dot{x}(t) + x(t) - u(t) = 0
-\qquad (3)
+\tag{3}
 $$
 
 (2) ve (3) formüllerini birleştirince,

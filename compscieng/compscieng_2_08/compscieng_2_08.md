@@ -6,7 +6,7 @@
 
 $$
 u_t + u u_x = 0
-\qquad (1)
+\tag{1}
 $$
 
 Bu denklem ile daha önce gördüğümüz alttaki denklem arasındaki fark bariz,
@@ -29,7 +29,7 @@ $$
 \frac{\partial u}{\partial t} +
 \frac{\partial }{\partial x}
 \underbrace{ \left( \frac{u^2}{2} \right)}_{f(u)} = 0
-\qquad (2)
+\tag{2}
 $$
 
 Hatta üstteki forma daha "doğru'' form ismi verilebilir, eğer onu açsak (1)'e
@@ -91,7 +91,7 @@ olabilir.
 $$
 \frac{\mathrm{d}}{\mathrm{d} t} \int_{x_L}^{x_R}
 u \mathrm{d} x + \left[ f(u_{right}) - f(u_{left})  \right] = 0
-\qquad (3)
+\tag{3}
 $$
 
 

@@ -47,7 +47,7 @@ uygularız,
 
 $$
 T f(x) = \alpha f^2 \left( \frac{x}{\alpha} \right) 
-\qquad (1)
+\tag{1}
 $$
 
 Umarım üstteki ifadeyi hatırlamışsınızdır, önceki derste tekrar normalizasyon
@@ -59,7 +59,7 @@ tekrar kendisine eşleniyordu. Yani fonksiyonel denklem şuna tekabül ediyor, $
 $T$'nin bir sabit noktası, yani $g$ kendisine tekrar normalize oluyor,
 
 $$ g(x) = \alpha g^2 \left( \frac{x}{\alpha} \right) 
-\qquad (2) $$
+\tag{2} $$
 
 Burada olan çılgın olayı farkettiniz umarım. Daha önce sabit noktalardan
 bahsederken reel sayıların diğer reel sayılara basit eşlenmesinden
@@ -97,7 +97,7 @@ Niye eyer? Soralım $T$'yi o evrensel, süperstabil $2^i$-çevrimlerden birine
 uygularsak ne olur? Yani $T g_i$'i merak ediyoruz. Cevabın
 
 $$Tg_i = Tg_{i-1} 
-\qquad (3)$$
+\tag{3}$$
 
 olduğu ortaya çıkıyor. Bu mantıklı mı? Bu $g_i$'ların ne olduğunu
 hatırlayalım. Onlar evrensel, süperstabil $2^i$-çevrimleri. Peki $T g_i$ neye
@@ -347,7 +347,7 @@ genelliğe zarar vermeden onu formülden çıkartabilirim, yani $a=1$, yani
 
 $$ 
 x_{n+1} = -(1+\mu)x_n  +x_n^2 + ...  
-\qquad (4) 
+\tag{4} 
 $$
 
 Yerel haritamız bu. 
@@ -386,10 +386,10 @@ olarak betimleyelim, ve $p$'nin $q$'ye ve $q$'nun $p$'ye eşlendiği şartını
 tatmin ediyor olsunlar. Bir önceki formülasyonu kullanırsak,
 
 $$ p = -(1+\mu)q + q^2 
-\qquad (5) $$
+\tag{5} $$
 
 $$ q = -(1+\mu)p + p^2 
-\qquad (6) $$
+\tag{6} $$
 
 Birazdan bir sürü cebir gelecek, o yüzden stratejinin ana hatlarını paylaşayım
 böylece kaybolmayalım. Yapmak istediğimiz döngüdeki ikinci basamağın (yani
@@ -437,13 +437,13 @@ $p$'den biraz sapan başka bir şey elde ediyorum (eşitliğin sol tarafı). Şi
 tüm bunları $\eta$'nin güçleri / dereceleri üzerinden açalım. Elde edeceğimiz,
 
 $$ \eta_{n+1} = (1-4\mu-\mu^2)\eta_n + C \eta_n^2 + ... 
-\qquad (7)$$
+\tag{7}$$
 
 Noktalı yerlerde $\eta$'nin yüksek (küpsel ve daha üstü) dereceli terimleri
 var, onları atladık. $C$ büyük bir sabit, ve suna eşit,
 
 $$ C = 4\mu + \mu^2 + -3\sqrt{\mu^2+4\mu} 
-\qquad (8)$$
+\tag{8}$$
 
 $\eta$ denklemi bu değişkenin $p$'ye yakınken nasıl evrildiğini
 gösteriyor. Umarım farketmişsinizdir, bu denklem efsanevi harita (4)'e çok

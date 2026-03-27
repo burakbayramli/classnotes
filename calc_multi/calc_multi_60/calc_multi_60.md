@@ -46,18 +46,18 @@ Böylece çember formülünden başlayarak üç tane formül elde etmiş olduk.
 
 $$
 (x-x_0)^2 + (y-y_0)^2 = r^2
-\qquad (1)
+\tag{1}
 $$
 
 $$
 (x-x_0) + (y-y_0) \frac{\mathrm{d} y}{\mathrm{d} x} = 0
-\qquad (2)
+\tag{2}
 $$
 
 $$
 1 + (y-y_0) \frac{\mathrm{d}^2y}{\mathrm{d} x^2} +
 \left( \frac{\mathrm{d} y}{\mathrm{d} x}  \right)^2 = 0
-\qquad (3)
+\tag{3}
 $$
 
 (3) formülünü $y-y_0$ solda olacak şekilde tekrar düzenleyelim,

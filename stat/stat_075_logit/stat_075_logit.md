@@ -541,7 +541,7 @@ sigmoid lazım. Bu ters gidişi ispatlamak kolay, ki bu "ters yönde'' harekete
 $logit^{-1}$ ismi de veriliyor, ters yöne doğru gidelim,
 
 $$ 
-\qquad (1)
+\tag{1}
 logit(p) = \log ( \frac{p}{1-p} ) = x
 $$
 
@@ -621,7 +621,7 @@ income         0.3245      0.056      5.775      0.000       0.214       0.435
 En basit haliyle bu denklem, 
 
 $$ 
-\qquad (2)
+\tag{2}
 Pr(y_i=1) = logit^{-1}(\alpha + \beta x)  $$
 
 Üstteki katsayı değerlerini baz alarak, 

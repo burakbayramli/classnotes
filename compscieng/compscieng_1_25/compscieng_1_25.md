@@ -23,14 +23,14 @@ z Transform ne işe yarar? Laplace Transform diferansiyel denklemlerin
 mesela
 
 $$ y(n) = 0.85 y(n-1) + x(n) 
-\qquad (3)
+\tag{3}
 $$
 
 şeklinde olabilir. Daha genel olarak farklılık denklemleri şu şekilde
 belirtilebilir,
 
 $$ \sum_{k=0}^N a_k y(n-k) = \sum_{l=0}^M b_l x(n-l) 
-\qquad (1)
+\tag{1}
 $$
 
 İki üstteki örnek, bu genel denklemin $N=1,M=0$ olduğu halidir, katsayılar
@@ -46,7 +46,7 @@ Ama ondan önce kaydırma işlemi, lineerlik gibi bazı temel özellikleri,
 işlemleri görelim. Mesela
 
 $$ X(z) = x(0) + x(1)z^{-1} + x(2) z^{-2} + ... 
-\qquad (2)
+\tag{2}
 $$
 
 ise, bu dizin üzerinde zaman kaydırma işlemi yapsak, yani $-1$ indeksi
@@ -89,7 +89,7 @@ $$ \to Y(z) \bigg[ 1 + \sum_{k=1}^Na_kz^{-k} \bigg] = \sum_{l=0}^M b_l z^{-l}X(z
 
 $$ \to Y(z)  = \frac{\sum_{l=0}^M b_l z^{-l}X(z) }{ 1 +
   \sum_{k=1}^Na_kz^{-k}} 
-\qquad (5)
+\tag{5}
 $$
 
 Formülün bölümdeki üst kısmını açarsak 
@@ -362,7 +362,7 @@ $$
 H(z) = 20 T \sum_{n=1}^{\infty} e^{-20 nT}z^{-1} 
 = 20 T \sum_{n=0}^{\infty} \big( e^{20 T}z^{-1} \big)^n
 = \frac{20T}{1 - e^{-20 T}z^{-1}} 
-\qquad (4)
+\tag{4}
 $$
 
 Son eşitlik nasıl mümkün oldu? Geometrik serilerinin açılımı sayesinde,

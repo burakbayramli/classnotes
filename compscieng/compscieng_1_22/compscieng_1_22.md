@@ -54,7 +54,7 @@ Ya da
 
 $$
 \frac{\partial v_1}{\partial y} - \frac{\partial v_2}{\partial x} = 0
-\qquad (1)
+\tag{1}
 $$
 
 Bu formül önemli çünkü Vektör Calculus'un temel eşitliği.
@@ -83,7 +83,7 @@ nasıl uygularım? Kapalı bir devre etrafında uygulamak istiyorum,
 
 $$
 \oint v_1 \mathrm{d} x + v_2 \mathrm{d} y = 0
-\qquad (2)
+\tag{2}
 $$
  
 Mesela bir hız alanında bir kapalı devre içinde gidiyorum, böyle bir alanda tüm,

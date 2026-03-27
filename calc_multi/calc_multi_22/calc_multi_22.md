@@ -224,7 +224,7 @@ Hepsini toplarsak
 $$
 \oint_C M \mathrm{d} x  =
 \int_a^b M(x,f_1(x)) \mathrm{d} x - \int_a^b M(x,f_2(x)) \mathrm{d} x 
-\qquad (1)
+\tag{1}
 $$
 
 Şimdi çift entegrale bakıyorum, ve bakalım bu çift entegrali üstteki
@@ -516,7 +516,7 @@ $$
 $$
 \iint_R \mathrm{grad} u \cdot w  \mathrm{d} x \mathrm{d} y =
 \iint_R u (-\mathrm{div} w) \mathrm{d} x \mathrm{d} y + \int_C uw \cdot n \mathrm{d} s
-\qquad (3)
+\tag{3}
 $$
 
 Böylece Gauss-Green eşitliğine erişmiş olduk.

@@ -67,7 +67,7 @@ Son denklemin bir sonucu,
 
 $$ 
 I = \Pi = Y - w \cdot L = Y - w \cdot \frac{Y}{a} = Y(1 - \frac{w}{a})
-\qquad (2)
+\tag{2}
 $$
 
 $L = Y/a$ üzerinde logaritmik türev alırsak [1, sf. 67], ve
@@ -77,7 +77,7 @@ $$
 \frac{\dot{L}}{L} 
 = \frac{\dot{Y}}{Y} - \frac{\dot{a}}{a} 
 = \frac{\dot{Y}}{Y} - \alpha
-\qquad (1)
+\tag{1}
 $$
 
 Logaritmik türev zor bir şey değil, önce log alıp sonra türev almak sadece,

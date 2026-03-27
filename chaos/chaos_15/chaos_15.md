@@ -118,7 +118,7 @@ sonra bu denklem,
 
 $$ 
 \frac{\partial m}{\partial t} = Q - Km - \omega \frac{\partial m}{\partial \theta}
-\qquad (1)
+\tag{1}
 $$
 
 olacak. Sisteme giren kütle $Q$. Çıkan $Km$, ki $K$ bir sabit. Çıkan
@@ -145,7 +145,7 @@ Bu kesitteki su miktarı için
 
 $$ 
 M = \int_{\theta_1}^{\theta_2} m(\theta, t) \mathrm{d}\theta 
-\qquad (4)
+\tag{4}
 $$
  
 formülünü vermiştik, bu formülün vereceği sonuç zamana göre değişecektir
@@ -363,7 +363,7 @@ Bu sabitlik sayesinde ikinci denklem şu hale gelir,
 $$ 
 I\dot{\omega} = -v\omega + gr \int_{0}^{2\pi} m(\theta,t) \sin\theta
 \mathrm{d}\theta 
-\qquad (3)
+\tag{3}
 $$
 
 Bu uzun zaman süresi için geçerli, ya da $1/k$'ye göre uzun olan bir zaman

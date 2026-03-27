@@ -80,7 +80,7 @@ Birim olarak $V$ nedir?
 
 $$
 \Delta U = q (-E \Delta x )  \equiv q \Delta V 
-\qquad (1)
+\tag{1}
 $$
 
 Üstteki formülde $q \Delta V$'den hareketle, eşitliğin sol tarafında enerji,
@@ -198,7 +198,7 @@ Potansiyel farkı
 
 $$
 \Delta V = - E_x d 
-\qquad (2)
+\tag{2}
 $$
 
 Fakat ya üst alt resimdeki gibi hareket etseydi? Önce aşağı, sonra sağa, sonra

@@ -39,7 +39,7 @@ Gaussian $x_{i+1}$ verisi üzerinde hesapladığı olasılık / sorumluluk
 
 $$
 p^{(m+1)}(C_g | \mathbf{x}_i) \approx p^{(m)}(C_g | \mathbf{x}_i)
-\qquad (1)
+\tag{1}
 $$
 
 Karışım Ağırlıkları $\pi_g$

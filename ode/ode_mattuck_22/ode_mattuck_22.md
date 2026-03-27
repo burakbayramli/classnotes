@@ -62,7 +62,7 @@ Entegral alt sınırı 0'dan başlıyor. Birim adım 0'dan büyükse hep 1, o za
 Transformudur. 
 
 $$ = \frac{1}{s} \ \ \ s>0 
-\qquad (1)
+\tag{1}
 $$
 
 Kaydırılmış birim adımın Laplace'i
@@ -148,7 +148,7 @@ transformunu alırız yani.
 ![](22_8.png)
 
 $$ u(t-a)f(t-a) \leadsto e^{-as}F(s) 
-\qquad (2)
+\tag{2}
 $$
 
 (2) geçişi Laplace Tablosunda görülebilir.

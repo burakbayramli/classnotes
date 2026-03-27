@@ -285,7 +285,7 @@ $$ \bigg| \frac{K-p}{p}\bigg| = e^{-kt - C} $$
 Eğer $A = \pm e^{-C}$ alırsak
 
 $$ \frac{K-p}{p} = A e^{-kt }  
-\qquad (1)
+\tag{1}
 $$
 
 $$ \frac{K}{p} - 1 = Ae^{-kt} $$

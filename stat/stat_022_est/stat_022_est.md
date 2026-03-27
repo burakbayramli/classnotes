@@ -332,7 +332,7 @@ yaklaşımıyla şöyledir,
 
 $$
 P(\theta | x) = \frac{P(x|\theta) P(\theta) }{P(x)}
-\qquad (3)
+\tag{3}
 $$
 
 $P(\theta|x)$: Sonsal dağılım, bize verilmiş olan ham veriyi dikkate
@@ -499,7 +499,7 @@ $$
 
 $$
 = \alpha \prod _{k=1}^{n} P(x_k | \mu) P(\mu)
-\qquad (4)
+\tag{4}
 $$
 
 $\alpha$ büyüklüğü iki üstteki formüldeki bölen, o bir ölçekleme

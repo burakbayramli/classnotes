@@ -171,7 +171,7 @@ $$
 \frac{d}{d \beta_j} LCL = 
 \sum_{i:y_i=1} \frac{d}{d \beta_j} \log p(1|..)
 + \sum_{i:y_i=0} \frac{d}{d \beta_j} \log p(0|..)
-\qquad (3)
+\tag{3}
 $$
 
 Eğer üstteki bir bölümü $p$ diğerine $1-p$ dersem, yani şöyle
@@ -193,12 +193,12 @@ Biliyoruz ki
 
 $$ 
 \frac{d}{d \beta_j}\log p = \frac{1}{p}\frac{d}{d \beta_j} p
-\qquad (1)
+\tag{1}
 $$
 
 $$ 
 \frac{d}{d \beta_j}\log (1-p) = \frac{1}{1-p}(-1)\frac{d}{d \beta_j} p
-\qquad (2)
+\tag{2}
 $$
 
 Üstteki son iki formülün her ikisinde de $d / d \beta_j p$ kısmı olduğuna
@@ -265,7 +265,7 @@ türevi her noktanın türevlerinin toplamı olacak, (3)'de görüldüğü gibi.
 $$ \frac{d}{d \beta_j} LCL = 
 \sum_{i: y_i = 1} (1-p_i)x_{ij} + 
 \sum_{i: y_i = 0} -p_i x_{ij}  
-\qquad (4)
+\tag{4}
 $$
 
 $x_{ij}$ notasyonunda $j$, $j$'inci öğe / özellik anlamına geliyor. Şimdi 
@@ -706,7 +706,7 @@ toplamdan "içeri'' nüfuz eder,
 
 $$
  = \sum_{\bar{y}} \prod_i \exp  g_i(y_{i-1}y_i) 
-\qquad (5)
+\tag{5}
 $$
 
 $t=1,..,n+1$ için şunu tanımlayalım,

@@ -78,7 +78,7 @@ kurar.
 
 $$
 \dot{q} \approx -\xi c(t)
-\qquad (5)
+\tag{5}
 $$
 
 Bu denklem uluslararası nakit girişi bir ülkenin kurundaki değişimi
@@ -94,7 +94,7 @@ ticari dengeyi düzeltir.
 
 $$
 \dot{z}(t) = -\phi_1 z(t)  - \phi_2 q(t) 
-\qquad (6a)
+\tag{6a}
 $$
 
 Parametre $\phi_1$ cari hesabın bir denge noktasına dönüş hızını tanımlar. 
@@ -103,7 +103,7 @@ Parametre $\phi_1$ cari hesabın bir denge noktasına dönüş hızını tanıml
 
 $$
 z(t) + d(t) + k(t) + c(t) + r(t) = 0 
-\qquad (8)
+\tag{8}
 $$
 
 ile belirtilebilir. O zaman, eğer ülkenin kendisi döviz piyasasında
@@ -112,7 +112,7 @@ işlem ve finans dengesiyle tanımlıdır,
 
 $$
 c(t) = -z(t) - k(t) - d(t)
-\qquad (9)
+\tag{9}
 $$
 
 Bu denkleme $r(t)=0$ ve (8)'in tekrar düzenlemesi ile ulaşılıyor. 
@@ -124,7 +124,7 @@ satış
 
 $$
 r(t) = -z(t) -k(t) -d(t)
-\qquad (10)
+\tag{10}
 $$
 
 olur. 
@@ -227,7 +227,7 @@ borcu $d(t)$ ile göstereceğiz, ve azalma dinamiğini $d$ üzerinden
 ekleyeceğiz. $z(t)$ ve $k(t) = 0$
 
 $$
-\dot{d} = -\dot{z}-\gamma d(t) \qquad (7)
+\dot{d} = -\dot{z}-\gamma d(t) \tag{7}
 $$
 
 ```python

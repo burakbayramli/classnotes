@@ -185,7 +185,7 @@ $$
 m_2 L_2 \dot{\theta}_2^2 \sin(\theta_1 - \theta_2) - (m_1 + m_2) g \sin(\theta_1)
 }
 {(m_1 + m_2) L_1 }
-\qquad (2)
+\tag{2}
 $$
 
 $\theta_2$ için
@@ -227,7 +227,7 @@ L_1 \dot{\theta}_1^2\sin(\theta_1-\theta_2) -
 g \sin(\theta_2)
 }
 {L_2}
-\qquad (1)
+\tag{1}
 $$
 
 Şimdi (1) ve (2) formüllerine bakarsak elimde $\ddot{\theta}_2$'ye dayanan bir
@@ -272,7 +272,7 @@ $$
 m_2 L_2 \dot{\theta}_2^2 \sin(\theta_1-\theta_2) - (m_1+m_2)g\sin(\theta_1)
 }
 {L_1 (m_1+m_2)-m_2L_1\cos^2(\theta_1-\theta_2)}
-\qquad (3)
+\tag{3}
 $$
 
 Dikkat: Bölünen çok kalabalık, o iki satır bölünendeki değerleri
@@ -290,7 +290,7 @@ g \sin(\theta_1) \cos(\theta_1-\theta_2)(m_1+m_2) +
 L_1 \dot{\theta}_1^2 \sin(\theta_1-\theta_2)(m_1+m_2) - g\sin(\theta_2) (m_1+m_2)
 }
 {L_2 (m_1+m_2) - m_2 L_2 \cos^2 (\theta_1-\theta_2)}
-\qquad (4)
+\tag{4}
 $$
 
 Artık elimde iki tane ikinci dereceden diferansiyel denklem var. Bu

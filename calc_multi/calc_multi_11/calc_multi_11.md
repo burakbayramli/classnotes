@@ -170,7 +170,7 @@ demek olduğunu iyi biliyoruz.
 
 $$
 \frac{\Delta f}{\Delta t} \to \frac{df}{dt}
-\qquad (1)
+\tag{1}
 $$
 
 Türevlerin tanımı matematiksel olarak budur. Bu durum tüm değişkenler için

@@ -47,7 +47,7 @@ basit, tüm değerleri topla, ve değer sayısına böl,
 
 $$
 \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
-\qquad (2)
+\tag{2}
 $$
 
 Kod ile
@@ -78,7 +78,7 @@ ayıralım,
 
 $$
 \bar{x} = \frac{1}{n} \left( \sum_{i=1}^{n-1} x_i + x_i \right)
-\qquad (1)
+\tag{1}
 $$
 
 (2)'de görülen $\bar{x}$ formülü ilk $n$ verisinin ortalaması demiştik, o zaman

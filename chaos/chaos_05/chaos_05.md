@@ -193,7 +193,7 @@ $$
 
 $$ 
 = \lambda^2 - \tau \lambda + \Delta 
-\qquad (1) 
+\tag{1} 
 $$
 
 Üstte daha ileride bolca kullanacağım notasyonu tanıştırmış oldum bir

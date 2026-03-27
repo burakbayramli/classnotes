@@ -348,7 +348,7 @@ En Az Kareler formülü
 
 $$ 
 A^TA \hat{x} = A^Tb 
-\qquad (1) 
+\tag{1} 
 $$
 
 için gereken $A^TA$'yi şu halde yazabiliriz,

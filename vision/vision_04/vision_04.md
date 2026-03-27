@@ -81,7 +81,7 @@ $$ e^{\hat{\xi}} =
 e^{\hat{w}} & \frac{(I-e^{\hat{w}}) \hat{w}v + ww^Tv}{|w|} \\
 0 & 1
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 Eğer $w = 0$ olsaydı $e^{\hat{\xi}}=\left[\begin{array}{rrr} I & v\\0 & 1\end{array}\right]$ 

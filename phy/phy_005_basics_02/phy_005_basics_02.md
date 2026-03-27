@@ -150,7 +150,7 @@ böleriz, yani iki vektörün arasındaki zaman farkına.
 
 $$
 \frac{\Delta \mathbf{v}}{\Delta t} = \mathbf{a}
-\qquad (2)
+\tag{2}
 $$
 
 $\Delta v / \Delta t$ ifadesine başka bir yönden erişmeye uğraşalım, iki üstteki
@@ -295,7 +295,7 @@ hesabı için çapraz çarpım kullanırız,
 
 $$
 \vec{s} = \vec{\theta} \times \vec{r}
-\qquad (1)
+\tag{1}
 $$
 
 Bu kullanımın iki boyut üzerinde hala geçerli olduğunu doğrulayabiliriz, [7]'de

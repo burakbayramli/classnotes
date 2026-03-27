@@ -8,7 +8,7 @@ herhangi bir $x$ noktası [9, sf. 84]
 
 $$
 x = s + \lambda (t-s) \quad 0 \le \lambda \le 1
-\qquad (1)
+\tag{1}
 $$
 
 ile temsil edilebilir, ki $x,s,t$ üç boyutlu vektörler olmak üzere, yani
@@ -30,7 +30,7 @@ $\mu_0 = 1-\mu_1-\mu_2$, üstteki formülü tekrar düzenleyince,
 
 $$
 x = p_0 + \mu_1 (p_1 - p_0) + \mu_2 (p_2 - p_0)
-\qquad (2)
+\tag{2}
 $$
 
 Böylece, (1),(2) ile, bizi çizgi parçası biri üçgen sathi ile ilgili iki

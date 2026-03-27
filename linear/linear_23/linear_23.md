@@ -427,7 +427,7 @@ sebeple başlangıç değeri $y(0)$'i bu baz üzerinden temsil edebileceğimiz,
 
 $$
 y(0) = c_1 x_1 + ... + c_n x_n
-\qquad (1)
+\tag{1}
 $$
 
 ki $c_1,..,c_n$ bilmediğimiz katsayılar.

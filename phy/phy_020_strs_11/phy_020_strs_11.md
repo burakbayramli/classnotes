@@ -28,7 +28,7 @@ $$
     &      & 12L  & 6L^2  \\
     &      &      & 4L^3
 \end{array}\right]
-\qquad (1)
+\tag{1}
 $$
 
 $x-y$ düzlemi
@@ -41,7 +41,7 @@ $$
     &      & 12L  & -6L^2  \\
     &      &      & 4L^3
 \end{array}\right]
-\qquad (2)
+\tag{2}
 $$
 
 Dikkat edersek $x-y$ düzleminin matrisi [1] matrisi ile aynı. $x-z$ düzlemi

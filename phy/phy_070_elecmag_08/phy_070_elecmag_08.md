@@ -126,7 +126,7 @@ istiyorum. $\Delta K$ ekleyelim,
 
 $$
 \Delta (E_1 + E_2) = \Delta K = W_{surr} + W_{internal} 
-\qquad (1)
+\tag{1}
 $$
 
 Soru

@@ -12,14 +12,14 @@ boyutta şuna benzerler [3, sf. 1],
 $$
 \frac{\partial }{\partial t} u(x,t) + 
 \frac{\partial }{\partial x} f(u(x,t)) = 0
-\qquad (1)
+\tag{1}
 $$
 
 Daha önce [1]'de Burgers'in denklemini görmüştük, bir PDE,
 
 $$
 u_t + uu_x = 0
-\qquad (2a)
+\tag{2a}
 $$
 
 Bu denklem (1) ışığında düşünülebilir, eğer $f(u) = u^2/2$ tanımlarsak,
@@ -27,7 +27,7 @@ Bu denklem (1) ışığında düşünülebilir, eğer $f(u) = u^2/2$ tanımlarsa
 
 $$
 u_t + f(u)_x = 0, \qquad f(u) = \frac{1}{2}u^2
-\qquad (2b)
+\tag{2b}
 $$
 
 İleride lazım olur, (1)'i açarsak [6, sf. 29],
@@ -35,7 +35,7 @@ $$
 $$
 \frac{\partial u}{\partial t} + 
 f'(u) \frac{\partial u}{\partial x} = 0
-\qquad (5)
+\tag{5}
 $$
 
 denklemi de doğrudur, ki $f'(u) = \frac{\mathrm{d} f}{\mathrm{d} u}$.
@@ -81,7 +81,7 @@ u(x,0) =
 u_l & x < 0 \\
 u_r & x > 0 
 \end{array} \right.
-\qquad (9)
+\tag{9}
 $$
 
 olduğu durumda çözüm özgün bir zayıf çözümdür, eğer $u_l > u_r$ ise (bu mümkün
@@ -216,7 +216,7 @@ toplam kütlenin / dalganın değişiminin hızı şok hızı $s$ olacaktır.
 
 $$
 \frac{\mathrm{d}}{\mathrm{d} t} \int_{-M}^{M} u(x,t) \mathrm{d} x = f(u_l) - f(u_r)
-\qquad (8)
+\tag{8}
 $$
 
 Salt entegralin nasıl hesaplanacağına bakarsak [3, sf. 31],
@@ -505,7 +505,7 @@ Notasyonda $f$ akış (flux) için kullanılır [14], $\Delta x$ için $h_x$,
 
 $$
 \overline{u}_i =  \frac{1}{h_x} \int_{x_{i-1/2}}^{x_{i+1/2}} u(x) \mathrm{d} x
-\qquad (1)
+\tag{1}
 $$
 
 [17] yazısında muhafaza kanununun entegral formunu görmüştük,
@@ -582,7 +582,7 @@ Aynı durum ikinci entegral için de geçerli, o zaman iki üstteki formül
 $$
 \overline{u}_{j,l+1} = \overline{u}_{j,l} -
 \frac{h_t}{h_x} ( f(u_{j+1/2}) - f(u_{j-1/2}) )
-\qquad (2)
+\tag{2}
 $$
 
 olacak. Böylece $l$ anındaki $j$ hücresinin ortalamasını bir sonraki zaman adımı

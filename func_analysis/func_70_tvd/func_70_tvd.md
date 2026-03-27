@@ -15,7 +15,7 @@ problemi çift hedefli bir halde konumlandırmak [4],
 
 $$
 || x-x_{cor}||_2, \qquad \phi_{tv} (x) = \sum_{i=1}^{n-1} | x_{i+1} - x_i | 
-\qquad (1)
+\tag{1}
 $$
 
 Burada $x_{cor} \in \mathbb{R}^n$ bize verilen bozulmuş sinyal,

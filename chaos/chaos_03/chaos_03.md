@@ -109,7 +109,7 @@ $$ \sin\phi^\ast = 0 $$
 
 olmalı, ya da
 
-$$ \cos\phi^\ast = \frac{g}{r\omega^2} \qquad (1)$$
+$$ \cos\phi^\ast = \frac{g}{r\omega^2} \tag{1}$$
 
 
 olmalı. Birinci şart için $\sin\phi^\ast = 0$ durumu $\phi$ ya 0, ya da $\pi$ ise
@@ -220,7 +220,7 @@ türevlerini tekrar tanımlayabiliriz.
 
 $$ 
 \frac{d\phi}{dt} = \frac{d\phi}{d\tau} \frac{d\tau}{dt} 
-\qquad (2) 
+\tag{2} 
 $$
 
 $\frac{d\tau}{dt}$ için $\tau = t / T$ üzerinde türev alırız, ve üstteki ifade,
@@ -282,7 +282,7 @@ O zaman
 
 $$ \frac{r}{gT^2} = \frac{r}{ g \big( \frac{br}{mg} \big)^2 }  =
 \frac{r m^2 g^2}{gb^2r^2} = \frac{m^2g}{b^2r}
-\qquad (3)
+\tag{3}
 $$
 
 1'den çok daha küçük olmasını istediğim şey eşitliğin en sağındaki. Kriterimizi
@@ -330,7 +330,7 @@ $$ \phi' = \Omega $$
 
 $$ 
 \Omega'  = \frac{1}{\epsilon} \big( f(\phi) - \Omega \big) 
-\qquad (4)
+\tag{4}
 $$
 
 Bu bir vektör alanı oluşturdu, her $\phi,\Omega$ kombinasyonu için bir

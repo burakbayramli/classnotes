@@ -7,7 +7,7 @@ alanımızın oluşmasında kritik bir rol oynadı, Van der Pol Titreşiri.
 Sistem şöyle,
 
 $$ \ddot{x} + \mu\dot{x} (x^2-1) + x = 0 
-\qquad (1)$$
+\tag{1}$$
 
 Van der Pol, daha doğrusu Balthazar van der Pol Hollandalı bir elektrik
 mühendisi idi, 1920, 30'lu yıllarda zannediyorum, ve ABD'de Bell Labaratuarı'nda
@@ -400,7 +400,7 @@ zannediyorum.
 Van der Pol titresirini sayısal olarak çözelim,
 
 $$ \ddot{x} + \mu\dot{x} (x^2-1) + x = 0 
-\qquad (1)$$
+\tag{1}$$
 
 ```python
 import numpy as np

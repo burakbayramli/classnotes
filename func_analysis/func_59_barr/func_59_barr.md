@@ -241,7 +241,7 @@ $$
 \nabla f(x^\ast(t)) +
 \sum \underbrace{\frac{-1}{t h_i(x^\ast(t))}}_{u_i} \nabla h_i(x^\ast(t)) + 
 A^T \underbrace{\frac{w}{t}}_{v}= 0 
-\qquad (4)
+\tag{4}
 $$
 
 desem, orijinal problemin durağanlık şartına benzeyen bir ifade elde etmiş
