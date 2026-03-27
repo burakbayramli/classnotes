@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+      });
+    });
+    </script>  
+   
+  <title>Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1 id="markov-zincirleri-monte-carlo-metropolis-hastings-gibbs">Markov
+Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs</h1>
+<p>Bir hedef dağılım <span class="math inline">\(\pi(x)\)</span>’ten
+örneklem almak istiyoruz — diyelim ki değerlendirebildiğimiz (evaluate)
+ama doğrudan örnekleyemediğimiz karmaşık bir olasılık dağılımı elimizde
+var. MH’nin büyük fikri şu: doğrudan örneklemek yerine, uzun vadeli
+davranışı <span class="math inline">\(\pi(x)\)</span>’i taklit eden bir
+Markov zinciri inşa et. Sonra zinciri çalıştırıp konum bilgisini
+toplayalım.</p>
+<p>“<span class="math inline">\(\pi\)</span>’yi değerlendirebiliyoruz
+ama örnekleyemiyoruz” gibi ifadeler ilk duyulduğunda sezgiye aykırı
+gelebilir. Peki değerlendirmesi kolay ama örneklemesi zor olan bir
+dağılıma örnek nedir? Zorluk yalnızca Bayesçi bağlamdan (paydada
+çözümsüz entegraller yaratan) ibaret değildir. Değerlendirmesi kolay ama
+doğrudan örneklemesi zor olan pek çok açık, kapalı-form dağılım vardır.
+İşte çirkin bir karışım örneği. <span
+class="math inline">\(\mathbb{R}^{10}\)</span>’da 100 Gaussian’ın
+karışımını ele alalım:</p>
+<p><span class="math display">\[\pi^*(x) = \frac{1}{100}
+\sum_{k=1}^{100} \mathcal{N}(x \mid \mu_k,
+\Sigma_k)\]</span></p>
+<p>Bu tamamen açık, normalize edilmiş bir olasılık yoğunluk
+fonksiyonudur — anında değerlendirilebilir. Ancak örnekleme zordur;
+çünkü modlar birbirinden çok uzak ve neredeyse sıfır olasılıklı
+bölgelerle ayrılmış olabilir. Naif / basit bir örnekleyici bir modda
+sıkışır ve diğerlerini hiç keşfedemez. Bu genel soruna çok modluluk
+denir. Asıl sorun ise “boyutluluğun laneti”dir. Daha temelde, bilinen
+bir olasılıksal yoğunluk fonksiyonundan örneklemenin standart numaraları
+yüksek boyutlarda ise yaramaz:</p>
+<ul>
+<li><p>Ters CDF: <span class="math inline">\(F^{-1}(u)\)</span>’yu
+hesaplamayı gerektirir; bu da <span
+class="math inline">\(\pi^*\)</span>’yi entegre etmek demektir — yüksek
+boyutta çözümsüzdür.</p></li>
+<li><p>Reddetme örneklemesi: Her yerde <span class="math inline">\(q(x)
+\geq c \cdot \pi^*(x)\)</span> koşulunu sağlayan bir öneri <span
+class="math inline">\(q(x)\)</span> gerekir. Yüksek boyutlarda <span
+class="math inline">\(\pi^*(x)/q(x)\)</span> oranı neredeyse her yerde
+astronomik biçimde küçülür; kabul oranı <span
+class="math inline">\(d\)</span>’de üstel olarak sıfıra gider.</p></li>
+<li><p>Izgara tabanlı yöntemler: <span class="math inline">\(d\)</span>
+boyutlu uzayı boyut başına <span class="math inline">\(n\)</span> kutuya
+bölmek <span class="math inline">\(n^d\)</span> nokta gerektirir — orta
+büyüklükteki <span class="math inline">\(d\)</span> değerleri için bile
+tamamen olanaksızdır.</p></li>
+</ul>
+<p>Değerlendirilebilirlik bize yerel bilgi verir (bu noktadaki yoğunluk
+nedir?), örnekleme ise küresel bilgi gerektirir (yoğunluk uzayın
+tamamında nasıl davranıyor?). Bu uçurumu kapatmak tam olarak MCMC’nin
+yaptığı şeydir: yalnızca yerel değerlendirmeleri kullanarak uzayı
+keşfeden bir Markov zinciri inşa eder.</p>
+<p>MH Yakınsaklığının Kanıtı</p>
+<p>Bu görev için durağanlık, indirgenemezlik ve aperiyodikliğin
+kanıtlanması gerekir.</p>
+<p>Durağanlık için geçişlerin Markov özelliğine sahip olması gerekir;
+gelecek yalnızca bugüne bağlıdır. Bu kalem oldukca basit, eğer bir
+sonraki adım için sadece o andaki konum bilgisini kullanırsak bunu
+otomatik olarak elde etmiş oluruz.</p>
+<p>Ayrıntılı denge üzerinden durağanlığı elde ederiz. Ancak durağanlık
+tek başına, zincirin rastgele bir başlangıç noktasından <span
+class="math inline">\(\pi\)</span>’ye yakınsadığını garanti etmez.
+Bunlara ek olarak şunlar gerekir:</p>
+<p>İndirgenemezlik: Zincir, pozitif olasılıklı herhangi bir bölgeye her
+yerden ulaşabilmelidir. Bu olmadan birden fazla durağan dağılım olabilir
+(her bağlantısız bileşen için bir tane) ve hangisinde sonuçlanacağınız
+başlangıç noktanıza bağlıdır. Gaussian öneri kullanan MH’de bu neredeyse
+bedavaya gelir; Gaussian her yerde tam destek sağlar.</p>
+<p>Aperiyodiklik: Zincir bir döngüde salınmamalıdır. <span
+class="math inline">\(A \to B \to A \to B \to \cdots\)</span> şeklinde
+giden bir zincirin <span class="math inline">\(\pi\)</span> durağan
+dağılımı olabilir, ama ergodik anlamda asla ona yakınsamaz. MH bunu
+“yerinde kal” adımıyla otomatik olarak çözer: bir öneri reddedildiğinde
+mevcut durum tekrar sayılır. Bu öz-döngü her türlü periyodu kırar.</p>
+<p>İndirgenemezlik + aperiyodiklik + durağanlık bize ergodikliği
+verir,</p>
+<p><span class="math display">\[\frac{1}{T} \sum_{t=1}^{T} f(x_t)
+\xrightarrow{T \to \infty} \mathbb{E}_\pi[f]\]</span></p>
+<p>başlangıç noktası <span class="math inline">\(x_0\)</span>’dan
+bağımsız olarak. Gerçek kazanım budur — yalnızca <span
+class="math inline">\(\pi\)</span>’nin durağan olması değil, zinciri
+çalıştırmanın <span class="math inline">\(\pi\)</span>’nin kendisinden
+örneklem vermesi.</p>
+<ul>
+<li>Ayrıntılı denge → <span class="math inline">\(\pi\)</span> bir
+durağan dağılımdır</li>
+<li>İndirgenemezlik + aperiyodiklik → <span
+class="math inline">\(\pi\)</span> tek durağan dağılımdır ve zincir ona
+yakınsar</li>
+<li>Ergodiklik → zaman ortalamaları <span
+class="math inline">\(\pi\)</span>-beklentilerine eşittir (yani
+örnekleriniz gerçekten işe yarar)</li>
+</ul>
+<p><span class="math inline">\(\alpha\)</span> yapısı ayrıntılı dengeyi
+güvence altına alır. Gaussian öneri ile reddet/yerinde-kal mekanizması,
+indirgenemezliği ve aperiyodikliği neredeyse bedavaya güvence altına
+alır.</p>
+<p>Durağanlık</p>
+<p>Ayrık durumda durağan bir dağılım şu koşulu sağlar:</p>
+<p><span class="math display">\[\pi(j) = \sum_i \pi(i)\,
+p_{ij}\]</span></p>
+<p>Sürekli durumda bu şöyle olur:</p>
+<p><span class="math display">\[\pi(y) = \int \pi(x)\, p(x, y)\,
+dx\]</span></p>
+<p><span class="math inline">\(\pi\)</span>’nin durağan dağılımı olacağı
+bir <span class="math inline">\(p(x, y)\)</span> inşa etmek istiyoruz.
+Bu temel hedeftir.</p>
+<p>Geri Dönüşlülük (Ayrıntılı Denge)</p>
+<p>Durağanlık için çalışması daha kolay olan yeterli bir koşul ayrıntılı
+denge olarak adlandırılır:</p>
+<p><span class="math display">\[\pi(x)\, p(x, y) = \pi(y)\, p(y,
+x)\]</span></p>
+<p>Bu şunu söyler: <span class="math inline">\(x\)</span>’te olup <span
+class="math inline">\(y\)</span>’ye atlama olasılığı, <span
+class="math inline">\(y\)</span>’de olup <span
+class="math inline">\(x\)</span>’e atlama olasılığına eşittir. İki durum
+arasındaki akış her iki yönde dengelenmiştir. Bunun durağanlığı ima
+ettiğini, her iki tarafı da <span class="math inline">\(x\)</span>
+üzerinden entegre ederek doğrulayabilirsiniz:</p>
+<p><span class="math display">\[\int \pi(x)\, p(x, y)\, dx = \int
+\pi(y)\, p(y, x)\, dx = \pi(y) \int p(y, x)\, dx = \pi(y)\]</span></p>
+<p>Bu tam olarak durağanlık koşuludur. Not: <span
+class="math inline">\(\int p(y,x)\,dx = 1\)</span>; çünkü <span
+class="math inline">\(p(y,x)\)</span> bir geçiş yoğunluğudur ve tüm
+olası sonraki durumlar üzerinden entegre edilince toplam olasılık 1
+vermelidir.</p>
+<p>Dolayısıyla hedef <span class="math inline">\(\pi\)</span>’ye göre
+ayrıntılı dengeyi sağlayan bir geçiş kuralı <span
+class="math inline">\(p(x,y)\)</span> inşa edebilirsek işimiz biter.</p>
+<p>Öneri Dağılımı</p>
+<p>Bir öneri dağılımı <span class="math inline">\(q(y \mid x)\)</span>
+tanıtıyoruz — mevcut durum <span class="math inline">\(x\)</span>’e
+koşullu olarak örnekleyebileceğimiz basit bir dağılım. Bunu şöyle
+düşünebiliriz: “<span class="math inline">\(x\)</span>’teyken bir
+sonraki sıçramayı nereye düşünmeliyim?” Yaygın bir seçim, mevcut konuma
+Gaussian gürültüsü eklemektir:</p>
+<p><span class="math display">\[y = x + \mathcal{N}(0,
+\sigma^2)\]</span></p>
+<p>Öneriyi her zaman kabul etseydik, zincir <span
+class="math inline">\(\pi\)</span>’ye göre değil <span
+class="math inline">\(q\)</span>’ya göre yürürdü. Dolayısıyla bir
+düzeltmeye ihtiyacımız var.</p>
+<p>Kabul Kriteri</p>
+<p>Öneri yoğunluğu <span class="math inline">\(q\)</span>’nun kendi
+başına ayrıntılı dengeyi sağlamadığını varsayalım. Örneğin:</p>
+<p><span class="math display">\[q(y \mid x)\, \pi(x) &gt; q(x \mid y)\,
+\pi(y)\]</span></p>
+<p>yani <span class="math inline">\(x\)</span>’ten <span
+class="math inline">\(y\)</span>’ye çok sık atlıyoruz. Bunu düzeltmek
+için sıçramayı her zaman kabul etmiyoruz. <span
+class="math inline">\(\alpha(x, y)\)</span> olasılığıyla kabul ediyoruz;
+bu olasılığı dengeyi yeniden sağlayacak şekilde seçiyoruz:</p>
+<p><span class="math display">\[\pi(x)\, q(y \mid x)\, \alpha(x, y) =
+\pi(y)\, q(x \mid y)\]</span></p>
+<p>En zekice çözüm:</p>
+<p><span class="math display">\[\alpha(x, y) = \min\!\left(1,\,
+\frac{\pi(y)\, q(x \mid y)}{\pi(x)\, q(y \mid x)}\right)\]</span></p>
+<p>Sezgisi basittir: önerilen <span class="math inline">\(y\)</span>
+durumu <span class="math inline">\(\pi\)</span> altında mevcut <span
+class="math inline">\(x\)</span> durumundan daha yüksek olasılığa
+sahipse her zaman kabul et. Daha düşükse yalnızca bazen kabul et — ne
+kadar düşük olduğuyla orantılı olarak. Bu, “yanlış” yöndeki hareketleri
+dengeyi yeniden sağlayacak kadar düşürür.</p>
+<p>Özetle, geçiş yoğunluğu şöyle yazılır:</p>
+<p><span class="math display">\[p_{\text{MH}}(x, y) = \alpha(x, y)\, q(y
+\mid x), \quad x \neq y\]</span></p>
+<p>Metropolis Özel Durumu</p>
+<p>Öneri simetrikse — yani <span class="math inline">\(q(y \mid x) = q(x
+\mid y)\)</span>, Gaussian gürültüde olduğu gibi — <span
+class="math inline">\(q\)</span> terimleri sadeleşir ve kabul şu hale
+gelir:</p>
+<p><span class="math display">\[\alpha(x, y) = \min\!\left(1,\,
+\frac{\pi(y)}{\pi(x)}\right)\]</span></p>
+<p>Bu orijinal Metropolis algoritmasıdır. MH ise bunun asimetrik
+önerilere genellemesidir.</p>
+<p>Algoritma</p>
+<ol type="1">
+<li>Bir başlangıç noktası seç, buna <span
+class="math inline">\(x\)</span> de</li>
+<li><span class="math inline">\(q(y \mid x)\)</span>’ten yeni bir durum
+<span class="math inline">\(y\)</span> öner</li>
+<li><span class="math inline">\(\alpha(x, y)\)</span>’yi hesapla</li>
+<li><span class="math inline">\(\alpha\)</span> olasılığıyla <span
+class="math inline">\(y\)</span>’yi kabul et; aksi takdirde <span
+class="math inline">\(x\)</span>’te kal</li>
+<li>Tekrarla</li>
+</ol>
+<p>Yeterince uzun süre çalıştıktan sonra ziyaret edilen durumlar <span
+class="math inline">\(\pi\)</span>’ye göre dağılmış olur. Isınma süresi,
+zincirin nereden başladığını “unutmadan” önceki başlangıç sürecidir — bu
+örnekler henüz <span class="math inline">\(\pi\)</span>’yi temsil
+etmediğinden atılır.</p>
+<p>Rosenbrock</p>
+<p>Geçerli bir yoğunluk için iki koşul gereklidir:</p>
+<ol type="1">
+<li><p>Negatif olmama: <span class="math inline">\(\pi^*(x) \geq
+0\)</span> — evet, üstel bunu garanti eder çünkü <span
+class="math inline">\(\exp(\cdot) &gt; 0\)</span> her zaman.</p></li>
+<li><p>1’e entegre olma: <span class="math inline">\(\int \pi^*(x)\, dx
+= 1\)</span> — burada <span class="math inline">\(\propto\)</span>
+sembolü önemli iş yapıyor. Ham <span
+class="math inline">\(\exp(-f/20)\)</span> zorunlu olarak 1’e entegre
+olmaz, dolayısıyla örtük bir normalleştirme sabiti <span
+class="math inline">\(Z\)</span> vardır:</p></li>
+</ol>
+<p><span class="math display">\[
+\pi^*(x_1, x_2) = \frac{1}{Z} \exp\!\left(-\frac{f(x_1,
+x_2)}{20}\right), \quad Z =
+\int \exp\!\left(-\frac{f(x_1, x_2)}{20}\right) dx
+\]</span></p>
+<p>MH’nin güzelliği burada: <span class="math inline">\(Z\)</span>’yi
+hiç hesaplamak zorunda değilsiniz. Kabul oranı şöyledir:</p>
+<p><span class="math display">\[\alpha(x, y) = \min\!\left(1,\,
+\frac{\exp(-f(y)/20)/Z}{\exp(-f(x)/20)/Z}\right)\]</span></p>
+<p><span class="math inline">\(Z\)</span>’ler sadeleşir; dolayısıyla MH
+yalnızca normalleştirme sabitine kadar bilinen dağılımlardan
+örnekleyebilir.</p>
+<p><code>exp</code>, normalleştirmeyi hesaplamayı kolaylaştırmaz.
+Rosenbrock yoğunluğu için <span class="math inline">\(Z\)</span>’nin
+kapalı formu yoktur. <code>exp</code>’in kullanılmasının asıl nedeni
+entegralin sonlu olmasını (yani <span class="math inline">\(Z &lt;
+\infty\)</span>) güvence altına almaktır. <span
+class="math inline">\(f(x_1, x_2) \geq 0\)</span> her yerde
+sağlandığından:</p>
+<p><span class="math display">\[\exp\!\left(-\frac{f(x_1,
+x_2)}{20}\right) \in (0, 1]\]</span></p>
+<p>dolayısıyla entegre edilen 1 ile sınırlı ve moddan uzaklaştıkça 0’a
+yaklaşır; bu da entegrali sonlu kılar. <span
+class="math inline">\(f\)</span>’yi doğrudan yoğunluk olarak
+kullansaydınız, <span class="math inline">\(f \geq 0\)</span> sınırsız
+büyüdüğünden anında başarısız olurdu.</p>
+<p>Özetle <code>exp</code> üç şey yapar:</p>
+<ol type="1">
+<li><p>Pozitifliği garanti eder</p></li>
+<li><p>Manzarayı çevirir (küçük <span class="math inline">\(f\)</span> →
+yüksek yoğunluk)</p></li>
+<li><p>Aralığı <span class="math inline">\((0,1]\)</span>’e sıkıştırır;
+entegrali sonlu kılar</p></li>
+</ol>
+<p>1’e gerçek normalleştirme ise <span
+class="math inline">\(Z\)</span>’ye bölmektir; MH’nin bunu hesaplaması
+gerekmez.</p>
+<p>Kod</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="dv">1</span>, <span class="dv">3</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">500</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">500</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>X1, X2 <span class="op">=</span> np.meshgrid(x1, x2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.exp(<span class="op">-</span>((a <span class="op">-</span> X1)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(X2 <span class="op">-</span> X1<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X1, X2, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>ax.scatter(a, a<span class="op">**</span><span class="dv">2</span>, <span class="fl">1.0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, s<span class="op">=</span><span class="dv">50</span>, zorder<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="ss">f&#39;Mode (</span><span class="sc">{</span>a<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>a<span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss">)&#39;</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&#39;$x_1$&#39;</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&#39;$x_2$&#39;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&#39;$</span><span class="ch">\\</span><span class="st">pi^*(x_1, x_2)$&#39;</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">&#39;Rosenbrock Density (3D)&#39;</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ax.view_init(azim<span class="op">=</span><span class="dv">340</span>, elev<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_01.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_097_mcmc_01.jpg" /></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> multivariate_normal <span class="im">as</span> mvn</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>n_iters <span class="op">=</span> <span class="dv">1000</span>          <span class="co"># number of Metropolis steps</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>proposal_var <span class="op">=</span> <span class="fl">0.1</span>      <span class="co"># proposal variance</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">100</span>           <span class="co"># discard early samples</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="dv">1</span>,<span class="dv">4</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rosen(x, y):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.exp(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span>((a <span class="op">-</span> x)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(y <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> np.empty((n_iters, <span class="dv">2</span>))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Random starting point</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>samples[<span class="dv">0</span>] <span class="op">=</span> np.random.uniform(</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    low<span class="op">=</span>[<span class="op">-</span><span class="dv">3</span>, <span class="op">-</span><span class="dv">3</span>],</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    high<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">10</span>],</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    size<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_iters):</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    curr <span class="op">=</span> samples[i <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Propose new point</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    prop <span class="op">=</span> curr <span class="op">+</span> mvn(</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        mean<span class="op">=</span>np.zeros(<span class="dv">2</span>),</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        cov<span class="op">=</span>np.eye(<span class="dv">2</span>) <span class="op">*</span> proposal_var</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Acceptance probability</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="bu">min</span>(</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="dv">1</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        rosen(<span class="op">*</span>prop) <span class="op">/</span> rosen(<span class="op">*</span>curr)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Accept or reject</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.random.uniform() <span class="op">&lt;</span> alpha:</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        curr <span class="op">=</span> prop</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    samples[i] <span class="op">=</span> curr</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove burn-in</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> samples[burn_in:]</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">60</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">60</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> rosen(X, Y)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample heights</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>Z_samples <span class="op">=</span> rosen(</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    samples[:, <span class="dv">0</span>],</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    samples[:, <span class="dv">1</span>]</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Surface (wireframe)</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X, Y, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    samples[:, <span class="dv">0</span>],</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    samples[:, <span class="dv">1</span>],</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    Z_samples,</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;x&quot;</span>)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&quot;y&quot;</span>)</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Metropolis Sampling on Rosenbrock Density&quot;</span>)</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_02.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_097_mcmc_02.jpg" /></p>
+<p>Gibbs Örneklemesi</p>
+<p>Gibbs örneklemesi, Metropolis-Hastings’in özel bir durumudur; yeni
+önerilen durum her zaman bire eşit olasılıkla kabul edilir. <span
+class="math inline">\(D\)</span> boyutlu bir sonsal dağılımı <span
+class="math inline">\(x = (x_1, \ldots, x_D)\)</span> parametreleriyle
+ele alalım. Gibbs örneklemesinin temel fikri, <span
+class="math inline">\(x_{-d}\)</span>’nin <span
+class="math inline">\(d\)</span>-inci parametre olmaksızın <span
+class="math inline">\(x\)</span> olduğu koşullu dağılım <span
+class="math inline">\(\pi(x_d \mid x_{-d}, X)\)</span>’ten yinelemeli
+olarak örneklemektir.</p>
+<p>Algoritma</p>
+<p><span class="math inline">\(t = 1, \ldots, T\)</span> için:</p>
+<ul>
+<li><span class="math inline">\(x_1^{(t+1)} := y_1 \sim \pi(x_1 \mid
+x_2^{(t)}, x_3^{(t)}, \ldots, x_D^{(t)}, X)\)</span></li>
+<li><span class="math inline">\(x_2^{(t+1)} := y_2 \sim \pi(x_2 \mid
+x_1^{(t+1)}, x_3^{(t)}, \ldots, x_D^{(t)}, X)\)</span></li>
+<li><span class="math inline">\(\ldots\)</span></li>
+<li><span class="math inline">\(x_d^{(t+1)} := y_d \sim \pi(x_d \mid
+x_1^{(t+1)}, \ldots, x_{d-1}^{(t+1)}, x_{d+1}^{(t)}, \ldots, x_D^{(t)},
+X)\)</span></li>
+<li><span class="math inline">\(x_D^{(t+1)} := y_D \sim \pi(x_D \mid
+x_1^{(t+1)}, x_2^{(t+1)}, \ldots, x_{D-1}^{(t+1)}, X)\)</span></li>
+</ul>
+<p>Üsttekinin neden çalıştığını görmek için</p>
+<p><span class="math display">\[\pi(x \mid X) = \pi(x_d, x_{-d} \mid X)
+= \pi(x_d \mid x_{-d}, X)\,\pi(x_{-d} \mid X)\]</span></p>
+<p>olduğuna dikkat edelim. Geçiş olasılığı şu şekilde yazılabilir,</p>
+<p><span class="math display">\[\alpha(x, y) = \min\left\{1,
+\frac{\pi(y) \pi(x_d | x_{-d}, X)}{\pi(x) \pi(y_d | y_{-d},
+X)}\right\}\]</span></p>
+<p>Dikkat edersek <span class="math inline">\(q\)</span> simdi <span
+class="math inline">\(\pi\)</span>, Gibbs örneklemesinde öneri dağılımı
+koşulun kendisi seçilir:</p>
+<p><span class="math display">\[q(y \mid x) = \pi(y_d \mid x_{-d},
+X)\]</span></p>
+<p>“yani <span class="math inline">\(d\)</span> koordinatı için yeni bir
+değer önerirken, diğer tüm koordinatları sabit tutarak (yani <span
+class="math inline">\(y_{-d} = x_{-d}\)</span>) doğrudan koşullu
+dağılımından örnekleme yaparsınız.”</p>
+<p>Bunu genel MH kabul oranına koyarsak:</p>
+<p><span class="math display">\[
+\alpha(y \mid x) = \min\!\left(1,\, \frac{\pi(y)\, q(x \mid y)}{\pi(x)\,
+q(y \mid x)}\right) = \min\!\left(1,\, \frac{\pi(y)\,\pi(x_d \mid
+y_{-d}, X)}{\pi(x)\,\pi(y_d \mid x_{-d}, X)}\right)
+\]</span></p>
+<p><span class="math inline">\(\pi(y) = \pi(y_d \mid y_{-d},
+X)\,\pi(y_{-d} \mid X)\)</span> ve <span class="math inline">\(\pi(x) =
+\pi(x_d \mid x_{-d}, X)\,\pi(x_{-d} \mid X)\)</span> açılımını
+kullanarak ve <span class="math inline">\(y_{-d} = x_{-d}\)</span>
+olduğundan her şey sadeleşir:</p>
+<p><span class="math display">\[= \min\!\left(1,\, \frac{\pi(y_d \mid
+y_{-d}, X)\,\pi(y_{-d} \mid X)\,\pi(x_d \mid x_{-d}, X)}{\pi(x_d \mid
+x_{-d}, X)\,\pi(x_{-d} \mid X)\,\pi(y_d \mid y_{-d}, X)}\right) =
+1\]</span></p>
+<p>Başka bir deyişle, Gibbs örneklemesinin her adımında, önerilen
+sonraki durum her zaman geri dönüşlülük kısıtını sağlayan bir
+Metropolis-Hastings benzeri rastgele yürüyüş gerçekleştiriyoruz.</p>
+<p>Gibbs örneklemesinin temel avantajı basittir: öneriler her zaman
+kabul edilir. Temel dezavantajı ise yukarıdaki koşullu olasılık
+dağılımlarını türetebilmemiz gerektiğidir. Bu, öncelin sonsal ile
+eşlenik olduğu durumlarda çözülebilirdir.</p>
+<p>Gibbs örneklemesini yalnızca Metropolis-Hastings algoritmasının özel
+bir durumu olarak görebiliriz. Her iki algoritmanın da kavramsal açıdan
+zor kısmı, geri dönüşlülük kısıtının doğruluğunu ve örtük bir Markov
+zincirinin durağan dağılımı olması garantili bir dağılımı nasıl
+belirleyebileceğimizi anlamaktır. Bu bilgiyle Gibbs örneklemesinin
+doğruluğunu yalnızca biraz cebirle görebiliriz.</p>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
