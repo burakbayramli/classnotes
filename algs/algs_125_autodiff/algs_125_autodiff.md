@@ -79,7 +79,7 @@ birebir takip ediyorlar. Bu sonuçtan istifade edebiliriz, fonksiyonları şu
 
 $$ 
 g(x + \dot{x}d) = g(x) + g'(\dot{x}d) 
-\qquad (1)
+\tag{1}
 $$
 
 O zaman mesela $\sin,\cos$ ya da pek çok diğer fonksiyonu $g$ olarak

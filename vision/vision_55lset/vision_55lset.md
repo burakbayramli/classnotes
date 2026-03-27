@@ -305,7 +305,7 @@ $$
 \frac{\partial \phi}{\partial x}\frac{dx}{dt} + 
 \frac{\partial \phi}{\partial y}\frac{dy}{dt} + 
 \phi_t = 0
-\qquad (1)
+\tag{1}
 $$
 
 Temsilen daha kısa bir işaret kullanmak gerekirse, $\bigtriangledown$
@@ -575,12 +575,12 @@ O zaman
 
 $$ 
 v \frac{du}{dx} = F_y \frac{dF_x}{dx} 
-\qquad (1)
+\tag{6}
 $$
 
 $$
 u \frac{dv}{dx} = -F_x \frac{dF_y }{dx} 
-\qquad (2)
+\tag{2}
 $$
 
 Bunlardan mesela $dF_x/dx$ üzerinde Zincirleme Kanunu (Chain Rule) uygulamak
@@ -590,24 +590,28 @@ $$ \frac{d F_x(x,f(x)) }{dx} = \frac{\partial F_x}{\partial  x}(x,f(x))+\frac{\p
 
 $$
 = F_{xx}(x,f(x))+F_{xy}(x,f(x))f'(x) 
-\qquad (3)
+\tag{3}
 $$
 
 $$
 \frac{d F_y(x,f(x)) }{dx} =  F_{xy}(x,f(x))+F_{yy}(x,f(x))f'(x) 
-\qquad (4)
+\tag{4}
 $$
 
 Zincirleme Kanunu niye üstteki şekilde açıldı? Tam Diferansiyeli bir daha
 hatırlayalım:
 
-$$ df = \frac{\partial f}{\partial x} dx + \frac{\partial f}{\partial y} dy  $$
+$$
+df = \frac{\partial f}{\partial x} dx + \frac{\partial f}{\partial y} dy
+$$
 
-$$ \frac{df}{dx} = \frac{\partial f}{\partial x} \frac{dx}{dx} + \frac{\partial f}{\partial y} \frac{dy}{dx}  $$
+$$
+\frac{df}{dx} = \frac{\partial f}{\partial x} \frac{dx}{dx} + \frac{\partial f}{\partial y} \frac{dy}{dx}
+$$
 
 $$ \frac{df}{dx} = \frac{\partial f}{\partial x} + \frac{\partial f}{\partial y} \frac{dy}{dx}  $$
 
-O zaman formüller (1) (2) (3) ve (4) bir araya konulursa,
+O zaman formüller (6) (2) (3) ve (4) bir araya konulursa,
 
 $$ y '' = - \frac{F_yF_{xx} - F_y F_{xy}\frac{F_x}{F_y} - F_xF_{xy} + F_xF_{yy}\frac{F_x}{F_y}}{F_y^2}\\ $$
 
@@ -669,7 +673,7 @@ $F_y^{-3}$ ve $F_y^{3}$ birbirlerini iptal ederler ve sonuç:
 $$
 \kappa = \frac{F_y^2F_{xx} - 2F_{xy}F_xF_y +
     F_x^2F_{yy}}{(F_y^2 + F_x^2)^{3/2}}
-\qquad (5)
+\tag{5}
 $$
 
 Üstteki ünlü eğim  formülüdür. 

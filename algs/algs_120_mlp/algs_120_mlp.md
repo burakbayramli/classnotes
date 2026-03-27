@@ -167,7 +167,7 @@ $$
 
 $$  
 = (a_k-t_k)g_k'(z_k)\frac{\partial}{\partial w_{jk}} z_k 
-\qquad (1)
+\tag{1}
 $$
 
 Yine Zincirleme Kanununu kullandık. Şimdi hatırlayalım ki
@@ -245,7 +245,7 @@ $$
 $$ 
 = \sum_k (a_k-t_k) g_k'(z_k)
 \frac{ \partial }{ \partial w_{ij} } z_k
-\qquad (2)
+\tag{2}
 $$
 
 Yine Zincirleme Kanununu kullandık. Evet, şimdi işler biraz daha
