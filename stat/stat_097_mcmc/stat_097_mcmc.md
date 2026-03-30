@@ -308,6 +308,11 @@ plt.savefig('stat_097_mcmc_02.jpg')
 
 ![](stat_097_mcmc_02.jpg)
 
+Üstteki grafikte Rosenbrock yoğunluğunun nasıl gezildiğini görüyoruz,
+mavi çizgilerin her biri önceki bir konumdan diğer sonraki konuma
+geçişi gösteriyor, bu geçişler sırasında durağan dağılımdan
+örneklemler toplamış oluyoruz.
+
 Gibbs Örneklemesi
 
 Gibbs örneklemesi, Metropolis-Hastings'in özel bir durumudur [2]; yeni
