@@ -60,11 +60,11 @@ tek başına, zincirin rastgele bir başlangıç noktasından $\pi$'ye
 yakınsadığını garanti etmez. Bunlara ek olarak şunlar gerekir:
 
 İndirgenemezlik: Zincir, pozitif olasılıklı herhangi bir bölgeye her
-yerden ulaşabilmelidir. Bu olmadan birden fazla durağan dağılım
-olabilir (her bağlantısız bileşen için bir tane) ve hangisinde
-sonuçlanacağınız başlangıç noktanıza bağlıdır. Gaussian öneri kullanan
-MH'de bu neredeyse bedavaya gelir; Gaussian her yerde tam destek
-sağlar.
+yerden ulaşabilmelidir. Bu olmazsa birden fazla durağan dağılım
+olabilirdi (her bağlantısız bileşen için bir tane) ve hangisinde
+sonuçlanacağınız başlangıç noktanıza bağlı olurdu. Gaussian öneri
+kullanan MH'de indirgenezlik neredeyse bedavaya gelir; Gaussian her
+yere ulaşabilirlik sağlar.
 
 Aperiyodiklik: Zincir bir döngüde salınmamalıdır. $A \to B \to A \to B
 \to \cdots$ şeklinde giden bir zincirin $\pi$ durağan dağılımı
@@ -76,7 +76,7 @@ durum tekrar sayılır. Bu öz-döngü her türlü periyodu kırar.
 
 $$\frac{1}{T} \sum_{t=1}^{T} f(x_t) \xrightarrow{T \to \infty} \mathbb{E}_\pi[f]$$
 
-başlangıç noktası $x_0$'dan bağımsız olarak. Gerçek kazanım budur —
+başlangıç noktası $x_0$'dan bağımsız olarak. Gerçek kazanım bu,
 yalnızca $\pi$'nin durağan olması değil, zinciri çalıştırmanın
 $\pi$'nin kendisinden örneklem vermesi.
 
