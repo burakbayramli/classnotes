@@ -1,6 +1,6 @@
 # Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs
 
-Bir hedef dağılım $\pi(x)$'ten örneklem almak istiyoruz — diyelim ki
+Bir hedef dağılım $\pi(x)$'ten örneklem almak istiyoruz,  diyelim ki
 değerlendirebildiğimiz (evaluate) ama doğrudan örnekleyemediğimiz
 karmaşık bir olasılık dağılımı elimizde var. MH'nin büyük fikri şu:
 doğrudan örneklemek yerine, uzun vadeli davranışı $\pi(x)$'i taklit
@@ -28,7 +28,7 @@ olasılıksal yoğunluk fonksiyonundan örneklemenin standart numaraları
 yüksek boyutlarda ise yaramaz:
 
 - Ters CDF: $F^{-1}(u)$'yu hesaplamayı gerektirir; bu da $\pi^*$'yi
-  entegre etmek demektir — yüksek boyutta çözümsüzdür.
+  entegre etmek demektir,  yüksek boyutta çözümsüzdür.
 
 - Reddetme örneklemesi: Her yerde $q(x) \geq c \cdot \pi^*(x)$
   koşulunu sağlayan bir öneri $q(x)$ gerekir. Yüksek boyutlarda
@@ -36,7 +36,7 @@ yüksek boyutlarda ise yaramaz:
   küçülür; kabul oranı $d$'de üstel olarak sıfıra gider.
 
 - Izgara tabanlı yöntemler: $d$ boyutlu uzayı boyut başına $n$ kutuya
-  bölmek $n^d$ nokta gerektirir — orta büyüklükteki $d$ değerleri için
+  bölmek $n^d$ nokta gerektirir,  orta büyüklükteki $d$ değerleri için
   bile tamamen olanaksızdır.
 
 Değerlendirilebilirlik bize yerel bilgi verir (bu noktadaki yoğunluk
@@ -100,32 +100,31 @@ Sürekli durumda bu şöyle olur:
 
 $$\pi(y) = \int \pi(x)\, p(x, y)\, dx$$
 
-$\pi$'nin durağan dağılımı olacağı bir $p(x, y)$ inşa etmek istiyoruz. Bu temel hedeftir.
+$\pi$'nin durağan dağılımı olacağı bir $p(x, y)$ inşa etmek
+istiyoruz. Bu temel hedef.
 
-Geri Dönüşlülük (Ayrıntılı Denge)
-
-Durağanlık için çalışması daha kolay olan yeterli bir koşul ayrıntılı
-denge olarak adlandırılır:
+Durağanlık için ispat edilmesi, kullanılması daha kolay olan yeterli
+bir koşul ayrıntılı denge olarak adlandırılır:
 
 $$\pi(x)\, p(x, y) = \pi(y)\, p(y, x)$$
 
 Bu şunu söyler: $x$'te olup $y$'ye atlama olasılığı, $y$'de olup $x$'e
 atlama olasılığına eşittir. İki durum arasındaki akış her iki yönde
 dengelenmiştir. Bunun durağanlığı ima ettiğini, her iki tarafı da $x$
-üzerinden entegre ederek doğrulayabilirsiniz:
+üzerinden entegre ederek doğrulayabiliriz:
 
 $$\int \pi(x)\, p(x, y)\, dx = \int \pi(y)\, p(y, x)\, dx = \pi(y) \int p(y, x)\, dx = \pi(y)$$
 
 Bu tam olarak durağanlık koşuludur. Not: $\int p(y,x)\,dx = 1$; çünkü
-$p(y,x)$ bir geçiş yoğunluğudur ve tüm olası sonraki durumlar
-üzerinden entegre edilince toplam olasılık 1 vermelidir.
+$p(y,x)$ bir geçiş yoğunluğu ve tüm olası sonraki durumlar üzerinden
+entegre edilince toplam olasılık 1 vermeli.
 
 Dolayısıyla hedef $\pi$'ye göre ayrıntılı dengeyi sağlayan bir geçiş
 kuralı $p(x,y)$ inşa edebilirsek işimiz biter.
 
 Öneri Dağılımı
 
-Bir öneri dağılımı $q(y \mid x)$ tanıtıyoruz — mevcut durum $x$'e
+Bir öneri dağılımı $q(y \mid x)$ tanıtıyoruz,  mevcut durum $x$'e
 koşullu olarak örnekleyebileceğimiz basit bir dağılım. Bunu şöyle
 düşünebiliriz: "$x$'teyken bir sonraki sıçramayı nereye düşünmeliyim?"
 Yaygın bir seçim, mevcut konuma Gaussian gürültüsü eklemektir:
@@ -150,11 +149,11 @@ En zekice çözüm:
 
 $$\alpha(x, y) = \min\!\left(1,\, \frac{\pi(y)\, q(x \mid y)}{\pi(x)\, q(y \mid x)}\right)$$
 
-Sezgisi basittir: önerilen $y$ durumu $\pi$ altında mevcut $x$
-durumundan daha yüksek olasılığa sahipse her zaman kabul et. Daha
-düşükse yalnızca bazen kabul et — ne kadar düşük olduğuyla orantılı
-olarak. Bu, "yanlış" yöndeki hareketleri dengeyi yeniden sağlayacak
-kadar düşürür.
+Kabaca olanları anlamak basit: önerilen $y$ durumu $\pi$ altında
+mevcut $x$ durumundan daha yüksek olasılığa sahipse her zaman kabul
+et. Daha düşükse yalnızca bazen kabul et, ne kadar düşük olduğuyla
+orantılı olarak. Bu, "yanlış" yöndeki hareketleri dengeyi yeniden
+sağlayacak kadar düşürür.
 
 Özetle, geçiş yoğunluğu şöyle yazılır:
 
@@ -162,9 +161,8 @@ $$p_{\text{MH}}(x, y) = \alpha(x, y)\, q(y \mid x), \quad x \neq y$$
 
 Metropolis Özel Durumu
 
-Öneri simetrikse — yani $q(y \mid x) = q(x \mid y)$, Gaussian
-gürültüde olduğu gibi — $q$ terimleri sadeleşir ve kabul şu hale
-gelir:
+Öneri simetrikse, yani $q(y \mid x) = q(x \mid y)$, Gaussian gürültüde
+olduğu gibi, $q$ terimleri sadeleşir ve kabul şu hale gelir:
 
 $$\alpha(x, y) = \min\!\left(1,\, \frac{\pi(y)}{\pi(x)}\right)$$
 
@@ -181,24 +179,25 @@ Algoritma
 
 Yeterince uzun süre çalıştıktan sonra ziyaret edilen durumlar $\pi$'ye
 göre dağılmış olur. Isınma süresi, zincirin nereden başladığını
-"unutmadan" önceki başlangıç sürecidir — bu örnekler henüz $\pi$'yi
+"unutmadan" önceki başlangıç sürecidir, bu örnekler henüz $\pi$'yi
 temsil etmediğinden atılır.
 
 Rosenbrock
 
-Geçerli bir yoğunluk için iki koşul gereklidir:
-
-1. Negatif olmama: $\pi^*(x) \geq 0$ — evet, üstel bunu garanti eder
-çünkü $\exp(\cdot) > 0$ her zaman.
-
-2. 1'e entegre olma: $\int \pi^*(x)\, dx = 1$ — burada $\propto$
-sembolü önemli iş yapıyor. Ham $\exp(-f/20)$ zorunlu olarak 1'e
-entegre olmaz, dolayısıyla örtük bir normalleştirme sabiti $Z$ vardır:
+Bir yoğunluk fonksiyonu yaratalım, onun üzerinden alttaki örneği
+kodlayacağız.
 
 $$
 \pi^*(x_1, x_2) = \frac{1}{Z} \exp\!\left(-\frac{f(x_1, x_2)}{20}\right), \quad Z =
 \int \exp\!\left(-\frac{f(x_1, x_2)}{20}\right) dx
 $$
+
+Geçerli bir yoğunluk için iki koşul gerekli: 1) Negatif olmama:
+$\pi^*(x) \geq 0$, evet, üstel bunu garanti eder çünkü $\exp(\cdot) >
+0$ her zaman. 2) 1'e entegre olma: $\int \pi^*(x)\, dx = 1$, burada
+$\propto$ sembolü önemli iş yapıyor. Ham $\exp(-f/20)$ zorunlu olarak
+1'e entegre olmaz, dolayısıyla örtük bir normalleştirme sabiti $Z$
+vardır:
 
 MH'nin güzelliği burada: $Z$'yi hiç hesaplamak zorunda
 değilsiniz. Kabul oranı şöyledir:
@@ -218,17 +217,12 @@ $$\exp\!\left(-\frac{f(x_1, x_2)}{20}\right) \in (0, 1]$$
 dolayısıyla entegre edilen 1 ile sınırlı ve moddan uzaklaştıkça 0'a
 yaklaşır; bu da entegrali sonlu kılar. $f$'yi doğrudan yoğunluk olarak
 kullansaydınız, $f \geq 0$ sınırsız büyüdüğünden anında başarısız
-olurdu.
+olurdu. Özetle `exp` üç şey yapar: 1) Pozitifliği garanti eder 2)
+Manzarayı çevirir (küçük $f$ → yüksek yoğunluk) 3) Aralığı $(0,1]$'e
+sıkıştırır; entegrali sonlu kılar
 
-Özetle `exp` üç şey yapar:
-
-1. Pozitifliği garanti eder
-
-2. Manzarayı çevirir (küçük $f$ → yüksek yoğunluk)
-
-3. Aralığı $(0,1]$'e sıkıştırır; entegrali sonlu kılar
-
-1'e gerçek normalleştirme ise $Z$'ye bölmektir; MH'nin bunu hesaplaması gerekmez.
+1'e gerçek normalleştirme ise $Z$'ye bölmektir; MH'nin bunu
+hesaplaması gerekmez.
 
 Kod
 
@@ -250,7 +244,7 @@ ax.scatter(a, a**2, 1.0, color='red', s=50, zorder=5, label=f'Mode ({a}, {a**2})
 ax.set_xlabel('$x_1$')
 ax.set_ylabel('$x_2$')
 ax.set_zlabel('$\\pi^*(x_1, x_2)$')
-ax.set_title('Rosenbrock Density (3D)')
+ax.set_title('Rosenbrock Yogunlugu')
 ax.view_init(azim=340, elev=30)
 ax.legend()
 plt.tight_layout()
@@ -314,7 +308,7 @@ plt.savefig('stat_097_mcmc_02.jpg')
 
 Gibbs Örneklemesi
 
-Gibbs örneklemesi, Metropolis-Hastings'in özel bir durumudur; yeni
+Gibbs örneklemesi, Metropolis-Hastings'in özel bir durumudur [2]; yeni
 önerilen durum her zaman bire eşit olasılıkla kabul edilir. $D$
 boyutlu bir sonsal dağılımı $x = (x_1, \ldots, x_D)$ parametreleriyle
 ele alalım. Gibbs örneklemesinin temel fikri, $x_{-d}$'nin $d$-inci
@@ -358,17 +352,35 @@ $\pi(y) = \pi(y_d \mid y_{-d}, X)\,\pi(y_{-d} \mid X)$ ve $\pi(x) = \pi(x_d \mid
 
 $$= \min\!\left(1,\, \frac{\pi(y_d \mid y_{-d}, X)\,\pi(y_{-d} \mid X)\,\pi(x_d \mid x_{-d}, X)}{\pi(x_d \mid x_{-d}, X)\,\pi(x_{-d} \mid X)\,\pi(y_d \mid y_{-d}, X)}\right) = 1$$
 
-Başka bir deyişle, Gibbs örneklemesinin her adımında, önerilen sonraki
-durum her zaman geri dönüşlülük kısıtını sağlayan bir
-Metropolis-Hastings benzeri rastgele yürüyüş gerçekleştiriyoruz.
+Demek ki öneriler her zaman kabul edilecek. 
+
+Gibbs örneklemesinin her adımında, önerilen sonraki durum her zaman
+geri dönüşlülük kısıtını sağlayan bir Metropolis-Hastings benzeri
+rastgele yürüyüş gerçekleştiriyoruz.
 
 Gibbs örneklemesinin temel avantajı basittir: öneriler her zaman kabul
 edilir. Temel dezavantajı ise yukarıdaki koşullu olasılık
 dağılımlarını türetebilmemiz gerektiğidir. Bu, öncelin sonsal ile
-eşlenik olduğu durumlarda çözülebilirdir.
+eşlenik olduğu durumlarda kolay idare edilebilir.
 
-Gibbs örneklemesini yalnızca Metropolis-Hastings algoritmasının özel bir durumu olarak görebiliriz. Her iki algoritmanın da kavramsal açıdan zor kısmı, geri dönüşlülük kısıtının doğruluğunu ve örtük bir Markov zincirinin durağan dağılımı olması garantili bir dağılımı nasıl belirleyebileceğimizi anlamaktır. Bu bilgiyle Gibbs örneklemesinin doğruluğunu yalnızca biraz cebirle görebiliriz.
+Gibbs örneklemesini yalnızca Metropolis-Hastings algoritmasının özel
+bir durumu olarak görebiliriz. Her iki algoritmanın da kavramsal
+açıdan zor kısmı, geri dönüşlülük kısıtının doğruluğunu ve örtük bir
+Markov zincirinin durağan dağılımı olması garantili bir dağılımı nasıl
+belirleyebileceğimizi anlamaktır.
+
+Not: Yukarıdaki ispat bize önerinin her zaman kabul edileceğini
+söyledi, ama MH bağlamında önerinin her zaman kabul edilmemesinin
+aperiyodikliği garanti ettiğini söylemiştik? Aperiyodikliği hala elde
+ediyoruz, çünkü MH cebirinin söylediği bir diğer şey "herhangi bir
+öneri kullanabileceğimiz". Gibbs için bir tür öneri seçtik, bu seçim
+her zaman kabulü sağladı, fakat demek ki bu seçim matematiksel
+mekanizmayı diğer şekillerde aperiyotluk için tatmin etti ki kabul / ret
+mekanizması için yapacak bir şey kalmadı. 
 
 Kaynaklar
 
 [1] Gundersen, <a href="https://gregorygundersen.com/blog/2019/11/02/metropolis-hastings/">Why Metropolis–Hastings Works</a>
+
+[2] Gundersen, <a href="https://gregorygundersen.com/blog/2020/02/23/gibbs-sampling/">Gibbs Sampling Is a Special Case of Metropolis–Hastings</a>
+
