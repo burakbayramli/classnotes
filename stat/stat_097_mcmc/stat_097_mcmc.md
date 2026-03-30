@@ -369,14 +369,19 @@ açıdan zor kısmı, geri dönüşlülük kısıtının doğruluğunu ve örtü
 Markov zincirinin durağan dağılımı olması garantili bir dağılımı nasıl
 belirleyebileceğimizi anlamaktır.
 
-Not: Yukarıdaki ispat bize önerinin her zaman kabul edileceğini
-söyledi, ama MH bağlamında önerinin her zaman kabul edilmemesinin
-aperiyodikliği garanti ettiğini söylemiştik? Aperiyodikliği hala elde
-ediyoruz, çünkü MH cebirinin söylediği bir diğer şey "herhangi bir
-öneri kullanabileceğimiz". Gibbs için bir tür öneri seçtik, bu seçim
-her zaman kabulü sağladı, fakat demek ki bu seçim matematiksel
-mekanizmayı diğer şekillerde aperiyotluk için tatmin etti ki kabul / ret
-mekanizması için yapacak bir şey kalmadı. 
+Not: Yukarıdaki ispat, Gibbs örneklemesinde önerilerin her zaman kabul
+edileceğini ($\alpha=1$) gösterdi. Metropolis-Hastings bağlamında ise
+genellikle reddetme mekanizmasının (öneri reddedilince yerde kalma)
+aperiyodikliği garanti ettiğini belirtmiştik. Peki reddetme olmadan
+aperiyodiklik nasıl sağlanıyor? MH cebiri bize şunu söyler: "Herhangi
+bir öneri dağılımı $q$ kullanabilirsin, kabul oranını buna göre
+ayarla." Gibbs'te biz $q$'yu koşullu dağılım olarak seçtiğimizde,
+cebirsel olarak ayarlanacak bir şey kalmıyor ($\alpha=1$). Bu seçim,
+reddetme mekanizmasına ihtiyaç duymadan, geçiş çekirdeğinin kendisi
+üzerinden ergodikliği (indirgenemezlik ve aperiyodiklik) sağlar. Yani
+MH kuralları içinde kalarak, reddetme olmadan da yakınsama garantisi
+verebiliriz; çünkü aperiyodiklik reddetmeye değil, seçilen $q$'nun
+yapısına bağlıdır.
 
 Kaynaklar
 
