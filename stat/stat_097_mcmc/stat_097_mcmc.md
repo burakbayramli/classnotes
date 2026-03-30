@@ -141,7 +141,9 @@ varsayalım. Örneğin:
 
 $$q(y \mid x)\, \pi(x) > q(x \mid y)\, \pi(y)$$
 
-yani $x$'ten $y$'ye çok sık atlıyoruz. Bunu düzeltmek için sıçramayı her zaman kabul etmiyoruz. $\alpha(x, y)$ olasılığıyla kabul ediyoruz; bu olasılığı dengeyi yeniden sağlayacak şekilde seçiyoruz:
+yani $x$'ten $y$'ye çok sık atlıyoruz. Bunu düzeltmek için sıçramayı
+her zaman kabul etmiyoruz. $\alpha(x, y)$ olasılığıyla kabul ediyoruz;
+bu olasılığı dengeyi yeniden sağlayacak şekilde seçiyoruz:
 
 $$\pi(x)\, q(y \mid x)\, \alpha(x, y) = \pi(y)\, q(x \mid y)$$
 
@@ -329,7 +331,8 @@ $t = 1, \ldots, T$ için:
 
 $$\pi(x \mid X) = \pi(x_d, x_{-d} \mid X) = \pi(x_d \mid x_{-d}, X)\,\pi(x_{-d} \mid X)$$
 
-olduğuna dikkat edelim. Geçiş olasılığı şu şekilde yazılabilir,
+olduğuna dikkat edelim. Geçiş olasılığı, daha önceki notasyona da
+bağlı kalacak şekilde, şu şekilde yazılabilir,
 
 $$\alpha(x, y) = \min\left\{1, \frac{\pi(y) \pi(x_d | x_{-d}, X)}{\pi(x) \pi(y_d | y_{-d}, X)}\right\}$$
 
@@ -342,7 +345,18 @@ $$q(y \mid x) = \pi(y_d \mid x_{-d}, X)$$
 koordinatları sabit tutarak (yani $y_{-d} = x_{-d}$) doğrudan koşullu
 dağılımından örnekleme yaparsınız."
 
-Bunu genel MH kabul oranına koyarsak:
+Ters yönde, $q(x \mid y)$: $y$'deyken $x$'e geçmeyi önerirsek, aynı
+mekanizma geçerli; $d$ dışındaki tüm koordinatları $y_{-d}$'de sabit
+tutup $x_d$'yi koşullu dağılımdan çekiyoruz. Dolayısıyla:
+
+$$q(x \mid y) = \pi(x_d \mid y_{-d}, X)$$
+
+Not: $y_{-d} = x_{-d}$ olduğundan (Gibbs adımı diğer koordinatları
+hiçbir zaman değiştirmez), bu şu hale gelir:
+
+$$q(x \mid y) = \pi(x_d \mid y_{-d}, X) = \pi(x_d \mid x_{-d}, X)$$
+
+Bunları genel MH kabul oranına koyarsak:
 
 $$
 \alpha(y \mid x) = \min\!\left(1,\, \frac{\pi(y)\, q(x \mid y)}{\pi(x)\, q(y \mid x)}\right) = \min\!\left(1,\, \frac{\pi(y)\,\pi(x_d \mid y_{-d}, X)}{\pi(x)\,\pi(y_d \mid x_{-d}, X)}\right)
