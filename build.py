@@ -150,7 +150,7 @@ def remove_sci_md(to):
             if "cover" in subdir or "000" in subdir : continue
             os.chdir(curr + "/" + topdir + "/" + subdir)
             mdfile = curr + "/" + topdir + "/" + subdir + "/" + subdir + ".md"            
-            print ('removing', mdfile)
+            #print ('removing', mdfile)
             if os.path.exists(mdfile): os.remove(mdfile)
     
             

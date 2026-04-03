@@ -120,6 +120,14 @@ olacaktir, yani
 ffmpeg -i in.mp4 -y -vf eq=gamma=1.5:saturation=1.5 -c:a copy out.mp4
 ```
 
+Alt yazı (subtitle) zamanını geri çekmek
+
+Bazen bir srt altyazı dosyası film ile uyuşmayabiliyor. Diyelim ki
+yazılar 5 dakika gecikmeli, yazı zamanını geri çekmek için
+
+```
+ffmpeg -itsoffset -5 -i input.srt -c copy output.srt
+```
 
 Video birlestirmek icin bir ara formattan gecmek lazim.
 
