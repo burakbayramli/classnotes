@@ -176,7 +176,8 @@ Algoritma
 1. Bir başlangıç noktası seç, buna $x$ de
 2. $q(y \mid x)$'ten yeni bir durum $y$ öner
 3. $\alpha(x, y)$'yi hesapla
-4. $\alpha$ olasılığıyla $y$'yi kabul et; aksi takdirde $x$'te kal
+4. Birönek dağılımdan sayı örnekle
+4. $\alpha$ olasılığıyla $y$'yi kabul et (birörnek sayıyla karşılaştır); aksi takdirde $x$'te kal
 5. Tekrarla
 
 Yeterince uzun süre çalıştıktan sonra ziyaret edilen durumlar $\pi$'ye
@@ -184,7 +185,72 @@ göre dağılmış olur. Isınma süresi, zincirin nereden başladığını
 "unutmadan" önceki başlangıç sürecidir, bu örnekler henüz $\pi$'yi
 temsil etmediğinden atılır.
 
-Rosenbrock
+Not: $\alpha(x, y)$ hesaplandıktan sonra onu birörnek dağılımdan
+alınan sayı ile karşılaştırmak önemli, ancak o şekilde $\alpha$
+olasılığına bağlı zar atabilmiş oluyoruz. Eğer $\alpha$ değeri 0.2 ise
+10 örneklem içinden 2 tane kabul olmalı 8 tane ret olmalı. Bunu tarif
+edilen örneklem aşaması ile gerçekleştirmiş oluyoruz.
+
+Örnek: Gaussian Karışımı
+
+Alttaki örnek [3, sf. 336]'dan alınmıştır, iki Gaussian karışımından
+örneklem almayı başarıyor.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Örneklemek istediğimiz hedef dağılım (Bimodal Gauss Karışımı)
+def p(x):
+    mu1 = 3; mu2 = 10; v1 = 10; v2 = 3
+    return 0.3 * np.exp(-(x - mu1)**2 / v1) + 0.7 * np.exp(-(x - mu2)**2 / v2)
+
+# Parametreler
+adim_boyutu = 0.5
+x = np.arange(-10, 20, adim_boyutu)
+px = p(x)
+N = 5000  # Örneklem sayısı
+
+# Rastgele Yürüyüş (Random Walk) Metropolis-Hastings
+u2 = np.random.rand(N)
+sigma_rw = 10  # Rastgele yürüyüşün adım genişliği
+y2 = np.zeros(N)
+y2[0] = np.random.normal(0, sigma_rw)  # Başlangıç durumu
+
+for i in range(N - 1):
+    # Mevcut duruma bağlı olarak yeni bir aday durum öner (Rastgele Yürüyüş)
+    y2new = y2[i] + np.random.normal(0, sigma_rw)
+    
+    # Kabul olasılığını hesapla (alpha)
+    # Öneri dağılımı simetrik olduğu için q(y|y_yeni) / q(y_yeni|y) = 1 olur.
+    alpha = min(1, p(y2new) / p(y2[i]))
+    
+    # Kabul etme veya reddetme adımı
+    if u2[i] < alpha:
+        y2[i+1] = y2new
+    else:
+        y2[i+1] = y2[i]
+
+# Görselleştirme: Rastgele Yürüyüş Zinciri
+plt.figure(figsize=(10, 6))
+# density=True kullanarak histogramı olasılık yoğunluğuna normalize ediyoruz
+plt.hist(y2, bins=x, density=True, alpha=0.6, label='MCMC Örneklemleri')
+
+# Hedef dağılımı normalize ederek çizdiriyoruz (np.trapezoid kullanımı)
+plt.plot(x, px / np.trapezoid(px, x), color='r', linewidth=2, label='Hedef Dağılım p(x)')
+
+plt.title("Metropolis-Hastings: Rastgele Yürüyüş Zinciri")
+plt.xlabel("Değer")
+plt.ylabel("Yoğunluk")
+plt.legend()
+
+plt.savefig('stat_097_mcmc_03.jpg')
+```
+
+![](stat_097_mcmc_03.jpg)
+
+
+Örnek: Rosenbrock
 
 Bir yoğunluk fonksiyonu yaratalım, onun üzerinden alttaki örneği
 kodlayacağız.
@@ -408,3 +474,4 @@ Kaynaklar
 
 [2] Gundersen, <a href="https://gregorygundersen.com/blog/2020/02/23/gibbs-sampling/">Gibbs Sampling Is a Special Case of Metropolis–Hastings</a>
 
+[3] Marsland, *Machine Learning An Algorithmic Perspective*

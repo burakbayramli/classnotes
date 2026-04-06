@@ -270,9 +270,11 @@ class="math inline">\(x\)</span> de</li>
 <li><span class="math inline">\(q(y \mid x)\)</span>’ten yeni bir durum
 <span class="math inline">\(y\)</span> öner</li>
 <li><span class="math inline">\(\alpha(x, y)\)</span>’yi hesapla</li>
+<li>Birönek dağılımdan sayı örnekle</li>
 <li><span class="math inline">\(\alpha\)</span> olasılığıyla <span
-class="math inline">\(y\)</span>’yi kabul et; aksi takdirde <span
-class="math inline">\(x\)</span>’te kal</li>
+class="math inline">\(y\)</span>’yi kabul et (birörnek sayıyla
+karşılaştır); aksi takdirde <span class="math inline">\(x\)</span>’te
+kal</li>
 <li>Tekrarla</li>
 </ol>
 <p>Yeterince uzun süre çalıştıktan sonra ziyaret edilen durumlar <span
@@ -280,7 +282,67 @@ class="math inline">\(\pi\)</span>’ye göre dağılmış olur. Isınma süresi
 zincirin nereden başladığını “unutmadan” önceki başlangıç sürecidir, bu
 örnekler henüz <span class="math inline">\(\pi\)</span>’yi temsil
 etmediğinden atılır.</p>
-<p>Rosenbrock</p>
+<p>Not: <span class="math inline">\(\alpha(x, y)\)</span> hesaplandıktan
+sonra onu birörnek dağılımdan alınan sayı ile karşılaştırmak önemli,
+ancak o şekilde <span class="math inline">\(\alpha\)</span> olasılığına
+bağlı zar atabilmiş oluyoruz. Eğer <span
+class="math inline">\(\alpha\)</span> değeri 0.2 ise 10 örneklem içinden
+2 tane kabul olmalı 8 tane ret olmalı. Bunu tarif edilen örneklem
+aşaması ile gerçekleştirmiş oluyoruz.</p>
+<p>Örnek: Gaussian Karışımı</p>
+<p>Alttaki örnek [3, sf. 336]’dan alınmıştır, iki Gaussian karışımından
+örneklem almayı başarıyor.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Örneklemek istediğimiz hedef dağılım (Bimodal Gauss Karışımı)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> p(x):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    mu1 <span class="op">=</span> <span class="dv">3</span><span class="op">;</span> mu2 <span class="op">=</span> <span class="dv">10</span><span class="op">;</span> v1 <span class="op">=</span> <span class="dv">10</span><span class="op">;</span> v2 <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">0.3</span> <span class="op">*</span> np.exp(<span class="op">-</span>(x <span class="op">-</span> mu1)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> v1) <span class="op">+</span> <span class="fl">0.7</span> <span class="op">*</span> np.exp(<span class="op">-</span>(x <span class="op">-</span> mu2)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> v2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Parametreler</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>adim_boyutu <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, adim_boyutu)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>px <span class="op">=</span> p(x)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">5000</span>  <span class="co"># Örneklem sayısı</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Rastgele Yürüyüş (Random Walk) Metropolis-Hastings</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>u2 <span class="op">=</span> np.random.rand(N)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>sigma_rw <span class="op">=</span> <span class="dv">10</span>  <span class="co"># Rastgele yürüyüşün adım genişliği</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>y2 <span class="op">=</span> np.zeros(N)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>y2[<span class="dv">0</span>] <span class="op">=</span> np.random.normal(<span class="dv">0</span>, sigma_rw)  <span class="co"># Başlangıç durumu</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mevcut duruma bağlı olarak yeni bir aday durum öner (Rastgele Yürüyüş)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    y2new <span class="op">=</span> y2[i] <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_rw)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul olasılığını hesapla (alpha)</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Öneri dağılımı simetrik olduğu için q(y|y_yeni) / q(y_yeni|y) = 1 olur.</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="bu">min</span>(<span class="dv">1</span>, p(y2new) <span class="op">/</span> p(y2[i]))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul etme veya reddetme adımı</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> u2[i] <span class="op">&lt;</span> alpha:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        y2[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> y2new</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        y2[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> y2[i]</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Görselleştirme: Rastgele Yürüyüş Zinciri</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># density=True kullanarak histogramı olasılık yoğunluğuna normalize ediyoruz</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>plt.hist(y2, bins<span class="op">=</span>x, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&#39;MCMC Örneklemleri&#39;</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Hedef dağılımı normalize ederek çizdiriyoruz (np.trapezoid kullanımı)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>plt.plot(x, px <span class="op">/</span> np.trapezoid(px, x), color<span class="op">=</span><span class="st">&#39;r&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;Hedef Dağılım p(x)&#39;</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Metropolis-Hastings: Rastgele Yürüyüş Zinciri&quot;</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Değer&quot;</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Yoğunluk&quot;</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_03.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_097_mcmc_03.jpg" /></p>
+<p>Örnek: Rosenbrock</p>
 <p>Bir yoğunluk fonksiyonu yaratalım, onun üzerinden alttaki örneği
 kodlayacağız.</p>
 <p><span class="math display">\[
@@ -326,79 +388,79 @@ kılar</p>
 class="math inline">\(Z\)</span>’ye bölmektir; MH’nin bunu hesaplaması
 gerekmez.</p>
 <p>Kod</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="dv">1</span>, <span class="dv">3</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">500</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">500</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>X1, X2 <span class="op">=</span> np.meshgrid(x1, x2)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.exp(<span class="op">-</span>((a <span class="op">-</span> X1)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(X2 <span class="op">-</span> X1<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X1, X2, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>ax.scatter(a, a<span class="op">**</span><span class="dv">2</span>, <span class="fl">1.0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, s<span class="op">=</span><span class="dv">50</span>, zorder<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="ss">f&#39;Mode (</span><span class="sc">{</span>a<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>a<span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss">)&#39;</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&#39;$x_1$&#39;</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&#39;$x_2$&#39;</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&#39;$</span><span class="ch">\\</span><span class="st">pi^*(x_1, x_2)$&#39;</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">&#39;Rosenbrock Yogunlugu&#39;</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ax.view_init(azim<span class="op">=</span><span class="dv">340</span>, elev<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_01.jpg&#39;</span>)</span></code></pre></div>
-<p><img src="stat_097_mcmc_01.jpg" /></p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> multivariate_normal <span class="im">as</span> mvn</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>n_iters <span class="op">=</span> <span class="dv">1000</span>          <span class="co"># Metropolis adımlarının sayısı</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>proposal_var <span class="op">=</span> <span class="fl">0.1</span>      <span class="co"># öneri varyansı</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">100</span>           <span class="co"># erken örnekleri at</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="dv">1</span>,<span class="dv">4</span></span>
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="dv">1</span>, <span class="dv">3</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">500</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">500</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X1, X2 <span class="op">=</span> np.meshgrid(x1, x2)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.exp(<span class="op">-</span>((a <span class="op">-</span> X1)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(X2 <span class="op">-</span> X1<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span>)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rosen(x, y): <span class="cf">return</span> np.exp( <span class="op">-</span>((a <span class="op">-</span> x)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(y <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> np.empty((n_iters, <span class="dv">2</span>))</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Rastgele başlangıç noktası</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>samples[<span class="dv">0</span>] <span class="op">=</span> np.random.uniform(low<span class="op">=</span>[<span class="op">-</span><span class="dv">3</span>, <span class="op">-</span><span class="dv">3</span>],high<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">10</span>],size<span class="op">=</span><span class="dv">2</span> )</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_iters):</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    curr <span class="op">=</span> samples[i <span class="op">-</span> <span class="dv">1</span>]</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Yeni nokta öner</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    prop <span class="op">=</span> curr <span class="op">+</span> mvn(mean<span class="op">=</span>np.zeros(<span class="dv">2</span>),cov<span class="op">=</span>np.eye(<span class="dv">2</span>) <span class="op">*</span> proposal_var)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul olasılığı</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="bu">min</span>(<span class="dv">1</span>, rosen(<span class="op">*</span>prop) <span class="op">/</span> rosen(<span class="op">*</span>curr))</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul et ya da reddet</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.random.uniform() <span class="op">&lt;</span> alpha:</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        curr <span class="op">=</span> prop</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    samples[i] <span class="op">=</span> curr</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Burn-in&#39;i çıkar</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> samples[burn_in:]</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">60</span>)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">60</span>)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> rosen(X, Y)</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Örnek yükseklikleri</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>Z_samples <span class="op">=</span> rosen(samples[:, <span class="dv">0</span>], samples[:, <span class="dv">1</span>])</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Yüzey</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X, Y, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>ax.plot(samples[:, <span class="dv">0</span>],samples[:, <span class="dv">1</span>],Z_samples,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;x&quot;</span>)</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&quot;y&quot;</span>)</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&quot;Density&quot;</span>)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Rosenbrock Yogunlugu Uzerinde Metropolis Orneklemesi&quot;</span>)</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_02.jpg&#39;</span>)</span></code></pre></div>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X1, X2, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ax.scatter(a, a<span class="op">**</span><span class="dv">2</span>, <span class="fl">1.0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, s<span class="op">=</span><span class="dv">50</span>, zorder<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="ss">f&#39;Mode (</span><span class="sc">{</span>a<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>a<span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss">)&#39;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&#39;$x_1$&#39;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&#39;$x_2$&#39;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&#39;$</span><span class="ch">\\</span><span class="st">pi^*(x_1, x_2)$&#39;</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">&#39;Rosenbrock Yogunlugu&#39;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ax.view_init(azim<span class="op">=</span><span class="dv">340</span>, elev<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_01.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_097_mcmc_01.jpg" /></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.random <span class="im">import</span> multivariate_normal <span class="im">as</span> mvn</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>n_iters <span class="op">=</span> <span class="dv">1000</span>          <span class="co"># Metropolis adımlarının sayısı</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>proposal_var <span class="op">=</span> <span class="fl">0.1</span>      <span class="co"># öneri varyansı</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">100</span>           <span class="co"># erken örnekleri at</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="dv">1</span>,<span class="dv">4</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rosen(x, y): <span class="cf">return</span> np.exp( <span class="op">-</span>((a <span class="op">-</span> x)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> b<span class="op">*</span>(y <span class="op">-</span> x<span class="op">**</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> <span class="dv">20</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> np.empty((n_iters, <span class="dv">2</span>))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Rastgele başlangıç noktası</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>samples[<span class="dv">0</span>] <span class="op">=</span> np.random.uniform(low<span class="op">=</span>[<span class="op">-</span><span class="dv">3</span>, <span class="op">-</span><span class="dv">3</span>],high<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">10</span>],size<span class="op">=</span><span class="dv">2</span> )</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_iters):</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    curr <span class="op">=</span> samples[i <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Yeni nokta öner</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    prop <span class="op">=</span> curr <span class="op">+</span> mvn(mean<span class="op">=</span>np.zeros(<span class="dv">2</span>),cov<span class="op">=</span>np.eye(<span class="dv">2</span>) <span class="op">*</span> proposal_var)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul olasılığı</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> <span class="bu">min</span>(<span class="dv">1</span>, rosen(<span class="op">*</span>prop) <span class="op">/</span> rosen(<span class="op">*</span>curr))</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Kabul et ya da reddet</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.random.uniform() <span class="op">&lt;</span> alpha:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        curr <span class="op">=</span> prop</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    samples[i] <span class="op">=</span> curr</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Burn-in&#39;i çıkar</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> samples[burn_in:]</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">60</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">10</span>, <span class="dv">60</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>X, Y <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> rosen(X, Y)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Örnek yükseklikleri</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>Z_samples <span class="op">=</span> rosen(samples[:, <span class="dv">0</span>], samples[:, <span class="dv">1</span>])</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Yüzey</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(X, Y, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>,alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>ax.plot(samples[:, <span class="dv">0</span>],samples[:, <span class="dv">1</span>],Z_samples,linewidth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;x&quot;</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&quot;y&quot;</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">&quot;Rosenbrock Yogunlugu Uzerinde Metropolis Orneklemesi&quot;</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_097_mcmc_02.jpg" /></p>
 <p>Üstteki grafikte Rosenbrock yoğunluğunun nasıl gezildiğini görüyoruz,
 mavi çizgilerin her biri önceki bir konumdan diğer sonraki konuma geçişi
@@ -511,6 +573,8 @@ Metropolis–Hastings Works</a></p>
 <p>[2] Gundersen,
 <a href="https://gregorygundersen.com/blog/2020/02/23/gibbs-sampling/">Gibbs
 Sampling Is a Special Case of Metropolis–Hastings</a></p>
+<p>[3] Marsland, <em>Machine Learning An Algorithmic
+Perspective</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
