@@ -456,7 +456,7 @@ belirleyebileceğimizi anlamaktır.
 
 Not: Yukarıdaki ispat, Gibbs örneklemesinde önerilerin her zaman kabul
 edileceğini ($\alpha=1$) gösterdi. Metropolis-Hastings bağlamında ise
-genellikle reddetme mekanizmasının (öneri reddedilince yerde kalma)
+genellikle reddetme mekanizmasının (öneri reddedilince yerinde kalma)
 aperiyodikliği garanti ettiğini belirtmiştik. Peki reddetme olmadan
 aperiyodiklik nasıl sağlanıyor? MH cebiri bize şunu söyler: "Herhangi
 bir öneri dağılımı $q$ kullanabilirsin, kabul oranını buna göre

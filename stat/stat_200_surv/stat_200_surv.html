@@ -15,12 +15,569 @@
    
   <title>Sağkalım Analizi (Survival Analysis)</title>
   <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
 </head>
 <body>
 <div id="header">
 </div>
 <h1 id="sağkalım-analizi-survival-analysis">Sağkalım Analizi (Survival
 Analysis)</h1>
+<p>Pozitif sürekli bir rasgele değişken X’i düşünelim; bunu bir nesnenin
+ömrü olarak yorumluyoruz [1, s. 581]. X’in dağılım fonksiyonu F,
+yoğunluk fonksiyonu f olsun. F’nin tehlike oranı (bazen arıza oranı da
+denir) fonksiyonu <span class="math inline">\(\lambda(t)\)</span> şöyle
+tanımlanır:</p>
+<p><span class="math display">\[\lambda(t) = \frac{f(t)}{1 -
+F(t)}\]</span></p>
+<p>İlgili bir diğer gösterim ise <span class="math inline">\(S(t) = 1 -
+F(t)\)</span>, yani:</p>
+<p><span class="math display">\[\lambda(t) =
+\frac{f(t)}{S(t)}\]</span></p>
+<p><span class="math inline">\(F\)</span> ve <span
+class="math inline">\(S\)</span> tabii ki bir yoğunluk <span
+class="math inline">\(f(t)\)</span>’ye göre hesaplanan alanlara tekabül
+ederler, alttaki grafikte görüyoruz, kümülatif dağılım <span
+class="math inline">\(F\)</span>’dir, ve <span
+class="math inline">\(t_0\)</span> için onun soluna düşen alandır, o
+zaman <span class="math inline">\(S(t_0)\)</span> sağ eteğe doğru giden
+geri kalan alandır.</p>
+<p><img src="stat_200_surv_01.jpg" /></p>
+<p>Tehlike oranı özünde herhangi bir dağılım için türetilebilen bir
+ifadedir. Belirli bir noktada olduğumuz varsayımıyla, bir olasılık
+yoğunluk fonksiyonunun (probability density function -pdf-) kuyruk
+kısmına ek bir hesaplama uyguluyoruz: <span
+class="math inline">\(f(t)/(1 - F(t))\)</span>. Bu, t’de bulunduğumuzdan
+hareketle “kalanın” gerçekleşmesi olarak yorumlanabilir (tabii x ekseni
+t olmak zorunda, ve pdf’nin bir ömür pdf’i olduğunu söylüyoruz).</p>
+<p><span class="math inline">\(f(t)\)</span>, t zamanında nüfusun
+(population) arıza yapma hızıdır; ancak <span
+class="math inline">\(f(t)\)</span>, tüm orijinal nüfusa göre ölçülür.
+Eğer nüfus büyük çoğunluğu t zamanında zaten ölmüşse, küçük bir <span
+class="math inline">\(f(t)\)</span> değeri hayatta kalan az sayıdaki
+birey için muazzam bir riski temsil ediyor olabilir. <span
+class="math inline">\(S(t)\)</span>’ye — yani hala hayatta olan orana —
+bölmek, <span class="math inline">\(f(t)\)</span>’yi orijinal nüfus
+başına değil, hayatta kalan basına olacak şekilde yeniden ölçekler. Bir
+oran hesaplamak başka bir birim başına ölçüm verdiğinden, “kalan ömür
+birimi basına yoğunluk / zaman noktası” değerini soruyorum aslında; yani
+bu yoğunluk/zaman noktasının birim potansiyel ölüm zamanı açısından ne
+kadar değerli olduğunu sorguluyorum. Aynı yoğunluk değeri, az zaman
+kaldığında daha yüksek bir değer verir.</p>
+<p><span class="math inline">\(h(t) = f(t)/S(t)\)</span> bir oran
+olduğundan, bir anlık hızdır (birim zaman başına), bir olasılık
+değildir. Bu yüzden buna yoğunluk oranı ya da ölüm kuvveti de denir; bu
+terimler, onun bir olasılık ya da yoğunluk yerine bir hız olduğunu daha
+iyi yansıtan aktüerya bilimi gibi alanlardan ödünç alınmıştır. Bir
+pdf’in <span class="math inline">\(f(t)\)</span> şunu sağlaması
+gerektiğini biliyoruz: <span class="math inline">\(\int_0^\infty
+f(t)\,dt = 1\)</span>. <span class="math inline">\(h(t)\)</span> için
+böyle bir beklenti yoktur.</p>
+<p><span class="math inline">\(S(t) = 1 - F(t)\)</span> ile başlıyoruz;
+dolayısıyla <span class="math inline">\(f(t) = F&#39;(t) =
+-S&#39;(t)\)</span>. Tanıma yerleştirirsek:</p>
+<p><span class="math display">\[h(t) = \frac{f(t)}{S(t)} =
+\frac{-S&#39;(t)}{S(t)}\]</span></p>
+<p>Logaritmanın türevi için zincir kuralını hatırlayalım:</p>
+<p><span class="math display">\[\frac{d}{dt}\log S(t) =
+\frac{S&#39;(t)}{S(t)}\]</span></p>
+<p>O halde şunu hemen görebiliriz:</p>
+<p><span class="math display">\[\frac{-S&#39;(t)}{S(t)} =
+-\frac{d}{dt}\log S(t)\]</span></p>
+<p>Dolayısıyla:</p>
+<p><span class="math display">\[h(t) = -\frac{d}{dt}\log
+S(t)\]</span></p>
+<p><span class="math inline">\(S(t)\)</span>’yi <span
+class="math inline">\(h(t)\)</span>’den de elde edebiliriz. Her iki
+tarafı 0’dan t’ye entegre edersek:</p>
+<p><span class="math display">\[\int_0^t h(u)\,du = -\log S(t) + \log
+S(0) = -\log S(t)\]</span></p>
+<p>çünkü <span class="math inline">\(S(0) = P(T &gt; 0) = 1\)</span>,
+yani <span class="math inline">\(\log S(0) = 0\)</span>.
+Dolayısıyla:</p>
+<p><span class="math display">\[S(t) = \exp\!\left(-\int_0^t
+h(u)\,du\right)\]</span></p>
+<p>Bu temel bir sonuçtur — yaşam fonksiyonunun tamamen tehlike
+fonksiyonu tarafından belirlendiğini gösterir.</p>
+<p>Weibull pdf’inden Weibull tehlikesine</p>
+<p>T ömrünün şu parametrelerle bir Weibull dağılımı izlediğini
+varsayalım: - şekil parametresi <span class="math inline">\(k &gt;
+0\)</span> - ölçek parametresi <span class="math inline">\(\lambda &gt;
+0\)</span></p>
+<p>Pdf şöyledir:</p>
+<p><span class="math display">\[f(t) =
+\frac{k}{\lambda}\left(\frac{t}{\lambda}\right)^{k-1}
+e^{-(t/\lambda)^k}\]</span></p>
+<p>Yaşam fonksiyonunu türetelim</p>
+<p>Tanımı gereği:</p>
+<p><span class="math display">\[S(t) = P(T &gt; t) = 1 -
+F(t)\]</span></p>
+<p>Weibull için kümülatif dağılım:</p>
+<p><span class="math display">\[F(t) = 1 -
+e^{-(t/\lambda)^k}\]</span></p>
+<p>Dolayısıyla:</p>
+<p><span class="math display">\[S(t) = e^{-(t/\lambda)^k}\]</span></p>
+<p>Şimdi tanımı kullanalım:</p>
+<p><span class="math display">\[h(t) = \frac{f(t)}{S(t)}\]</span></p>
+<p>Yerine koyarsak:</p>
+<p><span class="math display">\[h(t) =
+\frac{\dfrac{k}{\lambda}\left(\dfrac{t}{\lambda}\right)^{k-1}
+e^{-(t/\lambda)^k}}{e^{-(t/\lambda)^k}}\]</span></p>
+<p>Üstelleri sadeleştirirsek:</p>
+<p><span class="math display">\[h(t) =
+\frac{k}{\lambda}\left(\frac{t}{\lambda}\right)^{k-1}\]</span></p>
+<p>Bu, tanıdık Weibull tehlike biçimidir.</p>
+<p>Olurluk fonksiyonunu kurmak</p>
+<p>Diyelim ki <span class="math inline">\(n\)</span> tane özneyi
+gözlemliyoruz, bu öznelerin sağkalımsal bir dağılımı var. Sağkalım
+Analizi problemlerinde çok ortaya çıkan durum şudur; mesela bir grup
+hastaya bir deneysel ilaç veriliyor, ve ne kadar yaşadıklarına bakılıyor
+(kelimenin tam anlamıyla sağkalım analizi!). Vefat eden varsa bu zaman
+not ediliyor. Fakat deney bittikten sonra hala yaşamaya devam edenler
+olabilir (inşallah). Bu durumda eksik bir sinyal vardır, yani ölüm not
+ediliyor fakat sağkalım not edilmiyor, deney bittikten bir gün önce de
+olabilir, iki sene sonra da olabilir. Burada, bitiş noktası bilinmediği
+için bu tür veriye sağdan sansürlü (right censored) adı verilir. Sansür
+değişkeni literatürde <span class="math inline">\(\delta_i\)</span> ile
+gösterilir, 0 ya da 1 değerine sahiptir.</p>
+<p>İleride sansürlü veri noktalarının olurluğa nasıl etki ettiğini
+göreceğiz.</p>
+<p>Tekrar üzerinden geçmek gerekirse. N hasta gözlemlediğimizi
+varsayalım.</p>
+<ul>
+<li><p>Tüm hastalar 1. günde deneye alınır.</p></li>
+<li><p>Çalışma 60 gün sürer.</p></li>
+<li><p>Her hasta size tam olarak bir veri noktası verir: <span
+class="math inline">\((t_i, \delta_i)\)</span>.</p></li>
+</ul>
+<p>Çalışmanın sonunda, her hasta için tam olarak iki şeyden biri
+gerçekleşmiştir:</p>
+<ul>
+<li><p>Olay gerçekleşti: tam günü kaydettiniz → <span
+class="math inline">\(\delta_i = 1\)</span></p></li>
+<li><p>Çalışma sona erdi (ya da hasta ayrıldı) olay gerçekleşmeden:
+bilinen son sağ günü kaydettiniz → <span class="math inline">\(\delta_i
+= 0\)</span></p></li>
+</ul>
+<p>Dolayısıyla veri setiniz şöyle görünebilir:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Hasta</th>
+<th><span class="math inline">\(t_i\)</span></th>
+<th><span class="math inline">\(\delta_i\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>47</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>60</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>12</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>60</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Hasta 2 ve 4 sağdan sansürlüdür — sırasıyla 30. ve 60. günlerde
+takipten çıktıklarında yalnızca hala hayattaydılar. Önemli olan şu: Olay
+gerçekleşsin ya da gerçekleşmesin, zaman 1. günden itibaren sürekli
+aktığı için her hastanın bir <span class="math inline">\(t_i\)</span>
+değeri vardır.</p>
+<p>Birazdan göreceğimiz <span class="math inline">\(L = \prod_i
+h(t_i)^{\delta_i} S(t_i)\)</span> olurluğunun bunu temiz biçimde ele
+almasının nedeni de budur — <span
+class="math inline">\(\delta_i\)</span> göstergesi yalnızca bir hastanın
+son kaydedilen gününün bir olay mı yoksa yalnızca bir yaşam olasılığı mı
+katkısında bulunacağına karar veren bir anahtar işlevi görür.</p>
+<p>Öznelere dönersek, her birinin gözlemlenen zamanı <span
+class="math inline">\(t_i\)</span> ve bir sansürleme göstergesi <span
+class="math inline">\(\delta_i\)</span> var; burada <span
+class="math inline">\(\delta_i = 1\)</span> olayın gözlemlendiği, <span
+class="math inline">\(\delta_i = 0\)</span> ise sağdan sansürlendiği
+anlamında.</p>
+<p>Her özne için şunu sormalıyız: Gerçekte gözlemlediğim şeyin olasılığı
+nedir?</p>
+<ul>
+<li><p>Eğer <span class="math inline">\(\delta_i = 1\)</span>: <span
+class="math inline">\(t_i\)</span>’de gerçek bir olay gözlemledik, katkı
+pdf <span class="math inline">\(f(t_i)\)</span>’dir.</p></li>
+<li><p>Eğer <span class="math inline">\(\delta_i = 0\)</span>: Yalnızca
+olayın <span class="math inline">\(t_i\)</span>’ye kadar
+gerçekleşmediğini biliyoruz, katkı <span
+class="math inline">\(S(t_i)\)</span>’dir.</p></li>
+</ul>
+<p>Dikkat: katkı <span class="math inline">\(S(t_i)\)</span>, yani pdf
+grafiğini hatırlarsak “sağ kuyruktaki alan”. Sağkalım Analizi’nin
+sihirli numarası burada.</p>
+<p>Tam olurluk şöyledir:</p>
+<p><span class="math display">\[L = \prod_{i=1}^n f(t_i)^{\delta_i}
+S(t_i)^{1-\delta_i}\]</span></p>
+<p>Tehlikeyle bağlantı</p>
+<p><span class="math inline">\(h(t) = f(t)/S(t)\)</span> olduğundan
+<span class="math inline">\(f(t) = h(t)S(t)\)</span>, dolayısıyla:</p>
+<p><span class="math display">\[
+f(t_i)^{\delta_i} S(t_i)^{1-\delta_i} = h(t_i)^{\delta_i}
+S(t_i)^{\delta_i} S(t_i)^{1-\delta_i} = h(t_i)^{\delta_i} S(t_i)
+\]</span></p>
+<p>Böylece olurluk şöyle olur:</p>
+<p><span class="math display">\[L = \prod_{i=1}^n h(t_i)^{\delta_i}
+S(t_i)\]</span></p>
+<p><span class="math inline">\(S(t) = e^{-H(t)}\)</span> yerine
+koyarsak:</p>
+<p><span class="math display">\[L = \prod_{i=1}^n h(t_i)^{\delta_i}
+e^{-H(t_i)}\]</span></p>
+<p>Bu, yaşam olurluğunun literaturdeki halidir; <span
+class="math inline">\(h\)</span>, <span
+class="math inline">\(S\)</span>, <span
+class="math inline">\(H\)</span>’nin hepsi varsaydığınız dağılımdan
+gelir.</p>
+<p>Weibull’u yerine koymak</p>
+<p>Ölçek <span class="math inline">\(\lambda\)</span> ve şekil <span
+class="math inline">\(k\)</span> parametreli Weibull tehlike fonksiyonu
+(Weibull dağılımı değil) için:</p>
+<p><span class="math display">\[h(t) =
+\frac{k}{\lambda}\left(\frac{t}{\lambda}\right)^{k-1}, \quad
+H(t) = \left(\frac{t}{\lambda}\right)^k\]</span></p>
+<p>Bunları <span class="math inline">\(L\)</span>’ye koyup log-olurluk
+<span class="math inline">\(\ell = \log L\)</span>’yi alıp <span
+class="math inline">\(\lambda\)</span> (ve bilinmiyorsa <span
+class="math inline">\(k\)</span>) üzerinden maksimize ediyorsunuz.
+Sansürlü gözlemler yalnızca <span
+class="math inline">\(e^{-H(t_i)}\)</span> üzerinden katkı yapar — bir
+olay gerçekleşmiş gibi davranmadan parametre tahminlerini doğru yönde
+çekerler.</p>
+<p>Sansürlemeyi görmezden gelip gözlemlenen zamanlar üzerinde naif bir
+regresyon yapmak tahminleri neden çarpıtır? Çünkü sansürlü özneler için
+yaşam sürelerini sistematik olarak olduğundan kısa tahmin etmiş
+olursunuz.</p>
+<p>Rossi Verisi</p>
+<p>Şimdi Rossi veri setini anlayalım ve katsayılar / ağırlıklar modelini
+nasıl parametrize edeceğimize karar verelim. 1970’lerde Maryland eyalet
+hapishanelerinden tahliye edilen 432 mahkum bir yıl boyunca takip
+edilmiştir. Yarısına rastgele mali yardım atanmış, diğer yarısına
+atanmamıştır. Sonuç değişkeni, yeniden tutuklanmayanlar için 52. haftada
+sansürlenerek ilk tutuklanmanın gerçekleştiği haftadır.</p>
+<p>İlgilendiğimiz temel değişkenler şunlardır:</p>
+<ul>
+<li><code>week</code> — gözlemlenen zaman (<span
+class="math inline">\(t_i\)</span>)</li>
+<li><code>arrest</code> — olay göstergesi (<span
+class="math inline">\(\delta_i\)</span>, 1=tutuklandı, 0=sansürlü)</li>
+<li><code>fin</code> — mali yardım (0/1) — ana deneysel değişken</li>
+<li><code>age</code> — tahliye sırasındaki yaş</li>
+<li><code>prio</code> — önceki tutuklama sayısı</li>
+<li><code>wexp</code> — önceki iş deneyimi (0/1)</li>
+<li><code>mar</code> — evli (0/1)</li>
+<li><code>paro</code> — koşullu tahliye (0/1)</li>
+</ul>
+<p>AFT Weibull Modeli</p>
+<p><span class="math inline">\(\lambda\)</span>’nın kovaryantlara göre
+birey başına değişmesine izin vermemiz gerekiyor. Standart yol, Poisson
+regresyonuyla aynı fikir olan log-doğrusal bağlantıdır:</p>
+<p><span class="math display">\[
+\log \lambda_i = \beta_0 + \beta_1 \cdot \text{fin}_i + \beta_2 \cdot
+\text{age}_i + \beta_3 \cdot \text{prio}_i + \cdots
+\]</span></p>
+<p><span class="math display">\[\lambda_i = e^{X_i\beta}\]</span></p>
+<p>Bu, <span class="math inline">\(\lambda_i &gt; 0\)</span>’ı her zaman
+garanti eder. Şimdilik <span class="math inline">\(k\)</span>’yı sabit
+tutuyoruz (tüm bireyler için ortak) — tek şekil, bireysel ölçekler. Bu,
+standart Hızlandırılmış Arıza Zamanı (AFT) Weibull modelidir.</p>
+<p>Dolayısıyla parametre vektörünüz <span class="math inline">\(\theta =
+(k, \beta_0, \beta_1, \ldots, \beta_p)\)</span> olur — bir şekil
+parametresi artı regresyon katsayıları. MH örnekleyici tam olarak aynı
+kalır, yalnızca boyut artar.</p>
+<p>AFT’de kovaryantlar zaman akışını hızlandırır ya da yavaşlatır.
+Herkes için tek bir <span class="math inline">\(\lambda\)</span> yerine,
+her mahkum <span class="math inline">\(i\)</span> kendi efektif ölçeğini
+alır:</p>
+<p><span class="math display">\[\lambda_i = \lambda_0 \cdot e^{x_i^\top
+\beta}\]</span></p>
+<p>burada <span class="math inline">\(\lambda_0\)</span> temel ölçektir,
+<span class="math inline">\(\beta\)</span> kovaryant katsayılarıdır ve
+<span class="math inline">\(x_i = [\text{fin}_i, \text{age}_i,
+\text{prio}_i, \ldots]\)</span>’dir. Şekil <span
+class="math inline">\(k\)</span> tüm bireyler için ortaktır — tüm nüfus
+için tehlike şeklini yönetir.</p>
+<p>Dolayısıyla mahkum <span class="math inline">\(i\)</span> için
+Weibull tehlikesi ve kümülatif tehlike şöyle olur:</p>
+<p><span class="math display">\[h_i(t) =
+\frac{k}{\lambda_i}\left(\frac{t}{\lambda_i}\right)^{k-1}, \quad H_i(t)
+= \left(\frac{t}{\lambda_i}\right)^k\]</span></p>
+<p>Log Sonsal</p>
+<p>Log olurluk, artık bireysel katkıları toplayarak doğal biçimde
+genelleşir:</p>
+<p><span class="math display">\[\log L = \sum_{i=1}^n \left[\delta_i
+\log h_i(t_i) - H_i(t_i)\right]\]</span></p>
+<p><span class="math display">\[= \sum_{i=1}^n \left[\delta_i\left(\log
+k - k\log\lambda_i + (k-1)\log t_i\right) -
+\left(\frac{t_i}{\lambda_i}\right)^k\right]\]</span></p>
+<p>burada <span class="math inline">\(\log\lambda_i = \log\lambda_0 +
+x_i^\top\beta\)</span>.</p>
+<p>Örneklenecek parametreler</p>
+<p>Tam parametre vektörünüz <span class="math inline">\(\theta =
+\{\log\lambda_0, \log k, \beta\}\)</span>’dır. Kısıtsız pozitifliği
+sağlamak için <span class="math inline">\(\lambda_0\)</span> ve <span
+class="math inline">\(k\)</span> için log uzayında çalışıyoruz.</p>
+<p>Önseller</p>
+<p><span class="math display">\[\log\lambda_0 \sim \mathcal{N}(0, 10),
+\quad \log k \sim \mathcal{N}(0, 10)\]</span></p>
+<p><span class="math display">\[\beta_j \sim \mathcal{N}(0, 10) \quad
+\forall j\]</span></p>
+<p>Zayıf bilgilendirici Gaussianlar — olurluğa hakim olmayacak kadar
+geniş.</p>
+<p>Metropolis Adımı</p>
+<p>Her iterasyonda şunu öneriyorsunuz:</p>
+<p><span class="math display">\[\theta^* = \theta_{\text{mevcut}} +
+\varepsilon, \quad \varepsilon \sim \mathcal{N}(0, \sigma^2
+I)\]</span></p>
+<p>ve şu olasılıkla kabul ediyorsunuz:</p>
+<p><span class="math display">\[\alpha = \min\!\left(1,\,
+\frac{p(\theta^* \mid \text{veri})}{p(\theta_{\text{mevcut}} \mid
+\text{veri})}\right) = \min\!\left(1,\, e^{\log p(\theta^*) - \log
+p(\theta_{\text{mevcut}})}\right)\]</span></p>
+<p>Öneri simetrik olduğundan (Gaussian), öneri oranı sadeleşir — bu da
+onu Metropolis-Hastings değil, düz Metropolis yapan şeydir.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df    <span class="op">=</span> pd.read_csv(<span class="st">&quot;Rossi.csv&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t     <span class="op">=</span> df[<span class="st">&#39;week&#39;</span>].values.astype(<span class="bu">float</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> df[<span class="st">&#39;arrest&#39;</span>].values.astype(<span class="bu">float</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>fin  <span class="op">=</span> (df[<span class="st">&#39;fin&#39;</span>]  <span class="op">==</span> <span class="st">&#39;yes&#39;</span>).astype(<span class="bu">float</span>).values</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>age  <span class="op">=</span> ((df[<span class="st">&#39;age&#39;</span>]  <span class="op">-</span> df[<span class="st">&#39;age&#39;</span>].mean())  <span class="op">/</span> df[<span class="st">&#39;age&#39;</span>].std()).values</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>prio <span class="op">=</span> ((df[<span class="st">&#39;prio&#39;</span>] <span class="op">-</span> df[<span class="st">&#39;prio&#39;</span>].mean()) <span class="op">/</span> df[<span class="st">&#39;prio&#39;</span>].std()).values</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>wexp <span class="op">=</span> (df[<span class="st">&#39;wexp&#39;</span>] <span class="op">==</span> <span class="st">&#39;yes&#39;</span>).astype(<span class="bu">float</span>).values</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>mar  <span class="op">=</span> (df[<span class="st">&#39;mar&#39;</span>]  <span class="op">==</span> <span class="st">&#39;married&#39;</span>).astype(<span class="bu">float</span>).values</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>paro <span class="op">=</span> (df[<span class="st">&#39;paro&#39;</span>] <span class="op">==</span> <span class="st">&#39;yes&#39;</span>).astype(<span class="bu">float</span>).values</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.column_stack([fin, age, prio, wexp, mar, paro])  <span class="co"># (n, 6)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>n_cov <span class="op">=</span> X.shape[<span class="dv">1</span>]</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Son mahkumu test için ayır</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>t_test     <span class="op">=</span> t[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>delta_test <span class="op">=</span> delta[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>x_test     <span class="op">=</span> X[<span class="op">-</span><span class="dv">1</span>]          <span class="co"># test mahkumu için kovaryant vektörü</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>t_train    <span class="op">=</span> t[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>delta_train<span class="op">=</span> delta[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>X_train    <span class="op">=</span> X[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test mahkumu: hafta=</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">, tutuklandı mı=</span><span class="sc">{</span><span class="bu">bool</span>(delta_test)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Kovaryantlar : </span><span class="sc">{</span><span class="bu">dict</span>(<span class="bu">zip</span>([<span class="st">&#39;fin&#39;</span>,<span class="st">&#39;age&#39;</span>,<span class="st">&#39;prio&#39;</span>,<span class="st">&#39;wexp&#39;</span>,<span class="st">&#39;mar&#39;</span>,<span class="st">&#39;paro&#39;</span>], x_test.<span class="bu">round</span>(<span class="dv">3</span>)))<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Log-Posterior (Sadece eğitim verisi ile)</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(params):</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    log_lam0 <span class="op">=</span> params[<span class="dv">0</span>]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    log_k    <span class="op">=</span> params[<span class="dv">1</span>]</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    beta     <span class="op">=</span> params[<span class="dv">2</span>:]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    k         <span class="op">=</span> np.exp(log_k)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    log_lam_i <span class="op">=</span> log_lam0 <span class="op">+</span> X_train <span class="op">@</span> beta</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    lam_i     <span class="op">=</span> np.exp(log_lam_i)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Hazard ve Birikimli Hazard fonksiyonları üzerinden log-likelihood</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    log_h <span class="op">=</span> log_k <span class="op">-</span> k <span class="op">*</span> log_lam_i <span class="op">+</span> (k <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> np.log(t_train)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    H     <span class="op">=</span> (t_train <span class="op">/</span> lam_i) <span class="op">**</span> k</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    ll    <span class="op">=</span> np.<span class="bu">sum</span>(delta_train <span class="op">*</span> log_h <span class="op">-</span> H)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prior (Önsel) dağılımlar - Normal(0, 100)</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    lp  <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (log_lam0 <span class="op">**</span> <span class="dv">2</span>) <span class="op">/</span> <span class="dv">100</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    lp <span class="op">+=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (log_k    <span class="op">**</span> <span class="dv">2</span>) <span class="op">/</span> <span class="dv">100</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    lp <span class="op">+=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> np.<span class="bu">sum</span>(beta <span class="op">**</span> <span class="dv">2</span>) <span class="op">/</span> <span class="dv">100</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ll <span class="op">+</span> lp</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Metropolis Örnekleyici (Metropolis Sampler)</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> metropolis(log_post, init, n_iter<span class="op">=</span><span class="dv">50_000</span>, step<span class="op">=</span><span class="fl">0.08</span>, seed<span class="op">=</span><span class="dv">42</span>):</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    rng           <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    n_par         <span class="op">=</span> <span class="bu">len</span>(init)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    chain         <span class="op">=</span> np.zeros((n_iter, n_par))</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    current       <span class="op">=</span> init.copy()</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    log_post_curr <span class="op">=</span> log_post(current)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    accepted      <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_iter):</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        proposal      <span class="op">=</span> current <span class="op">+</span> rng.normal(<span class="dv">0</span>, step, size<span class="op">=</span>n_par)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        log_post_prop <span class="op">=</span> log_post(proposal)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Kabul/Red kriteri</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.log(rng.uniform()) <span class="op">&lt;</span> log_post_prop <span class="op">-</span> log_post_curr:</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>            current       <span class="op">=</span> proposal</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>            log_post_curr <span class="op">=</span> log_post_prop</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>            accepted      <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>        chain[i] <span class="op">=</span> current</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Kabul oranı: </span><span class="sc">{</span>accepted <span class="op">/</span> n_iter<span class="sc">:.2%}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> chain</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="co"># Çalıştır</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>init    <span class="op">=</span> np.zeros(<span class="dv">2</span> <span class="op">+</span> n_cov)</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>chain   <span class="op">=</span> metropolis(log_posterior, init, n_iter<span class="op">=</span><span class="dv">50_000</span>, step<span class="op">=</span><span class="fl">0.08</span>)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>burn    <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>samples <span class="op">=</span> chain[burn:]      <span class="co"># (40_000, 8) - Isınma evresi sonrası örnekler</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="co"># Özet İstatistikler </span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>names <span class="op">=</span> [<span class="st">&#39;log_lamtheta&#39;</span>, <span class="st">&#39;log_k&#39;</span>, <span class="st">&#39;beta_fin&#39;</span>, <span class="st">&#39;beta_age&#39;</span>, <span class="st">&#39;beta_prio&#39;</span>, <span class="st">&#39;beta_wexp&#39;</span>, <span class="st">&#39;beta_mar&#39;</span>, <span class="st">&#39;beta_paro&#39;</span>]</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="sc">{</span><span class="st">&#39;Parametre&#39;</span><span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span><span class="st">&#39;Ortalama&#39;</span><span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="st">&#39;Std&#39;</span><span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="st">&#39;2.5%&#39;</span><span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="st">&#39;97.5%&#39;</span><span class="sc">:&gt;8}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;-&quot;</span> <span class="op">*</span> <span class="dv">48</span>)</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, name <span class="kw">in</span> <span class="bu">enumerate</span>(names):</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> samples[:, j]</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">:&lt;12}</span><span class="ss"> </span><span class="sc">{</span>s<span class="sc">.</span>mean()<span class="sc">:&gt;8.3f}</span><span class="ss"> </span><span class="sc">{</span>s<span class="sc">.</span>std()<span class="sc">:&gt;8.3f}</span><span class="ss"> &quot;</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f&quot;</span><span class="sc">{</span>np<span class="sc">.</span>percentile(s, <span class="fl">2.5</span>)<span class="sc">:&gt;8.3f}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>percentile(s, <span class="fl">97.5</span>)<span class="sc">:&gt;8.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Her bir sonsal örnek için test mahkumunun S(t) değerini hesapla</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="co"># log lam_test = log_lam0 + x_test @ beta</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>log_lam_test <span class="op">=</span> samples[:, <span class="dv">0</span>] <span class="op">+</span> samples[:, <span class="dv">2</span>:] <span class="op">@</span> x_test   <span class="co"># (n_samples,)</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>lam_test     <span class="op">=</span> np.exp(log_lam_test)                        <span class="co"># (n_samples,)</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>k_test       <span class="op">=</span> np.exp(samples[:, <span class="dv">1</span>])                       <span class="co"># (n_samples,)</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="co"># S(t) = exp(-(t/lambda)^k), t_grid ve örnekler üzerinden yayılım (broadcasting)</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="co"># boyut: (n_samples, n_t)</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>S_samples <span class="op">=</span> np.exp(<span class="op">-</span>((t_grid[<span class="va">None</span>, :] <span class="op">/</span> lam_test[:, <span class="va">None</span>]) <span class="op">**</span> k_test[:, <span class="va">None</span>]))</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>S_mean   <span class="op">=</span> S_samples.mean(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>S_lower  <span class="op">=</span> np.percentile(S_samples, <span class="fl">2.5</span>,  axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>S_upper  <span class="op">=</span> np.percentile(S_samples, <span class="fl">97.5</span>, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="co"># Gerçek haftaya göre yeniden tutuklanma olasılığı </span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>idx  <span class="op">=</span> np.argmin(np.<span class="bu">abs</span>(t_grid <span class="op">-</span> t_test))</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>p_survive <span class="op">=</span> S_mean[idx]</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Sonsal ortalama S(</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">) = </span><span class="sc">{</span>p_survive<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">. haftaya kadar yeniden tutuklanma olasılığı = </span><span class="sc">{</span><span class="dv">1</span> <span class="op">-</span> p_survive<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Test mahkumu: hafta=52, tutuklandı mı=False
+Kovaryantlar : {&#39;fin&#39;: np.float64(1.0), &#39;age&#39;: np.float64(-0.098), &#39;prio&#39;: np.float64(-0.685), &#39;wexp&#39;: np.float64(1.0), &#39;mar&#39;: np.float64(0.0), &#39;paro&#39;: np.float64(1.0)}
+
+Kabul oranı: 24.19%
+
+Parametre    Ortalama      Std     2.5%    97.5%
+------------------------------------------------
+log_lamtheta    4.678    0.175    4.340    5.028
+log_k           0.278    0.093    0.089    0.457
+beta_fin        0.266    0.156   -0.025    0.595
+beta_age        0.276    0.108    0.083    0.505
+beta_prio      -0.191    0.066   -0.319   -0.060
+beta_wexp       0.101    0.158   -0.205    0.412
+beta_mar        0.373    0.300   -0.153    0.987
+beta_paro       0.069    0.155   -0.227    0.380
+
+Sonsal ortalama S(52) = 0.825
+52. haftaya kadar yeniden tutuklanma olasılığı = 0.175</code></pre>
+<p>Kayıp Tahmini (Churn Prediction)</p>
+<p>Makine öğrenmesinin en zorlu problemlerinden birine, kayıp problemine
+dalalım. Aşağıda bu alandaki en büyük sorunlardan bazılarını
+ayrıntılandıran [2]’den fikirler paylaşacağım.</p>
+<p>Kayıp tahmini, endüstrideki en yaygın makine öğrenmesi
+problemlerinden biridir. Görev, müşterilerin ayrılmak üzere olup
+olmadığını, yani kayıp mı vereceklerini tahmin etmektir. Ne kadar
+karmaşık ve yamuk yollarla bu işin yapıldığını hayal edemezsiniz…</p>
+<p>Asıl numara, problemi çözümü aşikar kılacak şekilde tanımlamaktır.
+Bunu yapınca, hastaların ne zaman öleceğini, makinelerin ne zaman arıza
+yapacağını ya da bir depremin ne zaman geleceğini tahmin etmekle özdeş
+hale gelir. Şunu söyleyebilirim ki, anlatacağım model bu problemler için
+de iyi bir çözüm olabilir.</p>
+<p>Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle tanısak da, bu
+bulanık kavramı operasyonelleştirmek zor olabilir. Sorun bir tür
+dilbilimsel hatadan kaynaklanıyor — kayıp sezgimiz gizli zamansal
+varsayımlarla dolu ve yerleşik döngüsel akıl yürütmeyle sarılmış
+görünüyor. Ayrıntılara indikçe, belirsizliğin uçurumunu
+keşfediyorsunuz.</p>
+<ul>
+<li>“Olacak” ne demek? Hepimiz bir gün ‘kayıp’ veririz.</li>
+<li>“Müşteri” ne demek? Belirli bir andaki müşteri mi? Bir abonelik
+planı mı? Belirli bir müşteri-id’sinin ‘kayıp vermemiş’ bir dönemi
+mi?..</li>
+<li>“Kayıp” ne demek? Milyonluk soru.</li>
+</ul>
+<p>[Bu noktada dehşete düşmüş] veri bilimciler çoğunlukla ‘30 gün içinde
+satın alma yok’ gibi keyfi bir çizgi çizerek tanım yapmak zorunda
+kalıyor.</p>
+<p>Kaynaklar</p>
+<p>[1] Ross, Introduction to Probability and Statistics for Engineers
+and Scientists</p>
+<p>[2] Egil Martinsson,
+<a href="https://ragulpr.github.io/2016/12/22/WTTE-RNN-Hackless-churn-modeling/">WTTE-RNN
+- Less hacky churn prediction</a></p>
 <p>[devam edecek]</p>
 <p>
   <a href="..">Yukarı</a>
