@@ -12,7 +12,7 @@ kümenin eşit büyüklükte ve küresel olduğunu örtük olarak varsayar,
 çünkü yalnızca Oklid mesafesini optimize eder. Bunun ötesinde, K-Means
 size yalnızca nokta tahminleri verir: her küme için tek bir merkez,
 her nokta için tek bir atama. Belirsizliği ölçmenin hiçbir yolu
-yoktür. İki kümenin sınırındaki bir noktanın %60 küme 1'e, %40 küme
+yoktur. İki kümenin sınırındaki bir noktanın %60 küme 1'e, %40 küme
 2'ye ait olduğunu söyleyemezsiniz — K-Means onu birbirine zıt iki
 seçenekten birine zorla atar. Gauss Karışım Modeli ise tam olarak bir
 olasılıksal modelden başlar: her noktanın gözlemlenebilir bir kümeden
@@ -22,17 +22,17 @@ her atama bir olasılık taşır ve belirsizlik modelin doğal bir parçası
 haline gelir.
 
 Gibbs örneklemesi neden Beklenti-Maksimizasyona (EM) tercih edilir?
-EM, GMM'yi veriye uydurmak (fıtting) için klasik yaklaşımdır ve
+EM, GMM'yi veriye uydurmak (fitting) için klasik yaklaşımdır ve
 oldukca verimlidir: her döngüde gizli değişkenler üzerindeki dağılımı
 hesaplar (E adımı), ardından bu dağılım altında log-olurluğu
 (log-likelihood) maksimize edecek parametreleri günceller (M
-adımı). Ancak EM nihayetinde bir maksimizasyon algoritmasidir —
+adımı). Ancak EM nihayetinde bir maksimizasyon algoritmasıdır —
 log-olurluğun bir yerel maksimumuna yakınsar ve size tek bir nokta
 tahmini verir: $\hat{\mu}_k$, $\hat{\sigma}_k^2$,
 $\hat{\pi}$. Parametreler üzerindeki belirsizlik hakkında hiçbir şey
 söylemez. Eğer veri azsa ya da kümeler birbirine yakınsa, EM'in
 bulduğu çözüme ne kadar güvenilmesi gerektiğini bilmek
-imkânsizdir. Gibbs örneklemesi ise tam Bayeşçi çıkarım yapar:
+imkansızdır. Gibbs örneklemesi ise tam Bayeşçi çıkarım yapar:
 parametrelerin tek bir tahmini yerine tüm sonsal dağılımını
 örnekler. Bu sayede her parametre için güven aralıkları elde
 edersiniz, küme sayısı veya karışım oranları üzerindeki belirsizliği
@@ -83,7 +83,7 @@ $$p(\mu, \sigma^2, \pi, Z \mid X) = \frac{p(X \mid Z, \mu, \sigma^2)\,
 p(Z \mid \pi)\, p(\pi)\, p(\mu)\, p(\sigma^2)}{p(X)}$$
 
 Paydaki $p(X)$'i hesaplamak son derece güçtür (tüm olası $Z, \mu,
-\sigma^2, \pi$ üzerinden integral almayı gerektirir). İşte bu yüzden
+\sigma^2, \pi$ üzerinden entegral almayı gerektirir). İşte bu yüzden
 Gibbs örneklemesine başvuruyoruz — bu yöntem, sonsal dağılımdan
 doğrudan hesaplamadan örneklememize olanak tanır.
 
@@ -125,7 +125,7 @@ burada $\mu_0$ küme ortalamasının nerede olabileceğine dair önceki
 inancımız, $\tau^2$ ise ne kadar emin olmadığımızdır.
 
 $\sigma_k^2$ için — Varyans pozitif olmalıdır, bu yüzden Gauss
-olurluğuyla eşlenik olan Ters-Gamma onselini kullanıyoruz:
+olurluğuyla eşlenik olan Ters-Gamma önselini kullanıyoruz:
 
 $$\sigma_k^2 \sim \text{Inverse-Gamma}(a, b)$$
 
@@ -421,9 +421,10 @@ bir mühendislik kararıdır.
 
 Örnek 1: İki Boyutta Kümeleme
 
-Yukarıdaki türetme netlik için 1B Gauss'lar kullandı. Aşağıdaki kod
-bunu 2B'ye genelleştirir: $\sigma_k^2$, bir kovaryans matrisi
-$\Sigma_k$'ya dönüşür ve Ters-Gamma önseli Ters-Wishart olur.
+Yukarıdaki türetme netlik için tek boyutlu Gausssian'lar
+kullandı. Aşağıdaki kod bunu iki boyuta genelleştirir: $\sigma_k^2$,
+bir kovaryans matrisi $\Sigma_k$'ya dönüşür ve Ters-Gamma önseli
+Ters-Wishart olur.
 
 
 ```python
@@ -581,12 +582,12 @@ Eğer her kullanıcıyı bir veri satırı olarak kabul edersek, ki 1-5
 arası beğeni verileri kolona tekabül eden filmler için olacaktır, bu
 çok boyutlu veri rahat bir şekilde kümelenebilir. Tek potansiyel
 problem GMM'in iç yapısındaki Gaussian'lar sebebiyle kullandığı olağan
-mesafe hesabıdır, bu mesafe Oklitselliği farz eder. Fakat oklitsel
+mesafe hesabıdır, bu mesafe Öklitselliği farz eder. Fakat Öklitsel
 mesafe çok seyrek olan vektörler arasında iyi işlemeyeceği için film
 beğeni vektörleri için kullanışlı olmayabilir. Bu tür veriler üzerinde
 kosinüs benzerlik / mesafesinin daha iyi işlediğini biliyoruz.
 
-Bu sebeple bir önişlem ile beğeni vektörlerini içinde Oklitsel
+Bu sebeple bir önişlem ile beğeni vektörlerini içinde Öklitsel
 uzaklığın işleyeceği başka bir uzaya yansıtmak daha iyi olabilir. Bu
 yansıtma işlemini baslangic verisinde kosinüs mesafesini göz önüne
 alacak şekilde seçersek, elde edilen yeni uzay içinde bildiğimiz GMM
@@ -604,3 +605,4 @@ Kaynaklar
 
 [1] <a href="https://umap-learn.readthedocs.io/en/latest/">UMap</a>
 
+   

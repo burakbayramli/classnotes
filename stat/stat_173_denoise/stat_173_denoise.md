@@ -204,7 +204,8 @@ e^{-(E_j - \min E)}}
 $$
 
 Kod
-```
+
+```python
 # min(energy) çıkarmak exp()'nin çok küçük olmasını engeller (alt taşma)
 probs = np.exp(np.min(energy, axis=1, keepdims=True) - energy)
 probs /= np.sum(probs, axis=1, keepdims=True)  # Toplamı 1 olacak şekilde normalleştir
