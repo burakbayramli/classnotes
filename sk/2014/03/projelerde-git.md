@@ -151,7 +151,26 @@ git push origin master
 
 yapilir.
 
-### Daha Sofistike Dal Yapılar
+### Github Depo Kopyalamak
+
+Diyelim ki bir Github projesinin kopyasını çıkardık, bu proje artık
+bizim kendi depomuz haline gelir, kopyalama anından itibaren yapılan
+değişimler bize özel depoda kalır.
+
+Fakat eğer ana depodaki değişimleri arada sırada kendimize almak
+istersek, ve önceden bir kere şunu yapmış isek,
+
+```
+git remote add upstream https://github.com/user1/depo1.git
+```
+
+Artık sonradan `git fetch upstream` ile orijinal kodu alabiliriz ve
+`git merge upstream/main` ile kendi depomuzla birleştirebiliriz
+(merge). Birleştirme işlemi akıllıdır, kaymış satırları vb durumların
+üstesinden gelebilir. Eğer çözülemeyecek çakışma olursa bu çakışmaları
+`merge` bildirir ve kullanıcı bunları çözebilir.
+
+### Sofistike Dal Yapıları
 
 http://nvie.com/posts/a-successful-git-branching-model/
 

@@ -157,8 +157,5 @@ Kaynaklar
 
 [1] Stein, *Introduction to Algorithms*
 
-[2] Heatland, *Python Algorithms*
-
-
-
+[2] Hetland, *Python Algorithms*
 

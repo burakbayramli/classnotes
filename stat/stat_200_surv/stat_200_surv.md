@@ -71,9 +71,23 @@ $$\int_0^t h(u)\,du = -\log S(t) + \log S(0) = -\log S(t)$$
 
 $$S(t) = \exp\!\left(-\int_0^t h(u)\,du\right)$$
 
-Bu temel bir sonuçtur — yaşam fonksiyonunun tamamen tehlike fonksiyonu tarafından belirlendiğini gösterir.
+Bu temel bir sonuçtur — yaşam fonksiyonunun tamamen tehlike fonksiyonu
+tarafından belirlendiğini gösterir.
 
-Weibull pdf'inden Weibull tehlikesine
+Notasyonel kisaltma amaciyla
+
+$$
+H(t) = \int_{0}^{t} h(u) du 
+$$
+
+kullanılabilir, o zaman iki üstteki formülü şu halde de yazabiliriz
+[3, sf. 14],
+
+$$
+S(t) = \exp^{-H(t)}
+$$
+
+### Weibull pdf'inden Weibull tehlikesine
 
 T ömrünün şu parametrelerle bir Weibull dağılımı izlediğini varsayalım:
 - şekil parametresi $k > 0$
@@ -111,7 +125,7 @@ $$h(t) = \frac{k}{\lambda}\left(\frac{t}{\lambda}\right)^{k-1}$$
 
 Bu, tanıdık Weibull tehlike biçimidir.
 
-Olurluk fonksiyonunu kurmak
+### Olurluk 
 
 Diyelim ki $n$ tane özneyi gözlemliyoruz, bu öznelerin sağkalımsal bir
 dağılımı var. Sağkalım Analizi problemlerinde çok ortaya çıkan durum
@@ -222,6 +236,30 @@ regresyon yapmak tahminleri neden çarpıtır? Çünkü sansürlü özneler
 için yaşam sürelerini sistematik olarak olduğundan kısa tahmin etmiş
 olursunuz.
 
+### Katsayılar, Regresyon
+
+Sağkalım problemleri için veri kullanarak regresyon yapmak mümkündür.
+Mesela bir ana dağılım seçilir, ve bu dağılımın parametrelerinin
+katsayıları (covariants) üzerinden değişmesine izin verilir. Eğer bu
+katsayılara önsel dağılım tanımlarsak, bir sonsal dağılımdan örneklem
+toplamak mümkündür, Monte Carlo Markov Zincirleri yaklaşımıyla
+(Metropolis, Gibbs) ile bir sonuca ulaşabiliriz.
+
+Hızlandırılmış Arıza Zamanı (Accelerated Failure Time -AFT-) modelleri
+burada kullanılabilir. Üstteki $\lambda$'yi her veri noktası için
+$\lambda_i$ haline çeviririz, ve onun hesabını katsayılar üzerinden
+yaparız,
+
+$$\lambda_i = \lambda_0 \cdot e^{x_i^\top \beta}$$
+
+Formüldeki $\beta$ değişkenler / parametreler / katsayılardır, mesela
+yaş, eğitim, vs gibi bilgiler buradan modele dahil edilebilir, ve bu
+katsayılar değerlerine göre modeli "hızlandırabilir" ya da
+yavaşlatabilir. Bu hızlandırma / yavaşlatma muhakkak etkilenen dağılım
+ile alakalı olacaktır, bazı katsayı değerleri dağılımı eteklere doğru
+genişletebilir, zaman "yavaşlar", ve arıza zamanı böylece daha ileri
+bir tarihte olabilir.
+
 Rossi Verisi
 
 Şimdi Rossi veri setini anlayalım ve katsayılar / ağırlıklar modelini
@@ -233,7 +271,7 @@ yarısına atanmamıştır. Sonuç değişkeni, yeniden tutuklanmayanlar için
 
 İlgilendiğimiz temel değişkenler şunlardır:
 
-- `week` — gözlemlenen zaman ($t_i$)
+- `week` — gözlemlenen zaman, hafta olarak ($t_i$)
 - `arrest` — olay göstergesi ($\delta_i$, 1=tutuklandı, 0=sansürlü)
 - `fin` — mali yardım (0/1) — ana deneysel değişken
 - `age` — tahliye sırasındaki yaş
@@ -244,9 +282,9 @@ yarısına atanmamıştır. Sonuç değişkeni, yeniden tutuklanmayanlar için
 
 AFT Weibull Modeli
 
-$\lambda$'nın kovaryantlara göre birey başına değişmesine izin
-vermemiz gerekiyor. Standart yol, Poisson regresyonuyla aynı fikir
-olan log-doğrusal bağlantıdır:
+$\lambda$'nin katsayılara göre birey başına değişmesine izin vermemiz
+gerekiyor. Standart yol, Poisson regresyonuyla aynı fikir olan
+log-doğrusal bağlantıdır:
 
 $$
 \log \lambda_i = \beta_0 + \beta_1 \cdot \text{fin}_i + \beta_2 \cdot
@@ -265,16 +303,15 @@ Dolayısıyla parametre vektörünüz $\theta = (k, \beta_0, \beta_1,
 katsayıları. MH örnekleyici tam olarak aynı kalır, yalnızca boyut
 artar.
 
-AFT'de kovaryantlar zaman akışını hızlandırır ya da yavaşlatır. Herkes
+AFT'de katsayılar zaman akışını hızlandırır ya da yavaşlatır. Herkes
 için tek bir $\lambda$ yerine, her mahkum $i$ kendi efektif ölçeğini
 alır:
 
 $$\lambda_i = \lambda_0 \cdot e^{x_i^\top \beta}$$
 
-burada $\lambda_0$ temel ölçektir, $\beta$ kovaryant katsayılarıdır ve
-$x_i = [\text{fin}_i, \text{age}_i, \text{prio}_i, \ldots]$'dir. Şekil
-$k$ tüm bireyler için ortaktır — tüm nüfus için tehlike şeklini
-yönetir.
+burada $\lambda_0$ temel ölçektir, $\beta$ katsayılardır ve $x_i =
+[\text{fin}_i, \text{age}_i, \text{prio}_i, \ldots]$'dir. Şekil $k$
+tüm bireyler için ortaktır — tüm nüfus için tehlike şeklini yönetir.
 
 Dolayısıyla mahkum $i$ için Weibull tehlikesi ve kümülatif tehlike şöyle olur:
 
@@ -336,13 +373,13 @@ n_cov = X.shape[1]
 # Son mahkumu test için ayır
 t_test     = t[-1]
 delta_test = delta[-1]
-x_test     = X[-1]          # test mahkumu için kovaryant vektörü
+x_test     = X[-1]          # test mahkumu için katsayi vektörü
 t_train    = t[:-1]
 delta_train= delta[:-1]
 X_train    = X[:-1]
 
 print(f"Test mahkumu: hafta={t_test:.0f}, tutuklandı mı={bool(delta_test)}")
-print(f"Kovaryantlar : {dict(zip(['fin','age','prio','wexp','mar','paro'], x_test.round(3)))}\n")
+print(f"Katsayilar : {dict(zip(['fin','age','prio','wexp','mar','paro'], x_test.round(3)))}\n")
 
 # Log-Posterior (Sadece eğitim verisi ile)
 def log_posterior(params):
@@ -426,7 +463,7 @@ print(f"{t_test:.0f}. haftaya kadar yeniden tutuklanma olasılığı = {1 - p_su
 
 ```text
 Test mahkumu: hafta=52, tutuklandı mı=False
-Kovaryantlar : {'fin': np.float64(1.0), 'age': np.float64(-0.098), 'prio': np.float64(-0.685), 'wexp': np.float64(1.0), 'mar': np.float64(0.0), 'paro': np.float64(1.0)}
+Katsayilar : {'fin': np.float64(1.0), 'age': np.float64(-0.098), 'prio': np.float64(-0.685), 'wexp': np.float64(1.0), 'mar': np.float64(0.0), 'paro': np.float64(1.0)}
 
 Kabul oranı: 24.19%
 
@@ -447,30 +484,31 @@ Sonsal ortalama S(52) = 0.825
 
 Kayıp Tahmini (Churn Prediction)
 
-Makine öğrenmesinin en zorlu problemlerinden birine, kayıp problemine
-dalalım. Aşağıda bu alandaki en büyük sorunlardan bazılarını
-ayrıntılandıran [2]'den fikirler paylaşacağım.
+Yapay öğrenmenin en zorlu problemlerinden birine, kayıp müşteri
+problemine bakalım. Kayıp tahmini, endüstrideki en yaygın yapay
+öğrenme problemlerinden biridir [2]. Görev, müşterilerin ayrılmak
+üzere olup olmadığını, yani kayıp mı olacaklarını tahmin etmektir. Ne
+kadar karmaşık ve yamuk yollarla bu işin yapıldığını hayal
+edemezsiniz... Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle
+tanısak da, bu bulanık işler hale getirmek zor olabilir...
 
-Kayıp tahmini, endüstrideki en yaygın makine öğrenmesi problemlerinden
-biridir. Görev, müşterilerin ayrılmak üzere olup olmadığını, yani
-kayıp mı vereceklerini tahmin etmektir. Ne kadar karmaşık ve yamuk
-yollarla bu işin yapıldığını hayal edemezsiniz...
+- Kayıp "olacak" ne demek? Hepimiz bir gün 'kayıp' olabiliriz.
 
-Asıl numara, problemi çözümü aşikar kılacak şekilde
-tanımlamaktır. Bunu yapınca, hastaların ne zaman öleceğini,
-makinelerin ne zaman arıza yapacağını ya da bir depremin ne zaman
-geleceğini tahmin etmekle özdeş hale gelir. Şunu söyleyebilirim ki,
-anlatacağım model bu problemler için de iyi bir çözüm olabilir.
+- "Müşteri" ne demek? Belirli bir andaki müşteri mi? Bir abonelik
+  planı mı? Belirli bir müşteri-id'sinin 'kayıp vermemiş' bir dönemi
+  mi?..
 
-Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle tanısak da, bu bulanık kavramı operasyonelleştirmek zor olabilir. Sorun bir tür dilbilimsel hatadan kaynaklanıyor — kayıp sezgimiz gizli zamansal varsayımlarla dolu ve yerleşik döngüsel akıl yürütmeyle sarılmış görünüyor. Ayrıntılara indikçe, belirsizliğin uçurumunu keşfediyorsunuz.
-
-- "Olacak" ne demek? Hepimiz bir gün 'kayıp' veririz.
-- "Müşteri" ne demek? Belirli bir andaki müşteri mi? Bir abonelik planı mı? Belirli bir müşteri-id'sinin 'kayıp vermemiş' bir dönemi mi?..
 - "Kayıp" ne demek? Milyonluk soru.
 
 [Bu noktada dehşete düşmüş] veri bilimciler çoğunlukla '30 gün içinde
-satın alma yok' gibi keyfi bir çizgi çizerek tanım yapmak zorunda
-kalıyor.
+satın olmadıysa' gibi keyfi bir çizgi çizerek tanım yapmak zorunda
+kalıyor. O çizgiden bir tarafındakilar kayıp diğerleri sadık müşteri
+olarak işaretleniyor. Fakat niye 30 gün? Niye 35 gün değil? Bunun
+tatmin edici bir cevabı yok.
+
+Fakat bu probleme yakından bakarsak aslında sağdan sansürlü bir
+sağkalım analizi problemi olduğunu görebiliyoruz. 
+
 
 Kaynaklar
 
@@ -478,11 +516,11 @@ Kaynaklar
 
 [2] Egil Martinsson, <a href="https://ragulpr.github.io/2016/12/22/WTTE-RNN-Hackless-churn-modeling/">WTTE-RNN - Less hacky churn prediction</a>
 
+[3] Box-Steffensmeier, *Event History Modeling*
 
+[4] <a href="https://www.dropbox.com/scl/fi/mnc3mdqk66ynt0t48ozx1/Online-Retail.zip?rlkey=s345ik8higx6k04jigb97r2qy&st=432se69w&raw=1">Online Retail (As CSV)</a>
 
-
-
-
+[5] https://web.archive.org/web/20260213150016/https://archive.ics.uci.edu/dataset/352/online+retail
 
 
 

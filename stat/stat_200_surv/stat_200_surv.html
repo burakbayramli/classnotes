@@ -165,7 +165,17 @@ Dolayısıyla:</p>
 h(u)\,du\right)\]</span></p>
 <p>Bu temel bir sonuçtur — yaşam fonksiyonunun tamamen tehlike
 fonksiyonu tarafından belirlendiğini gösterir.</p>
-<p>Weibull pdf’inden Weibull tehlikesine</p>
+<p>Notasyonel kisaltma amaciyla</p>
+<p><span class="math display">\[
+H(t) = \int_{0}^{t} h(u) du
+\]</span></p>
+<p>kullanılabilir, o zaman iki üstteki formülü şu halde de yazabiliriz
+[3, sf. 14],</p>
+<p><span class="math display">\[
+S(t) = \exp^{-H(t)}
+\]</span></p>
+<h3 id="weibull-pdfinden-weibull-tehlikesine">Weibull pdf’inden Weibull
+tehlikesine</h3>
 <p>T ömrünün şu parametrelerle bir Weibull dağılımı izlediğini
 varsayalım: - şekil parametresi <span class="math inline">\(k &gt;
 0\)</span> - ölçek parametresi <span class="math inline">\(\lambda &gt;
@@ -193,7 +203,7 @@ e^{-(t/\lambda)^k}}{e^{-(t/\lambda)^k}}\]</span></p>
 <p><span class="math display">\[h(t) =
 \frac{k}{\lambda}\left(\frac{t}{\lambda}\right)^{k-1}\]</span></p>
 <p>Bu, tanıdık Weibull tehlike biçimidir.</p>
-<p>Olurluk fonksiyonunu kurmak</p>
+<h3 id="olurluk">Olurluk</h3>
 <p>Diyelim ki <span class="math inline">\(n\)</span> tane özneyi
 gözlemliyoruz, bu öznelerin sağkalımsal bir dağılımı var. Sağkalım
 Analizi problemlerinde çok ortaya çıkan durum şudur; mesela bir grup
@@ -329,6 +339,27 @@ olay gerçekleşmiş gibi davranmadan parametre tahminlerini doğru yönde
 regresyon yapmak tahminleri neden çarpıtır? Çünkü sansürlü özneler için
 yaşam sürelerini sistematik olarak olduğundan kısa tahmin etmiş
 olursunuz.</p>
+<h3 id="katsayılar-regresyon">Katsayılar, Regresyon</h3>
+<p>Sağkalım problemleri için veri kullanarak regresyon yapmak mümkündür.
+Mesela bir ana dağılım seçilir, ve bu dağılımın parametrelerinin
+katsayıları (covariants) üzerinden değişmesine izin verilir. Eğer bu
+katsayılara önsel dağılım tanımlarsak, bir sonsal dağılımdan örneklem
+toplamak mümkündür, Monte Carlo Markov Zincirleri yaklaşımıyla
+(Metropolis, Gibbs) ile bir sonuca ulaşabiliriz.</p>
+<p>Hızlandırılmış Arıza Zamanı (Accelerated Failure Time -AFT-)
+modelleri burada kullanılabilir. Üstteki <span
+class="math inline">\(\lambda\)</span>’yi her veri noktası için <span
+class="math inline">\(\lambda_i\)</span> haline çeviririz, ve onun
+hesabını katsayılar üzerinden yaparız,</p>
+<p><span class="math display">\[\lambda_i = \lambda_0 \cdot e^{x_i^\top
+\beta}\]</span></p>
+<p>Formüldeki <span class="math inline">\(\beta\)</span> değişkenler /
+parametreler / katsayılardır, mesela yaş, eğitim, vs gibi bilgiler
+buradan modele dahil edilebilir, ve bu katsayılar değerlerine göre
+modeli “hızlandırabilir” ya da yavaşlatabilir. Bu hızlandırma /
+yavaşlatma muhakkak etkilenen dağılım ile alakalı olacaktır, bazı
+katsayı değerleri dağılımı eteklere doğru genişletebilir, zaman
+“yavaşlar”, ve arıza zamanı böylece daha ileri bir tarihte olabilir.</p>
 <p>Rossi Verisi</p>
 <p>Şimdi Rossi veri setini anlayalım ve katsayılar / ağırlıklar modelini
 nasıl parametrize edeceğimize karar verelim. 1970’lerde Maryland eyalet
@@ -338,7 +369,7 @@ atanmamıştır. Sonuç değişkeni, yeniden tutuklanmayanlar için 52. haftada
 sansürlenerek ilk tutuklanmanın gerçekleştiği haftadır.</p>
 <p>İlgilendiğimiz temel değişkenler şunlardır:</p>
 <ul>
-<li><code>week</code> — gözlemlenen zaman (<span
+<li><code>week</code> — gözlemlenen zaman, hafta olarak (<span
 class="math inline">\(t_i\)</span>)</li>
 <li><code>arrest</code> — olay göstergesi (<span
 class="math inline">\(\delta_i\)</span>, 1=tutuklandı, 0=sansürlü)</li>
@@ -350,7 +381,7 @@ class="math inline">\(\delta_i\)</span>, 1=tutuklandı, 0=sansürlü)</li>
 <li><code>paro</code> — koşullu tahliye (0/1)</li>
 </ul>
 <p>AFT Weibull Modeli</p>
-<p><span class="math inline">\(\lambda\)</span>’nın kovaryantlara göre
+<p><span class="math inline">\(\lambda\)</span>’nin katsayılara göre
 birey başına değişmesine izin vermemiz gerekiyor. Standart yol, Poisson
 regresyonuyla aynı fikir olan log-doğrusal bağlantıdır:</p>
 <p><span class="math display">\[
@@ -366,18 +397,17 @@ standart Hızlandırılmış Arıza Zamanı (AFT) Weibull modelidir.</p>
 (k, \beta_0, \beta_1, \ldots, \beta_p)\)</span> olur — bir şekil
 parametresi artı regresyon katsayıları. MH örnekleyici tam olarak aynı
 kalır, yalnızca boyut artar.</p>
-<p>AFT’de kovaryantlar zaman akışını hızlandırır ya da yavaşlatır.
-Herkes için tek bir <span class="math inline">\(\lambda\)</span> yerine,
-her mahkum <span class="math inline">\(i\)</span> kendi efektif ölçeğini
+<p>AFT’de katsayılar zaman akışını hızlandırır ya da yavaşlatır. Herkes
+için tek bir <span class="math inline">\(\lambda\)</span> yerine, her
+mahkum <span class="math inline">\(i\)</span> kendi efektif ölçeğini
 alır:</p>
 <p><span class="math display">\[\lambda_i = \lambda_0 \cdot e^{x_i^\top
 \beta}\]</span></p>
 <p>burada <span class="math inline">\(\lambda_0\)</span> temel ölçektir,
-<span class="math inline">\(\beta\)</span> kovaryant katsayılarıdır ve
-<span class="math inline">\(x_i = [\text{fin}_i, \text{age}_i,
-\text{prio}_i, \ldots]\)</span>’dir. Şekil <span
-class="math inline">\(k\)</span> tüm bireyler için ortaktır — tüm nüfus
-için tehlike şeklini yönetir.</p>
+<span class="math inline">\(\beta\)</span> katsayılardır ve <span
+class="math inline">\(x_i = [\text{fin}_i, \text{age}_i, \text{prio}_i,
+\ldots]\)</span>’dir. Şekil <span class="math inline">\(k\)</span> tüm
+bireyler için ortaktır — tüm nüfus için tehlike şeklini yönetir.</p>
 <p>Dolayısıyla mahkum <span class="math inline">\(i\)</span> için
 Weibull tehlikesi ve kümülatif tehlike şöyle olur:</p>
 <p><span class="math display">\[h_i(t) =
@@ -439,13 +469,13 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Son mahkumu test için ayır</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>t_test     <span class="op">=</span> t[<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>delta_test <span class="op">=</span> delta[<span class="op">-</span><span class="dv">1</span>]</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>x_test     <span class="op">=</span> X[<span class="op">-</span><span class="dv">1</span>]          <span class="co"># test mahkumu için kovaryant vektörü</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>x_test     <span class="op">=</span> X[<span class="op">-</span><span class="dv">1</span>]          <span class="co"># test mahkumu için katsayi vektörü</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>t_train    <span class="op">=</span> t[:<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>delta_train<span class="op">=</span> delta[:<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>X_train    <span class="op">=</span> X[:<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test mahkumu: hafta=</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">, tutuklandı mı=</span><span class="sc">{</span><span class="bu">bool</span>(delta_test)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Kovaryantlar : </span><span class="sc">{</span><span class="bu">dict</span>(<span class="bu">zip</span>([<span class="st">&#39;fin&#39;</span>,<span class="st">&#39;age&#39;</span>,<span class="st">&#39;prio&#39;</span>,<span class="st">&#39;wexp&#39;</span>,<span class="st">&#39;mar&#39;</span>,<span class="st">&#39;paro&#39;</span>], x_test.<span class="bu">round</span>(<span class="dv">3</span>)))<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Katsayilar : </span><span class="sc">{</span><span class="bu">dict</span>(<span class="bu">zip</span>([<span class="st">&#39;fin&#39;</span>,<span class="st">&#39;age&#39;</span>,<span class="st">&#39;prio&#39;</span>,<span class="st">&#39;wexp&#39;</span>,<span class="st">&#39;mar&#39;</span>,<span class="st">&#39;paro&#39;</span>], x_test.<span class="bu">round</span>(<span class="dv">3</span>)))<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Log-Posterior (Sadece eğitim verisi ile)</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(params):</span>
@@ -526,7 +556,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Sonsal ortalama S(</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">) = </span><span class="sc">{</span>p_survive<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
 <span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>t_test<span class="sc">:.0f}</span><span class="ss">. haftaya kadar yeniden tutuklanma olasılığı = </span><span class="sc">{</span><span class="dv">1</span> <span class="op">-</span> p_survive<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
 <pre class="text"><code>Test mahkumu: hafta=52, tutuklandı mı=False
-Kovaryantlar : {&#39;fin&#39;: np.float64(1.0), &#39;age&#39;: np.float64(-0.098), &#39;prio&#39;: np.float64(-0.685), &#39;wexp&#39;: np.float64(1.0), &#39;mar&#39;: np.float64(0.0), &#39;paro&#39;: np.float64(1.0)}
+Katsayilar : {&#39;fin&#39;: np.float64(1.0), &#39;age&#39;: np.float64(-0.098), &#39;prio&#39;: np.float64(-0.685), &#39;wexp&#39;: np.float64(1.0), &#39;mar&#39;: np.float64(0.0), &#39;paro&#39;: np.float64(1.0)}
 
 Kabul oranı: 24.19%
 
@@ -544,40 +574,35 @@ beta_paro       0.069    0.155   -0.227    0.380
 Sonsal ortalama S(52) = 0.825
 52. haftaya kadar yeniden tutuklanma olasılığı = 0.175</code></pre>
 <p>Kayıp Tahmini (Churn Prediction)</p>
-<p>Makine öğrenmesinin en zorlu problemlerinden birine, kayıp problemine
-dalalım. Aşağıda bu alandaki en büyük sorunlardan bazılarını
-ayrıntılandıran [2]’den fikirler paylaşacağım.</p>
-<p>Kayıp tahmini, endüstrideki en yaygın makine öğrenmesi
-problemlerinden biridir. Görev, müşterilerin ayrılmak üzere olup
-olmadığını, yani kayıp mı vereceklerini tahmin etmektir. Ne kadar
-karmaşık ve yamuk yollarla bu işin yapıldığını hayal edemezsiniz…</p>
-<p>Asıl numara, problemi çözümü aşikar kılacak şekilde tanımlamaktır.
-Bunu yapınca, hastaların ne zaman öleceğini, makinelerin ne zaman arıza
-yapacağını ya da bir depremin ne zaman geleceğini tahmin etmekle özdeş
-hale gelir. Şunu söyleyebilirim ki, anlatacağım model bu problemler için
-de iyi bir çözüm olabilir.</p>
-<p>Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle tanısak da, bu
-bulanık kavramı operasyonelleştirmek zor olabilir. Sorun bir tür
-dilbilimsel hatadan kaynaklanıyor — kayıp sezgimiz gizli zamansal
-varsayımlarla dolu ve yerleşik döngüsel akıl yürütmeyle sarılmış
-görünüyor. Ayrıntılara indikçe, belirsizliğin uçurumunu
-keşfediyorsunuz.</p>
+<p>Yapay öğrenmenin en zorlu problemlerinden birine, kayıp müşteri
+problemine bakalım. Kayıp tahmini, endüstrideki en yaygın yapay öğrenme
+problemlerinden biridir [2]. Görev, müşterilerin ayrılmak üzere olup
+olmadığını, yani kayıp mı olacaklarını tahmin etmektir. Ne kadar
+karmaşık ve yamuk yollarla bu işin yapıldığını hayal edemezsiniz…
+Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle tanısak da, bu
+bulanık işler hale getirmek zor olabilir…</p>
 <ul>
-<li>“Olacak” ne demek? Hepimiz bir gün ‘kayıp’ veririz.</li>
-<li>“Müşteri” ne demek? Belirli bir andaki müşteri mi? Bir abonelik
+<li><p>Kayıp “olacak” ne demek? Hepimiz bir gün ‘kayıp’
+olabiliriz.</p></li>
+<li><p>“Müşteri” ne demek? Belirli bir andaki müşteri mi? Bir abonelik
 planı mı? Belirli bir müşteri-id’sinin ‘kayıp vermemiş’ bir dönemi
-mi?..</li>
-<li>“Kayıp” ne demek? Milyonluk soru.</li>
+mi?..</p></li>
+<li><p>“Kayıp” ne demek? Milyonluk soru.</p></li>
 </ul>
 <p>[Bu noktada dehşete düşmüş] veri bilimciler çoğunlukla ‘30 gün içinde
-satın alma yok’ gibi keyfi bir çizgi çizerek tanım yapmak zorunda
-kalıyor.</p>
+satın olmadıysa’ gibi keyfi bir çizgi çizerek tanım yapmak zorunda
+kalıyor. O çizgiden bir tarafındakilar kayıp diğerleri sadık müşteri
+olarak işaretleniyor. Fakat niye 30 gün? Niye 35 gün değil? Bunun tatmin
+edici bir cevabı yok.</p>
+<p>Fakat bu probleme yakından bakarsak aslında sağdan sansürlü bir
+sağkalım analizi problemi olduğunu görebiliyoruz.</p>
 <p>Kaynaklar</p>
 <p>[1] Ross, Introduction to Probability and Statistics for Engineers
 and Scientists</p>
 <p>[2] Egil Martinsson,
 <a href="https://ragulpr.github.io/2016/12/22/WTTE-RNN-Hackless-churn-modeling/">WTTE-RNN
 - Less hacky churn prediction</a></p>
+<p>[3] Box-Steffensmeier, <em>Event History Modeling</em></p>
 <p>[devam edecek]</p>
 <p>
   <a href="..">Yukarı</a>
