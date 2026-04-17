@@ -3,6 +3,8 @@
 
 ## En Son
 
+17/4 - [Sağkalım Analizi (Survival Analysis)](https://burakbayramli.github.io/dersblog/stat/stat_200_surv/sagkalim_analizi__survival_analysis_.html)
+
 27/3 - [Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs](https://burakbayramli.github.io/dersblog/stat/stat_097_mcmc/markov_zincirleri_monte_carlo_metropolishastings_gibbs.html)
 
 13/3 - [Markov Rasgele Alanları (Markov Random Fields -MRF-), Gürültü Giderme](https://burakbayramli.github.io/dersblog/stat/stat_173_denoise/markov_rasgele_alanlari__markov_random_fields_mrf__gurultu_giderme.html)

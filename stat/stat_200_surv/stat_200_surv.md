@@ -650,7 +650,7 @@ sonuçtur.
 Kapatmadan önce üstteki kodun test etme stratejisine de değinelim;
 veri içine düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen
 verileri eğitim için diğerlerini test için ayırdık, tabii ki sağdan
-sansür kavramı da bu kesim (çutoff) noktasına göre ayarlandı. Yani
+sansür kavramı da bu kesim (cutoff) noktasına göre ayarlandı. Yani
 hesapladığımız test sonuçları regresyonun bakmadığı ve bilgisinin
 olmadığı veriler üzerinden gerçekleştirilmiştir.
 
@@ -669,3 +669,5 @@ Kaynaklar
 [4] <a href="https://www.dropbox.com/scl/fi/mnc3mdqk66ynt0t48ozx1/Online-Retail.zip?rlkey=s345ik8higx6k04jigb97r2qy&st=432se69w&raw=1">Online Retail (As CSV)</a>
 
 [5] <a href="https://web.archive.org/web/20260213150016/https://archive.ics.uci.edu/dataset/352/online+retail">Online Retail Dataset</a>
+
+
