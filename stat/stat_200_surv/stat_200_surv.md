@@ -1,5 +1,12 @@
 # Sağkalım Analizi (Survival Analysis)
 
+Bir müşteri bir şirketten satın alımlarını durdurmuş mudur (müşteri
+terki)? Şartlı tahliye edilen mahkumlar acaba tekrar suç işler mi,
+işlerse ne zaman işler? Bir ampul ne kadar süreli yanar, ne zaman
+patlar? Bu tür soruların cevabı sağkalım analizi ile verilebilir,
+böyle hesaplar bilinen istatistiki dağılımlar, yoğunluklar üzerinden
+yapılır, fakat ek bazı matematiksel bakış açılarını geliştirmek gerekir.
+
 Pozitif sürekli bir rasgele değişken X'i düşünelim; bunu bir nesnenin
 ömrü olarak yorumluyoruz [1, s. 581]. X'in dağılım fonksiyonu F,
 yoğunluk fonksiyonu f olsun. F'nin tehlike oranı (bazen arıza oranı da
@@ -74,7 +81,7 @@ $$S(t) = \exp\!\left(-\int_0^t h(u)\,du\right)$$
 Bu temel bir sonuçtur — yaşam fonksiyonunun tamamen tehlike fonksiyonu
 tarafından belirlendiğini gösterir.
 
-Notasyonel kisaltma amaciyla
+Notasyonel kısaltma amacıyla
 
 $$
 H(t) = \int_{0}^{t} h(u) du 
@@ -482,6 +489,10 @@ Sonsal ortalama S(52) = 0.825
 52. haftaya kadar yeniden tutuklanma olasılığı = 0.175
 ```
 
+Veri içinden bir mahkumun verisini kenarar ayırdık ve onun tekrar suç
+işleyip işlemediğini tahmin etmeye çalıştık. Üstteki tahminde bu
+ihtimal düşük görülüyor, ve hakikaten de bu kişi yakalanmamış.
+
 Kayıp Tahmini (Churn Prediction)
 
 Yapay öğrenmenin en zorlu problemlerinden birine, kayıp müşteri
@@ -490,7 +501,8 @@ problemine bakalım. Kayıp tahmini, endüstrideki en yaygın yapay
 üzere olup olmadığını, yani kayıp mı olacaklarını tahmin etmektir. Ne
 kadar karmaşık ve yamuk yollarla bu işin yapıldığını hayal
 edemezsiniz... Kaybettiğimiz bir müşteriyi gördüğümüzde genellikle
-tanısak da, bu bulanık işler hale getirmek zor olabilir...
+tanısak da, bu bulanık çıkarımı işler hale / hesaplanır getirmek zor
+olabilir...
 
 - Kayıp "olacak" ne demek? Hepimiz bir gün 'kayıp' olabiliriz.
 
@@ -502,13 +514,149 @@ tanısak da, bu bulanık işler hale getirmek zor olabilir...
 
 [Bu noktada dehşete düşmüş] veri bilimciler çoğunlukla '30 gün içinde
 satın olmadıysa' gibi keyfi bir çizgi çizerek tanım yapmak zorunda
-kalıyor. O çizgiden bir tarafındakilar kayıp diğerleri sadık müşteri
+kalırlar. O çizginin bir tarafındakilar kayıp diğerleri sadık müşteri
 olarak işaretleniyor. Fakat niye 30 gün? Niye 35 gün değil? Bunun
 tatmin edici bir cevabı yok.
 
 Fakat bu probleme yakından bakarsak aslında sağdan sansürlü bir
-sağkalım analizi problemi olduğunu görebiliyoruz. 
+sağkalım analizi problemi olduğunu görebiliyoruz. Müşteri hakkında
+"terk etti" diye bir bilgi veride yok. Sadece müşterinin yaptığı satın
+alım işlemleri var. Daha dün alım yapmış müşteri bile belki hiç tekrar
+alım yapmayacak, ya da benzer bir müşteri ertesi gün, ya da iki sene
+sonra tekrar yapacak. Bu durum aynen ilaç verilmiş hastaların ölümünün
+kaydedilmemiş olması ya da salınan mahkumların hepsinin tekrar suç
+işleyip işlemediğinin bilinmemesi durumuna benziyor, yani müşteri
+terki problemi de "sağdan sansürlü".
 
+Terk problemlerinin testi için elimizde güzel bir veri var. [5]
+bağlantısındaki veri, ki tekrar işlenmiş hali [4]'te bulunabilir,
+01/12/2010 ve 09/12/2011 tarihleri arasında müşterileri bir elektronik
+ticaret sitesinde yaptığı alımları kaydetmiştir.
+
+Biz `churn.py` içinde geliştirdiğimiz yaklaşımla (yine bir AFT
+modelinin uygulanması), müşterilerin terk etme olasılığını
+hesaplayacağız. Bu amaçla müşterinin yaptığı alımları kullanarak
+onlardan bir veya birden fazla veri noktası oluşturuyoruz. Mesela eğer
+müşteri siteden üç kere alım yaptıysa bu veri noktasından dört tane
+veri noktası yaratıyoruz, üç tanesi alımla biten noktalar ve
+dördüncüsü sağdan sansülü olan nokta. Yani bu veri için tüm
+müşterilerin verisi bir anlamda sağdan sansürlü, çünkü dün alım yapmış
+kişinin bile tekrar gelip gelmeyeceğini bilmiyoruz.
+
+Bir soru akla gelebilir, bir alımdan dört nokta çıkartıyorsak, ve
+bunları regresyona Weibull katsayıları olarak veriyorsak, bu
+regresyonda gereksiz tekrarı ortaya çıkartmaz mı? Mesela bir müşteri üç
+alım yapmış, onun yaş, eğitim durumu, zip kodu birinci noktaya
+katsayı oluyor, sonra aynı yaş, eğitim durumu, zip kodu ikinci noktaya
+katsayı oluyor, vs, sürekli bir tekrar durumu var, regresyon mantığının
+sinyal yakalamasını zorlaştırmış olmuyor muyuz? Evet eğer müşterinin
+tüm veri noktalarında tekrar eden veriler kullanırsak hakikaten
+problem ortaya çıkabilir. İşte bu sebeple alttaki yaklaşımda aynı
+müşteri olsa bile onun her alımında farklı olacak değerleri
+regresyonda vermeye dikkat ettik.
+
+Değisen veriler ne olabilir, mesela eğer müşterinin o ana kadar yapmış
+olduğu alımların kumulatif toplamını bir katsayı yaparsak, bu veri her
+alımda farklıdır. İlk alimda 500 liralım alım varsa, ikinci 300
+liralık alım sonrası kumulatif toplam 800 olacaktır.. Ayrıca alım
+miktarının kendisi de bir katsayı olabilir. Alımın *indisi* önemli bir
+sinyal olabilir, birinci alım mı, ikinci alım mı, vs.
+
+Kullanılan tüm değişkenler alttadır:
+
+| Değişken | Açıklama |
+|---|---|
+| intercept | Sabit terim. Tüm diğer değişkenler sıfır olduğunda baz satın alma aralığını belirler. |
+| prev_gap | Bir önceki satın alma aralığı (gün). Müşterinin geçmiş ritmi hakkında bilgi verir. |
+| log_purchase_idx | Satın alma sırasının logaritması — $\log(k+1)$. Müşteri sadakati ve alışkanlık etkisini ölçer |
+| spend | Mevcut faturadaki harcama miktarı. O andaki müşteri ilgisini yansıtır. |
+| cum_spend | O ana kadar yapılan toplam harcama. Müşterinin uzun vadeli değerini ve birikimli ilişkisini temsil eder. |
+| n_items | Mevcut faturadaki farklı ürün sayısı. Sepet çeşitliliğini ve ilgiyi ölçer. |
+| days_since_first | İlk satın alma tarihinden bu yana geçen gün sayısı. Müşteri yaşını (tenure) temsil eder. |
+| log_sigma | AFT modelinin ölçek parametresinin logaritması — $\log(\sigma)$. Satın alma aralıklarındaki açıklanamayan değişkenliği ölçer; doğrudan bir katsayı değildir. |
+
+
+```python
+import churn
+results = churn.main("/opt/Downloads/Online Retail.csv")
+```
+
+```text
+Loading data...
+Date range : 2010-12-01 -> 2011-12-09
+Cutoff     : 2011-10-01
+
+Building episodes...
+Total episodes : 16486
+split  delta
+test   0        2467
+       1        2180
+train  0        3616
+       1        8223
+
+Standardising covariates...
+
+Initial log-posterior: -43082.18
+
+Acceptance rate: 0.269  (target ~0.23)
+
+Posterior summary
+           param    mean     sd    q025     q50    q975
+       intercept  3.8732 0.0130  3.8475  3.8734  3.8976
+        prev_gap  0.0060 0.0182 -0.0293  0.0058  0.0423
+log_purchase_idx -1.2931 0.0240 -1.3407 -1.2937 -1.2467
+           spend -0.0367 0.0134 -0.0625 -0.0367 -0.0105
+       cum_spend  0.0443 0.0151  0.0139  0.0443  0.0745
+         n_items -0.0506 0.0134 -0.0784 -0.0503 -0.0256
+days_since_first  0.5682 0.0260  0.5169  0.5681  0.6193
+       log_sigma  0.2288 0.0084  0.2128  0.2287  0.2451
+
+C-index (test set): 0.7394
+Brier score (W=90d, n=4647): 0.1927
+```
+
+C-index yüksek gözüküyor, regresyon başarılı oldu demektir.
+
+Katsayılara bakarsak sonuçlarının çok rahat yorumlanabilir olduğunu
+görüyoruz.
+
+`log_purchase_idx` = -1.29, açık ara en güçlü sinyal. Katsayılar standartlaştırıldığı
+için birbirleriyle doğrudan karşılaştırılabilir. Daha fazla satın alma ->
+daha kısa sonraki aralık -> sadık müşteriler daha hızlı geri döner.
+Bu, alışkanlık (habituation) etkisi.
+
+`days_since_first` = +0.57, ikinci en güçlü değişken ve işareti
+pozitif - müşteri ne kadar uzun süredir varsa, bir sonraki satın alma
+aralığı o kadar *uzar*. İlk bakışta sezgiye aykırı gelebilir; ancak bu
+muhtemelen uzun soluklu bir ilişkide sadık müşterilerde bile
+gözlemlenen doğal soğuma etkisini yakalamaktadır.
+
+`cum_spend` = +0.044 ile `spend` = -0.037 arasında ilginç bir gerilim
+var. Mevcut faturadaki yüksek harcama bir sonraki aralığı kısaltır
+(ilgili müşteri), buna karşın yüksek birikimli harcama aralığı
+*uzatır*. Birikimli etki, "ihtiyacını karşılamış" müşterinin bir
+göstergesi olabilir.
+
+`prev_gap` = +0.006, diğer değişkenler kontrol edildiğinde geniş güven
+aralıklarıyla birlikte pratikte sıfıra eşdeğerdir - satın alma
+aralıkları arasında anlamlı bir kendisiyle korelasyon bulunmamaktadır.
+
+`log_sigma` = 0.229, $\sigma = e^{0.229} \approx 1.26$ anlamına
+gelir. Bu oldukça geniş bir log-normal dağılıma işaret eder - satın
+alma aralıklarında model tarafından açıklanamayan önemli bir
+heterojenlik mevcuttur; bu da perakende verisi için beklenen bir
+sonuçtur.
+
+Kapatmadan önce üstteki kodun test etme stratejisine de değinelim;
+veri içine düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen
+verileri eğitim için diğerlerini test için ayırdık, tabii ki sağdan
+sansür kavramı da bu kesim (çutoff) noktasına göre ayarlandı. Yani
+hesapladığımız test sonuçları regresyonun bakmadığı ve bilgisinin
+olmadığı veriler üzerinden gerçekleştirilmiştir.
+
+Kodlar
+
+[churn.py](churn.py)
 
 Kaynaklar
 
@@ -520,12 +668,4 @@ Kaynaklar
 
 [4] <a href="https://www.dropbox.com/scl/fi/mnc3mdqk66ynt0t48ozx1/Online-Retail.zip?rlkey=s345ik8higx6k04jigb97r2qy&st=432se69w&raw=1">Online Retail (As CSV)</a>
 
-[5] https://web.archive.org/web/20260213150016/https://archive.ics.uci.edu/dataset/352/online+retail
-
-
-
-
-
-
-[devam edecek]
-
+[5] <a href="https://web.archive.org/web/20260213150016/https://archive.ics.uci.edu/dataset/352/online+retail">Online Retail Dataset</a>

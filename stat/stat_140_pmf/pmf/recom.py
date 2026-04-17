@@ -70,7 +70,7 @@ def recommend():
         title = mov_id_to_title.get(m_id, "Unknown Title")
         if title in skips: continue
         ys = re.findall('\\((\\d\\d\\d\\d)\\)', title)  
-        if len(ys) > 0 and int(ys[0]) > 2008: 
+        if len(ys) > 0 and int(ys[0]) > 2007: 
             recoms.append(title)
             count += 1
     df = pd.DataFrame(recoms)
