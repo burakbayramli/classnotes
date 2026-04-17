@@ -13,8 +13,6 @@
 
 13/2 - [Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri](https://burakbayramli.github.io/dersblog/stat/stat_140_pmf/olasiliksal_matris_ayristirmasi__probabilistic_matrix_factorization__ve_film_tavsiyeleri.html)
 
-10/2 - [Matris Tersi, Cholesky Ayrıştırması](https://burakbayramli.github.io/dersblog/linear/linear_app02/matris_tersi_cholesky_ayristirmasi.html)
-
 ## Konular, Referans
 
 [Python](2016/01/python.html)
