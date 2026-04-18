@@ -13,7 +13,7 @@ yazmak olacak.
 cargo install osm4routing
 ```
 
-Örnek olarak Şeysel (Seychelles) adalarına bakalım, ufak bir dosya
+Örnek olarak Seyşel (Seychelles) adalarına bakalım, ufak bir dosya
 olduğu için örnekleri göstermek işletmek hızlı olur. Haritası Afrika
 dizini altında, oradaki osm.pbf dosyası indirilir.  `$HOME/Downloads`
 altında olduğunu farzedelim,
@@ -512,4 +512,7 @@ Kaynaklar
 [7] <a href="https://burakbayramli.github.io/dersblog/algs/algs_035_dijks/dijkstra_algoritmasi_ile_en_kisa_yol.html">Dijkstra Algoritması ile En Kısa Yol</a>
 
 [8] <a href="https://www.ics.uci.edu/~eppstein/161/python/">University of California Bilgisayar Bilim Kodları</a>
+
+
+
 
