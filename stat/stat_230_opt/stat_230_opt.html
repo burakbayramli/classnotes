@@ -213,6 +213,55 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <pre class="text"><code>minimum nokta [-0.9798643   0.95965552]
 minimum deger 0.00042834457379303055
 Kabul Orani: 20.52%</code></pre>
+<h3 id="parcacik-filtreleri">Parcacik Filtreleri</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>n_particles <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n_steps <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n_mcmc_steps <span class="op">=</span> <span class="dv">5</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>proposal_var <span class="op">=</span> <span class="fl">0.005</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>T_start <span class="op">=</span> <span class="fl">100.0</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>T_end <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>particles <span class="op">=</span> np.zeros((n_particles, <span class="dv">2</span>))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>particles[:, <span class="dv">0</span>] <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, n_particles)   <span class="co"># Initial X</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>particles[:, <span class="dv">1</span>] <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">3</span>, <span class="dv">10</span>, n_particles)  <span class="co"># Initial Y</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># dikkat linspace degil, geomspace, logaritmic azalma yapiliyor</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>temperatures <span class="op">=</span> np.geomspace(T_start, T_end, n_steps)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>min_val <span class="op">=</span> <span class="bu">float</span>(<span class="st">&#39;inf&#39;</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>min_coord <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">0</span>]</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> T_curr <span class="kw">in</span> temperatures:</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    energies <span class="op">=</span> Rosenbrock(particles[:, <span class="dv">0</span>], particles[:, <span class="dv">1</span>])</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    step_min_idx <span class="op">=</span> np.argmin(energies)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> energies[step_min_idx] <span class="op">&lt;</span> min_val:</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        min_val <span class="op">=</span> energies[step_min_idx]</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        min_coord <span class="op">=</span> particles[step_min_idx].copy()</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    unnorm_weights <span class="op">=</span> np.exp(<span class="op">-</span>(energies <span class="op">-</span> np.<span class="bu">min</span>(energies)) <span class="op">/</span> T_curr)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> unnorm_weights <span class="op">/</span> np.<span class="bu">sum</span>(unnorm_weights)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> np.random.choice(np.arange(n_particles), size<span class="op">=</span>n_particles, p<span class="op">=</span>weights)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    particles <span class="op">=</span> particles[indices]</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    curr_energies <span class="op">=</span> Rosenbrock(particles[:, <span class="dv">0</span>], particles[:, <span class="dv">1</span>])</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_mcmc_steps):</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        noise <span class="op">=</span> np.random.normal(<span class="dv">0</span>, np.sqrt(proposal_var), size<span class="op">=</span>(n_particles, <span class="dv">2</span>))</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        prop <span class="op">=</span> particles <span class="op">+</span> noise        </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        prop_energies <span class="op">=</span> Rosenbrock(prop[:, <span class="dv">0</span>], prop[:, <span class="dv">1</span>])        </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        diff <span class="op">=</span> (curr_energies <span class="op">-</span> prop_energies) <span class="op">/</span> T_curr</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        alpha <span class="op">=</span> np.exp(np.clip(diff, <span class="op">-</span><span class="dv">100</span>, <span class="dv">0</span>))</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        accept <span class="op">=</span> np.random.uniform(size<span class="op">=</span>n_particles) <span class="op">&lt;</span> alpha</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        particles[accept] <span class="op">=</span> prop[accept]</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        curr_energies[accept] <span class="op">=</span> prop_energies[accept]</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Final Best Coord: </span><span class="sc">{</span>min_coord<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Final Best Value: </span><span class="sc">{</span>min_val<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Final Best Coord: [-1.00018448  1.00031523]
+Final Best Value: 3.2312280609237785e-07</code></pre>
 <p>[devam edecek]</p>
 <p>
   <a href="..">Yukarı</a>

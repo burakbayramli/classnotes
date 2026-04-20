@@ -2,6 +2,7 @@
 
 
 
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -142,9 +143,60 @@ minimum deger 0.00042834457379303055
 Kabul Orani: 20.52%
 ```
 
+### Parcacik Filtreleri
 
+```python
+n_particles = 1000
+n_steps = 100
+n_mcmc_steps = 5 
+proposal_var = 0.005
+T_start = 100.0
+T_end = 1
 
+particles = np.zeros((n_particles, 2))
+particles[:, 0] = np.random.uniform(-3, 3, n_particles)   # Initial X
+particles[:, 1] = np.random.uniform(-3, 10, n_particles)  # Initial Y
 
+# dikkat linspace degil, geomspace, logaritmic azalma yapiliyor
+temperatures = np.geomspace(T_start, T_end, n_steps)
+
+min_val = float('inf')
+min_coord = [0, 0]
+
+for T_curr in temperatures:
+    energies = Rosenbrock(particles[:, 0], particles[:, 1])
+    
+    step_min_idx = np.argmin(energies)
+    if energies[step_min_idx] < min_val:
+        min_val = energies[step_min_idx]
+        min_coord = particles[step_min_idx].copy()
+    
+    unnorm_weights = np.exp(-(energies - np.min(energies)) / T_curr)
+    weights = unnorm_weights / np.sum(unnorm_weights)
+    
+    indices = np.random.choice(np.arange(n_particles), size=n_particles, p=weights)
+    particles = particles[indices]
+    
+    curr_energies = Rosenbrock(particles[:, 0], particles[:, 1])
+    
+    for _ in range(n_mcmc_steps):
+        noise = np.random.normal(0, np.sqrt(proposal_var), size=(n_particles, 2))
+        prop = particles + noise        
+        prop_energies = Rosenbrock(prop[:, 0], prop[:, 1])        
+        diff = (curr_energies - prop_energies) / T_curr
+        alpha = np.exp(np.clip(diff, -100, 0))
+        accept = np.random.uniform(size=n_particles) < alpha
+        particles[accept] = prop[accept]
+        curr_energies[accept] = prop_energies[accept]
+
+print(f"Final Best Coord: {min_coord}")
+print(f"Final Best Value: {min_val}")
+```
+
+```text
+Final Best Coord: [-1.00018448  1.00031523]
+Final Best Value: 3.2312280609237785e-07
+```
 
 
 
