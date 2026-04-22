@@ -186,6 +186,83 @@ yükü arttırıp hesap algoritmasinin yavaşlatacaktır. Monte Carlo yaklaşım
 "boyut laneti (the curse of dimensionality)'' denen kavramdan korunaklıdır, $N$
 arttıkça performansı artar, ve bu $N$ sayısı boyut $D$ ile bağlantılı değildir.
 
+[PF Cebir Ekle]
+
+
+Ornek
+
+```python
+# Your target distribution
+def p(x):
+    mu1 = 3; mu2 = 10; v1 = 10; v2 = 3
+    return 0.3 * np.exp(-(x - mu1)**2 / v1) + 0.7 * np.exp(-(x - mu2)**2 / v2)
+
+# --- SMC Parameters ---
+n_particles = 1000    # Number of parallel "trackers"
+n_steps = 20          # Number of intermediate "frames" (temperatures)
+sigma_mcmc = 2.0      # The "jiggle" width for the Mutation step
+
+# 1. Initialization (Prior)
+# We start by spreading particles uniformly across the domain
+particles = np.random.uniform(-10, 20, n_particles)
+weights = np.ones(n_particles) / n_particles
+
+# Temperature schedule (Linear bridge from 0 to 1)
+betas = np.linspace(0, 1, n_steps)
+
+# --- SMC Main Loop ---
+for t in range(1, n_steps):
+    # A. REWEIGHTING (Observation Step)
+    # We update weights based on the ratio: p(x)^beta_new / p(x)^beta_old
+    # This is where particles "sense" the distribution getting sharper
+    delta_beta = betas[t] - betas[t-1]
+    
+    # We use a small epsilon to avoid division by zero if p(x) is tiny
+    incremental_weights = np.power(np.maximum(p(particles), 1e-10), delta_beta)
+    weights *= incremental_weights
+    weights /= np.sum(weights)  # Normalize
+    
+    # B. RESAMPLING (The Survival Step)
+    # Just like in vision: particles with low weights die, high weights are cloned.
+    # We check Effective Sample Size (ESS) to decide if we resample
+    ess = 1.0 / np.sum(weights**2)
+    if ess < n_particles / 2:
+        indices = np.random.choice(np.arange(n_particles), size=n_particles, p=weights)
+        particles = particles[indices]
+        weights = np.ones(n_particles) / n_particles
+        
+    # C. MUTATION (The "Jiggle" / MCMC Step)
+    # This prevents the "cloud" from collapsing into a single point.
+    # We run a few Metropolis steps for each particle.
+    for _ in range(3):
+        proposals = particles + np.random.normal(0, sigma_mcmc, n_particles)
+        # Acceptance ratio for the current temperature betas[t]
+        ratio = (p(proposals)**betas[t]) / (p(particles)**betas[t])
+        accept = np.random.rand(n_particles) < ratio
+        particles[accept] = proposals[accept]
+    
+# --- Visualization ---
+x_plot = np.arange(-10, 20, 0.1)
+px_plot = p(x_plot)
+px_norm = px_plot / np.trapezoid(px_plot, x_plot)
+
+plt.figure(figsize=(12, 6))
+
+# Plot Final SMC Result
+plt.hist(particles, bins=40, density=True, alpha=0.5, label='SMC Final Particles', color='teal')
+plt.plot(x_plot, px_norm, 'r--', linewidth=2, label='True Target p(x)')
+
+plt.title(f"SMC Sampler: Tracking a Static Distribution ({n_particles} particles)")
+plt.xlabel("Value")
+plt.ylabel("Density")
+plt.legend()
+
+plt.savefig('stat_095_mcint_01.jpg')
+```
+
+![](stat_095_mcint_01.jpg)
+
+
 Kaynaklar
 
 [1] Zhao, *Monte Carlo integration in Python over univariate and multivariate functions*,

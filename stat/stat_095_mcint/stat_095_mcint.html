@@ -265,6 +265,76 @@ kavramdan korunaklıdır, <span class="math inline">\(N\)</span> arttıkça
 performansı artar, ve bu <span class="math inline">\(N\)</span> sayısı
 boyut <span class="math inline">\(D\)</span> ile bağlantılı
 değildir.</p>
+<p>[PF Cebir Ekle]</p>
+<p>Ornek</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Your target distribution</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> p(x):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    mu1 <span class="op">=</span> <span class="dv">3</span><span class="op">;</span> mu2 <span class="op">=</span> <span class="dv">10</span><span class="op">;</span> v1 <span class="op">=</span> <span class="dv">10</span><span class="op">;</span> v2 <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">0.3</span> <span class="op">*</span> np.exp(<span class="op">-</span>(x <span class="op">-</span> mu1)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> v1) <span class="op">+</span> <span class="fl">0.7</span> <span class="op">*</span> np.exp(<span class="op">-</span>(x <span class="op">-</span> mu2)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> v2)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># --- SMC Parameters ---</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>n_particles <span class="op">=</span> <span class="dv">1000</span>    <span class="co"># Number of parallel &quot;trackers&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>n_steps <span class="op">=</span> <span class="dv">20</span>          <span class="co"># Number of intermediate &quot;frames&quot; (temperatures)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>sigma_mcmc <span class="op">=</span> <span class="fl">2.0</span>      <span class="co"># The &quot;jiggle&quot; width for the Mutation step</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Initialization (Prior)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># We start by spreading particles uniformly across the domain</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>particles <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, n_particles)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.ones(n_particles) <span class="op">/</span> n_particles</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Temperature schedule (Linear bridge from 0 to 1)</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_steps)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- SMC Main Loop ---</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_steps):</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A. REWEIGHTING (Observation Step)</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We update weights based on the ratio: p(x)^beta_new / p(x)^beta_old</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This is where particles &quot;sense&quot; the distribution getting sharper</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    delta_beta <span class="op">=</span> betas[t] <span class="op">-</span> betas[t<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We use a small epsilon to avoid division by zero if p(x) is tiny</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    incremental_weights <span class="op">=</span> np.power(np.maximum(p(particles), <span class="fl">1e-10</span>), delta_beta)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">*=</span> incremental_weights</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">/=</span> np.<span class="bu">sum</span>(weights)  <span class="co"># Normalize</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># B. RESAMPLING (The Survival Step)</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Just like in vision: particles with low weights die, high weights are cloned.</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We check Effective Sample Size (ESS) to decide if we resample</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    ess <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> np.<span class="bu">sum</span>(weights<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ess <span class="op">&lt;</span> n_particles <span class="op">/</span> <span class="dv">2</span>:</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> np.random.choice(np.arange(n_particles), size<span class="op">=</span>n_particles, p<span class="op">=</span>weights)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        particles <span class="op">=</span> particles[indices]</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones(n_particles) <span class="op">/</span> n_particles</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># C. MUTATION (The &quot;Jiggle&quot; / MCMC Step)</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This prevents the &quot;cloud&quot; from collapsing into a single point.</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We run a few Metropolis steps for each particle.</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        proposals <span class="op">=</span> particles <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_mcmc, n_particles)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Acceptance ratio for the current temperature betas[t]</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        ratio <span class="op">=</span> (p(proposals)<span class="op">**</span>betas[t]) <span class="op">/</span> (p(particles)<span class="op">**</span>betas[t])</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>        accept <span class="op">=</span> np.random.rand(n_particles) <span class="op">&lt;</span> ratio</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>        particles[accept] <span class="op">=</span> proposals[accept]</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Visualization ---</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>x_plot <span class="op">=</span> np.arange(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, <span class="fl">0.1</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>px_plot <span class="op">=</span> p(x_plot)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>px_norm <span class="op">=</span> px_plot <span class="op">/</span> np.trapezoid(px_plot, x_plot)</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Final SMC Result</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>plt.hist(particles, bins<span class="op">=</span><span class="dv">40</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&#39;SMC Final Particles&#39;</span>, color<span class="op">=</span><span class="st">&#39;teal&#39;</span>)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>plt.plot(x_plot, px_norm, <span class="st">&#39;r--&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;True Target p(x)&#39;</span>)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f&quot;SMC Sampler: Tracking a Static Distribution (</span><span class="sc">{</span>n_particles<span class="sc">}</span><span class="ss"> particles)&quot;</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Value&quot;</span>)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_095_mcint_01.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_095_mcint_01.jpg" /></p>
 <p>Kaynaklar</p>
 <p>[1] Zhao, <em>Monte Carlo integration in Python over univariate and
 multivariate functions</em>, <a
