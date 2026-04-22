@@ -493,6 +493,64 @@ Veri içinden bir mahkumun verisini kenarar ayırdık ve onun tekrar suç
 işleyip işlemediğini tahmin etmeye çalıştık. Üstteki tahminde bu
 ihtimal düşük görülüyor, ve hakikaten de bu kişi yakalanmamış.
 
+Özetlemek gerekirse: Bayes yaklaşımın temelinde, veriyi gördükten
+sonra güncellediğimiz bilgiler yatar. Rossi örneğinde amacımız,
+mahkumların tekrar suç işleme riskini belirleyen parametrelerin
+($\theta$) en doğru değerlerini bulmaktır. Bayes metodunda sonsal
+dağılım ($p(\theta|D)$), modelin veriyi ne kadar iyi açıkladığı
+(olurluk -likelihood-) ile bizim başlangıçtaki varsayımlarımızın
+(onsel / prior) çarpımına eşittir (ya da log uzayında toplamına).
+
+Parametreler hakkında önceden çok baskın bir fikrimiz olmadığını
+belirtmek için "zayıf bilgilendirici" Gaussian (Normal) dağılımlar
+seçilmiştir. Bu sayede sonuçlar bizim önyargılarımızdan ziyade
+verinin kendisine dayanır:
+
+* $\log \lambda_{0} \sim \mathcal{N}(0, 10)$ ve $\log k \sim
+  \mathcal{N}(0, 10)$.
+
+* Katsayılar (Yaş, mali yardım vb.): Her bir $\beta_{j} \sim
+  \mathcal{N}(0, 10)$.
+
+Log-Sonsal (Log-Posterior)
+
+Hesaplamalarda sayısal kararlılığı korumak için çarpma işlemleri
+yerine toplama yapılabilen logaritmik uzay kullanılır. Toplam sonsal
+değerimiz, veriden gelen olurluk ile parametrelerden gelen önsel
+değerlerin toplamıdır:
+
+$$\log p(\theta|veri) \propto \text{Log-Olurluk} + \sum
+\text{Log-Önseller}$$
+
+Hazırladığınız `log_posterior` fonksiyonu, yukarıdaki cebirsel
+formülün Python dilindeki doğrudan karşılığıdır:
+
+| Bileşen | Matematiksel Karşılık | Kod Satırı (Kaynak: Rossi Uygulaması) |
+| :--- | :--- | :--- |
+| Önsel (Lambda) | $\log p(\log \lambda_{0})$ | `lp = -0.5 * (log_lam0  2) / 100` |
+| Önsel (Şekil) | $\log p(\log k)$ | `lp += -0.5 * (log_k  2) / 100` |
+| Önsel (Katsayılar) | $\sum \log p(\beta_{j})$ | `lp += -0.5 * np.sum(beta  2) / 100` |
+| Olurluk (Veri) | $\sum [\delta_{i} \log h_{i} - H_{i}]$ | `ll = np.sum(delta_train * log_h - H)` |
+| Sonsal (Sonuç) | $ll + lp$ | `return ll + lp` |
+
+Algoritma Üzerindeki Etkisi
+
+Bu hesaplama, Metropolis adımının karar merkezi olarak
+çalışır. Algoritma her adımda parametreler için yeni bir değer önerir
+ve şu mantığı yürütür:
+
+* Yeni önerilen parametrelerin sonsal olasılığı (`log_post_prop`),
+  mevcut olandan (`log_post_curr`) daha yüksekse veya rastgele kabul
+  kriterine uyuyorsa, bu yeni değer kabul edilir.
+
+* Bu süreç binlerce kez tekrarlandığında (örneğin 50.000 iterasyon),
+  elde ettiğimiz örnekler mahkumların gerçek risk parametrelerini
+  yansıtan bir dağılım oluşturur.
+
+Bu yapı sayesinde, Rossi verisindeki yaş veya mali yardım gibi
+değişkenlerin mahkumun "sağkalım" süresini nasıl etkilediğini
+istatistiksel olarak modellemiş oluyoruz.
+
 Kayıp Tahmini (Churn Prediction)
 
 Yapay öğrenmenin en zorlu problemlerinden birine, kayıp müşteri
@@ -647,12 +705,20 @@ alma aralıklarında model tarafından açıklanamayan önemli bir
 heterojenlik mevcuttur; bu da perakende verisi için beklenen bir
 sonuçtur.
 
-Kapatmadan önce üstteki kodun test etme stratejisine de değinelim;
-veri içine düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen
-verileri eğitim için diğerlerini test için ayırdık, tabii ki sağdan
-sansür kavramı da bu kesim (cutoff) noktasına göre ayarlandı. Yani
+Üstteki kodun test etme stratejisine de biraz değinelim; veri içine
+düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen verileri
+eğitim için diğerlerini test için ayırdık, tabii ki sağdan sansür
+kavramı da bu kesim (çutoff) noktasına göre ayarlandı. Yani
 hesapladığımız test sonuçları regresyonun bakmadığı ve bilgisinin
 olmadığı veriler üzerinden gerçekleştirilmiştir.
+
+Buradaki yaklaşımı [2] ile karşılaştırırsak oradaki yapay sınır ağı
+(RNN) kullanımını görüyoruz. [2] katsayıları bir RNN'e geçiyor, bizim
+yaklaşım Bayes metotu ile her parametreye bir dağılım atayarak bir
+sonsal dağılım elde ediyor. RNN noktasal tahmin yapar, Bayes sonuçları
+ise tüm sonsal dağılımı elde eder. İkincisi üzerinde ek çıkarımlar
+yapmak daha kolaydır, kesinlik, güven aralıkları türü hesapları
+kolayca başarabiliriz.
 
 Kodlar
 

@@ -582,6 +582,103 @@ Sonsal ortalama S(52) = 0.825
 <p>Veri içinden bir mahkumun verisini kenarar ayırdık ve onun tekrar suç
 işleyip işlemediğini tahmin etmeye çalıştık. Üstteki tahminde bu ihtimal
 düşük görülüyor, ve hakikaten de bu kişi yakalanmamış.</p>
+<p>Özetlemek gerekirse: Bayes yaklaşımın temelinde, veriyi gördükten
+sonra güncellediğimiz bilgiler yatar. Rossi örneğinde amacımız,
+mahkumların tekrar suç işleme riskini belirleyen parametrelerin (<span
+class="math inline">\(\theta\)</span>) en doğru değerlerini bulmaktır.
+Bayes metodunda sonsal dağılım (<span
+class="math inline">\(p(\theta|D)\)</span>), modelin veriyi ne kadar iyi
+açıkladığı (olurluk -likelihood-) ile bizim başlangıçtaki
+varsayımlarımızın (onsel / prior) çarpımına eşittir (ya da log uzayında
+toplamına).</p>
+<p>Parametreler hakkında önceden çok baskın bir fikrimiz olmadığını
+belirtmek için “zayıf bilgilendirici” Gaussian (Normal) dağılımlar
+seçilmiştir. Bu sayede sonuçlar bizim önyargılarımızdan ziyade verinin
+kendisine dayanır:</p>
+<ul>
+<li><p><span class="math inline">\(\log \lambda_{0} \sim \mathcal{N}(0,
+10)\)</span> ve <span class="math inline">\(\log k \sim \mathcal{N}(0,
+10)\)</span>.</p></li>
+<li><p>Katsayılar (Yaş, mali yardım vb.): Her bir <span
+class="math inline">\(\beta_{j} \sim \mathcal{N}(0,
+10)\)</span>.</p></li>
+</ul>
+<p>Log-Sonsal (Log-Posterior)</p>
+<p>Hesaplamalarda sayısal kararlılığı korumak için çarpma işlemleri
+yerine toplama yapılabilen logaritmik uzay kullanılır. Toplam sonsal
+değerimiz, veriden gelen olurluk ile parametrelerden gelen önsel
+değerlerin toplamıdır:</p>
+<p><span class="math display">\[\log p(\theta|veri) \propto
+\text{Log-Olurluk} + \sum
+\text{Log-Önseller}\]</span></p>
+<p>Hazırladığınız <code>log_posterior</code> fonksiyonu, yukarıdaki
+cebirsel formülün Python dilindeki doğrudan karşılığıdır:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Bileşen</th>
+<th style="text-align: left;">Matematiksel Karşılık</th>
+<th style="text-align: left;">Kod Satırı (Kaynak: Rossi Uygulaması)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Önsel (Lambda)</td>
+<td style="text-align: left;"><span class="math inline">\(\log p(\log
+\lambda_{0})\)</span></td>
+<td
+style="text-align: left;"><code>lp = -0.5 * (log_lam0  2) / 100</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Önsel (Şekil)</td>
+<td style="text-align: left;"><span class="math inline">\(\log p(\log
+k)\)</span></td>
+<td
+style="text-align: left;"><code>lp += -0.5 * (log_k  2) / 100</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Önsel (Katsayılar)</td>
+<td style="text-align: left;"><span class="math inline">\(\sum \log
+p(\beta_{j})\)</span></td>
+<td
+style="text-align: left;"><code>lp += -0.5 * np.sum(beta  2) / 100</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Olurluk (Veri)</td>
+<td style="text-align: left;"><span class="math inline">\(\sum
+[\delta_{i} \log h_{i} - H_{i}]\)</span></td>
+<td
+style="text-align: left;"><code>ll = np.sum(delta_train * log_h - H)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sonsal (Sonuç)</td>
+<td style="text-align: left;"><span class="math inline">\(ll +
+lp\)</span></td>
+<td style="text-align: left;"><code>return ll + lp</code></td>
+</tr>
+</tbody>
+</table>
+<p>Algoritma Üzerindeki Etkisi</p>
+<p>Bu hesaplama, Metropolis adımının karar merkezi olarak çalışır.
+Algoritma her adımda parametreler için yeni bir değer önerir ve şu
+mantığı yürütür:</p>
+<ul>
+<li><p>Yeni önerilen parametrelerin sonsal olasılığı
+(<code>log_post_prop</code>), mevcut olandan
+(<code>log_post_curr</code>) daha yüksekse veya rastgele kabul kriterine
+uyuyorsa, bu yeni değer kabul edilir.</p></li>
+<li><p>Bu süreç binlerce kez tekrarlandığında (örneğin 50.000
+iterasyon), elde ettiğimiz örnekler mahkumların gerçek risk
+parametrelerini yansıtan bir dağılım oluşturur.</p></li>
+</ul>
+<p>Bu yapı sayesinde, Rossi verisindeki yaş veya mali yardım gibi
+değişkenlerin mahkumun “sağkalım” süresini nasıl etkilediğini
+istatistiksel olarak modellemiş oluyoruz.</p>
 <p>Kayıp Tahmini (Churn Prediction)</p>
 <p>Yapay öğrenmenin en zorlu problemlerinden birine, kayıp müşteri
 problemine bakalım. Kayıp tahmini, endüstrideki en yaygın yapay öğrenme
@@ -759,12 +856,19 @@ e^{0.229} \approx 1.26\)</span> anlamına gelir. Bu oldukça geniş bir
 log-normal dağılıma işaret eder - satın alma aralıklarında model
 tarafından açıklanamayan önemli bir heterojenlik mevcuttur; bu da
 perakende verisi için beklenen bir sonuçtur.</p>
-<p>Kapatmadan önce üstteki kodun test etme stratejisine de değinelim;
-veri içine düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen
-verileri eğitim için diğerlerini test için ayırdık, tabii ki sağdan
-sansür kavramı da bu kesim (cutoff) noktasına göre ayarlandı. Yani
-hesapladığımız test sonuçları regresyonun bakmadığı ve bilgisinin
-olmadığı veriler üzerinden gerçekleştirilmiştir.</p>
+<p>Üstteki kodun test etme stratejisine de biraz değinelim; veri içine
+düşen bir tarih seçtik, ve bu tarihin bir tarafına düşen verileri eğitim
+için diğerlerini test için ayırdık, tabii ki sağdan sansür kavramı da bu
+kesim (çutoff) noktasına göre ayarlandı. Yani hesapladığımız test
+sonuçları regresyonun bakmadığı ve bilgisinin olmadığı veriler üzerinden
+gerçekleştirilmiştir.</p>
+<p>Buradaki yaklaşımı [2] ile karşılaştırırsak oradaki yapay sınır ağı
+(RNN) kullanımını görüyoruz. [2] katsayıları bir RNN’e geçiyor, bizim
+yaklaşım Bayes metotu ile her parametreye bir dağılım atayarak bir
+sonsal dağılım elde ediyor. RNN noktasal tahmin yapar, Bayes sonuçları
+ise tüm sonsal dağılımı elde eder. İkincisi üzerinde ek çıkarımlar
+yapmak daha kolaydır, kesinlik, güven aralıkları türü hesapları kolayca
+başarabiliriz.</p>
 <p>Kodlar</p>
 <p><a href="churn.py">churn.py</a></p>
 <p>Kaynaklar</p>
