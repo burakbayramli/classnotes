@@ -1,4 +1,6 @@
-# Kalman Filtreleri
+# Kalman ve Parçacık Filtreleri
+
+### Kalman Filtreleri
 
 Diyelim ki bir video kameradan gelen imajları kullanarak obje takip eden bir
 yazılım istiyoruz. Matematiksel olarak obje nedir? İmajı nedir? obje kendi
@@ -803,6 +805,253 @@ plt.savefig('tser_kf_02.png')
 
 ![](tser_kf_02.png)
 
+### Parcaçık Filtreleri
+
+Parcaçık filtreleri Kalman filtrelerinde olduğu gibi saklı bir konum
+bilgisi hakkında dış ölçümler üzerinden kestirme hesabı yapabilir. Her
+parçacık bir hipotezi, farklı bir konum bilgisini temsil eder,
+olasılığı, olurluğu ölçüm fonksiyonudur.
+
+
+Bu modelde gözlemler, yani dışarıdan görülen ölçümler $y_1,y_2,..$ ve bu rasgele
+değişkenler şartsal olarak eğer $x_0,x_1,.$ verili ise birbirlerinden
+bağımsızlar. Model,
+
+$\pi(x_0)$ başlangıç dağılımı
+
+$f(x_t|x_{t-1})$, $t \ge 1$ geçiş fonksiyonu
+
+$g(y_t|x_t)$, $t \ge 1$, gözlemlerin dağılımı
+
+$x_{0:t} = (x_0,..,x_t)$, $t$ anına kadar olan gizli konum zinciri
+
+$y_{1:t} = (y_1,..,y_t)$, $t$ anına kadar olan gözlemler
+
+Genel olarak filtreleme işleminin yaptığı şudur: nasıl davrandığını, ve
+dışarıdan görülebilen bir ölçütü olasılıksal olarak dışarı nasıl yansıttığını
+bildiğimiz bir sistemi, sadece bu ölçümlerine bakarak nasıl davrandığını
+anlamak, ve bunu sadece en son noktaya bakarak yapmak, yani sistemin konumu
+hakkındaki tahminimizi sürekli güncellemek.
+
+Mesela bir obje zikzak çizerek hareket ediyor. Bu zikzak hareketinin formülleri
+vardır, bu hareketi belli bir hata payıyla modelleriz. Fakat bu hareket 3
+boyutta, diyelim ki biz sadece 2 boyutlu dijital imajlar üzerinden bu objeyi
+görüyoruz. 3D/2D geçişi bir yansıtma işlemidir ve bir matris çarpımı ile temsil
+edilebilir, fakat bu geçiş sırasında bir kayıp olur, derinlik bilgisi gider,
+artı bir ölçüm gürültüsü orada eklenir diyelim. Fakat tüm bunlara rağmen, sadece
+eldeki en son imaja bakarak bu objenin yerini tahmin etmek mümkündür.
+
+Mesela zikzaklı harekete yandan bakıyor olsak obje sağa giderken bir bizden
+uzaklaşacak yani 2 boyutta küçülecek, ya da yakınlaşacak yani 2 boyutta
+büyüyecek. Tüm bu acaipliğe (!) rağmen eğer yansıtma modeli doğru kodlanmış
+ise filtre yeri tespit eder. Her parçacık farklı bir obje konumu hakkında
+bir hipotez olur, sonra objenin hareketi zikzak modeline göre, algoritmanin
+kendi zihninde yapılır, bu geçiş tüm parçacıklar / hipotezler üzerinde
+işletilir, sonra yine tüm parçacıklar ölçüm modeli üzerinden
+yansıtılır. Son olarak eldeki veri ile bu yansıtma arasındaki farka
+bakılır. Hangi parçacıklar daha yakın ise (daha doğrusu hangi ölçümün
+olasılığı mevcut modele göre daha yüksek ise) o parçacıklar hayatta kalır,
+çünkü o parçacıkların hipotezi daha doğrudur, onlar daha "önemli'' hale
+gelir, diğerleri devreden çıkmaya başlar. Böylece yavaşça elimizde hipotez
+doğru olana yaklaşmaya başlar.
+
+Matematiksel olarak belirtmek gerekirse, elde etmek istediğimiz sonsal dağılım
+$p(x_{0:t} | y_{1:t})$ ve ondan elde edilebilecek yan sonuçlar, mesela $p(x_t |
+y_{1:t})$. Bu kısmi (marginal) dağılıma *filtreleme dağılımı* ismi de
+veriliyor, kısmi çünkü $x_{1:t-1}$ entegre edilip dışarı çıkartılmış. Bir diğer
+ilgilenen yan ürün $\phi$ üzerinden $p(x_{0:t} | y_{1:t})$'nin beklentisi, ona
+$I$ diyelim,
+
+$$ I(f_t) = \int \phi_t(x_{0:t}) p(x_{0:t} | y_{1:t}) \mathrm{d} x_{0:t} $$
+
+En basit durumda eğer $\phi_t(x_{0:t}) =x_{0:t}$ alırsak, o zaman şartsal
+ortalama (conditional mean) elde ederiz. Farklı fonksiyonlar da mümkündür [6].
+
+Üstteki entegrali $x_{0:t} | y_{1:t}$'den örneklem alarak ve entegrali
+toplam haline getirerek yaklaşıksal şekilde hesaplayabileceğimizi [7]
+yazısında gördük. Fakat $x_{0:t} | y_{1:t}$'den örnekleyemiyoruz. Bu
+durumda yine aynı yazıda görmüştük ki örneklenebilen başka bir dağılımı baz
+alarak örneklem yapabiliriz, bu tekniğe önemsel örnekleme (importance
+sampling) adı veriliyordu. Mesela mesela herhangi bir yoğunluk $h(x_{0:t})$
+üzerinden,
+
+$$ I = \int
+\phi(x_{0:t})
+\frac{ p(x_{0:t}|y_{1:t}) }{ h(x_{0:t}) } h_{0:t} \mathrm{d} x_{0:t}
+$$
+
+yaklaşıksal olarak
+
+$$ \hat{I} = \frac{1}{N} \sum_{i=1}^{N} \phi (x^i_{0:t}) w^i_t  $$
+
+ki
+
+$$ 
+w^i_t = \frac{p(x^i_{0:t}|y_{1:t})}{h(x^i_{0:t})} 
+\tag{1} 
+$$
+
+ve bağımsız özdeşçe dağılmış (i.i.d.) $x^1_{0:t}, .., x^N_{0:t} \sim h$
+olacak şekilde. Yani örneklem $h$'den alınıyor.
+
+Bu güzel, fakat acaba $w^i_t$ formülündeki $p(x^i_{0:t}|y_{1:t})$'yi nasıl
+hesaplayacağız? Ayrıca $h$ nasıl seçilecek? Acaba üstteki hesap özyineli olarak
+yapılamaz mı, yani tüm $1:t$ ölçümlerini bir kerede kullanmadan, $t$ andaki
+hesap sadece $t-1$ adımındaki hesaba bağlı olsa hesapsal olarak daha iyi olmaz
+mı?
+
+Bu mümkün. Mesela önemsel dağılım $h$ için,
+
+$$ 
+h(x_{0:t}) = h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) 
+\tag{2}
+$$
+
+Üstteki ifade koşulsal olasılığın doğal bir sonucu. Peki ağırlıklar özyineli
+olarak hesaplanabilir mi? Bayes Teorisini kullanarak (1)'in bölünen kısmını
+açabiliriz,
+
+$$
+w_t =
+\frac{p(x_{0:t}|y_{1:t})}{h(x_{0:t})} =
+\frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_{0:t})p(y_{1:t}) }
+\tag{3}
+$$
+
+çünkü hatırlarsak $P(A|B) = P(B|A)P(A) / P(B)$, teknik işliyor çünkü
+$P(B,A)=P(A,B)$.  
+
+Şimdi $h(x_{0:t})$ için (2)'de gördüğümüz açılımı yerine koyalım,
+
+$$ w_t =
+\frac{p(y_{1:t}|x_{0:t}) p(x_{0:t})}{h(x_t | x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t}) }
+$$
+
+Ayrıca gözlem dağılımı $g$'yi $p(y_{1:t}|x_{0:t})$'yi, ve gizli geçiş dağılımı
+$f$'i $p(x_{0:t})$ açmak için kullanırsak,
+
+$$ = \frac
+{g(y_t|x_t) p(y_{1:t-1}|x_{0:t-1}) f(x_t|x_{t-1})p(x_{0:t-1}) }
+{h(x_t|x_{0:t-1}) h(x_{{0:t-1}}) p(y_{1:t})}
+$$
+
+Üstteki formülde bölünendeki 2. çarpan 4. çarpan ve bölende ortadaki
+çarpana bakalım, bu aslında (3)'e göre $w_{t-1}$'in tanımı değil mi?
+
+Neredeyse; arada tek bir fark var, bir $p(y_{1:t-1})$ lazım, o üstteki formülde
+yok, ama onu bölünene ekleyebiliriz, o zaman
+
+$$ =
+w_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1})p(y_{1:t-1}) }
+{h(x_t|x_{0:t-1}) p(y_{1:t})}
+$$
+
+Hem $p(y_{1:t})$ hem de $p(y_{1:t})$ birer sabittir, o zaman o değişkenleri
+atarak üstteki eşitliğin oransal doğru olduğunu söyleyebiliriz. Ayrıca bu
+ağırlıkları artık normalize edilmiş parçacıklar bazında düşünürsek,
+$\tilde{w}^i_t = \frac{w_t^i}{\sum_j w_t^j}$, o zaman 
+
+$$
+\tilde{w}^i_{t} \propto
+\tilde{w}^i_{t-1} \frac{g(y_t|x_t) f(x_t|x_{t-1}) } {h(x_t|x_{0:t-1}) }
+$$
+
+Eğer başlangıç dağılımı $x_0^{(1)}, ..., x_0^{(N)} \sim \pi(x_0)$'dan geliyor
+ise, ve biz $h(x_0) = \pi(x_0)$ dersek, ayrıca önem dağılımı $h$ için
+$h(x_t|x_{0:t-1}) = f(x_t|x_{t-1})$ kullanırsak, geriye 
+
+$$
+\tilde{w}^i_{t} \propto \tilde{w}^i_{t-1} g(y_t|x_t)
+$$
+
+kalacaktır.
+
+Burada ilginç bir nokta sistemin geçiş modeli $f$'in önemlilik örneklemindeki
+teklif (proposal) dağılımı olarak kullanılmış olması. 
+
+Tekrar Örnekleme
+
+Buraya kadar gördüklerimiz sıralı önemsel örnekleme (sequential importance
+sampling) algoritması olarak biliniyor. Fakat gerçek dünya uygulamalarında
+görüldü ki ağırlıklar her adımda çarpıla çarpıla dejenere hale geliyorlar. Bir
+ilerleme olarak ağırlıkları her adımda çarpmak yerine her adımda $w_t$ $g$
+üzerinden hesaplanır, ve bir ek işlem daha yapılır, eldeki ağırlıklara göre
+parçacıklardan "tekrar örneklem'' alınır. Bu sayede daha kuvvetli olan
+hipotezlerin hayatta kalması diğerlerinin yokolması sağlanır. 
+
+Nihai parcaçık filtre algoritması şöyledir,
+
+
+`particle_filter`$\left( f, g, y_{1:t} \right)$
+
+
+  * Her $i=1,..,N$ için 
+  
+     * $\tilde{x}_t^{(i)} \sim f(x_t|x_{t-1}^{(i)})$ örneklemini al, ve
+       $\tilde{x}_{0:t}^{(i)} = ( \tilde{x}_{0:t-1}^{(i)},\tilde{x}_{t}^{(i)})$ yap. 
+     * Önemsel ağırlıklar $\tilde{w}_t^{(i)} = g(y_t|\tilde{x}^{{i}})$'ı hesapla.
+     * $N$ tane yeni parçacık $(x_{0:t}^{(i)}; i=1,..,N )$ eski parçacıklar 
+       $\{ \tilde{x}^{(i)}_{0:t},...,\tilde{x}^{(i)}_{0:t} \}$ içinden
+       normalize edilmiş önemsel ağırlıklara göre örnekle. 
+     * $t = t + 1$ 
+
+
+Örnek
+
+Aşağıdaki 2 boyutlu bir düzlemde hareket eden bir robotun konumunu,
+sabit noktalardaki vericilerden (beacon) alınan mesafe ölçümleri
+üzerinden tahmin edeceğiz. Bu problem parçacık filtrelerinin gücünü
+göstermek için idealdir: durum uzayı süreklidir, hareket modeli
+doğrusal olmayabilir, ve ölçüm gürültüsü kolayca Gaussian olmayan bir
+biçim alabilir; bu koşulların hepsinde Kalman filtresi zorlanır,
+parçacık filtresi ise doğrudan uygulanabilir.
+
+Problem kurulumu. $K$ adet verici bilinen $b_k$ konumlarında sabit
+duruyor. Robot her adımda her vericiye olan gerçek mesafeyi, üzerine
+Gaussian gürültü eklenmiş biçimde ölçüyor:
+
+$$y_{t,k} = \|x_t - b_k\| + \mathcal{N}(0, \sigma_{obs}^2)$$
+
+Geçiş modeli. Robotun hareketi Gaussian rasgele yürüyüş ile
+modellenir:
+
+$$x_t = x_{t-1} + \mathcal{N}(0, \sigma_{mov}^2 I)$$
+
+Bu aynı zamanda bootstrap filtre seçimi olarak önerme (proposal)
+dağılımı $h(x_t|x_{t-1}) = f(x_t|x_{t-1})$ olarak kullanılır; bir
+önceki bölümde gördüğümüz gibi bu seçim ağırlık güncellemesini sadece
+ölçüm olurluğuna indirgeyerek basitleştirir.
+
+Ağırlık güncellemesi. Her parçacık $x_t^{(i)}$ için ağırlık, tüm
+vericilerdeki ölçüm hatalarının karelerinin toplamı üzerinden
+hesaplanır. Dokümanın başında tanıttığımız $e^{-\lambda
+\varepsilon^2}$ fonksiyonu burada doğal olarak ortaya çıkar:
+
+$$w_t^{(i)} \propto \exp\!\left(-\lambda \sum_{k=1}^K
+\left(\|x_t^{(i)} - b_k\| - y_{t,k}\right)^2\right)$$
+
+burada $\lambda = 1/(2\sigma_{obs}^2)$ ölçüm modelinin hassasiyet
+parametresidir.
+
+Tekrar örnekleme. Orijinal algoritmada kullanılan yöntem yerine
+sistematik tekrar örnekleme (systematic resampling)
+kullanılmıştır. Her iki yöntem de $O(N)$ maliyetlidir fakat sistematik
+yöntem çok daha düşük varyansa sahiptir: ağırlıklara göre CDF üzerinde
+eşit aralıklı $N$ nokta yerleştirilir, bu sayede yüksek ağırlıklı her
+parçacığın en az $\lfloor N w^{(i)} \rfloor$ kez seçilmesi garanti
+altına alınır.
+
+Kod çıktısında iki grafik göreceksiniz. Sol panelde farklı zaman
+adımlarındaki parçacık bulutları (koyu mavi = daha geç adım) ve tahmin
+edilen yol gösterilmektedir; parçacık bulutunun gerçek konuma nasıl
+yakınsadığı görselleştirilebilir. Sağ panelde ise tahmin edilen konum
+ile gerçek konum arasındaki Öklid hatası zaman içinde
+gösterilmektedir.
+
+Kodlar
+
+[pfdemo.py](pfdemo.py)
+
 Kaynaklar
 
 [1] Gelb, *Applied Optimal Estimation*
@@ -815,7 +1064,10 @@ Kaynaklar
 
 [5] Bayramlı, Zaman Serileri, *Ortalamaya Dönüş ile İşlem*
 
+[6] Gandy, *LTCC - Advanced Computational Methods in Statistics*,
+[http://wwwf.imperial.ac.uk/~agandy/ltcc.html](http://wwwf.imperial.ac.uk/~agandy/ltcc.html)
 
+[7] Bayramlı, Istatistik, *İstatistik, Monte Carlo, Entegraller, MCMC*
 
-
+[8] Bayramlı, Yapay Görüş, *Obje Takibi*
 
