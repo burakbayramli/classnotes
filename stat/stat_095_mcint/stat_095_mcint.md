@@ -1,4 +1,4 @@
-# Monte Carlo, Entegraller
+# Monte Carlo, Entegraller, Sıralı Monte Carlo
 
 Monte Carlo entegrasyonu bir entegral mesela $f(x)$'i sayısal olarak kestirmek
 (estimation), ona yakın bir sonuca sayısal olarak erişmenin
@@ -74,6 +74,10 @@ print(f"Monte Carlo çözümü: {mc_integrate(func1, -2, 2, 500000): .4f}")
 print(f"Analitik çözüm: {func1_int(-2, 2): .4f}")
 ```
 
+```text
+Monte Carlo çözümü:  5.3323
+Analitik çözüm:  5.3333
+```
 ```
 Monte Carlo çözümü:  5.3254
 Analitik çözüm:  5.3333
@@ -186,73 +190,300 @@ yükü arttırıp hesap algoritmasinin yavaşlatacaktır. Monte Carlo yaklaşım
 "boyut laneti (the curse of dimensionality)'' denen kavramdan korunaklıdır, $N$
 arttıkça performansı artar, ve bu $N$ sayısı boyut $D$ ile bağlantılı değildir.
 
-[PF Cebir Ekle]
+### Parçacık Filtreleri
 
+Parçacık filtresini, ya da Sıralı Monte Carlo yaklaşımını anlamak için
+statik tahmin ile dinamik durum-uzayı modelleri arasındaki boşluğu
+kapatmamız gerekiyor. Gereken matematiksel işlemler alttadır.
 
-Ornek
+Monte Carlo İntegrasyonu: Bu konuyu üstte işlemiştik, tekrar üzerinden
+geçelim. Monte Carlo yöntemleri, karmaşık bir integrali, $p(x)$
+dağılımını $N$ adet rastgele örnek (parçacık) kümesiyle
+$\{x^{(i)}\}_{i=1}^N$ temsil ederek yaklaşık olarak hesaplar.
+
+Şu formdaki bir integral için:
+$$I = \int f(x) p(x) dx$$
+
+Bunu sayısal ortalama kullanarak yaklaşık olarak hesaplayabiliriz:
+$$\hat{I} \approx \frac{1}{N} \sum_{i=1}^N f(x^{(i)})$$ burada
+$x^{(i)} \sim p(x)$. $N \to \infty$ iken, tahmin Büyük Sayılar Yasası
+sayesinde gerçek değere yakınsar.
+
+Önem Örneklemesi: Pek çok durumda, "hedef" dağılım $p(x)$'ten doğrudan
+örnekleyemeyiz, çünkü bu dağılım bilinmiyor ya da karmaşık
+olabilir. Bunun yerine, bilinen bir öneri dağılımı $q(x)$'ten
+örnekleme yaparız (önem yoğunluğu olarak da adlandırılır).
+
+İntegrali şu şekilde yeniden yazarız:
+
+$$
+I = \int f(x) \frac{p(x)}{q(x)} q(x) dx
+$$
+
+$w(x) = \frac{p(x)}{q(x)}$ terimi normalleştirilmemiş önem
+ağırlığıdır. Monte Carlo tahmini şu hale gelir:
+
+$$
+\hat{I} \approx \frac{1}{N} \sum_{i=1}^N f(x^{(i)}) w(x^{(i)}) \quad
+\text{burada } x^{(i)} \sim q(x)
+$$
+
+Normalleştirme
+
+Bayesçi filtrelemede, $p(x)$'i çoğunlukla yalnızca bir normalleştirme
+sabitine kadar biliriz (yani $p(x) \propto \pi(x)$). Paydayı
+bilmiyorsak, Öz-Normalleştirilmiş Önem Örneklemesi kullanırız:
+
+$$I \approx \frac{\sum_{i=1}^N f(x^{(i)}) w(x^{(i)})}{\sum_{j=1}^N w(x^{(j)})}$$
+
+Normalleştirilmiş ağırlıkları $W^{(i)} = \frac{w(x^{(i)})}{\sum
+w(x^{(j)})}$ olarak tanımlarsak şunu elde ederiz:
+
+$$\hat{I} \approx \sum_{i=1}^N W^{(i)} f(x^{(i)})$$
+
+Sıralı Önem Örneklemesi (SIS)
+
+$Y_t = y_{1:t}$, $X_t = x_{0:t}$ olduğunu varsayalım.
+
+Şimdi yukarıdakileri, $Y_t$ gözlemlerine dayanarak $X_t$ durum
+dizisini tahmin etmek istediğimiz dinamik bir sisteme
+uyguluyoruz. Hedef dağılım, sonsal dağılım $p(X_t | Y_t)$'dir.
+
+Özyinelemeli Hedef
+
+Bayes kuralını kullanarak, $t$ anındaki sonsal dağılım, $t-1$ anındaki
+sonsal dağılım cinsinden şöyle ifade edilebilir:
+
+$$
+p(X_t | Y_t) \propto p(y_t | x_t) p(x_t | x_{t-1}) p(X_{t-1} |
+Y_{t-1})
+\tag{1}
+$$
+
+Bunu nasıl elde ettik?
+
+Bu, türetmenin en kritik kısmıdır; çünkü o büyük ortak olasılığı küçük, yönetilebilir parçalara ayırmak için Birinci Dereceden Markov Özelliği ve Ölçüm Bağımsızlığı varsayımlarına dayanır. Bir kenara not düşelim; böyle bir çerçeve şu şekilde tanımlanır:
+
+Evrim (veya Geçiş) Modeli:
+   $p(x_t | X_{t-1}) = p(x_t | x_{t-1})$
+   Bu, Markov Özelliğidir. Mevcut durumun, en son duruma koşullu olarak geçmiş durumlardan bağımsız olduğunu belirtir.
+
+Ölçüm (veya Gözlem) Modeli:
+   $p(y_t | X_t, Y_{t-1}) = p(y_t | x_t)$
+   Bu, Ölçüm Bağımsızlığıdır. $t$ anındaki gözlemin, mevcut $x_t$ durumuna koşullu olarak diğer tüm değişkenlerden bağımsız olduğunu belirtir.
+
+Devam ederek (1)'i genişletmek için, sonsal dağılımın tanımından
+başlayıp Bayes Kuralı'nı kullanırız: $P(A, B | C) = P(B | A, C) P(A |
+C)$.
+
+En son ölçümü ($y_t$) ayır
+
+$y_t$'yi "yeni kanıt" olarak, geri kalanı $(\mathbf{X}_t,
+\mathbf{Y}_{t-1})$ ise bağlam olarak ele alıyoruz:
+
+$$p(\mathbf{X}_t | \mathbf{Y}_t) = p(\mathbf{X}_t | y_t,
+\mathbf{Y}_{t-1})$$
+
+Bayes Kuralını uygula:
+
+$$p(\mathbf{X}_t | y_t, \mathbf{Y}_{t-1}) = \frac{p(y_t |
+\mathbf{X}_t, \mathbf{Y}_{t-1}) p(\mathbf{X}_t |
+\mathbf{Y}_{t-1})}{p(y_t | \mathbf{Y}_{t-1})}$$
+
+Yalnızca orantısallığa ($\propto$) ihtiyacımız olduğundan paydayı
+düşürebiliriz:
+
+$$
+p(\mathbf{X}_t | \mathbf{Y}_t) \propto \underbrace{p(y_t | \mathbf{X}_t, \mathbf{Y}_{t-1})}_{\text{A Terimi}} \cdot \underbrace{p(\mathbf{X}_t | \mathbf{Y}_{t-1})}_{\text{B Terimi}}
+$$
+
+A Terimini Basitleştir (Olurluk)
+
+A Terimi: $p(y_t | \mathbf{X}_t, \mathbf{Y}_{t-1})$
+
+Bir GMM'de (Gizli Markov Modeli), $y_t$ ölçümü yalnızca mevcut $x_t$
+durumuna bağlıdır. Geçmiş durumları ($\mathbf{X}_{t-1}$) veya geçmiş
+ölçümleri ($\mathbf{Y}_{t-1}$) dikkate almaz.
+
+Sonuç: $p(y_t | \mathbf{X}_t, \mathbf{Y}_{t-1}) = p(y_t | x_t)$
+
+B Terimini Basitleştir (Tahmin)
+
+B Terimi: $p(\mathbf{X}_t | \mathbf{Y}_{t-1})$
+
+Şimdi $\mathbf{X}_t$ yolunu "mevcut durum" $x_t$ ve "önceki yol"
+$\mathbf{X}_{t-1}$ olarak ayırıyoruz:
+
+$$
+p(x_t, \mathbf{X}_{t-1} | \mathbf{Y}_{t-1}) = p(x_t | \mathbf{X}_{t-1}, \mathbf{Y}_{t-1}) p(\mathbf{X}_{t-1} | \mathbf{Y}_{t-1})
+$$
+
+Bir GMM'de, $x_t$ durumu yalnızca bir önceki $x_{t-1}$ durumuna bağlıdır.
+> Sonuç: $p(x_t | \mathbf{X}_{t-1}, \mathbf{Y}_{t-1}) = p(x_t | x_{t-1})$
+
+Basitleştirilmiş terimleri denkleme geri koy:
+
+$$
+p(\mathbf{X}_t | \mathbf{Y}_t) \propto \underbrace{p(y_t | x_t)}_{\text{A Teriminden}} \cdot \underbrace{p(x_t | x_{t-1}) p(\mathbf{X}_{t-1} | \mathbf{Y}_{t-1})}_{\text{B Teriminden}}
+$$
+
+Bu neden "Özyinelemeli"dir
+
+Son terime bakın: $p(\mathbf{X}_{t-1} | \mathbf{Y}_{t-1})$.  Bu,
+başlangıç noktamızla birebir aynı formdadır; yalnızca bir zaman adımı
+geriye kaydırılmıştır. Bu şu anlama gelir:
+
+* Mevcut inanç, önceki inancın yalnızca ölçeklendirilmiş bir versiyonudur.
+
+* Yeni inancı elde etmek için eskisini alır, "fizik" ile (geçiş)
+  çarpar ve ardından "algılayıcı (sensor)" ile (olurluk) çarparsınız.
+
+Bunu takip etmek için yalnızca iki "Markovian" kuralı kabul etmeniz gerekir:
+Ölçüm Bağımsızlığı: $y_t$ yalnızca $x_t$'yi görür.
+Durum Bağımsızlığı: $x_t$ yalnızca $x_{t-1}$'i hatırlar.
+
+Bu iki kural geçerliyse, devasa ortak olasılık $p(\mathbf{X}_t |
+\mathbf{Y}_t)$ o basit çarpıma kolayca indirgenebilir.
+
+Özyinelemeli Öneri
+
+Benzer şekilde çarpanlara ayrılan bir öneri dağılımı seçeriz:
+$$q(X_t | Y_t) = q(x_t | X_{t-1}, Y_t) q(X_{t-1} | Y_{t-1})$$
+
+Ağırlık Güncellemesi
+
+Tam bir $X_t^{(i)}$ yörüngesi için ağırlık şudur:
+
+$$w_t^{(i)} = \frac{p(X_t^{(i)} | Y_t)}{q(X_t^{(i)} | Y_t)}$$
+
+Yukarıdaki özyinelemeli tanımları yerine koyarak:
+
+$$
+w_t^{(i)} \propto \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)}) p(X_{t-1}^{(i)} | Y_{t-1})}{q(x_t^{(i)} | X_{t-1}^{(i)}, Y_t) q(X_{t-1}^{(i)} | Y_{t-1})}
+$$
+
+Bu, Sıralı Ağırlık Güncellemesine basitleşir:
+
+$$
+w_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)})
+p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | X_{t-1}^{(i)}, Y_t)}
+$$
+
+Not: Öneri dağılımı için en yaygın seçim, geçiş önselidir: $q(x_t |
+x_{t-1}, y_t) = p(x_t | x_{t-1})$.
+
+Bu seçim altında, ağırlık güncellemesi güzel bir biçimde olurluğa
+sadeleşir:
+
+$$
+w_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)})\,
+\cancel{p(x_t^{(i)} | x_{t-1}^{(i)})}}{\cancel{p(x_t^{(i)} |
+x_{t-1}^{(i)})}}
+$$
+
+$$
+w_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
+$$
+
+Parçacık Filtresi (SİR): Standart SİS algoritmasi bozulma problemiyle
+muzdariptir: birkaç döngü sonrasında parçacıkların neredeyse tamamının
+ağırlığı ihmal edilebilir düzeye düşer. Bunu çözmek için bir Yeniden
+Örnekleme adımı ekliyoruz. Etkin örneklem boyutu çok düşerse, mevcut
+ağırlıklı parçacık kümesini, $w_t^{(i)}$ ile orantılı olarak yerine
+koyarak örnekleme yaparak elde edilen yeni bir parçacık kümesiyle
+değiştiririz. Bir diğer deyişle çözüm, ağırlıkla orantılı "seçmek",
+tekrar örnekleme (resampling) kullanmaktır: Parçacıklar, yeni küme
+için normalleştirilmiş ağırlıklarıyla ($w_t^{(i)}$) orantılı bir
+olasılıkla "seçilir". Bu süreç, düşük ağırlıklı parçacıkları eler ve
+yüksek ağırlıklıları çoğaltarak "sürüyü" en olası durumlar üzerinde
+yeniden odaklar.
+
+Yani formülde görülen yeni ağırlığı eski ağırlıkla çarpmak
+($w_{t-1}^{(i)}$ terimi) yerine, yeniden örnekleme
+gerçekleştiririz. Parçacıkları önceki ağırlıklarına göre örnekleyerek,
+"başarılı" ağırlıklar kumulatif ondalık çarpma yoluyla değil,
+parçacıkların *şıklığı* aracılığıyla ileriye taşınır. Her zaman
+adımında yeniden örnekleme yaparız. Bunu yaptığınızda yeniden
+örneklemeden "sağ kurtulan" tüm parçacıklar bir sonraki tura eşit
+ağırlıklarla ($1/L$) başlar. Dolayısıyla $w_{t-1}^{(i)}$, tüm $i$
+değerleri için etkin biçimde bir sabit ($1/L$) haline gelir. Formül
+$w_t^{(i)} \propto \text{sabit} \cdot p(y_t | x_t^{(i)})$ şeklinde
+sadeleşir.
+
+Bu uygulamada, $w_{t-1}^{(i)}$ terimi yeniden örnekleme adımı
+tarafından hesaba katılır. Eski ağırlıklarla çarpmayız, çünkü hangi
+parçacıkların tutulacağını seçmek için o ağırlıkları zaten
+kullanmışızdır. Değerlendirdiğimiz her parçacık zaman adımına "temiz
+bir sayfa" ile başlar ve onu yalnızca yeni olurluk $p(y_t |
+x_t^{(i)})$ ile güncellememiz gerekir.
+
+Örnek
+
+Bir grafikte "yüz takibi" problemini `face.py` içinde bulabilirsiniz,
+örnek [4, sf. 613] Matlab kodundan tercüme edilmiştir. 
+
+Örnek
 
 ```python
-# Your target distribution
+# Hedef dağılımınız
 def p(x):
     mu1 = 3; mu2 = 10; v1 = 10; v2 = 3
     return 0.3 * np.exp(-(x - mu1)**2 / v1) + 0.7 * np.exp(-(x - mu2)**2 / v2)
 
-# --- SMC Parameters ---
-n_particles = 1000    # Number of parallel "trackers"
-n_steps = 20          # Number of intermediate "frames" (temperatures)
-sigma_mcmc = 2.0      # The "jiggle" width for the Mutation step
+# --- SMC Parametreleri ---
+n_particles = 1000    # Paralel "takipçi" sayısı
+n_steps = 20          # Ara "kare" sayısı (sıcaklıklar)
+sigma_mcmc = 2.0      # Mutasyon adımı için "sallama" genişliği
 
-# 1. Initialization (Prior)
-# We start by spreading particles uniformly across the domain
+# 1. Başlatma (Öncül)
+# Parçacıkları alan üzerinde düzgün biçimde yayarak başlıyoruz
 particles = np.random.uniform(-10, 20, n_particles)
 weights = np.ones(n_particles) / n_particles
 
-# Temperature schedule (Linear bridge from 0 to 1)
+# Sıcaklık takvimi (0'dan 1'e doğrusal köprü)
 betas = np.linspace(0, 1, n_steps)
 
-# --- SMC Main Loop ---
+# --- SMC Ana Döngüsü ---
 for t in range(1, n_steps):
-    # A. REWEIGHTING (Observation Step)
-    # We update weights based on the ratio: p(x)^beta_new / p(x)^beta_old
-    # This is where particles "sense" the distribution getting sharper
+    # A. YENİDEN AĞIRLIKLAMA (Gözlem Adımı)
+    # Ağırlıkları şu orana göre güncelliyoruz: p(x)^beta_yeni / p(x)^beta_eski
+    # Parçacıkların dağılımın keskinleştiğini "hissettiği" yer burasıdır
     delta_beta = betas[t] - betas[t-1]
     
-    # We use a small epsilon to avoid division by zero if p(x) is tiny
+    # p(x) çok küçükse sıfıra bölmekten kaçınmak için küçük bir epsilon kullanıyoruz
     incremental_weights = np.power(np.maximum(p(particles), 1e-10), delta_beta)
     weights *= incremental_weights
-    weights /= np.sum(weights)  # Normalize
+    weights /= np.sum(weights)  # Normalleştir
     
-    # B. RESAMPLING (The Survival Step)
-    # Just like in vision: particles with low weights die, high weights are cloned.
-    # We check Effective Sample Size (ESS) to decide if we resample
+    # B. YENİDEN ÖRNEKLEME (Hayatta Kalma Adımı)
+    # Görüdeki gibi: düşük ağırlıklı parçacıklar ölür, yüksek ağırlıklılar klonlanır.
+    # Yeniden örnekleyip örneklemeyeceğimize karar vermek için Etkin Örneklem Boyutu'nu (ESS) kontrol ediyoruz
     ess = 1.0 / np.sum(weights**2)
     if ess < n_particles / 2:
         indices = np.random.choice(np.arange(n_particles), size=n_particles, p=weights)
         particles = particles[indices]
         weights = np.ones(n_particles) / n_particles
         
-    # C. MUTATION (The "Jiggle" / MCMC Step)
-    # This prevents the "cloud" from collapsing into a single point.
-    # We run a few Metropolis steps for each particle.
+    # C. MUTASYON ("Sallama" / MCMC Adımı)
+    # Bu, "bulutun" tek bir noktaya çökmesini önler.
+    # Her parçacık için birkaç Metropolis adımı çalıştırıyoruz.
     for _ in range(3):
         proposals = particles + np.random.normal(0, sigma_mcmc, n_particles)
-        # Acceptance ratio for the current temperature betas[t]
+        # Mevcut sıcaklık betas[t] için kabul oranı
         ratio = (p(proposals)**betas[t]) / (p(particles)**betas[t])
         accept = np.random.rand(n_particles) < ratio
         particles[accept] = proposals[accept]
     
-# --- Visualization ---
+# --- Görselleştirme ---
 x_plot = np.arange(-10, 20, 0.1)
 px_plot = p(x_plot)
 px_norm = px_plot / np.trapezoid(px_plot, x_plot)
-
 plt.figure(figsize=(12, 6))
+# Nihai SMC Sonucunu Çiz
+plt.hist(particles, bins=40, density=True, alpha=0.5, label='SMC Nihai Parcaciklar', color='teal')
+plt.plot(x_plot, px_norm, 'r--', linewidth=2, label='Gercek Hedef p(x)')
 
-# Plot Final SMC Result
-plt.hist(particles, bins=40, density=True, alpha=0.5, label='SMC Final Particles', color='teal')
-plt.plot(x_plot, px_norm, 'r--', linewidth=2, label='True Target p(x)')
-
-plt.title(f"SMC Sampler: Tracking a Static Distribution ({n_particles} particles)")
+plt.title(f"SMC Ornekleyici: Sabit bir Dagilimi Takip  ({n_particles} particles)")
 plt.xlabel("Value")
 plt.ylabel("Density")
 plt.legend()
@@ -262,6 +493,9 @@ plt.savefig('stat_095_mcint_01.jpg')
 
 ![](stat_095_mcint_01.jpg)
 
+Kodlar
+
+[face.py](face.py)
 
 Kaynaklar
 
@@ -272,3 +506,4 @@ Kaynaklar
     
 [3] Pharr, *Physically Based Rendering 3rd Ed*
 
+[4] Barber, *Bayesian Reasoning and Machine Learning*
