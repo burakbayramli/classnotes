@@ -417,10 +417,56 @@ kullanmışızdır. Değerlendirdiğimiz her parçacık zaman adımına "temiz
 bir sayfa" ile başlar ve onu yalnızca yeni olurluk $p(y_t |
 x_t^{(i)})$ ile güncellememiz gerekir.
 
+Basit bir örnek üzerinde ile düşünmek gerekirse mesela elimizde dört
+parçacık olsun, sırasıyla `5`, `10`, `12`, `13` değerleri hipotezini
+taşıyorlar, ve ağırlıkları `5:3`, `10:1`, `12:0.5`, `13:0.1`. Tekrar
+örneklem işleminden sonra `5:0.25`, `5:0.25`, `5:0.25`, `12:0.25`
+parçacıklarına sahip olabiliriz, dikkat edilirse `13` değeri tamamen
+atılmıştır, `5` değerini taşıyan parçacık çoğaltılmıştır, ve ağırlık
+değerleri tamamen birbirine eşittir.
+
 Örnek
 
 Bir grafikte "yüz takibi" problemini `face.py` içinde bulabilirsiniz,
-örnek [4, sf. 613] Matlab kodundan tercüme edilmiştir. 
+örnek [4, sf. 613] Matlab kodundan tercüme edilmiştir.
+
+Bir görüntüde hareket eden bir yüz şekli var. Gizli hareket bir önceki
+konuma eklenen Gaussian gürültüdür, yani Brownian hareket. Bu yüz
+şeklinin şablon olarak şeklini biliyoruz. Peki filtreleme için gereken
+"sinyal" nedir?  Yüz şeklini arayıp buluyor muyuz?
+
+Parcaçık yaklaşımı için bize gereken tüm pikselleri ağırlıklara
+Dönüştürmek. Kod, parçacığın tahmin ettiği yüz görüntüsünü gerçek
+gürültülü görüntüden çıkarır (`np.abs(v_t - v_pred)`) ve üstel
+puanlama yapar, `np.exp(-0.5 * diff)`.
+
+* Fark düşükse (parçacık yüzün üzerindeyse), ağırlık yüksektir.
+
+* Fark yüksekse (parçacık boş alandaysa), ağırlık düşüktür.
+
+Sonuç: Bir Olasılık Haritası. Filtre, yüzü başlangıçta tek bir nokta
+olarak "bulmaz"; bir dağılım oluşturur. "Sinyal", parçacık
+ağırlıklarının bütünsel kümesidir.
+
+Özetle, yüz "bulunur"; çünkü yüz şablonunun siyah pikselleriyle
+örtüşen parçacıklar $p(y_t | x_t)$ skorlarında büyük bir artış
+alırken, "arka plan" gürültüsündeki parçacıklara sıfıra yakın
+ağırlıklar atanır ve bu parçacıklar Yeniden Örnekleme sırasında
+sonunda elenirler.
+
+Ölçüm olurluğunu hatırlayalım, $p(y_t | x_t^{(i)})$. İşte "bulma"
+işlemi `compat` ile oluyor, daha doğrusu algoritmik şekilde arayıp
+bulmak yerine her parçacığa olasılıksal bir soru soruyoruz: "eğer bir
+yüz tam bu parçacığın dediği yerde ($x_t^{(i)}$) olsaydı, sonuç
+görüntü benim şu anda baktığım gürültülü görüntü $y_t$'ye ne kadar
+benzerdi?"
+
+Fark alma bir görüntüyü diğerinden çıkarma kafamızı karıştırmasın,
+sonuçta parçacık hipotezi tek boyutlu Gaussian olsaydı ve elimize
+geçen verinin olurluğunu hesaplamak gerekseydi, bu veriyi Gaussian
+$\mu$ parametresinden çıkartmak gerekmez miydi, çünkü yoğunluğu
+hatırlarsak $f(x) = 1/Z \exp (- (x-\mu)^2 / 2\sigma^2)$, orada bir
+$x-\mu$, çıkartma işlemi var.
 
 Örnek
 

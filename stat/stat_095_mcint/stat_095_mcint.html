@@ -485,10 +485,56 @@ için o ağırlıkları zaten kullanmışızdır. Değerlendirdiğimiz her parç
 zaman adımına “temiz bir sayfa” ile başlar ve onu yalnızca yeni olurluk
 <span class="math inline">\(p(y_t | x_t^{(i)})\)</span> ile
 güncellememiz gerekir.</p>
+<p>Basit bir örnek üzerinde ile düşünmek gerekirse mesela elimizde dört
+parçacık olsun, sırasıyla <code>5</code>, <code>10</code>,
+<code>12</code>, <code>13</code> değerleri hipotezini taşıyorlar, ve
+ağırlıkları <code>5:3</code>, <code>10:1</code>, <code>12:0.5</code>,
+<code>13:0.1</code>. Tekrar örneklem işleminden sonra
+<code>5:0.25</code>, <code>5:0.25</code>, <code>5:0.25</code>,
+<code>12:0.25</code> parçacıklarına sahip olabiliriz, dikkat edilirse
+<code>13</code> değeri tamamen atılmıştır, <code>5</code> değerini
+taşıyan parçacık çoğaltılmıştır, ve ağırlık değerleri tamamen birbirine
+eşittir.</p>
 <p>Örnek</p>
 <p>Bir grafikte “yüz takibi” problemini <code>face.py</code> içinde
 bulabilirsiniz, örnek [4, sf. 613] Matlab kodundan tercüme
 edilmiştir.</p>
+<p>Bir görüntüde hareket eden bir yüz şekli var. Gizli hareket bir
+önceki konuma eklenen Gaussian gürültüdür, yani Brownian hareket. Bu yüz
+şeklinin şablon olarak şeklini biliyoruz. Peki filtreleme için gereken
+“sinyal” nedir? Yüz şeklini arayıp buluyor muyuz?</p>
+<p>Parcaçık yaklaşımı için bize gereken tüm pikselleri ağırlıklara
+Dönüştürmek. Kod, parçacığın tahmin ettiği yüz görüntüsünü gerçek
+gürültülü görüntüden çıkarır (<code>np.abs(v_t - v_pred)</code>) ve
+üstel puanlama yapar, <code>np.exp(-0.5 * diff)</code>.</p>
+<ul>
+<li><p>Fark düşükse (parçacık yüzün üzerindeyse), ağırlık
+yüksektir.</p></li>
+<li><p>Fark yüksekse (parçacık boş alandaysa), ağırlık
+düşüktür.</p></li>
+</ul>
+<p>Sonuç: Bir Olasılık Haritası. Filtre, yüzü başlangıçta tek bir nokta
+olarak “bulmaz”; bir dağılım oluşturur. “Sinyal”, parçacık
+ağırlıklarının bütünsel kümesidir.</p>
+<p>Özetle, yüz “bulunur”; çünkü yüz şablonunun siyah pikselleriyle
+örtüşen parçacıklar <span class="math inline">\(p(y_t | x_t)\)</span>
+skorlarında büyük bir artış alırken, “arka plan” gürültüsündeki
+parçacıklara sıfıra yakın ağırlıklar atanır ve bu parçacıklar Yeniden
+Örnekleme sırasında sonunda elenirler.</p>
+<p>Ölçüm olurluğunu hatırlayalım, <span class="math inline">\(p(y_t |
+x_t^{(i)})\)</span>. İşte “bulma” işlemi <code>compat</code> ile oluyor,
+daha doğrusu algoritmik şekilde arayıp bulmak yerine her parçacığa
+olasılıksal bir soru soruyoruz: “eğer bir yüz tam bu parçacığın dediği
+yerde (<span class="math inline">\(x_t^{(i)}\)</span>) olsaydı, sonuç
+görüntü benim şu anda baktığım gürültülü görüntü <span
+class="math inline">\(y_t\)</span>’ye ne kadar benzerdi?”</p>
+<p>Fark alma bir görüntüyü diğerinden çıkarma kafamızı karıştırmasın,
+sonuçta parçacık hipotezi tek boyutlu Gaussian olsaydı ve elimize geçen
+verinin olurluğunu hesaplamak gerekseydi, bu veriyi Gaussian <span
+class="math inline">\(\mu\)</span> parametresinden çıkartmak gerekmez
+miydi, çünkü yoğunluğu hatırlarsak <span class="math inline">\(f(x) =
+1/Z \exp (- (x-\mu)^2 / 2\sigma^2)\)</span>, orada bir <span
+class="math inline">\(x-\mu\)</span>, çıkartma işlemi var.</p>
 <p>Örnek</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hedef dağılımınız</span></span>
