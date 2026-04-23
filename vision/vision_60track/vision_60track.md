@@ -25,7 +25,7 @@ kullanılan $K$ matrisi, yansıtma metotu ve başlangıç imajı altta:
 
 ![](vision_60track_01.jpg)
 
-Kalman Fitreleri
+### Kalman Fitreleri
 
 Amacımız düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik bir
 satranç tahtası deseni bulunan bir kartonun, video görüntülerinden üç
@@ -188,150 +188,7 @@ H = [[1, 0, 0, 0],
 
 Model tamamen doğrusal olduğu için klasik Kalman filtresi yeterlidir.
 
-```python
-import cv2
-import numpy as np
-
-class KalmanXZ:
-    def __init__(self, dt):
-        self.dt = dt
-
-        # State: [X, Z, dX, dZ]
-        self.x = np.zeros((4, 1))
-        self.P = np.eye(4) * 10.0
-
-        self.F = np.array([
-            [1, 0, dt, 0],
-            [0, 1, 0, dt],
-            [0, 0, 1,  0],
-            [0, 0, 0,  1]
-        ])
-
-        self.H = np.array([
-            [1, 0, 0, 0],
-            [0, 1, 0, 0]
-        ])
-
-        self.Q = np.eye(4) * 0.05
-        self.R = np.eye(2) * 2.0
-        self.I = np.eye(4)
-
-    def predict(self):
-        self.x = self.F @ self.x
-        self.P = self.F @ self.P @ self.F.T + self.Q
-
-    def update(self, z):
-        z = z.reshape(2, 1)
-        y = z - self.H @ self.x
-        S = self.H @ self.P @ self.H.T + self.R
-        K = self.P @ self.H.T @ np.linalg.inv(S)
-
-        self.x = self.x + K @ y
-        self.P = (self.I - K @ self.H) @ self.P
-
-def run_kf();
-
-    cap = cv2.VideoCapture("/opt/Downloads/skdata/chessb-left.avi")
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    dt = 1.0 / fps
-
-    # ---- Camera intrinsics ----
-    K = np.array([
-        [700.,   0., 300.],
-        [  0., 700., 330.],
-        [  0.,   0.,   1.]
-    ])
-    dist = np.zeros((5, 1))
-    board_size = (3, 3)
-    square_size = 1.0
-
-    objp = np.zeros((board_size[0] * board_size[1], 3), np.float32)
-    objp[:, :2] = np.mgrid[0:3, 0:3].T.reshape(-1, 2)
-    objp *= square_size
-
-    axis = np.float32([
-        [0, 0, 0],
-        [2, 0, 0],
-        [0, 2, 0],
-        [0, 0, -2]
-    ])
-
-    kf = KalmanXZ(dt)
-    initialized = False
-
-    raw_trace = []
-    kf_trace = []
-
-    frame_idx = 0
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        found, corners = cv2.findChessboardCorners(gray, board_size)
-
-        cv2.putText(frame,
-                    f"Frame {frame_idx} | found={found}",
-                    (20, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.8,
-                    (0, 255, 0) if found else (0, 0, 255),
-                    2)
-
-        if found:
-            corners = cv2.cornerSubPix(
-                gray, corners, (5, 5), (-1, -1),
-                (cv2.TERM_CRITERIA_EPS +
-                 cv2.TERM_CRITERIA_MAX_ITER, 30, 0.01)
-            )
-
-            ok, rvec, tvec = cv2.solvePnP(objp, corners, K, dist)
-
-            if ok:
-                X, Z = float(tvec[0]), float(tvec[2])
-
-                raw_trace.append((X, Z))
-
-                if not initialized:
-                    kf.x[0, 0] = X
-                    kf.x[1, 0] = Z
-                    initialized = True
-
-                kf.predict()
-                kf.update(np.array([X, Z]))
-
-                kf_trace.append((kf.x[0, 0], kf.x[1, 0]))
-
-                cv2.drawChessboardCorners(frame, board_size, corners, found)
-
-                imgpts, _ = cv2.projectPoints(axis, rvec, tvec, K, dist)
-                imgpts = imgpts.astype(int)
-                o = tuple(imgpts[0].ravel())
-
-                cv2.line(frame, o, tuple(imgpts[1].ravel()), (0, 0, 255), 3)
-                cv2.line(frame, o, tuple(imgpts[2].ravel()), (0, 255, 0), 3)
-                cv2.line(frame, o, tuple(imgpts[3].ravel()), (255, 0, 0), 3)
-
-        cv2.imshow("Chessboard KF Tracking", frame)
-        if cv2.waitKey(20) & 0xFF == 27:
-            break
-
-        frame_idx += 1
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-    with open("trajectory.csv", "w") as f:
-        f.write("frame,raw_X,raw_Z,kf_X,kf_Z\n")
-        for i, ((rx, rz), (kx, kz)) in enumerate(zip(raw_trace, kf_trace)):
-            f.write(f"{i},{rx},{rz},{kx},{kz}\n")
-
-    print(f"\nSaved trajectory.csv with {len(kf_trace)} samples")
-
-run_kf()
-```
+Kodu `track-chess-kf.py` içinde bulabiliriz.
 
 Notasyon ve Semboller
 
@@ -379,7 +236,6 @@ plt.savefig('vision_60track_02.jpg')
 
 ![](vision_60track_02.jpg)
 
-
 Başlangıç Salınımı (Zig-Zag) Neden Normal?
 
 Elde edilen sonuçlarda başta küçük bir zig-zag görülmesi doğaldır:
@@ -418,7 +274,7 @@ Takip sirasinda daha onceki bazi kodlardan alinan ciktilar alttadir.
 ![](kf-out-50.jpg)
 ![](kf-out-70.jpg)
 
-Parcaçık Filtreleri (Partıcle Filters)
+### Parcaçık Filtreleri (Particle Filters)
 
 Parçacık filtreleri (PF) bir dağılımı ayrıksal olarak temsil
 edebilirler. Diyelim ki tek boyutlu bir dağılımı 100 öğe içeren bir dizin ile
@@ -430,82 +286,38 @@ birden fazla gayrı lineer hipotezi aynı anda işletebiliriz. KF ile tepe nokta
 en iyi tahminimizdir (mesela.. satranç kartonu masa ortasında), PF ile birkaç
 tahmini aynı anda hesaplatmak mümkün olabilir.
 
-PF kodlaması $x_t$ için iki tane veri yapısı gerektirir. Biri dağılım
-değerlerini temsil eden parçacıklardır, diğeri dağılımdaki önemini temsil eden
-ağırlıklardır.  Filtreleme mekaniği KF'e benzer, önce bir geçiş uygulanır, ki bu
-geçiş kararsızlığı arttıracaktır, ardından gözlem verisi ve bir hata fonksiyonu
-üzerinden dağılım güncellenir. Bu işlem sırasında hatası yüksek olan parçacıklar
-cezalandırılır, onların ağırlığı azalır, ötekilerinki yükselir. Her parçacık
-için hata fonksiyonu şudur:
+PF kodlaması $x_t$ için iki tane veri yapısı gerekir. Biri dağılım
+değerlerini temsil eden parçacıklardır, diğeri dağılımdaki önemini
+temsil eden ağırlıklardır.  Filtreleme mekanığı KF'e benzer, önce bir
+geçiş uygulanır, ki bu geçiş kararsızlığı arttıracaktır, ardından
+gözlem verisi ve bir hata fonksiyonu üzerinden dağılım güncellenir. Bu
+işlem sırasında hatası yüksek olan parçacıklar cezalandırılır, onların
+ağırlığı azalır, ötekilerinki yükselir.
 
-$$
-w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
-$$
+Bu uygulamada PF'in dışarıdan gelen gözlem verisine ihtiyacı var, veri
+muhakkak gürültülüdür, [3]'te görülen yüz takip örneğinde olduğu gibi,
+ve gözlem verisi görüntüde yeri saptanan satranç tahtası deseni
+*piksel* olacaktır, ki bu değerler bir yansımayı temsil ediyor, gizli
+bilgi objeşnin üç boyuttaki yeri var, bize gelenler onun iki boyuttaki
+yansıması. BU desenin iki boyutta belli köşe noktalarını alıyoruz.
 
-$y^{[i]}$ gözlem değeri, $p^{[i]}$ geçiş uygulandıktan sonra elimizdeki
-tahminimizdir, ki bu KF dünyasındaki $\Phi x_t + Q$'nun karşılığıdır. PF için
-hareket geçişi şöyle hesaplanır: Bir birörnek (uniform) dağılımdan örnekleme
-yapılır, ve bu örneklenen değerler $x$'e eklenir. Örnekleme için z-kordinatı
-için $Unif (-0.1, -1)$'i, x kordinatı için $Unif (-40, 40)$'i kullandık. Yani
-ileri doğru 0.1 ve 1 santimetre arasında bir hareket ekliyoruz, ve sağa ve sola
-dönük olarak 80 santimetrelik bir kararsızlığı hesaplara ekliyoruz.
+Şimdi PF'e gereken olurluk hesabı için her parçacığın iki boyut yer
+hipotezine göre eldeki verinin ne kadar "mümkün" olduğu hesaplanır. Bu
+hesaplara göre iyi tahmin etmiş olan parçacıklar ödüllendirilir,
+diğerleri cezalandırılır.
 
-Üstteki formülde $(y^{[i]} - p^{[i]})^2$ e niye 1 değeri eklediğimiz açıktır
-herhalde, bu sayede hata fonksiyonunun olasılık değerlerini andıran bir sonuç
-döndürmesini istiyoruz. Çok ufak hatalar için $1 + hata$ bölünendeki 1'i
-bölecek, ve 1'e yakın bir değer geri getirecek. İstediğimiz de bu zaten, küçük
-hataların daha büyük ağırlığa, büyük hataların ise tam tersine sebep olmaları.
+Kodlar `track-chess-pf.py` içinde bulunabilir.
 
-Tekrar örnekleme (resampling) sürecinde parçacıklar tekrar düzenlenerek ağırlığı
-çok olan parçacıkların ağırlığı az olanlara göre daha fazla tekrarlanmasını
-istiyoruz. Dikkat: tekrar örnekleme süreci yeni parçacık değerleri yaratmıyor,
-sadece mevcut olanları tekrarlıyor ya da onları atlıyor.
+Kodlar
 
-```python
-import sys; sys.path.append('../../tser/tser_085_pf')
-import cv2
-import util
-from PF import *
-
-dim = 3
-
-def run_pf():
-
-    fin = "/opt/Downloads/skdata/chessb-right.avi"
-    cap = cv2.VideoCapture(fin)
-    N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-    pf = PF(util.K, 200)
-
-    for i in range(N):
-        ret, frame = cap.read()
-        h,w = frame.shape[:2]
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        status, corners = cv2.findChessboardCorners( gray, (dim,dim))
-        is_x = []; is_y = []
-        if status: 
-            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)
-            for p in corners:
-                is_x.append(p[0][0])
-                is_y.append(p[0][1])
-
-        if len(is_x) > 0: 
-            pf.update(array([is_x[5], h-is_y[5], 1.]))
-            mu_x = pf.average()
-            util.proj_board(gray, mu_x[0], mu_x[1], mu_x[2])
-
-        cv2.imshow('frame',gray)
-        if cv2.waitKey(20) & 0xFF == ord('q'):
-            break        
-
-run_pf()
-
-```
+[track-chess-kf.py](track-chess-kf.py),
+[track-chess-pf.py](track-chess-pf.py)
 
 Kaynaklar
 
-[1] Bayramlı, [Sample Video](https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&st=1y9rflqg&raw=1)
+[1] Bayramlı, [Örnek  Video 1](https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&st=1y9rflqg&raw=1)
 
-[2] Bayramlı, [Sample Video](https://www.dropbox.com/scl/fi/pkjruc2u1g80cbn7ke6yw/chessb-right.avi?rlkey=3tl0x0c8tieo2z9j8tmzlspn1&st=075xba1m&raw=1)
+[2] Bayramlı, [Örnek  Video 2](https://www.dropbox.com/scl/fi/pkjruc2u1g80cbn7ke6yw/chessb-right.avi?rlkey=3tl0x0c8tieo2z9j8tmzlspn1&st=075xba1m&raw=1)
 
+[3] Bayramli, *Istatistik - Monte Carlo, Entegraller, Sıralı Monte Carlo*
 

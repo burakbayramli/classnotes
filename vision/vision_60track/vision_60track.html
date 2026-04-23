@@ -112,7 +112,7 @@ değerini deneyerek, yüzeyin resimde görülen masanın sonunda çıkacak
 class="math inline">\(K\)</span> matrisi, yansıtma metotu ve başlangıç
 imajı altta:</p>
 <p><img src="vision_60track_01.jpg" /></p>
-<p>Kalman Fitreleri</p>
+<h3 id="kalman-fitreleri">Kalman Fitreleri</h3>
 <p>Amacımız düz bir yüzey üzerinde hareket eden, üzerinde 4×4 karelik
 bir satranç tahtası deseni bulunan bir kartonun, video görüntülerinden
 üç boyutlu hareketinin nasıl takip edilebileceğini sistematık ve formel
@@ -239,149 +239,7 @@ Z_{t+1} = Z_t + dZ_t · \Delta t
      [0, 1, 0, 0]]</code></pre>
 <p>Model tamamen doğrusal olduğu için klasik Kalman filtresi
 yeterlidir.</p>
-<div class="sourceCode" id="cb7"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> KalmanXZ:</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, dt):</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.dt <span class="op">=</span> dt</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># State: [X, Z, dX, dZ]</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> np.zeros((<span class="dv">4</span>, <span class="dv">1</span>))</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> np.eye(<span class="dv">4</span>) <span class="op">*</span> <span class="fl">10.0</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.F <span class="op">=</span> np.array([</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">1</span>, <span class="dv">0</span>, dt, <span class="dv">0</span>],</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, dt],</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>,  <span class="dv">0</span>],</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>,  <span class="dv">1</span>]</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        ])</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.H <span class="op">=</span> np.array([</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>]</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        ])</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.Q <span class="op">=</span> np.eye(<span class="dv">4</span>) <span class="op">*</span> <span class="fl">0.05</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.R <span class="op">=</span> np.eye(<span class="dv">2</span>) <span class="op">*</span> <span class="fl">2.0</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.I <span class="op">=</span> np.eye(<span class="dv">4</span>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> predict(<span class="va">self</span>):</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> <span class="va">self</span>.F <span class="op">@</span> <span class="va">self</span>.x</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> <span class="va">self</span>.F <span class="op">@</span> <span class="va">self</span>.P <span class="op">@</span> <span class="va">self</span>.F.T <span class="op">+</span> <span class="va">self</span>.Q</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, z):</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> z.reshape(<span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> z <span class="op">-</span> <span class="va">self</span>.H <span class="op">@</span> <span class="va">self</span>.x</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        S <span class="op">=</span> <span class="va">self</span>.H <span class="op">@</span> <span class="va">self</span>.P <span class="op">@</span> <span class="va">self</span>.H.T <span class="op">+</span> <span class="va">self</span>.R</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>        K <span class="op">=</span> <span class="va">self</span>.P <span class="op">@</span> <span class="va">self</span>.H.T <span class="op">@</span> np.linalg.inv(S)</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> <span class="va">self</span>.x <span class="op">+</span> K <span class="op">@</span> y</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.P <span class="op">=</span> (<span class="va">self</span>.I <span class="op">-</span> K <span class="op">@</span> <span class="va">self</span>.H) <span class="op">@</span> <span class="va">self</span>.P</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_kf()<span class="op">;</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv2.VideoCapture(<span class="st">&quot;/opt/Downloads/skdata/chessb-left.avi&quot;</span>)</span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    fps <span class="op">=</span> cap.get(cv2.CAP_PROP_FPS)</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    dt <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> fps</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ---- Camera intrinsics ----</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> np.array([</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>        [<span class="fl">700.</span>,   <span class="fl">0.</span>, <span class="fl">300.</span>],</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>        [  <span class="fl">0.</span>, <span class="fl">700.</span>, <span class="fl">330.</span>],</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>        [  <span class="fl">0.</span>,   <span class="fl">0.</span>,   <span class="fl">1.</span>]</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    ])</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    dist <span class="op">=</span> np.zeros((<span class="dv">5</span>, <span class="dv">1</span>))</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    board_size <span class="op">=</span> (<span class="dv">3</span>, <span class="dv">3</span>)</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    square_size <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    objp <span class="op">=</span> np.zeros((board_size[<span class="dv">0</span>] <span class="op">*</span> board_size[<span class="dv">1</span>], <span class="dv">3</span>), np.float32)</span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    objp[:, :<span class="dv">2</span>] <span class="op">=</span> np.mgrid[<span class="dv">0</span>:<span class="dv">3</span>, <span class="dv">0</span>:<span class="dv">3</span>].T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    objp <span class="op">*=</span> square_size</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>    axis <span class="op">=</span> np.float32([</span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>        [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>        [<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>],</span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>        [<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>],</span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>        [<span class="dv">0</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">2</span>]</span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>    ])</span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>    kf <span class="op">=</span> KalmanXZ(dt)</span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>    initialized <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>    raw_trace <span class="op">=</span> []</span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>    kf_trace <span class="op">=</span> []</span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>    frame_idx <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>        ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> ret:</span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)</span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>        found, corners <span class="op">=</span> cv2.findChessboardCorners(gray, board_size)</span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>        cv2.putText(frame,</span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>                    <span class="ss">f&quot;Frame </span><span class="sc">{</span>frame_idx<span class="sc">}</span><span class="ss"> | found=</span><span class="sc">{</span>found<span class="sc">}</span><span class="ss">&quot;</span>,</span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">20</span>, <span class="dv">30</span>),</span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>                    cv2.FONT_HERSHEY_SIMPLEX,</span>
-<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>                    <span class="fl">0.8</span>,</span>
-<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>) <span class="cf">if</span> found <span class="cf">else</span> (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">255</span>),</span>
-<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">2</span>)</span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> found:</span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>            corners <span class="op">=</span> cv2.cornerSubPix(</span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>                gray, corners, (<span class="dv">5</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>),</span>
-<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>                (cv2.TERM_CRITERIA_EPS <span class="op">+</span></span>
-<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>                 cv2.TERM_CRITERIA_MAX_ITER, <span class="dv">30</span>, <span class="fl">0.01</span>)</span>
-<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>            ok, rvec, tvec <span class="op">=</span> cv2.solvePnP(objp, corners, K, dist)</span>
-<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> ok:</span>
-<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>                X, Z <span class="op">=</span> <span class="bu">float</span>(tvec[<span class="dv">0</span>]), <span class="bu">float</span>(tvec[<span class="dv">2</span>])</span>
-<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>                raw_trace.append((X, Z))</span>
-<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="kw">not</span> initialized:</span>
-<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>                    kf.x[<span class="dv">0</span>, <span class="dv">0</span>] <span class="op">=</span> X</span>
-<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>                    kf.x[<span class="dv">1</span>, <span class="dv">0</span>] <span class="op">=</span> Z</span>
-<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>                    initialized <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>                kf.predict()</span>
-<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>                kf.update(np.array([X, Z]))</span>
-<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>                kf_trace.append((kf.x[<span class="dv">0</span>, <span class="dv">0</span>], kf.x[<span class="dv">1</span>, <span class="dv">0</span>]))</span>
-<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>                cv2.drawChessboardCorners(frame, board_size, corners, found)</span>
-<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>                imgpts, _ <span class="op">=</span> cv2.projectPoints(axis, rvec, tvec, K, dist)</span>
-<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a>                imgpts <span class="op">=</span> imgpts.astype(<span class="bu">int</span>)</span>
-<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a>                o <span class="op">=</span> <span class="bu">tuple</span>(imgpts[<span class="dv">0</span>].ravel())</span>
-<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>                cv2.line(frame, o, <span class="bu">tuple</span>(imgpts[<span class="dv">1</span>].ravel()), (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">255</span>), <span class="dv">3</span>)</span>
-<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a>                cv2.line(frame, o, <span class="bu">tuple</span>(imgpts[<span class="dv">2</span>].ravel()), (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), <span class="dv">3</span>)</span>
-<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>                cv2.line(frame, o, <span class="bu">tuple</span>(imgpts[<span class="dv">3</span>].ravel()), (<span class="dv">255</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">3</span>)</span>
-<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a>        cv2.imshow(<span class="st">&quot;Chessboard KF Tracking&quot;</span>, frame)</span>
-<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cv2.waitKey(<span class="dv">20</span>) <span class="op">&amp;</span> <span class="bn">0xFF</span> <span class="op">==</span> <span class="dv">27</span>:</span>
-<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
-<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a>        frame_idx <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a>    cap.release()</span>
-<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a>    cv2.destroyAllWindows()</span>
-<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(<span class="st">&quot;trajectory.csv&quot;</span>, <span class="st">&quot;w&quot;</span>) <span class="im">as</span> f:</span>
-<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a>        f.write(<span class="st">&quot;frame,raw_X,raw_Z,kf_X,kf_Z</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, ((rx, rz), (kx, kz)) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(raw_trace, kf_trace)):</span>
-<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a>            f.write(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>rx<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>rz<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>kx<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>kz<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>)</span>
-<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Saved trajectory.csv with </span><span class="sc">{</span><span class="bu">len</span>(kf_trace)<span class="sc">}</span><span class="ss"> samples&quot;</span>)</span>
-<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a>run_kf()</span></code></pre></div>
+<p>Kodu <code>track-chess-kf.py</code> içinde bulabiliriz.</p>
 <p>Notasyon ve Semboller</p>
 <table>
 <colgroup>
@@ -448,31 +306,31 @@ Z]^T)</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&quot;trajectory.csv&quot;</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D  <span class="co"># noqa</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>ax.plot(df[<span class="st">&quot;kf_X&quot;</span>], df[<span class="st">&quot;kf_Z&quot;</span>], df[<span class="st">&quot;frame&quot;</span>],</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">&quot;Kalman trajectory&quot;</span>)</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>ax.scatter(df[<span class="st">&quot;raw_X&quot;</span>], df[<span class="st">&quot;raw_Z&quot;</span>], df[<span class="st">&quot;frame&quot;</span>],</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>           s<span class="op">=</span><span class="dv">5</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span><span class="st">&quot;Raw PnP&quot;</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;X (cm)&quot;</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&quot;Z (cm)&quot;</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&quot;Frame&quot;</span>)</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_60track_02.jpg&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&quot;trajectory.csv&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D  <span class="co"># noqa</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>ax.plot(df[<span class="st">&quot;kf_X&quot;</span>], df[<span class="st">&quot;kf_Z&quot;</span>], df[<span class="st">&quot;frame&quot;</span>],</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">&quot;Kalman trajectory&quot;</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>ax.scatter(df[<span class="st">&quot;raw_X&quot;</span>], df[<span class="st">&quot;raw_Z&quot;</span>], df[<span class="st">&quot;frame&quot;</span>],</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>           s<span class="op">=</span><span class="dv">5</span>, alpha<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span><span class="st">&quot;Raw PnP&quot;</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;X (cm)&quot;</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&quot;Z (cm)&quot;</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&quot;Frame&quot;</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;vision_60track_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="vision_60track_02.jpg" /></p>
 <p>Başlangıç Salınımı (Zig-Zag) Neden Normal?</p>
 <p>Elde edilen sonuçlarda başta küçük bir zig-zag görülmesi
@@ -503,7 +361,8 @@ sunmaktadır.</p>
 <p>Takip sirasinda daha onceki bazi kodlardan alinan ciktilar
 alttadir.</p>
 <p><img src="kf-out-50.jpg" /> <img src="kf-out-70.jpg" /></p>
-<p>Parcaçık Filtreleri (Partıcle Filters)</p>
+<h3 id="parcaçık-filtreleri-particle-filters">Parcaçık Filtreleri
+(Particle Filters)</h3>
 <p>Parçacık filtreleri (PF) bir dağılımı ayrıksal olarak temsil
 edebilirler. Diyelim ki tek boyutlu bir dağılımı 100 öğe içeren bir
 dizin ile temsil edebiliriz, o zaman dağılımın değerlerini 100 tane
@@ -515,85 +374,37 @@ aynı anda işletebiliriz. KF ile tepe noktası en iyi tahminimizdir
 (mesela.. satranç kartonu masa ortasında), PF ile birkaç tahmini aynı
 anda hesaplatmak mümkün olabilir.</p>
 <p>PF kodlaması <span class="math inline">\(x_t\)</span> için iki tane
-veri yapısı gerektirir. Biri dağılım değerlerini temsil eden
+veri yapısı gerekir. Biri dağılım değerlerini temsil eden
 parçacıklardır, diğeri dağılımdaki önemini temsil eden ağırlıklardır.
-Filtreleme mekaniği KF’e benzer, önce bir geçiş uygulanır, ki bu geçiş
+Filtreleme mekanığı KF’e benzer, önce bir geçiş uygulanır, ki bu geçiş
 kararsızlığı arttıracaktır, ardından gözlem verisi ve bir hata
 fonksiyonu üzerinden dağılım güncellenir. Bu işlem sırasında hatası
 yüksek olan parçacıklar cezalandırılır, onların ağırlığı azalır,
-ötekilerinki yükselir. Her parçacık için hata fonksiyonu şudur:</p>
-<p><span class="math display">\[
-w^{[i]} = \frac{1}{1 + (y^{[i]} - p^{[i]})^2  )}
-\]</span></p>
-<p><span class="math inline">\(y^{[i]}\)</span> gözlem değeri, <span
-class="math inline">\(p^{[i]}\)</span> geçiş uygulandıktan sonra
-elimizdeki tahminimizdir, ki bu KF dünyasındaki <span
-class="math inline">\(\Phi x_t + Q\)</span>’nun karşılığıdır. PF için
-hareket geçişi şöyle hesaplanır: Bir birörnek (uniform) dağılımdan
-örnekleme yapılır, ve bu örneklenen değerler <span
-class="math inline">\(x\)</span>’e eklenir. Örnekleme için z-kordinatı
-için <span class="math inline">\(Unif (-0.1, -1)\)</span>’i, x kordinatı
-için <span class="math inline">\(Unif (-40, 40)\)</span>’i kullandık.
-Yani ileri doğru 0.1 ve 1 santimetre arasında bir hareket ekliyoruz, ve
-sağa ve sola dönük olarak 80 santimetrelik bir kararsızlığı hesaplara
-ekliyoruz.</p>
-<p>Üstteki formülde <span class="math inline">\((y^{[i]} -
-p^{[i]})^2\)</span> e niye 1 değeri eklediğimiz açıktır herhalde, bu
-sayede hata fonksiyonunun olasılık değerlerini andıran bir sonuç
-döndürmesini istiyoruz. Çok ufak hatalar için <span
-class="math inline">\(1 + hata\)</span> bölünendeki 1’i bölecek, ve 1’e
-yakın bir değer geri getirecek. İstediğimiz de bu zaten, küçük hataların
-daha büyük ağırlığa, büyük hataların ise tam tersine sebep olmaları.</p>
-<p>Tekrar örnekleme (resampling) sürecinde parçacıklar tekrar
-düzenlenerek ağırlığı çok olan parçacıkların ağırlığı az olanlara göre
-daha fazla tekrarlanmasını istiyoruz. Dikkat: tekrar örnekleme süreci
-yeni parçacık değerleri yaratmıyor, sadece mevcut olanları tekrarlıyor
-ya da onları atlıyor.</p>
-<div class="sourceCode" id="cb9"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys<span class="op">;</span> sys.path.append(<span class="st">&#39;../../tser/tser_085_pf&#39;</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> util</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PF <span class="im">import</span> <span class="op">*</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>dim <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_pf():</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    fin <span class="op">=</span> <span class="st">&quot;/opt/Downloads/skdata/chessb-right.avi&quot;</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> cv2.VideoCapture(fin)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">int</span>(cap.get(cv2.CAP_PROP_FRAME_COUNT))</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    pf <span class="op">=</span> PF(util.K, <span class="dv">200</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        ret, frame <span class="op">=</span> cap.read()</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        h,w <span class="op">=</span> frame.shape[:<span class="dv">2</span>]</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        gray <span class="op">=</span> cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        status, corners <span class="op">=</span> cv2.findChessboardCorners( gray, (dim,dim))</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        is_x <span class="op">=</span> []<span class="op">;</span> is_y <span class="op">=</span> []</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> status: </span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>            cv2.drawChessboardCorners( gray, (dim,dim), corners, status)</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> p <span class="kw">in</span> corners:</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                is_x.append(p[<span class="dv">0</span>][<span class="dv">0</span>])</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                is_y.append(p[<span class="dv">0</span>][<span class="dv">1</span>])</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span>(is_x) <span class="op">&gt;</span> <span class="dv">0</span>: </span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            pf.update(array([is_x[<span class="dv">5</span>], h<span class="op">-</span>is_y[<span class="dv">5</span>], <span class="fl">1.</span>]))</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            mu_x <span class="op">=</span> pf.average()</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>            util.proj_board(gray, mu_x[<span class="dv">0</span>], mu_x[<span class="dv">1</span>], mu_x[<span class="dv">2</span>])</span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        cv2.imshow(<span class="st">&#39;frame&#39;</span>,gray)</span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cv2.waitKey(<span class="dv">20</span>) <span class="op">&amp;</span> <span class="bn">0xFF</span> <span class="op">==</span> <span class="bu">ord</span>(<span class="st">&#39;q&#39;</span>):</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span>        </span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>run_pf()</span></code></pre></div>
+ötekilerinki yükselir.</p>
+<p>Bu uygulamada PF’in dışarıdan gelen gözlem verisine ihtiyacı var,
+veri muhakkak gürültülüdür, [3]’te görülen yüz takip örneğinde olduğu
+gibi, ve gözlem verisi görüntüde yeri saptanan satranç tahtası deseni
+<em>piksel</em> olacaktır, ki bu değerler bir yansımayı temsil ediyor,
+gizli bilgi objeşnin üç boyuttaki yeri var, bize gelenler onun iki
+boyuttaki yansıması. BU desenin iki boyutta belli köşe noktalarını
+alıyoruz.</p>
+<p>Şimdi PF’e gereken olurluk hesabı için her parçacığın iki boyut yer
+hipotezine göre eldeki verinin ne kadar “mümkün” olduğu hesaplanır. Bu
+hesaplara göre iyi tahmin etmiş olan parçacıklar ödüllendirilir,
+diğerleri cezalandırılır.</p>
+<p>Kodlar <code>track-chess-pf.py</code> içinde bulunabilir.</p>
+<p>Kodlar</p>
+<p><a href="track-chess-kf.py">track-chess-kf.py</a>, <a
+href="track-chess-pf.py">track-chess-pf.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] Bayramlı, <a
-href="https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&amp;st=1y9rflqg&amp;raw=1">Sample
-Video</a></p>
+href="https://www.dropbox.com/scl/fi/unbrewsp6vbhcslquqmpx/chessb-left.avi?rlkey=bcplm61t2kix3rti8nfpj55qx&amp;st=1y9rflqg&amp;raw=1">Örnek
+Video 1</a></p>
 <p>[2] Bayramlı, <a
-href="https://www.dropbox.com/scl/fi/pkjruc2u1g80cbn7ke6yw/chessb-right.avi?rlkey=3tl0x0c8tieo2z9j8tmzlspn1&amp;st=075xba1m&amp;raw=1">Sample
-Video</a></p>
+href="https://www.dropbox.com/scl/fi/pkjruc2u1g80cbn7ke6yw/chessb-right.avi?rlkey=3tl0x0c8tieo2z9j8tmzlspn1&amp;st=075xba1m&amp;raw=1">Örnek
+Video 2</a></p>
+<p>[3] Bayramli, <em>Istatistik - Monte Carlo, Entegraller, Sıralı Monte
+Carlo</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

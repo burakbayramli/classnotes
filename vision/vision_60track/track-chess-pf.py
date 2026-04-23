@@ -1,12 +1,12 @@
-import sys; sys.path.append('../../tser/tser_085_pf')
 import cv2
 import util
+import sys
 from PF import *
 
 dim = 3
-if __name__ == "__main__":    
 
-    fin = sys.argv[1]
+def pf_track(fin):
+
     cap = cv2.VideoCapture(fin)
     N = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -33,4 +33,7 @@ if __name__ == "__main__":
         if cv2.waitKey(20) & 0xFF == ord('q'):
             break        
     
-      
+if __name__ == "__main__":          
+    # "/opt/Downloads/skdata/chessb-left.avi"
+    fin = sys.argv[1]
+    pf_track(fin)

@@ -805,9 +805,9 @@ plt.savefig('tser_kf_02.png')
 
 ![](tser_kf_02.png)
 
-### Parcaçık Filtreleri
+### Parçacık Filtreleri
 
-Parcaçık filtreleri Kalman filtrelerinde olduğu gibi saklı bir konum
+Parçacık filtreleri Kalman filtrelerinde olduğu gibi saklı bir konum
 bilgisi hakkında dış ölçümler üzerinden kestirme hesabı yapabilir. Her
 parçacık bir hipotezi, farklı bir konum bilgisini temsil eder,
 olasılığı, olurluğu ölçüm fonksiyonudur.
