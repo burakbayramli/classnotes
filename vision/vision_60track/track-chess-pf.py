@@ -1,7 +1,7 @@
+from PF import *
 import cv2
 import util
 import sys
-from PF import *
 
 dim = 3
 

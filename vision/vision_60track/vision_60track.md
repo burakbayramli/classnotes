@@ -188,7 +188,7 @@ H = [[1, 0, 0, 0],
 
 Model tamamen doğrusal olduğu için klasik Kalman filtresi yeterlidir.
 
-Kodu `track-chess-kf.py` içinde bulabiliriz.
+Kodu `track-chess-kf.py`, `util.py` içinde bulabiliriz.
 
 Notasyon ve Semboller
 
@@ -306,12 +306,14 @@ hipotezine göre eldeki verinin ne kadar "mümkün" olduğu hesaplanır. Bu
 hesaplara göre iyi tahmin etmiş olan parçacıklar ödüllendirilir,
 diğerleri cezalandırılır.
 
-Kodlar `track-chess-pf.py` içinde bulunabilir.
+Kodlar `track-chess-pf.py`, `PF.py`, `util.py` içinde bulunabilir.
 
 Kodlar
 
 [track-chess-kf.py](track-chess-kf.py),
 [track-chess-pf.py](track-chess-pf.py)
+[util.py](util.py),
+[PF.py](PF.py)
 
 Kaynaklar
 
