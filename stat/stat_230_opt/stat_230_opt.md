@@ -389,7 +389,49 @@ Final Best Coord: [-1.00018448  1.00031523]
 Final Best Value: 3.2312280609237785e-07
 ```
 
-Paralel SMC
+### Daha Zor Fonksiyon
+
+Cok daha zor bir fonksiyon kullanalim, Genz Carpim Tepe (Genz Product
+Peak) fonksiyonu [1],
+
+$$f(x) = \prod_{i=1}^{D} \left[ a_i^{-2} + (x_i - w_i)^2 \right]^{-1}$$
+
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+a = np.array([5.0, 5.0])   # sharpness: larger => narrower peak
+b = np.array([0.5, 0.5])   # peak location (centered in [0,1]^2)
+
+N = 300
+x1 = np.linspace(0, 1, N)
+x2 = np.linspace(0, 1, N)
+X1, X2 = np.meshgrid(x1, x2)
+
+def genz(x,y):
+    return 1.0 / ((1/a[0])**2 + (x - b[0])**2) / ((1/a[1])**2 + (y - b[1])**2)
+
+#Z = 1.0 / ((1/a[0])**2 + (X1 - b[0])**2) / ((1/a[1])**2 + (X2 - b[1])**2)
+Z = genz(X1,X2)
+
+fig = plt.figure(figsize=(10, 7))
+ax = fig.add_subplot(111, projection='3d')
+
+surf = ax.plot_surface(X1, X2, Z, cmap='viridis', linewidth=0, antialiased=True, alpha=0.92)
+
+ax.set_xlabel('$x_1$', fontsize=13, labelpad=8)
+ax.set_ylabel('$x_2$', fontsize=13, labelpad=8)
+ax.set_zlabel('$f(x_1, x_2)$', fontsize=13, labelpad=8)
+ax.view_init(elev=30, azim=-60)
+
+plt.tight_layout()
+plt.savefig('stat_230_opt_03.jpg')
+```
+
+![](stat_230_opt_03.jpg)
+
+Paralel
 
 ```
 Starting SMC for 100D Genz Product Peak with 1000000 particles...
@@ -462,3 +504,9 @@ Kodlar
 
 [devam edecek]
 
+Kaynaklar
+
+[1] Genz, *Testing multidimensional integration routines*. In
+    Proceeding of International Conference on Tools, Methods and
+    Languages for Scientific and Engineering Computation,
+    81–94. Elsevier North-Holland, Inc., 1984.

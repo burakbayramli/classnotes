@@ -42,7 +42,6 @@ for i, T_curr in enumerate(temperatures):
     start_time = time.time()
     
     # 1. Evaluate Likelihood (Energy)
-    # Corrected: Passing all required arguments
     energies = genz_product_peak(particles, a_coeffs, w_offsets)
     
     # 2. Resample (Memory Efficient Systematic Resampling)

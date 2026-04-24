@@ -449,7 +449,43 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a hr
 <span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Final Best Value: </span><span class="sc">{</span>min_val<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
 <pre class="text"><code>Final Best Coord: [-1.00018448  1.00031523]
 Final Best Value: 3.2312280609237785e-07</code></pre>
-<p>Paralel SMC</p>
+<h3 id="daha-zor-fonksiyon">Daha Zor Fonksiyon</h3>
+<p>Cok daha zor bir fonksiyon kullanalim, Genz Carpim Tepe (Genz Product
+Peak) fonksiyonu [1],</p>
+<p><span class="math display">\[f(x) = \prod_{i=1}^{D} \left[ a_i^{-2} +
+(x_i - w_i)^2 \right]^{-1}\]</span></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="fl">5.0</span>, <span class="fl">5.0</span>])   <span class="co"># sharpness: larger =&gt; narrower peak</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">0.5</span>])   <span class="co"># peak location (centered in [0,1]^2)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">300</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, N)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, N)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>X1, X2 <span class="op">=</span> np.meshgrid(x1, x2)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> genz(x,y):</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> ((<span class="dv">1</span><span class="op">/</span>a[<span class="dv">0</span>])<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> (x <span class="op">-</span> b[<span class="dv">0</span>])<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> ((<span class="dv">1</span><span class="op">/</span>a[<span class="dv">1</span>])<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> (y <span class="op">-</span> b[<span class="dv">1</span>])<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Z = 1.0 / ((1/a[0])**2 + (X1 - b[0])**2) / ((1/a[1])**2 + (X2 - b[1])**2)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> genz(X1,X2)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> fig.add_subplot(<span class="dv">111</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>surf <span class="op">=</span> ax.plot_surface(X1, X2, Z, cmap<span class="op">=</span><span class="st">&#39;viridis&#39;</span>, linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.92</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&#39;$x_1$&#39;</span>, fontsize<span class="op">=</span><span class="dv">13</span>, labelpad<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">&#39;$x_2$&#39;</span>, fontsize<span class="op">=</span><span class="dv">13</span>, labelpad<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">&#39;$f(x_1, x_2)$&#39;</span>, fontsize<span class="op">=</span><span class="dv">13</span>, labelpad<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>ax.view_init(elev<span class="op">=</span><span class="dv">30</span>, azim<span class="op">=-</span><span class="dv">60</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_230_opt_03.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_230_opt_03.jpg" /></p>
+<p>Paralel</p>
 <pre><code>Starting SMC for 100D Genz Product Peak with 1000000 particles...
 Step   1 | Temp: 50.0000 | Best:   101.3879 | Accept: 99.72% | Time: 7.77s
 Step   2 | Temp: 42.0224 | Best:   100.6690 | Accept: 99.65% | Time: 0.05s
@@ -514,6 +550,11 @@ Dim 4: Found 0.225209 | Actual 0.224242
 <p>Kodlar</p>
 <p><a href="pf_tf.py">pf_tf.py</a></p>
 <p>[devam edecek]</p>
+<p>Kaynaklar</p>
+<p>[1] Genz, <em>Testing multidimensional integration routines</em>. In
+Proceeding of International Conference on Tools, Methods and Languages
+for Scientific and Engineering Computation, 81–94. Elsevier
+North-Holland, Inc., 1984.</p>
 <p>
   <a href="..">Yukarı</a>
 </p>
