@@ -3,6 +3,8 @@
 
 ## En Son
 
+24/4 - [Monte Carlo, Entegraller, Sıralı Monte Carlo](https://burakbayramli.github.io/dersblog/stat/stat_095_mcint/monte_carlo_entegraller_sirali_monte_carlo.html)
+
 17/4 - [Sağkalım Analizi (Survival Analysis)](https://burakbayramli.github.io/dersblog/stat/stat_200_surv/sagkalim_analizi__survival_analysis_.html)
 
 27/3 - [Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs](https://burakbayramli.github.io/dersblog/stat/stat_097_mcmc/markov_zincirleri_monte_carlo_metropolishastings_gibbs.html)
@@ -10,8 +12,6 @@
 13/3 - [Markov Rasgele Alanları (Markov Random Fields -MRF-), Gürültü Giderme](https://burakbayramli.github.io/dersblog/stat/stat_173_denoise/markov_rasgele_alanlari__markov_random_fields_mrf__gurultu_giderme.html)
 
 6/3 - [Gauss Karışım Modelleri için Gibbs Örneklemesi](https://burakbayramli.github.io/dersblog/stat/stat_114_gmmgibbs/gauss_karisim_modelleri_icin_gibbs_orneklemesi.html)
-
-13/2 - [Olasılıksal Matris Ayrıştırması (Probabilistic Matrix Factorization) ve Film Tavsiyeleri](https://burakbayramli.github.io/dersblog/stat/stat_140_pmf/olasiliksal_matris_ayristirmasi__probabilistic_matrix_factorization__ve_film_tavsiyeleri.html)
 
 ## Konular, Referans
 

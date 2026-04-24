@@ -516,13 +516,13 @@ düşüktür.</p></li>
 <p>Sonuç: Bir Olasılık Haritası. Filtre, yüzü başlangıçta tek bir nokta
 olarak “bulmaz”; bir dağılım oluşturur. “Sinyal”, parçacık
 ağırlıklarının bütünsel kümesidir.</p>
-<p>Özetle, yüz “bulunur”; çünkü yüz şablonunun siyah pikselleriyle
-örtüşen parçacıklar <span class="math inline">\(p(y_t | x_t)\)</span>
-skorlarında büyük bir artış alırken, “arka plan” gürültüsündeki
+<p>Özetle, yüz bulunur çünkü yüz şablonunun siyah pikselleriyle örtüşen
+parçacıklar <span class="math inline">\(p(y_t | x_t)\)</span>
+skorlarında büyük bir artış alırken, arka plan gürültüsündeki
 parçacıklara sıfıra yakın ağırlıklar atanır ve bu parçacıklar Yeniden
 Örnekleme sırasında sonunda elenirler.</p>
 <p>Ölçüm olurluğunu hatırlayalım, <span class="math inline">\(p(y_t |
-x_t^{(i)})\)</span>. İşte “bulma” işlemi <code>compat</code> ile oluyor,
+x_t^{(i)})\)</span>. İşte bulma işlemi <code>compat</code> ile oluyor,
 daha doğrusu algoritmik şekilde arayıp bulmak yerine her parçacığa
 olasılıksal bir soru soruyoruz: “eğer bir yüz tam bu parçacığın dediği
 yerde (<span class="math inline">\(x_t^{(i)}\)</span>) olsaydı, sonuç
@@ -535,6 +535,56 @@ class="math inline">\(\mu\)</span> parametresinden çıkartmak gerekmez
 miydi, çünkü yoğunluğu hatırlarsak <span class="math inline">\(f(x) =
 1/Z \exp (- (x-\mu)^2 / 2\sigma^2)\)</span>, orada bir <span
 class="math inline">\(x-\mu\)</span>, çıkartma işlemi var.</p>
+<h3 id="evrensel-örnekleyici-olarak-pf">Evrensel Örnekleyici Olarak
+PF</h3>
+<p>Şimdi sıkı durun, bir parçacık filtresi herhangi bir dağılımdan
+örneklem almak için de kullanılabilir, yani [5]’te görülen MCMC,
+Metropolis yaklaşımı gibi. Evet, parçacık filtrelerini pek çok yerde
+hareketli bir nesneyi takip etmek için, görüntüsü ya da diğer sinyalleri
+ile, kullanılırken görüyoruz (burada “zaman” gerçek zamandır); ancak
+istatistik ve Bayes dünyasında bunlar herhangi bir statik, karmaşık
+dağılımdan örneklemek için Sıralı Monte Carlo (SMC, PF diğer adı) olarak
+genelleştirilmiştir.</p>
+<ul>
+<li><p>Yapay Görüş: Dağılım, nesne hareket ettiği için değişir.</p></li>
+<li><p>Örnekleme için SMC: Dağılım, onu <em>yapay olarak</em> daha zorlu
+hale getirdiğimiz için “değişir.”</p></li>
+</ul>
+<p>PF’lerin Evrensel Örnekleyici Olarak Davranışı</p>
+<p>Zor, statik bir dağılım <span
+class="math inline">\(\pi(x)\)</span>’ten örneklemek için SMC, kolay bir
+şeyden (düzgün bir Gaussian gibi) başlayıp yavaş yavaş karmaşık
+hedefinize “soğuyan” bir ara dağılımlar “köprüsü” oluşturur.</p>
+<p>Dizi: <span class="math inline">\(\pi_0, \pi_1, \dots, \pi_T\)</span>
+şeklinde bir dizi tanımlarız; burada <span
+class="math inline">\(\pi_0\)</span>’dan örneklemek kolaydır ve <span
+class="math inline">\(\pi_T\)</span> gerçek hedefinizdir.</p>
+<p>Parçacıklar: <span class="math inline">\(\pi_0\)</span>’dan
+örneklenen bir parçacık popülasyonuyla başlarsınız (tıpkı görüntü işleme
+örneklerinde olduğu gibi).</p>
+<p>Evrim:</p>
+<ul>
+<li><p>Yeniden Ağırlıklama: Parçacıklar, dizideki bir sonraki dağılıma
+ne kadar iyi uyduklarına göre ağırlıklandırılır.</p></li>
+<li><p>Yeniden Örnekleme: Yüksek ağırlıklı parçacıklar klonlanır; düşük
+ağırlıklılar elenir.</p></li>
+<li><p>Mutasyon: Tüm parçacıkların tek bir noktaya çökmesini önlemek
+için standart bir MCMC adımı (Metropolis gibi) kullanarak onları
+“sarsarız.”</p></li>
+</ul>
+<p>Bu Neden Umut Vadeden Gelecek: SMC’nin 2026’da standart HMC veya
+Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla olan
+ilişkisidir:</p>
+<ul>
+<li><p>Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir
+yolu yürüyen tek kişidir. SMC’de ise bir sürü halinde gezinme
+yapılabilir. Her parçacık, “ağırlık” ve “mutasyon” aşamalarında aynı
+anda farklı bir GPU çekirdeğinde işletebilir.</p></li>
+<li><p>Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
+kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026’da, bu
+adımı bile modern donanımda son derece hızlı hale getiren paralel
+yeniden örnekleme algoritmaları mevcuttur.</p></li>
+</ul>
 <p>Örnek</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hedef dağılımınız</span></span>
@@ -547,7 +597,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>n_steps <span class="op">=</span> <span class="dv">20</span>          <span class="co"># Ara &quot;kare&quot; sayısı (sıcaklıklar)</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>sigma_mcmc <span class="op">=</span> <span class="fl">2.0</span>      <span class="co"># Mutasyon adımı için &quot;sallama&quot; genişliği</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Başlatma (Öncül)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Başlatma (Önsel)</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Parçacıkları alan üzerinde düzgün biçimde yayarak başlıyoruz</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>particles <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, n_particles)</span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.ones(n_particles) <span class="op">/</span> n_particles</span>
@@ -555,9 +605,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Sıcaklık takvimi (0&#39;dan 1&#39;e doğrusal köprü)</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, n_steps)</span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- SMC Ana Döngüsü ---</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># SMC Ana Döngüsü </span></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_steps):</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A. YENİDEN AĞIRLIKLAMA (Gözlem Adımı)</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Yeniden agirliklama (gozlem adimi)</span></span>
 <span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ağırlıkları şu orana göre güncelliyoruz: p(x)^beta_yeni / p(x)^beta_eski</span></span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Parçacıkların dağılımın keskinleştiğini &quot;hissettiği&quot; yer burasıdır</span></span>
 <span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    delta_beta <span class="op">=</span> betas[t] <span class="op">-</span> betas[t<span class="op">-</span><span class="dv">1</span>]</span>
@@ -567,43 +617,45 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">*=</span> incremental_weights</span>
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">/=</span> np.<span class="bu">sum</span>(weights)  <span class="co"># Normalleştir</span></span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># B. YENİDEN ÖRNEKLEME (Hayatta Kalma Adımı)</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Görüdeki gibi: düşük ağırlıklı parçacıklar ölür, yüksek ağırlıklılar klonlanır.</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Yeniden ornekleme (hayatta kalma adimi)    </span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Düşük ağırlıklı parçacıklar ölür, yüksek agırlıklılar klonlanır.</span></span>
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Yeniden örnekleyip örneklemeyeceğimize karar vermek için Etkin Örneklem Boyutu&#39;nu (ESS) kontrol ediyoruz</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    ess <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> np.<span class="bu">sum</span>(weights<span class="op">**</span><span class="dv">2</span>)</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ess <span class="op">&lt;</span> n_particles <span class="op">/</span> <span class="dv">2</span>:</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> np.random.choice(np.arange(n_particles), size<span class="op">=</span>n_particles, p<span class="op">=</span>weights)</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        particles <span class="op">=</span> particles[indices]</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones(n_particles) <span class="op">/</span> n_particles</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># C. MUTASYON (&quot;Sallama&quot; / MCMC Adımı)</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bu, &quot;bulutun&quot; tek bir noktaya çökmesini önler.</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Her parçacık için birkaç Metropolis adımı çalıştırıyoruz.</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        proposals <span class="op">=</span> particles <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_mcmc, n_particles)</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mevcut sıcaklık betas[t] için kabul oranı</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        ratio <span class="op">=</span> (p(proposals)<span class="op">**</span>betas[t]) <span class="op">/</span> (p(particles)<span class="op">**</span>betas[t])</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        accept <span class="op">=</span> np.random.rand(n_particles) <span class="op">&lt;</span> ratio</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        particles[accept] <span class="op">=</span> proposals[accept]</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Görselleştirme ---</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>x_plot <span class="op">=</span> np.arange(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, <span class="fl">0.1</span>)</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>px_plot <span class="op">=</span> p(x_plot)</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>px_norm <span class="op">=</span> px_plot <span class="op">/</span> np.trapezoid(px_plot, x_plot)</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Nihai SMC Sonucunu Çiz</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>plt.hist(particles, bins<span class="op">=</span><span class="dv">40</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&#39;SMC Nihai Parcaciklar&#39;</span>, color<span class="op">=</span><span class="st">&#39;teal&#39;</span>)</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>plt.plot(x_plot, px_norm, <span class="st">&#39;r--&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;Gercek Hedef p(x)&#39;</span>)</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f&quot;SMC Ornekleyici: Sabit bir Dagilimi Takip  (</span><span class="sc">{</span>n_particles<span class="sc">}</span><span class="ss"> particles)&quot;</span>)</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Value&quot;</span>)</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Density&quot;</span>)</span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_095_mcint_01.jpg&#39;</span>)</span></code></pre></div>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    ess <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> np.<span class="bu">sum</span>(weights<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ess <span class="op">&lt;</span> n_particles <span class="op">/</span> <span class="dv">2</span>:</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> np.random.choice(np.arange(n_particles), size<span class="op">=</span>n_particles, p<span class="op">=</span>weights)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        particles <span class="op">=</span> particles[indices]</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones(n_particles) <span class="op">/</span> n_particles</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># C. Mutasyon (&quot;Sarsma&quot; / MCMC Adımı)</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bu, &quot;bulutun&quot; tek bir noktaya cokmesini onler.</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Her parçacık için birkaç Metropolis adımı çalıştırıyoruz.</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        proposals <span class="op">=</span> particles <span class="op">+</span> np.random.normal(<span class="dv">0</span>, sigma_mcmc, n_particles)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Mevcut sıcaklık betas[t] için kabul oranı</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        ratio <span class="op">=</span> (p(proposals)<span class="op">**</span>betas[t]) <span class="op">/</span> (p(particles)<span class="op">**</span>betas[t])</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        accept <span class="op">=</span> np.random.rand(n_particles) <span class="op">&lt;</span> ratio</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        particles[accept] <span class="op">=</span> proposals[accept]</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Görselleştirme ---</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>x_plot <span class="op">=</span> np.arange(<span class="op">-</span><span class="dv">10</span>, <span class="dv">20</span>, <span class="fl">0.1</span>)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>px_plot <span class="op">=</span> p(x_plot)</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>px_norm <span class="op">=</span> px_plot <span class="op">/</span> np.trapezoid(px_plot, x_plot)</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Nihai SMC Sonucunu Çiz</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>plt.hist(particles, bins<span class="op">=</span><span class="dv">40</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&#39;SMC Nihai Parcaciklar&#39;</span>, color<span class="op">=</span><span class="st">&#39;teal&#39;</span>)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>plt.plot(x_plot, px_norm, <span class="st">&#39;r--&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&#39;Gercek Hedef p(x)&#39;</span>)</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f&quot;SMC Ornekleyici: Sabit bir Dagilimi Takip  (</span><span class="sc">{</span>n_particles<span class="sc">}</span><span class="ss"> particles)&quot;</span>)</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Value&quot;</span>)</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_095_mcint_01.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_095_mcint_01.jpg" /></p>
 <p>Kodlar</p>
 <p><a href="face.py">face.py</a></p>
+<p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Zhao, <em>Monte Carlo integration in Python over univariate and
 multivariate functions</em>, <a
@@ -611,6 +663,8 @@ href="https://boyangzhao.github.io/posts/monte-carlo-integration">https://boyang
 <p>[2] Gezerlis, <em>Numerical Methods in Physics with Python</em></p>
 <p>[3] Pharr, <em>Physically Based Rendering 3rd Ed</em></p>
 <p>[4] Barber, <em>Bayesian Reasoning and Machine Learning</em></p>
+<p>[5] Bayramli, <em>Istatistik - Markov Zincirleri Monte Carlo,
+Metropolis-Hastings, Gibbs</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

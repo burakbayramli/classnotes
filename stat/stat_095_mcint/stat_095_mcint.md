@@ -448,18 +448,16 @@ Sonuç: Bir Olasılık Haritası. Filtre, yüzü başlangıçta tek bir nokta
 olarak "bulmaz"; bir dağılım oluşturur. "Sinyal", parçacık
 ağırlıklarının bütünsel kümesidir.
 
-Özetle, yüz "bulunur"; çünkü yüz şablonunun siyah pikselleriyle
-örtüşen parçacıklar $p(y_t | x_t)$ skorlarında büyük bir artış
-alırken, "arka plan" gürültüsündeki parçacıklara sıfıra yakın
-ağırlıklar atanır ve bu parçacıklar Yeniden Örnekleme sırasında
-sonunda elenirler.
+Özetle, yüz bulunur çünkü yüz şablonunun siyah pikselleriyle örtüşen
+parçacıklar $p(y_t | x_t)$ skorlarında büyük bir artış alırken, arka
+plan gürültüsündeki parçacıklara sıfıra yakın ağırlıklar atanır ve bu
+parçacıklar Yeniden Örnekleme sırasında sonunda elenirler.
 
-Ölçüm olurluğunu hatırlayalım, $p(y_t | x_t^{(i)})$. İşte "bulma"
-işlemi `compat` ile oluyor, daha doğrusu algoritmik şekilde arayıp
-bulmak yerine her parçacığa olasılıksal bir soru soruyoruz: "eğer bir
-yüz tam bu parçacığın dediği yerde ($x_t^{(i)}$) olsaydı, sonuç
-görüntü benim şu anda baktığım gürültülü görüntü $y_t$'ye ne kadar
-benzerdi?"
+Ölçüm olurluğunu hatırlayalım, $p(y_t | x_t^{(i)})$. İşte bulma işlemi
+`compat` ile oluyor, daha doğrusu algoritmik şekilde arayıp bulmak
+yerine her parçacığa olasılıksal bir soru soruyoruz: "eğer bir yüz tam
+bu parçacığın dediği yerde ($x_t^{(i)}$) olsaydı, sonuç görüntü benim
+şu anda baktığım gürültülü görüntü $y_t$'ye ne kadar benzerdi?"
 
 Fark alma bir görüntüyü diğerinden çıkarma kafamızı karıştırmasın,
 sonuçta parçacık hipotezi tek boyutlu Gaussian olsaydı ve elimize
@@ -467,6 +465,60 @@ geçen verinin olurluğunu hesaplamak gerekseydi, bu veriyi Gaussian
 $\mu$ parametresinden çıkartmak gerekmez miydi, çünkü yoğunluğu
 hatırlarsak $f(x) = 1/Z \exp (- (x-\mu)^2 / 2\sigma^2)$, orada bir
 $x-\mu$, çıkartma işlemi var.
+
+### Evrensel Örnekleyici Olarak PF
+
+Şimdi sıkı durun, bir parçacık filtresi herhangi bir dağılımdan
+örneklem almak için de kullanılabilir, yani [5]'te görülen MCMC,
+Metropolis yaklaşımı gibi. Evet, parçacık filtrelerini pek çok yerde
+hareketli bir nesneyi takip etmek için, görüntüsü ya da diğer
+sinyalleri ile, kullanılırken görüyoruz (burada "zaman" gerçek
+zamandır); ancak istatistik ve Bayes dünyasında bunlar herhangi bir
+statik, karmaşık dağılımdan örneklemek için Sıralı Monte Carlo (SMC,
+PF diğer adı) olarak genelleştirilmiştir.
+
+* Yapay Görüş: Dağılım, nesne hareket ettiği için değişir.
+
+* Örnekleme için SMC: Dağılım, onu *yapay olarak* daha zorlu hale
+  getirdiğimiz için "değişir."
+
+PF'lerin Evrensel Örnekleyici Olarak Davranışı
+
+Zor, statik bir dağılım $\pi(x)$'ten örneklemek için SMC, kolay bir
+şeyden (düzgün bir Gaussian gibi) başlayıp yavaş yavaş karmaşık
+hedefinize "soğuyan" bir ara dağılımlar "köprüsü" oluşturur.
+
+Dizi: $\pi_0, \pi_1, \dots, \pi_T$ şeklinde bir dizi tanımlarız;
+burada $\pi_0$'dan örneklemek kolaydır ve $\pi_T$ gerçek hedefinizdir.
+
+Parçacıklar: $\pi_0$'dan örneklenen bir parçacık popülasyonuyla
+başlarsınız (tıpkı görüntü işleme örneklerinde olduğu gibi).
+
+Evrim:
+
+* Yeniden Ağırlıklama: Parçacıklar, dizideki bir sonraki dağılıma ne
+  kadar iyi uyduklarına göre ağırlıklandırılır.
+
+* Yeniden Örnekleme: Yüksek ağırlıklı parçacıklar klonlanır; düşük
+  ağırlıklılar elenir.
+
+* Mutasyon: Tüm parçacıkların tek bir noktaya çökmesini önlemek için
+  standart bir MCMC adımı (Metropolis gibi) kullanarak onları
+  "sarsarız."
+
+Bu Neden Umut Vadeden Gelecek: SMC'nin 2026'da standart HMC veya
+Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla
+olan ilişkisidir:
+
+* Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir yolu
+  yürüyen tek kişidir. SMC'de ise bir sürü halinde gezinme
+  yapılabilir. Her parçacık, "ağırlık" ve "mutasyon" aşamalarında aynı
+  anda farklı bir GPU çekirdeğinde işletebilir.
+
+* Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
+  kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026'da,
+  bu adımı bile modern donanımda son derece hızlı hale getiren paralel
+  yeniden örnekleme algoritmaları mevcuttur.
 
 Örnek
 
@@ -481,7 +533,7 @@ n_particles = 1000    # Paralel "takipçi" sayısı
 n_steps = 20          # Ara "kare" sayısı (sıcaklıklar)
 sigma_mcmc = 2.0      # Mutasyon adımı için "sallama" genişliği
 
-# 1. Başlatma (Öncül)
+# 1. Başlatma (Önsel)
 # Parçacıkları alan üzerinde düzgün biçimde yayarak başlıyoruz
 particles = np.random.uniform(-10, 20, n_particles)
 weights = np.ones(n_particles) / n_particles
@@ -489,9 +541,9 @@ weights = np.ones(n_particles) / n_particles
 # Sıcaklık takvimi (0'dan 1'e doğrusal köprü)
 betas = np.linspace(0, 1, n_steps)
 
-# --- SMC Ana Döngüsü ---
+# SMC Ana Döngüsü 
 for t in range(1, n_steps):
-    # A. YENİDEN AĞIRLIKLAMA (Gözlem Adımı)
+    # Yeniden agirliklama (gozlem adimi)
     # Ağırlıkları şu orana göre güncelliyoruz: p(x)^beta_yeni / p(x)^beta_eski
     # Parçacıkların dağılımın keskinleştiğini "hissettiği" yer burasıdır
     delta_beta = betas[t] - betas[t-1]
@@ -501,17 +553,18 @@ for t in range(1, n_steps):
     weights *= incremental_weights
     weights /= np.sum(weights)  # Normalleştir
     
-    # B. YENİDEN ÖRNEKLEME (Hayatta Kalma Adımı)
-    # Görüdeki gibi: düşük ağırlıklı parçacıklar ölür, yüksek ağırlıklılar klonlanır.
+    # Yeniden ornekleme (hayatta kalma adimi)    
+    # Düşük ağırlıklı parçacıklar ölür, yüksek agırlıklılar klonlanır.
     # Yeniden örnekleyip örneklemeyeceğimize karar vermek için Etkin Örneklem Boyutu'nu (ESS) kontrol ediyoruz
+    
     ess = 1.0 / np.sum(weights**2)
     if ess < n_particles / 2:
         indices = np.random.choice(np.arange(n_particles), size=n_particles, p=weights)
         particles = particles[indices]
         weights = np.ones(n_particles) / n_particles
         
-    # C. MUTASYON ("Sallama" / MCMC Adımı)
-    # Bu, "bulutun" tek bir noktaya çökmesini önler.
+    # C. Mutasyon ("Sarsma" / MCMC Adımı)
+    # Bu, "bulutun" tek bir noktaya cokmesini onler.
     # Her parçacık için birkaç Metropolis adımı çalıştırıyoruz.
     for _ in range(3):
         proposals = particles + np.random.normal(0, sigma_mcmc, n_particles)
@@ -543,6 +596,8 @@ Kodlar
 
 [face.py](face.py)
 
+[devam edecek]
+
 Kaynaklar
 
 [1] Zhao, *Monte Carlo integration in Python over univariate and multivariate functions*,
@@ -553,3 +608,5 @@ Kaynaklar
 [3] Pharr, *Physically Based Rendering 3rd Ed*
 
 [4] Barber, *Bayesian Reasoning and Machine Learning*
+
+[5] Bayramli, *Istatistik - Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs*
