@@ -486,7 +486,7 @@ PF'lerin Evrensel Örnekleyici Olarak Davranışı
 
 Zor, statik bir dağılım $\pi(x)$'ten örneklemek için SMC, kolay bir
 şeyden (düzgün bir Gaussian gibi) başlayıp yavaş yavaş karmaşık
-hedefinize "soğuyan" bir ara dağılımlar "köprüsü" oluşturur.
+hedefinize "soğuyan" bir ara dağılımlar "köprüsü" oluştururuz.
 
 Dizi: $\pi_0, \pi_1, \dots, \pi_T$ şeklinde bir dizi tanımlarız;
 burada $\pi_0$'dan örneklemek kolaydır ve $\pi_T$ gerçek hedefinizdir.
@@ -494,19 +494,11 @@ burada $\pi_0$'dan örneklemek kolaydır ve $\pi_T$ gerçek hedefinizdir.
 Parçacıklar: $\pi_0$'dan örneklenen bir parçacık popülasyonuyla
 başlarsınız (tıpkı görüntü işleme örneklerinde olduğu gibi).
 
-Evrim:
+Ufak bir fark, mutasyon evresinde tüm parçacıkların tek bir noktaya
+çökmesini önlemek için standart bir MCMC adımı (Metropolis gibi)
+kullanarak onları "sarsmaktır."
 
-* Yeniden Ağırlıklama: Parçacıklar, dizideki bir sonraki dağılıma ne
-  kadar iyi uyduklarına göre ağırlıklandırılır.
-
-* Yeniden Örnekleme: Yüksek ağırlıklı parçacıklar klonlanır; düşük
-  ağırlıklılar elenir.
-
-* Mutasyon: Tüm parçacıkların tek bir noktaya çökmesini önlemek için
-  standart bir MCMC adımı (Metropolis gibi) kullanarak onları
-  "sarsarız."
-
-Bu Neden Umut Vadeden Gelecek: SMC'nin 2026'da standart HMC veya
+PF neden umut vadeden gelecek: SMC'nin 2026'da standart HMC veya
 Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla
 olan ilişkisidir:
 
@@ -517,8 +509,11 @@ olan ilişkisidir:
 
 * Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
   kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026'da,
-  bu adımı bile modern donanımda son derece hızlı hale getiren paralel
+  bu adımı bile modern donanımda son derece hızlı hale getiren paralel 
   yeniden örnekleme algoritmaları mevcuttur.
+
+Altta iki Gaussian içeren bir çetrefil dağılımdan örneklem almak için
+üstteki PF yaklaşımını kullandık. 
 
 Örnek
 
