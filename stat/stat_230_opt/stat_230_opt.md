@@ -391,7 +391,7 @@ Final Best Value: 3.2312280609237785e-07
 
 ### Daha Zor Fonksiyon
 
-Cok daha zor bir fonksiyon kullanalim, Genz Carpim Tepe (Genz Product
+Çok daha zor bir fonksiyon kullanalım, Genz Çarpım Tepe (Genz Product
 Peak) fonksiyonu [1],
 
 $$f(x) = \prod_{i=1}^{D} \left[ a_i^{-2} + (x_i - w_i)^2 \right]^{-1}$$
@@ -402,7 +402,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 a = np.array([5.0, 5.0])   # sharpness: larger => narrower peak
-b = np.array([0.5, 0.5])   # peak location (centered in [0,1]^2)
+w = np.array([0.5, 0.5])   # peak location 
 
 N = 300
 x1 = np.linspace(0, 1, N)
@@ -410,9 +410,8 @@ x2 = np.linspace(0, 1, N)
 X1, X2 = np.meshgrid(x1, x2)
 
 def genz(x,y):
-    return 1.0 / ((1/a[0])**2 + (x - b[0])**2) / ((1/a[1])**2 + (y - b[1])**2)
+    return 1.0 / ((1/a[0])**2 + (x - w[0])**2) / ((1/a[1])**2 + (y - w[1])**2)
 
-#Z = 1.0 / ((1/a[0])**2 + (X1 - b[0])**2) / ((1/a[1])**2 + (X2 - b[1])**2)
 Z = genz(X1,X2)
 
 fig = plt.figure(figsize=(10, 7))
