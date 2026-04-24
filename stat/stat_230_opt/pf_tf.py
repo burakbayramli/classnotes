@@ -10,11 +10,19 @@ MCMC_STEPS = 5        # Jiggle steps per temperature
 T_START = 50.0        # Higher start temp for the Product Peak "desert"
 T_END = 0.01
 
-# Product Peak Parameters (The "Needle")
-# a_coeffs control sharpness (higher = sharper)
-a_coeffs = tf.constant(np.random.uniform(5.0, 10.0, D), dtype=tf.float32)
-# w_offsets is the "hidden" secret location of the peak
-w_offsets = tf.constant(np.random.uniform(0.2, 0.8, D), dtype=tf.float32)
+# 1. Fixed "Sharpness" (a_coeffs)
+# Usually defined by a 'difficulty' constant H. 
+# A common rule: a_i = H * i^(-2) or simply a linear spread.
+H = 150.0 
+# This creates a specific difficulty profile:
+a_vals = H * np.power(np.arange(1, D + 1), -1.5) 
+a_coeffs = tf.constant(a_vals, dtype=tf.float32)
+
+# 2. Fixed "Location" (w_offsets)
+# Instead of random, use a fixed sequence like w_i = i / (D + 1)
+# or a specific 'shifted' constant like 0.5.
+w_vals = np.linspace(0.2, 0.8, D)
+w_offsets = tf.constant(w_vals, dtype=tf.float32)
 
 @tf.function
 def genz_product_peak(particles, a_coeffs, w_offsets):

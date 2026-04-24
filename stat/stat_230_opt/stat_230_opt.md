@@ -389,6 +389,73 @@ Final Best Coord: [-1.00018448  1.00031523]
 Final Best Value: 3.2312280609237785e-07
 ```
 
+Paralel SMC
+
+```
+Starting SMC for 100D Genz Product Peak with 1000000 particles...
+Step   1 | Temp: 50.0000 | Best:   101.3879 | Accept: 99.72% | Time: 7.77s
+Step   2 | Temp: 42.0224 | Best:   100.6690 | Accept: 99.65% | Time: 0.05s
+Step   3 | Temp: 35.3176 | Best:    99.4449 | Accept: 99.57% | Time: 0.11s
+Step   4 | Temp: 29.6826 | Best:    99.5849 | Accept: 99.45% | Time: 0.11s
+Step   5 | Temp: 24.9467 | Best:    98.9302 | Accept: 99.30% | Time: 0.05s
+Step   6 | Temp: 20.9664 | Best:    98.5596 | Accept: 99.09% | Time: 0.06s
+Step   7 | Temp: 17.6212 | Best:    98.2959 | Accept: 98.83% | Time: 0.05s
+Step   8 | Temp: 14.8097 | Best:    97.5658 | Accept: 98.46% | Time: 0.07s
+Step   9 | Temp: 12.4468 | Best:    97.4290 | Accept: 97.95% | Time: 0.06s
+Step  10 | Temp: 10.4609 | Best:    95.9413 | Accept: 97.25% | Time: 0.06s
+Step  11 | Temp:  8.7918 | Best:    96.2469 | Accept: 96.34% | Time: 0.08s
+Step  12 | Temp:  7.3891 | Best:    95.7737 | Accept: 95.14% | Time: 0.07s
+Step  13 | Temp:  6.2101 | Best:    94.9233 | Accept: 93.63% | Time: 0.06s
+Step  14 | Temp:  5.2193 | Best:    94.4495 | Accept: 91.87% | Time: 0.07s
+Step  15 | Temp:  4.3865 | Best:    94.0814 | Accept: 89.74% | Time: 0.09s
+Step  16 | Temp:  3.6867 | Best:    93.6314 | Accept: 87.29% | Time: 0.06s
+Step  17 | Temp:  3.0984 | Best:    93.2184 | Accept: 84.43% | Time: 0.05s
+Step  18 | Temp:  2.6041 | Best:    92.8988 | Accept: 81.02% | Time: 0.05s
+Step  19 | Temp:  2.1886 | Best:    92.1003 | Accept: 77.09% | Time: 0.05s
+Step  20 | Temp:  1.8394 | Best:    92.1704 | Accept: 72.68% | Time: 0.05s
+Step  21 | Temp:  1.5459 | Best:    91.8560 | Accept: 67.76% | Time: 0.04s
+Step  22 | Temp:  1.2993 | Best:    91.6460 | Accept: 62.38% | Time: 0.04s
+Step  23 | Temp:  1.0920 | Best:    91.3448 | Accept: 56.76% | Time: 0.05s
+Step  24 | Temp:  0.9177 | Best:    90.9284 | Accept: 50.88% | Time: 0.05s
+Step  25 | Temp:  0.7713 | Best:    90.8716 | Accept: 44.95% | Time: 0.05s
+Step  26 | Temp:  0.6482 | Best:    90.7874 | Accept: 39.08% | Time: 0.05s
+Step  27 | Temp:  0.5448 | Best:    90.7200 | Accept: 33.46% | Time: 0.05s
+Step  28 | Temp:  0.4579 | Best:    90.6329 | Accept: 28.18% | Time: 0.04s
+Step  29 | Temp:  0.3848 | Best:    90.5655 | Accept: 23.24% | Time: 0.05s
+Step  30 | Temp:  0.3234 | Best:    90.4675 | Accept: 18.87% | Time: 0.05s
+Step  31 | Temp:  0.2718 | Best:    90.4270 | Accept: 15.07% | Time: 0.05s
+Step  32 | Temp:  0.2285 | Best:    90.3473 | Accept: 11.85% | Time: 0.05s
+Step  33 | Temp:  0.1920 | Best:    90.3473 | Accept:  9.21% | Time: 0.04s
+Step  34 | Temp:  0.1614 | Best:    90.2679 | Accept:  7.04% | Time: 0.04s
+Step  35 | Temp:  0.1356 | Best:    90.2034 | Accept:  5.35% | Time: 0.04s
+Step  36 | Temp:  0.1140 | Best:    90.1353 | Accept:  3.99% | Time: 0.05s
+Step  37 | Temp:  0.0958 | Best:    90.1353 | Accept:  2.95% | Time: 0.05s
+Step  38 | Temp:  0.0805 | Best:    90.1199 | Accept:  2.14% | Time: 0.05s
+Step  39 | Temp:  0.0677 | Best:    90.0747 | Accept:  1.49% | Time: 0.05s
+Step  40 | Temp:  0.0569 | Best:    90.0467 | Accept:  0.94% | Time: 0.05s
+Step  41 | Temp:  0.0478 | Best:    90.0419 | Accept:  0.64% | Time: 0.06s
+Step  42 | Temp:  0.0402 | Best:    90.0410 | Accept:  0.45% | Time: 0.05s
+Step  43 | Temp:  0.0338 | Best:    90.0092 | Accept:  0.32% | Time: 0.05s
+Step  44 | Temp:  0.0284 | Best:    90.0085 | Accept:  0.24% | Time: 0.06s
+Step  45 | Temp:  0.0238 | Best:    89.9678 | Accept:  0.17% | Time: 0.07s
+Step  46 | Temp:  0.0200 | Best:    89.9678 | Accept:  0.13% | Time: 0.06s
+Step  47 | Temp:  0.0168 | Best:    89.9493 | Accept:  0.09% | Time: 0.07s
+Step  48 | Temp:  0.0142 | Best:    89.9168 | Accept:  0.09% | Time: 0.06s
+Step  49 | Temp:  0.0119 | Best:    89.8920 | Accept:  0.08% | Time: 0.05s
+Step  50 | Temp:  0.0100 | Best:    89.8833 | Accept:  0.05% | Time: 0.07s
+
+==============================
+Final Best Energy: 89.849319458008
+Accuracy Check (Found vs Actual for first 5 dims):
+Dim 0: Found 0.200349 | Actual 0.200000
+Dim 1: Found 0.205520 | Actual 0.206061
+Dim 2: Found 0.210462 | Actual 0.212121
+Dim 3: Found 0.218188 | Actual 0.218182
+Dim 4: Found 0.225209 | Actual 0.224242
+==============================
+```
+
+
 Kodlar
 
 [pf_tf.py](pf_tf.py)
