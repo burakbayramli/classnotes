@@ -4,28 +4,28 @@
 problemidir" denebilir mi? Bu kışkırtıcı kavramsal bir iddia
 olurdu. Katı matematiksel açıdan bakıldığında bu bir sezgisel kural,
 ancak teorik fizik ve Bayes istatistik perspektifinden son derece
-isabetlidir.
-
-Matematiksel köprü şudur: Gibbs dağılımı. Argümanın özü, Gibbs /
+isabetlidir. Matematiksel köprü Gibbs dağılımı. Argümanın özü Gibbs /
 Boltzmann dağılımında yatmaktadır. Optimizasyonda, $f(x)$'i maksimize
 eden $x^*$'i bulmak isteriz. Örneklemede ise bir olasılık dağılımı
 $p(x)$'ten örnekler çekmek isteriz. Herhangi bir optimizasyon
-problemini, bir dağılım tanımlayarak örnekleme problemine
-dönüştürebiliriz:
+problemini, bir dağılım tanımlayarak örnekleme problemine dönüştürmek
+mümkün:
 
 $$p(x) \propto \exp\left(\frac{f(x)}{T}\right)$$
 
-Burada $T$ bir "sıcaklık" parametresidir.
+Burada $T$'ye "sıcaklık" parametresi ismi verilir, sıcaklık değiştikça
+$f(x)$ ve $p(x)$ arasındaki bazı tür benzerlikler artar / azalır,
+bunları yazının devamında işleyeceğiz.
 
-Başka bir deyişle, optimizasyonda şunu bulmak isteriz:
-$$x^* = \arg\min f(x)$$
+Başka bir deyişle, optimizasyonda şunu bulmak isteriz: $$x^* =
+\arg\min f(x)$$
 
 Örneklemede ise bir dağılımdan örneklemler almak isteriz:
 
 $$p(x) = \frac{1}{Z} \exp\left(-\frac{f(x)}{T}\right)$$
 
-burada $Z$ bölüşüm fonksiyonu (normalleştirme sabiti) ve $T$ bir
-"sıcaklık" parametresidir.
+burada $Z$ bölüşüm fonksiyonu (normalleştirme sabiti) ve $T$ daha once
+belirttigimiz gibi "sıcaklık".
 
 * $T$ yüksek olduğunda: Dağılım düzdür; örnekleme, manzara üzerinde rastgele bir yürüyüş gibidir.
 
@@ -38,12 +38,14 @@ burada $Z$ bölüşüm fonksiyonu (normalleştirme sabiti) ve $T$ bir
 
 Dolayısıyla $f(x)$'in küresel optimumunu bulmak, sıcaklık sıfıra
 giderken $p(x)$ sonsal dağılımından örneklemeyle matematiksel olarak
-eşdeğerdir.
+eşdeğerdir. $T \to 0$ limitinde, sonsal dağılımdan örnekleme, küresel
+optimumu bulmakla eşdeğer hale gelir. Bu nedenle, bir optimizasyon
+problemi, sıcaklığın mutlak sıfıra itildiği bir örnekleme problemi
+olarak görülebilir. Eh, herhangi bir dağılımdan örneklem almanın da
+pek çok yöntemi olduğuna göre (Metropolis, Gibbs örneklem alma, hatta
+Parcaçık Filtreleri) optimizasyon problemlerini ikiz problemi
+üzerinden çözmek mümkündür.
 
-$T \to 0$ limitinde, sonsal dağılımdan örnekleme, küresel optimumu
-bulmakla eşdeğer hale gelir. Bu nedenle, bir optimizasyon problemi,
-sıcaklığın mutlak sıfıra itildiği bir örnekleme problemi olarak
-görülebilir.
 
 Bu yalnızca teorik bir merak konusu değildir; birçok önemli
 algoritmanın temelidir:
@@ -141,10 +143,10 @@ artımlı ağırlık şöyledir: $$w =
 * Türevi alınabilirlik: Üstel fonksiyon pürüzsüzdür ve sonsuz kez
   türevlenebilir.
 
-* Toplamsallik ve Bağımsız Değişkenler: Amaç fonksiyonunuz bağımsız
+* Toplamsallık ve Bağımsız Değişkenler: Amaç fonksiyonunuz bağımsız
   bileşenlerin toplamıysa, $f(x, y) = g(x) + h(y)$, üstel dönüşüm bu
-  toplamı olasılıkların bir çarpımına dönüştürür: $$\exp(-(g(x) +
-  h(y))) = \exp(-g(x)) \cdot \exp(-h(y))$$. Bu, verimli yüksek boyutlu
+  toplamı olasılıkların bir çarpımına dönüştürür: $\exp(-(g(x) +
+  h(y))) = \exp(-g(x)) \cdot \exp(-h(y))$. Bu, verimli yüksek boyutlu
   örneklemenin temel taşı olan ortak dağılımın çarpanlara ayrılmasına
   olanak tanır.
 
@@ -261,15 +263,25 @@ gördüğümüz en minimum değeri (ve ona tekabül eden kordinatları) akılda
 tutarız. Gezim bitince bu değerleri rapor ederiz.
 
 Dikkat: *minimumu* akılda tutuyoruz, çünkü değerleri Rosenbrock
-fonksiyonunun kendisini çağırarak hesaplıyoruz.
+fonksiyonunun kendisini çağırarak hesaplıyoruz. Simülasyonun bize
+sağladığı kabiliyet fonksiyonun önemli bölgelerini gezebilme
+kabiliyetidir.
 
 ```python
 from numpy.random import multivariate_normal as mvn
 
+np.random.seed(0)
+
+def Rosenbrock(x, y):
+    return (1 + x)**2 + 100*(y - x**2)**2
+
 proposal_var = 0.005
 burn_in = 100
 n_iters = 5000
-T = 0.18  # Low temperature to push particles toward the minimum
+T_0 = 100
+T_f = 0.01
+T = T_0
+gamma = (T_f / T_0) ** (1 / n_iters)  # ~0.9988, computed automatically
 
 curr = np.random.uniform(low=[-3, -3],high=[3, 10],size=2 )
 min_p_coord = [0,0]
@@ -277,8 +289,7 @@ min_p_val = 1000
 
 accepted_count = 0
 for i in range(1, n_iters):    
-    prop = curr + mvn(mean=np.zeros(2), cov=np.eye(2) * proposal_var)
-    
+    prop = curr + mvn(mean=np.zeros(2), cov=np.eye(2) * proposal_var)    
     energy_curr = Rosenbrock(*curr)
     energy_prop = Rosenbrock(*prop)
     
@@ -292,6 +303,8 @@ for i in range(1, n_iters):
         if energy_curr < min_p_val:
             min_p_coord = curr
             min_p_val = energy_curr
+
+    T = T_0 * (gamma ** i)            
     
 print ('minimum nokta',min_p_coord)
 print ('minimum deger',min_p_val)
@@ -300,9 +313,9 @@ print(f"Kabul Orani: {acceptance_rate:.2%}")
 ```
 
 ```text
-minimum nokta [-0.9798643   0.95965552]
-minimum deger 0.00042834457379303055
-Kabul Orani: 20.52%
+minimum nokta [-1.00635415  1.01207271]
+minimum deger 8.606730178162036e-05
+Kabul Orani: 48.62%
 ```
 
 Üstteki değerler hakikaten Rosenbrock'un bilinen minimum noktasına
