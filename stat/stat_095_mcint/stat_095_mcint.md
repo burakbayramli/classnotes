@@ -498,22 +498,26 @@ Ufak bir fark, mutasyon evresinde tüm parçacıkların tek bir noktaya
 çökmesini önlemek için standart bir MCMC adımı (Metropolis gibi)
 kullanarak onları "sarsmaktır."
 
-PF neden umut vadeden gelecek: SMC'nin 2026'da standart HMC veya
-Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla
-olan ilişkisidir:
+Ana tekniğe dönelim: evrile evrile $p(x)$ haline gelen ara $\pi(x)$
+dağılımlarını tanımlamak için kullanılan numara geometrik oynama
+(geometric tempering) tekniği. Bir geçiş "takvimi" hazırlarız,
+$\beta_i$ katsayıları üzerinden, bunlar 0 ile 1 arasındaki reel
+sayılar, $\beta_0 = 0,\ \beta_1,\ \ldots,\ \beta_T = 1$. Ara dağılım
+şöyle tanımlanır, $\pi_t(x) \propto p(x)^{\beta_t}$.
 
-* Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir yolu
-  yürüyen tek kişidir. SMC'de ise bir sürü halinde gezinme
-  yapılabilir. Her parçacık, "ağırlık" ve "mutasyon" aşamalarında aynı
-  anda farklı bir GPU çekirdeğinde işletebilir.
-
-* Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
-  kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026'da,
-  bu adımı bile modern donanımda son derece hızlı hale getiren paralel 
-  yeniden örnekleme algoritmaları mevcuttur.
+Bu numara niye işliyor? Çünkü dikkatle bakarsak $\beta = 0$: $\pi_0(x)
+\propto p(x)^0 = 1$. Sürekli 1 döndüren dağılım nedir? Birörnek
+dağılımdır! Yani en kabaca, en tepe içermeyen düz dağılım budur,
+hiçbir şey bilmemek ile eşdeğerdir, ve ilk başta örneklemin ondan
+gelmesinde problem yoktur. Daha sonra evrile evrile ne elde ediyoruz?
+$\beta = 1$: $\pi_T(x) \propto p(x)^1 = p(x)$, yani nihai hedef
+$p(x)$'in kendisi. O zaman 0 ila 1 arasındaki tüm $\beta$ değerleri
+bizi en kaba tanımdan en detaylı tanıma doğru evriltiyor, ve bu sırada
+onu takip eden Sıralı Monte Carlo işlemi doğru örneklemleri toplamaya
+doğru değişmiş oluyor. 
 
 Altta iki Gaussian içeren bir çetrefil dağılımdan örneklem almak için
-üstteki PF yaklaşımını kullandık. 
+üstteki yaklaşımı kullandık.
 
 Örnek
 
@@ -590,6 +594,23 @@ plt.savefig('stat_095_mcint_01.jpg')
 Kodlar
 
 [face.py](face.py)
+
+### Paralellik
+
+PF neden umut vadeden gelecek: SMC'nin 2026'da standart HMC veya
+Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla
+olan ilişkisidir:
+
+* Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir yolu
+  yürüyen tek kişidir. SMC'de ise bir sürü halinde gezinme
+  yapılabilir. Her parçacık, "ağırlık" ve "mutasyon" aşamalarında aynı
+  anda farklı bir GPU çekirdeğinde işletebilir.
+
+* Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
+  kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026'da,
+  bu adımı bile modern donanımda son derece hızlı hale getiren paralel 
+  yeniden örnekleme algoritmaları mevcuttur.
+
 
 [devam edecek]
 

@@ -565,19 +565,28 @@ class="math inline">\(\pi_T\)</span> gerçek hedefinizdir.</p>
 <p>Ufak bir fark, mutasyon evresinde tüm parçacıkların tek bir noktaya
 çökmesini önlemek için standart bir MCMC adımı (Metropolis gibi)
 kullanarak onları “sarsmaktır.”</p>
-<p>PF neden umut vadeden gelecek: SMC’nin 2026’da standart HMC veya
-Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla olan
-ilişkisidir:</p>
-<ul>
-<li><p>Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir
-yolu yürüyen tek kişidir. SMC’de ise bir sürü halinde gezinme
-yapılabilir. Her parçacık, “ağırlık” ve “mutasyon” aşamalarında aynı
-anda farklı bir GPU çekirdeğinde işletebilir.</p></li>
-<li><p>Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
-kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026’da, bu
-adımı bile modern donanımda son derece hızlı hale getiren paralel
-yeniden örnekleme algoritmaları mevcuttur.</p></li>
-</ul>
+<p>Ana tekniğe dönelim: evrile evrile <span
+class="math inline">\(p(x)\)</span> haline gelen ara <span
+class="math inline">\(\pi(x)\)</span> dağılımlarını tanımlamak için
+kullanılan numara geometrik oynama (geometric tempering) tekniği. Bir
+geçiş “takvimi” hazırlarız, <span class="math inline">\(\beta_i\)</span>
+katsayıları üzerinden, bunlar 0 ile 1 arasındaki reel sayılar, <span
+class="math inline">\(\beta_0 = 0,\ \beta_1,\ \ldots,\ \beta_T =
+1\)</span>. Ara dağılım şöyle tanımlanır, <span
+class="math inline">\(\pi_t(x) \propto p(x)^{\beta_t}\)</span>.</p>
+<p>Bu numara niye işliyor? Çünkü dikkatle bakarsak <span
+class="math inline">\(\beta = 0\)</span>: <span
+class="math inline">\(\pi_0(x) \propto p(x)^0 = 1\)</span>. Sürekli 1
+döndüren dağılım nedir? Birörnek dağılımdır! Yani en kabaca, en tepe
+içermeyen düz dağılım budur, hiçbir şey bilmemek ile eşdeğerdir, ve ilk
+başta örneklemin ondan gelmesinde problem yoktur. Daha sonra evrile
+evrile ne elde ediyoruz? <span class="math inline">\(\beta = 1\)</span>:
+<span class="math inline">\(\pi_T(x) \propto p(x)^1 = p(x)\)</span>,
+yani nihai hedef <span class="math inline">\(p(x)\)</span>’in kendisi. O
+zaman 0 ila 1 arasındaki tüm <span class="math inline">\(\beta\)</span>
+değerleri bizi en kaba tanımdan en detaylı tanıma doğru evriltiyor, ve
+bu sırada onu takip eden Sıralı Monte Carlo işlemi doğru örneklemleri
+toplamaya doğru değişmiş oluyor.</p>
 <p>Altta iki Gaussian içeren bir çetrefil dağılımdan örneklem almak için
 üstteki PF yaklaşımını kullandık.</p>
 <p>Örnek</p>
@@ -650,6 +659,20 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <p><img src="stat_095_mcint_01.jpg" /></p>
 <p>Kodlar</p>
 <p><a href="face.py">face.py</a></p>
+<h3 id="paralellik">Paralellik</h3>
+<p>PF neden umut vadeden gelecek: SMC’nin 2026’da standart HMC veya
+Metropolis karşısında bu kadar zemin kazanmasının nedeni, donanımla olan
+ilişkisidir:</p>
+<ul>
+<li><p>Devasa Paralellik: Standart bir MCMC zincirinde algoritma bir
+yolu yürüyen tek kişidir. SMC’de ise bir sürü halinde gezinme
+yapılabilir. Her parçacık, “ağırlık” ve “mutasyon” aşamalarında aynı
+anda farklı bir GPU çekirdeğinde işletebilir.</p></li>
+<li><p>Paralel olmayan tek kısım, yeniden ornekleme idi (parçacıkların
+kimin hayatta kaldığını görmek için iletişim kurduğu yer). 2026’da, bu
+adımı bile modern donanımda son derece hızlı hale getiren paralel
+yeniden örnekleme algoritmaları mevcuttur.</p></li>
+</ul>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Zhao, <em>Monte Carlo integration in Python over univariate and
