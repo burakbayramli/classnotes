@@ -640,8 +640,7 @@ Kaynaklar
 
 [9] Bayramlı, *Fizik, Temel Fizik 3, Basınç, Çarpışma*
 
-[10] Bayramlı, *Simulasyon Animasyonu*,
-    [https://github.com/burakbayramli/classnotes/blob/master/compscieng/compscieng_app40sph/balls4.gif?raw=true](https://github.com/burakbayramli/classnotes/blob/master/compscieng/compscieng_app40sph/balls4.gif?raw=true)
+[10] Bayramlı, [Simulasyon Animasyonu](https://www.dropbox.com/scl/fi/x7c3q9yntewp2fddabuxa/balls4.gif?rlkey=3hjzarzgp0417k177cekxkq82&st=verg7ded&raw=1)
 
 [11] Bayramlı, *Istatistik, Dairesel Baz Fonksiyonları (Radial Basis Functions -RBF-)*
 
