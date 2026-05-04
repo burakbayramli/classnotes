@@ -5,7 +5,7 @@ problemidir" denebilir mi? Bu kışkırtıcı kavramsal bir iddia
 olurdu. Katı matematiksel açıdan bakıldığında bu bir sezgisel kural,
 ancak teorik fizik ve Bayes istatistik perspektifinden son derece
 isabetlidir. Matematiksel köprü Gibbs dağılımı. Argümanın özü Gibbs /
-Boltzmann dağılımında yatmaktadır. Optimizasyonda, $f(x)$'i maksimize
+Boltzmann dağılımında yatmaktadır. Optimizasyonda, $f(x)$'i minimize
 eden $x^*$'i bulmak isteriz. Örneklemede ise bir olasılık dağılımı
 $p(x)$'ten örnekler çekmek isteriz. Herhangi bir optimizasyon
 problemini, bir dağılım tanımlayarak örnekleme problemine dönüştürmek
