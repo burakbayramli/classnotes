@@ -409,6 +409,7 @@ Peak) fonksiyonu [1],
 
 $$f(x) = \prod_{i=1}^{D} \left[ a_i^{-2} + (x_i - w_i)^2 \right]^{-1}$$
 
+Fonksiyonun 3 boyuttaki hali alttadır,
 
 ```python
 import numpy as np
@@ -442,6 +443,13 @@ plt.savefig('stat_230_opt_03.jpg')
 ```
 
 ![](stat_230_opt_03.jpg)
+
+Optimizasyonu iyice zorlaştırmak için 100 boyutlu bir Genz fonksiyonu
+seçtik. Bu fonksiyonu yine dağılım haline getireceğiz, ama bu sefer
+paralel parçacık filtresi ile onu gezeceğiz... Parçacık filtrelerinin
+parallelliğe yatkın bir yaklaşım olduğunu görmüştük, her parçacık
+farklı bir CPU/GPU çekirdeği üzerinde işleyebilir. Alttaki `pf_tf.py`
+kodu aynen bunu yapıyor.
 
 Paralel
 
@@ -509,6 +517,12 @@ Dim 4: Found 0.225209 | Actual 0.224242
 ==============================
 ```
 
+Kod tek GPU üzerinde (Google Colab'da denenebilir) birkaç saniye
+içinde sonucu buluyor. Üstte ilk 5 boyutta gerçek minimum noktasına ne
+kadar yaklaşıldığını göstermek için bulunan ve gerçek optimal nokta
+yanyana gösterilmiş. Genz fonksiyonu optimizasyonun en zor
+problemlerinden biridir. Fakat parallellik, ve olasılıksal yaklaşım
+ile yaklaşık optimal noktasını bulabiliyoruz.
 
 Kodlar
 
