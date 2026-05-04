@@ -47,11 +47,11 @@ Parcaçık Filtreleri) optimizasyon problemlerini ikiz problemi
 üzerinden çözmek mümkündür.
 
 
-Bu yalnızca teorik bir merak konusu değildir; birçok önemli
-algoritmanın temelidir:
+Bu yalnızca teorik bir merak konusu değil; birçok önemli algoritmanın
+temeli:
 
-* Simule Edilen Yumusatma (Simulated Annealing): Bu teknik tanimi
-  baglaminda Gibbs dağılımından örnekleme ve sistemi küresel optimuma
+* Simule Edilen Yumuşatma (Simulated Annealing): Bu teknik tanımı
+  bağlamında Gibbs dağılımından örnekleme ve sistemi küresel optimuma
   "dondurarak" yavaş yavaş $T$'yi düşürme süreci, yani tıpatıp üstte
   tarif ettiğimiz yaklaşım. Bu arada "annealing" metalurjiden gelen
   bir kavram.
@@ -80,10 +80,10 @@ Optimizasyonu örnekleme olarak görmek çeşitli avantajlar sunar:
   önem taşır. Bir sonsal dağılımın güvenlik aralıklarını
   hesaplayabiliriz. Nihai tek nokta ile yapacak fazla bir şey yoktur.
 
-* Düzenlileştirme (Regularization): Örnekleme bakış açısında, onsel
+* Düzenlileştirme (Regularization): Örnekleme bakış açısında, önsel
   dağılım bir düzenlileştirici görevi görür. Ağırlık azalmasıyla
   ($\ell_2$ düzenlileştirme) yapılan optimizasyon, Gaussian öncülüyle
-  MAP tahmini bulmakla tamamen aynıdır.
+  MAP tahmini bulmakla zaten tamamen aynıdır.
 
 ### Niye $\exp$
 
@@ -104,15 +104,14 @@ kullandık? Bazı sebepler var.
   dağılımdır. Belirli bir beklenen maliyete $\langle f \rangle$ sahip
   olan ancak bunun dışında mümkün olduğunca tarafsız olan bir olasılık
   dağılımı bulmak istiyorsanız, Maksimum Entropi İlkesi çözümün şu
-  formu alması gerektiğini kanıtlar: $$P(x) \propto \exp(-\beta
-  f(x))$$. $\exp$ kullanmak, amaç fonksiyonunun kendisi tarafından
+  formu alması gerektiğini kanıtlar: $P(x) \propto \exp(-\beta
+  f(x))$. $\exp$ kullanmak, amaç fonksiyonunun kendisi tarafından
   zorunlu kılınmayan gizli varsayımlar veya "örüntüler" eklenmediğini
   güvence altına alır.
 
 * Ölçek Ayrımı (Sıcaklık Parametresi): Üstel fonksiyon, bir "sıcaklık"
   veya "ters sıcaklık" parametresi olan $\beta = 1/T$'nin
-  tanıtılmasına olanak tanır. Bu, SMC'de benzersiz bir mekanik avantaj
-  sağlar:
+  tanıtılmasına olanak tanır. Bu, SMC'ye bir mekanik avantaj sağlar:
 
     * Düzleştirme ve Keskinleştirme: $T$ yüksek olduğunda, dağılım
       neredeyse düzgündür ve parçacıkların tüm durum uzayını
@@ -128,12 +127,12 @@ kullandık? Bazı sebepler var.
       Bu, örnekleyiciyi fonksiyonun mutlak büyüklüğü yerine göreli
       iyileştirmelere duyarlı kılar.
 
-* SMC'de Matematiksel Kolaylık: Sıralı Monte Carlo'da,
-parçacıklarınızı güncellemek için önem ağırlıkları hesaplamanız
-gerekir. $T_n$ sıcaklığındaki bir dağılımdan $T_{n+1}$'e geçerken,
-artımlı ağırlık şöyledir: $$w =
-\frac{\exp(-f(x)/T_{n+1})}{\exp(-f(x)/T_n)} = \exp\left(-f(x) \left(
-\frac{1}{T_{n+1}} - \frac{1}{T_n} \right) \right)$$
+* Matematiksel Kolaylık: Sıralı Monte Carlo'da, parçacıklarınızı
+  güncellemek için önem ağırlıkları hesaplamanız gerekir. $T_n$
+  sıcaklığındaki bir dağılımdan $T_{n+1}$'e geçerken, artımlı ağırlık
+  şöyledir: $$w = \frac{\exp(-f(x)/T_{n+1})}{\exp(-f(x)/T_n)} =
+  \exp\left(-f(x) \left( \frac{1}{T_{n+1}} - \frac{1}{T_n} \right)
+  \right)$$
 
 * Logaritmik Doğrusallık: Üslerin özellikleri sayesinde, bu
   güncellemeler logaritmik uzayda toplamsal hale gelir. Bu, sayısal
@@ -319,11 +318,12 @@ Kabul Orani: 48.62%
 ```
 
 Üstteki değerler hakikaten Rosenbrock'un bilinen minimum noktasına
-oldukca yakındır. Kod içindeki bir kısmı aydınlatalım, niye `min(1,
-np.exp((energy_curr - energy_prop) / T))` kullandık? Çünkü bir
-Metropolis örnekleyici iki olasılık hesabının oranına göre hareketi
-kabul eder, diyelim `prop` teklif, `curr` o andaki durumu temsil
-ediyorsa,
+oldukca yakın.
+
+Kod içindeki bir kısmı aydınlatalım, niye `min(1, np.exp((energy_curr
+- energy_prop) / T))` kullandık? Çünkü bir Metropolis örnekleyici iki
+olasılık hesabının oranına göre hareketi kabul eder, diyelim `prop`
+teklif, `curr` o andaki durumu temsil ediyorsa,
 
 $$
 \alpha = \min\left(1, \frac{P(prop)}{P(curr)}\right)
@@ -444,12 +444,14 @@ plt.savefig('stat_230_opt_03.jpg')
 
 ![](stat_230_opt_03.jpg)
 
-Optimizasyonu iyice zorlaştırmak için 100 boyutlu bir Genz fonksiyonu
-seçtik. Bu fonksiyonu yine dağılım haline getireceğiz, ama bu sefer
+Genz fonksiyonu istenen boyutta tanımlanabilir, ve boyutlar arttıkça
+minimum noktası çok daha zor bulunur hale gelir. Biz şimdi
+optimizasyonu iyice zorlaştırmak için 100 boyutlu bir Genz fonksiyonu
+seçiyoruz. Onu dağılım haline getireceğiz, fakat bu sefer dağılımı
 paralel parçacık filtresi ile onu gezeceğiz... Parçacık filtrelerinin
 parallelliğe yatkın bir yaklaşım olduğunu görmüştük, her parçacık
 farklı bir CPU/GPU çekirdeği üzerinde işleyebilir. Alttaki `pf_tf.py`
-kodu aynen bunu yapıyor.
+kodu da aynen bunu yapıyor.
 
 Paralel
 
@@ -520,15 +522,15 @@ Dim 4: Found 0.225209 | Actual 0.224242
 Kod tek GPU üzerinde (Google Colab'da denenebilir) birkaç saniye
 içinde sonucu buluyor. Üstte ilk 5 boyutta gerçek minimum noktasına ne
 kadar yaklaşıldığını göstermek için bulunan ve gerçek optimal nokta
-yanyana gösterilmiş. Genz fonksiyonu optimizasyonun en zor
-problemlerinden biridir. Fakat parallellik, ve olasılıksal yaklaşım
-ile yaklaşık optimal noktasını bulabiliyoruz.
+yanyana gösterilmiş, değerler oldukca yakın.
+
+Genz fonksiyonu optimizasyonun en zor problemlerinden biridir. Fakat
+parallellik, ve olasılıksal yaklaşım ile yaklaşık optimal noktasını
+hızlı bir şekilde bulabiliyoruz.
 
 Kodlar
 
 [pf_tf.py](pf_tf.py)
-
-[devam edecek]
 
 Kaynaklar
 
@@ -536,3 +538,4 @@ Kaynaklar
     Proceeding of International Conference on Tools, Methods and
     Languages for Scientific and Engineering Computation,
     81–94. Elsevier North-Holland, Inc., 1984.
+
