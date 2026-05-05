@@ -82,8 +82,8 @@ Optimizasyonu örnekleme olarak görmek çeşitli avantajlar sunar:
 
 * Düzenlileştirme (Regularization): Örnekleme bakış açısında, önsel
   dağılım bir düzenlileştirici görevi görür. Ağırlık azalmasıyla
-  ($\ell_2$ düzenlileştirme) yapılan optimizasyon, Gaussian öncülüyle
-  MAP tahmini bulmakla zaten tamamen aynıdır.
+  ($\ell_2$ düzenlileştirme) yapılan optimizasyon, Gaussian önselliği
+  üzerinden MAP tahmini bulmakla zaten tamamen aynıdır.
 
 ### Niye $\exp$
 
