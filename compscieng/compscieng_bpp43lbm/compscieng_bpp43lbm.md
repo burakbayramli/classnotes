@@ -27,5 +27,4 @@
 
 Kaynaklar
 
-[1] G. A. Bird, *The DSMC Method*
 
