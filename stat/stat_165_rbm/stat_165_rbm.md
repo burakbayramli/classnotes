@@ -208,7 +208,7 @@ $$
 y_iy_j
 $$
 
-Eğer bölümün üstünü ve altını $Z$ ile bolşek,
+Eğer bölümün üstünü ve altını $Z$ ile bölsek,
 
 $$ 
 = \sum_h  
@@ -569,5 +569,4 @@ Kaynaklar
 
 [5] Larochelle, H., *Neural networks [5.1] : Restricted Boltzmann machine - definition*, 
     [https://www.youtube.com/watch?v=p4Vh_zMw-HQ](https://www.youtube.com/watch?v=p4Vh_zMw-HQ)
-
 

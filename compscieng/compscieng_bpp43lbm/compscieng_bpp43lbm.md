@@ -1,4 +1,4 @@
-# Örgü (Lattıce) Boltzmann Metodu
+# Örgü (Lattice) Boltzmann Metodu
 
 
 
@@ -26,5 +26,7 @@
 
 
 Kaynaklar
+
+
 
 
