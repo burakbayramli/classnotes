@@ -3,7 +3,7 @@
 
 ## En Son
 
-22/5 - [Sıvı ve Gaz Mekaniği - 2, Boltzmann Taşıma Denklemi](https://burakbayramli.github.io/dersblog/phy/phy_030_flgas2/sivi_ve_gaz_mekanigi__2.html)
+22/5 - [Sıvı ve Gaz Mekaniği - 2](https://burakbayramli.github.io/dersblog/phy/phy_030_flgas2/sivi_ve_gaz_mekanigi__2.html)
 
 4/5 - [Optimizasyon, Simulasyon](https://burakbayramli.github.io/dersblog/stat/stat_230_opt/optimizasyon_simulasyon.html)
 

@@ -105,12 +105,12 @@ manzaramızı verir:
 
 $$f(v) = \phi(v_x)\phi(v_y)\phi(v_z)$$
 
-Fonksiyonel Denklemi Çözme (Türev Hilesi)
+Fonksiyonel Denklemi Çözme (Türev Numarası)
 
 Birleşik bir değişkene bağlı bir fonksiyonun, ayrı bağımsız
 değişkenlerin çarpımına eşit olduğu bir denklemimiz var. Bunları
 birbirinden ayırmak için her iki tarafı da tek bir bileşen olan
-$v_x$'e göre türev alırız.
+$v_x$'e göre türev alırız [5].
 
 Sol tarafta zincir kuralını kullanarak:
 
@@ -253,7 +253,7 @@ dağılımını istiyoruz.
 
 Geometrik olarak, aynı hıza $v$ sahip tüm noktalar, $v$ yarıçaplı bir
 kürenin yüzeyini oluşturur. Hızdaki $\ud v$ artışı, bu kürenin
-etrafına ince bir küresel kabuk eklemeye karşılık gelir.
+etrafına ince bir küresel kabuk eklemeye karşılık gelir [2, sf. 20].
 
 Bu ince kabuğun hız uzayındaki hacmi, yüzey alanı ile kalınlığının
 çarpımına eşittir: $4\pi v^2 \ud v$.
@@ -489,5 +489,4 @@ Kaynaklar
 
 [4] Gibiansky, <a href="https://www.gibiansky.com/blog/physics/lattice-boltzmann-method/index.html">Lattice Boltzmann Method</a>
 
-
-
+[5] Rodrigues, <a href="https://www.researchgate.net/publication/388525760_Deriving_the_Maxwell-Boltzmann_speed_distribution_function">Deriving the Maxwell-Boltzmann speed distribution function</a>
