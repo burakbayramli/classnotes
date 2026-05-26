@@ -143,7 +143,7 @@ Son olarak her iki tarafı $v_x$'e böleriz:
 
 $$\frac{f'(v)}{f(v) \cdot v} = \frac{\phi'(v_x)}{\phi(v_x) \cdot v_x}$$
 
-Değişkenlerin Ayrılmasının Gücü
+Değişkenlerin Ayrılmasının Avantajı
 
 Az önce izole ettiğimiz denkleme dikkatle bakın:
 
@@ -279,7 +279,7 @@ anda her bir parçacığın konum vektörünü ve hızını bilmek mümkün
 olabilir. Bu tür bilgi, sistemin tam dinamik durumunu verir ve klasik
 mekanikle birlikte tüm gelecekteki durumların tam olarak tahmin
 edilmesine olanak tanır [1]. Ancak gerçekçi bir simülasyonda bu tür
-bir takip, muazzam bilişim kaynakları gerektirir.
+bir takip, muazzam hesapsal kaynakları gerektirir.
 
 Ama alternatif olarak sistemi bir *dağılım* fonksiyonu $f(r, c, t)$
 ile tanımlayabiliriz. Burada dağılım, koordinatların konum, hız
@@ -394,7 +394,7 @@ aralığında olan kümeyi oluştururdu.
 
 Sonuç olarak şunu elde ederiz:
 
-$$f(c + F\ud t,\, r + c\ud t,\, t + \ud t) = f(c, r, t)\ud c\ud r = 0$$
+$$f(c + F\ud t,\, r + c\ud t,\, t + \ud t) = f(c, r, t)\ud c\ud r $$
 
 Zaman Diferansiyelini İzole Etmek: Cebirsel değişime başlamak için
 denklemin her iki tarafını toplam diferansiyel hacim elemanı $\ud
@@ -490,3 +490,7 @@ Kaynaklar
 [4] Gibiansky, <a href="https://www.gibiansky.com/blog/physics/lattice-boltzmann-method/index.html">Lattice Boltzmann Method</a>
 
 [5] Rodrigues, <a href="https://www.researchgate.net/publication/388525760_Deriving_the_Maxwell-Boltzmann_speed_distribution_function">Deriving the Maxwell-Boltzmann speed distribution function</a>
+
+
+
+
