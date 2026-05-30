@@ -242,7 +242,11 @@ Tam 3 Boyutlu Hız Dağılım Fonksiyonunun Oluşturulması
 Üç 1 boyutlu dağılımı çarparak ($\phi(v_x)\phi(v_y)\phi(v_z)$) toplam
 3 boyutlu hız dağılımını elde ederiz:
 
-$$f(v_x, v_y, v_z) = \left(\frac{m}{2\pi kT}\right)^{3/2} e^{-\frac{m(v_x^2 + v_y^2 + v_z^2)}{2kT}} = \left(\frac{m}{2\pi kT}\right)^{3/2} e^{-\frac{mv^2}{2kT}}$$
+$$
+f(v_x, v_y, v_z) =
+\left(\frac{m}{2\pi kT}\right)^{3/2} e^{-\frac{m(v_x^2 + v_y^2 + v_z^2)}{2kT}} =
+\left(\frac{m}{2\pi kT}\right)^{3/2} e^{-\frac{mv^2}{2kT}}
+$$
 
 Hız Vektörlerinden Tek Sayısal Hıza Geçiş
 
@@ -394,7 +398,9 @@ aralığında olan kümeyi oluştururdu.
 
 Sonuç olarak şunu elde ederiz:
 
-$$f(c + F\ud t,\, r + c\ud t,\, t + \ud t) = f(c, r, t)\ud c\ud r $$
+$$
+f(c + F\ud t,\, r + c\ud t,\, t + \ud t) \ud c\ud r = f(c, r, t) \ud c\ud r
+$$
 
 Zaman Diferansiyelini İzole Etmek: Cebirsel değişime başlamak için
 denklemin her iki tarafını toplam diferansiyel hacim elemanı $\ud
