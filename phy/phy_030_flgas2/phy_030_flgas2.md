@@ -248,32 +248,6 @@ f(v_x, v_y, v_z) =
 \left(\frac{m}{2\pi kT}\right)^{3/2} e^{-\frac{mv^2}{2kT}}
 $$
 
-Hız Vektörlerinden Tek Sayısal Hıza Geçiş
-
-Şu an, $f(v_x, v_y, v_z) \ud v_x \ud v_y \ud v_z$, hız
-uzayındaki sonsuz küçük bir kutu içinde bir molekül bulma olasılığını
-temsil etmektedir. Ancak biz, yönden bağımsız olarak hız (v)
-dağılımını istiyoruz.
-
-Geometrik olarak, aynı hıza $v$ sahip tüm noktalar, $v$ yarıçaplı bir
-kürenin yüzeyini oluşturur. Hızdaki $\ud v$ artışı, bu kürenin
-etrafına ince bir küresel kabuk eklemeye karşılık gelir [2, sf. 20].
-
-Bu ince kabuğun hız uzayındaki hacmi, yüzey alanı ile kalınlığının
-çarpımına eşittir: $4\pi v^2 \ud v$.
-
-Bu nedenle, nihai tek sayı hız dağılımı $F(v)$'yi elde etmek için 3
-boyutlu hız olasılık yoğunluğunu bu geometrik kabuk hacim çarpanıyla
-çarparız:
-
-$$F(v) \ud v = f(v) \cdot 4\pi v^2 \ud v$$
-
-$$F(v) = 4\pi \left(\frac{m}{2\pi kT}\right)^{3/2} v^2 \, e^{-\frac{mv^2}{2kT}}$$
-
-Bu, sıfır varsayımdan hareketle, saf kalkülüs ve temel termodinamik
-ilişkiler kullanılarak açıkça inşa edilmiş, tamamlanmış
-Maxwell-Boltzmann hız dağılım fonksiyonudur.
-
 ### Boltzmann Taşıma Denklemi
 
 Sert küresel parçacıklardan oluşan ve büyük hızlarla hareket eden
@@ -496,7 +470,3 @@ Kaynaklar
 [4] Gibiansky, <a href="https://www.gibiansky.com/blog/physics/lattice-boltzmann-method/index.html">Lattice Boltzmann Method</a>
 
 [5] Rodrigues, <a href="https://www.researchgate.net/publication/388525760_Deriving_the_Maxwell-Boltzmann_speed_distribution_function">Deriving the Maxwell-Boltzmann speed distribution function</a>
-
-
-
-
