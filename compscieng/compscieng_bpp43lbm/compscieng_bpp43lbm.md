@@ -48,7 +48,11 @@ olduğundan hesaplamak güçtür. Ancak çarpışma operatörünü, çözümün
 sonucunda önemli bir hata ortaya çıkarmadan basit bir hesaplamayla
 yaklaşık olarak ifade etmek mümkündür [2, sf. 28].
 
-$\Omega$'yı yaklaşık olarak ifade edebilmek için BGK yaklaşımı adı verilen bir yöntem geliştirilmiştir. BGK kaba ama zekice bir basitleştirmedir: tüm çarpışmaları hesaplamak yerine şu soruyu sorar: "Mevcut dağılım denge durumundan ne kadar uzakta ve ne kadar hızlı gevşiyor?" Bu şu sonucu verir:
+$\Omega$'yı yaklaşık olarak ifade edebilmek için BGK yaklaşımı adı
+verilen bir yöntem geliştirilmiştir. BGK kaba ama zekice bir
+basitleştirmedir: tüm çarpışmaları hesaplamak yerine şu soruyu sorar:
+"Mevcut dağılım denge durumundan ne kadar uzakta ve ne kadar hızlı
+gevşiyor?" Bu şu sonucu verir:
 
 $$\Omega = \frac{1}{\tau}(f^{eq} - f)$$
 
@@ -75,7 +79,8 @@ temsil eder.
   moleküler popülasyonun sınır dışına ne kadar çıktığını tam olarak
   ölçer.
 
-Sapma bu çıkarma işlemiyle algılandıktan sonra, BGK operatörü bu değeri sistemi değiştirmek için hemen kullanır:
+Sapma bu çıkarma işlemiyle algılandıktan sonra, BGK operatörü bu
+değeri sistemi değiştirmek için hemen kullanır:
 
 $$\Omega = \frac{1}{\tau}(f^{eq} - f)$$
 
@@ -85,20 +90,29 @@ bir ölçümü aktif bir geri yükleyici kuvvete dönüştürür.
 - Belirli bir hızda hareket eden çok fazla molekül varsa ($f > f^{eq}$), terim negatif olur ve çarpışma adımı o yöndeki popülasyonları azaltır.
 - Çok az molekül varsa ($f < f^{eq}$), terim pozitif olur ve çarpışma adımı o yöndeki popülasyonları artırır.
 
-Değişiklik her zaman sapmayı doğrudan orantılıdır. Bir düğüm doğal denge durumundan ne kadar uzaksa, onu yeniden dengeye sokmak için değiştirme adımı o kadar agresif hale gelir.
+Değişiklik her zaman sapmayı doğrudan orantılıdır. Bir düğüm doğal
+denge durumundan ne kadar uzaksa, onu yeniden dengeye sokmak için
+değiştirme adımı o kadar agresif hale gelir.
 
-BGK çarpışma operatörünü aynı anda iki görev yerine getiren akıllı bir geri besleme döngüsü olarak düşünebiliriz:
+BGK çarpışma operatörünü aynı anda iki görev yerine getiren akıllı bir
+geri besleme döngüsü olarak düşünebiliriz:
 
 1. Algılar: $(f^{eq} - f)$'yi hesaplayarak, o belirli düğümdeki sıvının denge durumundan ne kadar uzakta olduğunu ölçen bir sensör görevi görür.
 2. Değiştirir: Bu ölçümü, orantılı bir düzeltme hesaplamak için kullanır. Bir hız durumu kalabalıksa BGK onu boşaltır; azalmışsa doldurur.
 
-Bu, kendi kendini düzenleyen matematiksel bir motordur: yüksek bozulma, büyük bir düzeltici çarpışma tepkisini tetiklerken, sakin ve dengelenmiş bir akış tamamen değişmeden geçer.
+Bu, kendi kendini düzenleyen matematiksel bir motordur: yüksek
+bozulma, büyük bir düzeltici çarpışma tepkisini tetiklerken, sakin ve
+dengelenmiş bir akış tamamen değişmeden geçer.
 
-Bir not olarak belirtmek gerekir ki yukarıda açıklanan şema özünde doğrusal bir gevşeme modelidir; Newton'un soğuma yasası $dT/dt = -(T - T_\infty)/\tau$ ile aynı matematiksel yapıya sahiptir.
+Bir not olarak belirtmek gerekir ki yukarıda açıklanan şema özünde
+doğrusal bir gevşeme modelidir; Newton'un soğuma yasası $dT/dt = -(T -
+T_\infty)/\tau$ ile aynı matematiksel yapıya sahiptir.
 
 ### Denge Dağılımı
 
-Denge dağılımını daha kolay hesaplanabilir hale getirmek için üzerinde bazı işlemler yapmamız gerekiyor. Gaussian $\exp(-|c|^2/2RT)$, ayrık bir ızgara için çeşitli nedenlerle sorunludur:
+Denge dağılımını daha kolay hesaplanabilir hale getirmek için üzerinde
+bazı işlemler yapmamız gerekiyor. Gaussian $\exp(-|c|^2/2RT)$, ayrık
+bir ızgara için çeşitli nedenlerle sorunludur:
 
 - Sürekli $c$ için tanımlanmıştır
 - Hiçbir zaman tam olarak sıfıra eşit olmadığından sonlu sayıda yöne kesilemez
@@ -120,13 +134,20 @@ $$= \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \exp\le
 
 $$\exp(x) = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots \tag{2}$$
 
-Taylor açılımını herhangi bir basitleştirme yapmadan doğrudan (1)'e koyarak:
+Taylor açılımını herhangi bir basitleştirme yapmadan doğrudan (1)'e
+koyarak:
 
 $$f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \left(1 - \frac{-2c \cdot u + u \cdot u}{2RT} + \frac{(-2c \cdot u + u \cdot u)^2}{4R^2T^2} + \cdots\right) \tag{3}$$
 
-burada parantez içindeki ikinci terim (2)'deki $x$ terimidir, üçüncü terim $x^2/2!$ terimidir; $O(u^3)$ terimleri atılır ve $(-2c \cdot u + u \cdot u)^2 \approx 4(c \cdot u)^2$ sadeleştirmesi yapılır (çünkü kare içindeki $u \cdot u$ terimi zaten $O(u^2)$ mertebesinde olduğundan bütün ifadeyi $O(u^4)$ yapar), bu da (3)'ten (4)'e geçişi sağlar.
+burada parantez içindeki ikinci terim (2)'deki $x$ terimidir, üçüncü
+terim $x^2/2!$ terimidir; $O(u^3)$ terimleri atılır ve $(-2c \cdot u +
+u \cdot u)^2 \approx 4(c \cdot u)^2$ sadeleştirmesi yapılır (çünkü
+kare içindeki $u \cdot u$ terimi zaten $O(u^2)$ mertebesinde
+olduğundan bütün ifadeyi $O(u^4)$ yapar), bu da (3)'ten (4)'e geçişi
+sağlar.
 
-İkinci üstelin Taylor açılımı yapılarak $O(u^3)$ terimleri atıldığında:
+İkinci üstelin Taylor açılımı yapılarak $O(u^3)$ terimleri
+atıldığında:
 
 $$f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \left(1 + \frac{2c \cdot u - u \cdot u}{2RT} + \frac{(c \cdot u)^2}{2R^2T^2}\right) \tag{4}$$
 
@@ -142,22 +163,34 @@ $f^{eq}_i$, Taylor açılımlı MB (3.4) ile $\rho$ ve $u$ kullanılarak hesapla
 
 $$f^{eq}_i = w_i \rho \left(1 + \frac{c_i \cdot u}{c_s^2} + \frac{(c_i \cdot u)^2}{2c_s^4} - \frac{u \cdot u}{2c_s^2}\right)$$
 
-Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir olan $c \cdot u$ cinsinden bir polinomla değiştirir. Ardından yapılan iki yerine koyma işlemi zariftir:
+Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir olan
+$c \cdot u$ cinsinden bir polinomla değiştirir. Ardından yapılan iki
+yerine koyma işlemi zariftir:
 
 - $W(c) = \exp(-c \cdot c / 2RT)(2\pi RT)^{-D/2}$, Gaussian'ı bir ağırlığa absorbe eder — ve bu ağırlık yalnızca $c$'nin büyüklüğüne bağlı olduğundan, her ayrık ızgara yönü $i$ için bir kez hesaplanan sabit bir $w_i$ sabitine dönüşür
 - $RT = c_s^2$, termodinamiği ızgara ses hızına bağlar
 
-Dolayısıyla (5)'te ayrıklaştırmanın ardından $f^{eq}_i$, sabit katsayıları $w_i$, $c_i$, $c_s$ olan — hepsi önceden hesaplanabilir — $u$ cinsinden yalnızca bir polinomdur. LBM'yi hesaplamalı açıdan bu kadar çekici yapan da budur.
+Dolayısıyla (5)'te ayrıklaştırmanın ardından $f^{eq}_i$, sabit
+katsayıları $w_i$, $c_i$, $c_s$ olan — hepsi önceden hesaplanabilir —
+$u$ cinsinden yalnızca bir polinomdur. LBM'yi hesaplamalı açıdan bu
+kadar çekici yapan da budur.
 
-$O(u^2)$ kesmesi aynı zamanda sınırlamayı da bize söyler: bu, düşük Mach sayısı yaklaşımıdır. $|u|/c_s$'nin küçük olmadığı yüksek hızlı akışlar için daha yüksek mertebeden terimler gerekecektir.
+$O(u^2)$ kesmesi aynı zamanda sınırlamayı da bize söyler: bu, düşük
+Mach sayısı yaklaşımıdır. $|u|/c_s$'nin küçük olmadığı yüksek hızlı
+akışlar için daha yüksek mertebeden terimler gerekecektir.
 
 ### Ana Denklemin Ayrıklaştırılması
 
-Şimdi bir Taylor açılımına daha ihtiyaç duyacağız. Bu tekniği $f(..)$ için kullanmak istiyoruz. Çok boyutlu durumda $f(x_1, x_2, \ldots)$'yi $a_1, a_2, \ldots$ etrafında açmak şu şekilde ifade edilebilir:
+Şimdi bir Taylor açılımına daha ihtiyaç duyacağız. Bu tekniği $f(..)$
+için kullanmak istiyoruz. Çok boyutlu durumda $f(x_1, x_2, \ldots)$'yi
+$a_1, a_2, \ldots$ etrafında açmak şu şekilde ifade edilebilir:
 
 $$f(x_1, x_2, \ldots) \approx f(a_1, a_2, \ldots) + \frac{\partial f}{\partial x_1}(x_1 - a_1) + \frac{\partial f}{\partial x_2}(x_2 - a_2) + \cdots$$
 
-Buradaki küçük fark, $x$, $t$ etrafında açılım yapmak istememizdir; bir sonraki durum $x + c_i \Delta t$ ve $t + \Delta t$'dir. Bu nedenle yukarıda görülen $x_1 - a_1$ ve $x_2 - a_2$ türü ifadeleri şu şekilde yeniden belirtmemiz gerekir:
+Buradaki küçük fark, $x$, $t$ etrafında açılım yapmak istememizdir;
+bir sonraki durum $x + c_i \Delta t$ ve $t + \Delta t$'dir. Bu nedenle
+yukarıda görülen $x_1 - a_1$ ve $x_2 - a_2$ türü ifadeleri şu şekilde
+yeniden belirtmemiz gerekir:
 
 - $x + c_i \Delta t - x \to c_i \Delta t$
 - $t + \Delta t - t \to \Delta t$
@@ -170,7 +203,8 @@ Ya da $\nabla$ gösterimini kullanarak şunu da söyleyebiliriz:
 
 $$f_i(x + c_i \Delta t, t + \Delta t) = f_i(x, t) + \frac{\partial f_i}{\partial t} \Delta t + \nabla f_i \cdot c_i \Delta t + O(\Delta t^2)$$
 
-Her iki taraftan $f_i(x, t)$'yi çıkarır ve tüm denklemi $\Delta t$'ye böleriz:
+Her iki taraftan $f_i(x, t)$'yi çıkarır ve tüm denklemi $\Delta t$'ye
+böleriz:
 
 $$\frac{f_i(x + c_i \Delta t, t + \Delta t) - f_i(x, t)}{\Delta t} = \frac{\partial f_i}{\partial t} + c_i \cdot \nabla f_i + O(\Delta t)$$
 
@@ -178,17 +212,31 @@ $\Delta t \to 0$ limitini alırsak, yüksek mertebeden $O(\Delta t)$ terimleri y
 
 $$= \frac{\partial f_i}{\partial t} + c_i \cdot \nabla f_i$$
 
-Bu form tanıdık geliyor mu? Elbette! Bu, daha önce türettiğimiz Boltzmann taşınım denkleminin kendisidir ve bunun neye eşit olduğunu biliyoruz:
+Bu form tanıdık geliyor mu? Elbette! Bu, daha önce türettiğimiz
+Boltzmann taşınım denkleminin kendisidir ve bunun neye eşit olduğunu
+biliyoruz:
 
 $$\frac{\partial f_i}{\partial t} + c_i \cdot \nabla f_i = \frac{1}{\tau}(f^{eq}_i - f_i) \tag{7}$$
 
-Dolayısıyla (6)'daki sol tarafın ayrıklaştırılması bize iki şey sağladı. Birincisi algoritmanın nasıl ilerlediğini gösterdi, şöyle:
+Dolayısıyla (6)'daki sol tarafın ayrıklaştırılması bize iki şey
+sağladı. Birincisi algoritmanın nasıl ilerlediğini gösterdi, şöyle:
 
 $$f_i(x + c_i \Delta t, t + \Delta t) = f^*_i(x, t)$$
 
-Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından $i$ yönü için $c_i$ hız vektörüne bakılır, az önce $x$ düğümünde hesaplanan çarpışma sonrası $f^*_i$ değeri alınır ve bir sonraki zaman adımı için tam olarak $x + c_i \Delta t$ konumundaki komşu düğümde $i$ yönüne karşılık gelen bellek yuvasına yazılır.
+Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından $i$
+yönü için $c_i$ hız vektörüne bakılır, az önce $x$ düğümünde
+hesaplanan çarpışma sonrası $f^*_i$ değeri alınır ve bir sonraki zaman
+adımı için tam olarak $x + c_i \Delta t$ konumundaki komşu düğümde $i$
+yönüne karşılık gelen bellek yuvasına yazılır.
 
-(6) sol tarafından elde ettiğimiz ikinci kazanım, bunun Boltzmann taşınım denklemine eşit olduğunu görmekti; dolayısıyla (7)'nin sağ tarafı da doğru olacaktır. Çarpışma matematiğini hesaplamak için bu gerçeği kullanabiliriz: her $i$ yönü için düğümün mevcut $\rho$ ve $u$ değerlerini polinom formülüne koyarak $f^{eq}_i$ denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi çıkarırız, bunu $\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız ve elde edilen sonucu orijinal $f_i$'den çıkarırız.
+Denklem (6)'nın sol tarafından elde ettiğimiz ikinci kazanım, bunun
+Boltzmann taşınım denklemine eşit olduğunu görmekti; dolayısıyla
+(7)'nin sağ tarafı da doğru olacaktır. Çarpışma matematiğini
+hesaplamak için bu gerçeği kullanabiliriz: her $i$ yönü için düğümün
+mevcut $\rho$ ve $u$ değerlerini polinom formülüne koyarak $f^{eq}_i$
+denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi çıkarırız, bunu
+$\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız ve elde edilen
+sonucu orijinal $f_i$'den çıkarırız.
 
 
 
