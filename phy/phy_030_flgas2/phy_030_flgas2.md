@@ -347,6 +347,13 @@ $$
 \frac{\partial f}{\partial t} + c \cdot \frac{\partial f}{\partial r} + \frac{F}{m}\frac{\partial f}{\partial c} = \Omega
 $$
 
+Eğer sistemde uygulanan dış kuvvet yok ise, ve ufak bir notasyon
+değişikliği de eklersek üstteki denklem şu şekilde de yazılabilir,
+
+$$
+\frac{\partial f}{\partial t} + c \cdot \nabla f  = \Omega
+$$
+
 Boltzmann Taşıma Denklemi için Alternatif Yollar
 
 Denklem (1)'e ulaşmanın başka bir yolu daha vardır. Birim kütleli bir
@@ -395,7 +402,11 @@ fonksiyonu için, $(a_1, a_2, a_3, \ldots)$ taban noktası etrafındaki
 resmi birinci mertebe Taylor açılımı açık koordinat farklarıyla şöyle
 yazılır:
 
-$$f(x_1, x_2, \ldots) \approx f(a_1, a_2, \ldots) + \frac{\partial f}{\partial x_1}(x_1 - a_1) + \frac{\partial f}{\partial x_2}(x_2 - a_2) + \ldots$$
+$$
+f(x_1, x_2, \ldots) \approx f(a_1, a_2, \ldots) +
+\frac{\partial f}{\partial x_1}(x_1 - a_1) +
+\frac{\partial f}{\partial x_2}(x_2 - a_2) + \ldots
+$$
 
 Dağılım fonksiyonumuz $f$, yedi ayrı değişkene bağlı olduğundan — üç
 konum koordinatı $(x, y, z)$, üç hız koordinatı $(u, v, w)$ ve zaman
