@@ -5,28 +5,30 @@ varsayılır ve bu sıvı parçacıkları bir simülasyon bölgesinde hareket
 edebilir, diğer sıvı parçacıklarıyla çarpışabilir. Simülasyon alanı
 bir örgü / ızgara sistemi olarak ele alınır ve sıvı parçacıkları
 düğümden düğüme hareket eder; yani bir bölge içinde serbestçe hareket
-edemezler. Bu yöntemin MD yöntemine kıyasla en önemli farkı, ızgara
-Boltzmann yönteminin sıvı parçacıklarının konumlarını ve hızlarını
-değil, hızların parçacık dağılım fonksiyonunu kullanarak hesap
-yapmasıdır [3, sf. 24].
+edemezler. Bu yöntemin moleküler dinamik yöntemine kıyasla en önemli
+farkı ızgara Boltzmann yönteminin sıvı parçacıklarının konumlarını ve
+hızlarını değil, parçacıkların hız dağılım fonksiyonunu kullanarak
+hesap yapmasıdır [3, sf. 24].
 
-Aşağıdaki şekil iki boyutlu bir sistem için ızgara Boltzmann yöntemini
-göstermektedir. (A), bir simülasyon bölgesinin ızgara sistemine
+Bir diğer sınırlama hareket yönleri üzerinde yapılmıştır. Aşağıdaki
+şekil iki boyutlu bir sistem için ızgara Boltzmann yöntemi
+şekillenmiş. (A), bir simülasyon bölgesinin ızgara sistemine
 bölündüğünü göstermektedir. (B) ise birim kare ızgara hücresinin
-büyütülmüş halidir. Çözücü moleküllerinin grupları veya kümeleri
-olarak ele alınan sanal sıvı parçacıklarının yalnızca komşu düğümlere
-hareket etmesine izin verilir, daha uzak düğümlere değil. Yani 0
-düğümündeki sıvı parçacıklarının bir sonraki zaman adımında orada
-kalmasına ya da 1, 2, .., 8 numaralı düğümlere hareket etmesine izin
-verilir. Bu durum, 1, 2, 3 ve 4 numaralı düğümlere hareket eden sıvı
-parçacıklarının $c = \Delta x / \Delta t$ hızına, 5, 6, 7 ve 8
+büyütülmüş halidir. Moleküllerin grupları veya kümeleri olarak ele
+alınan sanal sıvı parçacıklarının yalnızca komşu düğümlere hareket
+etmesine izin verilir, daha uzak düğümlere değil. Yani 0 düğümündeki
+sıvı parçacıklarının bir sonraki zaman adımında orada kalmasına ya da
+1, 2, .., 8 numaralı düğümlere hareket etmesine izin verilir. Bu
+hareket kısıtlaması hareket hızını da standardize eder ve
+basitleştirir. 1, 2, 3 ve 4 numaralı düğümlere hareket eden sıvı
+parçacıklarının $c = \Delta x / \Delta t$ hızı olacaktır, 5, 6, 7 ve 8
 numaralı düğümlere hareket edenlerin ise $\sqrt{2}c$ hızına sahip
-olduğunu ima eder; burada $\Delta x$ en yakın iki düğüm arasındaki
-ızgara aralığı ve $\Delta t$ simülasyonlar için zaman
-aralığıdır. $\sqrt{2}c$ değeri, (B)'deki köşegen mesafenin
-$\sqrt{\Delta x^2 + \Delta x^2} = \sqrt{2}\Delta x$ olduğu ve buradaki
-hızın $\sqrt{2}\Delta x / \Delta t$, yani önceki $c$'nin $\sqrt{2}$
-katı olacağı gerçeğinden hesaplanabilir.
+olmalıdır; burada $\Delta x$ en yakın iki düğüm arasındaki ızgara
+aralığı ve $\Delta t$ simülasyonlar için zaman aralığıdır. $\sqrt{2}c$
+değeri, (B)'deki köşegen mesafenin $\sqrt{\Delta x^2 + \Delta x^2} =
+\sqrt{2}\Delta x$ olduğu ve buradaki hızın $\sqrt{2}\Delta x / \Delta
+t$, yani önceki $c$'nin $\sqrt{2}$ katı olacağı gerçeğinden
+hesaplanabilir.
 
 ![](compscieng_bpp43lbm_01.jpg)
 
@@ -35,78 +37,78 @@ Bu yöntemin gerekli denklemlerini türetmeye başlayalım. Daha önce
 
 $$\frac{\partial f}{\partial t} + c \cdot \nabla f = \Omega$$
 
-$\Omega$, moleküller hareket ettikten sonra gerçekleşebilecek çarpışmaları temsil eder; $dr\, dc$ aralığındaki molekül sayıları arasındaki net farkı yakalar.
+$\Omega$, moleküller hareket ettikten sonra gerçekleşebilecek
+çarpışmaları temsil eder; $dr\, dc$ aralığındaki molekül sayıları
+arasındaki önce ve sonra arasındaki net farkı yakalar.
 
 ### Çarpışmalar
 
-Hiç çarpışma olmasaydı, önceki sayım sonraki sayımla tamamen aynı
-olurdu ve aralarındaki fark sıfır olurdu. Bunun olmadığı durumlarda
-sıfırdan farklı bir $\Omega$'ya ihtiyaç duyarız. Bu, $\Omega$'nın
-hesaplanmasının kolay olduğu anlamına gelmez. Gerçek bir çarpışma
-sayımı sistemdeki tüm olası çarpışmaları hesaba katmak zorunda
-olduğundan hesaplamak güçtür. Ancak çarpışma operatörünü, çözümün
-sonucunda önemli bir hata ortaya çıkarmadan basit bir hesaplamayla
-yaklaşık olarak ifade etmek mümkündür [2, sf. 28].
+Hiç çarpışma olmasaydı, $f()$ bağlamında önceki sayım sonraki sayımla
+tamamen aynı olurdu ve aralarındaki fark sıfır olurdu. Bunun olmadığı
+durumlarda sıfırdan farklı bir $\Omega$'ya ihtiyaç duyarız. Bu,
+$\Omega$'nın hesaplanmasının kolay olduğu anlamına gelmez. Gerçek bir
+çarpışma sayımı sistemdeki tüm olası çarpışmaları hesaba katmak
+zorunda olduğundan hesaplamak güçtür. Ancak çarpışma operatörünü
+çözümün sonucunda önemli bir hata ortaya çıkarmadan basit bir
+hesaplamayla yaklaşık olarak ifade etmek mümkündür [2, sf. 28].
 
 $\Omega$'yı yaklaşık olarak ifade edebilmek için BGK yaklaşımı adı
 verilen bir yöntem geliştirilmiştir. BGK kaba ama zekice bir
 basitleştirmedir: tüm çarpışmaları hesaplamak yerine şu soruyu sorar:
 "Mevcut dağılım denge durumundan ne kadar uzakta ve ne kadar hızlı
-gevşiyor?" Bu şu sonucu verir:
+dengeye doğru meyili var?" Bu şu sonucu verir:
 
 $$\Omega = \frac{1}{\tau}(f^{eq} - f)$$
 
 burada $f^{eq}$, Maxwell-Boltzmann dağılımıdır — [1]'de türettiğimiz
 denge dağılımı. Fiziksel fikir şudur: bir gazı yeterince uzun süre
 kendi haline bırakırsanız, çarpışmalar onu bu denge durumuna
-yönlendirur. Dolayısıyla $f^{eq}$, $f$'nin ulaşmaya çalıştığı yeri
-temsil eder.
+yönlendirir. Dolayısıyla $f^{eq}$, $f$'nin ulaşmaya çalıştığı yeri
+temsil eder. Hatırlamak icin $f^{eq}$ formülünü tekrar verelim,
 
 $$f^{eq} = \left(\frac{m}{2\pi k_B T}\right)^{3/2} \exp\left(-\frac{m|c-u|^2}{2k_BT}\right)$$
 
-Birçok açıdan BGK modeli, sistemin durumunu fark terimi aracılığıyla
-"algılar": $(f^{eq} - f)$. $f^{eq}$ doğrudan yerel, gerçek zamanlı
+Birçok açıdan BGK modeli, sistemin durumunu fark terimi $(f^{eq} - f)$
+aracılığıyla "algılar". $f^{eq}$ doğrudan yerel, gerçek zamanlı
 makroskopik özelliklerden ($\rho$ ve $u$) hesaplandığından, sıvının
-tam anlamıyla gevşemiş olsaydı bulunması gereken matematiksel durumu
-temsil eder.
+tam anlamıyla oraya meyillendirilmiş olma durumunda bulunması gereken
+matematiksel durumu temsil eder.
 
 - Sıvı zaten denge durumundaysa $f = f^{eq}$, yani $\Delta f =
   0$. Model, hiçbir düzeltmeye gerek olmadığını algılar.
 
 - $f$ ile $f^{eq}$ birbirinden uzaklaşır ve $\Delta f$ büyürse, bu
   çarpışmaların olduğu anlamına gelir; bu fark, bir kontrol
-  sistemindeki hata sinyali veya sensör okuması gibi davranarak
-  moleküler popülasyonun sınır dışına ne kadar çıktığını tam olarak
-  ölçer.
+  sistemindeki hata sinyali gibi algılanır moleküler popülasyonun
+  sınır dışına ne kadar çıktığını tam olarak ölçer.
 
 Sapma bu çıkarma işlemiyle algılandıktan sonra, BGK operatörü bu
 değeri sistemi değiştirmek için hemen kullanır:
 
 $$\Omega = \frac{1}{\tau}(f^{eq} - f)$$
 
-Bu hata sinyalini $\frac{1}{\tau}$ gevşeme faktörüyle çarpar ve pasif
-bir ölçümü aktif bir geri yükleyici kuvvete dönüştürür.
+Bu hata sinyalini $\frac{1}{\tau}$ meyillendirme / gevşeme faktörüyle
+çarpar ve pasif bir ölçümü aktif bir geri yükleyici kuvvete
+dönüştürür.
 
-- Belirli bir hızda hareket eden çok fazla molekül varsa ($f > f^{eq}$), terim negatif olur ve çarpışma adımı o yöndeki popülasyonları azaltır.
-- Çok az molekül varsa ($f < f^{eq}$), terim pozitif olur ve çarpışma adımı o yöndeki popülasyonları artırır.
+- Belirli bir hızda hareket eden çok fazla molekül varsa ($f >
+  f^{eq}$), terim negatif olur ve çarpışma adımı o yöndeki mevcudiyeti
+  azaltır.
+
+- Çok az molekül varsa ($f < f^{eq}$), terim pozitif olur ve çarpışma
+  adımı o yöndeki mevcudu artırır.
 
 Değişiklik her zaman sapmayı doğrudan orantılıdır. Bir düğüm doğal
 denge durumundan ne kadar uzaksa, onu yeniden dengeye sokmak için
-değiştirme adımı o kadar agresif hale gelir.
-
-BGK çarpışma operatörünü aynı anda iki görev yerine getiren akıllı bir
-geri besleme döngüsü olarak düşünebiliriz:
-
-1. Algılar: $(f^{eq} - f)$'yi hesaplayarak, o belirli düğümdeki sıvının denge durumundan ne kadar uzakta olduğunu ölçen bir sensör görevi görür.
-2. Değiştirir: Bu ölçümü, orantılı bir düzeltme hesaplamak için kullanır. Bir hız durumu kalabalıksa BGK onu boşaltır; azalmışsa doldurur.
-
-Bu, kendi kendini düzenleyen matematiksel bir motordur: yüksek
-bozulma, büyük bir düzeltici çarpışma tepkisini tetiklerken, sakin ve
-dengelenmiş bir akış tamamen değişmeden geçer.
+değiştirme adımı o kadar agresif hale gelir. Bu, kendi kendini
+düzenleyen matematiksel bir motordur: yüksek bozulma, büyük bir
+düzeltici çarpışma tepkisini tetiklerken, sakin ve dengelenmiş bir
+akış tamamen değişmeden geçer.
 
 Bir not olarak belirtmek gerekir ki yukarıda açıklanan şema özünde
-doğrusal bir gevşeme modelidir; Newton'un soğuma yasası $dT/dt = -(T -
-T_\infty)/\tau$ ile aynı matematiksel yapıya sahiptir.
+doğrusal bir meyillendirme / gevşeme modelidir; Newton'un soğuma
+yasası $dT/dt = -(T - T_\infty)/\tau$ ile aynı matematiksel yapıya
+sahiptir.
 
 ### Denge Dağılımı
 
@@ -115,89 +117,158 @@ bazı işlemler yapmamız gerekiyor. Gaussian $\exp(-|c|^2/2RT)$, ayrık
 bir ızgara için çeşitli nedenlerle sorunludur:
 
 - Sürekli $c$ için tanımlanmıştır
-- Hiçbir zaman tam olarak sıfıra eşit olmadığından sonlu sayıda yöne kesilemez
+
+- Hiçbir zaman tam olarak sıfıra eşit olmadığından sonlu sayıda yön
+  bağlamında budanamaz (truncate).
+
 - Simülasyonda tekrar tekrar değerlendirilmesi pahalıdır
 
-Bunu aşağıdaki adımlarla çözebiliriz.
+Bunu aşağıdaki adımlarla çözebiliriz, $f^{eq}$ denklemini biraz
+masajlayarak onu farklı bir forma çevirelim.
 
-$$f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{(c-u)^2}{2RT}\right)$$
+$$
+f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{(c-u)^2}{2RT}\right)
+$$
 
-Üsteldeki kareyi açarak:
+Üsteldeki kareyi açalım,
 
-$$= \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c - 2c \cdot u + u \cdot u}{2RT}\right)$$
+$$ = \frac{\rho}{(2\pi RT)^{D/2}}
+\exp\left(-\frac{c \cdot c - 2c \cdot u + u \cdot u}{2RT}\right)
+$$
 
-Üsteli bölerek:
+Üstel $\exp$'yi iki blok halinde alalım,
 
-$$= \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \exp\left(\frac{2c \cdot u - u \cdot u}{2RT}\right) \tag{1}$$
+$$ = \frac{\rho}{(2\pi RT)^{D/2}}
+\exp\left(-\frac{c \cdot c}{2RT}\right)
+\exp\left(\frac{2c \cdot u - u \cdot u}{2RT}\right)
+\tag{1}
+$$
 
-Üstel fonksiyon bir Taylor serisi kullanılarak açılabilir:
+Üstel fonksiyon bir Taylor serisi kullanılarak açılabilir, $\exp$ için
+standart açılımı hatırlarsak,
 
 $$\exp(x) = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots \tag{2}$$
 
-Taylor açılımını herhangi bir basitleştirme yapmadan doğrudan (1)'e
-koyarak:
+Taylor açılımını ikinci üstel üzerinde uygulayalalım, 
 
-$$f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \left(1 - \frac{-2c \cdot u + u \cdot u}{2RT} + \frac{(-2c \cdot u + u \cdot u)^2}{4R^2T^2} + \cdots\right) \tag{3}$$
+$$
+f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}}
+\exp\left(-\frac{c \cdot c}{2RT}\right)
+\left(
+  1 - \frac{-2c \cdot u + u \cdot u}{2RT} +
+  \frac{(-2c \cdot u + u \cdot u)^2}{4R^2T^2} + \cdots
+\right)
+\tag{3}
+$$
 
 burada parantez içindeki ikinci terim (2)'deki $x$ terimidir, üçüncü
 terim $x^2/2!$ terimidir; $O(u^3)$ terimleri atılır ve $(-2c \cdot u +
 u \cdot u)^2 \approx 4(c \cdot u)^2$ sadeleştirmesi yapılır (çünkü
 kare içindeki $u \cdot u$ terimi zaten $O(u^2)$ mertebesinde
 olduğundan bütün ifadeyi $O(u^4)$ yapar), bu da (3)'ten (4)'e geçişi
-sağlar.
+sağlar. Devam edelim, ıkinci üstelin Taylor açılımı yapılarak $O(u^3)$
+terimleri atıldığında:
 
-İkinci üstelin Taylor açılımı yapılarak $O(u^3)$ terimleri
-atıldığında:
+$$
+f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right)
+\left(1 + \frac{2c \cdot u - u \cdot u}{2RT} +
+\frac{(c \cdot u)^2}{2R^2T^2}\right)
+\tag{4}
+$$
 
-$$f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{c \cdot c}{2RT}\right) \left(1 + \frac{2c \cdot u - u \cdot u}{2RT} + \frac{(c \cdot u)^2}{2R^2T^2}\right) \tag{4}$$
+$W(c) = \frac{1}{(2\pi RT)^{D/2}} \exp\!\left(-\frac{c \cdot
+c}{2RT}\right)$ ve $RT = c_s^2$ yerine koyarak:
 
-$W(c) = \frac{1}{(2\pi RT)^{D/2}} \exp\!\left(-\frac{c \cdot c}{2RT}\right)$ ve $RT = c_s^2$ yerine koyarak:
-
-$$f^{eq} = \rho W(c) \left(1 + \frac{2c \cdot u - u \cdot u}{2c_s^2} + \frac{(c \cdot u)^2}{2c_s^4}\right)$$
+$$
+f^{eq} = \rho W(c) \left(1 + \frac{2c \cdot u - u \cdot u}{2c_s^2} +
+\frac{(c \cdot u)^2}{2c_s^4}\right)
+$$
 
 $W(c) \to w_i$ ızgara yönü $i$ boyunca ayrıklaştırılarak:
 
-$$f^{eq}_i = \rho w_i \left(1 + \frac{2c_i \cdot u - u \cdot u}{2c_s^2} + \frac{(c_i \cdot u)^2}{2c_s^4}\right) + O(u^2) \tag{5}$$
+$$
+f^{eq}_i =
+\rho w_i \left(1 + \frac{2c_i \cdot u - u \cdot u}{2c_s^2} +
+\frac{(c_i \cdot u)^2}{2c_s^4}\right) + O(u^2) \tag{5}
+$$
 
-$f^{eq}_i$, Taylor açılımlı MB (3.4) ile $\rho$ ve $u$ kullanılarak hesaplanır:
+Izgara Boltzmann Yöntemi'nde "ızgara yönleri", sanal parçacıkların
+hareket etmesine ve çarpışmasına izin verilen sabit, ayrık yolları
+temsil eder. Sürekli fonksiyon $f(x, c, t)$, sonsuz bir hız
+aralığındaki parçacık yoğunluğunu izlerken, LBM bunu hız uzayını $i$
+alt indisiyle gösterilen sonlu bir vektörler kümesine ayrıştırarak
+basitleştirir. Sonuç olarak, sürekli $f$, bir ayrık dağılım
+fonksiyonları kümesine, $f_i$'ye bölünür; burada her $f_i(x, t)$, $x$
+konumundaki $t$ zamanında $i$ kafes yönünde hareket eden parçacıkların
+özgül yoğunluğunu temsil eder. Örneğin, yaygın $D2Q9$ modelinde (2
+boyut, 9 hız), $i$ indisi 0'dan 8'e kadar uzanır. Burada $f_0$ durağan
+parçacıkları temsil eder, $f_1$'den $f_4$'e kadar olanlar $c$ hızında
+en yakın komşulara yatay ve dikey yönde hareket eden parçacıkları
+temsil eder ve $f_5$'ten $f_8$'e kadar olanlar $\sqrt{2}c$ hızında bir
+sonraki en yakın komşulara çapraz hareketleri izler. Bu ayrıştırma,
+karmaşık bir diferansiyel denklemi son derece verimli,
+yerelleştirilmiş cebirsel hesaplamalara dönüştüren şeydir.
 
-$$f^{eq}_i = w_i \rho \left(1 + \frac{c_i \cdot u}{c_s^2} + \frac{(c_i \cdot u)^2}{2c_s^4} - \frac{u \cdot u}{2c_s^2}\right)$$
+Devam edelim, $f^{eq}_i$, Taylor açılımlı Maxwell-Boltzmann (3.4) ile
+$\rho$ ve $u$ kullanılarak hesaplanır:
 
-Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir olan
-$c \cdot u$ cinsinden bir polinomla değiştirir. Ardından yapılan iki
-yerine koyma işlemi zariftir:
+$$
+f^{eq}_i = w_i \rho \left(1 + \frac{c_i \cdot u}{c_s^2} +
+\frac{(c_i \cdot u)^2}{2c_s^4} - \frac{u \cdot u}{2c_s^2}\right)
+$$
 
-- $W(c) = \exp(-c \cdot c / 2RT)(2\pi RT)^{-D/2}$, Gaussian'ı bir ağırlığa absorbe eder — ve bu ağırlık yalnızca $c$'nin büyüklüğüne bağlı olduğundan, her ayrık ızgara yönü $i$ için bir kez hesaplanan sabit bir $w_i$ sabitine dönüşür
+Yani Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir
+olan $c \cdot u$ cinsinden bir polinomla değiştirdi. Ardından yapılan
+iki yerine koyma işlemi de iyi oldu,
+
+- $W(c) = \exp(-c \cdot c / 2RT)(2\pi RT)^{-D/2}$, Gaussian'ı bir
+  ağırlığa absorbe eder — ve bu ağırlık yalnızca $c$'nin büyüklüğüne
+  bağlı olduğundan, her ayrık ızgara yönü $i$ için bir kez hesaplanan
+  sabit bir $w_i$ sabitine dönüşür
+
 - $RT = c_s^2$, termodinamiği ızgara ses hızına bağlar
 
 Dolayısıyla (5)'te ayrıklaştırmanın ardından $f^{eq}_i$, sabit
 katsayıları $w_i$, $c_i$, $c_s$ olan — hepsi önceden hesaplanabilir —
-$u$ cinsinden yalnızca bir polinomdur. LBM'yi hesaplamalı açıdan bu
+$u$ cinsinden yalnızca bir polinomdur. LBM'yi hesaplamsal açıdan bu
 kadar çekici yapan da budur.
 
-$O(u^2)$ kesmesi aynı zamanda sınırlamayı da bize söyler: bu, düşük
-Mach sayısı yaklaşımıdır. $|u|/c_s$'nin küçük olmadığı yüksek hızlı
-akışlar için daha yüksek mertebeden terimler gerekecektir.
+$O(u^2)$ budaması aynı zamanda yaklaşımın sınırlarını da bize söyler:
+üstte gösterilen LBM yaklaşıksallığı bir düşük Mach sayısı
+yaklaşımıdır. $|u|/c_s$'nin küçük olmadığı yüksek hızlı akışlar için
+daha yüksek mertebeden terimler gerekecektir.
 
 ### Ana Denklemin Ayrıklaştırılması
 
 Şimdi bir Taylor açılımına daha ihtiyaç duyacağız. Bu tekniği $f(..)$
-için kullanmak istiyoruz. Çok boyutlu durumda $f(x_1, x_2, \ldots)$'yi
-$a_1, a_2, \ldots$ etrafında açmak şu şekilde ifade edilebilir:
+için kullanmak istiyoruz.
 
-$$f(x_1, x_2, \ldots) \approx f(a_1, a_2, \ldots) + \frac{\partial f}{\partial x_1}(x_1 - a_1) + \frac{\partial f}{\partial x_2}(x_2 - a_2) + \cdots$$
+Çok boyutlu durumda $f(x_1, x_2, \ldots)$'yi $a_1, a_2, \ldots$
+etrafında açmak için şu genel açılımı hatırlayabiliriz,
 
-Buradaki küçük fark, $x$, $t$ etrafında açılım yapmak istememizdir;
-bir sonraki durum $x + c_i \Delta t$ ve $t + \Delta t$'dir. Bu nedenle
-yukarıda görülen $x_1 - a_1$ ve $x_2 - a_2$ türü ifadeleri şu şekilde
-yeniden belirtmemiz gerekir:
+$$
+f(x_1, x_2, \ldots) \approx
+f(a_1, a_2, \ldots) +
+\frac{\partial f}{\partial x_1}(x_1 - a_1) +
+\frac{\partial f}{\partial x_2}(x_2 - a_2) +
+\cdots
+$$
+
+Bizim uygulamamız için küçük fark $x$, $t$ etrafında açılım yapmak
+istememizdir; bir sonraki durum $x + c_i \Delta t$ ve $t + \Delta
+t$'dir. Bu nedenle yukarıda görülen $x_1 - a_1$ ve $x_2 - a_2$ türü
+ifadeleri şu şekilde yeniden belirtmemiz gerekir:
 
 - $x + c_i \Delta t - x \to c_i \Delta t$
 - $t + \Delta t - t \to \Delta t$
 
 Artık Taylor açılımı şu hale gelir:
 
-$$f(x + c_i \Delta t, t + \Delta t) \approx f_i(x, t) + \frac{\partial f_i}{\partial x} c_i \Delta t + \frac{\partial f_i}{\partial t} \Delta t \tag{6}$$
+$$
+f_i(x + c_i \Delta t, t + \Delta t) \approx f_i(x, t) +
+\frac{\partial f_i}{\partial x} c_i \Delta t +
+\frac{\partial f_i}{\partial t} \Delta t \tag{6}
+$$
 
 Ya da $\nabla$ gösterimini kullanarak şunu da söyleyebiliriz:
 
