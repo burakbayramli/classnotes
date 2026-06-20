@@ -194,20 +194,22 @@ $$
 
 Izgara Boltzmann Yöntemi'nde "ızgara yönleri", sanal parçacıkların
 hareket etmesine ve çarpışmasına izin verilen sabit, ayrık yolları
-temsil eder. Sürekli fonksiyon $f(x, c, t)$, sonsuz bir hız
-aralığındaki parçacık yoğunluğunu izlerken, LBM bunu hız uzayını $i$
-alt indisiyle gösterilen sonlu bir vektörler kümesine ayrıştırarak
-basitleştirir. Sonuç olarak, sürekli $f$, bir ayrık dağılım
-fonksiyonları kümesine, $f_i$'ye bölünür; burada her $f_i(x, t)$, $x$
+temsil eder. Sürekli fonksiyon $f(x, c, t)$, sonsuz hız yelpazesi,
+sonsuz küçük aralıklarda parçacık yoğunluğunu izlerken, LBM bunu hız
+uzayını $i$ alt indisiyle gösterilen sonlu bir vektörler kümesine
+ayrıştırarak basitleştirir. Sonuç olarak, sürekli $f$, bir ayrık
+dağılım fonksiyonları kümesine, $f_i$'ye bölünür; burada her $f_i(x, t)$, $x$
 konumundaki $t$ zamanında $i$ kafes yönünde hareket eden parçacıkların
-özgül yoğunluğunu temsil eder. Örneğin, yaygın $D2Q9$ modelinde (2
-boyut, 9 hız), $i$ indisi 0'dan 8'e kadar uzanır. Burada $f_0$ durağan
-parçacıkları temsil eder, $f_1$'den $f_4$'e kadar olanlar $c$ hızında
-en yakın komşulara yatay ve dikey yönde hareket eden parçacıkları
-temsil eder ve $f_5$'ten $f_8$'e kadar olanlar $\sqrt{2}c$ hızında bir
-sonraki en yakın komşulara çapraz hareketleri izler. Bu ayrıştırma,
-karmaşık bir diferansiyel denklemi son derece verimli,
-yerelleştirilmiş cebirsel hesaplamalara dönüştüren şeydir.
+özgül yoğunluğunu temsil eder.
+
+Örneğin, ilk figürdeki yaygın $D2Q9$ modelinde (2 boyut, 9 hız), $i$
+indisi 0'dan 8'e kadar uzanır. Burada $f_0$ durağan parçacıkları
+temsil eder, $f_1$'den $f_4$'e kadar olanlar $c$ hızında en yakın
+komşulara yatay ve dikey yönde hareket eden parçacıkları temsil eder
+ve $f_5$'ten $f_8$'e kadar olanlar $\sqrt{2}c$ hızında bir sonraki en
+yakın komşulara çapraz hareketleri izler. Bu ayrıştırma, karmaşık bir
+diferansiyel denklemi son derece verimli, yerelleştirilmiş cebirsel
+hesaplamalara dönüştüren şeydir.
 
 Devam edelim, $f^{eq}_i$, Taylor açılımlı Maxwell-Boltzmann (3.4) ile
 $\rho$ ve $u$ kullanılarak hesaplanır:
@@ -309,8 +311,188 @@ denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi çıkarırız, bunu
 $\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız ve elde edilen
 sonucu orijinal $f_i$'den çıkarırız.
 
+### Kodlama
+
+Altta yazacağımız simülasyonda kapak güdümlü alan / oyuk (lid-driven
+cavity) içindeki sıvı akış problemini çözmeye uğraşacağız. Problem
+tanımı şöyle: Bir oyuğun üstündeki kapak sabit bir hızda sürekli
+soldan sağa gidiyor. Bu gidiş sırasında kapak alttaki su ile temasta
+olduğu için temas edilen en üst seviyedeki suyu soldan sağa doğru
+itecektir. Oyuk içindeki sağ, sol ve en alt kısmındaki duvarlar
+sabittir, tabii hareket halindeki su onlara çarpınca geri sekme olur,
+bu sekmenin diğer su molekülleri ile olan etkileşimi vs göz önüne
+alınmalıdır, tüm bu mekaniğin hesaplanması gerekir.
+
+Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, yani iki
+boyuttayız, ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu
+yönleri ve onların numaralandırılmasını alttaki şekilde görüyoruz.
+
+![](compscieng_bpp43lbm_03.jpg)
 
 
+```python
+A = np.array([[0,0,0],[0,1,1],[0,0,0]])
+print (A)
+A = np.roll(np.roll(A[:, :], -1, axis=0), 0, axis=1)
+print (A)
+A = np.roll(np.roll(A[:, :], 0, axis=0), 1, axis=1)
+print (A)
+```
+
+```text
+[[0 0 0]
+ [0 1 1]
+ [0 0 0]]
+[[0 1 1]
+ [0 0 0]
+ [0 0 0]]
+[[1 0 1]
+ [0 0 0]
+ [0 0 0]]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```python
+nx, ny = 101, 101
+
+f   = np.zeros((nx, ny, 9))
+ux   = np.zeros((nx, ny))
+uy   = np.zeros((nx, ny))
+rho = np.ones((nx, ny))
+
+w  = np.array([1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36, 4/9])
+cx = np.array([1,  0, -1,  0,  1, -1, -1,  1,  0])
+cy = np.array([0,  1,  0, -1,  1,  1, -1, -1,  0])
+
+xl, yl = 1.0, 1.0
+dx = xl / (nx - 1)
+dy = yl / (ny - 1)
+x  = np.linspace(0, xl, nx)
+y  = np.linspace(0, yl, ny)
+
+uo    = 0.10
+alpha = 0.1
+Re    = uo * (ny - 1) / alpha
+omega = 1.0 / (3.0 * alpha + 0.5)
+
+tol   = 1e-4
+error = 10.0
+erso  = 0.0
+count = 0
+
+# Kapak hizi
+ux[:, -1] = uo
+
+def collision(f, u, v, rho):
+    t1 = u**2 + v**2                                    # (nx, ny)
+    # t2[k] = ux*cx[k] + uy*cy[k] her k yonu icin 
+    t2 = (ux[:, :, np.newaxis] * cx
+        + uy[:, :, np.newaxis] * cy)                     # (nx, ny, 9)
+    feq = (rho[:, :, np.newaxis] * w
+           * (1.0 + 3.0*t2 + 4.5*t2**2
+              - 1.5*t1[:, :, np.newaxis]))
+    f = (1.0 - omega) * f + omega * feq
+    return f
+
+
+def stream(f):
+    # Alttaki MATLAB circshift([+1,0]) cagrisinin benzeridir
+    # MATLAB: circshift(A, [r,c]) tum satirlari r kadar, kolonlari c kadar kaydirir
+    shifts = [(1,0),(0,1),(-1,0),(0,-1),(1,1),(-1,1),(-1,-1),(1,-1)]
+    for k, (sr, sc) in enumerate(shifts):
+        f[:, :, k] = np.roll(np.roll(f[:, :, k], sr, axis=0), sc, axis=1)
+    return f
+
+
+def boundary(f, uo):
+    # --- sol duvar
+    f[0, :, 0] = f[0, :, 2]
+    f[0, :, 4] = f[0, :, 6]   
+    f[0, :, 7] = f[0, :, 5]   
+
+    # --- sag duvar
+    f[-1, :, 2] = f[-1, :, 0] 
+    f[-1, :, 6] = f[-1, :, 4] 
+    f[-1, :, 5] = f[-1, :, 7] 
+
+    # --- alt duvar
+    f[:, 0, 1] = f[:, 0, 3]    
+    f[:, 0, 4] = f[:, 0, 6]    
+    f[:, 0, 5] = f[:, 0, 7]    
+
+    # Üst sınır (top boundary) hareket eden kapak (Zou/He usulü) 
+    # hesap iç x düğümleri üzerinden vektorize edilmiştir (index 1..nx-2)    
+    i = slice(1, nx - 1)
+    rhon = (f[i, -1, 8] + f[i, -1, 0] + f[i, -1, 2]
+            + 2.0 * (f[i, -1, 1] + f[i, -1, 5] + f[i, -1, 4]))
+    f[i, -1, 3] = f[i, -1, 1]                       
+    f[i, -1, 7] = f[i, -1, 5] + rhon * üo / 6.0    
+    f[i, -1, 6] = f[i, -1, 4] - rhon * üo / 6.0    
+
+    return f
+
+
+def ruv(f):
+    rho = f.sum(axis=2)
+
+    # Üst satırdaki yoğunluğu düzelt (hareket eden kapak için denge
+    # dışı dışdeğerleme -extrapolation- yap)    
+    rho[:, -1] = (f[:, -1, 8] + f[:, -1, 0] + f[:, -1, 2]
+                  + 2.0 * (f[:, -1, 1] + f[:, -1, 5] + f[:, -1, 4]))
+
+    ux = (f[:, :, 0] + f[:, :, 4] + f[:, :, 7]
+       - f[:, :, 2] - f[:, :, 5] - f[:, :, 6]) / rho
+
+    uy = (f[:, :, 1] + f[:, :, 4] + f[:, :, 5]
+       - f[:, :, 3] - f[:, :, 6] - f[:, :, 7]) / rho
+
+    return rho, ux, uy
+
+while error > tol:
+    f = collision(f, ux, uy, rho)
+    f = stream(f)
+    f = boundary(f, uo)
+    rho, ux, uy = ruv(f)
+
+    count += 1
+    ers   = np.sum(ux**2 + uy**2)
+    error = abs(ers - erso)
+    erso  = ers
+
+# Post-processing (mirrors result.m)
+mid_x = (nx - 1) // 2
+mid_y = (ny - 1) // 2
+
+um = ux[mid_x, :] / uo   # centreline u-velocity vs y
+vm = uy[:, mid_y] / uo   # centreline v-velocity vs x
+
+fig, ax = plt.subplots()
+X, Y = np.meshgrid(x, y)
+speed = np.sqrt(ux**2 + uy**2)
+strm = ax.streamplot(X, Y, ux.T, uy.T, color=speed.T, cmap='viridis', linewidth=1.5)
+fig.colorbar(strm.lines, label=u'Hız Büyüklüğü')
+ax.set_xlabel("X"); ax.set_ylabel("Y")
+fig.savefig("compscieng_bpp43lbm_02.jpg", dpi=150)
+```
+
+![](compscieng_bpp43lbm_02.jpg)
 
 
 
