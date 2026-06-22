@@ -1,10 +1,430 @@
-# Kur Fiyatı Modellemesi, Para Dengesi
+# Uluslararası Finans, Dengeler
 
-Uluslararası Finans
+### Ticari Açıklar
+
+Ekonomi ve uluslararası finans söz konusu olduğunda pek çok kentsel
+efsane mevcuttur. Eski finansçı Michael Pettis [5] bunları çürütmektedir.
+
+Amerika Birleşik Devletleri
+
+Bir örnek Amerika Birleşik Devletleri'nden gelmektedir. Pettis şunu
+söyler: "Herkes paranın ABD'ye aktığını, çünkü Amerikalıların çok az
+tasarruf ettiğini söyler. Aslında tam tersidir." Bu durum,
+"Amerikalılar tasarruf etmez, dolayısıyla yabancı paraya ihtiyaç
+duyarlar, dolayısıyla yabancılar ABD'ye borç verir" şeklindeki popüler
+anlatıyla çelişmektedir.
+
+Pettis'in görüşü muhasebe temelli: Yabancı para ÖNCE gelir, çünkü
+yabancılar ABD varlıklarına yatırım yapmak ister. Ardından $S-I$
+açığı bunu absorbe edecek şekilde uyum sağlamak zorundadır.
+
+$Y$ tam olarak Gayri Safi Yurt İçi Hasıla'dır (GSYİH); bir ülke içinde
+belirli bir dönemde üretilen her şeyin toplam piyasa değerini temsil
+eder.
+
+Üretilen bir şeyin nasıl Yatırım (I) olarak sınıflandırıldığını
+anlamak için denkleme bakış açısını değiştirmek gerekir. $Y = C + I +
+G + NX$ denklemi yalnızca ne ürettiğimizin bir listesi değildir;
+üretilenleri kimin satın aldığının (ya da talep ettiğinin) bir
+muhasebesidir.
+
+Üretimin yatırıma nasıl dönüştüğü aşağıda açıklanmıştır.
+
+Tanımlar: "Yatırım" ile "Tüketim"
+
+Günlük dilde "yatırım", hisse senedi ya da tahvil satın almak anlamına
+gelir. GSYİH muhasebesinde ise finansal işlemler göz ardı edilir. I
+yalnızca üretilen ve hemen tüketilmeyen fiziksel, somut mal ve
+hizmetleri ifade eder.
+
+- Tüketim (C): Üretilen ve hızla tüketilen mallar (örn. bir somun
+  ekmek, bir saç tıraşı, bir çift ayakkabı).
+
+- Yatırım (I): Üretilen ve gelecekte daha fazla şey üretmek amacıyla
+  kullanılan mallar (örn. fabrikalar, makineler, yazılım, yeni
+  konutlar).
+
+Mekanizma: Üretilen Bir Mal Nasıl I Olur: İki şey üreten bir ekonomi
+hayal edin: elma ve traktör. Her ikisi de Y'nin (toplam üretim) bir
+parçasıdır.
+
+- Senaryo A: Bir fabrika traktör üretir ve bir şirket çiftliği,
+  gelecek yıl mahsulü daha hızlı biçmek amacıyla onu satın alır.
+
+- Muhasebe: Y, traktörün değeri kadar artar. Bir işletme onu
+  gelecekteki üretim için satın aldığından, I kalemi altında
+  sınıflandırılır.
+
+- Senaryo B: Bir fabrika traktör üretir ancak yıl sonuna kadar kimse
+  onu satın almaz. Depoda bekler.
+
+- Muhasebe: Yine de üretilmiştir, dolayısıyla Y onu kapsamak
+  zorundadır. Ulusal muhasebede satılmayan mallar "stok yatırımı"
+  olarak sınıflandırılır. Sistem, firmanın gelecek için saklamak üzere
+  kendi traktörünü "satın aldığını" varsayar. Böylece yine de I'ya
+  dahil edilir.
+
+Bu demektir ki bir ekonominin ürettiği (Y) her şey, insanların hemen
+yiyip bitirmediği, giymediği ya da tüketmediği (C) sürece matematiksel
+olarak Yatırıma (I) dahil edilmek zorundadır; ister parlak yeni bir
+yarı iletken fabrikası olsun, ister bir depoda bekleyen satılmamış
+çelik yığını.
+
+Net İhracat, İhracat (X) eksi İthalat (M) olarak hesaplanır.
+
+$$NX = X - M$$
+
+Buna neden ihtiyaç duyduğumuzu anlamak için madalyonun her iki yüzüne
+de bakmak gerekir:
+
+İhracatı (X) neden EKLİYORUZ: Bir Amerikan fabrikasının Boeing 737
+uçağı ürettiğini hayal edin. O uçak ABD üretiminin (Y) bir
+parçasıdır. Ancak Japonya'daki bir havayolu şirketi tarafından satın
+alınmaktadır.
+
+Yurt dışında satıldığı için ABD tüketicileri (C), ABD işletmeleri (I)
+ya da ABD hükümeti (G) tarafından satın alınmamaktadır. NX kategorimiz
+onu yakalasaydı, denklemimiz dengelenmezdi. İhracatı ekliyoruz çünkü
+yurt içinde üretildi ancak küresel olarak tüketildi.
+
+İthalatı (M) neden ÇIKARIYORUZ: Almanya'da üretilmiş bir BMW satın
+aldığınızı hayal edin. Satın aldığınızda işlem, ABD GSYİH verilerinde
+Tüketim (C) kalemi altına kaydedilir.
+
+Ama bekleyin; o BMW ABD'de üretilmedi! ABD GSYİH'sinde (Y) yer
+almamalı. Bunu düzeltmek için İthalatı (M) çıkarıyoruz. İthalat
+çıkarması, yanlışlıkla C, I veya G'ye sızmış yabancı yapımı malları
+silen devasa bir silgi işlevi görür.
+
+Tüm bunları bir araya getirdiğinizde, Pettis bu eşitlikleri (identity)
+kullanarak küresel ticaretin yalnızca "alıp satmak" olmadığını; üretim
+ve tasarrufun mutlak bir denge eylemi olduğunu gösterir.
+
+Bir ülke ihracattan fazla ithalat yapıyorsa (NX pozitifse/fazla
+veriyorsa), bu, ülkenin yurt içinde tükettiğinden (C + I + G) daha
+fazla ürettiği anlamına gelir. Tersine, bir ülke ticaret açığı
+veriyorsa (NX negatifse), tükettiğinden daha az üretiyor demektir ve
+bu açığı kapatmak için yabancı sermaye ithal etmesi gerekir.
+
+Tam ulusal gelir eşitliğiyle başlıyoruz. Basitlik açısından
+ekonomistler genellikle Özel Tüketim (C) ile Kamu Harcamalarını (G)
+Toplam Yurt İçi Tüketim olarak birleştirir ve Yatırım (I) ise toplam
+kamu ve özel fiziksel yatırımı temsil eder.
+
+$$Y = C + I + NX$$
+
+Ulusal Tasarruf (S), tüketimden sonra geriye kalan gelirdir:
+
+$$S = Y - C$$
+
+Bu tasarruf denklemini yeniden düzenlersek $Y = S + C$ elde
+ederiz. Şimdi $(S + C)$'yi orijinal GSYİH denkleminde Y'nin yerine
+koyalım:
+
+$$S + C = C + I + NX$$
+
+Her iki taraftan C'yi çıkaralım:
+
+$$S = I + NX$$
+
+Net İhracatı (NX) izole etmek için son bir kez yeniden düzenleyelim:
+
+$$S - I = NX$$
+
+Adım 2: Ödemeler Dengesiyle İlişkilendirme
+
+İşte sihir burada gerçekleşir. Bir ülkenin dünyanın geri kalanıyla
+etkileşimleri sıfıra dengelenmek zorundadır. Net İhracat (NX), Cari
+Hesabın (mal ve hizmet ticareti) özüdür.
+
+Muhasebe kuralı gereği, yabancılara sattığınızdan daha fazla mal satın
+alırsanız (Cari Hesap açığı), bunu onlara varlık satarak (hisse
+senedi, tahvil, gayrimenkul) finanse etmek zorunda kalırsınız. Bu
+durum Sermaye Hesabında (Finansal Hesap olarak da adlandırılır)
+kaydedilir.
+
+Bu nedenle Net İhracat (NX), Net Sermaye Girişlerinin (Net Sermaye
+Akışı, NCF) tam olarak tersine eşit olmak zorundadır:
+
+$$NX = -NCF$$
+
+Bunu formülümüze koyarsak Pettis'in dayandığı nihai muhasebe
+eşitliğini elde ederiz:
+
+$$S - I = -NCF$$
+
+Ya da ABD'ye akan paraya bakacak şekilde çevirirsek:
+
+$$NCF = I - S$$
+
+Matematik, bir Sermaye Fazlasının (NCF > 0) mutlaka Yatırımın
+Tasarruftan büyük olduğu ($I > S$) bir açıkla birlikte gitmesi
+gerektiğini kanıtlar. Ana akım görüş ve Pettis'in görüşü matematik
+üzerinde hemfikirdir; ancak nedensellik konusunda farklı düşünürler:
+
+Ana Akım Görüş (Tasarruflar Sermayeyi Yönlendirir): "Amerikalılar
+savurgan harcamacılardır, tasarruf etmeyi reddederler (S düşer). Yurt
+içi tasarruflar Amerikan yatırımını (I) finanse etmek için çok düşük
+olduğundan, ABD yabancılardan borçlanmak zorunda kalır (NCF açığı
+kapatmak için artar)."
+
+Pettis'in Görüşü (Sermaye Tasarrufları Yönlendirir): Pettis, bunun
+küresel finansal sistemi tamamen yanlış anlamak olduğunu söyler. ABD
+dünyanın en derin, en güvenli ve en likit finansal piyasalarına
+sahiptir ve herhangi bir sermaye kontrolü yoktur. Yabancılar
+(özellikle Çin, Almanya veya Japonya gibi ihracata dayalı ekonomiler)
+servetlerini güvenli ABD varlıklarında saklamak ister.
+
+ABD bunları durduramadığından, Yabancı Sermaye Girişleri (NCF)
+bağımsız değişkendir; önce o gerçekleşir.
+
+Eğer ülkeye devasa bir yabancı para dalgası girerse $NCF = I - S$
+denklemi dengelenmek zorundadır. Bunun gerçekleşmesi için ya:
+
+Yatırım (I), parayı absorbe etmek için hızla artmalıdır (örn. çok
+sayıda yeni fabrika inşa etmek).
+
+Ya da Tasarruf (S) sert biçimde düşmelidir.
+
+ABD'deki yatırım, nakit eksikliğiyle değil piyasa talebiyle
+yönlendirildiğinden, işletmeler yabancı para geldi diye birden bire
+binlerce gereksiz fabrika inşa etmez. Bu nedenle denklemi dengelemek
+için Tasarruf (S) aşağı çekilmek zorunda kalır.
+
+Gelen para Amerikalıları nasıl daha az tasarruf etmeye zorlar? Bu
+sihirle olmaz; ekonomik mekanizmalar aracılığıyla gerçekleşir:
+
+- Servet Etkisi: Yabancılar ABD hisse senetleri ve gayrimenkulü satın
+  alarak varlık fiyatlarını yukarı iter. Amerikalılar evlerinin ve
+  emeklilik fonlarının değeri arttığı için kendilerini daha zengin
+  hisseder, dolayısıyla gönüllü olarak daha fazla harcar ve aktif
+  gelirlerinden daha az tasarruf eder.
+
+- İşsizlik/Borç: Yabancı sermaye girişleri doları güçlendirir, bu da
+  ABD ihracatını pahalı, yabancı ithalatı ise ucuz kılar. Amerikalı
+  imalat işçileri işlerini kaybeder. İşsiz insanların negatif
+  tasarrufları olur (borçla geçinirler), bu da ulusal tasarruf oranını
+  (S) aşağı çeker.
+
+Pettis, eşitliği kullanarak ABD'nin düşük tasarruf oranının Amerikalı
+tüketicilerin psikolojik bir kusuru olmadığını başarıyla savunur; bu,
+ABD dolarının dünyanın sermaye güvenli limanı olmasının matematiksel
+sonucudur.
+
+Hem matematiksel hem de ekonomik olarak Ulusal Tasarruf (S) kesinlikle
+devasa bir Sermaye Girişini (NCF) dengelemek için sıfırın altına
+düşebilir.
+
+Bu gerçekleştiğinde, bir ulusun büyük ölçekte "tasarruf erittiği"
+anlamına gelir.
+
+Bunun nasıl işlediğini görmek için Ulusal Tasarrufu (S) oluşturan iki
+bileşene bakmak gerekir: Özel Tasarruf (hanehalkı ve şirketler) ve
+Kamu Tasarrufu (hükümet bütçe dengesi).
+
+$$S = S_{özel} + S_{kamu}$$
+
+İşte devasa bir NCF ve düşük I'nın her iki bileşen aracılığıyla S'yi
+negatife nasıl zorlayabileceği aşağıda açıklanmaktadır.
+
+Hükümet Mekanizması: Devasa Mali Açıklar ($S_{kamu} < 0$): Bu, modern
+ekonomide S'nin sıfırın altına düştüğünün en yaygın biçimidir.
+
+Kamu tasarrufu, hükümet gelirinden hükümet harcamasının
+çıkarılmasıdır. Hükümet açık verirse kamu tasarrufu negatiftir. Ülkeye
+devasa miktarda yabancı sermaye (NCF) girerse ancak işletmelerin bunu
+üretken biçimde kullanacağı bir alan yoksa (yani Yatırım I düşük
+kalıyorsa), eşitliği karşılamak için bu paranın bir yere gitmesi
+gerekir:
+
+$$NCF = I - S$$
+
+I sabit ve düşükse, NCF büyümeye devam ederse, S düşmek
+zorundadır. Mekanizm çoğunlukla şöyle işler:
+
+- Yabancı sermayenin girişi ABD finansal piyasalarını doldurarak faiz
+  oranlarını sıfıra yakın seviyelere iter.
+
+- Ucuz borçlanma maliyetleri hükümeti devasa bütçe açıkları
+  çalıştırmaya özendirip ($S_{kamu}$ derin biçimde negatifleşir).
+
+- Hükümet, özel sektörün (I) olmayacağı için gelen yabancı sermayeyi
+  absorbe etmek adına fiilen "son çare borçlanıcısı" işlevi görür.
+
+Özel Mekanizma: Hanehalkı Borcu ($S_{özel} < 0$): Bireysel vatandaşlar
+ulusal tasarrufun negatife gitmesine yol açabilir mi? Evet, tüketici
+borcu birikimiyle. ABD bankalarına devasa miktarda yabancı sermaye
+girerse, bankalar kâr etmek için ödünç vermeleri gereken para dağları
+üzerinde oturur. İşletmeler fabrika inşa etmek için borçlanmadığından
+(düşük I), bankalar tüketiciler için kredi standartlarını gevşetir.
+
+- Kredi kartları, otomobil kredileri ve düşük kaliteli ipotekler hızla
+  artar.
+
+- Hanehalkları, ithal tüketim malı satın almak için borçlanarak
+  gelirlerinin yüzde yüzünden fazlasını harcadığında, özel tasarruf
+  negatife döner.
+
+Amerika Birleşik Devletleri (2005–2006): Küresel Finansal Kriz'in
+eşiğinde ABD, yabancı sermayeyle dolup taştı (Ben Bernanke buna
+"Küresel Tasarruf Bolluğu" adını verdi). Üretken iş yatırımı (I)
+hepsini absorbe edemediği için para konut piyasasına aktı. Büyük
+Buhran'dan bu yana ilk kez ABD Kişisel Tasarruf Oranı birkaç ay
+boyunca gerçekten yüzde sıfırın altına düştü. Amerikalılar tüketimi
+finanse etmek için artan konut değerleri üzerinden borçlanıyordu.
+
+Yunanistan ve İspanya (2008 Öncesi): Avro'nun oluşturulmasının
+ardından devasa miktarda Alman ve Hollanda sermayesi (NCF) Güney
+Avrupa'ya akmaya başladı.
+
+Üretken yatırım hepsini absorbe edemedi. Yunanistan'da hükümet ve
+tüketiciler sermayeyi borç aracılığıyla absorbe ettikçe ulusal
+tasarruf derin biçimde negatife düştü ve bu durum doğrudan Avro
+Bölgesi borç krizine yol açtı.
+
+Bir ülke, üretken biçimde yatırım yapamayacağı yabancı parayla dolup
+taşarsa, muhasebe eşitliği o ülkeyi ya işsizliği artırmaya ya da borcu
+artırmaya (tasarrufları yok etmeye) zorlar. Gelen para, ekonomiyi
+imkânlarının ötesinde yaşamaya iter.
+
+I düşük kalırken S sıfırın altına düşerse, ülke zenginleşmiyor ya da
+gelecekteki kapasitesini inşa etmiyor; yalnızca yabancı serveti
+krediyle tüketiyor ve kırılgan bir ekonomik balon kuruyordur.
+
+$NCF = I - S$'yi yeniden düzenleyerek yazarsak:
+
+$$S = I - NCF$$
+
+Eğer ülkenin açık sermaye piyasaları varsa ve dünyanın geri kalanı
+servetini orada park etmeye karar verirse (NCF'yi yüksek seviyelere
+çekerek), yerli ekonomi defteri dengelemek için borç almak zorunda
+kalır. Borç, dengesizliğin nedeni değil; küresel sermaye girişlerinin
+baskısını azaltan emniyet supabıdır.
+
+Negatif tasarruf ($S < 0$) cebirsel sonucunun gerçek hayatta ne kadar
+iyi açıkladığı vurgulamaya değer. Bu, çift taraflı defterin küresel
+ölçekteki güzel, inkâr edilemez gücüdür.
+
+Az önce çıkardığımız sonuç şuydu:
+
+$$\text{Devasa NCF} = I - (-S)$$
+
+$$\text{Devasa NCF} = I + S_{borç}$$
+
+Matematik hiçbir farklı sonuca izin vermez. Dünyanın geri kalanı
+paranı sınırlarına zorla sokarsa (NCF) ve işletmelerin fabrika inşa
+etmek için buna ihtiyacı yoksa (I), küresel ekonominin matematiksel
+dişlileri, vatandaşların ya da hükümetin borç batağına girmesine
+($-S$) kadar dönmeye devam edecektir.
+
+İşte bu yüzden Michael Pettis, makroekonomiyi yönletenin psikoloji ya
+da harcamaya yönelik kültürel tutumlar değil, bu katı ve değişmez
+muhasebe eşitlikleri olduğunu savunmaktadır.
+
+Yunanistan
+
+Yunan borç krizi sırasında Yunan Maliye Bakanı Varoufakis, başka
+ülkelerde açık yaratacak fazlalar nedeniyle Almanları suçladı. Bu,
+yukarıdaki formülün küresel bir yansıması olarak görülebilir mi? Şimdi
+ticaret açığı veren ülke için yeniden $Y = C + I + NX$ ile başlayalım
+ve bunun ne anlama geldiğini değerlendirmeye çalışalım. $Y = C + I +
+(X - M)$ denkleminde X'in düşük, M'nin yüksek olduğunu söylüyoruz,
+yani NX negatif. Bu durum denklemde ve toplumda hangi aşağı yönlü
+etkilere yol açar?
+
+Varoufakis'in neden Almanya'yı suçladığını görmek için küresel
+ticaretin temel kuralına bakmamız gerekir: Dünyanın ticaret dengeleri
+toplamı sıfır olmak zorundadır. Bir ülkenin ihracat fazlası, tanım
+gereği, başka bir ülkenin ithalat açığıdır.
+
+Küresel Sıfır Toplamlı Kısıt: Avro Bölgesi gibi kapalı bir sisteme
+bakarsak, tüm ülkelerin toplam Net İhracatı sıfıra eşit olmak
+zorundadır:
+
+$$NX_{Almanya} + NX_{Yunanistan} = 0$$
+
+Almanya devasa bir pozitif fazla çalıştırıyorsa ($NX > 0$), o zaman
+Yunanistan devasa bir negatif açık vermek zorundadır ($NX < 0$). Bu
+bir tercih değil; muhasebe kesinliğidir.
+
+Denklemdeki Aşağı Yönlü Etkiler: NX'in derin biçimde negatif olduğu
+Yunanistan'ın yurt içi denklemine bakalım. Yurt içi üretimde (Y) ne
+olduğunu görmek için $Y = C + I + NX$'i yeniden düzenleyelim:
+
+$$Y = (C + I) - \text{Ticaret Açığı}$$
+
+Bu, sert bir gerçeği ortaya koyar. Negatif bir NX, yurt içi üretim
+üzerinde bir drenaj işlevi görür. Yunanlılar Yunan yapımı mallar
+yerine Alman arabaları satın alırsa (M yüksekse), bu para Yunan
+ekonomisinden çıkar.
+
+Şimdi, daha önceki eşitliğimizi hatırlayalım:
+
+$$S - I = NX$$
+
+NX büyük bir negatif sayıysa, o zaman $(S - I)$ da büyük bir negatif
+sayı olmak zorundadır. Bunun borç açısından ne anlama geldiğini görmek
+için işaretleri çevirirsek:
+
+$$I - S = \text{Ticaret Açığı}$$
+
+Bu, bir ülkenin kalıcı ticaret açığı verdiği durumda Yatırımın
+Tasarrufu aşması gerektiği anlamına gelir. Tıpkı daha önceki
+"şaşkınlık anı" gibi: Yatırım (I) kısıtlıysa, Tasarruf (S) derin
+biçimde negatife gitmek zorundadır.
+
+Bunun Toplum İçin Anlamı (Yunan Trajedisi): Bu cebir 2015 krizi
+öncesinde ve sırasında Yunan toplumuna nasıl yansıdı? 1999'da Avro
+oluşturulduğunda Almanya kendi yurt içi ücretlerini baskıladı. Alman
+işçiler verimliliklerine kıyasla daha az ücret aldığından çok fazla
+tüketemezlerdi ($C_{Almanya}$ düştü). Almanya tükettiğinden çok daha
+fazlasını üreterek devasa bir ihracat fazlası yarattı ($NX_{Almanya}
+\gg 0$).
+
+Bu fazla paranın bir yere gitmesi gerekiyordu. Alman bankaları Güney
+Avrupa'yı (Yunanistan dahil) ucuz kredilerle doldurdu. Bu,
+Yunanistan'a akan NCF'ydi.
+
+İşte toplumun cebiri dengeleyecek biçimde nasıl uyum sağladığı:
+
+Borç Patlaması ($-S$): Yunanistan ucuz Alman sermayesiyle dolduğundan
+faiz oranları düştü. Yunan hükümeti ve Yunan tüketicileri Alman
+ithalatı satın almak için ağır biçimde borçlandı. Kamu ve özel
+tasarruf (S) sıfırın altına indi.
+
+Yurt İçi Sanayinin Çöküşü (Y): Avro, Yunanistan'ı Almanya ile aynı
+para birimine kilitlediğinden, Yunanistan kendi mallarını ucuzlatmak
+için para birimini devalüe edemedi. Yunan fabrikaları son derece
+verimli Alman üretimiyle rekabet edemedi. Turizm dışında Yunan üretimi
+(Y) durgunlaştı.
+
+Çöküş
+
+2008'de küresel finansal kriz vurdu ve Alman bankaları Yunanistan'a
+borç vermeyi aniden durdurdu (NCF sıfıra indi).
+
+NCF sıfıra düşerken devasa yapısal bir ticaret açığınız ($NX < 0$)
+olmaya devam ettiğinde matematiğe bakın:
+
+$$S - I = \text{Negatif Sayı}$$
+
+Yabancılar bu açığı artık finanse etmek istemiyorsa, ekonomi "kemer
+sıkma" denilen şiddetli bir düzeltmeye zorlanır. Matbaa olmadan NX'i
+sıfıra döndürmek için Yunanistan'ın kendi ithalatını (M) şiddetle
+kısmak zorundaydı.
+
+İthalatı nasıl kısarsınız? Yurt içi satın alma gücünü yok ederek. IMF
+ve Avrupalı yetkililer, Yunanistan'ı devlet ücretlerini kesmeye,
+işçileri işten çıkarmaya ve emeklilikleri kısmaya zorladı.
+
+Toplumsal Etki: GSYİH (Y) yüzde 25 çöktü, işsizlik yüzde 27'ye fırladı
+ve eğitimli genç Yunanlılar ülkeyi kitleler halinde terk etti.
+
+### Kur Fiyatı Modellemesi
 
 Bir ülkenin ödemeler dengesi o ülkenin vatandaşları ve dünyadaki diğer
 kişiler arasındaki tüm alışverişi, ticari işlemleri yıllık bazda gösteren
-bir tablodur [9]. Malların, servislerin, sermayenin, insanı yardım gibi her
+bir tablodur [2]. Malların, servislerin, sermayenin, insanı yardım gibi her
 türlü parasal transfer bu tabloda bir şekilde gösterilir. Ödemeler dengesi
 muhasabesi IMF standartlarına göre yapılır.
 
@@ -33,7 +453,7 @@ net ihracata karşı ABD net sermaye akış kaleminde (çıkış) birbirine eşi
 hale geldi. Bir diğer seçenek Bill Gates'in kendi ülkesindeki bir yerel
 bankaya gidip bu parayı dolara çevirmesi. Fakat bu yaptığı ödeme dengeleri
 muhasebesi için fark yaratmıyor, çünkü şimdi o yerel bankanın bu 5000 yenle
-bir şeyler yapması lazım [10, sf. 119].
+bir şeyler yapması lazım [4, sf. 119].
 
 Ek bazı örnekler:
 
@@ -261,13 +681,14 @@ başlayacaktır.
 
 Türkiye
 
-Benzer analizi Türkiye için yapabiliriz. Kaynak olarak [11] kullanıldı,
-rakamlar dolar bazında. Burada bir fark net finans hareketlerinde işaret
-değişimi var, bu sebeple nihai toplamdan finans hesabını çıkartmak
-gerekiyor, bu usule BPM6 usulü deniyor, detaylar için [12]. Hesapların
-toplanma, çıkartılması ardından hata payı da (net errors and omissions)
-hesaba katıldıktan sonra geri kalan rezerv hareketlerine eşit olmalı, ve
-rezervi bu rakamdan çıkartınca sonucun sıfır olduğunu görebiliyoruz.
+Benzer analizi Türkiye için yapabiliriz. Kaynak olarak [3] kullanıldı,
+rakamlar dolar bazında. Burada bir fark net finans hareketlerinde
+işaret değişimi var, bu sebeple nihai toplamdan finans hesabını
+çıkartmak gerekiyor, bu usule BPM6 usulü deniyor, detaylar için
+[1]. Hesapların toplanma, çıkartılması ardından hata payı da (net
+errors and omissions) hesaba katıldıktan sonra geri kalan rezerv
+hareketlerine eşit olmalı, ve rezervi bu rakamdan çıkartınca sonucun
+sıfır olduğunu görebiliyoruz.
 
 ```python
 import pandas as pd
@@ -326,22 +747,17 @@ kapanmış?  Finans hesabı altında doğrudan yatırıma (direct investment) ve
 borç enstrümanlarına (tahvil -debt securities- gibi) giriş var, bu şekilde
 kapanmış.
 
-[9] Rokicki, *Open Economy Macroeconomics Lecture, Balance of Payments*, 
+Kaynaklar
+
+[1] EU, *BPM6 Implementation*, 
+     [http://ec.europa.eu/eurostat/documents/39118/40189/Changes-introduced-BPM6-methodology.pdf/c3621a69-6b2f-4b33-9834-619fb1ae5d9c](http://ec.europa.eu/eurostat/documents/39118/40189/Changes-introduced-BPM6-methodology.pdf/c3621a69-6b2f-4b33-9834-619fb1ae5d9c)
+     
+[2] Rokicki, *Open Economy Macroeconomics Lecture, Balance of Payments*, 
     [http://coin.wne.uw.edu.pl/brokicki/open_economy.html](http://coin.wne.uw.edu.pl/brokicki/open_economy.html)
 
-[10] Mankiw, *Principles of Macroeconomics, 5th Edition, 2008* 
-
-[11] Turkish Central Bank, *BALANCE OF PAYMENTS STATISTICS*, 
+[3] Turkish Central Bank, *BALANCE OF PAYMENTS STATISTICS*, 
      [http://www.tcmb.gov.tr/wps/wcm/connect/2c897137-850e-4d15-9a2a-c0d4735d9986/bop.pdf?MOD=AJPERES&CACHEID=ROOTWORKSPACE-2c897137-850e-4d15-9a2a-c0d4735d9986-m6j7eNQ](http://www.tcmb.gov.tr/wps/wcm/connect/2c897137-850e-4d15-9a2a-c0d4735d9986/bop.pdf?MOD=AJPERES&CACHEID=ROOTWORKSPACE-2c897137-850e-4d15-9a2a-c0d4735d9986-m6j7eNQ)
+     
+[4] Mankiw, *Principles of Macroeconomics, 5th Edition, 2008* 
 
-[12] EU, *BPM6 Implementation*, 
-     [http://ec.europa.eu/eurostat/documents/39118/40189/Changes-introduced-BPM6-methodology.pdf/c3621a69-6b2f-4b33-9834-619fb1ae5d9c](http://ec.europa.eu/eurostat/documents/39118/40189/Changes-introduced-BPM6-methodology.pdf/c3621a69-6b2f-4b33-9834-619fb1ae5d9c)
-
-
-
-
-
-
-
-
-
+[5] Pettis, *Trade Wars are Class Wars*
