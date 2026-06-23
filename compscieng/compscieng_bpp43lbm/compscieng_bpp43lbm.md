@@ -326,12 +326,12 @@ soldan sağa gidiyor. Bu gidiş sırasında kapak alttaki su ile temasta
 olduğu için temas edilen en üst seviyedeki suyu soldan sağa doğru
 itecektir. Oyuk içindeki sağ, sol ve en alt kısmındaki duvarlar
 sabittir, tabii hareket halindeki su onlara çarpınca geri sekme olur,
-bu sekmenin diğer su molekülleri ile olan etkileşimi vs göz önüne
-alınmalıdır, tüm bu mekaniğin hesaplanması gerekir.
+bu sekmenin diğer su molekülleri ile olan etkileşimi de
+hesaplanmalıdır, tüm bu mekaniğin simulasyonda gösterilmesi gerekir.
 
-Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, yani iki
-boyuttayız, ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu
-yönleri ve onların numaralandırılmasını alttaki şekilde görüyoruz.
+Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, iki boyuttayız,
+ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu yönleri ve
+onların numaralandırılmasını alttaki şekilde görüyoruz.
 
 ![](compscieng_bpp43lbm_03.jpg)
 
@@ -339,34 +339,36 @@ Sabit hızda kapak hareketin altındaki suya yapacağı sabit etkiyi
 sisteme dahil etmenin en rahat yolu $u$ üzerinden olacaktır. Daha önce
 $u$ değişkeninin global hareketi temsil ettiğini söylemiştik. O zaman,
 mesela sisteme etki edecek bir "rüzgar" ya da bu örnekteki gibi sabit
-hızdaki bir sıvı hareketini $u$ ile yaparız. Hesapsal olarak $u$'yu
-temsil eden matrisin en üst satırına bu sabit hız enjekte edilebilir.
+hızdaki bir sıvı hareketini $u$ ile yaparız. Simulasyon sırasında
+$u$'yu temsil eden matrisin en üst satırına bu sabit hız enjekte
+edilebilir.
 
 Sağ, sol, alt duvarları sabittir, bu duvarlara dokunan $u$
 noktalarında hız sıfırlanmalıdır, ayrıca orada momentumun her zaman
 sıfır olmalısı da gerekir, buna sıvı mekaniğinde kaymamazlık koşulu /
 kayma-yok (no-slip condition) ismi veriliyor. Bu kaymazlık koşulunun
-momentum kismini elde etmek için de çarpısma sonrasi yönsel yoğunluğu
+momentum kısmını elde etmek için de çarpışma sonrası yönsel yoğunluğu
 (D2Q9'daki 9 tane yönden bahsediyoruz) *tamamen tersine* çevirmek
 gerekir. Dikkat: Pong oyunu usulü topun duvardan bir açıyla
 sekmesinden bahsetmiyoruz, alt sola doğru olan gidişi tam tersine,
 *üst sağa* çevirmekten bahsediyoruz (Pong olsaydı "sekme" sonrası
 gidiş sağ alta doğru olurdu).
 
-Not: Hareket etmeyen duvara temas eden ince sıvı tabakasının hızının
-sıfırlanması gerçekçi bir seçimdir, duvarlar pürüzsüz değildir, pek
-çok girintisi çıkıntısı olan yapılardır, bu noktalara temas eden sıvı
-moleküllerinin oraya yapıştığı deneylerde saptanmıştır.
+Bu arada belirtelim hareket etmeyen duvara temas eden ince sıvı
+tabakasının hızının sıfırlanması gerçekçi bir seçimdir, duvarlar
+pürüzsüz değildir, pek çok girintisi çıkıntısı olan yapılardır, bu
+noktalara temas eden sıvı moleküllerinin oraya yapıştığı deneylerde
+saptanmıştır.
 
 Hız yönünün tersini çevrilmesi gerekliliğini momentum muhafazasından
-türetebiliriz. Bir duvar düğümünde, $f_i$'leri gelen ve giden
-popülasyonlara ayıralım. 
+türetebiliriz. Bir duvar düğümünde $f_i$'leri gelen ve giden
+popülasyonlara ayıralım.
 
 - $f_i^+$ — $\mathbf{e}_i$'sı duvardan uzaklaşan yoğunluk
 
 - $f_i^-$ — $\mathbf{e}_i$'sı duvara doğru işaret eden yoğunluk
 
-ki $\mathbf{e}_i$ vektörleri LBM izgara yapısının tanımladığı
+ki $\mathbf{e}_i$ vektörleri LBM ızgara yapısının tanımladığı
 yönlerdir. Akış sonrasında, $f_i^-$ molekülleri duvara henüz
 ulaşmıştır. $f_i^+$ yoğunluğu ise bilinmeyendir — bunların sınır
 koşulu tarafından belirlenmesi gerekir. Kayma-yok kısıtlaması şunu

@@ -3,6 +3,8 @@
 
 ## En Son
 
+23/6 - [Uluslararası Finans - Ekler](https://burakbayramli.github.io/dersblog/tser/tser_115_bop/uluslararasi_finans_dengeler.html)
+
 22/5 - [Sıvı ve Gaz Mekaniği - 2](https://burakbayramli.github.io/dersblog/phy/phy_030_flgas2/sivi_ve_gaz_mekanigi__2.html)
 
 4/5 - [Optimizasyon, Simulasyon](https://burakbayramli.github.io/dersblog/stat/stat_230_opt/optimizasyon_simulasyon.html)
@@ -10,8 +12,6 @@
 24/4 - [Monte Carlo, Entegraller, Sıralı Monte Carlo](https://burakbayramli.github.io/dersblog/stat/stat_095_mcint/monte_carlo_entegraller_sirali_monte_carlo.html)
 
 17/4 - [Sağkalım Analizi (Survival Analysis)](https://burakbayramli.github.io/dersblog/stat/stat_200_surv/sagkalim_analizi__survival_analysis_.html)
-
-27/3 - [Markov Zincirleri Monte Carlo, Metropolis-Hastings, Gibbs](https://burakbayramli.github.io/dersblog/stat/stat_097_mcmc/markov_zincirleri_monte_carlo_metropolishastings_gibbs.html)
 
 ## Konular, Referans
 

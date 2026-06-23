@@ -398,10 +398,8 @@ için para birimini devalüe edemedi. Yunan fabrikaları son derece
 verimli Alman üretimiyle rekabet edemedi. Turizm dışında Yunan üretimi
 (Y) durgunlaştı.
 
-Çöküş
-
-2008'de küresel finansal kriz vurdu ve Alman bankaları Yunanistan'a
-borç vermeyi aniden durdurdu (NCF sıfıra indi).
+Çöküş: 2008'de küresel finansal kriz vurdu ve Alman bankaları
+Yunanistan'a borç vermeyi aniden durdurdu (NCF sıfıra indi).
 
 NCF sıfıra düşerken devasa yapısal bir ticaret açığınız ($NX < 0$)
 olmaya devam ettiğinde matematiğe bakın:
@@ -761,3 +759,4 @@ Kaynaklar
 [4] Mankiw, *Principles of Macroeconomics, 5th Edition, 2008* 
 
 [5] Pettis, *Trade Wars are Class Wars*
+    
