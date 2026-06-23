@@ -203,8 +203,8 @@ sihirle olmaz; ekonomik mekanizmalar aracılığıyla gerçekleşir:
 - İşsizlik/Borç: Yabancı sermaye girişleri doları güçlendirir, bu da
   ABD ihracatını pahalı, yabancı ithalatı ise ucuz kılar. Amerikalı
   imalat işçileri işlerini kaybeder. İşsiz insanların negatif
-  tasarrufları olur (borçla geçinirler), bu da ulusal tasarruf oranını
-  (S) aşağı çeker.
+  tasarrufları olur (borçla geçinirler), bu da ulusal tasarruf oranını (S)
+  aşağı çeker.
 
 Pettis, eşitliği kullanarak ABD'nin düşük tasarruf oranının Amerikalı
 tüketicilerin psikolojik bir kusuru olmadığını başarıyla savunur; bu,

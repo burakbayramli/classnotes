@@ -79,8 +79,8 @@ matematiksel durumu temsil eder.
 
 - $f$ ile $f^{eq}$ birbirinden uzaklaşır ve $\Delta f$ büyürse, bu
   çarpışmaların olduğu anlamına gelir; bu fark, bir kontrol
-  sistemindeki hata sinyali gibi algılanır moleküler popülasyonun
-  sınır dışına ne kadar çıktığını tam olarak ölçer.
+  sistemindeki hata sinyali gibi algılanır moleküler sınır dışına ne
+  kadar çıktığını tam olarak ölçer.
 
 Sapma bu çıkarma işlemiyle algılandıktan sonra, BGK operatörü bu
 değeri sistemi değiştirmek için hemen kullanır:
@@ -135,6 +135,12 @@ $$
 $$ = \frac{\rho}{(2\pi RT)^{D/2}}
 \exp\left(-\frac{c \cdot c - 2c \cdot u + u \cdot u}{2RT}\right)
 $$
+
+Üstteki $c-u$ kullanımı hızı iki bileşene ayırıyor. Bu bilisenlerden
+birisi $u$ ile belirtilen genel / global / toptan (bulk) hızdır,
+diğeri mikro seviyedeki $c$ hızıdır. 9 tane yön altında incelenen hız
+$c$ olacaktır, ve bu hız makro seviyedeki $u$'dan arta kalan dinamik
+olarak incelenir, nihai dağılım formülüne verilen $c-u$ olur. 
 
 Üstel $\exp$'yi iki blok halinde alalım,
 
@@ -328,6 +334,69 @@ boyuttayız, ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu
 yönleri ve onların numaralandırılmasını alttaki şekilde görüyoruz.
 
 ![](compscieng_bpp43lbm_03.jpg)
+
+Sabit hızda kapak hareketin altındaki suya yapacağı sabit etkiyi
+sisteme dahil etmenin en rahat yolu $u$ üzerinden olacaktır. Daha önce
+$u$ değişkeninin global hareketi temsil ettiğini söylemiştik. O zaman,
+mesela sisteme etki edecek bir "rüzgar" ya da bu örnekteki gibi sabit
+hızdaki bir sıvı hareketini $u$ ile yaparız. Hesapsal olarak $u$'yu
+temsil eden matrisin en üst satırına bu sabit hız enjekte edilebilir.
+
+Sağ, sol, alt duvarları sabittir, bu duvarlara dokunan $u$
+noktalarında hız sıfırlanmalıdır, ayrıca orada momentumun her zaman
+sıfır olmalısı da gerekir, buna sıvı mekaniğinde kaymamazlık koşulu /
+kayma-yok (no-slip condition) ismi veriliyor. Bu kaymazlık koşulunun
+momentum kismini elde etmek için de çarpısma sonrasi yönsel yoğunluğu
+(D2Q9'daki 9 tane yönden bahsediyoruz) *tamamen tersine* çevirmek
+gerekir. Dikkat: Pong oyunu usulü topun duvardan bir açıyla
+sekmesinden bahsetmiyoruz, alt sola doğru olan gidişi tam tersine,
+*üst sağa* çevirmekten bahsediyoruz (Pong olsaydı "sekme" sonrası
+gidiş sağ alta doğru olurdu).
+
+Not: Hareket etmeyen duvara temas eden ince sıvı tabakasının hızının
+sıfırlanması gerçekçi bir seçimdir, duvarlar pürüzsüz değildir, pek
+çok girintisi çıkıntısı olan yapılardır, bu noktalara temas eden sıvı
+moleküllerinin oraya yapıştığı deneylerde saptanmıştır.
+
+Hız yönünün tersini çevrilmesi gerekliliğini momentum muhafazasından
+türetebiliriz. Bir duvar düğümünde, $f_i$'leri gelen ve giden
+popülasyonlara ayıralım. 
+
+- $f_i^+$ — $\mathbf{e}_i$'sı duvardan uzaklaşan yoğunluk
+
+- $f_i^-$ — $\mathbf{e}_i$'sı duvara doğru işaret eden yoğunluk
+
+ki $\mathbf{e}_i$ vektörleri LBM izgara yapısının tanımladığı
+yönlerdir. Akış sonrasında, $f_i^-$ molekülleri duvara henüz
+ulaşmıştır. $f_i^+$ yoğunluğu ise bilinmeyendir — bunların sınır
+koşulu tarafından belirlenmesi gerekir. Kayma-yok kısıtlaması şunu
+söyler:
+
+$$\sum_{i^+} f_i^+ \mathbf{e}_i^+ + \sum_{i^-} f_i^- \mathbf{e}_i^- = 0$$
+
+Üstteki formül alttakinin açılmış hali, çünkü LBM'de $\mathbf{x}$
+düğümündeki momentum şöyledir:
+
+$$\rho \mathbf{u}(\mathbf{x}, t) = \sum_i f_i(\mathbf{x}, t)\, \mathbf{e}_i$$
+
+Devam edelim, sıfıra eşit olmayı sağlamanın en basit yolu, her gelen
+$i^-$ yönü için şunu ayarlamaktır:
+
+$$f_{\bar{i}}^+ = f_i^-$$
+
+burada $\bar{i}$, $i$'nin karşı yönüdür, yani $\mathbf{e}_{\bar{i}} =
+-\mathbf{e}_i$. O halde:
+
+$$\sum_{i^-} f_{\bar{i}}^+ \mathbf{e}_{\bar{i}}^+ + \sum_{i^-} f_i^-
+\mathbf{e}_i^- = \sum_{i^-} f_i^- (-\mathbf{e}_i^-) + \sum_{i^-} f_i^-
+\mathbf{e}_i^- = 0 $$
+
+Her çift tam olarak birbirini iptal eder. Bu geri-sekme kuralıdır,
+momentum toplamının sıfır olması talebi doğrultusunda doğrudan elde
+edilir.
+
+
+
 
 
 ```python

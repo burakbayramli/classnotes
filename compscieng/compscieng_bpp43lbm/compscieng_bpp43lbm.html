@@ -176,8 +176,8 @@ Model, hiçbir düzeltmeye gerek olmadığını algılar.</p></li>
 class="math inline">\(f^{eq}\)</span> birbirinden uzaklaşır ve <span
 class="math inline">\(\Delta f\)</span> büyürse, bu çarpışmaların olduğu
 anlamına gelir; bu fark, bir kontrol sistemindeki hata sinyali gibi
-algılanır moleküler popülasyonun sınır dışına ne kadar çıktığını tam
-olarak ölçer.</p></li>
+algılanır moleküler sınır dışına ne kadar çıktığını tam olarak
+ölçer.</p></li>
 </ul>
 <p>Sapma bu çıkarma işlemiyle algılandıktan sonra, BGK operatörü bu
 değeri sistemi değiştirmek için hemen kullanır:</p>
@@ -227,6 +227,15 @@ f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}}
 <p><span class="math display">\[ = \frac{\rho}{(2\pi RT)^{D/2}}
 \exp\left(-\frac{c \cdot c - 2c \cdot u + u \cdot u}{2RT}\right)
 \]</span></p>
+<p>Üstteki <span class="math inline">\(c-u\)</span> kullanımı hızı iki
+bileşene ayırıyor. Bu bilisenlerden birisi <span
+class="math inline">\(u\)</span> ile belirtilen genel / global / toptan
+(bulk) hızdır, diğeri mikro seviyedeki <span
+class="math inline">\(c\)</span> hızıdır. 9 tane yön altında incelenen
+hız <span class="math inline">\(c\)</span> olacaktır, ve bu hız makro
+seviyedeki <span class="math inline">\(u\)</span>’dan arta kalan dinamik
+olarak incelenir, nihai dağılım formülüne verilen <span
+class="math inline">\(c-u\)</span> olur.</p>
 <p>Üstel <span class="math inline">\(\exp\)</span>’yi iki blok halinde
 alalım,</p>
 <p><span class="math display">\[ = \frac{\rho}{(2\pi RT)^{D/2}}
@@ -440,6 +449,69 @@ mekaniğin hesaplanması gerekir.</p>
 boyuttayız, ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu
 yönleri ve onların numaralandırılmasını alttaki şekilde görüyoruz.</p>
 <p><img src="compscieng_bpp43lbm_03.jpg" /></p>
+<p>Sabit hızda kapak hareketin altındaki suya yapacağı sabit etkiyi
+sisteme dahil etmenin en rahat yolu <span
+class="math inline">\(u\)</span> üzerinden olacaktır. Daha önce <span
+class="math inline">\(u\)</span> değişkeninin global hareketi temsil
+ettiğini söylemiştik. O zaman, mesela sisteme etki edecek bir “rüzgar”
+ya da bu örnekteki gibi sabit hızdaki bir sıvı hareketini <span
+class="math inline">\(u\)</span> ile yaparız. Hesapsal olarak <span
+class="math inline">\(u\)</span>’yu temsil eden matrisin en üst satırına
+bu sabit hız enjekte edilebilir.</p>
+<p>Sağ, sol, alt duvarları sabittir, bu duvarlara dokunan <span
+class="math inline">\(u\)</span> noktalarında hız sıfırlanmalıdır,
+ayrıca orada momentumun her zaman sıfır olmalısı da gerekir, buna sıvı
+mekaniğinde kaymamazlık koşulu / kayma-yok (no-slip condition) ismi
+veriliyor. Bu kaymazlık koşulunun momentum kismini elde etmek için de
+çarpısma sonrasi yönsel yoğunluğu (D2Q9’daki 9 tane yönden bahsediyoruz)
+<em>tamamen tersine</em> çevirmek gerekir. Dikkat: Pong oyunu usulü
+topun duvardan bir açıyla sekmesinden bahsetmiyoruz, alt sola doğru olan
+gidişi tam tersine, <em>üst sağa</em> çevirmekten bahsediyoruz (Pong
+olsaydı “sekme” sonrası gidiş sağ alta doğru olurdu).</p>
+<p>Not: Hareket etmeyen duvara temas eden ince sıvı tabakasının hızının
+sıfırlanması gerçekçi bir seçimdir, duvarlar pürüzsüz değildir, pek çok
+girintisi çıkıntısı olan yapılardır, bu noktalara temas eden sıvı
+moleküllerinin oraya yapıştığı deneylerde saptanmıştır.</p>
+<p>Hız yönünün tersini çevrilmesi gerekliliğini momentum muhafazasından
+türetebiliriz. Bir duvar düğümünde, <span
+class="math inline">\(f_i\)</span>’leri gelen ve giden popülasyonlara
+ayıralım.</p>
+<ul>
+<li><p><span class="math inline">\(f_i^+\)</span> — <span
+class="math inline">\(\mathbf{e}_i\)</span>’sı duvardan uzaklaşan
+yoğunluk</p></li>
+<li><p><span class="math inline">\(f_i^-\)</span> — <span
+class="math inline">\(\mathbf{e}_i\)</span>’sı duvara doğru işaret eden
+yoğunluk</p></li>
+</ul>
+<p>ki <span class="math inline">\(\mathbf{e}_i\)</span> vektörleri LBM
+izgara yapısının tanımladığı yönlerdir. Akış sonrasında, <span
+class="math inline">\(f_i^-\)</span> molekülleri duvara henüz
+ulaşmıştır. <span class="math inline">\(f_i^+\)</span> yoğunluğu ise
+bilinmeyendir — bunların sınır koşulu tarafından belirlenmesi gerekir.
+Kayma-yok kısıtlaması şunu söyler:</p>
+<p><span class="math display">\[\sum_{i^+} f_i^+ \mathbf{e}_i^+ +
+\sum_{i^-} f_i^- \mathbf{e}_i^- = 0\]</span></p>
+<p>Üstteki formül alttakinin açılmış hali, çünkü LBM’de <span
+class="math inline">\(\mathbf{x}\)</span> düğümündeki momentum
+şöyledir:</p>
+<p><span class="math display">\[\rho \mathbf{u}(\mathbf{x}, t) = \sum_i
+f_i(\mathbf{x}, t)\, \mathbf{e}_i\]</span></p>
+<p>Devam edelim, sıfıra eşit olmayı sağlamanın en basit yolu, her gelen
+<span class="math inline">\(i^-\)</span> yönü için şunu
+ayarlamaktır:</p>
+<p><span class="math display">\[f_{\bar{i}}^+ = f_i^-\]</span></p>
+<p>burada <span class="math inline">\(\bar{i}\)</span>, <span
+class="math inline">\(i\)</span>’nin karşı yönüdür, yani <span
+class="math inline">\(\mathbf{e}_{\bar{i}} = -\mathbf{e}_i\)</span>. O
+halde:</p>
+<p><span class="math display">\[\sum_{i^-} f_{\bar{i}}^+
+\mathbf{e}_{\bar{i}}^+ + \sum_{i^-} f_i^-
+\mathbf{e}_i^- = \sum_{i^-} f_i^- (-\mathbf{e}_i^-) + \sum_{i^-} f_i^-
+\mathbf{e}_i^- = 0 \]</span></p>
+<p>Her çift tam olarak birbirini iptal eder. Bu geri-sekme kuralıdır,
+momentum toplamının sıfır olması talebi doğrultusunda doğrudan elde
+edilir.</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]])</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (A)</span>
