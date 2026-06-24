@@ -329,6 +329,8 @@ sabittir, tabii hareket halindeki su onlara çarpınca geri sekme olur,
 bu sekmenin diğer su molekülleri ile olan etkileşimi de
 hesaplanmalıdır, tüm bu mekaniğin simulasyonda gösterilmesi gerekir.
 
+Izgara, Global Akış
+
 Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, iki boyuttayız,
 ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu yönleri ve
 onların numaralandırılmasını alttaki şekilde görüyoruz.
@@ -397,8 +399,11 @@ Her çift tam olarak birbirini iptal eder. Bu geri-sekme kuralıdır,
 momentum toplamının sıfır olması talebi doğrultusunda doğrudan elde
 edilir.
 
+Yayılım (Streaming)
 
-
+LBM yayılım mantigini olabildigince basitlestirir. Mevcut dagilimi
+onceden tanimli hareket yonlerine sadece bir izgara hucresi uzerinden
+kopyala. Kopyalama icin `np.roll` kullaniliyor, bazi ornekler asagida,
 
 
 ```python
@@ -422,7 +427,16 @@ print (A)
  [0 0 0]]
 ```
 
+Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
+diğer ucuna kopyalar.
 
+Her neyse, bir soru akla gelebilir, eğer yayılım evresinde her hücre
+yanindakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor?
+Çünkü A yanindaki B'ye kopyalar, sonra B geri A'ya kopyalar. Değişim
+nerede? Bu doğru bir gözlem: eğer hiçbir çarpışma olmasaydı (ki daha
+önce bahsettiğimiz gibi çarpışma miktarı denge dağılımına olan
+uzaklıkla doğru orantılıdır) o zaman hakikaten giden moleküller
+gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti. 
 
 
 

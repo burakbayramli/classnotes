@@ -443,11 +443,12 @@ sağa gidiyor. Bu gidiş sırasında kapak alttaki su ile temasta olduğu
 için temas edilen en üst seviyedeki suyu soldan sağa doğru itecektir.
 Oyuk içindeki sağ, sol ve en alt kısmındaki duvarlar sabittir, tabii
 hareket halindeki su onlara çarpınca geri sekme olur, bu sekmenin diğer
-su molekülleri ile olan etkileşimi vs göz önüne alınmalıdır, tüm bu
-mekaniğin hesaplanması gerekir.</p>
-<p>Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, yani iki
-boyuttayız, ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu
-yönleri ve onların numaralandırılmasını alttaki şekilde görüyoruz.</p>
+su molekülleri ile olan etkileşimi de hesaplanmalıdır, tüm bu mekaniğin
+simulasyonda gösterilmesi gerekir.</p>
+<p>Izgara, Global Akış</p>
+<p>Kodlama için kullanılan ızgara D2Q9 ızgarası olacak, iki boyuttayız,
+ve hareketsizlik dahil olmak üzere 9 tane yön var. Bu yönleri ve onların
+numaralandırılmasını alttaki şekilde görüyoruz.</p>
 <p><img src="compscieng_bpp43lbm_03.jpg" /></p>
 <p>Sabit hızda kapak hareketin altındaki suya yapacağı sabit etkiyi
 sisteme dahil etmenin en rahat yolu <span
@@ -455,25 +456,26 @@ class="math inline">\(u\)</span> üzerinden olacaktır. Daha önce <span
 class="math inline">\(u\)</span> değişkeninin global hareketi temsil
 ettiğini söylemiştik. O zaman, mesela sisteme etki edecek bir “rüzgar”
 ya da bu örnekteki gibi sabit hızdaki bir sıvı hareketini <span
-class="math inline">\(u\)</span> ile yaparız. Hesapsal olarak <span
+class="math inline">\(u\)</span> ile yaparız. Simulasyon sırasında <span
 class="math inline">\(u\)</span>’yu temsil eden matrisin en üst satırına
 bu sabit hız enjekte edilebilir.</p>
 <p>Sağ, sol, alt duvarları sabittir, bu duvarlara dokunan <span
 class="math inline">\(u\)</span> noktalarında hız sıfırlanmalıdır,
 ayrıca orada momentumun her zaman sıfır olmalısı da gerekir, buna sıvı
 mekaniğinde kaymamazlık koşulu / kayma-yok (no-slip condition) ismi
-veriliyor. Bu kaymazlık koşulunun momentum kismini elde etmek için de
-çarpısma sonrasi yönsel yoğunluğu (D2Q9’daki 9 tane yönden bahsediyoruz)
+veriliyor. Bu kaymazlık koşulunun momentum kısmını elde etmek için de
+çarpışma sonrası yönsel yoğunluğu (D2Q9’daki 9 tane yönden bahsediyoruz)
 <em>tamamen tersine</em> çevirmek gerekir. Dikkat: Pong oyunu usulü
 topun duvardan bir açıyla sekmesinden bahsetmiyoruz, alt sola doğru olan
 gidişi tam tersine, <em>üst sağa</em> çevirmekten bahsediyoruz (Pong
 olsaydı “sekme” sonrası gidiş sağ alta doğru olurdu).</p>
-<p>Not: Hareket etmeyen duvara temas eden ince sıvı tabakasının hızının
-sıfırlanması gerçekçi bir seçimdir, duvarlar pürüzsüz değildir, pek çok
-girintisi çıkıntısı olan yapılardır, bu noktalara temas eden sıvı
-moleküllerinin oraya yapıştığı deneylerde saptanmıştır.</p>
+<p>Bu arada belirtelim hareket etmeyen duvara temas eden ince sıvı
+tabakasının hızının sıfırlanması gerçekçi bir seçimdir, duvarlar
+pürüzsüz değildir, pek çok girintisi çıkıntısı olan yapılardır, bu
+noktalara temas eden sıvı moleküllerinin oraya yapıştığı deneylerde
+saptanmıştır.</p>
 <p>Hız yönünün tersini çevrilmesi gerekliliğini momentum muhafazasından
-türetebiliriz. Bir duvar düğümünde, <span
+türetebiliriz. Bir duvar düğümünde <span
 class="math inline">\(f_i\)</span>’leri gelen ve giden popülasyonlara
 ayıralım.</p>
 <ul>
@@ -485,7 +487,7 @@ class="math inline">\(\mathbf{e}_i\)</span>’sı duvara doğru işaret eden
 yoğunluk</p></li>
 </ul>
 <p>ki <span class="math inline">\(\mathbf{e}_i\)</span> vektörleri LBM
-izgara yapısının tanımladığı yönlerdir. Akış sonrasında, <span
+ızgara yapısının tanımladığı yönlerdir. Akış sonrasında, <span
 class="math inline">\(f_i^-\)</span> molekülleri duvara henüz
 ulaşmıştır. <span class="math inline">\(f_i^+\)</span> yoğunluğu ise
 bilinmeyendir — bunların sınır koşulu tarafından belirlenmesi gerekir.
@@ -512,6 +514,11 @@ halde:</p>
 <p>Her çift tam olarak birbirini iptal eder. Bu geri-sekme kuralıdır,
 momentum toplamının sıfır olması talebi doğrultusunda doğrudan elde
 edilir.</p>
+<p>Yayılım (Streaming)</p>
+<p>LBM yayılım mantigini olabildigince basitlestirir. Mevcut dagilimi
+onceden tanimli hareket yonlerine sadece bir izgara hucresi uzerinden
+kopyala. Kopyalama icin <code>np.roll</code> kullaniliyor, bazi ornekler
+asagida,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]])</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (A)</span>
@@ -528,6 +535,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 [[1 0 1]
  [0 0 0]
  [0 0 0]]</code></pre>
+<p>Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
+diğer ucuna kopyalar.</p>
+<p>Her neyse, bir soru akla gelebilir, eğer yayılım evresinde her hücre
+yanindakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor? Çünkü
+A yanindaki B’ye kopyalar, sonra B geri A’ya kopyalar. Değişim nerede?
+Bu doğru bir gözlem: eğer hiçbir çarpışma olmasaydı (ki daha önce
+bahsettiğimiz gibi çarpışma miktarı denge dağılımına olan uzaklıkla
+doğru orantılıdır) o zaman hakikaten giden moleküller gelenler ile aynı
+olacaktı, yani hiçbir şey değişmeyecekti.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nx, ny <span class="op">=</span> <span class="dv">101</span>, <span class="dv">101</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
