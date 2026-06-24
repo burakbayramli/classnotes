@@ -15,20 +15,22 @@ duyarlar, dolayısıyla yabancılar ABD'ye borç verir" şeklindeki popüler
 anlatıyla çelişmektedir.
 
 Pettis'in görüşü muhasebe temelli: Yabancı para ÖNCE gelir, çünkü
-yabancılar ABD varlıklarına yatırım yapmak ister. Ardından $S-I$
-açığı bunu absorbe edecek şekilde uyum sağlamak zorundadır.
+yabancılar ABD varlıklarına yatırım yapmak ister. Ardından ortaya
+çıkan açık dolayısıyla ekonomi bunu absorbe edecek şekilde uyum
+sağlamak zorundadır.
 
-$Y$ tam olarak Gayri Safi Yurt İçi Hasıla'dır (GSYİH); bir ülke içinde
-belirli bir dönemde üretilen her şeyin toplam piyasa değerini temsil
-eder.
+Formüllere bakalım. $Y$ Gayri Safi Yurt İçi Hasıla'dır (GSYİH); bir
+ülke içinde belirli bir dönemde üretilen her şeyin toplam piyasa
+değerini temsil eder. Ana denklem şu,
+
+$$
+Y = C + I + NX
+$$
 
 Üretilen bir şeyin nasıl Yatırım (I) olarak sınıflandırıldığını
-anlamak için denkleme bakış açısını değiştirmek gerekir. $Y = C + I +
-G + NX$ denklemi yalnızca ne ürettiğimizin bir listesi değildir;
-üretilenleri kimin satın aldığının (ya da talep ettiğinin) bir
-muhasebesidir.
-
-Üretimin yatırıma nasıl dönüştüğü aşağıda açıklanmıştır.
+anlamak için denkleme bakış açısını değiştirmek gerekir. $Y$ denklemi
+yalnızca ne ürettiğimizin bir listesi değildir; üretilenleri kimin
+satın aldığının (ya da talep ettiğinin) bir muhasebesidir.
 
 Tanımlar: "Yatırım" ile "Tüketim"
 
@@ -275,12 +277,10 @@ finanse etmek için artan konut değerleri üzerinden borçlanıyordu.
 
 Yunanistan ve İspanya (2008 Öncesi): Avro'nun oluşturulmasının
 ardından devasa miktarda Alman ve Hollanda sermayesi (NCF) Güney
-Avrupa'ya akmaya başladı.
-
-Üretken yatırım hepsini absorbe edemedi. Yunanistan'da hükümet ve
-tüketiciler sermayeyi borç aracılığıyla absorbe ettikçe ulusal
-tasarruf derin biçimde negatife düştü ve bu durum doğrudan Avro
-Bölgesi borç krizine yol açtı.
+Avrupa'ya akmaya başladı. Üretken yatırım hepsini absorbe
+edemedi. Yunanistan'da hükümet ve tüketiciler sermayeyi borç
+aracılığıyla absorbe ettikçe ulusal tasarruf derin biçimde negatife
+düştü ve bu durum doğrudan Avro Bölgesi borç krizine yol açtı.
 
 Bir ülke, üretken biçimde yatırım yapamayacağı yabancı parayla dolup
 taşarsa, muhasebe eşitliği o ülkeyi ya işsizliği artırmaya ya da borcu
