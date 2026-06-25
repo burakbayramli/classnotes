@@ -317,6 +317,47 @@ denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi çıkarırız, bunu
 $\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız ve elde edilen
 sonucu orijinal $f_i$'den çıkarırız.
 
+$f_i$ güncelleme formülü için bir ayrıksallaştırma daha gerekiyor. $t + \Delta t$
+noktasında, (7)'nın sol tarafı şöyle ayrıksallaştırılır,
+
+$$
+\frac{f_k(x, t+\Delta t) - f_k(x, t)}{\Delta t} + c_k \cdot
+\frac{f_k(x+\Delta x, t+\Delta t) - f_k(x, t+\Delta t)}{\Delta x} =
+-\frac{1}{\tau}(f_k - f_k^{eq})
+\tag{8}
+$$
+
+$\Delta x = c_k \Delta t$ oldugu icin 
+
+$$
+= \frac{\cancel{f_k(x, t+\Delta t)} -
+f_k(x, t)}{\Delta t} +
+\cancel{c_k} \cdot \frac{f_k(x+\Delta x, t+\Delta t) -
+\cancel{f_k(x, t+\Delta t)}}{\cancel{c_k} \Delta t} 
+$$
+
+Geri kalanları toparlarsak ve (8)'ın sağ tarafını geri getirip $\Delta t$'yi
+oraya geçirirsek,
+
+$$
+f_k(x+\Delta x, t+\Delta t) - f_k(x, t) = -\frac{\Delta t}{\tau}(f_k - f_k^{eq})
+$$
+
+Şu eşitliği kullanalım şimdi $\omega = \frac{\Delta t}{\tau}$, 
+
+$$
+f_k(x+\Delta x, t+\Delta t) =  \omega f_k^{eq}(x, t) - \omega f_k(x, t) +  f_k(x, t)
+$$
+
+Ya da
+
+$$
+f_k(x+\Delta x, t+\Delta t) =  (1-\omega) f_k(x, t) + \omega f_k^{eq}(x, t)
+$$
+
+
+Üstteki nihai güncelleme formülüdür, bunu koda bakarken göreceğiz. 
+
 ### Kodlama
 
 Altta yazacağımız simülasyonda kapak güdümlü alan / oyuk (lid-driven
@@ -431,7 +472,7 @@ Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
 diğer ucuna kopyalar.
 
 Her neyse, bir soru akla gelebilir, eğer yayılım evresinde her hücre
-yanindakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor?
+yanındakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor?
 Çünkü A yanindaki B'ye kopyalar, sonra B geri A'ya kopyalar. Değişim
 nerede? Bu doğru bir gözlem: eğer hiçbir çarpışma olmasaydı (ki daha
 önce bahsettiğimiz gibi çarpışma miktarı denge dağılımına olan
