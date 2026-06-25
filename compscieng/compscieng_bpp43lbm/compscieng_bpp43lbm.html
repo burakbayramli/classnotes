@@ -410,24 +410,12 @@ Boltzmann taşınım denkleminin kendisidir ve bunun neye eşit olduğunu
 biliyoruz:</p>
 <p><span class="math display">\[\frac{\partial f_i}{\partial t} + c_i
 \cdot \nabla f_i = \frac{1}{\tau}(f^{eq}_i - f_i) \tag{7}\]</span></p>
-<p>Dolayısıyla (6)’daki sol tarafın ayrıklaştırılması bize iki şey
-sağladı. Birincisi algoritmanın nasıl ilerlediğini gösterdi, şöyle:</p>
-<p><span class="math display">\[f_i(x + c_i \Delta t, t + \Delta t) =
-f^*_i(x, t)\]</span></p>
-<p>Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından
-<span class="math inline">\(i\)</span> yönü için <span
-class="math inline">\(c_i\)</span> hız vektörüne bakılır, az önce <span
-class="math inline">\(x\)</span> düğümünde hesaplanan çarpışma sonrası
-<span class="math inline">\(f^*_i\)</span> değeri alınır ve bir sonraki
-zaman adımı için tam olarak <span class="math inline">\(x + c_i \Delta
-t\)</span> konumundaki komşu düğümde <span
-class="math inline">\(i\)</span> yönüne karşılık gelen bellek yuvasına
-yazılır.</p>
-<p>Denklem (6)’nın sol tarafından elde ettiğimiz ikinci kazanım, bunun
-Boltzmann taşınım denklemine eşit olduğunu görmekti; dolayısıyla (7)’nin
-sağ tarafı da doğru olacaktır. Çarpışma matematiğini hesaplamak için bu
-gerçeği kullanabiliriz: her <span class="math inline">\(i\)</span> yönü
-için düğümün mevcut <span class="math inline">\(\rho\)</span> ve <span
+<p>Dolayısıyla (6)’daki sol tarafın ayrıklaştırılması bize şunu
+kazandırdı, onun Boltzmann taşınım denklemine eşit olduğunu gördük;
+dolayısıyla (7)’nın sağ tarafı da doğru olacaktır. Çarpışma matematiğini
+hesaplamak için bu gerçeği kullanabiliriz: her <span
+class="math inline">\(i\)</span> yönü için düğümün mevcut <span
+class="math inline">\(\rho\)</span> ve <span
 class="math inline">\(u\)</span> değerlerini polinom formülüne koyarak
 <span class="math inline">\(f^{eq}_i\)</span> denge değerini hesaplarız,
 <span class="math inline">\(f_i\)</span>’den <span
@@ -435,9 +423,10 @@ class="math inline">\(f^{eq}_i\)</span>’yi çıkarırız, bunu <span
 class="math inline">\(\frac{\Delta t}{\tau}\)</span> (gevşeme faktörü)
 ile çarparız ve elde edilen sonucu orijinal <span
 class="math inline">\(f_i\)</span>’den çıkarırız.</p>
-<p><span class="math inline">\(f_i\)</span> güncelleme formülü için bir
-ayrıksallaştırma daha gerekiyor. <span class="math inline">\(t + \Delta
-t\)</span> noktasında, (7)’nın sol tarafı şöyle ayrıksallaştırılır,</p>
+<p><span class="math inline">\(f_i\)</span> güncelleme formülünü daha
+detaylı görmek için ayrıksallaştırmaya şu şekilde de yaklaşabilirdik.
+<span class="math inline">\(t + \Delta t\)</span> noktasında, (7)’nın
+sol tarafı şöyle ayrıksallaştırılır,</p>
 <p><span class="math display">\[
 \frac{f_k(x, t+\Delta t) - f_k(x, t)}{\Delta t} + c_k \cdot
 \frac{f_k(x+\Delta x, t+\Delta t) - f_k(x, t+\Delta t)}{\Delta x} =
@@ -459,7 +448,7 @@ f_k(x+\Delta x, t+\Delta t) - f_k(x, t) = -\frac{\Delta t}{\tau}(f_k -
 f_k^{eq})
 \]</span></p>
 <p>Şu eşitliği kullanalım şimdi <span class="math inline">\(\omega =
-\frac{\Delta t}{\tau}\)</span>,</p>
+\Delta t / \tau\)</span>,</p>
 <p><span class="math display">\[
 f_k(x+\Delta x, t+\Delta t) =  \omega f_k^{eq}(x, t) - \omega f_k(x, t)
 +  f_k(x, t)
@@ -469,8 +458,19 @@ f_k(x+\Delta x, t+\Delta t) =  \omega f_k^{eq}(x, t) - \omega f_k(x, t)
 f_k(x+\Delta x, t+\Delta t) =  (1-\omega) f_k(x, t) + \omega f_k^{eq}(x,
 t)
 \]</span></p>
-<p>Üstteki nihai güncelleme formülüdür, bunu koda bakarken
-göreceğiz.</p>
+<p>Üstteki nihai güncelleme formülüdür, bunu koda bakarken göreceğiz.
+Sağ tarafı şöyle de gösterebilirdik,</p>
+<p><span class="math display">\[f_i(x + c_i \Delta t, t + \Delta t) =
+f^*_i(x, t)\]</span></p>
+<p>Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından
+<span class="math inline">\(i\)</span> yönü için <span
+class="math inline">\(c_i\)</span> hız vektörüne bakılır, az önce <span
+class="math inline">\(x\)</span> düğümünde hesaplanan çarpışma sonrası
+<span class="math inline">\(f^*_i\)</span> değeri alınır ve bir sonraki
+zaman adımı için tam olarak <span class="math inline">\(x + c_i \Delta
+t\)</span> konumundaki komşu düğümde <span
+class="math inline">\(i\)</span> yönüne karşılık gelen bellek yuvasına
+yazılır.</p>
 <h3 id="kodlama">Kodlama</h3>
 <p>Altta yazacağımız simülasyonda kapak güdümlü alan / oyuk (lid-driven
 cavity) içindeki sıvı akış problemini çözmeye uğraşacağız. Problem

@@ -297,28 +297,18 @@ biliyoruz:
 
 $$\frac{\partial f_i}{\partial t} + c_i \cdot \nabla f_i = \frac{1}{\tau}(f^{eq}_i - f_i) \tag{7}$$
 
-Dolayısıyla (6)'daki sol tarafın ayrıklaştırılması bize iki şey
-sağladı. Birincisi algoritmanın nasıl ilerlediğini gösterdi, şöyle:
+Dolayısıyla (6)'daki sol tarafın ayrıklaştırılması bize şunu
+kazandırdı, onun Boltzmann taşınım denklemine eşit olduğunu gördük;
+dolayısıyla (7)'nın sağ tarafı da doğru olacaktır. Çarpışma
+matematiğini hesaplamak için bu gerçeği kullanabiliriz: her $i$ yönü
+için düğümün mevcut $\rho$ ve $u$ değerlerini polinom formülüne
+koyarak $f^{eq}_i$ denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi
+çıkarırız, bunu $\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız
+ve elde edilen sonucu orijinal $f_i$'den çıkarırız.
 
-$$f_i(x + c_i \Delta t, t + \Delta t) = f^*_i(x, t)$$
-
-Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından $i$
-yönü için $c_i$ hız vektörüne bakılır, az önce $x$ düğümünde
-hesaplanan çarpışma sonrası $f^*_i$ değeri alınır ve bir sonraki zaman
-adımı için tam olarak $x + c_i \Delta t$ konumundaki komşu düğümde $i$
-yönüne karşılık gelen bellek yuvasına yazılır.
-
-Denklem (6)'nın sol tarafından elde ettiğimiz ikinci kazanım, bunun
-Boltzmann taşınım denklemine eşit olduğunu görmekti; dolayısıyla
-(7)'nin sağ tarafı da doğru olacaktır. Çarpışma matematiğini
-hesaplamak için bu gerçeği kullanabiliriz: her $i$ yönü için düğümün
-mevcut $\rho$ ve $u$ değerlerini polinom formülüne koyarak $f^{eq}_i$
-denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi çıkarırız, bunu
-$\frac{\Delta t}{\tau}$ (gevşeme faktörü) ile çarparız ve elde edilen
-sonucu orijinal $f_i$'den çıkarırız.
-
-$f_i$ güncelleme formülü için bir ayrıksallaştırma daha gerekiyor. $t + \Delta t$
-noktasında, (7)'nın sol tarafı şöyle ayrıksallaştırılır,
+$f_i$ güncelleme formülünü daha detaylı görmek için ayrıksallaştırmaya
+şu şekilde de yaklaşabilirdik. $t + \Delta t$ noktasında, (7)'nın sol
+tarafı şöyle ayrıksallaştırılır,
 
 $$
 \frac{f_k(x, t+\Delta t) - f_k(x, t)}{\Delta t} + c_k \cdot
@@ -343,7 +333,7 @@ $$
 f_k(x+\Delta x, t+\Delta t) - f_k(x, t) = -\frac{\Delta t}{\tau}(f_k - f_k^{eq})
 $$
 
-Şu eşitliği kullanalım şimdi $\omega = \frac{\Delta t}{\tau}$, 
+Şu eşitliği kullanalım şimdi $\omega = \Delta t / \tau$, 
 
 $$
 f_k(x+\Delta x, t+\Delta t) =  \omega f_k^{eq}(x, t) - \omega f_k(x, t) +  f_k(x, t)
@@ -355,8 +345,16 @@ $$
 f_k(x+\Delta x, t+\Delta t) =  (1-\omega) f_k(x, t) + \omega f_k^{eq}(x, t)
 $$
 
+Üstteki nihai güncelleme formülüdür, bunu koda bakarken göreceğiz. Sağ
+tarafı şöyle de gösterebilirdik,
 
-Üstteki nihai güncelleme formülüdür, bunu koda bakarken göreceğiz. 
+$$f_i(x + c_i \Delta t, t + \Delta t) = f^*_i(x, t)$$
+
+Algoritmik açıdan bu saf bir bellek kopyalama işlemidir. Ardından $i$
+yönü için $c_i$ hız vektörüne bakılır, az önce $x$ düğümünde
+hesaplanan çarpışma sonrası $f^*_i$ değeri alınır ve bir sonraki zaman
+adımı için tam olarak $x + c_i \Delta t$ konumundaki komşu düğümde $i$
+yönüne karşılık gelen bellek yuvasına yazılır.
 
 ### Kodlama
 
