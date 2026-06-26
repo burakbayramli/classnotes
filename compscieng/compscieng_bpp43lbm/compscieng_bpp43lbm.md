@@ -225,6 +225,7 @@ $\rho$ ve $u$ kullanılarak hesaplanır:
 $$
 f^{eq}_i = w_i \rho \left(1 + \frac{c_i \cdot u}{c_s^2} +
 \frac{(c_i \cdot u)^2}{2c_s^4} - \frac{u \cdot u}{2c_s^2}\right)
+\tag{9}
 $$
 
 Yani Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir
@@ -632,15 +633,59 @@ $$
 Görüldüğü gibi $c_k$'lerin önceden tanımlı olmasına rağmen değisen $f$'ler
 toptan hızda etki yaratıyor.
 
+Dış Etkinin Yayılması
 
+Üstteki sonuçta kapak-güdümlü oyuk probleminin gerçekçi bir
+simülasyonunu görüyoruz. Sadece en üst, ince bir tabakaya uygulanan
+dış hareket (kapak hareketi sebebiyle, aerodinamikte bu bir rüzgar
+olabilirdi) alt bölgelere nüfuz etti. Simülasyonun ardından nasıl
+ilerlediğini tahmin edebiliriz, en üst tabakadaki soldan sağa hareket
+gide gide sağ duvara çarpacaktı, oradan sekerek aşağı doğru bir
+hareket yaratacaktı, bunun yer değimine sebep olduğu su kütleleri de
+yavaş yavaş alt bölgelere doğru giderek üstteki hareketi ortaya
+çıkaracaktı. 
 
+Fakat duvara çarpma olmadan önce bile en üstteki ince su hareketinin
+alt tabakalara yayılması mümkündür (tabii bu da fiziksel sezgiye
+uygundur). Bu durumun nasıl ortaya çıkacağına bakalım.
 
+Kod içinde sabit hareket en üst noktaya enjekte ediliyor, `ux[:, -1] =
+üo`, ki `üo = 0.10`, ve `-1` en son indis değerini temsil eder, x-y
+grafiğinde y bağlamında en üst nokta tabii ki oyuk kapağı burada.
 
+Kütle yer değişimi, hareket olması için çarpışma olması gerektiğinden
+bahsettik, bu da denge bozulmasına bağlı, yani $f^{eq}$ hesabına, daha
+detaya inersek, her yöndeki $f_i^{eq}$ hesabına. Sıvı kütlelerinin alt
+yönlere doğru gitmesi için en azından sağ alt yöne doğru bir hareket
+olmalı. En üstteki global hız bu yöndeki dengeyi nasıl etkiler acaba?
+(9) formülüne bakarsak ne olacağını anlayabiliriz. Alt sağ yönü için
+$k=7$, onun vektör yönü $c_7 = (1,-1)$. O zaman (9) denge formülündeki
+noktasal çarpımı hesaplarsak,
 
+$$
+\mathbf{u} = \begin{pmatrix} u_x \\ u_y
+\end{pmatrix} = \begin{pmatrix} +0.10 \\ 0.00 \end{pmatrix}
+\quad
+\mathbf{c}_7 = \begin{pmatrix} c_{7x} \\
+c_{7y} \end{pmatrix} = \begin{pmatrix} +1 \\ -1
+\end{pmatrix}
+$$
 
+$$
+\mathbf{c}_7 \cdot \mathbf{u} = (c_{7x}
+\cdot u_x) + (c_{7y} \cdot u_y)
+$$
 
+$$
+\mathbf{c}_7 \cdot \mathbf{u} = \left(
+(+1) \cdot (+0.10) \right) + \left( (-1) \cdot (0.00)
+\right)
+$$
 
-
+Bu demektir ki sağ alt (köşegen) yönüne doğru pozitif birikme
+olmuştur, ve LBM mekaniği bu yöne doğru yoğunluk kaydırması
+yaratacaktır! Böylece su kütleleri yavaş yavaş aşağı doğru yayılmaya
+başlarlar.
 
 Kodlar
 
@@ -650,8 +695,6 @@ Kodlar
 [result.m](mohamad/result.m),
 [ruv.m](mohamad/ruv.m),
 [stream.m](mohamad/stream.m)
-
-[devam edecek]
 
 Kaynaklar
 

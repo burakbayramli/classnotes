@@ -329,6 +329,7 @@ class="math inline">\(u\)</span> kullanılarak hesaplanır:</p>
 <p><span class="math display">\[
 f^{eq}_i = w_i \rho \left(1 + \frac{c_i \cdot u}{c_s^2} +
 \frac{(c_i \cdot u)^2}{2c_s^4} - \frac{u \cdot u}{2c_s^2}\right)
+\tag{9}
 \]</span></p>
 <p>Yani Taylor açılımı, üsteli ayrık bir ızgara üzerinde ele alınabilir
 olan <span class="math inline">\(c \cdot u\)</span> cinsinden bir
@@ -728,13 +729,59 @@ u = \frac{1}{\rho} \sum_{k} f_k c_k
 <p>Görüldüğü gibi <span class="math inline">\(c_k\)</span>’lerin önceden
 tanımlı olmasına rağmen değisen <span
 class="math inline">\(f\)</span>’ler toptan hızda etki yaratıyor.</p>
+<p>Dış Etkinin Yayılması</p>
+<p>Üstteki sonuçta kapak-güdümlü oyuk probleminin gerçekçi bir
+simülasyonunu görüyoruz. Sadece en üst, ince bir tabakaya uygulanan dış
+hareket (kapak hareketi sebebiyle, aerodinamikte bu bir rüzgar
+olabilirdi) alt bölgelere nüfuz etti. Simülasyonun ardından nasıl
+ilerlediğini tahmin edebiliriz, en üst tabakadaki soldan sağa hareket
+gide gide sağ duvara çarpacaktı, oradan sekerek aşağı doğru bir hareket
+yaratacaktı, bunun yer değimine sebep olduğu su kütleleri de yavaş yavaş
+alt bölgelere doğru giderek üstteki hareketi ortaya çıkaracaktı.</p>
+<p>Fakat duvara çarpma olmadan önce bile en üstteki ince su hareketinin
+alt tabakalara yayılması mümkündür (tabii bu da fiziksel sezgiye
+uygundur). Bu durumun nasıl ortaya çıkacağına bakalım.</p>
+<p>Kod içinde sabit hareket en üst noktaya enjekte ediliyor,
+<code>ux[:, -1] = üo</code>, ki <code>üo = 0.10</code>, ve
+<code>-1</code> en son indis değerini temsil eder, x-y grafiğinde y
+bağlamında en üst nokta tabii ki oyuk kapağı burada.</p>
+<p>Kütle yer değişimi, hareket olması için çarpışma olması gerektiğinden
+bahsettik, bu da denge bozulmasına bağlı, yani <span
+class="math inline">\(f^{eq}\)</span> hesabına, daha detaya inersek, her
+yöndeki <span class="math inline">\(f_i^{eq}\)</span> hesabına. Sıvı
+kütlelerinin alt yönlere doğru gitmesi için en azından sağ alt yöne
+doğru bir hareket olmalı. En üstteki global hız bu yöndeki dengeyi nasıl
+etkiler acaba? (9) formülüne bakarsak ne olacağını anlayabiliriz. Alt
+sağ yönü için <span class="math inline">\(k=7\)</span>, onun vektör yönü
+<span class="math inline">\(c_7 = (1,-1)\)</span>. O zaman (9) denge
+formülündeki noktasal çarpımı hesaplarsak,</p>
+<p><span class="math display">\[
+\mathbf{u} = \begin{pmatrix} u_x \\ u_y
+\end{pmatrix} = \begin{pmatrix} +0.10 \\ 0.00 \end{pmatrix}
+\quad
+\mathbf{c}_7 = \begin{pmatrix} c_{7x} \\
+c_{7y} \end{pmatrix} = \begin{pmatrix} +1 \\ -1
+\end{pmatrix}
+\]</span></p>
+<p><span class="math display">\[
+\mathbf{c}_7 \cdot \mathbf{u} = (c_{7x}
+\cdot u_x) + (c_{7y} \cdot u_y)
+\]</span></p>
+<p><span class="math display">\[
+\mathbf{c}_7 \cdot \mathbf{u} = \left(
+(+1) \cdot (+0.10) \right) + \left( (-1) \cdot (0.00)
+\right)
+\]</span></p>
+<p>Bu demektir ki sağ alt (köşegen) yönüne doğru pozitif birikme
+olmuştur, ve LBM mekaniği bu yöne doğru yoğunluk kaydırması
+yaratacaktır! Böylece su kütleleri yavaş yavaş aşağı doğru yayılmaya
+başlarlar.</p>
 <p>Kodlar</p>
 <p><a href="mohamad/boundary.m">boundary.m</a>, <a
 href="mohamad/collision.m">collision.m</a>, <a
 href="mohamad/main.m">main.m</a>, <a
 href="mohamad/result.m">result.m</a>, <a href="mohamad/ruv.m">ruv.m</a>,
 <a href="mohamad/stream.m">stream.m</a></p>
-<p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, <em>Fizik - Sıvı ve Gaz Mekaniği - 2</em></p>
 <p>[2] Mohamad, <em>Lattice Boltzmann Method Fundamentals and
