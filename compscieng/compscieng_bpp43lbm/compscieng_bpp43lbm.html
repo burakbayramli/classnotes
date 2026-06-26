@@ -551,10 +551,10 @@ halde:</p>
 momentum toplamının sıfır olması talebi doğrultusunda doğrudan elde
 edilir.</p>
 <p>Yayılım (Streaming)</p>
-<p>LBM yayılım mantigini olabildigince basitlestirir. Mevcut dagilimi
-onceden tanimli hareket yonlerine sadece bir izgara hucresi uzerinden
-kopyala. Kopyalama icin <code>np.roll</code> kullaniliyor, bazi ornekler
-asagida,</p>
+<p>LBM yayılım mantığını olabildiğince basitleştirir. Mevcut dağılımı
+önceden tanımlı hareket yönlerine sadece bir ızgara hücresi üzerinden
+kopyalar. Kopyalama için <code>np.roll</code> kullanılıyor, bazı
+örnekler aşağıda,</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>],[<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>],[<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>]])</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (A)</span>
@@ -572,14 +572,18 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
  [0 0 0]
  [0 0 0]]</code></pre>
 <p>Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
-diğer ucuna kopyalar.</p>
-<p>Her neyse, bir soru akla gelebilir, eğer yayılım evresinde her hücre
-yanındakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor? Çünkü
-A yanindaki B’ye kopyalar, sonra B geri A’ya kopyalar. Değişim nerede?
-Bu doğru bir gözlem: eğer hiçbir çarpışma olmasaydı (ki daha önce
-bahsettiğimiz gibi çarpışma miktarı denge dağılımına olan uzaklıkla
-doğru orantılıdır) o zaman hakikaten giden moleküller gelenler ile aynı
-olacaktı, yani hiçbir şey değişmeyecekti.</p>
+diğer ucuna döndürür / kopyalar.</p>
+<p>Bir soru akla gelebilir, eğer yayılım evresinde her hücre yanındakine
+kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor? Çünkü normal
+durumda diyelim <span class="math inline">\(\Omega = 0\)</span>, A
+yanındaki B’ye kopyalar, sonra B geri A’ya kopyalar. Değişim nerede
+ortaya çıkıyor? Bu yerine bir gözlem: eğer hiçbir çarpışma olmasaydı (ki
+çarpışma miktarı denge dağılımına olan uzaklıkla doğru orantılı) o zaman
+hakikaten giden moleküller gelenler ile aynı olacaktı, yani hiçbir şey
+değişmeyecekti. Tarif edilen işlemler tabii ki hiçbir şey yapmamak için
+gereğinden fazla simülasyon. Fakat birazdan göreceğiz ki çarpışma ortaya
+çıktığında LBM’in gerçek avantajları ortaya çıkıyor.</p>
+<p>Kod altta görülebilir, [2]’nin Matlab kodları baz alınmıştır.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nx, ny <span class="op">=</span> <span class="dv">101</span>, <span class="dv">101</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -654,8 +658,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>    rhon <span class="op">=</span> (f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">8</span>] <span class="op">+</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>] <span class="op">+</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>]</span>
 <span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="fl">2.0</span> <span class="op">*</span> (f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>] <span class="op">+</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">5</span>] <span class="op">+</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">4</span>]))</span>
 <span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>] <span class="op">=</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]                       </span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>] <span class="op">=</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">5</span>] <span class="op">+</span> rhon <span class="op">*</span> üo <span class="op">/</span> <span class="fl">6.0</span>    </span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">6</span>] <span class="op">=</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">4</span>] <span class="op">-</span> rhon <span class="op">*</span> üo <span class="op">/</span> <span class="fl">6.0</span>    </span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">7</span>] <span class="op">=</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">5</span>] <span class="op">+</span> rhon <span class="op">*</span> uo <span class="op">/</span> <span class="fl">6.0</span>    </span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">6</span>] <span class="op">=</span> f[i, <span class="op">-</span><span class="dv">1</span>, <span class="dv">4</span>] <span class="op">-</span> rhon <span class="op">*</span> uo <span class="op">/</span> <span class="fl">6.0</span>    </span>
 <span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> f</span>
 <span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
@@ -702,6 +706,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 <span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">&quot;X&quot;</span>)<span class="op">;</span> ax.set_ylabel(<span class="st">&quot;Y&quot;</span>)</span>
 <span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">&quot;compscieng_bpp43lbm_02.jpg&quot;</span>, dpi<span class="op">=</span><span class="dv">150</span>)</span></code></pre></div>
 <p><img src="compscieng_bpp43lbm_02.jpg" /></p>
+<p>Kodlar</p>
+<p><a href="mohamad/boundary.m">boundary.m</a>, <a
+href="mohamad/collision.m">collision.m</a>, <a
+href="mohamad/main.m">main.m</a>, <a
+href="mohamad/result.m">result.m</a>, <a href="mohamad/ruv.m">ruv.m</a>,
+<a href="mohamad/stream.m">stream.m</a></p>
 <p>[devam edecek]</p>
 <p>Kaynaklar</p>
 <p>[1] Bayramli, <em>Fizik - Sıvı ve Gaz Mekaniği - 2</em></p>

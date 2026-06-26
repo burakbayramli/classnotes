@@ -440,9 +440,10 @@ edilir.
 
 Yayılım (Streaming)
 
-LBM yayılım mantigini olabildigince basitlestirir. Mevcut dagilimi
-onceden tanimli hareket yonlerine sadece bir izgara hucresi uzerinden
-kopyala. Kopyalama icin `np.roll` kullaniliyor, bazi ornekler asagida,
+LBM yayılım mantığını olabildiğince basitleştirir. Mevcut dağılımı
+önceden tanımlı hareket yönlerine sadece bir ızgara hücresi üzerinden
+kopyalar. Kopyalama için `np.roll` kullanılıyor, bazı örnekler
+aşağıda,
 
 
 ```python
@@ -467,20 +468,18 @@ print (A)
 ```
 
 Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
-diğer ucuna kopyalar.
+diğer ucuna döndürür / kopyalar.
 
-Her neyse, bir soru akla gelebilir, eğer yayılım evresinde her hücre
-yanındakine kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor?
-Çünkü A yanindaki B'ye kopyalar, sonra B geri A'ya kopyalar. Değişim
-nerede? Bu doğru bir gözlem: eğer hiçbir çarpışma olmasaydı (ki daha
-önce bahsettiğimiz gibi çarpışma miktarı denge dağılımına olan
-uzaklıkla doğru orantılıdır) o zaman hakikaten giden moleküller
-gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti. 
-
-
-
-
-
+Bir soru akla gelebilir, eğer yayılım evresinde her hücre yanındakine
+kopyalıyorsa, o zaman genel akış nasıl ortaya çıkıyor?  Çünkü normal
+durumda diyelim $\Omega = 0$, A yanındaki B'ye kopyalar, sonra B geri
+A'ya kopyalar. Değişim nerede ortaya çıkıyor? Bu yerine bir gözlem:
+eğer hiçbir çarpışma olmasaydı (ki çarpışma miktarı denge dağılımına
+olan uzaklıkla doğru orantılı) o zaman hakikaten giden moleküller
+gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti. Tarif
+edilen işlemler tabii ki hiçbir şey yapmamak için gereğinden fazla
+simülasyon. Fakat birazdan göreceğiz ki çarpışma ortaya çıktığında
+LBM'in gerçek avantajları ortaya çıkıyor.
 
 
 
@@ -492,6 +491,11 @@ gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti.
 
 
 
+
+
+
+
+Kod altta görülebilir, [2]'nin Matlab kodları baz alınmıştır.
 
 ```python
 nx, ny = 101, 101
@@ -567,8 +571,8 @@ def boundary(f, uo):
     rhon = (f[i, -1, 8] + f[i, -1, 0] + f[i, -1, 2]
             + 2.0 * (f[i, -1, 1] + f[i, -1, 5] + f[i, -1, 4]))
     f[i, -1, 3] = f[i, -1, 1]                       
-    f[i, -1, 7] = f[i, -1, 5] + rhon * üo / 6.0    
-    f[i, -1, 6] = f[i, -1, 4] - rhon * üo / 6.0    
+    f[i, -1, 7] = f[i, -1, 5] + rhon * uo / 6.0    
+    f[i, -1, 6] = f[i, -1, 4] - rhon * uo / 6.0    
 
     return f
 
@@ -635,7 +639,14 @@ fig.savefig("compscieng_bpp43lbm_02.jpg", dpi=150)
 
 
 
+Kodlar
 
+[boundary.m](mohamad/boundary.m),
+[collision.m](mohamad/collision.m),
+[main.m](mohamad/main.m),
+[result.m](mohamad/result.m),
+[ruv.m](mohamad/ruv.m),
+[stream.m](mohamad/stream.m)
 
 [devam edecek]
 
@@ -646,4 +657,3 @@ Kaynaklar
 [2] Mohamad, *Lattice Boltzmann Method Fundamentals and Engineering Applications with Computer Codes*
 
 [3] Satoh, *Introduction to Practice of Molecular Simulation*
-
