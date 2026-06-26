@@ -10,25 +10,23 @@ farkı ızgara Boltzmann yönteminin sıvı parçacıklarının konumlarını ve
 hızlarını değil, parçacıkların hız dağılım fonksiyonunu kullanarak
 hesap yapmasıdır [3, sf. 24].
 
-Bir diğer sınırlama hareket yönleri üzerinde yapılmıştır. Aşağıdaki
-şekil iki boyutlu bir sistem için ızgara Boltzmann yöntemi
-şekillenmiş. (A), bir simülasyon bölgesinin ızgara sistemine
-bölündüğünü göstermektedir. (B) ise birim kare ızgara hücresinin
-büyütülmüş halidir. Moleküllerin grupları veya kümeleri olarak ele
-alınan sanal sıvı parçacıklarının yalnızca komşu düğümlere hareket
-etmesine izin verilir, daha uzak düğümlere değil. Yani 0 düğümündeki
-sıvı parçacıklarının bir sonraki zaman adımında orada kalmasına ya da
-1, 2, .., 8 numaralı düğümlere hareket etmesine izin verilir. Bu
-hareket kısıtlaması hareket hızını da standardize eder ve
-basitleştirir. 1, 2, 3 ve 4 numaralı düğümlere hareket eden sıvı
-parçacıklarının $c = \Delta x / \Delta t$ hızı olacaktır, 5, 6, 7 ve 8
-numaralı düğümlere hareket edenlerin ise $\sqrt{2}c$ hızına sahip
-olmalıdır; burada $\Delta x$ en yakın iki düğüm arasındaki ızgara
-aralığı ve $\Delta t$ simülasyonlar için zaman aralığıdır. $\sqrt{2}c$
-değeri, (B)'deki köşegen mesafenin $\sqrt{\Delta x^2 + \Delta x^2} =
-\sqrt{2}\Delta x$ olduğu ve buradaki hızın $\sqrt{2}\Delta x / \Delta
-t$, yani önceki $c$'nin $\sqrt{2}$ katı olacağı gerçeğinden
-hesaplanabilir.
+Aşağıdaki şekil iki boyutlu bir sistem için ızgara Boltzmann yöntemi
+şekli var. (A), bir simülasyon bölgesinin ızgara sistemine bölündüğünü
+göstermektedir. (B) ise birim kare ızgara hücresinin büyütülmüş
+halidir. Moleküllerin grupları veya kümeleri olarak ele alınan sanal
+sıvı parçacıklarının yalnızca komşu düğümlere hareket etmesine izin
+verilir, daha uzak düğümlere değil. Yani 0 düğümündeki sıvı
+parçacıklarının bir sonraki zaman adımında orada kalmasına ya da 1, 2,
+.., 8 numaralı düğümlere hareket etmesine izin verilir. Bu hareket
+kısıtlaması hareket hızını da standardize eder ve basitleştirir. 1, 2,
+3 ve 4 numaralı düğümlere hareket eden sıvı parçacıklarının $c =
+\Delta x / \Delta t$ hızı olacaktır, 5, 6, 7 ve 8 numaralı düğümlere
+hareket edenlerin ise $\sqrt{2}c$ hızına sahip olmalıdır; burada
+$\Delta x$ en yakın iki düğüm arasındaki ızgara aralığı ve $\Delta t$
+simülasyonlar için zaman aralığıdır. $\sqrt{2}c$ değeri, (B)'deki
+köşegen mesafenin $\sqrt{\Delta x^2 + \Delta x^2} = \sqrt{2}\Delta x$
+olduğu ve buradaki hızın $\sqrt{2}\Delta x / \Delta t$, yani önceki
+$c$'nin $\sqrt{2}$ katı olacağından hesaplanabilir.
 
 ![](compscieng_bpp43lbm_01.jpg)
 
@@ -50,13 +48,12 @@ $\Omega$'nın hesaplanmasının kolay olduğu anlamına gelmez. Gerçek bir
 çarpışma sayımı sistemdeki tüm olası çarpışmaları hesaba katmak
 zorunda olduğundan hesaplamak güçtür. Ancak çarpışma operatörünü
 çözümün sonucunda önemli bir hata ortaya çıkarmadan basit bir
-hesaplamayla yaklaşık olarak ifade etmek mümkündür [2, sf. 28].
-
-$\Omega$'yı yaklaşık olarak ifade edebilmek için BGK yaklaşımı adı
-verilen bir yöntem geliştirilmiştir. BGK kaba ama zekice bir
-basitleştirmedir: tüm çarpışmaları hesaplamak yerine şu soruyu sorar:
-"Mevcut dağılım denge durumundan ne kadar uzakta ve ne kadar hızlı
-dengeye doğru meyili var?" Bu şu sonucu verir:
+hesaplamayla yaklaşık olarak ifade etmek mümkündür [2,
+sf. 28]. $\Omega$'yı yaklaşık olarak ifade edebilmek için BGK
+yaklaşımı adı verilen bir yöntem geliştirilmiştir. BGK kaba ama zekice
+bir basitleştirmedir: tüm çarpışmaları hesaplamak yerine şu soruyu
+sorar: "Mevcut dağılım denge durumundan ne kadar uzakta ve ne kadar
+hızlı dengeye doğru meyili var?" Bu şu sonucu verir:
 
 $$\Omega = \frac{1}{\tau}(f^{eq} - f)$$
 
@@ -98,7 +95,7 @@ dönüştürür.
 - Çok az molekül varsa ($f < f^{eq}$), terim pozitif olur ve çarpışma
   adımı o yöndeki mevcudu artırır.
 
-Değişiklik her zaman sapmayı doğrudan orantılıdır. Bir düğüm doğal
+Değişiklik her zaman sapma ile doğrudan orantılıdır. Bir düğüm doğal
 denge durumundan ne kadar uzaksa, onu yeniden dengeye sokmak için
 değiştirme adımı o kadar agresif hale gelir. Bu, kendi kendini
 düzenleyen matematiksel bir motordur: yüksek bozulma, büyük bir
@@ -121,10 +118,10 @@ bir ızgara için çeşitli nedenlerle sorunludur:
 - Hiçbir zaman tam olarak sıfıra eşit olmadığından sonlu sayıda yön
   bağlamında budanamaz (truncate).
 
-- Simülasyonda tekrar tekrar değerlendirilmesi pahalıdır
+- Simülasyonda tekrar tekrar hesaplanması pahalıdır
 
 Bunu aşağıdaki adımlarla çözebiliriz, $f^{eq}$ denklemini biraz
-masajlayarak onu farklı bir forma çevirelim.
+masajlayarak onu farklı bir forma çevirelim [2, sf. 37].
 
 $$
 f^{eq} = \frac{\rho}{(2\pi RT)^{D/2}} \exp\left(-\frac{(c-u)^2}{2RT}\right)
@@ -201,12 +198,17 @@ $$
 Izgara Boltzmann Yöntemi'nde "ızgara yönleri", sanal parçacıkların
 hareket etmesine ve çarpışmasına izin verilen sabit, ayrık yolları
 temsil eder. Sürekli fonksiyon $f(x, c, t)$, sonsuz hız yelpazesi,
-sonsuz küçük aralıklarda parçacık yoğunluğunu izlerken, LBM bunu hız
+sonsuz küçük aralıklarda parçacık yoğunluğunu izler. LBM bunu hız
 uzayını $i$ alt indisiyle gösterilen sonlu bir vektörler kümesine
-ayrıştırarak basitleştirir. Sonuç olarak, sürekli $f$, bir ayrık
-dağılım fonksiyonları kümesine, $f_i$'ye bölünür; burada her $f_i(x, t)$, $x$
-konumundaki $t$ zamanında $i$ kafes yönünde hareket eden parçacıkların
-özgül yoğunluğunu temsil eder.
+ayrıştırarak basitleştirir. Bu noktayı vurgulamak iyi olur, LBM ile
+$f$ üzerinden bir "yönsel dağılıma" bakıyoruz, 9 yöndeki vektörler
+üzerinde moleküler dinamik bağlamında tekil parçacık hareketlerini
+takip etmiyoruz.
+
+Sonuç olarak, sürekli $f$, bir ayrık dağılım fonksiyonları kümesine,
+$f_i$'ye bölünür; burada her $f_i(x, t)$, $x$ konumundaki $t$
+zamanında $i$ kafes yönünde hareket eden parçacıkların yoğunluğunu
+temsil eder.
 
 Örneğin, ilk figürdeki yaygın $D2Q9$ modelinde (2 boyut, 9 hız), $i$
 indisi 0'dan 8'e kadar uzanır. Burada $f_0$ durağan parçacıkları
@@ -238,8 +240,8 @@ iki yerine koyma işlemi de iyi oldu,
 
 Dolayısıyla (5)'te ayrıklaştırmanın ardından $f^{eq}_i$, sabit
 katsayıları $w_i$, $c_i$, $c_s$ olan — hepsi önceden hesaplanabilir —
-$u$ cinsinden yalnızca bir polinomdur. LBM'yi hesaplamsal açıdan bu
-kadar çekici yapan da budur.
+$u$ cinsinden yalnızca bir polinomdur. LBM'yi hesapsal açıdan bu kadar
+çekici yapan da budur.
 
 $O(u^2)$ budaması aynı zamanda yaklaşımın sınırlarını da bize söyler:
 üstte gösterilen LBM yaklaşıksallığı bir düşük Mach sayısı
@@ -307,8 +309,8 @@ koyarak $f^{eq}_i$ denge değerini hesaplarız, $f_i$'den $f^{eq}_i$'yi
 ve elde edilen sonucu orijinal $f_i$'den çıkarırız.
 
 $f_i$ güncelleme formülünü daha detaylı görmek için ayrıksallaştırmaya
-şu şekilde de yaklaşabilirdik. $t + \Delta t$ noktasında, (7)'nın sol
-tarafı şöyle ayrıksallaştırılır,
+şu şekilde de yaklaşabilirdik [2, sf. 57]. $t + \Delta t$ noktasında,
+(7)'nın sol tarafı şöyle ayrıksallaştırılır,
 
 $$
 \frac{f_k(x, t+\Delta t) - f_k(x, t)}{\Delta t} + c_k \cdot
@@ -442,8 +444,8 @@ Yayılım (Streaming)
 
 LBM yayılım mantığını olabildiğince basitleştirir. Mevcut dağılımı
 önceden tanımlı hareket yönlerine sadece bir ızgara hücresi üzerinden
-kopyalar. Kopyalama için `np.roll` kullanılıyor, bazı örnekler
-aşağıda,
+kopyalar. Kopyalama için `np.roll` kullanılıyor, bu çağrının bazı
+örnekleri aşağıda,
 
 
 ```python
@@ -467,7 +469,7 @@ print (A)
  [0 0 0]]
 ```
 
-Bu kopyalama matrisin sınırlarından taşan değerlere döndürüp matrisin
+Bu kopyalama tekniği matrisin sınırlarından taşan değerleri matrisin
 diğer ucuna döndürür / kopyalar.
 
 Bir soru akla gelebilir, eğer yayılım evresinde her hücre yanındakine
@@ -476,24 +478,10 @@ durumda diyelim $\Omega = 0$, A yanındaki B'ye kopyalar, sonra B geri
 A'ya kopyalar. Değişim nerede ortaya çıkıyor? Bu yerine bir gözlem:
 eğer hiçbir çarpışma olmasaydı (ki çarpışma miktarı denge dağılımına
 olan uzaklıkla doğru orantılı) o zaman hakikaten giden moleküller
-gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti. Tarif
-edilen işlemler tabii ki hiçbir şey yapmamak için gereğinden fazla
-simülasyon. Fakat birazdan göreceğiz ki çarpışma ortaya çıktığında
-LBM'in gerçek avantajları ortaya çıkıyor.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+gelenler ile aynı olacaktı, yani hiçbir şey değişmeyecekti. O zaman
+hiçbir şey yapmamak için gereğinden fazla kod işletmiş olurduk. Fakat
+birazdan göreceğiz ki çarpışma olduğu zaman LBM'in gerçek avantajları
+ortaya çıkıyor.
 
 Kod altta görülebilir, [2]'nin Matlab kodları baz alınmıştır.
 
@@ -622,12 +610,27 @@ fig.savefig("compscieng_bpp43lbm_02.jpg", dpi=150)
 
 ![](compscieng_bpp43lbm_02.jpg)
 
+Çarpışma
 
+Yayılım mekanik bir kopyalama işlemidir, mevcut dağılımı önceden
+belirlenmiş yönde kopyalar. Çarpışma her yönde ne kadar kütlenin
+olacağını ayarlar, bunu mevcut (yönsel) dağılımı denge dağılımı
+$f^{eq}$'ya doğru çekerek yapar.
 
+Diyelim ki fiziksel akışta sağa doğru bir ivme var, çarpışma mantığı
+bu noktada sol yöne doğru bakan kanallardan kütle alır ($k=2,5,6$), ve
+bu kütleyi sağ yöne doğru bakan kanallara verir ($k=0,4,7$). Böylece
+bir sonraki yayılım adımında daha fazla kütle sağa doğru gitmiş olur.
 
+Bu değişim tabii ki momentum hesabı `ruv(f)` üzerinden global hız
+$u$'yu da etkiler. Orada yapılan hesap şöyleydi,
 
+$$
+u = \frac{1}{\rho} \sum_{k} f_k c_k
+$$
 
-
+Görüldüğü gibi $c_k$'lerin önceden tanımlı olmasına rağmen değisen $f$'ler
+toptan hızda etki yaratıyor.
 
 
 
