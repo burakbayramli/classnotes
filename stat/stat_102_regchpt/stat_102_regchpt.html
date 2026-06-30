@@ -100,8 +100,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;C ~ Temp&#39;</span>, data<span class="op">=</span>df).fit()</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%0.2f</span><span class="st">&quot;</span> <span class="op">%</span> results.rsquared)</span></code></pre></div>
-<pre class="text"><code>0.62</code></pre>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;R^2 = </span><span class="sc">%0.2f</span><span class="st"> (</span><span class="sc">%0.2f</span><span class="st">, </span><span class="sc">%0.2f</span><span class="st">)&quot;</span> <span class="op">%</span> (results.rsquared, results.params[<span class="dv">0</span>],results.params[<span class="dv">1</span>],))</span></code></pre></div>
+<pre class="text"><code>R^2 = 0.62 (44.26, -0.30)</code></pre>
 <p>Uyum (fit) başarısı üstteki gibi rapor edildi. Sonuç fena değil ama
 daha iyi olabilirdi. Şunu soralım, üstteki veriye tek bir çizgi uydurmak
 uygun mudur? Aslında iki (ya da daha fazla) çizgi daha uygun olmaz
@@ -110,14 +110,92 @@ veriyi iki parça olarak alalım, ve her parça üzerinde ayrı bir regresyon
 işletelim.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;C ~ Temp&#39;</span>, data<span class="op">=</span>df[<span class="dv">0</span>:<span class="dv">15</span>]).fit()</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%0.2f</span><span class="st">&quot;</span> <span class="op">%</span> results.rsquared)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;R^2 = </span><span class="sc">%0.2f</span><span class="st">&quot;</span> <span class="op">%</span> results.rsquared)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;C ~ Temp&#39;</span>, data<span class="op">=</span>df[<span class="dv">15</span>:<span class="op">-</span><span class="dv">1</span>]).fit()</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;</span><span class="sc">%0.2f</span><span class="st">&quot;</span> <span class="op">%</span> results.rsquared)</span></code></pre></div>
-<pre class="text"><code>0.77
-0.80</code></pre>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (<span class="st">&quot;R^2 = </span><span class="sc">%0.2f</span><span class="st">&quot;</span> <span class="op">%</span> results.rsquared)</span></code></pre></div>
+<pre class="text"><code>R^2 = 0.77
+R^2 = 0.80</code></pre>
 <p>Parçalı uyum sonucu daha iyi olarak rapor edildi. Demek ki üstteki
-veride tek değil en az iki ve birbirinden farklı doğrusal ilişki
+veride tek değil (en az) iki ve birbirinden farklı doğrusal ilişki
 var.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x_data <span class="op">=</span> df[<span class="st">&#39;Temp&#39;</span>].values</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>y_data <span class="op">=</span> df[<span class="st">&#39;C&#39;</span>].values</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(x_data)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_likelihood(alpha, beta, sigma, x, y):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sigma <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> alpha <span class="op">+</span> beta <span class="op">*</span> x</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    term1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    term2 <span class="op">=</span> <span class="op">-</span>np.log(sigma)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    term3 <span class="op">=</span> <span class="op">-</span>((y <span class="op">-</span> mu) <span class="op">**</span> <span class="dv">2</span>) <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> (sigma <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(term1 <span class="op">+</span> term2 <span class="op">+</span> term3)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_prior(alpha, beta, sigma):</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sigma <span class="op">&lt;=</span> <span class="dv">0</span> <span class="kw">or</span> sigma <span class="op">&gt;</span> <span class="dv">50</span>: </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> (<span class="op">-</span><span class="dv">100</span> <span class="op">&lt;</span> alpha <span class="op">&lt;</span> <span class="dv">100</span>): </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> (<span class="op">-</span><span class="dv">10</span> <span class="op">&lt;</span> beta <span class="op">&lt;</span> <span class="dv">10</span>):    </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">0.0</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(alpha, beta, sigma, x, y):</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_prior(alpha, beta, sigma) <span class="op">+</span> log_likelihood(alpha, beta, sigma, x, y)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> metropolis_sampler(x, y, iterations<span class="op">=</span><span class="dv">25000</span>, proposal_width_alpha<span class="op">=</span><span class="fl">1.0</span>, proposal_width_beta<span class="op">=</span><span class="fl">0.05</span>, proposal_width_sigma<span class="op">=</span><span class="fl">0.5</span>):</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    current_alpha <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    current_beta <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    current_sigma <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    alpha_trace <span class="op">=</span> np.zeros(iterations)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    beta_trace <span class="op">=</span> np.zeros(iterations)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    sigma_trace <span class="op">=</span> np.zeros(iterations)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    accepted_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(iterations):</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        proposed_alpha <span class="op">=</span> np.random.normal(current_alpha, proposal_width_alpha)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        proposed_beta <span class="op">=</span> np.random.normal(current_beta, proposal_width_beta)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        proposed_sigma <span class="op">=</span> np.random.normal(current_sigma, proposal_width_sigma)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        log_post_current <span class="op">=</span> log_posterior(current_alpha, current_beta, current_sigma, x, y)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        log_post_proposed <span class="op">=</span> log_posterior(proposed_alpha, proposed_beta, proposed_sigma, x, y)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>        log_acceptance_ratio <span class="op">=</span> log_post_proposed <span class="op">-</span> log_post_current</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.log(np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">&lt;</span> log_acceptance_ratio:</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>            current_alpha <span class="op">=</span> proposed_alpha</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>            current_beta <span class="op">=</span> proposed_beta</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>            current_sigma <span class="op">=</span> proposed_sigma</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>            accepted_count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>        alpha_trace[i] <span class="op">=</span> current_alpha</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>        beta_trace[i] <span class="op">=</span> current_beta</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>        sigma_trace[i] <span class="op">=</span> current_sigma</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Acceptance Rate: </span><span class="sc">{</span>accepted_count <span class="op">/</span> iterations <span class="op">*</span> <span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%&quot;</span>)</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> alpha_trace, beta_trace, sigma_trace</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>iterations <span class="op">=</span> <span class="dv">25000</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>burn_in <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>alpha_chain, beta_chain, sigma_chain <span class="op">=</span> metropolis_sampler(x_data, y_data, iterations<span class="op">=</span>iterations)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>final_beta <span class="op">=</span> beta_chain[burn_in:]</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>final_sigma <span class="op">=</span> sigma_chain[burn_in:]</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">--- Posterior Estimates (Standardized Scale) ---&quot;</span>)</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Beta: </span><span class="sc">{</span>np<span class="sc">.</span>mean(final_beta)<span class="sc">:.4f}</span><span class="ss"> ± </span><span class="sc">{</span>np<span class="sc">.</span>std(final_beta)<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Sigma (Residual Noise):      </span><span class="sc">{</span>np<span class="sc">.</span>mean(final_sigma)<span class="sc">:.4f}</span><span class="ss"> ± </span><span class="sc">{</span>np<span class="sc">.</span>std(final_sigma)<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Acceptance Rate: 19.79%
+
+--- Posterior Estimates (Standardized Scale) ---
+Beta: -0.2970 ± 0.0247
+Sigma (Residual Noise):      6.1444 ± 0.4725</code></pre>
 <p>Kaynaklar</p>
 <p>[1] Bayramlı, İstatistik, <em>Lineer Regresyon</em></p>
 <p>[2] Bayramlı, Hesapsal Bilim, Eğri Uydurma, Aradeğerleme
