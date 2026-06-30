@@ -8,6 +8,8 @@ katsayıları bulmak için En Az Kareler (Least Squares) en iyi bilinen
 yöntemlerden biri; En Az Kareler daha önce pek çok değişik ders notlarında,
 yazıda türetildi. Mesela [7], [8], ya da [9].
 
+### Metod
+
 Lineer Regresyonun sadece iki değişken temelli işlemek gerekirse, 
 
 $$ Y = \beta_0 + \beta_1 x + \epsilon$$
@@ -543,7 +545,7 @@ Görüldüğü gibi `x4` artık $<0.05$ altında!
 OLS'in bu tür nüanslarını bilmek iyi olur. Eğer veride tekrar varsa, herhangi
 bir sebeple, tekrarlayan verileri çıkartmak belki de mantıklı olacaktır.
 
-ABD Başkanlık Yarışını Tahmin Etmek
+### ABD Başkanlık Yarışını Tahmin Etmek
 
 ABD başkanlık yarışlarının oldukça tahmin edilebilir olduğu uzunca süredir iddia
 edilmektedir. Bu alanda pek çok model var, Andrew Gelman'ın oldukça çetrefil,
@@ -750,11 +752,75 @@ print (results.aic)
 
 AIC sonucu arttı, bu modelin daha kötüleştiği anlamına gelir. 
 
-Not: Gayri-safi yurtiçi hasıla (GDP) 2. çeyrekteki artışına bakılıyor. Bu
-artış bir sene önceye kıyasla değil (year-over-year) bir önceki çeyreğe
-göre artıştır dikkat, ve sonra bu artış, yıl ölçeğine çıkartılır, $d$
-artışı diyelim $(1+\d)^4 - 1$ formülü üzerinden. Yani "her çeyrekte artış
-$d$ olsaydı, tüm sene artışı nereye gelirdi?'' sorusunun cevabı.
+Not: Gayri-safi yurtiçi hasıla (GDP) 2. çeyrekteki artışına
+bakılıyor. Bu artış bir sene önceye kıyasla değil (year-over-year) bir
+önceki çeyreğe göre artıştır dikkat, ve sonra bu artış, yıl ölçeğine
+çıkartılır, $d$ artışı diyelim $(1+d)^4 - 1$ formülü üzerinden. Yani
+"her çeyrekte artış $d$ olsaydı, tüm sene artışı nereye gelirdi?''
+sorusunun cevabı.
+
+### Pearson Korelasyonu ile Lineer Regresyon Bağlantısı
+
+İki zaman serisi arasında Pearson korelasyon katsayısı $\rho$
+hesaplanabilir. Çok bilinmeyen bir özellik bu hesabın aslında
+normalize edilmiş iki zaman serisi arasında regresyon hesabının
+verdiği eğim katsayısı ile aynı olmasıdır.
+
+Örnek üzerinde görelim, önce Pearson,
+
+```python
+import pandas as pd
+df = pd.read_csv('../stat_040_tests2/fossum.csv')
+print (df.totlngth.corr(df.hdlngth))
+```
+
+```text
+0.779239322172446
+```
+
+Şimdi regresyon,
+
+```python
+import statsmodels.formula.api as smf
+cols = ['totlngth','hdlngth']
+
+df2 = df.copy(); df[cols] = (df[cols] - df[cols].mean()) / df[cols].std()
+
+results = smf.ols('totlngth ~ hdlngth', data=df2).fit()
+
+print (results.params['hdlngth'])
+```
+
+```text
+0.7792393221724462
+```
+
+Aynı sonucu elde ettik. İspatını yapalım. Diyelim ki elimizde
+normalize edilmiş iki vektör var, $\vec{x}$ ve $\vec{y}$, bu vektörler
+orijin etrafında merkezlenmişler.
+
+Tanım itibariyle bu tür iki vektör arasındaki korelasyon $\rho$,
+onların arasındaki açının kosinüsüne eşittir.
+
+$$\rho = \cos(\theta)$$
+
+Peki regresyon ne işlemini yapar? Bu işlem $\vec{y}$ vektörünü dikgen
+şekilde $\vec{x}$ yansıtarak $\hat{y} = \beta\vec{x}$ için en iyi
+lineer uyumluluğu bulmaya uğraşır.
+
+Vektör yansıtmasının tanımından hareketle yansıtılmış vektörün
+uzunluğunun alttakine eşit olduğunu biliyoruz,
+
+$$\beta = \frac{\|\vec{y}\| \cos(\theta)}{\|\vec{x}\|}$$
+
+Bizim durumumuzda vektörler normalize edilmiş, o zaman $\|\vec{x}\| = 1$
+ve $\|\vec{y}\| = 1$,
+
+$$\beta = \frac{1 \cdot \cos(\theta)}{1}$$
+
+$$\beta = \cos(\theta)$$
+
+$\rho = \cos(\theta)$ olduğuna göre $\beta = \rho$ olmalıdır.
 
 Kaynaklar
 
@@ -782,5 +848,5 @@ Kaynaklar
 [11] Bayramlı, Istatistik, *Güven Aralıkları, Hipotez Testleri*
 
 [12] Bayramlı, Istatistik, *Tahmin Aralıkları (Prediction Interval)*
-```
+
 

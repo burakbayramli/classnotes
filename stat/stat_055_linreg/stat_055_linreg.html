@@ -8,7 +8,8 @@
     <script type="text/x-mathjax-config">
     MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
       MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
-        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"],
+        ud: ["Macro", "{\\,\\mathrm{d}#1}\\,", 1]
       });
     });
     </script>  
@@ -95,6 +96,7 @@ olduğunu kabul etmektir, yani eldeki değişkenlerin belli ağırlıklar ile
 katsayıları bulmak için En Az Kareler (Least Squares) en iyi bilinen
 yöntemlerden biri; En Az Kareler daha önce pek çok değişik ders
 notlarında, yazıda türetildi. Mesela [7], [8], ya da [9].</p>
+<h3 id="metod">Metod</h3>
 <p>Lineer Regresyonun sadece iki değişken temelli işlemek gerekirse,</p>
 <p><span class="math display">\[ Y = \beta_0 + \beta_1 x +
 \epsilon\]</span></p>
@@ -571,7 +573,8 @@ class="math inline">\(&lt;0.05\)</span> altında!</p>
 <p>OLS’in bu tür nüanslarını bilmek iyi olur. Eğer veride tekrar varsa,
 herhangi bir sebeple, tekrarlayan verileri çıkartmak belki de mantıklı
 olacaktır.</p>
-<p>ABD Başkanlık Yarışını Tahmin Etmek</p>
+<h3 id="abd-başkanlık-yarışını-tahmin-etmek">ABD Başkanlık Yarışını
+Tahmin Etmek</h3>
 <p>ABD başkanlık yarışlarının oldukça tahmin edilebilir olduğu uzunca
 süredir iddia edilmektedir. Bu alanda pek çok model var, Andrew
 Gelman’ın oldukça çetrefil, MCMC kullanan modelinden [4] (ki bunun için
@@ -755,9 +758,58 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a h
 bakılıyor. Bu artış bir sene önceye kıyasla değil (year-over-year) bir
 önceki çeyreğe göre artıştır dikkat, ve sonra bu artış, yıl ölçeğine
 çıkartılır, <span class="math inline">\(d\)</span> artışı diyelim <span
-class="math inline">\((1+\d)^4 - 1\)</span> formülü üzerinden. Yani “her
+class="math inline">\((1+d)^4 - 1\)</span> formülü üzerinden. Yani “her
 çeyrekte artış <span class="math inline">\(d\)</span> olsaydı, tüm sene
 artışı nereye gelirdi?’’ sorusunun cevabı.</p>
+<h3 id="pearson-korelasyonu-ile-lineer-regresyon-bağlantısı">Pearson
+Korelasyonu ile Lineer Regresyon Bağlantısı</h3>
+<p>İki zaman serisi arasında Pearson korelasyon katsayısı <span
+class="math inline">\(\rho\)</span> hesaplanabilir. Çok bilinmeyen bir
+özellik bu hesabın aslında normalize edilmiş iki zaman serisi arasında
+regresyon hesabının verdiği eğim katsayısı ile aynı olmasıdır.</p>
+<p>Örnek üzerinde görelim, önce Pearson,</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../stat_040_tests2/fossum.csv&#39;</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.totlngth.corr(df.hdlngth))</span></code></pre></div>
+<pre class="text"><code>0.779239322172446</code></pre>
+<p>Şimdi regresyon,</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">&#39;totlngth&#39;</span>,<span class="st">&#39;hdlngth&#39;</span>]</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> df.copy()<span class="op">;</span> df[cols] <span class="op">=</span> (df[cols] <span class="op">-</span> df[cols].mean()) <span class="op">/</span> df[cols].std()</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> smf.ols(<span class="st">&#39;totlngth ~ hdlngth&#39;</span>, data<span class="op">=</span>df2).fit()</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (results.params[<span class="st">&#39;hdlngth&#39;</span>])</span></code></pre></div>
+<pre class="text"><code>0.7792393221724462</code></pre>
+<p>Aynı sonucu elde ettik. İspatını yapalım. Diyelim ki elimizde
+normalize edilmiş iki vektör var, <span
+class="math inline">\(\vec{x}\)</span> ve <span
+class="math inline">\(\vec{y}\)</span>, bu vektörler orijin etrafında
+merkezlenmişler.</p>
+<p>Tanım itibariyle bu tür iki vektör arasındaki korelasyon <span
+class="math inline">\(\rho\)</span>, onların arasındaki açının
+kosinüsüne eşittir.</p>
+<p><span class="math display">\[\rho = \cos(\theta)\]</span></p>
+<p>Peki regresyon ne işlemini yapar? Bu işlem <span
+class="math inline">\(\vec{y}\)</span> vektörünü dikgen şekilde <span
+class="math inline">\(\vec{x}\)</span> yansıtarak <span
+class="math inline">\(\hat{y} = \beta\vec{x}\)</span> için en iyi lineer
+uyumluluğu bulmaya uğraşır.</p>
+<p>Vektör yansıtmasının tanımından hareketle yansıtılmış vektörün
+uzunluğunun alttakine eşit olduğunu biliyoruz,</p>
+<p><span class="math display">\[\beta = \frac{\|\vec{y}\|
+\cos(\theta)}{\|\vec{x}\|}\]</span></p>
+<p>Bizim durumumuzda vektörler normalize edilmiş, o zaman <span
+class="math inline">\(\|\vec{x}\| = 1\)</span> ve <span
+class="math inline">\(\|\vec{y}\| = 1\)</span>,</p>
+<p><span class="math display">\[\beta = \frac{1 \cdot
+\cos(\theta)}{1}\]</span></p>
+<p><span class="math display">\[\beta = \cos(\theta)\]</span></p>
+<p><span class="math inline">\(\rho = \cos(\theta)\)</span> olduğuna
+göre <span class="math inline">\(\beta = \rho\)</span> olmalıdır.</p>
 <p>Kaynaklar</p>
 <p>[1] Teetor, <em>R Cookbook</em></p>
 <p>[2] The Yhat Blog ,<em>Fitting &amp; Interpreting Linear Models in
@@ -779,7 +831,7 @@ Kareler</em></p>
 <p>[11] Bayramlı, Istatistik, <em>Güven Aralıkları, Hipotez
 Testleri</em></p>
 <p>[12] Bayramlı, Istatistik, <em>Tahmin Aralıkları (Prediction
-Interval)</em> ```</p>
+Interval)</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>
