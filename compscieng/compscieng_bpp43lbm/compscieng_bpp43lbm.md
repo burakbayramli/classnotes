@@ -10,8 +10,8 @@ farkı ızgara Boltzmann yönteminin sıvı parçacıklarının konumlarını ve
 hızlarını değil, parçacıkların hız dağılım fonksiyonunu kullanarak
 hesap yapmasıdır [3, sf. 24].
 
-Aşağıdaki şekil iki boyutlu bir sistem için ızgara Boltzmann yöntemi
-şekli var. (A), bir simülasyon bölgesinin ızgara sistemine bölündüğünü
+Aşağıda iki boyutlu bir sistem için ızgara Boltzmann yöntemi şekli
+var. (A), bir simülasyon bölgesinin ızgara sistemine bölündüğünü
 göstermektedir. (B) ise birim kare ızgara hücresinin büyütülmüş
 halidir. Moleküllerin grupları veya kümeleri olarak ele alınan sanal
 sıvı parçacıklarının yalnızca komşu düğümlere hareket etmesine izin

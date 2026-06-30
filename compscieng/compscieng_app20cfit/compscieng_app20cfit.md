@@ -73,15 +73,15 @@ res = np.dot(np.dot(lin.pinv(np.dot(A.T,A)),A.T),y)
 print (A, '\n\n', res)
 ```
 
-```
-[[   1.    1.    1.    1.]
- [   8.    4.    2.    1.]
- [  27.    9.    3.    1.]
- [  64.   16.    4.    1.]
- [ 125.   25.    5.    1.]
- [ 216.   36.    6.    1.]] 
+```text
+[[  1.   1.   1.   1.]
+ [  8.   4.   2.   1.]
+ [ 27.   9.   3.   1.]
+ [ 64.  16.   4.   1.]
+ [125.  25.   5.   1.]
+ [216.  36.   6.   1.]] 
 
-[  0.03925926   0.42313492  -6.5032672   16.12666667]
+ [ 0.03925926  0.42313492 -6.5032672  16.12666667]
 ```
 
 Kütüphane çağrısı `polyfit` kullanırsak,
@@ -90,8 +90,8 @@ Kütüphane çağrısı `polyfit` kullanırsak,
 print (np.polyfit(x,y,3))
 ```
 
-```
-[  0.03925926   0.42313492  -6.5032672   16.12666667]
+```text
+[ 0.03925926  0.42313492 -6.5032672  16.12666667]
 ```
 
 Tıpatıp aynı sonuç çıktı, çünkü büyük bir ihtimalle `polyfit` aynı
@@ -384,24 +384,24 @@ reslin = smf.ols('y ~ 1 + x + I((x-55)*(x>55))', data=df).fit()
 print (reslin.summary())
 ```
 
-```
+```text
                             OLS Regression Results                            
 ==============================================================================
 Dep. Variable:                      y   R-squared:                       0.957
 Model:                            OLS   Adj. R-squared:                  0.956
 Method:                 Least Squares   F-statistic:                     1081.
-Date:                Thu, 12 Jan 2017   Prob (F-statistic):           4.96e-67
-Time:                        14:27:42   Log-Likelihood:                -243.44
+Date:                Tue, 30 Jun 2026   Prob (F-statistic):           4.96e-67
+Time:                        10:28:22   Log-Likelihood:                -243.44
 No. Observations:                 100   AIC:                             492.9
 Df Residuals:                      97   BIC:                             500.7
 Df Model:                           2                                         
 Covariance Type:            nonrobust                                         
 ==========================================================================================
-                             coef    std err          t      P>|t|      [95.0% Conf. Int.]
+                             coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------------------
-Intercept                 15.7364      0.701     22.447      0.000        14.345    17.128
-x                          0.2956      0.019     15.422      0.000         0.258     0.334
-I((x - 55) * (x > 55))     0.3530      0.040      8.926      0.000         0.275     0.432
+Intercept                 15.7364      0.701     22.447      0.000      14.345      17.128
+x                          0.2956      0.019     15.422      0.000       0.258       0.334
+I((x - 55) * (x > 55))     0.3530      0.040      8.926      0.000       0.275       0.432
 ==============================================================================
 Omnibus:                       15.710   Durbin-Watson:                   2.312
 Prob(Omnibus):                  0.000   Jarque-Bera (JB):                4.411
@@ -409,7 +409,7 @@ Skew:                          -0.025   Prob(JB):                        0.110
 Kurtosis:                       1.972   Cond. No.                         148.
 ==============================================================================
 
-Warnings:
+Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 ```
 
@@ -456,45 +456,11 @@ y_pred = model.predict(df)
 ss_total = np.sum((y_true - np.mean(y_true))**2)
 ss_residual = np.sum((y_true - y_pred)**2)
 r_squared = 1 - (ss_residual / ss_total)
-print(f"\nR-squared: {r_squared:.4f}")
+print(f"R-squared: {r_squared:.4f}")
 ```
 
-```
-                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:                      C   R-squared:                       0.962
-Model:                            OLS   Adj. R-squared:                  0.956
-Method:                 Least Squares   F-statistic:                     177.4
-Date:                Thu, 12 Jan 2017   Prob (F-statistic):           2.03e-50
-Time:                        13:13:45   Log-Likelihood:                -185.82
-No. Observations:                  90   AIC:                             395.6
-Df Residuals:                      78   BIC:                             425.6
-Df Model:                          11                                         
-Covariance Type:            nonrobust                                         
-================================================================================================
-                                   coef    std err          t      P>|t|      [95.0% Conf. Int.]
-------------------------------------------------------------------------------------------------
-Intercept                       31.8192      1.354     23.494      0.000        29.123    34.515
-Temp                             0.3800      0.204      1.863      0.066        -0.026     0.786
-I((Temp > 10) * (Temp - 10))    -0.0764      0.497     -0.154      0.878        -1.065     0.912
-I((Temp > 15) * (Temp - 15))    -0.0524      0.651     -0.081      0.936        -1.348     1.243
-I((Temp > 20) * (Temp - 20))    -0.0027      0.673     -0.004      0.997        -1.342     1.337
-I((Temp > 25) * (Temp - 25))    -0.1210      0.674     -0.179      0.858        -1.463     1.221
-I((Temp > 30) * (Temp - 30))    -0.3380      0.674     -0.501      0.618        -1.681     1.005
-I((Temp > 35) * (Temp - 35))    -0.0869      0.674     -0.129      0.898        -1.429     1.256
-I((Temp > 40) * (Temp - 40))     0.1147      0.674      0.170      0.865        -1.227     1.457
-I((Temp > 45) * (Temp - 45))     0.0320      0.670      0.048      0.962        -1.302     1.366
-I((Temp > 50) * (Temp - 50))    -0.0149      0.598     -0.025      0.980        -1.205     1.176
-I((Temp > 55) * (Temp - 55))    -0.6336      0.295     -2.144      0.035        -1.222    -0.045
-==============================================================================
-Omnibus:                        7.572   Durbin-Watson:                   1.924
-Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.180
-Skew:                          -0.575   Prob(JB):                       0.0276
-Kurtosis:                       3.770   Cond. No.                         691.
-==============================================================================
-
-Warnings:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+```text
+R-squared: 0.9629
 ```
 
 İstatistiki modelleri irdelemek bilimden ziyada biraz sanattır, fakat
@@ -653,7 +619,7 @@ f = sm.OLS(y,X).fit()
 print (f.params)
 ```
 
-```
+```text
 1     1.586781
 x     1.747705
 x2   -0.381304
@@ -743,15 +709,15 @@ for k in knots: plt.plot(k,speval(k,bhat,knots),'rd')
 plt.savefig('compscieng_app20_01.png')
 ```
 
-```
+```text
             x         y
-156 -4.037867  0.786392
-214 -3.442141  0.716684
-101 -3.331777  0.400504
-249 -3.178510 -1.019875
-235 -3.131058  0.309575
-[ 2.60209869  0.37061018 -0.09614395  0.3059325  -0.30256291 -0.05312331
-  0.33303297 -0.24924314  0.06210785]
+177 -5.245175  1.363877
+219 -3.624992 -0.583888
+210 -3.250711  0.417469
+128 -3.213517 -0.731863
+224 -3.193534 -1.372611
+[-4.72642451 -1.15285991  0.03646609 -0.03351518  0.01509642 -0.24834158
+  0.53017669 -0.42693497  0.12705253]
 ```
 
 ![](compscieng_app20_01.png)
@@ -770,7 +736,7 @@ for k in knots: plt.plot(k,speval(k,bhat,knots),'rd')
 plt.savefig('compscieng_app20_03.png')
 ```
 
-```
+```text
 [ 3.16368016  0.17418578  0.02336622 -0.01432746 -0.05277535  0.42087813
  -0.37714154]
 ```
@@ -1112,7 +1078,7 @@ x = lin.solve(u,y)
 print (x)
 ```
 
-```
+```text
 [[ 5.44047619]
  [ 3.10714286]
  [ 0.26785714]
@@ -1150,7 +1116,7 @@ c = lin.solve(u,y)
 print (c)
 ```
 
-```
+```text
 [ 13.45756677 -13.90702275   2.64390455]
 ```
 
@@ -1305,6 +1271,10 @@ if __name__ == "__main__":
     
 ```
 
+```text
+y = 0.7678571428571428
+```
+
 ```python
 import pandas as pd, cubicSpline
 df = pd.read_csv('in.csv')
@@ -1312,7 +1282,7 @@ res = cubicSpline.curvatures(np.array(df.x), np.array(df.y))
 print (res)
 ```
 
-```
+```text
 [ 0.         -2.27960615  0.5983445  -2.14369027 -0.5421918  -0.9485407
   4.83823742  1.40244849 -0.82589911 -1.3439826   2.52298704  0.        ]
 ```
