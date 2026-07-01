@@ -101,6 +101,17 @@ Benim tercihim programları emulasyon içinde, yani Ubuntu ise Ubuntu
 üzerinde, o sisteme göre kurmak, Termux'ta degil, böylece o programın
 diğerleri ile olan etkileşimi daha rahat olur.
 
+Eksikler
+
+Bazı eksikler mevcut muhakkak, Ubuntu ile Android iletişim iyi
+kurulmuş, ortaya çıkan sonuçlar mücezevi türden, çoğu Ubuntu programı
+hiç değişime ihtiyaç olmadan işliyor, fakat arada hala ince bir
+"tutkal tabaka" olduğunu unutmamak lazım. Mesela geçende Python
+üzerinden `multiprocessing` çağrıları ile birden fazla CPU kullanan
+bir programı işletmek istedim, proot bunu yapamadı. Demek ki sistemle
+çok derinden iletişmesi gereken, özel ihtiyaçlar için yazılmış bazı
+programlar çalışmayabiliyor. Bunu akılda tutmak iyi olur.
+
 Tus Değişimi
 
 Eğer bir Bluetooth klavye ile bağlanıyorsak, bu klavyenin bazı
