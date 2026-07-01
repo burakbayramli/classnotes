@@ -207,72 +207,19 @@ Bölüm 2'deki ortak log-olurluk türetmemizi yerine koyarak, genişletilmiş am
 
 $$\ln P(\alpha, \beta, \sigma|D) \propto \sum_{t=1}^{N}\left[-\frac{1}{2}\ln(2\pi) - \ln(\sigma) - \frac{1}{2\sigma^2}(y_t - (\alpha + \beta x_t))^2\right] + \ln P(\alpha) + \ln P(\beta) + \ln P(\sigma)$$
 
+Üstteki yaklaşımın kodları `bayes_ols.py` içinde bulunabilir.
+
 ```python
+import bayes_ols
+
 x_data = df['Temp'].values
 y_data = df['C'].values
 N = len(x_data)
 
-def log_likelihood(alpha, beta, sigma, x, y):
-    if sigma <= 0:
-        return -np.inf
-
-    mu = alpha + beta * x
-    
-    term1 = -0.5 * np.log(2 * np.pi)
-    term2 = -np.log(sigma)
-    term3 = -((y - mu) ** 2) / (2 * (sigma ** 2))
-    return np.sum(term1 + term2 + term3)
-
-def log_prior(alpha, beta, sigma):
-    if sigma <= 0 or sigma > 50: 
-        return -np.inf
-    if not (-100 < alpha < 100): 
-        return -np.inf
-    if not (-10 < beta < 10):    
-        return -np.inf
-    return 0.0
-
-def log_posterior(alpha, beta, sigma, x, y):
-    return log_prior(alpha, beta, sigma) + log_likelihood(alpha, beta, sigma, x, y)
-
-def metropolis_sampler(x, y, iterations=25000, proposal_width_alpha=1.0, proposal_width_beta=0.05, proposal_width_sigma=0.5):
-    current_alpha = 0.0
-    current_beta = 0.0
-    current_sigma = 1.0
-    
-    alpha_trace = np.zeros(iterations)
-    beta_trace = np.zeros(iterations)
-    sigma_trace = np.zeros(iterations)
-    
-    accepted_count = 0
-    
-    for i in range(iterations):
-        proposed_alpha = np.random.normal(current_alpha, proposal_width_alpha)
-        proposed_beta = np.random.normal(current_beta, proposal_width_beta)
-        proposed_sigma = np.random.normal(current_sigma, proposal_width_sigma)
-        
-        log_post_current = log_posterior(current_alpha, current_beta, current_sigma, x, y)
-        log_post_proposed = log_posterior(proposed_alpha, proposed_beta, proposed_sigma, x, y)
-        
-        log_acceptance_ratio = log_post_proposed - log_post_current
-        
-        if np.log(np.random.uniform(0, 1)) < log_acceptance_ratio:
-            current_alpha = proposed_alpha
-            current_beta = proposed_beta
-            current_sigma = proposed_sigma
-            accepted_count += 1
-            
-        alpha_trace[i] = current_alpha
-        beta_trace[i] = current_beta
-        sigma_trace[i] = current_sigma
-        
-    print(f"Acceptance Rate: {accepted_count / iterations * 100:.2f}%")
-    return alpha_trace, beta_trace, sigma_trace
-
 iterations = 25000
 burn_in = 5000
 
-alpha_chain, beta_chain, sigma_chain = metropolis_sampler(x_data, y_data, iterations=iterations)
+alpha_chain, beta_chain, sigma_chain = bayes_ols.metropolis_sampler(x_data, y_data, iterations=iterations)
 
 final_beta = beta_chain[burn_in:]
 final_sigma = sigma_chain[burn_in:]
@@ -283,13 +230,16 @@ print(f"Sigma (Residual Noise):      {np.mean(final_sigma):.4f} ± {np.std(final
 ```
 
 ```text
-Acceptance Rate: 19.79%
+Acceptance Rate: 20.30%
 
 --- Posterior Estimates (Standardized Scale) ---
-Beta: -0.2970 ± 0.0247
-Sigma (Residual Noise):      6.1444 ± 0.4725
+Beta: -0.2975 ± 0.0242
+Sigma (Residual Noise):      6.1331 ± 0.4661
 ```
 
+Görüldüğü gibi OLS hesabına yakın bir sonuç elde ettik.
+
+Formüllerin Kod ile Bağlantıları
 
 Türetmenin sonunda, tek bir veri noktasının log-olurluğu için kapalı
 biçimli bir ifadeye ulaşmıştık: Bu ifadenin tam olarak üç toplamsal
@@ -505,10 +455,189 @@ esasen aynı eğime yakınsıyor, ama artık tek çıplak bir sayı yerine,
 etrafındaki belirsizliği tanımlayan tam bir dağılımla birlikte
 geliyor.
 
+### Parçalı Regresyon
+
+Eğer veriyi nerede olduklarını baştan bilmediğimiz noktalar arasında
+bölmek, ve bu her bölüm üzerinde regresyonun farklı bir kesi ve eğime
+sahip olmasına izin vermek istiyorsak o zaman formülasyonunu biraz
+değiştirmek gerekecek. İdeal olarak hala tek bir sonsal fonksiyona,
+dağılıma ulaşmak istiyoruz. Gereken değişkenleri tanımlayalım,
+
+Veri $D=\{(x_{t},y_{t})\}_{t=1}^{N}$. 
+
+* Değişim noktaları: $\tau=\{\tau_{1},\tau_{2}\}$ (where $1<\tau_{1}<\tau_{2}<N$) 
+
+* Her blok için kesi: $\alpha=\{\alpha_{1},\alpha_{2},\alpha_{3}\}$
+
+* Her bloğun eğim katsayısı: $\beta=\{\beta_{1},\beta_{2},\beta_{3}\}$ 
+
+* Her blok için artık varyans (gürültü):
+  $\sigma^{2}=\{\sigma_{1}^{2},\sigma_{2}^{2},\sigma_{3}^{2}\}$
+
+Bayes formülasyonu artık şöyle,
+
+$$P(\tau, \alpha, \beta, \sigma^2 | D) \propto P(D | \tau, \alpha, \beta, \sigma^2) P(\tau) P(\alpha) P(\beta) P(\sigma^2) \quad \text{}$$
+
+Eğer elimizde üç blok olsaydı, o zaman iki değişim noktası $\tau_1$,
+$\tau_2$ üzerinden $\hat{\mu}_t$, ve $\hat{\sigma}_t$ şöyle
+olabilirdi,
+
+$$
+\hat{\mu}_{t}=w_{1}(t)\cdot(\alpha_{1} +
+\beta_{1}x_{t})+w_{2}(t)\cdot(\alpha_{2} +
+\beta_{2}x_{t})+w_{3}(t)\cdot(\alpha_{3} + \beta_{3}x_{t})
+$$
+
+$$
+\hat{\sigma}_{t}^{2}= w_{1}(t)\cdot\sigma_{1}^{2} +
+w_{2}(t)\cdot\sigma_{2}^{2} +
+w_{3}(t)\cdot\sigma_{3}^{2} 
+$$
+
+Artık bu parametreler Gaussian hesabı için kullanılabilir,
+
+$$
+y_{t}\sim\mathcal{N}(\hat{\mu}_{t},\hat{\sigma}_{t}^{2}) 
+$$
+
+Formülde görülen ağırlıklar $w_1,w_2,w_3$ birleşik formülün belli
+bölgelerinin açılıp / kapatılmasını sağlayan bir numara içeriyor,
+çünkü o ağırlıkları şöyle tanımlıyoruz,
+
+* $w_{1}(t)=1-\sigma(t,\tau_{1},k)$ 
+
+* $w_{2}(t)=\sigma(t,\tau_{1},k)\cdot(1-\sigma(t,\tau_{2},k))$ 
+
+* $w_{3}(t)=\sigma(t,\tau_{2},k)$ 
+
+Görülen $\sigma$ fonksiyonu sigmoid fonksiyonudur, tanımı
+
+$$
+\sigma_{j}(t)=\frac{1}{1+e^{-k(t-\tau_{j})}} \quad \text{for }
+j=1,2,...,M-1
+$$
+
+Bu formüllere göre $\sum_{j=1}^{M}w_{j}(t) \approx 1$ olduğu
+görülebilir (yaklaşık dedik çünkü bazı şartlarda 1'e toplanamayabilir,
+ileride daha sağlam, tam bire toplanan bir alternatif te göreceğiz).
+
+Acip kapama isini yapan anahtar gibi is goren fonksiyon icin sigmoid
+secildi. Bu fonksiyonun nasil davrandigina bazi orneklerle bakalim.
 
 
+```python
+import numpy as np
+
+def sigmoid(t, tau, k=2.0):
+    return 1.0 / (1.0 + np.exp(-k * (t - tau)))
+
+print(1 - sigmoid(t=1, tau=2))
+print(1 - sigmoid(t=2, tau=2))
+print(1 - sigmoid(t=3, tau=2))
+print(1 - sigmoid(t=6, tau=2))
+```
+
+```text
+0.8807970779778824
+0.5
+0.11920292202211769
+0.00033535013046637197
+```
+
+Örnekte değişim noktası olarak $\tau=2$ seçtik. Bu değer öncesi,
+üstünde, sonrasında 1 - sigmoid'in nasıl davrandığı görülüyor, ki
+regresyona vermeden önce çarpım için kullanılan ağırlıklar o sigmoid
+hesabını kullandı. Sonuçlar diyor ki $\tau=2$ öncesi büyük bir değer
+var, bu anahtarın açık olduğu anlamına gelir. Tam $\tau=2$ üzerinde
+0.5 görüyoruz, bu da istediğimiz bir şey, o noktada önceki blok ve
+sonraki blok aynı etkiye sahip. Değişim noktasını geçer geçmez sigmoid
+değer kaybına başlıyor, ne kadar $\tau=2$'in uzağına gidilirse o kadar
+sıfıra yaklaşılıyor, yani oralarda "anahtar kapanıyor", u bloğu tamsil
+eden regresyon parçasının kuvveti azalıyor.
 
 
+```python
+import bayes_segmented
+
+X = df['Temp'].values
+Y = df['C'].values
+N = len(df)
+time_axis = np.arange(N)
+
+NUM_BLOCKS = 3  
+NUM_TAUS = NUM_BLOCKS - 1
+
+trace_taus, trace_alphas, trace_betas, trace_sigmas = bayes_segmented.metropolis_sampler(
+    X, Y, 
+    iterations=50000, 
+    burn_in=20000, 
+    proposal_width_tau=0.3,    
+    proposal_width_alpha=0.15, 
+    proposal_width_beta=0.01,  
+    proposal_width_sigma=0.05  
+)
+print("\n--- INFERENCE RESULTS ---")
+for i in range(NUM_TAUS):
+    print(f"Estimated Tau {i+1} (Timeline Index): {np.mean(trace_taus[:, i]):.2f} ± {np.std(trace_taus[:, i]):.2f}")
+print("")
+for i in range(NUM_BLOCKS):
+    print(f"Block {i+1} -> Alpha (Intercept): {np.mean(trace_alphas[:, i]):.3f} | Beta (Slope): {np.mean(trace_betas[:, i]):.3f} | Sigma (Noise): {np.mean(trace_sigmas[:, i]):.3f}")
+
+print("\n--- GOODNESS-OF-FIT METRICS ---")
+est_taus = np.mean(trace_taus, axis=0)
+est_alphas = np.mean(trace_alphas, axis=0)
+est_betas = np.mean(trace_betas, axis=0)
+est_sigmas = np.mean(trace_sigmas, axis=0)
+
+max_log_lik = bayes_segmented.log_likelihood(est_taus, est_alphas, est_betas, est_sigmas, X, Y)
+
+num_params = (NUM_BLOCKS - 1) + NUM_BLOCKS + NUM_BLOCKS + NUM_BLOCKS
+aic = 2 * num_params - 2 * max_log_lik
+bic = num_params * np.log(N) - 2 * max_log_lik
+
+print(f"Maximized Log-Likelihood: {max_log_lik:.2f}")
+print(f"Total Parameters (k):     {num_params}  (Expanded to 4M - 1 due to intercepts)")
+print(f"AIC Score:                {aic:.2f}")
+print(f"BIC Score:                {bic:.2f} <-- Best for identifying true block count")
+```
+
+```text
+Loaded 90 data points from cave.csv.
+Running intercept-aware Metropolis sampler for 3 blocks...
+Post-Burn-in Acceptance Rate: 30.96%
+
+Estimated Tau 1 (Timeline Index): 27.87 ± 3.74
+Estimated Tau 2 (Timeline Index): 54.65 ± 2.43
+
+Block 1 -> Alpha (Intercept): 33.007 | Beta (Slope): 0.246 | Sigma (Noise): 2.221
+Block 2 -> Alpha (Intercept): 47.769 | Beta (Slope): -0.246 | Sigma (Noise): 2.290
+Block 3 -> Alpha (Intercept): 79.923 | Beta (Slope): -0.808 | Sigma (Noise): 1.823
+
+Maximized Log-Likelihood: -185.67
+Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
+AIC Score:                393.33
+BIC Score:                420.83 <-- Best for identifying true block count
+Running intercept-aware Metropolis sampler for 3 blocks...
+Post-Burn-in Acceptance Rate: 39.02%
+
+Estimated Tau 1 (Timeline Index): 29.65 ± 3.28
+Estimated Tau 2 (Timeline Index): 72.10 ± 1.05
+
+Block 1 -> Alpha (Intercept): 32.805 | Beta (Slope): 0.256 | Sigma (Noise): 2.309
+Block 2 -> Alpha (Intercept): 53.794 | Beta (Slope): -0.390 | Sigma (Noise): 2.161
+Block 3 -> Alpha (Intercept): 35.590 | Beta (Slope): -0.273 | Sigma (Noise): 3.623
+
+Maximized Log-Likelihood: -203.35
+Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
+AIC Score:                428.70
+BIC Score:                456.20 <-- Best for identifying true block count
+```
+
+Kodlar
+
+[bayes_ols.py](bayes_ols.py),
+[bayes_segmented.py](bayes_segmented.py),
+[corr_segment.py](corr_segment.py)
 
 Kaynaklar
 
