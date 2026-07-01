@@ -559,9 +559,6 @@ eden regresyon parçasının kuvveti azalıyor.
 ```python
 import bayes_segmented 
 
-# =====================================================================
-# 1. CONFIGURATION & LOAD RAW DATA
-# =====================================================================
 NUM_BLOCKS = 3  
 NUM_TAUS = NUM_BLOCKS - 1
 np.random.seed(42)
@@ -573,9 +570,6 @@ N = len(df)
 
 print(f"Loaded {N} data points from cave.csv.")
 
-# =====================================================================
-# 2. RUN SAMPLER
-# =====================================================================
 trace_taus, trace_alphas, trace_betas, trace_sigmas = bayes_segmented.metropolis_sampler(
     X, Y, 
     num_blocks=NUM_BLOCKS,
@@ -587,9 +581,6 @@ trace_taus, trace_alphas, trace_betas, trace_sigmas = bayes_segmented.metropolis
     proposal_width_sigma=0.05   
 )
 
-# =====================================================================
-# 3. RESULTS & GOODNESS-OF-FIT
-# =====================================================================
 print("\n--- INFERENCE RESULTS ---")
 for i in range(NUM_TAUS):
     print(f"Estimated Tau {i+1} (Timeline Index): {np.mean(trace_taus[:, i]):.2f} ± {np.std(trace_taus[:, i]):.2f}")
@@ -603,7 +594,6 @@ est_alphas = np.mean(trace_alphas, axis=0)
 est_betas = np.mean(trace_betas, axis=0)
 est_sigmas = np.mean(trace_sigmas, axis=0)
 
-# Call modular log_likelihood from the routine package
 max_log_lik = bayes_segmented.log_likelihood(est_taus, est_alphas, est_betas, est_sigmas, X, Y)
 
 num_params = (NUM_BLOCKS - 1) + NUM_BLOCKS + NUM_BLOCKS + NUM_BLOCKS
