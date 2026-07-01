@@ -48,7 +48,7 @@ Parçalı uyum sonucu daha iyi olarak rapor edildi. Demek ki üstteki
 veride tek değil (en az) iki ve birbirinden farklı doğrusal ilişki
 var.
 
-Bayes Yaklaşımı
+### Normal Regresyon, Bayes Yaklaşımı
 
 Nerede olduklarını bilmediğimiz parçalı regresyonu çözmenin iyi bir
 yöntemi bunu olasılıksal olarak yapmak, ve Bayes yöntemine başvurmak.
@@ -382,15 +382,15 @@ def log_prior(alpha, beta, sigma):
 ```
 
 Bu, daha önceki `smf.ols(...)` çağrılarındaki gibi sıradan bir
-(Bayesçi olmayan, "frekansçı") regresyonda karşılığı olmayan Bayesçi
-bileşendir. Bayesçi çıkarımda, herhangi bir veriye bakmadan önce,
+(Bayessel olmayan, "frekansçı") regresyonda karşılığı olmayan Bayessel
+bileşendir. Bayessel çıkarımda, herhangi bir veriye bakmadan önce,
 parametrelerin makul olarak hangi değerleri alabileceğine dair bir
-onsel inanç ifade edersiniz. Burada seçilen onsel, sınırlı bir kutu
-üzerinde "düz" ya da "tekdüze" onsel olarak adlandırılan şeydir:
+önsel inanç ifade edersiniz. Burada seçilen önsel, sınırlı bir kutu
+üzerinde "düz" ya da "tekdüze" önsel olarak adlandırılan şeydir:
 $-100$ ile $100$ arasındaki herhangi bir $\alpha$, $-10$ ile $10$
 arasındaki herhangi bir $\beta$ ve $0$ ile $50$ arasındaki herhangi
 bir $\sigma$ eşit derecede olası kabul edilir (fonksiyonun sabit $0.0$
-döndürmesinin nedeni budur — ve unutmayın, bu bir log-onseldir,
+döndürmesinin nedeni budur — ve unutmayın, bu bir log-önseldir,
 dolayısıyla $0$'lık bir log-olasılık, orantılı olarak $1$'lik bir
 olasılığa karşılık gelir, yani "tekdüze olası"). Bu kutuların
 dışındaki her şey imkânsız ilan edilir, dolayısıyla log-uzayında
@@ -422,11 +422,11 @@ eşittir.
 
 Neden örnekleme ve metropolis_sampler'ın gerçekte ne yaptığı
 
-İşte üzerinde durmaya değer bir incelik, çünkü bu "bir formülümüz
+İşte üzerinde durmaya değer bir detay, çünkü bu "bir formülümüz
 var"dan "25.000 kez bir döngü çalıştırıyoruz"a kavramsal
 sıçramadır. Klasik bir regresyonda (daha önceki `smf.ols` çağrısı),
 her parametre için tek bir en-iyi-uyum sayısı elde edersiniz; bu, tek
-seferde analitik olarak hesaplanır. Bayesçi ortamda ise tek bir sayı
+seferde analitik olarak hesaplanır. Bayessel ortamda ise tek bir sayı
 istemezsiniz — $(\alpha, \beta, \sigma)$ üzerindeki sonsal dağılımın
 tamamını istersiniz; bu da, veriyle ne kadar tutarlı olduklarına göre
 ağırlıklandırılmış, veriyle tutarlı olan parametre değerlerinin tüm
@@ -495,13 +495,13 @@ verir.
 Son yazdırılan satırlar, `np.mean(final_beta)` ve
 `np.std(final_beta)`, bu yaklaşık sonsal dağılımı, herhangi bir
 dağılımı özetlediğiniz gibi $\beta$ için özetler: bir merkez (sonsal
-ortalama, klasik nokta tahmininin Bayesçi karşılığı) ve bir yayılım
-(sonsal standart sapma, standart hatanın Bayesçi
+ortalama, klasik nokta tahmininin Bayessel karşılığı) ve bir yayılım
+(sonsal standart sapma, standart hatanın Bayessel
 karşılığı). Gördüğünüz $-0.2970 \pm 0.0247$ sayısı budur — ve bunu,
 belgenin çok daha önceki bir kısmında sıradan `smf.ols` uyumundan
 çıkan $\beta = -0.30$ ile kavramsal olarak karşılaştırmaya değer:
-tamamen o log-olurluk türetmesinden inşa edilen Bayesçi makine, esasen
-aynı eğime yakınsıyor, ama artık tek çıplak bir sayı yerine,
+tamamen o log-olurluk türetmesinden inşa edilen Bayessel makine,
+esasen aynı eğime yakınsıyor, ama artık tek çıplak bir sayı yerine,
 etrafındaki belirsizliği tanımlayan tam bir dağılımla birlikte
 geliyor.
 
