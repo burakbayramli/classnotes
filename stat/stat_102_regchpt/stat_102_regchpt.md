@@ -557,25 +557,39 @@ eden regresyon parçasının kuvveti azalıyor.
 
 
 ```python
-import bayes_segmented
+import bayes_segmented 
 
+# =====================================================================
+# 1. CONFIGURATION & LOAD RAW DATA
+# =====================================================================
+NUM_BLOCKS = 3  
+NUM_TAUS = NUM_BLOCKS - 1
+np.random.seed(42)
+
+df = pd.read_csv('../../compscieng/compscieng_app20cfit/cave.csv')
 X = df['Temp'].values
 Y = df['C'].values
 N = len(df)
-time_axis = np.arange(N)
 
-NUM_BLOCKS = 3  
-NUM_TAUS = NUM_BLOCKS - 1
+print(f"Loaded {N} data points from cave.csv.")
 
+# =====================================================================
+# 2. RUN SAMPLER
+# =====================================================================
 trace_taus, trace_alphas, trace_betas, trace_sigmas = bayes_segmented.metropolis_sampler(
     X, Y, 
+    num_blocks=NUM_BLOCKS,
     iterations=50000, 
     burn_in=20000, 
     proposal_width_tau=0.3,    
-    proposal_width_alpha=0.15, 
-    proposal_width_beta=0.01,  
-    proposal_width_sigma=0.05  
+    proposal_width_alpha=0.15,  
+    proposal_width_beta=0.01,   
+    proposal_width_sigma=0.05   
 )
+
+# =====================================================================
+# 3. RESULTS & GOODNESS-OF-FIT
+# =====================================================================
 print("\n--- INFERENCE RESULTS ---")
 for i in range(NUM_TAUS):
     print(f"Estimated Tau {i+1} (Timeline Index): {np.mean(trace_taus[:, i]):.2f} ± {np.std(trace_taus[:, i]):.2f}")
@@ -589,6 +603,7 @@ est_alphas = np.mean(trace_alphas, axis=0)
 est_betas = np.mean(trace_betas, axis=0)
 est_sigmas = np.mean(trace_sigmas, axis=0)
 
+# Call modular log_likelihood from the routine package
 max_log_lik = bayes_segmented.log_likelihood(est_taus, est_alphas, est_betas, est_sigmas, X, Y)
 
 num_params = (NUM_BLOCKS - 1) + NUM_BLOCKS + NUM_BLOCKS + NUM_BLOCKS
@@ -606,6 +621,7 @@ Loaded 90 data points from cave.csv.
 Running intercept-aware Metropolis sampler for 3 blocks...
 Post-Burn-in Acceptance Rate: 30.96%
 
+--- INFERENCE RESULTS ---
 Estimated Tau 1 (Timeline Index): 27.87 ± 3.74
 Estimated Tau 2 (Timeline Index): 54.65 ± 2.43
 
@@ -613,31 +629,31 @@ Block 1 -> Alpha (Intercept): 33.007 | Beta (Slope): 0.246 | Sigma (Noise): 2.22
 Block 2 -> Alpha (Intercept): 47.769 | Beta (Slope): -0.246 | Sigma (Noise): 2.290
 Block 3 -> Alpha (Intercept): 79.923 | Beta (Slope): -0.808 | Sigma (Noise): 1.823
 
+--- GOODNESS-OF-FIT METRICS ---
 Maximized Log-Likelihood: -185.67
 Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
 AIC Score:                393.33
 BIC Score:                420.83 <-- Best for identifying true block count
-Running intercept-aware Metropolis sampler for 3 blocks...
-Post-Burn-in Acceptance Rate: 39.02%
-
-Estimated Tau 1 (Timeline Index): 29.65 ± 3.28
-Estimated Tau 2 (Timeline Index): 72.10 ± 1.05
-
-Block 1 -> Alpha (Intercept): 32.805 | Beta (Slope): 0.256 | Sigma (Noise): 2.309
-Block 2 -> Alpha (Intercept): 53.794 | Beta (Slope): -0.390 | Sigma (Noise): 2.161
-Block 3 -> Alpha (Intercept): 35.590 | Beta (Slope): -0.273 | Sigma (Noise): 3.623
-
-Maximized Log-Likelihood: -203.35
-Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
-AIC Score:                428.70
-BIC Score:                456.20 <-- Best for identifying true block count
 ```
+
+### Uygulama: Korelasyon Analizi
+
+
+```
+Regime Shift 1: Index 35.3 (±0.63) -> Date: 2011-02-23
+Regime Shift 2: Index 1006.8 (±0.41) -> Date: 2014-12-08
+Regime Shift 3: Index 1996.9 (±0.77) -> Date: 2018-10-19
+Regime Shift 4: Index 2951.4 (±0.28) -> Date: 2022-07-15
+Regime Shift 5: Index 3926.4 (±0.47) -> Date: 2026-05-01
+```
+
 
 Kodlar
 
 [bayes_ols.py](bayes_ols.py),
 [bayes_segmented.py](bayes_segmented.py),
-[corr_segment.py](corr_segment.py)
+[corr_segment.py](corr_segment.py),
+[run_corr.py](run_corr.py)
 
 Kaynaklar
 
