@@ -154,11 +154,10 @@ temsil eder.</p></li>
 <span class="math inline">\(X\)</span>’teki birim değişim başına <span
 class="math inline">\(Y\)</span>’deki değişim oranını belirler.</p></li>
 <li><p><span class="math inline">\(\mu_t\)</span>, o belirli veri
-noktası için elde edilen ders kitabı tahminidir.</p></li>
+noktası için elde edilen tahmindir.</p></li>
 </ul>
 <p>Yani, <span class="math inline">\(y_t \sim N(\mu_t,
-\sigma^2)\)</span> yazdığımızda, çan eğrisinin merkezine kodlanmış her
-iki parametreyi de açıkça görmek için bunu tamamen açabilirsiniz:</p>
+\sigma^2)\)</span> yazdığımızda şunu elde ederiz,</p>
 <p><span class="math display">\[y_t \sim N(\alpha + \beta x_t,
 \sigma^2)\]</span></p>
 <p>Bu, modelin, veri noktalarınız <span
@@ -166,9 +165,9 @@ class="math inline">\(y_t\)</span>’nin, taban yüksekliği <span
 class="math inline">\(\alpha\)</span> tarafından kontrol edilen ve
 dikliği tamamen eğim parametresi <span
 class="math inline">\(\beta\)</span> tarafından belirlenen düz bir çizgi
-etrafında rastgele sıçradığını varsaydığı anlamına gelir.</p>
-<p>Tek bir bağımsız gözlem <span class="math inline">\(y_t\)</span> için
-Olasılık Yoğunluk Fonksiyonu (PDF) şudur:</p>
+etrafında rastgele sıçradığını varsaydığı anlamına gelir. Tek bir
+bağımsız gözlem <span class="math inline">\(y_t\)</span> için Olasılık
+Yoğunluk Fonksiyonu (PDF) şudur:</p>
 <p><span class="math display">\[P(y_t|x_t, \alpha, \beta, \sigma) =
 \frac{1}{\sqrt{2\pi\sigma^2}}
 \exp\left(-\frac{(y_t - \mu_t)^2}{2\sigma^2}\right)\]</span></p>
@@ -485,14 +484,14 @@ bunu yapmanın en basit yollarından biridir.</p>
 <p>Döngünün içindeki mantık esasen <span class="math inline">\((\alpha,
 \beta, \sigma)\)</span> değerlerinin üç boyutlu uzayında yönlendirilmiş,
 rastgele bir yürüyüştür:</p>
-<p>Her yinelemede, geçerli konumunuzdan küçük rastgele bir sıçrama
-önerirsiniz —
+<p>Her yinelemede geçerli konumumuzdan küçük rastgele bir sıçrama
+öneriliyor,
 <code>proposed_alpha = np.random.normal(current_alpha, proposal_width_alpha)</code>
-ve <code>beta</code> ile <code>sigma</code> için de benzer şekilde —
-yani bir sonraki aday nokta, şu anda bulunduğunuz yerde merkezlenmiş bir
-Gauss’tan çekilir.</p>
+ve <code>beta</code> ile <code>sigma</code> için de benzer şekilde, yani
+bir sonraki aday nokta, şu anda bulunduğunuz yerde merkezlenmiş bir
+Gaussian’dan örneklem alınır.</p>
 <p>Ardından <code>log_posterior</code>’ı hem geçerli noktada hem de
-önerilen noktada değerlendirir ve aralarındaki farkı hesaplarsınız:
+önerilen noktada değerlendiliyor ve aralarındaki fark hesaplanıyor:
 <code>log_acceptance_ratio = log_post_proposed - log_post_current</code>.
 Bunlar log-sonsallar olduğundan, onları çıkarmak, (normalleştirilmemiş)
 sonsal yoğunlukların oranının logaritmasını almaya eşdeğerdir — bu,
@@ -547,7 +546,7 @@ belirsizliği tanımlayan tam bir dağılımla birlikte geliyor.</p>
 <h3 id="parçalı-regresyon">Parçalı Regresyon</h3>
 <p>Eğer veriyi nerede olduklarını baştan bilmediğimiz noktalar arasında
 bölmek, ve bu her bölüm üzerinde regresyonun farklı bir kesi ve eğime
-sahip olmasına izin vermek istiyorsak o zaman formülasyonunu biraz
+sahip olmasına izin vermek istiyorsak o zaman formülasyonu biraz
 değiştirmek gerekecek. İdeal olarak hala tek bir sonsal fonksiyona,
 dağılıma ulaşmak istiyoruz. Gereken değişkenleri tanımlayalım,</p>
 <p>Veri <span
@@ -636,56 +635,172 @@ da istediğimiz bir şey, o noktada önceki blok ve sonraki blok aynı
 etkiye sahip. Değişim noktasını geçer geçmez sigmoid değer kaybına
 başlıyor, ne kadar <span class="math inline">\(\tau=2\)</span>’in
 uzağına gidilirse o kadar sıfıra yaklaşılıyor, yani oralarda “şalter
-kapanıyor”, bu bloğu tamsil eden regresyon parçasının kuvveti
+kapanıyor”, bu bloğu temsil eden regresyon parçasının kuvveti
 azalıyor.</p>
+<p>Ağırlık Hesabının Genelleştirilmesi</p>
+<p>Yukarıdaki yaklaşım çarpımsal bir zincirleme sonuca / bozulmaya sebep
+olabilir ve ufak ta olsa mevcut bir analitik sızıntıya yol açar. Daha
+iyi bir yaklaşım zamanla değişen ağırlıkları <span
+class="math inline">\(w_j(t)\)</span> türetmek için fark alma yöntemini
+kullanmak. Bu formülasyon 1 değerinin mükemmel bir bölünmesi anlamına
+geliyor ve tüm bloklardaki ağırlıkların herhangi bir <span
+class="math inline">\(t\)</span> zaman damgasında tam olarak 1.0’a
+toplanmasını sağlıyor.</p>
+<p>Bunu <span class="math inline">\(M\)</span> bloğu üzerinde yapmak
+için <span class="math inline">\(M-1\)</span> değişim noktasına (<span
+class="math inline">\(\tau_1\)</span>, <span
+class="math inline">\(\tau_2\)</span>, …, <span
+class="math inline">\(\tau_{M-1}\)</span>) ihtiyacımız olacak.</p>
+<p>Keyfi sayıda bloğu ele alırken tam 1’in bölünmesini (üstel uç nokta
+sızıntısı olmadan tam olarak 1.0’a toplanan) korumanın çok daha temiz
+bir yolu fark yöntemidir:</p>
+<ul>
+<li><p><span class="math inline">\(w_1(t) = 1 -
+\sigma_1(t)\)</span></p></li>
+<li><p><span class="math inline">\(w_j(t) = \sigma_{j-1}(t) -
+\sigma_j(t)\)</span>, <span class="math inline">\(j = 2, ...,
+M-1\)</span> için</p></li>
+<li><p><span class="math inline">\(w_M(t) =
+\sigma_{M-1}(t)\)</span></p></li>
+</ul>
+<p>Bunları topladığımızda mükemmel bir şekilde teleskopik olarak
+sadeleşirler: <span
+class="math inline">\((1-\sigma_1)+(\sigma_1-\sigma_2)+\cdots+\sigma_{M-1}
+= 1\)</span>.</p>
+<p>Ağırlık tahsislerini teleskopik bir çıkarma şeması aracılığıyla
+düzenleyerek, tüm <span class="math inline">\(M\)</span> blok için
+aktivasyon pencerelerini zaman çizelgesi boyunca ortaya koyuyoruz:</p>
+<ul>
+<li><p>Blok 1 Ağırlığı (<span class="math inline">\(w_1(t)\)</span>):
+Zaman serisinin en başında aktiftir ve zaman ilk değişim noktası <span
+class="math inline">\(\tau_1\)</span>’i geçtikçe yumuşak bir şekilde
+kapanır.</p></li>
+<li><p><span class="math inline">\(\tau_1\)</span>’den önce: <span
+class="math inline">\(\sigma_1(t) \approx 0 \Rightarrow w_1(t) \approx
+1\)</span> (Tam Aktif)</p></li>
+<li><p><span class="math inline">\(\tau_1\)</span>’den sonra: <span
+class="math inline">\(\sigma_1(t) \approx 1 \Rightarrow w_1(t) \approx
+0\)</span> (Aktif Değil)</p></li>
+<li><p>Ara Blok Ağırlıkları (<span
+class="math inline">\(w_j(t)\)</span>, <span class="math inline">\(j =
+2, ..., M-1\)</span> için): Bunlar iç “pencere” bloklarıdır. Bir ara
+blok <span class="math inline">\(j\)</span>, <span
+class="math inline">\(\tau_{j-1}\)</span> değişim noktasını geçtikten
+sonra aktive olur ve <span class="math inline">\(\tau_j\)</span> değişim
+noktasını geçtikten sonra deaktive olur:</p></li>
+</ul>
+<p><span class="math inline">\(w_j(t) = \sigma_{j-1}(t) -
+\sigma_j(t)\)</span></p>
+<ul>
+<li><p>Blok <span class="math inline">\(j\)</span>’ye girmeden önce
+(<span class="math inline">\(t &lt; \tau_{j-1}\)</span>): Her iki şalter
+de kapalıdır (<span class="math inline">\(\sigma_{j-1} \approx
+0\)</span>, <span class="math inline">\(\sigma_j \approx 0\)</span>)
+-&gt; <span class="math inline">\(w_j(t) \approx 0\)</span> (Aktif
+Değil)</p></li>
+<li><p>Blok <span class="math inline">\(j\)</span>’nin içinde (<span
+class="math inline">\(\tau_{j-1} &lt; t &lt; \tau_j\)</span>): Öncü
+şalter açılmıştır ancak takip eden şalter hâlâ kapalıdır (<span
+class="math inline">\(\sigma_{j-1} \approx 1\)</span>, <span
+class="math inline">\(\sigma_j \approx 0\)</span>) -&gt; <span
+class="math inline">\(w_j(t) \approx 1 - 0 = 1\)</span> (Tam
+Aktif)</p></li>
+<li><p>Blok <span class="math inline">\(j\)</span>’den çıktıktan sonra
+(<span class="math inline">\(t &gt; \tau_j\)</span>): Her iki şalter de
+tamamen açılmıştır (<span class="math inline">\(\sigma_{j-1} \approx
+1\)</span>, <span class="math inline">\(\sigma_j \approx 1\)</span>)
+-&gt; <span class="math inline">\(w_j(t) \approx 1 - 1 = 0\)</span>
+(Aktif Değil)</p></li>
+<li><p>Son Blok Ağırlığı (<span class="math inline">\(w_M(t)\)</span>):
+Zaman son değişim noktası <span
+class="math inline">\(\tau_{M-1}\)</span>’i geçtiğinde tetiklenir ve
+veri serisinin sonuna kadar aktif kalır:</p></li>
+</ul>
+<p><span class="math inline">\(w_M(t) = \sigma_{M-1}(t)\)</span></p>
+<ul>
+<li><p><span class="math inline">\(\tau_{M-1}\)</span>’den önce: <span
+class="math inline">\(\sigma_{M-1}(t) \approx 0 \Rightarrow w_M(t)
+\approx 0\)</span> (Aktif Değil)</p></li>
+<li><p><span class="math inline">\(\tau_{M-1}\)</span>’den sonra: <span
+class="math inline">\(\sigma_{M-1}(t) \approx 1 \Rightarrow w_M(t)
+\approx 1\)</span> (Tam Aktif)</p></li>
+</ul>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bayes_segmented </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>NUM_BLOCKS <span class="op">=</span> <span class="dv">3</span>  </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>NUM_TAUS <span class="op">=</span> NUM_BLOCKS <span class="op">-</span> <span class="dv">1</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../../compscieng/compscieng_app20cfit/cave.csv&#39;</span>)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[<span class="st">&#39;Temp&#39;</span>].values</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> df[<span class="st">&#39;C&#39;</span>].values</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(df)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Loaded </span><span class="sc">{</span>N<span class="sc">}</span><span class="ss"> data points from cave.csv.&quot;</span>)</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>trace_taus, trace_alphas, trace_betas, trace_sigmas <span class="op">=</span> bayes_segmented.metropolis_sampler(</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    X, Y, </span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>NUM_BLOCKS,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    iterations<span class="op">=</span><span class="dv">50000</span>, </span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    burn_in<span class="op">=</span><span class="dv">20000</span>, </span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    proposal_width_tau<span class="op">=</span><span class="fl">0.3</span>,    </span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    proposal_width_alpha<span class="op">=</span><span class="fl">0.15</span>,  </span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    proposal_width_beta<span class="op">=</span><span class="fl">0.01</span>,   </span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    proposal_width_sigma<span class="op">=</span><span class="fl">0.05</span>   </span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">--- INFERENCE RESULTS ---&quot;</span>)</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(NUM_TAUS):</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Estimated Tau </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> (Timeline Index): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_taus[:, i])<span class="sc">:.2f}</span><span class="ss"> ± </span><span class="sc">{</span>np<span class="sc">.</span>std(trace_taus[:, i])<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(NUM_BLOCKS):</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Block </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> -&gt; Alpha (Intercept): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_alphas[:, i])<span class="sc">:.3f}</span><span class="ss"> | Beta (Slope): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_betas[:, i])<span class="sc">:.3f}</span><span class="ss"> | Sigma (Noise): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_sigmas[:, i])<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">--- GOODNESS-OF-FIT METRICS ---&quot;</span>)</span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>est_taus <span class="op">=</span> np.mean(trace_taus, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>est_alphas <span class="op">=</span> np.mean(trace_alphas, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>est_betas <span class="op">=</span> np.mean(trace_betas, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>est_sigmas <span class="op">=</span> np.mean(trace_sigmas, axis<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>max_log_lik <span class="op">=</span> bayes_segmented.log_likelihood(est_taus, est_alphas, est_betas, est_sigmas, X, Y)</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>num_params <span class="op">=</span> (NUM_BLOCKS <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> NUM_BLOCKS <span class="op">+</span> NUM_BLOCKS <span class="op">+</span> NUM_BLOCKS</span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>aic <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> num_params <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> max_log_lik</span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>bic <span class="op">=</span> num_params <span class="op">*</span> np.log(N) <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> max_log_lik</span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Maximized Log-Likelihood: </span><span class="sc">{</span>max_log_lik<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Total Parameters (k):     </span><span class="sc">{</span>num_params<span class="sc">}</span><span class="ss">  (Expanded to 4M - 1 due to intercepts)&quot;</span>)</span>
-<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;AIC Score:                </span><span class="sc">{</span>aic<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;BIC Score:                </span><span class="sc">{</span>bic<span class="sc">:.2f}</span><span class="ss"> &lt;-- Best for identifying true block count&quot;</span>)</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tau_1 <span class="op">=</span> <span class="fl">10.0</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tau_2 <span class="op">=</span> <span class="fl">13.0</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    sig1 <span class="op">=</span> sigmoid(t, tau_1)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    sig2 <span class="op">=</span> sigmoid(t, tau_2)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    w2 <span class="op">=</span> sig1 <span class="op">-</span> sig2</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;</span><span class="sc">%d</span><span class="st">, </span><span class="sc">%0.4f</span><span class="st">&quot;</span> <span class="op">%</span> (t, w2))</span></code></pre></div>
+<pre class="text"><code>0, 0.0000
+1, 0.0000
+2, 0.0000
+3, 0.0000
+4, 0.0000
+5, 0.0000
+6, 0.0003
+7, 0.0025
+8, 0.0179
+9, 0.1189
+10, 0.4975
+11, 0.8628
+12, 0.8628
+13, 0.4975
+14, 0.1189
+15, 0.0179
+16, 0.0025
+17, 0.0003
+18, 0.0000
+19, 0.0000</code></pre>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bayes_segmented </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>NUM_BLOCKS <span class="op">=</span> <span class="dv">3</span>  </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>NUM_TAUS <span class="op">=</span> NUM_BLOCKS <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../../compscieng/compscieng_app20cfit/cave.csv&#39;</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df[<span class="st">&#39;Temp&#39;</span>].values</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> df[<span class="st">&#39;C&#39;</span>].values</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="bu">len</span>(df)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Loaded </span><span class="sc">{</span>N<span class="sc">}</span><span class="ss"> data points from cave.csv.&quot;</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>trace_taus, trace_alphas, trace_betas, trace_sigmas <span class="op">=</span> bayes_segmented.metropolis_sampler(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    X, Y, </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    num_blocks<span class="op">=</span>NUM_BLOCKS,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    iterations<span class="op">=</span><span class="dv">50000</span>, </span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    burn_in<span class="op">=</span><span class="dv">20000</span>, </span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    proposal_width_tau<span class="op">=</span><span class="fl">0.3</span>,    </span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    proposal_width_alpha<span class="op">=</span><span class="fl">0.15</span>,  </span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    proposal_width_beta<span class="op">=</span><span class="fl">0.01</span>,   </span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    proposal_width_sigma<span class="op">=</span><span class="fl">0.05</span>   </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">--- INFERENCE RESULTS ---&quot;</span>)</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(NUM_TAUS):</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Estimated Tau </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> (Timeline Index): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_taus[:, i])<span class="sc">:.2f}</span><span class="ss"> ± </span><span class="sc">{</span>np<span class="sc">.</span>std(trace_taus[:, i])<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(NUM_BLOCKS):</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Block </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> -&gt; Alpha (Intercept): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_alphas[:, i])<span class="sc">:.3f}</span><span class="ss"> | Beta (Slope): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_betas[:, i])<span class="sc">:.3f}</span><span class="ss"> | Sigma (Noise): </span><span class="sc">{</span>np<span class="sc">.</span>mean(trace_sigmas[:, i])<span class="sc">:.3f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">--- GOODNESS-OF-FIT METRICS ---&quot;</span>)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>est_taus <span class="op">=</span> np.mean(trace_taus, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>est_alphas <span class="op">=</span> np.mean(trace_alphas, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>est_betas <span class="op">=</span> np.mean(trace_betas, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>est_sigmas <span class="op">=</span> np.mean(trace_sigmas, axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>max_log_lik <span class="op">=</span> bayes_segmented.log_likelihood(est_taus, est_alphas, est_betas, est_sigmas, X, Y)</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>num_params <span class="op">=</span> (NUM_BLOCKS <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> NUM_BLOCKS <span class="op">+</span> NUM_BLOCKS <span class="op">+</span> NUM_BLOCKS</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>aic <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> num_params <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> max_log_lik</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>bic <span class="op">=</span> num_params <span class="op">*</span> np.log(N) <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> max_log_lik</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Maximized Log-Likelihood: </span><span class="sc">{</span>max_log_lik<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Total Parameters (k):     </span><span class="sc">{</span>num_params<span class="sc">}</span><span class="ss">  (Expanded to 4M - 1 due to intercepts)&quot;</span>)</span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;AIC Score:                </span><span class="sc">{</span>aic<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;BIC Score:                </span><span class="sc">{</span>bic<span class="sc">:.2f}</span><span class="ss"> &lt;-- Best for identifying true block count&quot;</span>)</span></code></pre></div>
 <pre class="text"><code>Loaded 90 data points from cave.csv.
 Running intercept-aware Metropolis sampler for 3 blocks...
 Post-Burn-in Acceptance Rate: 30.96%

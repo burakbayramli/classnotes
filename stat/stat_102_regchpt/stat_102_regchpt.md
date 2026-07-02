@@ -78,21 +78,17 @@ $$\mu_t = \alpha + \beta x_t$$
 - $\beta$, eğim katsayısıdır ve $X$'teki birim değişim başına $Y$'deki
   değişim oranını belirler.
 
-- $\mu_t$, o belirli veri noktası için elde edilen ders kitabı
-  tahminidir.
+- $\mu_t$, o belirli veri noktası için elde edilen tahmindir.
 
-Yani, $y_t \sim N(\mu_t, \sigma^2)$ yazdığımızda, çan eğrisinin
-merkezine kodlanmış her iki parametreyi de açıkça görmek için bunu
-tamamen açabilirsiniz:
+Yani, $y_t \sim N(\mu_t, \sigma^2)$ yazdığımızda şunu elde ederiz,
 
 $$y_t \sim N(\alpha + \beta x_t, \sigma^2)$$
 
 Bu, modelin, veri noktalarınız $y_t$'nin, taban yüksekliği $\alpha$
 tarafından kontrol edilen ve dikliği tamamen eğim parametresi $\beta$
 tarafından belirlenen düz bir çizgi etrafında rastgele sıçradığını
-varsaydığı anlamına gelir.
-
-Tek bir bağımsız gözlem $y_t$ için Olasılık Yoğunluk Fonksiyonu (PDF) şudur:
+varsaydığı anlamına gelir. Tek bir bağımsız gözlem $y_t$ için Olasılık
+Yoğunluk Fonksiyonu (PDF) şudur:
 
 $$P(y_t|x_t, \alpha, \beta, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}}
 \exp\left(-\frac{(y_t - \mu_t)^2}{2\sigma^2}\right)$$
@@ -392,14 +388,14 @@ algoritması bunu yapmanın en basit yollarından biridir.
 Döngünün içindeki mantık esasen $(\alpha, \beta, \sigma)$ değerlerinin
 üç boyutlu uzayında yönlendirilmiş, rastgele bir yürüyüştür:
 
-Her yinelemede, geçerli konumunuzdan küçük rastgele bir sıçrama
-önerirsiniz — `proposed_alpha = np.random.normal(current_alpha,
-proposal_width_alpha)` ve `beta` ile `sigma` için de benzer şekilde —
+Her yinelemede geçerli konumumuzdan küçük rastgele bir sıçrama
+öneriliyor, `proposed_alpha = np.random.normal(current_alpha,
+proposal_width_alpha)` ve `beta` ile `sigma` için de benzer şekilde,
 yani bir sonraki aday nokta, şu anda bulunduğunuz yerde merkezlenmiş
-bir Gauss'tan çekilir.
+bir Gaussian'dan örneklem alınır.
 
 Ardından `log_posterior`'ı hem geçerli noktada hem de önerilen noktada
-değerlendirir ve aralarındaki farkı hesaplarsınız:
+değerlendiliyor ve aralarındaki fark hesaplanıyor:
 `log_acceptance_ratio = log_post_proposed - log_post_current`. Bunlar
 log-sonsallar olduğundan, onları çıkarmak, (normalleştirilmemiş)
 sonsal yoğunlukların oranının logaritmasını almaya eşdeğerdir — bu,
@@ -459,7 +455,7 @@ geliyor.
 
 Eğer veriyi nerede olduklarını baştan bilmediğimiz noktalar arasında
 bölmek, ve bu her bölüm üzerinde regresyonun farklı bir kesi ve eğime
-sahip olmasına izin vermek istiyorsak o zaman formülasyonunu biraz
+sahip olmasına izin vermek istiyorsak o zaman formülasyonu biraz
 değiştirmek gerekecek. İdeal olarak hala tek bir sonsal fonksiyona,
 dağılıma ulaşmak istiyoruz. Gereken değişkenleri tanımlayalım,
 
@@ -553,8 +549,114 @@ var, bu şalterin açık olduğu anlamına gelir. Tam $\tau=2$ üzerinde 0.5
 görüyoruz, bu da istediğimiz bir şey, o noktada önceki blok ve sonraki
 blok aynı etkiye sahip. Değişim noktasını geçer geçmez sigmoid değer
 kaybına başlıyor, ne kadar $\tau=2$'in uzağına gidilirse o kadar
-sıfıra yaklaşılıyor, yani oralarda "şalter kapanıyor", bu bloğu tamsil
+sıfıra yaklaşılıyor, yani oralarda "şalter kapanıyor", bu bloğu temsil
 eden regresyon parçasının kuvveti azalıyor.
+
+Ağırlık Hesabının Genelleştirilmesi
+
+Yukarıdaki yaklaşım çarpımsal bir zincirleme sonuca / bozulmaya sebep
+olabilir ve ufak ta olsa mevcut bir analitik sızıntıya yol açar. Daha
+iyi bir yaklaşım zamanla değişen ağırlıkları $w_j(t)$ türetmek için
+fark alma yöntemini kullanmak. Bu formülasyon 1 değerinin mükemmel bir
+bölünmesi anlamına geliyor ve tüm bloklardaki ağırlıkların herhangi
+bir $t$ zaman damgasında tam olarak 1.0'a toplanmasını sağlıyor.
+
+Bunu $M$ bloğu üzerinde yapmak için $M-1$ değişim noktasına ($\tau_1$,
+$\tau_2$, ..., $\tau_{M-1}$) ihtiyacımız olacak.
+
+Keyfi sayıda bloğu ele alırken tam 1'in bölünmesini (üstel uç nokta
+sızıntısı olmadan tam olarak 1.0'a toplanan) korumanın çok daha temiz
+bir yolu fark yöntemidir:
+
+- $w_1(t) = 1 - \sigma_1(t)$
+
+- $w_j(t) = \sigma_{j-1}(t) - \sigma_j(t)$, $j = 2, ..., M-1$ için
+
+- $w_M(t) = \sigma_{M-1}(t)$
+
+Bunları topladığımızda mükemmel bir şekilde teleskopik olarak
+sadeleşirler: $(1-\sigma_1)+(\sigma_1-\sigma_2)+\cdots+\sigma_{M-1} =
+1$.
+
+Ağırlık tahsislerini teleskopik bir çıkarma şeması aracılığıyla
+düzenleyerek, tüm $M$ blok için aktivasyon pencerelerini zaman
+çizelgesi boyunca ortaya koyuyoruz:
+
+- Blok 1 Ağırlığı ($w_1(t)$): Zaman serisinin en başında aktiftir ve
+  zaman ilk değişim noktası $\tau_1$'i geçtikçe yumuşak bir şekilde
+  kapanır.
+
+- $\tau_1$'den önce: $\sigma_1(t) \approx 0 \Rightarrow w_1(t) \approx
+  1$ (Tam Aktif)
+
+- $\tau_1$'den sonra: $\sigma_1(t) \approx 1 \Rightarrow w_1(t)
+  \approx 0$ (Aktif Değil)
+
+- Ara Blok Ağırlıkları ($w_j(t)$, $j = 2, ..., M-1$ için): Bunlar iç
+  "pencere" bloklarıdır. Bir ara blok $j$, $\tau_{j-1}$ değişim
+  noktasını geçtikten sonra aktive olur ve $\tau_j$ değişim noktasını
+  geçtikten sonra deaktive olur:
+
+$w_j(t) = \sigma_{j-1}(t) - \sigma_j(t)$
+
+- Blok $j$'ye girmeden önce ($t < \tau_{j-1}$): Her iki şalter de
+  kapalıdır ($\sigma_{j-1} \approx 0$, $\sigma_j \approx 0$) -> $w_j(t)
+  \approx 0$ (Aktif Değil)
+
+- Blok $j$'nin içinde ($\tau_{j-1} < t < \tau_j$): Öncü şalter
+  açılmıştır ancak takip eden şalter hâlâ kapalıdır ($\sigma_{j-1}
+  \approx 1$, $\sigma_j \approx 0$) -> $w_j(t) \approx 1 - 0 = 1$ (Tam
+  Aktif)
+
+- Blok $j$'den çıktıktan sonra ($t > \tau_j$): Her iki şalter de
+  tamamen açılmıştır ($\sigma_{j-1} \approx 1$, $\sigma_j \approx 1$)
+  -> $w_j(t) \approx 1 - 1 = 0$ (Aktif Değil)
+
+- Son Blok Ağırlığı ($w_M(t)$): Zaman son değişim noktası
+  $\tau_{M-1}$'i geçtiğinde tetiklenir ve veri serisinin sonuna kadar
+  aktif kalır:
+
+$w_M(t) = \sigma_{M-1}(t)$
+
+- $\tau_{M-1}$'den önce: $\sigma_{M-1}(t) \approx 0 \Rightarrow w_M(t)
+  \approx 0$ (Aktif Değil)
+
+- $\tau_{M-1}$'den sonra: $\sigma_{M-1}(t) \approx 1 \Rightarrow
+  w_M(t) \approx 1$ (Tam Aktif)
+
+```python
+tau_1 = 10.0
+tau_2 = 13.0
+for t in range(20):
+    sig1 = sigmoid(t, tau_1)
+    sig2 = sigmoid(t, tau_2)
+    w2 = sig1 - sig2
+    print("%d, %0.4f" % (t, w2))
+
+```
+
+```text
+0, 0.0000
+1, 0.0000
+2, 0.0000
+3, 0.0000
+4, 0.0000
+5, 0.0000
+6, 0.0003
+7, 0.0025
+8, 0.0179
+9, 0.1189
+10, 0.4975
+11, 0.8628
+12, 0.8628
+13, 0.4975
+14, 0.1189
+15, 0.0179
+16, 0.0025
+17, 0.0003
+18, 0.0000
+19, 0.0000
+```
 
 
 ```python
