@@ -592,7 +592,7 @@ y_{t}\sim\mathcal{N}(\hat{\mu}_{t},\hat{\sigma}_{t}^{2})
 \]</span></p>
 <p>ki <span class="math inline">\(y_t\)</span> formülü ile (1) içindeki
 <span class="math inline">\(P(D | \tau, \alpha, \beta,
-\sigma^2)\)</span> degerini hesaplamis oluyoruz, cunku <span
+\sigma^2)\)</span> değerini hesaplamış oluyoruz, çünkü <span
 class="math inline">\(y_t\)</span> verinin olurluğunu temsil ediyor.</p>
 <p>Devam edelim üstte görülen ağırlıklar <span
 class="math inline">\(w_1,w_2,w_3\)</span> birleşik formülün belli
@@ -734,14 +734,19 @@ class="math inline">\(\sigma_{M-1}(t) \approx 0 \Rightarrow w_M(t)
 class="math inline">\(\sigma_{M-1}(t) \approx 1 \Rightarrow w_M(t)
 \approx 1\)</span> (Tam Aktif)</p></li>
 </ul>
+<p>Farklar üzerinden tanımlı ağırlıkların nasıl işlediğini bir örnekte
+görelim. İki tane ayraç yeri tanımladık, <span
+class="math inline">\(\tau_1 = 10\)</span>, <span
+class="math inline">\(\tau_2 = 13\)</span>, ve şimdi <span
+class="math inline">\(w_2\)</span> ağırlığının (ki 10 ile 13 arasında
+aktif olacak şekilde tanımlı) nasıl davrandığına bakalım.</p>
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tau_1 <span class="op">=</span> <span class="fl">10.0</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tau_2 <span class="op">=</span> <span class="fl">13.0</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    sig1 <span class="op">=</span> sigmoid(t, tau_1)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    sig2 <span class="op">=</span> sigmoid(t, tau_2)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    w2 <span class="op">=</span> sig1 <span class="op">-</span> sig2</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;</span><span class="sc">%d</span><span class="st">, </span><span class="sc">%0.4f</span><span class="st">&quot;</span> <span class="op">%</span> (t, w2))</span></code></pre></div>
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tau_1 <span class="op">=</span> <span class="fl">10.0</span><span class="op">;</span> tau_2 <span class="op">=</span> <span class="fl">13.0</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">20</span>):</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    sig1 <span class="op">=</span> sigmoid(t, tau_1)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    sig2 <span class="op">=</span> sigmoid(t, tau_2)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    w2 <span class="op">=</span> sig1 <span class="op">-</span> sig2</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;</span><span class="sc">%d</span><span class="st">, </span><span class="sc">%0.4f</span><span class="st">&quot;</span> <span class="op">%</span> (t, w2))</span></code></pre></div>
 <pre class="text"><code>0, 0.0000
 1, 0.0000
 2, 0.0000
@@ -762,6 +767,8 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 17, 0.0003
 18, 0.0000
 19, 0.0000</code></pre>
+<p>Artık parçalı Bayes usulü regresyonumuzu kodlayabiliriz. Kodlar
+<code>bayes_segmented.py</code> içinde bulunabilir.</p>
 <div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> bayes_segmented </span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -805,9 +812,9 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>bic <span class="op">=</span> num_params <span class="op">*</span> np.log(N) <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> max_log_lik</span>
 <span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Maximized Log-Likelihood: </span><span class="sc">{</span>max_log_lik<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Total Parameters (k):     </span><span class="sc">{</span>num_params<span class="sc">}</span><span class="ss">  (Expanded to 4M - 1 due to intercepts)&quot;</span>)</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Total Parameters (k):     </span><span class="sc">{</span>num_params<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
 <span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;AIC Score:                </span><span class="sc">{</span>aic<span class="sc">:.2f}</span><span class="ss">&quot;</span>)</span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;BIC Score:                </span><span class="sc">{</span>bic<span class="sc">:.2f}</span><span class="ss"> &lt;-- Best for identifying true block count&quot;</span>)</span></code></pre></div>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;BIC Score:                </span><span class="sc">{</span>bic<span class="sc">:.2f}</span><span class="ss"> &quot;</span>)</span></code></pre></div>
 <pre class="text"><code>Loaded 90 data points from cave.csv.
 Running intercept-aware Metropolis sampler for 3 blocks...
 Post-Burn-in Acceptance Rate: 30.96%
@@ -822,9 +829,15 @@ Block 3 -&gt; Alpha (Intercept): 79.923 | Beta (Slope): -0.808 | Sigma (Noise): 
 
 --- GOODNESS-OF-FIT METRICS ---
 Maximized Log-Likelihood: -185.67
-Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
+Total Parameters (k):     11  
 AIC Score:                393.33
-BIC Score:                420.83 &lt;-- Best for identifying true block count</code></pre>
+BIC Score:                420.83</code></pre>
+<p>Rapor edilen sonuçlar kabaca doğru gibi gözüküyor. Üç tane eğim
+değeri elde ettik, bunlardan ilkinin pozitif, ikincisinin negatif (ama
+fazla değil), ve üçüncüsünün çok daha negatif değerli olmasını
+bekliyorduk, sonuçlar da öyle oldu. Şimdi bu kesi ve eğim değerlerini
+alıp ham veri üzerinde grafiklersek nihai görsel doğrulamayı elde etmiş
+olacağız.</p>
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(fcave)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> np.array([<span class="fl">33.007</span>, <span class="fl">47.769</span>, <span class="fl">79.923</span>])</span>
@@ -839,11 +852,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a h
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    np.linspace(bp2, max_temp, <span class="dv">100</span>),  <span class="co"># Block 3</span></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>]</span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(df.Temp, df.C, s<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span><span class="st">&quot;gray&quot;</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&quot;Data&quot;</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>plt.scatter(df.Temp, df.C, s<span class="op">=</span><span class="dv">3</span>, color<span class="op">=</span><span class="st">&quot;blue&quot;</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&quot;Data&quot;</span>)</span>
 <span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    y_vals <span class="op">=</span> alphas[i] <span class="op">+</span> betas[i] <span class="op">*</span> x_ranges[i]</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    plt.plot(x_ranges[i],y_vals,label<span class="op">=</span><span class="ss">f&quot;Block </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">&quot;</span>,linewidth<span class="op">=</span><span class="fl">2.5</span>,color<span class="op">=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    plt.plot(x_ranges[i],y_vals,label<span class="op">=</span><span class="ss">f&quot;Block </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">&quot;</span>,linewidth<span class="op">=</span><span class="fl">2.5</span>)</span>
 <span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">&quot;Temperature&quot;</span>)</span>
 <span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">&quot;C&quot;</span>)</span>

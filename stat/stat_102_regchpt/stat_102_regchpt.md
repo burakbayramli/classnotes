@@ -507,7 +507,7 @@ y_{t}\sim\mathcal{N}(\hat{\mu}_{t},\hat{\sigma}_{t}^{2})
 $$
 
 ki $y_t$ formülü ile (1) içindeki $P(D | \tau, \alpha, \beta,
-\sigma^2)$ degerini hesaplamis oluyoruz, cunku $y_t$ verinin
+\sigma^2)$ değerini hesaplamış oluyoruz, çünkü $y_t$ verinin
 olurluğunu temsil ediyor.
 
 Devam edelim üstte görülen ağırlıklar $w_1,w_2,w_3$ birleşik formülün
@@ -638,9 +638,13 @@ $w_M(t) = \sigma_{M-1}(t)$
 - $\tau_{M-1}$'den sonra: $\sigma_{M-1}(t) \approx 1 \Rightarrow
   w_M(t) \approx 1$ (Tam Aktif)
 
+Farklar üzerinden tanımlı ağırlıkların nasıl işlediğini bir örnekte
+görelim.  İki tane ayraç yeri tanımladık, $\tau_1 = 10$, $\tau_2 =
+13$, ve şimdi $w_2$ ağırlığının (ki 10 ile 13 arasında aktif olacak
+şekilde tanımlı) nasıl davrandığına bakalım.
+
 ```python
-tau_1 = 10.0
-tau_2 = 13.0
+tau_1 = 10.0; tau_2 = 13.0
 for t in range(20):
     sig1 = sigmoid(t, tau_1)
     sig2 = sigmoid(t, tau_2)
@@ -671,6 +675,9 @@ for t in range(20):
 18, 0.0000
 19, 0.0000
 ```
+
+Artık parçalı Bayes usulü regresyonumuzu kodlayabiliriz. Kodlar
+`bayes_segmented.py` içinde bulunabilir.
 
 
 ```python
@@ -716,9 +723,9 @@ aic = 2 * num_params - 2 * max_log_lik
 bic = num_params * np.log(N) - 2 * max_log_lik
 
 print(f"Maximized Log-Likelihood: {max_log_lik:.2f}")
-print(f"Total Parameters (k):     {num_params}  (Expanded to 4M - 1 due to intercepts)")
+print(f"Total Parameters (k):     {num_params} ")
 print(f"AIC Score:                {aic:.2f}")
-print(f"BIC Score:                {bic:.2f} <-- Best for identifying true block count")
+print(f"BIC Score:                {bic:.2f} ")
 ```
 
 ```text
@@ -736,10 +743,16 @@ Block 3 -> Alpha (Intercept): 79.923 | Beta (Slope): -0.808 | Sigma (Noise): 1.8
 
 --- GOODNESS-OF-FIT METRICS ---
 Maximized Log-Likelihood: -185.67
-Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
+Total Parameters (k):     11  
 AIC Score:                393.33
-BIC Score:                420.83 <-- Best for identifying true block count
+BIC Score:                420.83
 ```
+
+Rapor edilen sonuçlar kabaca doğru gibi gözüküyor. Üç tane eğim değeri
+elde ettik, bunlardan ilkinin pozitif, ikincisinin negatif (ama fazla
+değil), ve üçüncüsünün çok daha negatif değerli olmasını bekliyorduk,
+sonuçlar da öyle oldu. Şimdi bu kesi ve eğim değerlerini alıp ham veri
+üzerinde grafiklersek nihai görsel doğrulamayı elde etmiş olacağız.
 
 ```python
 df = pd.read_csv(fcave)
@@ -755,11 +768,11 @@ x_ranges = [
     np.linspace(bp2, max_temp, 100),  # Block 3
 ]
 
-plt.scatter(df.Temp, df.C, s=3, color="gray", alpha=0.5, label="Data")
+plt.scatter(df.Temp, df.C, s=3, color="blue", alpha=0.5, label="Data")
 
 for i in range(3):
     y_vals = alphas[i] + betas[i] * x_ranges[i]
-    plt.plot(x_ranges[i],y_vals,label=f"Block {i+1}",linewidth=2.5,color='blue')
+    plt.plot(x_ranges[i],y_vals,label=f"Block {i+1}",linewidth=2.5)
 
 plt.xlabel("Temperature")
 plt.ylabel("C")
