@@ -517,12 +517,13 @@ $$
 j=1,2,...,M-1
 $$
 
-Bu formüllere göre $\sum_{j=1}^{M}w_{j}(t) \approx 1$ olduğu
-görülebilir (yaklaşık dedik çünkü bazı şartlarda 1'e toplanamayabilir,
-ileride daha sağlam, tam bire toplanan bir alternatif te göreceğiz).
+$\sum_{j=1}^{M}w_{j}(t) \approx 1$ olduğu da görülebilir (yaklaşık
+dedik çünkü bazı şartlarda 1'e toplanamayabilir, ileride daha sağlam,
+tam bire toplanan bir alternatif te göreceğiz).
 
-Acip kapama isini yapan anahtar gibi is goren fonksiyon icin sigmoid
-secildi. Bu fonksiyonun nasil davrandigina bazi orneklerle bakalim.
+Açıp kapama işini yapan bir nevi şalter gibi iş gören fonksiyon için
+sigmoid seçildi. Bu fonksiyonun nasıl davrandığını görmek için bazı
+örneklerle bakalım.
 
 
 ```python
@@ -548,11 +549,11 @@ print(1 - sigmoid(t=6, tau=2))
 üstünde, sonrasında 1 - sigmoid'in nasıl davrandığı görülüyor, ki
 regresyona vermeden önce çarpım için kullanılan ağırlıklar o sigmoid
 hesabını kullandı. Sonuçlar diyor ki $\tau=2$ öncesi büyük bir değer
-var, bu anahtarın açık olduğu anlamına gelir. Tam $\tau=2$ üzerinde
-0.5 görüyoruz, bu da istediğimiz bir şey, o noktada önceki blok ve
-sonraki blok aynı etkiye sahip. Değişim noktasını geçer geçmez sigmoid
-değer kaybına başlıyor, ne kadar $\tau=2$'in uzağına gidilirse o kadar
-sıfıra yaklaşılıyor, yani oralarda "anahtar kapanıyor", u bloğu tamsil
+var, bu şalterin açık olduğu anlamına gelir. Tam $\tau=2$ üzerinde 0.5
+görüyoruz, bu da istediğimiz bir şey, o noktada önceki blok ve sonraki
+blok aynı etkiye sahip. Değişim noktasını geçer geçmez sigmoid değer
+kaybına başlıyor, ne kadar $\tau=2$'in uzağına gidilirse o kadar
+sıfıra yaklaşılıyor, yani oralarda "şalter kapanıyor", bu bloğu tamsil
 eden regresyon parçasının kuvveti azalıyor.
 
 
