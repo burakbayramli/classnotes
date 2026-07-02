@@ -94,15 +94,14 @@ araçtır. Diyelim ki sonsal (posterior) dağılımdan örneklem
 biliyoruz.
 
 Kabul oranını yazarken bu çarpımı kullanırız. Eğer bulmaya
-uğraştığımız yaptığımız bir katsayının (örneğin bir eğimin) muhakkak
-belli bir aralıkta kalmasını istiyorsak bunu onsel dağılıma birörnek
-(uniform) bir sınır koyarak çözebiliriz. Aday adım bu sınırların
-dışına çıktığı an önsel değeri $0$ (log uzayında $-\infty$)
-döndürebilir, bu da $\alpha$ kabul oranını anında sıfırlayarak
-zincirin o yasaklı bölgeye basmasını engeller. Algoritma içerisinde
-olasılıkların çarpımı yerine sayısal taşmaları önlemek için logarıtmık
-toplamlar ($\ln(\text{Likelihood}) + \ln(\text{Prior})$)
-kullanılabilir.
+uğraştığımız bir katsayının muhakkak belli bir aralıkta kalmasını
+istiyorsak bunu onsel dağılıma birörnek (uniform) bir sınır koyarak
+çözebiliriz. Aday adım bu sınırların dışına çıktığı an önsel değeri
+$0$ (log uzayında $-\infty$) döndürebilir, bu da $\alpha$ kabul
+oranını anında sıfırlayarak zincirin o yasaklı bölgeye basmasını
+engeller. Algoritma içerisinde olasılıkların çarpımı yerine sayısal
+taşmaları önlemek için logarıtmik toplamlar ($\ln(\text{Likelihood}) +
+\ln(\text{Prior})$) kullanılabilir.
 
 Basit Bir Örnek: Standart Gaussian Dağılımından Örnekleme
 
@@ -152,22 +151,23 @@ plt.savefig('stat_097_mcmc_04.jpg')
 
 ![](stat_097_mcmc_04.jpg)
 
-
-Aynı zamanda önsel ve olurluk fonksiyonlarının kendi içlerinde de
-olasılık dağılımı olmalarından kaynaklanan normalleştirme sabitleri
-(örneğin Gaussian formülünün başındaki $\frac{1}{\sigma\sqrt{2\pi}}$
-gibi ifadeler) bulunur. Bu sabitleri $c_{\text{olurluk}}$ ve
-$c_{\text{önsel}}$ olarak ayırırsak fonksiyonları ham halleriyle
-yazabiliriz:
+Biraz önce önsel dağılımlarda sınır tanımlamaktan bahsettik, bunu
+sıfır log uzayda sonsuz değer döndürerek yapabiliyoruz. Fakat bu durum
+1'e entegre olması gereken dağılımlar bağlamında problem çıkarmıyor
+mu? Olmuyor, nedeninden bahsedelim. Önsel ve olurluk fonksiyonlarının
+kendi içlerinde de olasılık dağılımı olmalarından kaynaklanan
+normalleştirme sabitleri (örneğin Gaussian formülünün başındaki
+$\frac{1}{\sigma\sqrt{2\pi}}$ gibi ifadeler) var. Bu sabitleri
+$c_{\text{olurluk}}$ ve $c_{\text{önsel}}$ olarak ayıralım
+ve fonksiyonları ham halleriyle yazalım:
 
 * $P(D | \theta) = c_{\text{olurluk}} \times P^*(D | \theta)$
 
 * $P(\theta) = c_{\text{önsel}} \times P^*(\theta)$
 
-Şimdi bu ifadeleri eksiksiz bir şekilde Metropolis kabul oranına
-($\alpha$) yerleştirelim ve mevcut bir $\theta_{\text{mevcut}}$
-konumundan önerilen bir $\theta_{\text{aday}}$ konumuna geçiş cebirini
-inceleyelim:
+Şimdi bu ifadeleri Metropolis kabul oranına ($\alpha$) yerleştirelim
+ve mevcut bir $\theta_{\text{mevcut}}$ konumundan önerilen bir
+$\theta_{\text{aday}}$ konumuna geçiş cebirini inceleyelim:
 
 $$\alpha = \min\left(1,
 \frac{\pi(\theta_{\text{aday}})}{\pi(\theta_{\text{mevcut}})}\right) =
@@ -206,10 +206,10 @@ Yani MCMC simülasyonu yaparken ne $P(D)$ paydasını entegre etmek
 zorundayız ne de önsel dağılımın alanının 1'e eşit olmasını sağlayan o
 karmaşık katsayıları hesaplamak zorundayız. Algoritma sadece o an
 tırmandığı tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod
-yazarken önsel dağılımın sadece "şeklini" (kernel) korumamız
-matematiksel olarak tamamen geçerlidir.
+yazarken önsel dağılımın sadece "şeklini" korumamız matematiksel
+olarak tamamen geçerlidir.
 
-MH Yakınsaklığının Kanıtır
+MH Yakınsaklığının Kanıtı
 
 Bu görev için durağanlık, indirgenemezlik ve aperiyodikliğin
 kanıtlanması gerekir.

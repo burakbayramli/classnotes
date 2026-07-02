@@ -190,16 +190,16 @@ Bayes kuralı gereği <span class="math inline">\(\text{Sonsal} \propto
 \text{Olabilirlik (Likelihood)} \times \text{Önsel (Prior)}\)</span>
 olduğunu biliyoruz.</p>
 <p>Kabul oranını yazarken bu çarpımı kullanırız. Eğer bulmaya
-uğraştığımız yaptığımız bir katsayının (örneğin bir eğimin) muhakkak
-belli bir aralıkta kalmasını istiyorsak bunu onsel dağılıma birörnek
-(uniform) bir sınır koyarak çözebiliriz. Aday adım bu sınırların dışına
-çıktığı an önsel değeri <span class="math inline">\(0\)</span> (log
-uzayında <span class="math inline">\(-\infty\)</span>) döndürebilir, bu
-da <span class="math inline">\(\alpha\)</span> kabul oranını anında
-sıfırlayarak zincirin o yasaklı bölgeye basmasını engeller. Algoritma
-içerisinde olasılıkların çarpımı yerine sayısal taşmaları önlemek için
-logarıtmık toplamlar (<span class="math inline">\(\ln(\text{Likelihood})
-+ \ln(\text{Prior})\)</span>) kullanılabilir.</p>
+uğraştığımız bir katsayının muhakkak belli bir aralıkta kalmasını
+istiyorsak bunu onsel dağılıma birörnek (uniform) bir sınır koyarak
+çözebiliriz. Aday adım bu sınırların dışına çıktığı an önsel değeri
+<span class="math inline">\(0\)</span> (log uzayında <span
+class="math inline">\(-\infty\)</span>) döndürebilir, bu da <span
+class="math inline">\(\alpha\)</span> kabul oranını anında sıfırlayarak
+zincirin o yasaklı bölgeye basmasını engeller. Algoritma içerisinde
+olasılıkların çarpımı yerine sayısal taşmaları önlemek için logarıtmik
+toplamlar (<span class="math inline">\(\ln(\text{Likelihood}) +
+\ln(\text{Prior})\)</span>) kullanılabilir.</p>
 <p>Basit Bir Örnek: Standart Gaussian Dağılımından Örnekleme</p>
 <p>Metropolis mantığını görmek için hedefimizin sadece standart bir
 normal dağılım (<span class="math inline">\(\mu=0, \sigma=1\)</span>)
@@ -243,26 +243,28 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_097_mcmc_04.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_097_mcmc_04.jpg" /></p>
-<p>Aynı zamanda önsel ve olurluk fonksiyonlarının kendi içlerinde de
-olasılık dağılımı olmalarından kaynaklanan normalleştirme sabitleri
-(örneğin Gaussian formülünün başındaki <span
+<p>Biraz önce önsel dağılımlarda sınır tanımlamaktan bahsettik, bunu
+sıfır log uzayda sonsuz değer döndürerek yapabiliyoruz. Fakat bu durum
+1’e entegre olması gereken dağılımlar bağlamında problem çıkarmıyor mu?
+Olmuyor, nedeninden bahsedelim. Önsel ve olurluk fonksiyonlarının kendi
+içlerinde de olasılık dağılımı olmalarından kaynaklanan normalleştirme
+sabitleri (örneğin Gaussian formülünün başındaki <span
 class="math inline">\(\frac{1}{\sigma\sqrt{2\pi}}\)</span> gibi
-ifadeler) bulunur. Bu sabitleri <span
+ifadeler) var. Bu sabitleri <span
 class="math inline">\(c_{\text{olurluk}}\)</span> ve <span
-class="math inline">\(c_{\text{önsel}}\)</span> olarak ayırırsak
-fonksiyonları ham halleriyle yazabiliriz:</p>
+class="math inline">\(c_{\text{önsel}}\)</span> olarak ayıralım ve
+fonksiyonları ham halleriyle yazalım:</p>
 <ul>
 <li><p><span class="math inline">\(P(D | \theta) = c_{\text{olurluk}}
 \times P^*(D | \theta)\)</span></p></li>
 <li><p><span class="math inline">\(P(\theta) = c_{\text{önsel}} \times
 P^*(\theta)\)</span></p></li>
 </ul>
-<p>Şimdi bu ifadeleri eksiksiz bir şekilde Metropolis kabul oranına
-(<span class="math inline">\(\alpha\)</span>) yerleştirelim ve mevcut
-bir <span class="math inline">\(\theta_{\text{mevcut}}\)</span>
-konumundan önerilen bir <span
-class="math inline">\(\theta_{\text{aday}}\)</span> konumuna geçiş
-cebirini inceleyelim:</p>
+<p>Şimdi bu ifadeleri Metropolis kabul oranına (<span
+class="math inline">\(\alpha\)</span>) yerleştirelim ve mevcut bir <span
+class="math inline">\(\theta_{\text{mevcut}}\)</span> konumundan
+önerilen bir <span class="math inline">\(\theta_{\text{aday}}\)</span>
+konumuna geçiş cebirini inceleyelim:</p>
 <p><span class="math display">\[\alpha = \min\left(1,
 \frac{\pi(\theta_{\text{aday}})}{\pi(\theta_{\text{mevcut}})}\right) =
 \min\left(1, \frac{\frac{P(D | \theta_{\text{aday}})
@@ -299,9 +301,9 @@ class="math inline">\(P(D)\)</span> paydasını entegre etmek zorundayız
 ne de önsel dağılımın alanının 1’e eşit olmasını sağlayan o karmaşık
 katsayıları hesaplamak zorundayız. Algoritma sadece o an tırmandığı
 tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod yazarken
-önsel dağılımın sadece “şeklini” (kernel) korumamız matematiksel olarak
-tamamen geçerlidir.</p>
-<p>MH Yakınsaklığının Kanıtır</p>
+önsel dağılımın sadece “şeklini” korumamız matematiksel olarak tamamen
+geçerlidir.</p>
+<p>MH Yakınsaklığının Kanıtı</p>
 <p>Bu görev için durağanlık, indirgenemezlik ve aperiyodikliğin
 kanıtlanması gerekir.</p>
 <p>Durağanlık için geçişlerin Markov özelliğine sahip olması gerekir;
