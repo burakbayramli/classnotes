@@ -5,7 +5,8 @@ veriye bir çizgi uydurma problemi olarak yaklaşacağız.
 
 ```python
 import pandas as pd
-df = pd.read_csv('../../compscieng/compscieng_app20cfit/cave.csv')
+fcave = '../../compscieng/compscieng_app20cfit/cave.csv'
+df = pd.read_csv(fcave)
 plt.figure(figsize=(5, 3))
 plt.scatter(df.Temp, df.C,s=3)
 plt.grid(True)
@@ -201,7 +202,12 @@ $$\ln P(\alpha, \beta, \sigma|D) \propto \ln P(D|\alpha, \beta, \sigma) + \ln P(
 
 Bölüm 2'deki ortak log-olurluk türetmemizi yerine koyarak, genişletilmiş amaç fonksiyonu şu hale gelir:
 
-$$\ln P(\alpha, \beta, \sigma|D) \propto \sum_{t=1}^{N}\left[-\frac{1}{2}\ln(2\pi) - \ln(\sigma) - \frac{1}{2\sigma^2}(y_t - (\alpha + \beta x_t))^2\right] + \ln P(\alpha) + \ln P(\beta) + \ln P(\sigma)$$
+$$
+\ln P(\alpha, \beta, \sigma|D) \propto
+\sum_{t=1}^{N}\left[-\frac{1}{2}\ln(2\pi) - \ln(\sigma) -
+\frac{1}{2\sigma^2}(y_t - (\alpha + \beta x_t))^2\right] + \ln
+P(\alpha) + \ln P(\beta) + \ln P(\sigma)
+$$
 
 Üstteki yaklaşımın kodları `bayes_ols.py` içinde bulunabilir.
 
@@ -472,7 +478,11 @@ Veri $D=\{(x_{t},y_{t})\}_{t=1}^{N}$.
 
 Bayes formülasyonu artık şöyle,
 
-$$P(\tau, \alpha, \beta, \sigma^2 | D) \propto P(D | \tau, \alpha, \beta, \sigma^2) P(\tau) P(\alpha) P(\beta) P(\sigma^2) \quad \text{}$$
+$$
+P(\tau, \alpha, \beta, \sigma^2 | D) \propto P(D | \tau, \alpha,
+\beta, \sigma^2) P(\tau) P(\alpha) P(\beta) P(\sigma^2)
+\tag{1}
+$$
 
 Eğer elimizde üç blok olsaydı, o zaman iki değişim noktası $\tau_1$,
 $\tau_2$ üzerinden $\hat{\mu}_t$, ve $\hat{\sigma}_t$ şöyle
@@ -496,9 +506,13 @@ $$
 y_{t}\sim\mathcal{N}(\hat{\mu}_{t},\hat{\sigma}_{t}^{2}) 
 $$
 
-Formülde görülen ağırlıklar $w_1,w_2,w_3$ birleşik formülün belli
-bölgelerinin açılıp / kapatılmasını sağlayan bir numara içeriyor,
-çünkü o ağırlıkları şöyle tanımlıyoruz,
+ki $y_t$ formülü ile (1) içindeki $P(D | \tau, \alpha, \beta,
+\sigma^2)$ degerini hesaplamis oluyoruz, cunku $y_t$ verinin
+olurluğunu temsil ediyor.
+
+Devam edelim üstte görülen ağırlıklar $w_1,w_2,w_3$ birleşik formülün
+belli bölgelerinin açılıp / kapatılmasını sağlayan bir numara
+içeriyor, çünkü o ağırlıkları şöyle tanımlıyoruz,
 
 * $w_{1}(t)=1-\sigma(t,\tau_{1},k)$ 
 
@@ -666,12 +680,10 @@ NUM_BLOCKS = 3
 NUM_TAUS = NUM_BLOCKS - 1
 np.random.seed(42)
 
-df = pd.read_csv('../../compscieng/compscieng_app20cfit/cave.csv')
+df = pd.read_csv(fcave)
 X = df['Temp'].values
 Y = df['C'].values
 N = len(df)
-
-print(f"Loaded {N} data points from cave.csv.")
 
 trace_taus, trace_alphas, trace_betas, trace_sigmas = bayes_segmented.metropolis_sampler(
     X, Y, 
@@ -728,6 +740,36 @@ Total Parameters (k):     11  (Expanded to 4M - 1 due to intercepts)
 AIC Score:                393.33
 BIC Score:                420.83 <-- Best for identifying true block count
 ```
+
+```python
+df = pd.read_csv(fcave)
+alphas = np.array([33.007, 47.769, 79.923])
+betas = np.array([0.246, -0.246, -0.808])
+bp1 = (alphas[1] - alphas[0]) / (betas[0] - betas[1])
+bp2 = (alphas[2] - alphas[1]) / (betas[1] - betas[2])
+min_temp = df.Temp.min()
+max_temp = df.Temp.max()
+x_ranges = [
+    np.linspace(min_temp, bp1, 100),  # Block 1
+    np.linspace(bp1, bp2, 100),  # Block 2
+    np.linspace(bp2, max_temp, 100),  # Block 3
+]
+
+plt.scatter(df.Temp, df.C, s=3, color="gray", alpha=0.5, label="Data")
+
+for i in range(3):
+    y_vals = alphas[i] + betas[i] * x_ranges[i]
+    plt.plot(x_ranges[i],y_vals,label=f"Block {i+1}",linewidth=2.5,color='blue')
+
+plt.xlabel("Temperature")
+plt.ylabel("C")
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.savefig('stat_102_regchpt_02.jpg')
+```
+
+![](stat_102_regchpt_02.jpg)
+
 
 ### Uygulama: Korelasyon Analizi
 
