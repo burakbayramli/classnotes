@@ -45,7 +45,171 @@ tamamında nasıl davranıyor?). Bu uçurumu kapatmak tam olarak MCMC'nin
 yaptığı şeydir: yalnızca yerel değerlendirmeleri kullanarak uzayı
 keşfeden bir Markov zinciri inşa eder.
 
-MH Yakınsaklığının Kanıtı
+Metropolis Yöntemi: Temel Mantık
+
+Metropolis algoritması, karmaşık bir $\pi(x)$ hedef dağılımından
+doğrudan örneklem çekemediğimizde imdadımıza yetişir. Yöntemin kalbi
+şu 3 adımdan oluşan döngüye dayanır:
+
+1. Aday Önerisi (Proposal): Mevcut konumumuz $x$ iken, kolayca
+örnekleyebileceğimiz simetrik bir $q(y|x)$ dağılımından (örneğin
+mevcut konuma Gaussian gürültüsü ekleyerek: $y = x + \mathcal{N}(0,
+\sigma^2)$) yeni bir $y$ adayı öneririz.
+
+2. Kabul Oranı (Acceptance Ratio) Hesaplama: Önerilen noktanın mevcut
+noktaya göre ne kadar "iyi" olduğunu anlamak için hedef yoğunlukların
+oranına bakarız:
+
+$$\alpha(x,y) = \min\left(1, \frac{\pi(y)}{\pi(x)}\right)$$
+
+3. Zar Atma (Kabul/Ret): $[0, 1]$ aralığından rastgele bir $u$ sayısı
+çekeriz. Eğer $u < \alpha$ ise öneriyi kabul edip $y$ konumuna
+geçeriz; aksi takdirde teklifi reddeder ve mevcut $x$ konumumuzda
+kalıp bu konumu tekrar sayarız.
+
+En Büyük Numara: Normalleştirme Sabitinden Kurtulmak. Bayes usulü
+analizde veya karmaşık fizik modellerinde hedef dağılımımız genellikle
+$\pi(x) = \frac{\pi^*(x)}{Z}$ biçimindedir. Burada $\pi^*(x)$
+formülünü kolayca hesaplayabildiğimiz ham fonksiyon, $Z$ ise
+hesaplaması imkansız olan normalleştirme sabitidir (entegral veya
+payda).
+
+Metropolis yönteminin asıl dehası kabul oranında gizlidir. Orana
+koyduğumuzda $Z$ sabiti tamamen sadeleşir:
+
+$$
+\alpha(x,y) = \min\left(1, \frac{\pi^*(y) / Z}{\pi^*(x) / Z}\right)
+= \min\left(1, \frac{\pi^*(y)}{\pi^*(x)}\right)
+$$
+
+Yani dağılımın uzayda toplamda 1'e entegre olup olmaması MCMC'nin
+umurunda değildir; algoritma sadece o an tırmandığı tepelerin
+birbirine oranına (eğimine) bakar.
+
+Önsel (Prior) Seçimiyle Sınırları Yönetmek. Aynı sadeleşme mantığı
+Bayes modellerinde parametrelere sınır koymak için de mükemmel bir
+araçtır. Diyelim ki sonsal (posterior) dağılımdan örneklem
+çekiyoruz. Bayes kuralı gereği $\text{Sonsal} \propto
+\text{Olabilirlik (Likelihood)} \times \text{Önsel (Prior)}$ olduğunu
+biliyoruz.
+
+Kabul oranını yazarken bu çarpımı kullanırız. Eğer bulmaya
+uğraştığımız yaptığımız bir katsayının (örneğin bir eğimin) muhakkak
+belli bir aralıkta kalmasını istiyorsak bunu onsel dağılıma birörnek
+(uniform) bir sınır koyarak çözebiliriz. Aday adım bu sınırların
+dışına çıktığı an önsel değeri $0$ (log uzayında $-\infty$)
+döndürebilir, bu da $\alpha$ kabul oranını anında sıfırlayarak
+zincirin o yasaklı bölgeye basmasını engeller. Algoritma içerisinde
+olasılıkların çarpımı yerine sayısal taşmaları önlemek için logarıtmık
+toplamlar ($\ln(\text{Likelihood}) + \ln(\text{Prior})$)
+kullanılabilir.
+
+Basit Bir Örnek: Standart Gaussian Dağılımından Örnekleme
+
+Metropolis mantığını görmek için hedefimizin sadece standart bir
+normal dağılım ($\mu=0, \sigma=1$) olduğu en basit senaryoyu
+kodlayalım:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Hedef Dağılım (Normalleştirme sabiti olmadan sadece şekli yeterli!)
+def hedef_pi(x):
+    return np.exp(-0.5 * x**2)
+
+# Parametreler
+N = 10000
+adim_genisligi = 0.5
+zincir = np.zeros(N)
+zincir[0] = 5.0 # Kötü bir başlangıç noktası seçelim (Dağılımın çok uzağı)
+
+# Metropolis Döngüsü
+for i in range(N-1):
+    mevcut = zincir[i]
+    
+    # Adım 1: Rastgele bir aday öner (Simetrik Gaussian Rastgele Yürüyüş)
+    aday = mevcut + np.random.normal(0, adim_genisligi)
+    
+    # Adım 2: Kabul oranını hesapla (Z'ler zaten yok, pi'ler oranlanıyor)
+    alpha = min(1, hedef_pi(aday) / hedef_pi(mevcut))
+    
+    # Adım 3: Kabul / Ret mekanizması
+    if np.random.uniform(0, 1) < alpha:
+        zincir[i+1] = aday
+    else:
+        zincir[i+1] = mevcut
+
+# Görselleştirme
+plt.figure(figsize=(8, 4))
+plt.hist(zincir[1000:], bins=50, density=True, alpha=0.6, label='MCMC Örneklemleri')
+x_ekseni = np.linspace(-4, 4, 200)
+plt.plot(x_ekseni, 1/np.sqrt(2*np.pi)*np.exp(-0.5 * x_ekseni**2), 'r', label='Gerçek Hedef')
+plt.title("Metropolis ile Standart Gaussian Örneklemesi")
+plt.legend()
+plt.savefig('stat_097_mcmc_04.jpg')
+```
+
+![](stat_097_mcmc_04.jpg)
+
+
+Aynı zamanda önsel ve olurluk fonksiyonlarının kendi içlerinde de
+olasılık dağılımı olmalarından kaynaklanan normalleştirme sabitleri
+(örneğin Gaussian formülünün başındaki $\frac{1}{\sigma\sqrt{2\pi}}$
+gibi ifadeler) bulunur. Bu sabitleri $c_{\text{olurluk}}$ ve
+$c_{\text{önsel}}$ olarak ayırırsak fonksiyonları ham halleriyle
+yazabiliriz:
+
+* $P(D | \theta) = c_{\text{olurluk}} \times P^*(D | \theta)$
+
+* $P(\theta) = c_{\text{önsel}} \times P^*(\theta)$
+
+Şimdi bu ifadeleri eksiksiz bir şekilde Metropolis kabul oranına
+($\alpha$) yerleştirelim ve mevcut bir $\theta_{\text{mevcut}}$
+konumundan önerilen bir $\theta_{\text{aday}}$ konumuna geçiş cebirini
+inceleyelim:
+
+$$\alpha = \min\left(1,
+\frac{\pi(\theta_{\text{aday}})}{\pi(\theta_{\text{mevcut}})}\right) =
+\min\left(1, \frac{\frac{P(D | \theta_{\text{aday}})
+P(\theta_{\text{aday}})}{P(D)}}{\frac{P(D | \theta_{\text{mevcut}})
+P(\theta_{\text{mevcut}})}{P(D)}}\right)$$
+
+Paydadaki hesaplanamaz $P(D)$ terimleri parametreye bağlı olmadıkları
+için birbirini doğrudan götürür:
+
+$$\alpha = \min\left(1, \frac{P(D | \theta_{\text{aday}})
+P(\theta_{\text{aday}})}{P(D | \theta_{\text{mevcut}})
+P(\theta_{\text{mevcut}})}\right)$$
+
+Şimdi fonksiyonların içindeki normalleştirme sabitlerini de yerine
+koyalım:
+
+$$
+\alpha = \min\left(1, \frac{\left[c_{\text{olurluk}} \times P^*(D |
+\theta_{\text{aday}})\right] \times \left[c_{\text{önsel}} \times
+P^*(\theta_{\text{aday}})\right]}{\left[c_{\text{olurluk}} \times P^*(D |
+\theta_{\text{mevcut}})\right] \times \left[c_{\text{önsel}} \times
+P^*(\theta_{\text{mevcut}})\right]}\right)
+$$
+
+Görüldüğü üzere hem olurluktan gelen $c_{\text{olurluk}}$ sabitleri hem
+de önselden gelen $c_{\text{prior}}$ sabitleri kesrin pay ve
+paydasında sadeleşir. Sonuç olarak kabul oranı sadece ham
+fonksiyonların çarpımına eşitlenir:
+
+$$\alpha = \min\left(1, \frac{P^*(D | \theta_{\text{aday}}) \times
+P^*(\theta_{\text{aday}})}{P^*(D | \theta_{\text{mevcut}}) \times
+P^*(\theta_{\text{mevcut}})}\right)$$
+
+Yani MCMC simülasyonu yaparken ne $P(D)$ paydasını entegre etmek
+zorundayız ne de önsel dağılımın alanının 1'e eşit olmasını sağlayan o
+karmaşık katsayıları hesaplamak zorundayız. Algoritma sadece o an
+tırmandığı tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod
+yazarken önsel dağılımın sadece "şeklini" (kernel) korumamız
+matematiksel olarak tamamen geçerlidir.
+
+MH Yakınsaklığının Kanıtır
 
 Bu görev için durağanlık, indirgenemezlik ve aperiyodikliğin
 kanıtlanması gerekir.
