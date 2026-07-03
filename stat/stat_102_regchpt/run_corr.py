@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import corr_segment
 
-NUM_BLOCKS = 6  
+NUM_BLOCKS = 6
 NUM_TAUS = NUM_BLOCKS - 1
 np.random.seed(42)
 

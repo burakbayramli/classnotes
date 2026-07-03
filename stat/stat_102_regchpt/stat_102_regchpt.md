@@ -789,77 +789,11 @@ plt.savefig('stat_102_regchpt_02.jpg')
 
 ![](stat_102_regchpt_02.jpg)
 
-### Uygulama: Korelasyon Analizi
-
-Korelasyon hesaplarında genel yaklaşım iki tane zaman serisinin
-tamamını kullanarak korelasyon hesaplamaktır. Fakat bazı durumlarda
-korelasyon katsayısının farklı bloklarda farklı sonuçlar verebildiğini
-görebiliyoruz.
-
-İyi bir örnek reel faizler ile altın fiyatları arasında. Ders kitabı
-der ki merkez banka faizlerinden enflasyonu çıkartınca elde edilen
-"reel faiz" eger sıfırın altında ise altının fiyatı artar. Bu durumda
-eger korelasyon analizi yaparsak sonuc negatif olmalıdır, reel faiz
-azalınca altın artmalıdır, ve tersi de doğru olmalıdır. 
-
-Fakat ABD merkezli veriye bakınca bu veride farklı bloklar olduğunu
-görüyoruz. Korelasyon bazen negatif bazen pozitif. Deneme / yanilma
-yöntemi ile en az iki tane blok olduğunu görebiliyoruz, kabaca 2020
-sonrası ve öncesi.
-
-Acaba bu blokları istatistiksel bir şekilde veriden kestirmemiz mümkün
-müdür? Burada bir numara kullanabiliriz; normalize edilmiş (yani sıfır
-merkezli) iki zaman serisi arasında lineer regresyon işletmek o iki
-seri arasında korelasyon hesabı yapmaya eşdeğerdir. Bunun ispatı
-[1]'de bulunabilir. Böylece korelasyon hesabını regresyon hesabına
-indirgemek mümkün oluyor.
-
-Bir sonraki adım bu iki zaman serisi üzerinde "regresyon blokları"
-hesaplamak. Aynen üstte yaptımız gibi ayrım noktaları bilinmeyen
-parçalı regresyon yaklaşımını standardize edilmiş veri üzerinde
-uygularsak bize gereken korelasyon bloklarını bulmuş olacağız.
-
-Dikkat edilmesi gereken tek püf nokta bu "korelasyon için regresyon"
-hesabının kesi (intercept) değişkeni olmadan hesap yapması gerektiği,
-çünkü, daha önce belirttiğimiz gibi, veriyi normalize ettik, yani kesi
-aranıp bulunmasını gereksiz hale getirdik, bu durumda regresyon
-mekanizmasının da kesi ara**ma**masını özellikle kodlamak, ki kod
-olmayan yerde kesi aramaya uğraşılmasın (bize esas gereken diğer
-değişken $\beta$ içeriği bozulmasın).
-
-Bu şekilde hazırlanmış kodlar `corr_segment.py` içinde, işletmek için
-`run_corr.py`. Sonuç alttaki liste görülüyor,
-
-```
-Regime Shift 1: Index 35.3 (±0.63) ->   Date: 2011-02-23
-Regime Shift 2: Index 1006.8 (±0.41) -> Date: 2014-12-08
-Regime Shift 3: Index 1996.9 (±0.77) -> Date: 2018-10-19
-Regime Shift 4: Index 2951.4 (±0.28) -> Date: 2022-07-15
-Regime Shift 5: Index 3926.4 (±0.47) -> Date: 2026-05-01
-```
-
-`2022-07-15` tarihi özellikle ilginç, bu noktada korelasyon negatiften
-pozitife geçiyor. Ekonomik veriye göz atınca bu tarihte Haziran/Temmuz
-2022'de ABD enflasyonunun 9.1% değerine geldiğini görüyoruz, ve
-ardından ABD Merkez Bankası faiz yükseltmesi yaparak daha da arttırım
-yapacaklarının sinyalini vermişti. Ve analize göre bu tarihte faiz /
-altın korelasyonu koptu, faiz arttı ama altın Eylül aylarında o
-hepimizin gördüğü müthiş yükseliş trendine girdi.
-
-Bunun sebepleri ne diye sorulursa ekonomistlerden şöyle cevaplar
-duyulabiliyor, "dünya dolar standartından vazgeçmeye (dedolarization)
-karar verdi", "bankacılık standardı Basel III altını güvenli varlık
-olarak kabul ettiği için, merkez bankaları altın depolamaya başladı"
-gibi... Bunların geçerli olup olmadığını izleyip göreceğiz. Ders
-kitabı korelasyonu acaba geri gelir mi?
-
 Kodlar
 
 [bayes_ols.py](bayes_ols.py),
 [bayes_segmented.py](bayes_segmented.py),
 [data.py](data.py),
-[corr_segment.py](corr_segment.py),
-[run_corr.py](run_corr.py)
 
 Kaynaklar
 
