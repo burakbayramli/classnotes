@@ -833,20 +833,20 @@ Regime Shift 4: Index 2951.4 (±0.28) -> Date: 2022-07-15
 Regime Shift 5: Index 3926.4 (±0.47) -> Date: 2026-05-01
 ```
 
-`2022-07-15` tarihi ozellikle ilginc, bu noktada korelasyon negatiften
-pozitife geciyor. Ekonomik veriye goz atinca bu tarihte Haziran/Temmuz
-2022'de ABD enflasyonunun 9.1% degerine geldigini goruyoruz, ve
-ardindan ABD Merkez Bankasi faiz yukseltmesi yaparak daha da arttirim
-yapacaklarinin sinyalini vermisti. Ve analize gore bu tarihte faiz /
-altin korelasyonu koptu, faiz artti ama altin Eylul aylarinda o
-hepimizin gordugu muthis yukselis trendine girdi.
+`2022-07-15` tarihi özellikle ilginç, bu noktada korelasyon negatiften
+pozitife geçiyor. Ekonomik veriye göz atınca bu tarihte Haziran/Temmuz
+2022'de ABD enflasyonunun 9.1% değerine geldiğini görüyoruz, ve
+ardından ABD Merkez Bankası faiz yükseltmesi yaparak daha da arttırım
+yapacaklarının sinyalini vermişti. Ve analize göre bu tarihte faiz /
+altın korelasyonu koptu, faiz arttı ama altın Eylül aylarında o
+hepimizin gördüğü müthiş yükseliş trendine girdi.
 
 Bunun sebepleri diye sorulursa ekonomistlerden şöyle cevaplar
-duyulabiliyor, "dünya dolardan vazgeçmeye (dedolarization) karar
-verdi", "bankacılık standardı Basel III altını güvenli varlık olarak
-kabul ettiği için, merkez bankaları altın depolamaya başladı"
-gibi. Bunlarin gecerli olup olmadigini izleyip gorecegiz. Ders kitabı
-korelasyonu acaba geri gelir mi?
+duyulabiliyor, "dünya dolar standartından vazgeçmeye (dedolarization)
+karar verdi", "bankacılık standardı Basel III altını güvenli varlık
+olarak kabul ettiği için, merkez bankaları altın depolamaya başladı"
+gibi... Bunların geçerli olup olmadığını izleyip göreceğiz. Ders
+kitabı korelasyonu acaba geri gelir mi?
 
 Kodlar
 
@@ -861,4 +861,3 @@ Kaynaklar
 [1] Bayramlı, İstatistik, *Lineer Regresyon*
 
 [2] Bayramlı, Hesapsal Bilim, Eğri Uydurma, Aradeğerleme (Interpolation)
-
