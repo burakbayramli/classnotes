@@ -789,11 +789,66 @@ plt.savefig('stat_102_regchpt_02.jpg')
 
 ![](stat_102_regchpt_02.jpg)
 
+### Uygulama: Korelasyon Analizi
+
+Korelasyon hesaplarında genel yaklaşım iki tane zaman serisinin
+tamamını kullanarak korelasyon hesaplamaktır. Fakat bazı durumlarda
+korelasyon katsayısının farklı bloklarda farklı sonuçlar verdigi
+görülüyor.
+
+İyi bir örnek reel faizler ile altın fiyatları arasında. Ders kitabı
+der ki merkez banka faizlerinden enflasyonu çıkartınca elde edilen
+"reel faiz" eger sıfırın altında ise altının fiyatı artar. Eger
+korelasyon analizi yapsak o seriler üzerinde negatif elde edilmelidir,
+reel faiz azalınca altın artmalı, ve tersi de doğru olmalı.
+
+Fakat ABD merkezli veriye bakınca farklı bloklar olduğunu
+görüyoruz. Korelasyon bazen negatif bazen pozitif. Deneme / yanılma
+yöntemi ile en az iki tane blok olduğunu görebiliyoruz, kabaca 2020
+sonrası ve öncesi. Acaba bu blokları istatistiksel bir şekilde veriden
+kestirmemiz mümkün müdür? Bir numara kullanabiliriz; normalize edilmiş
+(yani sıfır merkezli) iki zaman serisi arasında lineer regresyon
+işletmek o iki seri arasında korelasyon hesabı yapmaya
+eşdeğerdir. Bunun ispatı [1]'de bulunabilir. Böylece korelasyon
+hesabını regresyon hesabına indirgemek mümkün oluyor. Bir sonraki adım
+bu iki zaman serisi üzerinde "regresyon blokları" hesaplamak. Aynen
+üstte yaptımız gibi ayrım noktaları bilinmeyen parçalı regresyon
+yaklaşımını standardize edilmiş veri üzerinde uygularsak bize gereken
+korelasyon bloklarını bulmuş olacağız.
+
+Bu şekilde hazırlanmış kodlar `corr_segment.py` içinde, işletmek için
+`run_corr.py`. Sonuç alttaki liste görülüyor,
+
+```
+Block 1 (2011-01-01 to 2012-03-19): Correlation r = -0.653 pval = 0.000
+Block 2 (2012-03-19 to 2014-11-26): Correlation r = -0.260 pval = 0.000
+Block 3 (2014-11-26 to 2021-03-30): Correlation r = -0.283 pval = 0.000
+Block 4 (2021-03-30 to 2024-03-08): Correlation r = 0.618 pval = 0.000
+Block 5 (2024-03-08 to 2026-06-29): Correlation r = -0.783 pval = 0.000
+```
+
+2021-03-30 ve 2024-03-07 arasındaki bloğa dikkat, burada korelasyon
+negatiften pozitife dönmüş. 2022 yılında ABD Merkez Bankası 40 yıldır
+görülmemiş bir şekilde faizleri yükseltmeye başladı. Normal kurallara
+göre altının fiyatının düşmesi gerekiyordu. Tam aksine altın artmaya
+başladı. Yapısal bir değişim ortaya çıkmıştı, Rusya'nın rezervleri
+Batı bankalarında dondurulmuştu, gelişmekte olan ülkelerin merkez
+bankaları birdenbire G7 ülkelerinin tahvillerini tutmanın riskli
+olduğuna karar verince ve dolardan kaçma ve altına hücum başladı.
+
+2024-03-08 ve 2026-06-29 arasında normal finans kuralları dönüş
+yapmış, ilk dolardan kaçıs fiyatlandıktan sonra merkez banka alımları
+stabil bir seyre girdi, ve klasik fiyatlama kuralları geri
+döndü. Enflasyonun küresel olarak dönüşü ABD faizlerinde artışı
+tetikledi, bu sefer altın ters şekilde etkilendi.
+
 Kodlar
 
 [bayes_ols.py](bayes_ols.py),
 [bayes_segmented.py](bayes_segmented.py),
 [data.py](data.py),
+[corr_segment.py](corr_segment.py),
+[run_corr.py](run_corr.py)
 
 Kaynaklar
 
