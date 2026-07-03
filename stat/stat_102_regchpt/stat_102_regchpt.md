@@ -817,19 +817,18 @@ indirgemek mümkün oluyor.
 Bir sonraki adım bu iki zaman serisi üzerinde "regresyon blokları"
 hesaplamak. Aynen üstte yaptımız gibi ayrım noktaları bilinmeyen
 parçalı regresyon yaklaşımını standardize edilmiş veri üzerinde
-uygularsak böylece bize gereken korelasyon bloklarını da bulmuş
-olacağız.
+uygularsak bize gereken korelasyon bloklarını bulmuş olacağız.
 
 Dikkat edilmesi gereken tek püf nokta bu "korelasyon için regresyon"
 hesabının kesi (intercept) değişkeni olmadan hesap yapması gerektiği,
 çünkü, daha önce belirttiğimiz gibi, veriyi normalize ettik, yani kesi
 aranıp bulunmasını gereksiz hale getirdik, bu durumda regresyon
-mekanizmasının da kesi ara**ma**masını özellikle kodlamak gerekir ki
-kod olmayan yerde kesi aramaya uğraşmasın (ki bize esas gereken diğer
-değişken $\beta$ içergini bozmasın).
+mekanizmasının da kesi ara**ma**masını özellikle kodlamak, ki kod
+olmayan yerde kesi aramaya uğraşılmasın (bize esas gereken diğer
+değişken $\beta$ içeriği bozulmasın).
 
 Bu şekilde hazırlanmış kodlar `corr_segment.py` içinde, işletmek için
-`run_corr.py` içinde. Sonuç olarak alttaki liste görülüyor,
+`run_corr.py`. Sonuç alttaki liste görülüyor,
 
 ```
 Regime Shift 1: Index 35.3 (±0.63) ->   Date: 2011-02-23
