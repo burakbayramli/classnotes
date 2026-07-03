@@ -793,37 +793,37 @@ görebiliyoruz.
 İyi bir örnek reel faizler ile altın fiyatları arasında. Ders kitabı
 der ki merkez banka faizlerinden enflasyonu çıkartınca elde edilen
 "reel faiz" eger sıfırın altında ise altının fiyatı artar. Bu durumda
-eger korelasyon analizi yaparsak sonuc negatif olmalidir, reel faiz
-azalinca altin artmalidir, ve tersi de dogru olmalidir. 
+eger korelasyon analizi yaparsak sonuc negatif olmalıdır, reel faiz
+azalınca altın artmalıdır, ve tersi de doğru olmalıdır. 
 
-Fakat ABD merkezli veriye bakinca bu veride farkli bloklar oldugunu
-goruyoruz. Korelasyon bazen negatif bazen pozitif. Deneme / yanilma
-yontemi ile en az iki tane blok oldugunu gorebiliyoruz, kabaca 2020
-sonrasi ve oncesi.
+Fakat ABD merkezli veriye bakınca bu veride farklı bloklar olduğunu
+görüyoruz. Korelasyon bazen negatif bazen pozitif. Deneme / yanilma
+yöntemi ile en az iki tane blok olduğunu görebiliyoruz, kabaca 2020
+sonrası ve öncesi.
 
-Acaba bu bloklari istatistiksel bir sekilde veriden kestirmemiz mumkun
-mudur? Burada bir numara kullanabiliriz; normalize edilmis (yani sifir
-merkezli) iki zaman serisi arasinda lineer regresyon isletmek o iki
-seri arasinda korelasyon hesabi yapmaya esdegerdir. Bunun ispati
-[1]'de bulunabilir. Boylece korelasyon hesabini regresyon hesabina
-indirgemek mumkun oluyor .
+Acaba bu blokları istatistiksel bir şekilde veriden kestirmemiz mümkün
+müdür? Burada bir numara kullanabiliriz; normalize edilmiş (yani sıfır
+merkezli) iki zaman serisi arasında lineer regresyon işletmek o iki
+seri arasında korelasyon hesabı yapmaya eşdeğerdir. Bunun ispatı
+[1]'de bulunabilir. Böylece korelasyon hesabını regresyon hesabına
+indirgemek mümkün oluyor.
 
-Bir sonraki adim bu iki zaman serisi uzerinde "regresyon bloklari"
-hesaplamak. Aynen ustte yaptimiz gibi ayrim noktalari bilinmeyen
-parcali regresyon yaklasimini standardize edilmis veri uzerinde
-uygularsak boylece bize gereken korelasyon bloklarini da bulmus
-olacagiz.
+Bir sonraki adım bu iki zaman serisi üzerinde "regresyon blokları"
+hesaplamak. Aynen üstte yaptımız gibi ayrım noktaları bilinmeyen
+parçalı regresyon yaklaşımını standardize edilmiş veri üzerinde
+uygularsak böylece bize gereken korelasyon bloklarını da bulmuş
+olacağız.
 
-Dikkat edilmesi gereken tek puf nokta bu "korelasyon icin regresyon"
-hesabinin kesi (intercept) degiskeni olmadan hesap yapmasidir. Cunku,
-daha once belirttigimiz gibi, veriyi normalize ettik, yani kesi aranip
-bulunmasini gereksiz hale getirdik, bu durumda regresyon
-mekanizmasinin da kesi ara**ma**masini ozellikle kodlamak gerekir ki
-kod olmayan yerde kesi aramaya ugrasmasin (ki bize esas gereken diger
-degisken $\beta$ icergini bozmasin).
+Dikkat edilmesi gereken tek püf nokta bu "korelasyon için regresyon"
+hesabının kesi (intercept) değişkeni olmadan hesap yapmasıdır. Çünkü,
+daha önce belirttiğimiz gibi, veriyi normalize ettik, yani kesi aranıp
+bulunmasını gereksiz hale getirdik, bu durumda regresyon
+mekanizmasının da kesi ara**ma**masını özellikle kodlamak gerekir ki
+kod olmayan yerde kesi aramaya uğraşmasın (ki bize esas gereken diğer
+değişken $\beta$ içergini bozmasın).
 
-Bu sekilde hazirlanmis kodlar `corr_segment.py` icinde, isletmek icin
-`run_corr.py` icinde. Sonuc olarak alttaki liste goruluyor,
+Bu şekilde hazırlanmış kodlar `corr_segment.py` içinde, işletmek için
+`run_corr.py` içinde. Sonuç olarak alttaki liste görülüyor,
 
 ```
 Regime Shift 1: Index 35.3 (±0.63) ->   Date: 2011-02-23
