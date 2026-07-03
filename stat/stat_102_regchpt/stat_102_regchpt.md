@@ -280,7 +280,13 @@ def log_likelihood(alpha, beta, sigma, x, y):
 
 `term3 = -((y - mu)2) / (2 * (sigma2))`, $-\frac{1}{2\sigma^2}(y_t - \mu_t)^2$'dir. `y` ve `mu` her ikisi de $N$ uzunluğunda diziler olduğundan (her veri noktası için bir giriş), bu tek satır üçüncü terimi her gözlem için aynı anda, elemanlar bazında hesaplar.
 
-`if sigma <= 0: return -np.inf` satırı, matematikte açıkça görünmeyen ama onunla örtük olarak ima edilen küçük ama önemli bir muhasebe parçasıdır: $\ln(\sigma)$, $\sigma \leq 0$ için tanımsızdır ve bir standart sapma zaten negatif ya da sıfır olamaz, bu yüzden kod kısa devre yaparak, programın anlamsız bir logaritma üzerinde çökmesine izin vermek yerine log-olurluğa negatif sonsuz değeri (yani "bu imkânsız") atar.
+`if sigma <= 0: return -np.inf` satırı, matematikte açıkça görünmeyen
+ama onunla örtük olarak ima edilen küçük ama önemli bir muhasebe
+parçasıdır: $\ln(\sigma)$, $\sigma \leq 0$ için tanımsızdır ve bir
+standart sapma zaten negatif ya da sıfır olamaz, bu yüzden kod kısa
+devre yaparak, programın anlamsız bir logaritma üzerinde çökmesine
+izin vermek yerine log-olurluğa negatif sonsuz değeri (yani "bu
+imkânsız") atar.
 
 Tek bir noktadan tüm veri kümesine: toplam nereden geliyor?
 
@@ -815,9 +821,9 @@ uygularsak böylece bize gereken korelasyon bloklarını da bulmuş
 olacağız.
 
 Dikkat edilmesi gereken tek püf nokta bu "korelasyon için regresyon"
-hesabının kesi (intercept) değişkeni olmadan hesap yapmasıdır. Çünkü,
-daha önce belirttiğimiz gibi, veriyi normalize ettik, yani kesi aranıp
-bulunmasını gereksiz hale getirdik, bu durumda regresyon
+hesabının kesi (intercept) değişkeni olmadan hesap yapması gerektiği,
+çünkü, daha önce belirttiğimiz gibi, veriyi normalize ettik, yani kesi
+aranıp bulunmasını gereksiz hale getirdik, bu durumda regresyon
 mekanizmasının da kesi ara**ma**masını özellikle kodlamak gerekir ki
 kod olmayan yerde kesi aramaya uğraşmasın (ki bize esas gereken diğer
 değişken $\beta$ içergini bozmasın).
@@ -841,7 +847,7 @@ yapacaklarının sinyalini vermişti. Ve analize göre bu tarihte faiz /
 altın korelasyonu koptu, faiz arttı ama altın Eylül aylarında o
 hepimizin gördüğü müthiş yükseliş trendine girdi.
 
-Bunun sebepleri diye sorulursa ekonomistlerden şöyle cevaplar
+Bunun sebepleri ne diye sorulursa ekonomistlerden şöyle cevaplar
 duyulabiliyor, "dünya dolar standartından vazgeçmeye (dedolarization)
 karar verdi", "bankacılık standardı Basel III altını güvenli varlık
 olarak kabul ettiği için, merkez bankaları altın depolamaya başladı"
