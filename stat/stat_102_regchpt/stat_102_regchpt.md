@@ -827,7 +827,7 @@ Block 4 (2021-03-30 to 2024-03-08): Correlation r = 0.618 pval = 0.000
 Block 5 (2024-03-08 to 2026-06-29): Correlation r = -0.783 pval = 0.000
 ```
 
-2021-03-30 ve 2024-03-07 arasındaki bloğa dikkat, burada korelasyon
+`2021-03-30` ve `2024-03-07` arasındaki bloğa dikkat, burada korelasyon
 negatiften pozitife dönmüş. 2022 yılında ABD Merkez Bankası 40 yıldır
 görülmemiş bir şekilde faizleri yükseltmeye başladı. Normal kurallara
 göre altının fiyatının düşmesi gerekiyordu. Tam aksine altın artmaya
@@ -836,7 +836,7 @@ Batı bankalarında dondurulmuştu, gelişmekte olan ülkelerin merkez
 bankaları birdenbire G7 ülkelerinin tahvillerini tutmanın riskli
 olduğuna karar verince ve dolardan kaçma ve altına hücum başladı.
 
-2024-03-08 ve 2026-06-29 arasında normal finans kuralları dönüş
+`2024-03-08` ve `2026-06-29` arasında normal finans kuralları dönüş
 yapmış, ilk dolardan kaçıs fiyatlandıktan sonra merkez banka alımları
 stabil bir seyre girdi, ve klasik fiyatlama kuralları geri
 döndü. Enflasyonun küresel olarak dönüşü ABD faizlerinde artışı
@@ -855,3 +855,6 @@ Kaynaklar
 [1] Bayramlı, İstatistik, *Lineer Regresyon*
 
 [2] Bayramlı, Hesapsal Bilim, Eğri Uydurma, Aradeğerleme (Interpolation)
+
+
+
