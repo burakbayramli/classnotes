@@ -114,7 +114,8 @@ kararlıdır ve hesaplaması daha kolaydır.
 $$\ln P(y_t|\mu_t, \sigma) = \ln\left[\frac{1}{\sqrt{2\pi\sigma^2}}
 \exp\left(-\frac{(y_t - \mu_t)^2}{2\sigma^2}\right)\right]$$
 
-Standart logaritma kurallarını kullanarak — $\ln(A \cdot B) = \ln A + \ln B$ ve $\ln(A^B) = B \ln A$ — bunu genişletiriz:
+Standart logaritma kurallarını kullanarak, $\ln(A \cdot B) = \ln A +
+\ln B$ ve $\ln(A^B) = B \ln A$, bunu genişletiriz:
 
 $$\ln P(y_t|\mu_t, \sigma) = \ln\left[(2\pi\sigma^2)^{-1/2}\right] +
 \ln\left[\exp\left(-\frac{(y_t - \mu_t)^2}{2\sigma^2}\right)\right]$$
@@ -246,16 +247,21 @@ Formüllerin Kod ile Bağlantıları
 Türetmenin sonunda, tek bir veri noktasının log-olurluğu için kapalı
 biçimli bir ifadeye ulaşmıştık: Bu ifadenin tam olarak üç toplamsal
 parçaya sahip olduğuna dikkat edelim. Bu, yazılış şeklinin bir
-tesadüfü değildir — bu, bir üstel ile bir normalleştirme sabitinin
+tesadüfü değildir, bu, bir üstel ile bir normalleştirme sabitinin
 çarpımının logaritmasının alınmasının doğrudan cebirsel bir sonucudur;
 bu da bir çarpımı toplamaya böler (hatırlayın: $\ln(A \cdot B) = \ln A
 + \ln B$). Bu üç parça şunlardır:
 
-$-\frac{1}{2}\ln(2\pi)$ — bir sabit. $\alpha$, $\beta$, $\sigma$'ya ya da veriye hiç bağlı değildir. Bu sadece Gauss'un normalleştirme sabitinden gelen bir yük.
+$-\frac{1}{2}\ln(2\pi)$, bir sabit. $\alpha$, $\beta$, $\sigma$'ya ya
+da veriye hiç bağlı değildir. Bu sadece Gauss'un normalleştirme
+sabitinden gelen bir tanım.
 
-$-\ln(\sigma)$ — yalnızca $\sigma$'ya, yani varsaydığınız gürültü düzeyine bağlıdır.
+$-\ln(\sigma)$, yalnızca $\sigma$'ya, yani varsaydığınız gürültü
+düzeyine bağlıdır.
 
-$-\frac{1}{2\sigma^2}(y_t - \mu_t)^2$ — gerçek "uyum" terimi. Bu, modelin tahmini $\mu_t = \alpha + \beta x_t$, gözlemlenen $y_t$'den uzak olduğunda modeli cezalandıran parçadır.
+$-\frac{1}{2\sigma^2}(y_t - \mu_t)^2$, gerçek "uyum" terimi. Bu,
+modelin tahmini $\mu_t = \alpha + \beta x_t$, gözlemlenen $y_t$'den
+uzak olduğunda modeli cezalandıran parçadır.
 
 log_likelihood içinde bunun nerede göründüğü
 
@@ -272,13 +278,23 @@ def log_likelihood(alpha, beta, sigma, x, y):
     return np.sum(term1 + term2 + term3)
 ```
 
-`mu = alpha + beta * x`, tüm gözlemler için aynı anda hesaplanan $\mu_t = \alpha + \beta x_t$'den başka bir şey değildir (NumPy, $t$ üzerinden açık bir döngü yazmadan bunu yapmanıza izin verir; `x`, tek bir skaler değil, `x_data` dizisinin tamamıdır).
+`mu = alpha + beta * x`, tüm gözlemler için aynı anda hesaplanan
+$\mu_t = \alpha + \beta x_t$'den başka bir şey değildir (NumPy, $t$
+üzerinden açık bir döngü yazmadan bunu yapmanıza izin verir; `x`, tek
+bir tek sayı (scalar) değil, `x_data` dizisinin tamamıdır).
 
-`term1 = -0.5 * np.log(2 * np.pi)`, sözcük anlamıyla $-\frac{1}{2}\ln(2\pi)$'dir; sembollerin yerine kod ile yazılmıştır. Burada gizli hiçbir şey yoktur — bu, birebir bir transkripsiyondur.
+`term1 = -0.5 * np.log(2 * np.pi)`, sözcük anlamıyla
+$-\frac{1}{2}\ln(2\pi)$'dir; sembollerin yerine kod ile
+yazılmıştır. Burada gizli hiçbir şey yoktur, bu, birebir bir
+tercümesidir.
 
-`term2 = -np.log(sigma)`, yine doğrudan bir transkripsiyon olan $-\ln(\sigma)$'dır.
+`term2 = -np.log(sigma)`, yine doğrudan bir transkripsiyon olan
+$-\ln(\sigma)$'dır.
 
-`term3 = -((y - mu)2) / (2 * (sigma2))`, $-\frac{1}{2\sigma^2}(y_t - \mu_t)^2$'dir. `y` ve `mu` her ikisi de $N$ uzunluğunda diziler olduğundan (her veri noktası için bir giriş), bu tek satır üçüncü terimi her gözlem için aynı anda, elemanlar bazında hesaplar.
+`term3 = -((y - mu)2) / (2 * (sigma2))`, $-\frac{1}{2\sigma^2}(y_t -
+\mu_t)^2$'dir. `y` ve `mu` her ikisi de $N$ uzunluğunda diziler
+olduğundan (her veri noktası için bir giriş), bu tek satır üçüncü
+terimi her gözlem için aynı anda, elemanlar bazında hesaplar.
 
 `if sigma <= 0: return -np.inf` satırı, matematikte açıkça görünmeyen
 ama onunla örtük olarak ima edilen küçük ama önemli bir muhasebe
@@ -286,12 +302,12 @@ parçasıdır: $\ln(\sigma)$, $\sigma \leq 0$ için tanımsızdır ve bir
 standart sapma zaten negatif ya da sıfır olamaz, bu yüzden kod kısa
 devre yaparak, programın anlamsız bir logaritma üzerinde çökmesine
 izin vermek yerine log-olurluğa negatif sonsuz değeri (yani "bu
-imkânsız") atar.
+imkansız") atar.
 
 Tek bir noktadan tüm veri kümesine: toplam nereden geliyor?
 
 Bu, kodda gözden kaçırılması kolay ama aslında gerçek kavramsal iş
-yapan bir adımdır. Daha önceki türetmeden hatırlayın, bağımsızlık
+yapan bir adımdır. Daha önceki türetmeden hatırlayalım, bağımsızlık
 varsayımı altında tüm veri kümesinin ortak olurluğu, veri noktaları
 üzerinden bir çarpımdır:
 
@@ -300,18 +316,18 @@ $$P(D|\alpha, \beta, \sigma) = \prod_{t=1}^{N} P(y_t|x_t, \alpha,
 
 Her iki tarafın logaritmasını almak, o çarpımı bir toplama dönüştürür;
 bu, daha önce kullanılan aynı logaritma kuralıyla olur ($\ln(A \cdot
-B) = \ln A + \ln B$, birçok çarpana genişletilmiş hâliyle):
+B) = \ln A + \ln B$, birçok çarpana genişletilmiş haliyle):
 
 $$\ln P(D|\alpha, \beta, \sigma) = \sum_{t=1}^{N} \ln P(y_t|x_t,
 \alpha, \beta, \sigma)$$
 
 `np.sum(term1 + term2 + term3)` ifadesinin yaptığı tam olarak
 budur. `term1`, `term2`, `term3`'ün her biri $N$ uzunluğunda bir
-dizidir (`term1` teknik olarak yayınlanan bir skalerdir, ama kavramsal
-olarak "$N$ konumdan her birine eklenen aynı sabit" olarak
+dizidir (`term1` teknik olarak yayınlanan bir tek sayıdır, ama
+kavramsal olarak "$N$ konumdan her birine eklenen aynı sabit" olarak
 düşünebilirsiniz). Üç diziyi elemanlar bazında toplamak, size $t$
-konumunda tam olarak $\ln P(y_t|x_t, \alpha, \beta, \sigma)$'yı verir
-— nokta başına log-olurluk.
+konumunda tam olarak $\ln P(y_t|x_t, \alpha, \beta, \sigma)$'yı verir,
+nokta başına log-olurluk.
 
 Ardından `np.sum(...)`, $N$ uzunluğundaki nokta-başına log-olurluk
 dizisini, $\sum_{t=1}^{N} \ln P(y_t|\ldots)$ olan tek bir sayıya
@@ -319,14 +335,16 @@ indirger; bu da belirli bir aday $(\alpha, \beta, \sigma)$
 verildiğinde tüm veri kümesinin toplam log-olurluğudur.
 
 Yani `log_likelihood(alpha, beta, sigma, x, y)` fonksiyonu, belirsiz
-bir anlamda "olurluk" adı verilen soyut bir niceliği hesaplamıyor —
-çok gerçek anlamda, `alpha`, `beta` ve `sigma` olarak beslediğiniz
-belirli sayılar için, toplanmış log-olurluk formülünün sağ tarafını
+bir anlamda "olurluk" adı verilen soyut bir niceliği hesaplamıyor, çok
+gerçek anlamda, `alpha`, `beta` ve `sigma` olarak beslediğiniz belirli
+sayılar için, toplanmış log-olurluk formülünün sağ tarafını
 hesaplıyor.
 
 Salt matematiksel türetmenin kapsamadığı parça: önsel
 
-Orijinal türetme yalnızca olurlukla, $P(D|\alpha, \beta, \sigma)$ ile — yani "parametreler verildiğinde, veri ne kadar olasıdır?" sorusuyla ilgileniyordu. Ancak kod ayrıca şunu da tanımlıyor:
+Orijinal türetme yalnızca olurlukla, $P(D|\alpha, \beta, \sigma)$ ile,
+yani "parametreler verildiğinde, veri ne kadar olasıdır?" sorusuyla
+ilgileniyordu. Ancak kod ayrıca şunu da tanımlıyor:
 
 ```
 def log_prior(alpha, beta, sigma):
@@ -348,10 +366,10 @@ parametrelerin makul olarak hangi değerleri alabileceğine dair bir
 $-100$ ile $100$ arasındaki herhangi bir $\alpha$, $-10$ ile $10$
 arasındaki herhangi bir $\beta$ ve $0$ ile $50$ arasındaki herhangi
 bir $\sigma$ eşit derecede olası kabul edilir (fonksiyonun sabit $0.0$
-döndürmesinin nedeni budur — ve unutmayın, bu bir log-önseldir,
+döndürmesinin nedeni budur, ve unutmayalım, bu bir log-önseldir,
 dolayısıyla $0$'lık bir log-olasılık, orantılı olarak $1$'lik bir
 olasılığa karşılık gelir, yani "tekdüze olası"). Bu kutuların
-dışındaki her şey imkânsız ilan edilir, dolayısıyla log-uzayında
+dışındaki her şey imkansız ilan edilir, dolayısıyla log-uzayında
 $-\infty$ (bu da tam olarak $0$'lık bir olasılığa karşılık gelir).
 
 Bu, pedagojik olarak önemlidir çünkü "Bayessel" sözcüğünün belgenin
@@ -385,7 +403,7 @@ var"dan "25.000 kez bir döngü çalıştırıyoruz"a kavramsal
 sıçramadır. Klasik bir regresyonda (daha önceki `smf.ols` çağrısı),
 her parametre için tek bir en-iyi-uyum sayısı elde edersiniz; bu, tek
 seferde analitik olarak hesaplanır. Bayessel ortamda ise tek bir sayı
-istemezsiniz — $(\alpha, \beta, \sigma)$ üzerindeki sonsal dağılımın
+istemezsiniz, $(\alpha, \beta, \sigma)$ üzerindeki sonsal dağılımın
 tamamını istersiniz; bu da, veriyle ne kadar tutarlı olduklarına göre
 ağırlıklandırılmış, veriyle tutarlı olan parametre değerlerinin tüm
 aralığını bilmek istediğiniz anlamına gelir. En basit modellerin
@@ -410,8 +428,8 @@ Ardından `log_posterior`'ı hem geçerli noktada hem de önerilen noktada
 değerlendiliyor ve aralarındaki fark hesaplanıyor:
 `log_acceptance_ratio = log_post_proposed - log_post_current`. Bunlar
 log-sonsallar olduğundan, onları çıkarmak, (normalleştirilmemiş)
-sonsal yoğunlukların oranının logaritmasını almaya eşdeğerdir — bu,
-öncekiyle aynı logaritma kuralının tersinden çalıştırılmış hâlidir:
+sonsal yoğunlukların oranının logaritmasını almaya eşdeğerdir, bu,
+öncekiyle aynı logaritma kuralının tersinden çalıştırılmış halidir:
 $\ln A - \ln B = \ln(A/B)$.
 
 `if np.log(np.random.uniform(0, 1)) < log_acceptance_ratio:` satırı,
@@ -419,7 +437,7 @@ kabul/ret adımıdır. Önerilen noktanın geçerli noktadan daha yüksek
 sonsal yoğunluğu varsa (oran 1'den büyük, yani log-oran 0'dan
 büyükse), hareket her zaman kabul edilir. Önerilen noktanın yoğunluğu
 daha düşükse, yalnızca o orana eşit bir olasılıkla belirli zamanlarda
-kabul edilir — bu, tam olarak neden `log_acceptance_ratio` ile
+kabul edilir, bu, tam olarak neden `log_acceptance_ratio` ile
 birimleri eşleştirmek için log-biçiminde alınmış, $(0, 1)$ üzerinde
 tekdüze bir dağılımdan rastgele bir çekilişle karşılaştırdığınızın
 nedenidir. "Daha kötü" hareketlerin bu olasılıksal kabulü, tam olarak
@@ -430,7 +448,7 @@ veren şeydir.
 Öneri kabul edilsin ya da reddedilsin, `alpha_trace[i]`,
 `beta_trace[i]`, `sigma_trace[i]`'nin geçerli değerleri
 kaydedilir. 25.000 yinelemenin ardından, fonksiyon "zincirler" ya da
-"izler" olarak adlandırılan üç uzun sayı dizisini geri döndürür — ve
+"izler" olarak adlandırılan üç uzun sayı dizisini geri döndürür, ve
 zincirin $(\alpha, \beta, \sigma)$-uzayının farklı bölgelerini ziyaret
 ettiği göreceli sıklık, yeterli sayıda yinelemenin ardından, gerçek
 sonsal dağılımın bir yaklaşımıdır.
@@ -455,7 +473,7 @@ Son yazdırılan satırlar, `np.mean(final_beta)` ve
 dağılımı özetlediğiniz gibi $\beta$ için özetler: bir merkez (sonsal
 ortalama, klasik nokta tahmininin Bayessel karşılığı) ve bir yayılım
 (sonsal standart sapma, standart hatanın Bayessel
-karşılığı). Gördüğünüz $-0.2970 \pm 0.0247$ sayısı budur — ve bunu,
+karşılığı). Gördüğünüz $-0.2970 \pm 0.0247$ sayısı budur, ve bunu,
 belgenin çok daha önceki bir kısmında sıradan `smf.ols` uyumundan
 çıkan $\beta = -0.30$ ile kavramsal olarak karşılaştırmaya değer:
 tamamen o log-olurluk türetmesinden inşa edilen Bayessel makine,
@@ -634,7 +652,7 @@ $w_j(t) = \sigma_{j-1}(t) - \sigma_j(t)$
   \approx 0$ (Aktif Değil)
 
 - Blok $j$'nin içinde ($\tau_{j-1} < t < \tau_j$): Öncü şalter
-  açılmıştır ancak takip eden şalter hâlâ kapalıdır ($\sigma_{j-1}
+  açılmıştır ancak takip eden şalter hala kapalıdır ($\sigma_{j-1}
   \approx 1$, $\sigma_j \approx 0$) -> $w_j(t) \approx 1 - 0 = 1$ (Tam
   Aktif)
 
