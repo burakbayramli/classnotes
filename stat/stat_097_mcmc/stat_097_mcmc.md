@@ -209,15 +209,29 @@ tırmandığı tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod
 yazarken önsel dağılımın sadece "şeklini" korumamız matematiksel
 olarak tamamen geçerlidir.
 
+Zincire Kaydedilenler
+
+Üstteki koda dikkat edilirse her adımda `zincir[i+1]` ile zincire
+kayıt yapılıyor, bu öneri kabul edilsin / edilmesin muhakkak
+yapılıyor. Eğer öneri kabul edilirse yeni adımın kaydedilmesini
+bekleriz fakat ret durumunda niye kayıt yapılıyor acaba? Bu aslında
+istatistiki olarak doğru bir adım. Eğer öneri red edilmişse, o an
+üzerinde olduğumuz noktanın yine kaydedilmesini isteriz çünkü bu
+yüksek olasılığı olan bir bölgede olduğumuzun işareti olacaktır.  O
+bölgedeki noktaların frekansı zincir üzerinde artarsa bu bizim için
+doğru bir sonuç olur, çünkü bu frekans artışı o zincir üzerinden bizim
+döngü bittiğinde yapacağımız özet istatistiklerine direk yansır. Eğer
+zincirde 10 değeri etrafında bir sürü değer var ise, zincir
+değerlerinde `mean` hesabı yapınca 10'a yakın bir sonuç elde
+edebiliriz.
+
 MH Yakınsaklığının Kanıtı
 
 Bu görev için durağanlık, indirgenemezlik ve aperiyodikliğin
-kanıtlanması gerekir.
-
-Durağanlık için geçişlerin Markov özelliğine sahip olması gerekir;
-gelecek yalnızca bugüne bağlıdır. Bu kalem oldukca basit, eğer bir
-sonraki adım için sadece o andaki konum bilgisini kullanırsak bunu
-otomatik olarak elde etmiş oluruz.
+kanıtlanması gerekir. Durağanlık için geçişlerin Markov özelliğine
+sahip olması gerekir; gelecek yalnızca bugüne bağlıdır. Bu kalem
+oldukca basit, eğer bir sonraki adım için sadece o andaki konum
+bilgisini kullanırsak bunu otomatik olarak elde etmiş oluruz.
 
 Ayrıntılı denge üzerinden durağanlığı elde ederiz. Ancak durağanlık
 tek başına, zincirin rastgele bir başlangıç noktasından $\pi$'ye

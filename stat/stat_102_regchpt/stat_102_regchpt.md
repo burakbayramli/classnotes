@@ -419,27 +419,34 @@ Döngünün içindeki mantık esasen $(\alpha, \beta, \sigma)$ değerlerinin
 üç boyutlu uzayında yönlendirilmiş, rastgele bir yürüyüştür:
 
 Her yinelemede geçerli konumumuzdan küçük rastgele bir sıçrama
-öneriliyor, `proposed_alpha = np.random.normal(current_alpha,
-proposal_width_alpha)` ve `beta` ile `sigma` için de benzer şekilde,
-yani bir sonraki aday nokta, şu anda bulunduğunuz yerde merkezlenmiş
-bir Gaussian'dan örneklem alınır.
+öneriliyor,
 
-Ardından `log_posterior`'ı hem geçerli noktada hem de önerilen noktada
-değerlendiliyor ve aralarındaki fark hesaplanıyor:
-`log_acceptance_ratio = log_post_proposed - log_post_current`. Bunlar
-log-sonsallar olduğundan, onları çıkarmak, (normalleştirilmemiş)
-sonsal yoğunlukların oranının logaritmasını almaya eşdeğerdir, bu,
-öncekiyle aynı logaritma kuralının tersinden çalıştırılmış halidir:
-$\ln A - \ln B = \ln(A/B)$.
+```python
+proposed_alpha = np.random.normal(current_alpha, proposal_width_alpha)
+```
 
-`if np.log(np.random.uniform(0, 1)) < log_acceptance_ratio:` satırı,
+ve `beta` ile `sigma` için de benzer şekilde, yani bir sonraki aday
+nokta, şu anda bulunduğunuz yerde merkezlenmiş bir Gaussian'dan
+örneklem alınır. Ardından `log_posterior`'ı hem geçerli noktada hem de
+önerilen noktada değerlendiliyor ve aralarındaki fark hesaplanıyor:
+
+```python
+log_acceptance_ratio = log_post_proposed - log_post_current
+```
+
+Bunlar log-sonsallar olduğundan, onları çıkarmak,
+(normalleştirilmemiş) sonsal yoğunlukların oranının logaritmasını
+almaya eşdeğerdir, bu, öncekiyle aynı logaritma kuralının tersinden
+çalıştırılmış halidir: $\ln A - \ln B = \ln(A/B)$.
+
+`if np.log(np.random.uniform(0, 1)) < log_acceptance_ratio` satırı,
 kabul/ret adımıdır. Önerilen noktanın geçerli noktadan daha yüksek
 sonsal yoğunluğu varsa (oran 1'den büyük, yani log-oran 0'dan
 büyükse), hareket her zaman kabul edilir. Önerilen noktanın yoğunluğu
 daha düşükse, yalnızca o orana eşit bir olasılıkla belirli zamanlarda
 kabul edilir, bu, tam olarak neden `log_acceptance_ratio` ile
 birimleri eşleştirmek için log-biçiminde alınmış, $(0, 1)$ üzerinde
-birörnek bir dağılımdan rastgele bir çekilişle karşılaştırdığımızın
+birörnek bir dağılımdan rasgele bir örneklemle karşılaştırmamızın
 nedenidir. "Daha kötü" hareketlerin bu olasılıksal kabulü, tam olarak
 zincirin, bir optimize edicinin yapacağı gibi doğrudan tek bir zirveye
 yürüyüp orada durmak yerine, sonsalın tüm şeklini keşfetmesine izin
