@@ -66,15 +66,15 @@ Serinin hem taban yüksekliği hem de zaman içindeki gidişatı, doğrudan
 bu tahmin edilen ortalamanın, yani $\mu_t$'nin içine
 gömülüdür. Verinin ham biçimde tutulduğu klasik bir basit doğrusal
 regresyon modelinde, herhangi bir $t$ zaman adımındaki beklenen
-ortalama için hem bir taban kesme noktası ($\alpha$) hem de bir eğim
+ortalama için hem bir kesi (intercept, $\alpha$) hem de bir eğim
 katsayısı ($\beta$) gereklidir:
 
 $$\mu_t = \alpha + \beta x_t$$
 
 - $x_t$, $t$ zamanındaki bağımsız değişkeninizdir (örneğin, Sıcaklık (`Temp`)).
 
-- $\alpha$, kesme noktası (intercept) katsayısıdır ve $X = 0$
-  olduğunda $Y$'nin taban değerini temsil eder.
+- $\alpha$, kesi katsayısıdır ve $X = 0$ olduğunda $Y$'nin taban
+  değerini temsil eder.
 
 - $\beta$, eğim katsayısıdır ve $X$'teki birim değişim başına $Y$'deki
   değişim oranını belirler.
@@ -107,7 +107,7 @@ Doğal Logaritmanın Alınması
 Log-olurluğu bulmak için, parametrelerimizi Gauss PDF'sinin içine
 yerleştirir ve doğal logaritmasını (ln) alırız. Logaritmayı almak,
 çarpımımızı ($\prod$) bir toplama dönüştürür; bu da sayısal olarak
-kararlıdır ve hesaplaması daha kolaydır.
+stabildir ve hesaplaması daha kolaydır.
 
 Önce tek bir veri noktasının log-olurluğuna bakalım:
 
@@ -144,9 +144,9 @@ $$P(\alpha, \beta, \sigma) = P(\alpha) \cdot P(\beta) \cdot P(\sigma)$$
 
 Bu önseller için yaygın standart seçimler şunları içerir:
 
-- Kesme Noktası ($\alpha$): Bilinen bir taban yönelimi yoksa
-  genellikle sıfırda merkezlenmiş geniş bir Gauss önseli atanır:
-  $\alpha \sim N(0, \sigma_\alpha^2)$.
+- Kesi ($\alpha$): Bilinen bir baz / taban yönelimi yoksa genellikle
+  sıfırda merkezlenmiş geniş bir Gauss önseli atanır: $\alpha \sim
+  N(0, \sigma_\alpha^2)$.
 
 - Eğim ($\beta$): Benzer şekilde bir Gauss önseli atanır: $\beta \sim
   N(0, \sigma_\beta^2)$.
@@ -178,14 +178,14 @@ Burada:
   inançlarımız).
 
 - $P(D)$, Marjinal Olurluk'tur (ya da kanıt), pay kısmının tüm olası
-  parametre uzayları üzerinden integrali alınarak hesaplanır:
+  parametre uzayları üzerinden entegrali alınarak hesaplanır:
 
 $$P(D) = \int\int\int P(D|\alpha, \beta, \sigma) P(\alpha, \beta, \sigma)\, d\alpha\, d\beta\, d\sigma$$
 
 Orantısal Form
 
 Payda $P(D)$, $\alpha$, $\beta$ veya $\sigma$ parametrelerine bağlı
-olmadığından, yalnızca sonsalin 1'e integre olmasını sağlayan bir
+olmadığından, yalnızca sonsalin 1'e entegre olmasını sağlayan bir
 normalleştirme sabiti işlevi görür. Bu nedenle, analitik türetmeler
 sırasında bunu atlarız ve orantısal formülasyonla çalışırız:
 
@@ -197,11 +197,12 @@ Log-Sonsal Formülasyonu
 
 Hesaplamalı uygulama için (Markov Zinciri Monte Carlo örneklemesi
 gibi), sonsalın doğal logaritmasını alırız. Bu, kalan tüm çarpımları
-toplamlara dönüştürerek kararlılığı en üst düzeye çıkarır:
+toplamlara dönüştürerek stabiliteyi en üst düzeye çıkarır:
 
 $$\ln P(\alpha, \beta, \sigma|D) \propto \ln P(D|\alpha, \beta, \sigma) + \ln P(\alpha) + \ln P(\beta) + \ln P(\sigma)$$
 
-Bölüm 2'deki ortak log-olurluk türetmemizi yerine koyarak, genişletilmiş amaç fonksiyonu şu hale gelir:
+Bölüm 2'deki ortak log-olurluk türetmemizi yerine koyarsak
+genişletilmiş amaç fonksiyonu şu hale gelir:
 
 $$
 \ln P(\alpha, \beta, \sigma|D) \propto
@@ -245,27 +246,27 @@ Görüldüğü gibi OLS hesabına yakın bir sonuç elde ettik.
 Formüllerin Kod ile Bağlantıları
 
 Türetmenin sonunda, tek bir veri noktasının log-olurluğu için kapalı
-biçimli bir ifadeye ulaşmıştık: Bu ifadenin tam olarak üç toplamsal
-parçaya sahip olduğuna dikkat edelim. Bu, yazılış şeklinin bir
-tesadüfü değildir, bu, bir üstel ile bir normalleştirme sabitinin
-çarpımının logaritmasının alınmasının doğrudan cebirsel bir sonucudur;
-bu da bir çarpımı toplamaya böler (hatırlayın: $\ln(A \cdot B) = \ln A
-+ \ln B$). Bu üç parça şunlardır:
+biçimli (closed form, sonlu sayıda adımda hesaplanabilen formül türü)
+bir ifadeye ulaşmıştık: Bu ifadenin tam olarak üç toplamsal parçaya
+sahip olduğuna dikkat edelim. Bu, yazılış şeklinin bir tesadüfü
+değildir, bu, bir üstel ile bir normalleştirme sabitinin çarpımının
+logaritmasının alınmasının doğrudan cebirsel bir sonucu; bu da bir
+çarpımı toplamaya böler (hatırlayın: $\ln(A \cdot B) = \ln A + \ln
+B$). Bu üç parça şunlardır:
 
 $-\frac{1}{2}\ln(2\pi)$, bir sabit. $\alpha$, $\beta$, $\sigma$'ya ya
-da veriye hiç bağlı değildir. Bu sadece Gauss'un normalleştirme
+da veriye hiç bağlı değil. Bu sadece Gauss'un normalleştirme
 sabitinden gelen bir tanım.
 
 $-\ln(\sigma)$, yalnızca $\sigma$'ya, yani varsaydığınız gürültü
-düzeyine bağlıdır.
+düzeyine bağlı.
 
 $-\frac{1}{2\sigma^2}(y_t - \mu_t)^2$, gerçek "uyum" terimi. Bu,
 modelin tahmini $\mu_t = \alpha + \beta x_t$, gözlemlenen $y_t$'den
-uzak olduğunda modeli cezalandıran parçadır.
+uzak olduğunda modeli cezalandıran parça.
 
-log_likelihood içinde bunun nerede göründüğü
-
-İşte fonksiyon tekrar:
+log_likelihood içinde bunun nerede göründüğüne bakalım. İşte fonksiyon
+tekrar:
 
 ```
 def log_likelihood(alpha, beta, sigma, x, y):
@@ -279,16 +280,15 @@ def log_likelihood(alpha, beta, sigma, x, y):
 ```
 
 `mu = alpha + beta * x`, tüm gözlemler için aynı anda hesaplanan
-$\mu_t = \alpha + \beta x_t$'den başka bir şey değildir (NumPy, $t$
-üzerinden açık bir döngü yazmadan bunu yapmanıza izin verir; `x`, tek
-bir tek sayı (scalar) değil, `x_data` dizisinin tamamıdır).
+$\mu_t = \alpha + \beta x_t$'den başka bir şey değil (NumPy, $t$
+üzerinden açık bir döngü yazmadan bunu yapmamıza izin verir; `x`, tek
+bir tek sayı (scalar) değil, `x_data` dizisinin tamamı).
 
 `term1 = -0.5 * np.log(2 * np.pi)`, sözcük anlamıyla
 $-\frac{1}{2}\ln(2\pi)$'dir; sembollerin yerine kod ile
-yazılmıştır. Burada gizli hiçbir şey yoktur, bu, birebir bir
-tercümesidir.
+yazılmıştır. Burada gizli hiçbir şey yok, bu birebir bir tercüme.
 
-`term2 = -np.log(sigma)`, yine doğrudan bir transkripsiyon olan
+`term2 = -np.log(sigma)`, yine doğrudan bir tercüme olan
 $-\ln(\sigma)$'dır.
 
 `term3 = -((y - mu)2) / (2 * (sigma2))`, $-\frac{1}{2\sigma^2}(y_t -
@@ -298,7 +298,7 @@ terimi her gözlem için aynı anda, elemanlar bazında hesaplar.
 
 `if sigma <= 0: return -np.inf` satırı, matematikte açıkça görünmeyen
 ama onunla örtük olarak ima edilen küçük ama önemli bir muhasebe
-parçasıdır: $\ln(\sigma)$, $\sigma \leq 0$ için tanımsızdır ve bir
+parçası: $\ln(\sigma)$, $\sigma \leq 0$ için tanımsızdır ve bir
 standart sapma zaten negatif ya da sıfır olamaz, bu yüzden kod kısa
 devre yaparak, programın anlamsız bir logaritma üzerinde çökmesine
 izin vermek yerine log-olurluğa negatif sonsuz değeri (yani "bu
@@ -307,9 +307,9 @@ imkansız") atar.
 Tek bir noktadan tüm veri kümesine: toplam nereden geliyor?
 
 Bu, kodda gözden kaçırılması kolay ama aslında gerçek kavramsal iş
-yapan bir adımdır. Daha önceki türetmeden hatırlayalım, bağımsızlık
+yapan bir adım. Daha önceki türetmeden hatırlayalım, bağımsızlık
 varsayımı altında tüm veri kümesinin ortak olurluğu, veri noktaları
-üzerinden bir çarpımdır:
+üzerinden bir çarpım:
 
 $$P(D|\alpha, \beta, \sigma) = \prod_{t=1}^{N} P(y_t|x_t, \alpha,
 \beta, \sigma)$$
@@ -322,10 +322,10 @@ $$\ln P(D|\alpha, \beta, \sigma) = \sum_{t=1}^{N} \ln P(y_t|x_t,
 \alpha, \beta, \sigma)$$
 
 `np.sum(term1 + term2 + term3)` ifadesinin yaptığı tam olarak
-budur. `term1`, `term2`, `term3`'ün her biri $N$ uzunluğunda bir
-dizidir (`term1` teknik olarak yayınlanan bir tek sayıdır, ama
-kavramsal olarak "$N$ konumdan her birine eklenen aynı sabit" olarak
-düşünebilirsiniz). Üç diziyi elemanlar bazında toplamak, size $t$
+budur. `term1`, `term2`, `term3`'ün her biri $N$ uzunluğunda bir dizi
+(`term1` teknik olarak yayınlanan bir tek sayıdır, ama kavramsal
+olarak "$N$ konumdan her birine eklenen aynı sabit" olarak
+düşünebiliriz). Üç diziyi elemanlar bazında toplamak, bize $t$
 konumunda tam olarak $\ln P(y_t|x_t, \alpha, \beta, \sigma)$'yı verir,
 nokta başına log-olurluk.
 
@@ -336,13 +336,12 @@ verildiğinde tüm veri kümesinin toplam log-olurluğudur.
 
 Yani `log_likelihood(alpha, beta, sigma, x, y)` fonksiyonu, belirsiz
 bir anlamda "olurluk" adı verilen soyut bir niceliği hesaplamıyor, çok
-gerçek anlamda, `alpha`, `beta` ve `sigma` olarak beslediğiniz belirli
-sayılar için, toplanmış log-olurluk formülünün sağ tarafını
-hesaplıyor.
+gerçek anlamda, `alpha`, `beta` ve `sigma` olarak verdiğimiz belirli
+sayılar için toplanmış log-olurluk formülünün sağ tarafını hesaplıyor.
 
 Salt matematiksel türetmenin kapsamadığı parça: önsel
 
-Orijinal türetme yalnızca olurlukla, $P(D|\alpha, \beta, \sigma)$ ile,
+Baştaki türetim yalnızca olurlukla, $P(D|\alpha, \beta, \sigma)$ ile,
 yani "parametreler verildiğinde, veri ne kadar olasıdır?" sorusuyla
 ilgileniyordu. Ancak kod ayrıca şunu da tanımlıyor:
 
@@ -357,23 +356,24 @@ def log_prior(alpha, beta, sigma):
     return 0.0
 ```
 
-Bu, daha önceki `smf.ols(...)` çağrılarındaki gibi sıradan bir
-(Bayessel olmayan, "frekansçı") regresyonda karşılığı olmayan Bayessel
-bileşendir. Bayessel çıkarımda, herhangi bir veriye bakmadan önce,
+Bu, daha önceki `smf.ols(...)` çağrılarındaki gibi sıradan bir (Bayes
+olmayan, "frekansçı") regresyonda karşılığı olmayan Bayes usulü
+bileşendir. Bayes tarzı çıkarımda herhangi bir veriye bakmadan önce
 parametrelerin makul olarak hangi değerleri alabileceğine dair bir
-önsel inanç ifade edersiniz. Burada seçilen önsel, sınırlı bir kutu
-üzerinde "düz" ya da "tekdüze" önsel olarak adlandırılan şeydir:
-$-100$ ile $100$ arasındaki herhangi bir $\alpha$, $-10$ ile $10$
-arasındaki herhangi bir $\beta$ ve $0$ ile $50$ arasındaki herhangi
-bir $\sigma$ eşit derecede olası kabul edilir (fonksiyonun sabit $0.0$
-döndürmesinin nedeni budur, ve unutmayalım, bu bir log-önseldir,
-dolayısıyla $0$'lık bir log-olasılık, orantılı olarak $1$'lik bir
-olasılığa karşılık gelir, yani "tekdüze olası"). Bu kutuların
-dışındaki her şey imkansız ilan edilir, dolayısıyla log-uzayında
-$-\infty$ (bu da tam olarak $0$'lık bir olasılığa karşılık gelir).
+önsel inanç ifade edilir. Burada seçilen önsel, sınırlı bir kutu
+üzerinde "düz" ya da "birörnek (uniform)" önsel olarak adlandırılan
+şeydir: $-100$ ile $100$ arasındaki herhangi bir $\alpha$, $-10$ ile
+$10$ arasındaki herhangi bir $\beta$ ve $0$ ile $50$ arasındaki
+herhangi bir $\sigma$ eşit derecede olası kabul edilir (fonksiyonun
+sabit $0.0$ döndürmesinin nedeni budur, ve unutmayalım, bu bir
+log-önsel, dolayısıyla $0$'lık bir log-olasılık, orantılı olarak
+$1$'lik bir olasılığa karşılık gelir, yani "birörnek olası"). Bu
+kutuların dışındaki her şey imkansız ilan edilir, dolayısıyla
+log-uzayında $-\infty$ (bu da tam olarak $0$'lık bir olasılığa
+karşılık gelir).
 
-Bu, pedagojik olarak önemlidir çünkü "Bayessel" sözcüğünün belgenin
-başlığında neden yer aldığını gösterir: çıkarım yalnızca olurluğa
+Bu pedagojik olarak önemli çünkü "Bayes" sözcüğünün belgenin
+başlığında neden yer aldığını gösteriyor: çıkarım yalnızca olurluğa
 dayanmaz, bu olurluğu bu önselle Bayes kuralı aracılığıyla
 birleştirmeye dayanır. Log-uzayında, (normalleştirilmemiş) sonsal için
 Bayes kuralı yalnızca bir toplamadır:
@@ -393,25 +393,25 @@ def log_posterior(alpha, beta, sigma, x, y):
 
 Tek bir toplama satırı, ama belgenin tamamının doğru yönde inşa ettiği
 toplama budur: log-olurluk (Gauss PDF'sinden uzun uzadıya türetilmiş)
-artı log-önsel (basit bir sınır-kutusu varsayımı), log-sonsale
+artı log-önsel (basit bir sınır-kutusu varsayımı), log-sonsala
 eşittir.
 
 Neden örnekleme ve metropolis_sampler'ın gerçekte ne yaptığı
 
 İşte üzerinde durmaya değer bir detay, çünkü bu "bir formülümüz
 var"dan "25.000 kez bir döngü çalıştırıyoruz"a kavramsal
-sıçramadır. Klasik bir regresyonda (daha önceki `smf.ols` çağrısı),
-her parametre için tek bir en-iyi-uyum sayısı elde edersiniz; bu, tek
+sıçrama. Klasik bir regresyonda (daha önceki `smf.ols` çağrısı), her
+parametre için tek bir en-iyi-uyum sayısı elde edersiniz; bu, tek
 seferde analitik olarak hesaplanır. Bayessel ortamda ise tek bir sayı
-istemezsiniz, $(\alpha, \beta, \sigma)$ üzerindeki sonsal dağılımın
-tamamını istersiniz; bu da, veriyle ne kadar tutarlı olduklarına göre
+istemeyiz, $(\alpha, \beta, \sigma)$ üzerindeki sonsal dağılımın
+tamamını isteriz; bu da veriyle ne kadar tutarlı olduklarına göre
 ağırlıklandırılmış, veriyle tutarlı olan parametre değerlerinin tüm
 aralığını bilmek istediğiniz anlamına gelir. En basit modellerin
 ötesindeki her şey için, bu dağılımın yazıp doğrudan
-değerlendirebileceğiniz temiz bir kapalı-form formülü yoktur; yalnızca
-(normalleştirilmemiş) sonsal yoğunluğu belirli bir $(\alpha, \beta,
-\sigma)$ noktasında, `log_posterior` aracılığıyla
-değerlendirebilirsiniz. Bunun etrafından dolaşmanın yolu, dağılımı
+değerlendirebileceğiniz temiz bir kapalı biçimli formülü yoktur;
+yalnızca (normalleştirilmemiş) sonsal yoğunluğu belirli bir $(\alpha,
+\beta, \sigma)$ noktasında, `log_posterior` aracılığıyla
+değerlendirebiliriz. Bunun etrafından dolaşmanın yolu, dağılımı
 doğrudan çözmek yerine ondan örneklem almaktır ve Metropolis
 algoritması bunu yapmanın en basit yollarından biridir.
 
@@ -439,10 +439,10 @@ büyükse), hareket her zaman kabul edilir. Önerilen noktanın yoğunluğu
 daha düşükse, yalnızca o orana eşit bir olasılıkla belirli zamanlarda
 kabul edilir, bu, tam olarak neden `log_acceptance_ratio` ile
 birimleri eşleştirmek için log-biçiminde alınmış, $(0, 1)$ üzerinde
-tekdüze bir dağılımdan rastgele bir çekilişle karşılaştırdığınızın
+birörnek bir dağılımdan rastgele bir çekilişle karşılaştırdığımızın
 nedenidir. "Daha kötü" hareketlerin bu olasılıksal kabulü, tam olarak
 zincirin, bir optimize edicinin yapacağı gibi doğrudan tek bir zirveye
-yürüyüp orada durmak yerine, sonselin tüm şeklini keşfetmesine izin
+yürüyüp orada durmak yerine, sonsalın tüm şeklini keşfetmesine izin
 veren şeydir.
 
 Öneri kabul edilsin ya da reddedilsin, `alpha_trace[i]`,
@@ -460,12 +460,12 @@ beta_chain[burn_in:]`, zincirle herhangi bir şey yapmadan önce ilk
 5.000 örneği atmaktır. Bu, Metropolis algoritmasının bilinen bir
 tuhaflığını ele alır: algoritma, keyfi bir noktadan başlar
 (fonksiyonun içinde `current_alpha = 0.0`, `current_beta = 0.0`,
-`current_sigma = 1.0` olarak ayarlanmıştır); bu nokta, sonselin
+`current_sigma = 1.0` olarak ayarlanmıştır); bu nokta, sonsalın
 gerçekte kütlesinin çoğuna sahip olduğu yerden uzak olabilir,
 dolayısıyla zincirin erken kısmı, ondan anlamlı bir şekilde örneklem
 almak yerine yüksek-yoğunluklu bölgeye "yürüyerek yaklaşmakla"
 geçer. Bu ilk geçici kısmı atıp yalnızca 5.001. yinelemeden itibaren
-gelen örnekleri tutmak, gerçek sonselin daha temiz bir yaklaşımını
+gelen örnekleri tutmak, gerçek sonsalın daha temiz bir yaklaşımını
 verir.
 
 Son yazdırılan satırlar, `np.mean(final_beta)` ve
@@ -557,7 +557,7 @@ tam bire toplanan bir alternatif te göreceğiz).
 
 Dikkat edelim bölme noktaları $\tau$ reel sayılardır, her ne kadar
 veri bir dizin (array) içinde olsa bile (ki dizin erişim indisleri tam
-sayıdır -inteğer- reel değil) $\tau$ tanımını reel sayı yapmak sonsal
+sayıdır -integer- reel değil) $\tau$ tanımını reel sayı yapmak sonsal
 dağılımdan örneklem almayı kolaylaştırdı. Bu yaklaşımı bazen
 x-kordinatında sene olan bazı veri işleme yöntemlerinde görebiliyoruz,
 hesapları kolaylaştırmak için sene reel kabul ediliyor, ve mesela
