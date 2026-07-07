@@ -551,7 +551,8 @@ belirsizliği tanımlayan tam bir dağılımla birlikte geliyor.</p>
 bölmek, ve bu her bölüm üzerinde regresyonun farklı bir kesi ve eğime
 sahip olmasına izin vermek istiyorsak o zaman formülasyonu biraz
 değiştirmek gerekecek. İdeal olarak hala tek bir sonsal fonksiyona,
-dağılıma ulaşmak istiyoruz. Gereken değişkenleri tanımlayalım,</p>
+dağılıma ulaşmak istiyoruz. Diyelim ki üç tane blok var. Gereken
+değişkenleri tanımlayalım,</p>
 <p>Veri <span
 class="math inline">\(D=\{(x_{t},y_{t})\}_{t=1}^{N}\)</span>.</p>
 <ul>
@@ -571,7 +572,7 @@ P(\tau, \alpha, \beta, \sigma^2 | D) \propto P(D | \tau, \alpha,
 \beta, \sigma^2) P(\tau) P(\alpha) P(\beta) P(\sigma^2)
 \tag{1}
 \]</span></p>
-<p>Eğer elimizde üç blok olsaydı, o zaman iki değişim noktası <span
+<p>Üç blok için iki değişim noktası <span
 class="math inline">\(\tau_1\)</span>, <span
 class="math inline">\(\tau_2\)</span> üzerinden <span
 class="math inline">\(\hat{\mu}_t\)</span>, ve <span
@@ -606,8 +607,8 @@ class="math inline">\(w_{2}(t)=\sigma(t,\tau_{1},k)\cdot(1-\sigma(t,\tau_{2},k))
 <li><p><span
 class="math inline">\(w_{3}(t)=\sigma(t,\tau_{2},k)\)</span></p></li>
 </ul>
-<p>Görülen <span class="math inline">\(\sigma\)</span> fonksiyonu
-sigmoid fonksiyonudur, tanımı</p>
+<p>ki <span class="math inline">\(\sigma\)</span> fonksiyonu sigmoid
+diye bilinir, tanımı</p>
 <p><span class="math display">\[
 \sigma_{j}(t)=\frac{1}{1+e^{-k(t-\tau_{j})}} \quad \text{for }
 j=1,2,...,M-1
@@ -616,8 +617,19 @@ j=1,2,...,M-1
 olduğu da görülebilir (yaklaşık dedik çünkü bazı şartlarda 1’e
 toplanamayabilir, ileride daha sağlam, tam bire toplanan bir alternatif
 te göreceğiz).</p>
+<p>Dikkat edelim bölme noktaları <span
+class="math inline">\(\tau\)</span> reel sayılardır, her ne kadar veri
+bir dizin (array) içinde olsa bile (ki dizin erişim indisleri tam
+sayıdır -inteğer- reel değil) <span class="math inline">\(\tau\)</span>
+tanımını reel sayı yapmak sonsal dağılımdan örneklem almayı
+kolaylaştırdı. Bu yaklaşımı bazen x-kordinatında sene olan bazı veri
+işleme yöntemlerinde görebiliyoruz, hesapları kolaylaştırmak için sene
+reel kabul ediliyor, ve mesela hesaplar sırasında 1996.5 gibi bir sene
+görülebiliyor, bu sene ortasına tekabül eder tabii, algoritma bunu
+gerektiği yerde tercüme edebilir, 1996.5 o senenin Haziran sonudur gibi
+mesela.</p>
 <p>Açıp kapama işini yapan bir nevi şalter gibi iş gören fonksiyon için
-sigmoid seçildi. Bu fonksiyonun nasıl davrandığını görmek için bazı
+sigmoid seçtik. Bu fonksiyonun nasıl davrandığını görmek için bazı
 örneklerle bakalım.</p>
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -864,6 +876,18 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a h
 <span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_102_regchpt_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_102_regchpt_02.jpg" /></p>
+<p>Kaç Tane Parça En İyi</p>
+<p>Aynen kümeleme (clustering) problemlerinde olduğu gibi bu problemde
+de acaba kaç tane doğru parçası veriyi daha iyi açıklar sorusunu
+sorabilirdik, kümeleme problemlerinde kaç küme daha iyidir diye sorulur.
+Bu önemli çünkü üstteki algoritma önceden tanımlanan kadar doğru
+parçasını bir şekilde “bulacaktır” çünkü o kadar bulunması önceden
+tanımlanmış.</p>
+<p>Çözüm yöntemi kümeleme yöntemlerinde kullanılan yaklaşımla aynı.
+Metropolis örneklem döngüleri bittikten sonra uyumun başarısını
+raporlayan AIC ve BIC hesapları görülüyor. Farklı çizgi sayılarını
+deneyip AIC ve BIC sonuçlarına bakabiliriz, hangi çizgi sayısı daha iyi
+sonuç veriyorsa o sayıyı optimal olarak kullanırız.</p>
 <h3 id="uygulama-korelasyon-analizi">Uygulama: Korelasyon Analizi</h3>
 <p>Korelasyon hesaplarında genel yaklaşım iki tane zaman serisinin
 tamamını kullanarak korelasyon hesaplamaktır. Fakat bazı durumlarda
@@ -895,15 +919,26 @@ Block 2 (2012-03-19 to 2014-11-26): Correlation r = -0.260 pval = 0.000
 Block 3 (2014-11-26 to 2021-03-30): Correlation r = -0.283 pval = 0.000
 Block 4 (2021-03-30 to 2024-03-08): Correlation r = 0.618 pval = 0.000
 Block 5 (2024-03-08 to 2026-06-29): Correlation r = -0.783 pval = 0.000</code></pre>
-<p><code>2021-03-30</code> ve <code>2024-03-07</code> arasındaki bloğa
-dikkat, burada korelasyon negatiften pozitife dönmüş. 2022 yılında ABD
-Merkez Bankası 40 yıldır görülmemiş bir şekilde faizleri yükseltmeye
-başladı. Normal kurallara göre altının fiyatının düşmesi gerekiyordu.
-Tam aksine altın artmaya başladı. Yapısal bir değişim ortaya çıkmıştı,
-Rusya’nın rezervleri Batı bankalarında dondurulmuştu, gelişmekte olan
-ülkelerin merkez bankaları birdenbire G7 ülkelerinin tahvillerini
-tutmanın riskli olduğuna karar verince ve dolardan kaçma ve altına hücum
-başladı.</p>
+<p>Saptanan blokların korelasyon değerini ek bir çağrı, o bloklar
+üzerinde bir <code>p_corr</code> çağrısı ile
+(<code>DataFrame.corr</code> da olabilirdi) hesapladık. Peki niye o veri
+parçasına uydurulan çizginin eğimini direk kullanmadık? Standardize
+edilen veri üzerinde regresyon eğiminin korelasyona eşit olduğunu
+söylemiştik. Buradaki tek pürüz standardizasyonun tüm veri üzerinden
+yapılmış olması, her parçanın merkezi ve standart sapması aynı
+olmayabilir, gerçi kabaca yakın olması muhtemeldir. Bu sebeple normalize
+edilmiş veriyi parçaların başlangıç bitiş noktasını bulmak için
+kullandık, ama bulunan parçaların nihai korelasyonu için ayrı bir çağrı
+yaptık.</p>
+<p>Şimdi sonuçlara bakalım. <code>2021-03-30</code> ve
+<code>2024-03-07</code> arasındaki bloğa dikkat, burada korelasyon
+negatiften pozitife dönmüş. 2022 yılında ABD Merkez Bankası 40 yıldır
+görülmemiş bir şekilde faizleri yükseltmeye başladı. Normal kurallara
+göre altının fiyatının düşmesi gerekiyordu. Tam aksine altın artmaya
+başladı. Yapısal bir değişim ortaya çıkmıştı, Rusya’nın rezervleri Batı
+bankalarında dondurulmuştu, gelişmekte olan ülkelerin merkez bankaları
+birdenbire G7 ülkelerinin tahvillerini tutmanın riskli olduğuna karar
+verince ve dolardan kaçma ve altına hücum başladı.</p>
 <p><code>2024-03-08</code> ve <code>2026-06-29</code> arasında normal
 finans kuralları dönüş yapmış, ilk dolardan kaçıs fiyatlandıktan sonra
 merkez banka alımları stabil bir seyre girdi, ve klasik fiyatlama

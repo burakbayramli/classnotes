@@ -469,7 +469,8 @@ Eğer veriyi nerede olduklarını baştan bilmediğimiz noktalar arasında
 bölmek, ve bu her bölüm üzerinde regresyonun farklı bir kesi ve eğime
 sahip olmasına izin vermek istiyorsak o zaman formülasyonu biraz
 değiştirmek gerekecek. İdeal olarak hala tek bir sonsal fonksiyona,
-dağılıma ulaşmak istiyoruz. Gereken değişkenleri tanımlayalım,
+dağılıma ulaşmak istiyoruz. Diyelim ki üç tane blok var. Gereken
+değişkenleri tanımlayalım,
 
 Veri $D=\{(x_{t},y_{t})\}_{t=1}^{N}$. 
 
@@ -490,9 +491,8 @@ P(\tau, \alpha, \beta, \sigma^2 | D) \propto P(D | \tau, \alpha,
 \tag{1}
 $$
 
-Eğer elimizde üç blok olsaydı, o zaman iki değişim noktası $\tau_1$,
-$\tau_2$ üzerinden $\hat{\mu}_t$, ve $\hat{\sigma}_t$ şöyle
-olabilirdi,
+Üç blok için iki değişim noktası $\tau_1$, $\tau_2$ üzerinden
+$\hat{\mu}_t$, ve $\hat{\sigma}_t$ şöyle olabilirdi,
 
 $$
 \hat{\mu}_{t}=w_{1}(t)\cdot(\alpha_{1} +
@@ -526,7 +526,7 @@ içeriyor, çünkü o ağırlıkları şöyle tanımlıyoruz,
 
 * $w_{3}(t)=\sigma(t,\tau_{2},k)$ 
 
-Görülen $\sigma$ fonksiyonu sigmoid fonksiyonudur, tanımı
+ki $\sigma$ fonksiyonu sigmoid diye bilinir, tanımı
 
 $$
 \sigma_{j}(t)=\frac{1}{1+e^{-k(t-\tau_{j})}} \quad \text{for }
@@ -537,8 +537,18 @@ $\sum_{j=1}^{M}w_{j}(t) \approx 1$ olduğu da görülebilir (yaklaşık
 dedik çünkü bazı şartlarda 1'e toplanamayabilir, ileride daha sağlam,
 tam bire toplanan bir alternatif te göreceğiz).
 
+Dikkat edelim bölme noktaları $\tau$ reel sayılardır, her ne kadar
+veri bir dizin (array) içinde olsa bile (ki dizin erişim indisleri tam
+sayıdır -inteğer- reel değil) $\tau$ tanımını reel sayı yapmak sonsal
+dağılımdan örneklem almayı kolaylaştırdı. Bu yaklaşımı bazen
+x-kordinatında sene olan bazı veri işleme yöntemlerinde görebiliyoruz,
+hesapları kolaylaştırmak için sene reel kabul ediliyor, ve mesela
+hesaplar sırasında 1996.5 gibi bir sene görülebiliyor, bu sene
+ortasına tekabül eder tabii, algoritma bunu gerektiği yerde tercüme
+edebilir, 1996.5 o senenin Haziran sonudur gibi mesela.
+
 Açıp kapama işini yapan bir nevi şalter gibi iş gören fonksiyon için
-sigmoid seçildi. Bu fonksiyonun nasıl davrandığını görmek için bazı
+sigmoid seçtik. Bu fonksiyonun nasıl davrandığını görmek için bazı
 örneklerle bakalım.
 
 
@@ -789,6 +799,21 @@ plt.savefig('stat_102_regchpt_02.jpg')
 
 ![](stat_102_regchpt_02.jpg)
 
+Kaç Tane Parça En İyi
+
+Aynen kümeleme (clustering) problemlerinde olduğu gibi bu problemde de
+acaba kaç tane doğru parçası veriyi daha iyi açıklar sorusunu
+sorabilirdik, kümeleme problemlerinde kaç küme daha iyidir diye
+sorulur. Bu önemli çünkü üstteki algoritma önceden tanımlanan kadar
+doğru parçasını bir şekilde "bulacaktır" çünkü o kadar bulunması
+önceden tanımlanmış.
+
+Çözüm yöntemi kümeleme yöntemlerinde kullanılan yaklaşımla aynı.
+Metropolis örneklem döngüleri bittikten sonra uyumun başarısını
+raporlayan AIC ve BIC hesapları görülüyor. Farklı çizgi sayılarını
+deneyip AIC ve BIC sonuçlarına bakabiliriz, hangi çizgi sayısı daha
+iyi sonuç veriyorsa o sayıyı optimal olarak kullanırız.
+
 ### Uygulama: Korelasyon Analizi
 
 Korelasyon hesaplarında genel yaklaşım iki tane zaman serisinin
@@ -827,20 +852,33 @@ Block 4 (2021-03-30 to 2024-03-08): Correlation r = 0.618 pval = 0.000
 Block 5 (2024-03-08 to 2026-06-29): Correlation r = -0.783 pval = 0.000
 ```
 
-`2021-03-30` ve `2024-03-07` arasındaki bloğa dikkat, burada korelasyon
-negatiften pozitife dönmüş. 2022 yılında ABD Merkez Bankası 40 yıldır
-görülmemiş bir şekilde faizleri yükseltmeye başladı. Normal kurallara
-göre altının fiyatının düşmesi gerekiyordu. Tam aksine altın artmaya
-başladı. Yapısal bir değişim ortaya çıkmıştı, Rusya'nın rezervleri
-Batı bankalarında dondurulmuştu, gelişmekte olan ülkelerin merkez
-bankaları birdenbire G7 ülkelerinin tahvillerini tutmanın riskli
-olduğuna karar verince ve dolardan kaçma ve altına hücum başladı.
+Saptanan blokların korelasyon değerini ek bir çağrı, o bloklar
+üzerinde bir `p_corr` çağrısı ile (`DataFrame.corr` da olabilirdi)
+hesapladık. Peki niye o veri parçasına uydurulan çizginin eğimini
+direk kullanmadık? Standardize edilen veri üzerinde regresyon eğiminin
+korelasyona eşit olduğunu söylemiştik. Buradaki tek pürüz
+standardizasyonun tüm veri üzerinden yapılmış olması, her parçanın
+merkezi ve standart sapması aynı olmayabilir, gerçi kabaca yakın
+olması muhtemeldir. Bu sebeple normalize edilmiş veriyi parçaların
+başlangıç bitiş noktasını bulmak için kullandık, ama bulunan
+parçaların nihai korelasyonu için ayrı bir çağrı yaptık.
+
+Şimdi sonuçlara bakalım. `2021-03-30` ve `2024-03-07` arasındaki bloğa
+dikkat, burada korelasyon negatiften pozitife dönmüş. 2022 yılında ABD
+Merkez Bankası 40 yıldır görülmemiş bir şekilde faizleri yükseltmeye
+başladı. Normal kurallara göre altının fiyatının düşmesi
+gerekiyordu. Tam aksine altın artmaya başladı. Yapısal bir değişim
+ortaya çıkmıştı, Rusya'nın rezervleri Batı bankalarında dondurulmuştu,
+gelişmekte olan ülkelerin merkez bankaları birdenbire G7 ülkelerinin
+tahvillerini tutmanın riskli olduğuna karar verince ve dolardan kaçma
+ve altına hücum başladı.
 
 `2024-03-08` ve `2026-06-29` arasında normal finans kuralları dönüş
 yapmış, ilk dolardan kaçıs fiyatlandıktan sonra merkez banka alımları
 stabil bir seyre girdi, ve klasik fiyatlama kuralları geri
 döndü. Enflasyonun küresel olarak dönüşü ABD faizlerinde artışı
 tetikledi, bu sefer altın ters şekilde etkilendi.
+
 
 Kodlar
 
