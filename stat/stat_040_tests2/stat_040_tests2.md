@@ -138,7 +138,7 @@ atabiliriz, sonra çıplak gözle AIC'e bakarız, vs. Fakat bu testi daha
 İstatistiksel bir hipotez testi olarak yapmak daha iyi olmaz mıydı? Alttaki
 test bu durumlar için kullanılır,
 
-F Testi
+### F Testi
 
 Diyelim ki reklam harcamasının satışı etkileyip etkilemediğini merak
 ediyoruz. Fakat artık bir değil iki tane reklam ile alakalı değişkenimiz
@@ -300,7 +300,7 @@ Testin özünde şu var, ki varyansın eşitsizliği oranın 1'den ne kadar uzak
 olduğuna bağlı. Ama ne kadar uzak istatistiki olarak önemli bir uzaklık? İşte
 bunun cevabını F-dağılımı veriyor. 
 
-Örneklem Korelasyonu 
+### Korelasyonların P-Değeri
 
 Korelasyon $\rho$'yu daha önce gördük, tahmin edicisi $r$'dir, 
 
@@ -410,7 +410,7 @@ print (c, pval)
 p-değeri çok küçük, demek ki korelason olmadığı tezi reddedildi. Korelasyon
 var.
 
-Pearson Chi Kare Uyum Derecesi (Goodness-of-Fit) Testi
+### Pearson Chi Kare Uyum Derecesi (Goodness-of-Fit) Testi
 
 Her sene günde kaç saat çalıştığımızı bir yere yazdık diyelim, elde 365
 veri noktası var. Ertesi sene yine aynı veriyi topladık, şu soruyu
