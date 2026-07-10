@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"],
+        ud: ["Macro", "{\\,\\mathrm{d}#1}\\,", 1]
+      });
+    });
+    </script>  
+   
+  <title>Kovaryans ve Korelasyon - 2</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1 id="kovaryans-ve-korelasyon---2">Kovaryans ve Korelasyon - 2</h1>
+<p>Matrisler İle Kovaryans Hesabı</p>
+<p>Eğer verinin kolonları arasındaki ilişkiyi görmek istersek, en hızlı
+yöntem matristeki her kolonun (değişkenin) ortalamasını kendisinden
+çıkartmak, yani onu “sıfırda ortalamak’’ ve bu matrisin devriğini alarak
+kendisi ile çarpmaktır. Bu işlem her kolonu kendisi ve diğer kolonlar
+ile noktasal çarpımdan geçirecektir ve çarpım, toplama sonucunu nihai
+matrise yazacaktır. Çarpımların bildiğimiz özelliğine göre, artı değer
+artı değerle çarpılınca artı, eksi ile eksi artı, eksi ile artı eksi
+verir, ve bu bilgi bize ilinti bulma hakkında güzel bir ipucu sunar.
+Pozitif sonucun pozitif korelasyon, negatif ise tersi şekilde ilinti
+olduğu sonucuna böylece kolayca erişebiliriz.</p>
+<p>Tanım</p>
+<p><span class="math display">\[ S = \frac{1}{n} (X-E(X))^T(X-E(X)))
+\]</span></p>
+<p>Pandas ile <code>cov</code> çağrısı bu hesabı hızlı bir şekilde
+yapar,</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;iris.csv&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">&#39;Sepal Length&#39;</span>,  <span class="st">&#39;Sepal Width&#39;</span>,  <span class="st">&#39;Petal Length&#39;</span>,  <span class="st">&#39;Petal Width&#39;</span>]]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (df.cov())</span></code></pre></div>
+<pre><code>              Sepal Length  Sepal Width  Petal Length  Petal Width
+Sepal Length      0.685694    -0.039268      1.273682     0.516904
+Sepal Width      -0.039268     0.188004     -0.321713    -0.117981
+Petal Length      1.273682    -0.321713      3.113179     1.296387
+Petal Width       0.516904    -0.117981      1.296387     0.582414</code></pre>
+<p>Eger kendimiz bu hesabi yapmak istersek,</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>means <span class="op">=</span> df.mean()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> df.shape[<span class="dv">0</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> df.<span class="bu">apply</span>(<span class="kw">lambda</span> x: x <span class="op">-</span> means, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.dot(df2.T,df2) <span class="op">/</span> n)</span></code></pre></div>
+<pre><code>[[ 0.68112222 -0.03900667  1.26519111  0.51345778]
+ [-0.03900667  0.18675067 -0.319568   -0.11719467]
+ [ 1.26519111 -0.319568    3.09242489  1.28774489]
+ [ 0.51345778 -0.11719467  1.28774489  0.57853156]]</code></pre>
+<p>Verisel kovaryansın sayısal gösterdiğini grafiklemek istersek, yani
+iki veya daha fazla boyutun arasındaki ilişkileri grafiklemek için
+yöntemlerden birisi verideki mümkün her ikili ilişkiyi grafiksel olarak
+göstermektir. Pandas <code>scatter_matrix</code> bunu yapabilir. Iris
+veri seti üzerinde görelim, her boyut hem y-ekseni hem x-ekseninde
+verilmiş, ilişkiyi görmek için eksende o boyutu bulup kesişme
+noktalarındaki grafiğe bakmak lazım.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#df = df.iloc[:,0:4]</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pd.plotting.scatter_matrix(df)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_summary_01.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_summary_01.png" /></p>
+<p><img src="stat_cov_corr_01.png" /></p>
+<p>İlişki olduğu zaman o ilişkiye tekabül eden grafikte “düz çizgiye
+benzer’’ bir görüntü olur, demek ki değişkenlerden biri artınca öteki de
+artıyor (eğer çizgi soldan sage yukarı doğru gidiyorsa), azalınca öteki
+de azalıyor demektir (eğer çizgi aşağı doğru iniyorsa). Eğer ilinti yok
+ise bol gürültülü, ya da yuvarlak küreye benzer bir şekil çıkar. Üstteki
+grafiğe göre yaprak genişliği (petal width) ile yaprak boyu (petal
+length) arasında bir ilişki var.</p>
+<p>Tanım</p>
+<p><span class="math inline">\(X,Y\)</span> rasgele değişkenlerin
+arasındaki kovaryans,</p>
+<p><span class="math display">\[ Cov(X,Y) = E(X-E(X))(Y-E(Y))
+\]</span></p>
+<p>Yani hem <span class="math inline">\(X\)</span> hem <span
+class="math inline">\(Y\)</span>’nin beklentilerinden ne kadar
+saptıklarını her veri ikilisi için, çıkartarak tespit ediyoruz, daha
+sonra bu farkları birbiriyle çarpıyoruz, ve beklentisini alıyoruz (yani
+tüm olasılık üzerinden ne olacağını hesaplıyoruz).</p>
+<p>Ayrı ayrı <span class="math inline">\(X,Y\)</span> değişkenleri
+yerine çok boyutlu <span class="math inline">\(X\)</span> kullanırsak,
+ki boyutları <span class="math inline">\(m,n\)</span> olsun yani <span
+class="math inline">\(m\)</span> veri noktası ve <span
+class="math inline">\(n\)</span> boyut (özellik, öğe) var, tanımı şöyle
+ifade edebiliriz,</p>
+<p><span class="math display">\[ \Sigma = Cov(X) = E((X-E(X))^T(X-E(X)))
+\]</span></p>
+<p>Phi Korelasyon Katsayısı</p>
+<p>Phi katsayısı iki tane ikisel değişkenin birbiriyle ne kadar alakalı,
+bağlantılı olduğunu hesaplayan bir ölçüttür. Mesela <span
+class="math inline">\(x,y\)</span> değişkenleri için elde olan <span
+class="math inline">\((x_1,y_1),(x_2,y_2),..\)</span> verilerini
+kullanarak hem <span class="math inline">\(x=1\)</span> hem <span
+class="math inline">\(y=1\)</span> olan verileri sayıp toplamı <span
+class="math inline">\(n_{11}\)</span>’e yazarız, <span
+class="math inline">\(y=1,x=0\)</span> icin <span
+class="math inline">\(n_{10}\)</span>, aynı şekilde diğer
+kombinasyonlara bakarak alttaki tabloyu oluştururuz [5],</p>
+<p><img src="phitable.png" /></p>
+<p>Phi korelasyon katsayısı</p>
+<p><span class="math display">\[
+\phi = \frac{n_{11}n - n_{1\bullet}n_{\bullet 1}}
+{\sqrt{n_{0\bullet} n_{1\bullet} n_{\bullet 0} n_{\bullet 1}}}
+\tag{6}
+\]</span></p>
+<p>ile hesaplanır. Bu ifadeyi türetmek için iki rasgele değişken
+arasındaki korelasyonu hesaplayan formül ile başlıyoruz,</p>
+<p><span class="math display">\[ Corr(X,Y) = \frac{E (x-E(X)) (y-E(Y))
+}{\sqrt{Var(X) \cdot Var(Y) } } \]</span></p>
+<p><span class="math display">\[
+= \frac{E(XY) - E(X)E(Y)}{ \sqrt{Var(X) \cdot Var(Y)} }
+\]</span></p>
+<p><span class="math inline">\(X,Y\)</span> değişkenlerinin Bernoulli
+dağılımına sahip olduğunu düşünelim, çünkü 0/1 değerlerine sahip
+olabilen ikisel değişkenler bunlar, o zaman</p>
+<p><span class="math display">\[
+E[X]= \frac{n_{1\bullet}}{n}, \quad
+Var[X]= \frac{n_{0\bullet}n_{1\bullet}}{n^2}, \quad
+E[Y]= \frac{n_{\bullet 1}}{n}, \quad
+Var[Y]= \frac{n_{\bullet 0}n_{\bullet 1}}{n^2}, \quad
+E[XY]= \frac{n_{11}}{n^2}
+\]</span></p>
+<p>olacaktır. <span class="math inline">\(E(XY)\)</span> nasıl
+hesaplandı? Ayrıksal dağılımlar için beklenti formülünün iki değişken
+için şöyle ifade edildiğini biliyoruz,</p>
+<p><span class="math display">\[  E[XY] = \sum_i\sum_j x_i\cdot y_j
+\cdot P\{X = x_i, Y = y_j\} \]</span></p>
+<p>Bu ifadeyi tabloya uyarlarsak, ve tablodaki hesapların üstteki
+ifadeler için tahmin ediciler olduğunu biliyoruz, iki üstteki sonucu
+elde edebileceğimizi görürüz, çünkü tek geçerli toplam <span
+class="math inline">\(x_i y_i\)</span> her iki değişken de aynı anda 1
+olduğunda geçerlidir. Bu değerleri yerine geçirince (6) elde edilir.</p>
+<p>Phi katsayısının bir diğer ismi Matthews korelasyon katsayısı. Bu
+hesabı mesela bir 0/1 tahmini üreten sınıflayıcının başarısını ölçmek
+için kullanabiliriz, gerçek, test 0/1 verileri bir dizinde, üretilen
+tahminler bir diğerinde olur, ve Phi katsayısı ile aradaki uyumu
+raporlarız. Sonuç -1,+1 arasında olacağı için sonuca bakarak irdeleme
+yapmak kolaydır, bu bir başarı raporu olarak algılanabilir. Ayrıca Phi
+hesabının, AUC hesabı gibi, dengesiz veri setleri üzerinde (mesela 0’a
+kıyasla çok daha fazla 1 olan veriler, ya da tam tersi) üzerinde bile
+hala optimal olarak çalıştığı [4] bulunmuştur.</p>
+<p>Bazı örnekler,</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> matthews_corrcoef</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> [<span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> [<span class="op">+</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> ((matthews_corrcoef(y_true, y_pred)  ))</span></code></pre></div>
+<pre><code>-0.333333333333</code></pre>
+<p>Ya da</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [[<span class="dv">0</span>,  <span class="dv">0</span>],[<span class="dv">0</span>,  <span class="dv">0</span>],[<span class="dv">0</span>,  <span class="dv">0</span>],[<span class="dv">0</span>,  <span class="dv">0</span>],[<span class="dv">0</span>,  <span class="dv">0</span>],[<span class="dv">1</span>,  <span class="dv">0</span>],<span class="op">\</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">0</span>],[<span class="dv">1</span>,  <span class="dv">0</span>],[<span class="dv">0</span>,  <span class="dv">1</span>],[<span class="dv">0</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],<span class="op">\</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],<span class="op">\</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">1</span>], [<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],<span class="op">\</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>],[<span class="dv">1</span>,  <span class="dv">1</span>]]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array(a)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> ((matthews_corrcoef(a[:,<span class="dv">0</span>], a[:,<span class="dv">1</span>])))</span></code></pre></div>
+<pre><code>0.541553390893</code></pre>
+<p>Medyan ve Yüzdelikler (Percentile)</p>
+<p>Üstteki hesapların çoğu sayıları toplayıp, bölmek üzerinden yapıldı.
+Medyan ve diğer yüzdeliklerin hesabı (ki medyan 50. yüzdeliğe tekabül
+eder) için eldeki tüm değerleri “sıraya dizmemiz” ve sonra 50. yüzdelik
+için ortadakine bakmamız gerekiyor. Mesela eğer ilk 5. yüzdeliği
+arıyorsak ve elimizde 80 tane değer var ise, baştan 4. sayıya / vektör
+hücresine / öğeye bakmamız gerekiyor. Eğer 100 eleman var ise, 5. sayıya
+bakmamız gerekiyor, vs.</p>
+<p>Bu sıraya dizme işlemi kritik. Kıyasla ortalama hesabı hangi sırada
+olursa olsun, sayıları birbirine topluyor ve sonra bölüyor. Zaten
+ortalama ve sapmanın istatistikte daha çok kullanılmasının tarihi sebebi
+de aslında bu; bilgisayar öncesi çağda sayıları sıralamak (sorting) zor
+bir işti. Bu sebeple hangi sırada olursa olsun, toplayıp, bölerek
+hesaplanabilecek özetler daha makbuldü. Fakat artık sıralama işlemi
+kolay, ve veri setleri her zaman tek tepeli, simetrik olmayabiliyor.
+Örnek veri seti olarak ünlü <code>dellstore2</code> tabanındaki satış
+miktarları kullanırsak,</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.loadtxt(<span class="st">&quot;glass.data&quot;</span>,delimiter<span class="op">=</span><span class="st">&quot;,&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.mean(data))</span></code></pre></div>
+<pre><code>213.948899167</code></pre>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.median(data))</span></code></pre></div>
+<pre><code>214.06</code></pre>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.std(data))</span></code></pre></div>
+<pre><code>125.118481954</code></pre>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.mean(data)<span class="op">+</span><span class="dv">2</span><span class="op">*</span>np.std(data))</span></code></pre></div>
+<pre><code>464.185863074</code></pre>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (np.percentile(data, <span class="dv">95</span>))</span></code></pre></div>
+<pre><code>410.4115</code></pre>
+<p>Görüldüğü gibi üç nokta hesabı için ortalamadan iki sapma ötesini
+kullanırsak, 464.18, fakat 95. yüzdeliği kullanırsak 410.41 elde
+ediyoruz. Niye? Sebep ortalamanın kendisi hesaplanırken çok üç
+değerlerin toplama dahil edilmiş olması ve bu durum, ortalamanın
+kendisini daha büyük seviyeye doğru itiyor. Yüzdelik hesabı ise sadece
+sayıları sıralayıp belli bazı elemanları otomatik olarak üç nokta olarak
+addediyor.</p>
+<p>Grupların Ortalamalarını ve Varyanslarını Birleştirmek</p>
+<p>Bazen elimizde bir verinin farklı parçaları üzerinde hesaplanmış
+ortalama, varyans sonucu olabilir, ve bu hesapları bu parçaların toplamı
+için birleştirmemiz gerekebilir. Belki paralel süreçler var, verinin
+parçaları üzerinde eşzamanlı çalışıyorlar, bir ortalama, varyans
+hesaplıyorlar, ve nihai sonucun bu alt sonuçlar üzerinden raporlanması
+lazım [3].</p>
+<p>İşlenen veri setinin tamamı, birleşmiş (pooled) veri <span
+class="math inline">\(D = \{ x_1, x_2,.., x_N\}\)</span> olsun, ki <span
+class="math inline">\(N\)</span> veri noktası sayısı. Bu verinin
+ortalaması <span class="math inline">\(a = (x_1 + x_2 + .. + x_N) /
+N\)</span>, varyansı <span class="math inline">\(v = ((x_1 - a)^2 + (x_2
+- a)^2 + ... + (x_N - a)^2 ) / N\)</span>.<br />
+Standart sapma tabii ki <span class="math inline">\(\sigma_N =
+\sqrt{v}\)</span>.</p>
+<p>Veriyi ayrı işledik diyelim, veri şu şekilde ayrıldı <span
+class="math inline">\(D_1 = \{ x_1, x_2,..,x_j\}\)</span>, <span
+class="math inline">\(D_2 = \{ x_{j+1}, x_{j+2},..,x_{j+k}\}\)</span>,
+<span class="math inline">\(D_3 = \{ x_{j+k+1},
+x_{j+k+2},..,x_{j+k+m}\}\)</span>. Yani her veri grubunun büyüklüğü
+sırasıyla <span class="math inline">\(j,k,m\)</span> ve toplam veri
+noktaları <span class="math inline">\(n = j+k+m\)</span>.</p>
+<p><span class="math inline">\(D_P\)</span>’nin ortalaması <span
+class="math inline">\(a_P = \frac{1}{n} \sum_{i=1}^{n} x_i\)</span>. Her
+grup <span class="math inline">\(D_1,D_2,D_3\)</span>’un ortalaması
+<span class="math inline">\(a_1,a_2,a_3\)</span> benzer şekilde
+bulunabilir. Bu durumda “ortalamaların ortalaması’’, yani nihai ortalama
+<span class="math inline">\(a_P\)</span> şöyle bulunabilir,</p>
+<p><span class="math display">\[
+a_P = (j a_1 + k a_2 + m a_3 ) / n
+\]</span></p>
+<p>Varyansa ulaşmak için kareler toplamı, grup varyanslarına bakalım
+şimdi, <span class="math inline">\(D_P\)</span> için kareler toplamı</p>
+<p><span class="math display">\[
+S_P = \sum_{i=1}^{n} x_i^2
+\tag{7}
+\]</span></p>
+<p>Gruplar <span class="math inline">\(D_1,D_2,D_3\)</span> için
+toplamlar <span class="math inline">\(S_1,S_2,S_3\)</span> benzer
+şekilde tanımlanıyor, ve nihai toplam bu gruplar üzerinden <span
+class="math inline">\(S_P = S_1 + S_2 + S_3\)</span> olarak
+tanımlanabiliyor.</p>
+<p>Tum veri <span class="math inline">\(D_P\)</span> icin varyans</p>
+<p><span class="math display">\[
+v_P = \frac{1}{n} \sum_{i=1}^{n} (x_i - a_P)^2
+\]</span></p>
+<p>Bu ifadeyi acarsak</p>
+<p><span class="math display">\[
+= \frac{1}{n} \sum_{i=1}^{n} ( x_i^2 - 2 x_i a_p + a_p^2 )
+\]</span></p>
+<p><span class="math display">\[
+= \frac{1}{n} \sum_{i=1}^{n}  x_i^2  - \frac{1}{n} \sum_{i=1}^{n}  2 x_i
+a_p + \frac{1}{n} \sum_{i=1}^{n} a_p^2
+\]</span></p>
+<p><span class="math inline">\(\frac{1}{n} \sum_{i=1}^{n} x_i =
+a_p\)</span> olduğunu hatırlarsak, ve <span
+class="math inline">\(\frac{1}{n} \sum_{i=1}^{n} a_p\)</span> tabii ki
+yine <span class="math inline">\(a_p\)</span> o zaman</p>
+<p><span class="math display">\[
+= S_p / n  - 2 a_p^2 + \frac{1}{n} \sum_{i=1}^{n} a_p^2
+\]</span></p>
+<p><span class="math inline">\(\frac{1}{n} \sum_{i=1}^{n} a_p^2\)</span>
+benzer sekilde tekrar <span class="math inline">\(a_p\)</span>,</p>
+<p><span class="math display">\[
+= S_p / n  - 2 a_p^2 +  a_p^2
+\]</span></p>
+<p><span class="math display">\[
+v_P = S_p / n  -  a_p^2
+\tag{8}
+\]</span></p>
+<p>Bu durumda parçaların ayrı varyans formülleri de üstteki gibi
+yazılabilir,</p>
+<p><span class="math display">\[
+v_1 = S_1 / j  -  a_1^2, \quad
+v_2 = S_2 / k  -  a_2^2, \quad
+v_3 = S_3 / m  -  a_3^2
+\tag{9}
+\]</span></p>
+<p>Amacımız <span class="math inline">\(v_p\)</span>’yi ufak parçaların
+varyansları <span class="math inline">\(v_1,v_2,v_3\)</span> üzerinden
+hesaplamak.</p>
+<p>Simdi (7,8,9) formullerini kullanarak <span
+class="math inline">\(v_p\)</span> su sekilde de yazilabilirdi,</p>
+<p><span class="math display">\[
+v_p = (S_1 + S_2 + S_3) / n
+\]</span></p>
+<p>Ya da</p>
+<p><span class="math display">\[
+n v_p = S_1 + S_2 + S_3 - n a_p^2
+\]</span></p>
+<p>Açarsak</p>
+<p><span class="math display">\[
+n v_p = j (v_1 + a_1)^2 + k (v_2 + a_2)^2 + m (v_3 + a_3)^2 - n a_p^2
+\tag{10}
+\]</span></p>
+<p>Şu da söylenebilir,</p>
+<p><span class="math display">\[
+n v_p = j v_1 + k v_2 + m v_3 + j a_1^2 + k a_2^2 + m a_3^2 - n a_p^2
+\]</span></p>
+<p>Şimdi (10) formülüne nasıl erisebileceğimizi düşünelim. Alttaki iki
+kavramdan hareketle bunu yapabilir miyiz acaba?</p>
+<p>Varyansların ortalamasını</p>
+<p><span class="math display">\[
+a_v = (j v_1 + k v_2 + m v_3) / n
+\tag{11}
+\]</span></p>
+<p>ve ortalamaların varyansını</p>
+<p><span class="math display">\[
+v_a = [ j(a_1-a_p)^2 + k(a_2-a_p)^2 + m(a_3-a_p)^2 ] / n
+\]</span></p>
+<p>diye tanımlayalım. Üstteki formülü açalım,</p>
+<p><span class="math display">\[
+n v_a = j(a_1-a_p)^2 + k(a_2-a_p)^2 + m(a_3-a_p)^2
+\]</span></p>
+<p><span class="math display">\[
+= j a_1^2 + k a_2^2 + m a_3^2 - 2 a_p (ja_1 + ka_2 + ma_3) + n a_p^2
+\]</span></p>
+<p>Ortadaki terim <span class="math inline">\(n a_p = ja_1 + ka_2 +
+ma_3\)</span> olduguna gore</p>
+<p><span class="math display">\[
+= j a_1^2 + k a_2^2 + m a_3^2 - 2 a_p (n a_p) + n a_p^2
+\]</span></p>
+<p><span class="math display">\[
+= j a_1^2 + k a_2^2 + m a_3^2 - 2 n a_p^2 + n a_p^2
+\]</span></p>
+<p><span class="math display">\[
+n v_a = j a_1^2 + k a_2^2 + m a_3^2 - n a_p^2
+\]</span></p>
+<p>Varyansların ortalaması (11) formülünü hatırlayalım şimdi</p>
+<p><span class="math display">\[
+n a_v = j v_1 + k v_2 + m v_3
+\]</span></p>
+<p>Üstteki iki formülü toplarsak <span class="math inline">\(n
+v_p\)</span>’ye erisebilir miyiz acaba?</p>
+<p><span class="math display">\[
+n v_a + n a_v =
+j a_1^2 + k a_2^2 + m a_3^2 - n a_p^2 +
+j v_1 + k v_2 + m v_3
+\]</span></p>
+<p><span class="math inline">\(j,k,m\)</span>’nin çarptığı terimleri
+onların altında gruplarsak,</p>
+<p><span class="math display">\[
+=  j (a_1^2 + v_1) + k (a_2^2 + v_2) + m (a_3^2 + v_3) - n a_p^2 +
+\]</span></p>
+<p>Evet bu hakikaten mümkün, (10) formülüne erişmiş olduk. Demek ki ayrı
+gruplardan elde edilen varyanslar ve ortalamarını alıp, bu varyansların
+ortalamasını ve ortalamaların varyanslarını hesaplayıp birbirine
+toplayınca tüm verinin nihai varyansına erişmiş oluyoruz.</p>
+<p>Kod üzerinde görelim, [3]’teki veriyi kullandık,</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> np.array([<span class="dv">32</span>, <span class="dv">36</span>, <span class="dv">27</span>, <span class="dv">28</span>, <span class="dv">30</span>, <span class="dv">31</span>])</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> np.array([<span class="dv">32</span>, <span class="dv">34</span>, <span class="dv">30</span>, <span class="dv">33</span>, <span class="dv">29</span>, <span class="dv">36</span>, <span class="dv">24</span>])</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> np.array([<span class="dv">39</span>, <span class="dv">40</span>, <span class="dv">42</span>])</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>n1,n2,n3 <span class="op">=</span> <span class="bu">len</span>(d1),<span class="bu">len</span>(d2),<span class="bu">len</span>(d3)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>dp <span class="op">=</span> np.hstack([d1,d2,d3])</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>m1,m2,m3,mp <span class="op">=</span> d1.mean(), d2.mean(), d3.mean(),dp.mean()</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>v1,v2,v3,vp <span class="op">=</span> d1.var(), d2.var(), d3.var(),dp.var()</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (m1,m2,m3,mp)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (v1,v2,v3,vp)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>ap <span class="op">=</span> (n1<span class="op">*</span>m1 <span class="op">+</span> n2<span class="op">*</span>m2 <span class="op">+</span> n3<span class="op">*</span>m3) <span class="op">/</span> (n1<span class="op">+</span>n2<span class="op">+</span>n3) </span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>mean_of_var <span class="op">=</span> (n1<span class="op">*</span>v1 <span class="op">+</span> n2<span class="op">*</span>v2 <span class="op">+</span> n3<span class="op">*</span>v3) <span class="op">/</span> (n1<span class="op">+</span>n2<span class="op">+</span>n3) </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>var_of_means <span class="op">=</span> (n1<span class="op">*</span>(m1<span class="op">-</span>ap)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> n2<span class="op">*</span>(m2<span class="op">-</span>ap)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> n3<span class="op">*</span>(m3<span class="op">-</span>ap)<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> (n1<span class="op">+</span>n2<span class="op">+</span>n3)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (mean_of_var)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (var_of_means)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (mean_of_var <span class="op">+</span> var_of_means)</span></code></pre></div>
+<pre><code>30.666666666666668 31.142857142857142 40.333333333333336 32.6875
+8.555555555555554 13.26530612244898 1.5555555555555554 22.83984375
+9.303571428571427
+13.536272321428578
+22.839843750000007</code></pre>
+<p>Not: Birleştirirken <span class="math inline">\(n_1\)</span>,<span
+class="math inline">\(n_2\)</span> sayıları ile çarpım var, bu aşırı
+büyük sayılara sebep olmaz mı? Olabilir doğru, ki kısmen bu sebeple
+artımsal hesap yapıyorduk, fakat hala büyük sayılardan kaçmak mümkün,
+mesela genel ortalama hesaplarken <span
+class="math inline">\(n_1\)</span>,<span
+class="math inline">\(n_2\)</span> ile çarpıp <span
+class="math inline">\(n_1+n2\)</span> ile bölüyor olabiliriz, fakat bu
+hesapta tek gerekli olan aslında <span
+class="math inline">\(n_1\)</span> ve <span
+class="math inline">\(n_2\)</span>’nin birbirine olan izafi
+büyüklüğüdür. Eğer <span class="math inline">\(n_i/100\)</span>
+kullansak birleştirme işlemi yine aynı çıkardı. O zaman bir teknik tüm
+<span class="math inline">\(n_i\)</span>’leri en büyük olan ile bölmek,
+böylece 1’den ufak sayılarla iş yaparız, ve sonuç yine aynı çıkar.</p>
+<p>Box Whisker Grafikleri</p>
+<p>Tek boyutlu bir verinin dağılımını görmek için Box ve Whisker
+grafikleri faydalı araçlardır; medyan (median), dağılımın genişliğini ve
+sıradışı noktaları (outliers) açık şekilde gösterirler. İsim nereden
+geliyor? Box yani kutu, dağılımın ağırlığının nerede olduğunu gösterir,
+medyanın sağındada ve solunda olmak üzere iki çeyreğin arasındaki
+kısımdır, kutu olarak resmedilir. Whiskers kedilerin bıyıklarına verilen
+isimdir, zaten grafikte birazcık bıyık gibi duruyorlar. Bu uzantılar
+medyan noktasından her iki yana kutunun iki katı kadar uzatılır sonra
+verideki “ondan az olan en büyük” noktaya kadar geri çekilir. Tüm
+bunların dışında kalan veri ise teker teker nokta olarak grafikte
+basılır. Bunlar sıradışı (outlier) oldukları için daha az olacakları
+tahmin edilir.</p>
+<p>BW grafikleri iki veriyi dağılımsal olarak karşılaştırmak için</p>
+<p>içeren Quintus Curtius Snodgrass veri setinin değişik olduğunu
+ispatlamak için bir sürü hesap yapmışlardır, bir sürü matematiksel
+işleme girmişlerdir, fakat basit bir BW grafiği iki setin farklılığını
+hemen gösterir.</p>
+<p>BW grafikleri iki veriyi dağılımsal olarak karşılaştırmak için
+birebirdir. Mesela Larsen and Marx adlı araştırmacılar çok az veri
+içeren Quintus Curtius Snodgrass veri setinin değişik olduğunu
+ispatlamak için bir sürü hesap yapmışlardır, bir sürü matematiksel
+işleme girmişlerdir, fakat basit bir BW grafiği iki setin farklılığını
+hemen gösterir.</p>
+<p>Python üzerinde basit bir BW grafiği</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spread<span class="op">=</span> np.random.rand(<span class="dv">50</span>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>center <span class="op">=</span> np.ones(<span class="dv">25</span>) <span class="op">*</span> <span class="dv">50</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>flier_high <span class="op">=</span> np.random.rand(<span class="dv">10</span>) <span class="op">*</span> <span class="dv">100</span> <span class="op">+</span> <span class="dv">100</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>flier_low <span class="op">=</span> np.random.rand(<span class="dv">10</span>) <span class="op">*</span> <span class="op">-</span><span class="dv">100</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>data2 <span class="op">=</span>np.concatenate((spread, center, flier_high, flier_low), <span class="dv">0</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data2)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_feat_01.png&#39;</span>)</span></code></pre></div>
+<p><img src="stat_feat_01.png" /></p>
+<p>Bir diğer örnek Glass veri seti üzerinde</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>head <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">7</span>]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>tableware <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">6</span>]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>containers <span class="op">=</span> data[data[:,<span class="dv">10</span>]<span class="op">==</span><span class="dv">5</span>]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (head[:,<span class="dv">1</span>])</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span>(containers[:,<span class="dv">1</span>], tableware[:,<span class="dv">1</span>], head[:,<span class="dv">1</span>])</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plt.yticks([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="st">&#39;containers&#39;</span>, <span class="st">&#39;tableware&#39;</span>, <span class="st">&#39;head&#39;</span>])</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>plt.boxplot(data,<span class="dv">0</span>,<span class="st">&#39;rs&#39;</span>,<span class="dv">0</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_feat_02.png&#39;</span>)</span></code></pre></div>
+<pre><code>[ 1.51131  1.51838  1.52315  1.52247  1.52365  1.51613  1.51602  1.51623
+  1.51719  1.51683  1.51545  1.51556  1.51727  1.51531  1.51609  1.51508
+  1.51653  1.51514  1.51658  1.51617  1.51732  1.51645  1.51831  1.5164
+  1.51623  1.51685  1.52065  1.51651  1.51711]</code></pre>
+<p><img src="stat_feat_02.png" /></p>
+<p>Kaynaklar</p>
+<p>[5] Cross Validated, <em>Relation between the phi, Matthews and
+Pearson correlation coefficients?</em>, <a
+href="https://stats.stackexchange.com/questions/59343/relation-between-the-phi-matthews-and-pearson-correlation-coefficients">https://stats.stackexchange.com/questions/59343/relation-between-the-phi-matthews-and-pearson-correlation-coefficients</a></p>
+<p>[3] Rudmin, <em>Calculating the Exact Pooled Variance</em>, <a
+href="https://arxiv.org/abs/1007.1012">https://arxiv.org/abs/1007.1012</a></p>
+<p>[4] Boughorbel, <em>Optimal classifier for imbalanced data using
+Matthews Correlation Coefficient metric</em>, <a
+href="http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0177678&amp;type=printable">http://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0177678&amp;type=printable</a></p>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
