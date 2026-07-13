@@ -1,4 +1,6 @@
-# Binom İçin Normal Yaklaşıksallığı
+# İstatistiki Testler
+
+### Binom İçin Normal Yaklaşıksallığı
 
 Merkezi Limit Teorisinden $\bar{X}$'nin her $X_i$ için aynı olan nüfus
 beklentisi ve sapmasını içeren $N(\mu,\sigma)$ olarak dağılacağını
@@ -137,7 +139,6 @@ belli bir olay ardından çoğunlukla yükseldiğini söylüyor. Yazara göre hi
 çıkma şansının 6/9=\%66.7 olduğunu iddia ediyor. Okuyucu bunu ciddiye alsın
 mı?
 
-
 Cevap 
 
 Ufak örneklemler için Agresti ve Coull yöntemini kullanmak iyi olur, bu
@@ -162,7 +163,7 @@ güven aralığının iki ucu da \%50 üzerinde olmalıydı. Noktasal tahmin
 bağlamında \%66.7 rakamı da yanıltıcıdir. Bu yazar okuyucularının para
 kaybetmesine sebep olabilir.
 
-Örneklem Büyüklüğü
+### Örneklem Büyüklüğü
 
 Bir araştırmacı $n$ bağımsız deney baz alınarak elde edilen binom
 parametresi $p$'yi tahmin etmek istiyor, fakat kaç tane $n$ kullanması
@@ -350,7 +351,7 @@ kalırdı. Bunun sebebi formülün $n$'ye bağlı olması.
 Daha önemli soru hata payı basının üstteki ifadesinin gerçekten seçim
 sonucu ile alakalı olup olmadığı! 
 
-Hipotez Testleri (Hypothesis Testing)
+### Hipotez Testleri (Hypothesis Testing)
 
 İstatistik tek ya da aralıklar olarak sayısal tahminler üretmenin ötesinde,
 "iki şey arasında birisini seçmek'' türünde bir karar bağlamında da
@@ -511,6 +512,7 @@ print (norm.ppf(0.95))
 ```
 
 $$ P(Z \le 1.64)  = 0.95 $$
+
 O zaman 
 
 $$ \frac{\bar{y}^\ast - 25.0}{2.4 / \sqrt{30}} = 1.64 $$
@@ -550,7 +552,7 @@ eseri olması da muhtemel.
 
 ![](sat1.png)
 
-Binom Hipotez Testleri
+### Binom Hipotez Testleri
 
 Örnek
 
@@ -687,7 +689,7 @@ Sonuç p değeri 0.05'ten küçük çıktı yani yüzde 5 önemliliğini
 (significantly) uzakta. Demek ki ortalamanın 7725 olduğu hipotezini
 reddetmemiz gerekiyor.
 
-İki Örneklemli Test
+### İki Örneklemli Test
 
 Gruplar 0/1 değerleri ile işaretlendi, ve test etmek istediğimiz iki grubun
 ortalamasının (mean) aynı olduğu hipotezini test etmek. t-test bu arada
@@ -719,7 +721,7 @@ two-sample t-test 0.0007989982111700593
 $p$ değeri $< 0.05$ yani iki grubun ortalaması aynı değildir. Aynı olduğu
 hipotezi reddedildi.
 
-Eşlemeli t-Test (Paired t-test)
+### Eşlemeli t-Test (Paired t-test)
 
 Eşlemeli testler aynı deneysel birimin ölçümü alındığı zaman
 kullanılabilir, yani ölçüm alınan aynı grupta, deney sonrası deneyin
@@ -747,7 +749,7 @@ print ("paired t-test", p_value)
 paired t-test 3.059020942934875e-07
 ```
 
-Wilcoxon işaretli-sıralı testi (Wilcoxon signed-rank test)
+### Wilcoxon işaretli-sıralı testi (Wilcoxon signed-rank test)
 
 t Testleri Normal dağılıma göre sapmaları yakalamak açısından,
 özellikle büyük örneklemler var ise, oldukça sağlamdır. Fakat bazen
@@ -790,7 +792,7 @@ print ("paired wilcoxon-test", p_value)
 paired wilcoxon-test 0.0009765625
 ```
 
-Normallik Testi
+### Normallik Testi
 
 Paket `scipy.stats` altında normallik testleri için bazı çağrılar var,
 bu tekniklerden ikisini altta gösteriyoruz,

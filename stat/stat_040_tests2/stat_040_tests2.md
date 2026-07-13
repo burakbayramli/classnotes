@@ -1,4 +1,4 @@
-# Testlere Devam
+# İstatistiki Testler - 2
 
 İstatistiki test yaratmak için takip edilen teknik basit; bir istatistiki
 ölçüt hesaplıyoruz, ya da hesabımızın başka noktasından çıkanı alıyoruz, ki
