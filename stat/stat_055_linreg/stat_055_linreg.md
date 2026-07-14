@@ -770,7 +770,7 @@ verdiği eğim katsayısı ile aynı olmasıdır.
 
 ```python
 import pandas as pd
-df = pd.read_csv('../stat_040_tests2/fossum.csv')
+df = pd.read_csv('../stat_103_bcorr/fossum.csv')
 print (df.totlngth.corr(df.hdlngth))
 ```
 
