@@ -464,10 +464,22 @@ interval) Bayes dünyasındaki karşılığı budur, Bayes literatürü onlara
 "inandırıcı aralık (credible interval)" ismini veriyor, Bayes güven
 aralığı olarak ta tanımlanabilirler.
 
-Bayes p-değerini hesaplamak için elde edilen tahmin değişkeninin
-işaretine bakılır, ve "sonsal örneklem içinde kaç tane değer bu
-işaretin tersi işaretine sahiptir" sorusu sorulur, cevap bir oran
-olarak raporlanır.
+Bayes p-değerini hesaplamak için elde edilen sonucun (bu örnekte
+$\rho$) işaretine bakılır, ve "sonsal örneklem içinde kaç tane değer
+bu işaretin tersi işaretine sahiptir" sorusu sorulur, cevap bir oran
+olarak raporlanır. Burada yapılmaya uğraşılan, kritik eşik olan sıfırı
+merkez alan bir özet hesabı yaratmak. Bir sonuç elde ettik, şunu
+soruyoruz, "acaba ters işaretli olan sonuçların yüzde kaçı sıfırın
+diğer tarafında?"
+
+Bir diğer önemli gösterge Bayes güven aralığı olabilir. Üstte görülen
+sonuçlarda aralık -0.0353 ve 0.0251 olarak hesaplanmış. Sıfır değeri
+bu aralığın içinde (hatta neredeyse tam ortasında) olduğu için
+korelasyon olmadığı sonucu daha kuvvetlenmiş demektir, ayrıca güven
+aralığının ne kadar sıkı (tight) olduğuna da bakabiliriz. Gördüğümüz
+raporda aralık uçları birbirine oldukca yakın, demek ki aralık dar, ve
+demek ki sıfırın bu aralıkta olması çok çok muhtemel, böylece
+korelasyon olmadığı tezi daha da kuvvetlenmiş oluyor.
 
 Kaynaklar
 
