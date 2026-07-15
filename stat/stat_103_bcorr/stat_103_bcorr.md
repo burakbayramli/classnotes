@@ -282,9 +282,12 @@ $$\ln L(\theta \mid D) = \sum_{i=1}^N \left[ -\ln(2\pi) -
 \rho^2)} \left( z_{i,1}^2 - 2\rho z_{i,1} z_{i,2} + z_{i,2}^2 \right)
 \right]$$
 
-$$\ln L(\theta \mid D) = -N \ln\left(2\pi \sigma_1 \sigma_2 \sqrt{1 -
+$$
+\ln L(\theta \mid D) = -N \ln\left(2\pi \sigma_1 \sigma_2 \sqrt{1 -
 \rho^2}\right) - \frac{1}{2(1 - \rho^2)} \sum_{i=1}^N \left( z_{i,1}^2
-- 2\rho z_{i,1} z_{i,2} + z_{i,2}^2 \right)$$
+- 2\rho z_{i,1} z_{i,2} + z_{i,2}^2 \right)
+\tag{5}
+$$
 
 ```python
 import pandas as pd
@@ -400,9 +403,6 @@ for i in range(1, n_samples):
 rho_samples = trace[burn_in:, 4]
 acceptance_rate = accepted / n_samples
 
-
-# --- SONUÇ İŞLEME VE SONUÇLAR ---
-
 # Bayesçi "p-değeri" karşılığı (Ters işaret olasılığı)
 mean_rho = np.mean(rho_samples)
 if mean_rho > 0:
@@ -427,7 +427,7 @@ print("=" * 60)
 print(f"{'Metrik':<25} | {'Frekansçı (Pearson)':<20} | {'Bayesçi MCMC (El Yapımı)':<20}")
 print("-" * 60)
 print(f"{'Korelasyon (r / rho)':<25} | {r_freq:>20.4f} | {mean_rho:>20.4f}")
-print(f"{'p-değeri / İşaret Olasılığı':<25} | {p_freq:>20.4e} | {p_bayes:>20.4f}")
+print(f"{'p-değeri (işaret olasılık)':<25} | {p_freq:>20.4e} | {p_bayes:>20.4f}")
 print(f"{'%95 Aralık Alt Sınır':<25} | {ci_freq[0]:>20.4f} | {hdi[0]:>20.4f}")
 print(f"{'%95 Aralık Üst Sınır':<25} | {ci_freq[1]:>20.4f} | {hdi[1]:>20.4f}")
 print("=" * 60)
@@ -437,22 +437,37 @@ print("=" * 60)
 ============================================================
 MCMC Raporu: Kabul Oranı = 57.14%
 ============================================================
-Metrik                    | Frekansçı (Pearson)  | Bayesçi MCMC (El Yapımı)
+Metrik                     | Frekansçı (Pearson) | Bayes MCMC
 ------------------------------------------------------------
-Korelasyon (r / rho)      |              -0.0042 |              -0.0045
-p-değeri / İşaret Olasılığı |           7.9035e-01 |               0.3901
-%95 Aralık Alt Sınır      |              -0.0353 |              -0.0353
-%95 Aralık Üst Sınır      |               0.0269 |               0.0251
+Korelasyon (r / rho)       |             -0.0042 |   -0.0045
+p-değeri (işaret olasılık) |          7.9035e-01 |    0.3901
+%95 Aralık Alt Sınır       |             -0.0353 |   -0.0353
+%95 Aralık Üst Sınır       |              0.0269 |    0.0251
 ============================================================
 ```
 
+Kodda görülen `term1` ve `term2` hesapları (5) formülündeki birinci ve
+ikinci terime tekabül ediyor.
 
+Korelasyon katsayısının efrekansçı ve Bayes ile birbirine yakın
+olduğunu olduğunu görüyoruz.
 
+P-değeri hesabı birinde 0.79 diğerinde 0.39 çıktı, 0.05 altında
+olmadıkları için bu sonuçların bulunan $\rho$'nun istatistiki olarak
+önemli olmadığı sonucuna varabiliriz.
 
+Bayes yaklaşımında elde edilen sonuç sonsal dağılımdır demiştik, daha
+detaylandırmak gerekirse sonsal dağılımdan toplanmış
+örneklemlerdir. Bu örneklem vektörü üzerinde sayısal güven aralıkları
+hesaplanabilir, ve frekansçı dünyadaki güven aralıkları (confidence
+interval) Bayes dünyasındaki karşılığı budur, Bayes literatürü onlara
+"inandırıcı aralık (credible interval)" ismini veriyor, Bayes güven
+aralığı olarak ta tanımlanabilirler.
 
-
-
-[devam edecek]
+Bayes p-değerini hesaplamak için elde edilen tahmin değişkeninin
+işaretine bakılır, ve "sonsal örneklem içinde kaç tane değer bu
+işaretin tersi işaretine sahiptir" sorusu sorulur, cevap bir oran
+olarak raporlanır.
 
 Kaynaklar
 

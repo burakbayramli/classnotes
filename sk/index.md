@@ -3,6 +3,8 @@
 
 ## En Son
 
+15/7 - [Korelasyon Hesaplamak, p-değeri - Ekler - Bayes](https://burakbayramli.github.io/dersblog/stat/stat_103_bcorr/korelasyon_pdegerleri_bayes_yaklasimi.html)
+
 3/7 - [Bayes Usulü Parçalı Regresyon](https://burakbayramli.github.io/dersblog/stat/stat_102_regchpt/bayes_usulu_parcali_regresyon.html)
 
 3/7 - [Lineer Regresyon - Ekler - Korelasyon](https://burakbayramli.github.io/dersblog/stat/stat_055_linreg/lineer_regresyon.html)
@@ -10,8 +12,6 @@
 26/6 - [Örgü (Lattice) Boltzmann Metodu](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp43lbm/orgu__lattice__boltzmann_metodu.html)
 
 23/6 - [Uluslararası Finans - Ekler](https://burakbayramli.github.io/dersblog/tser/tser_115_bop/uluslararasi_finans_dengeler.html)
-
-22/5 - [Sıvı ve Gaz Mekaniği - 2](https://burakbayramli.github.io/dersblog/phy/phy_030_flgas2/sivi_ve_gaz_mekanigi__2.html)
 
 ## Konular, Referans
 
