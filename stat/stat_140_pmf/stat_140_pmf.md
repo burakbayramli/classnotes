@@ -237,7 +237,7 @@ R_{kj}
 \sigma^2
 \right)^{I_{kj}}
 \right]
-\qquad{(2)}
+\tag{2}
 $$
 
 İkinci çarpım $U_i$'ye bağlı değildir.

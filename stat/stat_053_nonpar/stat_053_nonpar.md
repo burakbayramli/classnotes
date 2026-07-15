@@ -67,7 +67,7 @@ uğraşılıyor, bunu
 
 $$
 \hat{f}(x) = \frac{1}{n} \sum _{i=1}^{n} \frac{1}{h} K \left( \frac{x - x_i}{h}  \right)
-\qquad{(1)}
+\tag{1}
 $$
 
 hesabı ile gerçekleştirebiliriz. $K$ ile gösterilen çekirdek
@@ -257,7 +257,7 @@ eşitliğin soluna taşırsak,
 
 $$
 E[\hat{f}(x)] - f(x) = \frac{h^2 \sigma_K^2 f''(x)}{2} + o(h^2)
-\qquad{(3)}
+\tag{3}
 $$
 
 Eşitliğin solundaki terim yanlılık (bias) hesabıdır. Doğal olarak
@@ -348,7 +348,7 @@ $$
 \frac{1}{n} \left[
 \int \frac{1}{h} K^2(u) \big( f(x) - huf'(x) \big) \,du - f(x)^2 + O(h^2)
 \right]
-\qquad{(2)}
+\tag{2}
 $$
 
 Şimdi entegrali açalım, sonuç şöyle olur,
@@ -448,7 +448,7 @@ $p_{n+1}(x)$ için özyineli bir güncelleme formülü verir,
 
 $$
 p_{n+1}(x) = \frac{n}{n+1}\,p_n(x) + \frac{1}{n+1}\,K_h(x - x_{n+1})
-\qquad{(1)}
+\tag{2}
 $$
 
 Kodları görelim,
@@ -494,7 +494,7 @@ $$
 $$
 
 Şimdi KDE, sayaç güncellemesinin nerede olduğuna bağlı olarak ve bir
-indis kaydırması yaparak KDE özyineli formül (1) şu şekilde de
+indis kaydırması yaparak KDE özyineli formül (2) şu şekilde de
 gösterilebilir,
 
 $$

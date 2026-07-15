@@ -115,11 +115,336 @@ print (c, pval)
 p-değeri çok küçük, demek ki korelason olmadığı tezi reddedildi. Korelasyon
 var.
 
-### Bayes
+### Bayes Usulü Korelasyon Hesabı
+
+Frekansçı yaklaşımla korelasyon hesabı yaptığımızda verinin dağılımı
+hakkında bir faraziye yapmığımızı söylemiştik, bu faraziye dağılımın
+iki değişkenli (bivariate) Gaussian olduğu idi. O zaman Bayes
+yaklaşımı ile korelasyon tahmini yapmak için bu başlangıç noktasını
+kullanabiliriz. 
+
+Önce Gaussian dağılımının formülünü hatırlayalım, genel $d$ boyutlu
+Gaussian dağılımı şöyledir,
+
+$$ f(x | \mu,\Sigma) = \frac{ 1}{(2\pi)^{k/2} \det(\Sigma)^{1/2}} \exp
+\bigg\{ -\frac{ 1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \bigg\} $$
+
+Bizim için iki değişkenli Gaussian lazım, yani $k=2$ olacak, o zaman
+bir veri noktası $x_i$'nin olasılığı,
+
+$$
+f(x_i \mid \theta) = \frac{1}{2\pi
+\sqrt{\det(\Sigma)}} \exp \left(
+-\frac{1}{2} (x_i - \mu)^T \Sigma^{-1} (x_i - \mu) \right)
+\tag{2}
+$$
+
+ki
+
+$$ \mu = \begin{pmatrix} \mu_1 \\ \mu_2 \end{pmatrix}, \quad \Sigma =
+\begin{pmatrix} \sigma_1^2 & \sigma_{12} \\ \sigma_{21} &
+\sigma_2^2 \end{pmatrix} $$
+
+$\theta = (\mu_1, \mu_2, \sigma_1, \sigma_2, \sigma_{12},
+\sigma_{21})^T$ şeklinde de tanımlanabilirdi. Bu dağılımı bir
+korelasyon hesabı $\rho$ için nasıl kullanabiliriz?  Düşünelim,
+korelasyon katsayısı nedir? Bu katsayı eğer pür dağılım üzerinden
+düşünürsek $\rho = \frac{\sigma_{12}}{\sigma_1 \sigma_2}$ değil midir?
+Evet, o zaman üstteki dağılımdaki varyans ile ilgili değişkenleri
+saptayabilirsek bize gereken sonucu elde etmiş olacağız. Bu
+değişkenleri nasıl buluruz? Bayes yaklaşımında $\theta$ içeriği
+rasgele değişken olarak kabul edilir, onların bir dağılımı
+vardır. Bayes terminolojisinde (yine rasgele değişken kabul edilen)
+veri ile koşullandırılmış (conditioned) $\theta$ olasılık (sonsal)
+yoğunluğu fonksiyonunu bulmamız gerekiyor.
+
+İşin cebirsel / mekaniksel / hesapsal kısmına gelirsek, bazen bu
+sonsal (posterior) dağılımın ne olduğunu analitik olarak bulunabilir,
+eğer bu mümkün değil ise sayısal yöntemlerle sonsaldan örneklem
+toplamak mümkündür. Demek ki $\sigma_1, \sigma_2, \sigma_{12},
+\sigma_{21}$ rasgele değişkenlerinin dağılımından örneklem
+toplayabilirsek bu simülasyon sonuçlarından $\rho$ hesaplanabilir.
+
+Daha ilerlemeden bir numara daha tanıştıralım. Birazdan göreceğimiz
+Metropolis yönteminde $\theta$'daki değişkenlerden örneklem topluyor
+olacağız, fakat bu sırada $\sigma_{12}$, $\sigma_{21}$ değişkenlerinin
+$\sigma_1, \sigma_2$ değişkenlerinden alakasız yönlere evrilmesi
+sayısal problem çıkartabilir. Ayrıca hesaplamaya uğraştığımız nihai
+değişken $\rho$'yu direk simülasyon içine dahil edebilirsek bizim için
+daha iyi olacak. O zaman
+
+$$\rho = \frac{\sigma_{12}}{\sigma_1 \sigma_2}$$
+
+olduğundan hareketle $\rho \sigma_1 \sigma_2 = \sigma_{12}$ ifadesi de
+doğrudur. Ayrıca $\sigma_{12} = \sigma_{21}$ da olduğu için $\rho
+\sigma_1 \sigma_2 = \sigma_{21}$ da diyebiliriz. Bu iki eşitliği
+Gaussian formülünde $\sigma_{12}$ ve $\sigma_{21}$ yerine kullanırsak
+simülasyon kodu daha basitleşecek. O zaman iki değişkenli
+Gaussian'ımız için $\mu$ ve $\Sigma$ şu hale gelecek,
+
+$$
+\mu = \begin{pmatrix} \mu_1 \\ \mu_2
+\end{pmatrix}, \quad \Sigma =
+\begin{pmatrix} \sigma_1^2 & \rho \sigma_1 \sigma_2 \\ \rho \sigma_1
+\sigma_2 & \sigma_2^2 \end{pmatrix}
+\tag{3}
+$$
+
+O zaman ilgilendiğimiz parametreler $\theta = (\mu_1, \mu_2, \sigma_1,
+\sigma_2, \rho)^T$ olacak. Veri $D = \{x_1, x_2, \dots, x_N\}$ ise, ki
+her veri noktası iki değişkenli $x_i = (x_{i,1}, x_{i,2})^T$ olur,
+Bayes Teorisi şöyle der,
+
+$$
+p(\theta \mid D) = \frac{p(D \mid \theta) \, p(\theta)}{p(D)}
+\propto p(D \mid \theta) \, p(\theta)
+$$
+
+Her iki tarafın doğal logiratmasını alalım, bu işlem çarpımları
+toplama dönüştürür,
+
+$$
+\ln p(\theta \mid D) = \ln p(D \mid \theta) + \ln p(\theta) +
+\text{sabit}
+$$
+
+Demek ki üstteki hesabı yapabilmek için eşitliğin sağındaki verinin log
+olurluğu (log likelihood) bize lazım, tüm veri için
+
+$$
+L(\theta \mid D) = \prod_{i=1}^N f(x_i
+\mid \theta)
+$$
+
+$$
+\ln L(\theta \mid D) = \sum_{i=1}^N \ln f(x_i \mid \theta)
+\tag{4}
+$$
+
+Eriştiğimiz son ifade için (2) formülündeki determinantlar, onun
+tersi, formülde görülen karesel ifadenin açılımı ve tüm bunların
+log'unun alınması gerekecek. (3) üzerinde determinant alalım,
+
+$$
+\det(\Sigma) = (\sigma_1^2)(\sigma_2^2)
+- (\rho \sigma_1 \sigma_2)^2
+= \sigma_1^2 \sigma_2^2 (1 - \rho^2)
+$$
+
+Karekök alınca
+
+$$
+\sqrt{\det(\Sigma)} = \sigma_1 \sigma_2
+\sqrt{1 - \rho^2}
+$$
+
+Kovaryans matrisinin tersi
+
+$$
+\Sigma^{-1} = \frac{1}{\sigma_1^2
+\sigma_2^2 (1 - \rho^2)}
+\begin{pmatrix} \sigma_2^2 & -\rho \sigma_1 \sigma_2 \\ -\rho
+\sigma_1
+\sigma_2 & \sigma_1^2 \end{pmatrix} = \frac{1}{1 - \rho^2}
+\begin{pmatrix} \frac{1}{\sigma_1^2} & -\frac{\rho}{\sigma_1
+\sigma_2}
+\\ -\frac{\rho}{\sigma_1 \sigma_2} & \frac{1}{\sigma_2^2}
+\end{pmatrix}
+$$
+
+$z_{i,1} = \frac{x_{i,1} - \mu_1}{\sigma_1}$ ve $z_{i,2} =
+\frac{x_{i,2} - \mu_2}{\sigma_2}$ olsun (bir tür "standardizasyon"
+işlemi yapıyoruz). Üstel içindeki terimler şu hale gelir,
+
+$$(x_i - \mu)^T \Sigma^{-1} (x_i - \mu) = \begin{pmatrix} x_{i,1} -
+\mu_1 & x_{i,2} - \mu_2 \end{pmatrix} \left[ \frac{1}{1 - \rho^2}
+\begin{pmatrix} \frac{1}{\sigma_1^2} & -\frac{\rho}{\sigma_1 \sigma_2}
+\\ -\frac{\rho}{\sigma_1 \sigma_2} & \frac{1}{\sigma_2^2}
+\end{pmatrix} \right] \begin{pmatrix} x_{i,1} - \mu_1 \\ x_{i,2} -
+\mu_2 \end{pmatrix}$$
+
+$$
+= \frac{1}{1 - \rho^2} \left[ \left(\frac{x_{i,1} -
+\mu_1}{\sigma_1}\right)^2 - 2\rho \left(\frac{x_{i,1} -
+\mu_1}{\sigma_1}\right)\left(\frac{x_{i,2} - \mu_2}{\sigma_2}\right) +
+\left(\frac{x_{i,2} - \mu_2}{\sigma_2}\right)^2 \right]
+$$
+
+$$
+= \frac{1}{1 - \rho^2} \left( z_{i,1}^2 - 2\rho z_{i,1} z_{i,2} +
+z_{i,2}^2 \right)
+$$
+
+O zaman (4) hesabı şu şekilde yapılabilir,
+
+$$\ln L(\theta \mid D) = \sum_{i=1}^N \left[ -\ln(2\pi) -
+\ln\left(\sigma_1 \sigma_2 \sqrt{1 - \rho^2}\right) - \frac{1}{2(1 -
+\rho^2)} \left( z_{i,1}^2 - 2\rho z_{i,1} z_{i,2} + z_{i,2}^2 \right)
+\right]$$
+
+$$\ln L(\theta \mid D) = -N \ln\left(2\pi \sigma_1 \sigma_2 \sqrt{1 -
+\rho^2}\right) - \frac{1}{2(1 - \rho^2)} \sum_{i=1}^N \left( z_{i,1}^2
+- 2\rho z_{i,1} z_{i,2} + z_{i,2}^2 \right)$$
+
+```python
+import pandas as pd
+import scipy.stats as st
+
+# 1. Kurulum ve veri temizleme
+np.random.seed(42)
+
+df = pd.read_csv('../stat_102_regchpt/gold_ir.csv', index_col=0)
+df_clean = df.dropna().copy()
+
+raw_gold = df_clean.Gold_Price
+raw_rate = df_clean.Calculated_Real_IR
+
+# Durağanlık (stabilite) için farkını alma
+diff_gold = np.diff(raw_gold)
+diff_rate = np.diff(raw_rate)
+data = np.column_stack((diff_gold, diff_rate))
+N = len(data)
+
+# --- FREKANSÇI (FREQUENTIST) YAKLAŞIM ---
+r_freq, p_freq = st.pearsonr(diff_gold, diff_rate)
 
 
+# --- MODÜLER BAYESÇİ KURULUM (Regresyon Tarzı) ---
+
+def log_prior(params):
+    """
+    Parametreler için kesin sınırlar belirler.
+    Önerilen parametreler fiziksel olarak mümkünse 0.0 (ln(1)) döndürür,
+    kurallarımızı ihlal ediyorsa -inf (ln(0)) döndürür.
+    """
+    mu1, mu2, sigma1, sigma2, rho = params
+    
+    # Standart sapmalar pozitif olmalı, korelasyon [-1, 1] aralığında olmalı
+    if sigma1 <= 0 or sigma2 <= 0 or not (-1 < rho < 1):
+        return -np.inf
+    
+    # (İsteğe bağlı) bayes_ols'ta yaptığınız gibi ortalamalar için gevşek düz sınırlar ekleyebilirsiniz:
+    # if not (-100 < mu1 < 100) or not (-100 < mu2 < 100):
+    #     return -np.inf
+    
+    return 0.0
 
 
+def log_likelihood(params, data):
+    """
+    İki değişkenli Normal Olurluk'u hesaplar. Önsel kontrolü zaten
+    çalıştığı için parametrelerin geçerli olduğunu varsayar.
+    """
+    mu1, mu2, sigma1, sigma2, rho = params
+    
+    # Standart skorları hesapla
+    z1 = (data[:, 0] - mu1) / sigma1
+    z2 = (data[:, 1] - mu2) / sigma2
+    
+    # İki değişkenli normal log-yoğunluk fonksiyonu toplamı
+    term1 = -N * np.log(2 * np.pi * sigma1 * sigma2 * np.sqrt(1 - rho**2))
+    term2 = -1 / (2 * (1 - rho**2)) * np.sum(z1**2 - 2 * rho * z1 * z2 + z2**2)
+    
+    return term1 + term2
+
+
+def log_posterior(params, data):
+    """
+    Geçersiz matematiksel durumlara karşı korumak amacıyla kısa devre
+    değerlendirmesi kullanarak Önsel ve Olurluk'u birleştirir.
+    """
+    lp = log_prior(params)
+    
+    # Eğer önsel "hayır" diyorsa, sıfıra bölme veya NaN durumlarını önlemek için hemen dur
+    if np.isneginf(lp):
+        return -np.inf
+        
+    return lp + log_likelihood(params, data)
+
+
+# --- MCMC METROPOLIS ÖRNEKLEYİCİ ---
+
+n_samples = 50000
+burn_in = 10000
+
+# Parametre vektörü formatı: [mu1, mu2, sigma1, sigma2, rho]
+initial_params = [np.mean(diff_gold), np.mean(diff_rate), np.std(diff_gold), np.std(diff_rate), 0.0]
+
+proposal_sigmas = np.array([0.001, 0.001, 0.001, 0.001, 0.005])
+
+# İz (trace) depolama
+trace = np.zeros((n_samples, 5))
+trace[0] = initial_params
+current_log_post = log_posterior(trace[0], data)
+
+accepted = 0
+
+for i in range(1, n_samples):
+    # Gauss rastgele yürüyüşü kullanarak yeni parametreler öner
+    proposal = trace[i-1] + np.random.normal(0, proposal_sigmas)
+    
+    # Önerilen log-sonsal değerini hesapla
+    proposal_log_post = log_posterior(proposal, data)
+    
+    # Metropolis kabul kriteri
+    log_acceptance_ratio = proposal_log_post - current_log_post
+    
+    if np.log(np.random.uniform(0, 1)) < log_acceptance_ratio:
+        trace[i] = proposal
+        current_log_post = proposal_log_post
+        accepted += 1
+    else:
+        trace[i] = trace[i-1]
+
+# Yanma süresi (burn-in) sonrası korelasyon katsayısı için örneklemler (rho 4. indekste)
+rho_samples = trace[burn_in:, 4]
+acceptance_rate = accepted / n_samples
+
+
+# --- SONUÇ İŞLEME VE SONUÇLAR ---
+
+# Bayesçi "p-değeri" karşılığı (Ters işaret olasılığı)
+mean_rho = np.mean(rho_samples)
+if mean_rho > 0:
+    p_bayes = np.mean(rho_samples <= 0)
+else:
+    p_bayes = np.mean(rho_samples >= 0)
+
+# %95 Güvenilir Aralığı (Trace'ten yüzdelik yöntemiyle) hesapla
+hdi = np.percentile(rho_samples, [2.5, 97.5])
+
+# Frekansçı için Güven Aralığı (Fisher Dönüşümü ile)
+r_z = np.arctanh(r_freq)
+se = 1 / np.sqrt(N - 3)
+z_crit = st.norm.ppf(0.975)
+ci_freq = np.tanh([r_z - z_crit * se, r_z + z_crit * se])
+
+
+# --- SONUÇLARI YAN YANA GÖSTER ---
+print("=" * 60)
+print(f"MCMC Raporu: Kabul Oranı = {acceptance_rate:.2%}")
+print("=" * 60)
+print(f"{'Metrik':<25} | {'Frekansçı (Pearson)':<20} | {'Bayesçi MCMC (El Yapımı)':<20}")
+print("-" * 60)
+print(f"{'Korelasyon (r / rho)':<25} | {r_freq:>20.4f} | {mean_rho:>20.4f}")
+print(f"{'p-değeri / İşaret Olasılığı':<25} | {p_freq:>20.4e} | {p_bayes:>20.4f}")
+print(f"{'%95 Aralık Alt Sınır':<25} | {ci_freq[0]:>20.4f} | {hdi[0]:>20.4f}")
+print(f"{'%95 Aralık Üst Sınır':<25} | {ci_freq[1]:>20.4f} | {hdi[1]:>20.4f}")
+print("=" * 60)
+```
+
+```text
+============================================================
+MCMC Raporu: Kabul Oranı = 57.14%
+============================================================
+Metrik                    | Frekansçı (Pearson)  | Bayesçi MCMC (El Yapımı)
+------------------------------------------------------------
+Korelasyon (r / rho)      |              -0.0042 |              -0.0045
+p-değeri / İşaret Olasılığı |           7.9035e-01 |               0.3901
+%95 Aralık Alt Sınır      |              -0.0353 |              -0.0353
+%95 Aralık Üst Sınır      |               0.0269 |               0.0251
+============================================================
+```
 
 
 

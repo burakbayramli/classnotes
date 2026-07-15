@@ -122,7 +122,7 @@ $S_g^{(m)}$ diyebiliriz,
 
 $$
 S_g^{(m)} = \sum_{i=1}^{m} p^{(m)}(C_g | \mathbf{x}_i) \mathbf{x}_i = m \pi_g^{(m)} \mu_g^{(m)}
-\qquad{(2)}
+\tag{2}
 $$
 
 Yeni veri noktası $\mathbf{x}_{m+1}$ geldiğinde üstteki toplama bir
