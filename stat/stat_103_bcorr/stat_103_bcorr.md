@@ -475,15 +475,16 @@ Fonksiyon `log_prior` içinde simülasyonun istenen sınırlar içinde
 kalmasının nasıl kontrol edildiğini görüyoruz. Önsel tanımımız içinde
 birörnek dağılımlar vardı hatırlarsak, ve bu dağılımlar belli
 aralıklar içinde kalmalıdır. `sigma1`, `sigma2`, `rho` eğer istenmeyen
-değerlere gelirlerse fonksiyon `np.inf` yani sonsuz değer döndürüyoruz
-(oradaki olasılığı sıfırlamış oluyoruz, log olasılıkta sıfırın log
-değeri sonsuz).
+değerlere gelirlerse fonksiyondan `np.inf` yani sonsuz değer
+döndürüyoruz (oradaki olasılığı sıfırlamış oluyoruz, log olasılıkta
+sıfırın log değeri sonsuz).
 
 Sonuçlara bakalım: Korelasyon katsayısının frekansçı ve Bayes ile
 birbirine yakın olduğunu olduğunu görüyoruz. P-değeri hesabı birinde
-0.79 diğerinde 0.39 çıktı, 0.05 altında olmadıkları için, bulunan
-$\rho$'nun istatistiki olarak önemli (significant) olmadığı sonucuna
-varabiliriz.
+0.79 diğerinde 0.39 çıktı (ikinci hesap tek taraflı test, ikiyle
+çarpınca birinci değere yaklaşırız), 0.05 altında olmadıkları için,
+bulunan $\rho$'nun istatistiki olarak önemli (significant) olmadığı
+sonucuna varabiliriz.
 
 Bayes yaklaşımında elde edilen sonuç sonsal dağılımdır demiştik, daha
 detaylandırmak gerekirse sonsal dağılımdan toplanmış
@@ -496,7 +497,7 @@ aralığı olarak ta tanımlanabilirler.
 Bayes p-değerini hesaplamak için elde edilen sonucun (bu örnekte
 $\rho$) işaretine bakılır, ve "sonsal örneklem içinde kaç tane değer
 bu işaretin tersi işaretine sahiptir" sorusu sorulur, cevap bir oran
-olarak raporlanır. Burada yapılmaya uğraşılan, kritik eşik olan sıfırı
+olarak raporlanır. Burada yapılmaya uğraşılan kritik eşik olan sıfırı
 merkez alan bir özet hesabı yaratmak. Bir sonuç elde ettik, şunu
 soruyoruz, "acaba ters işaretli olan sonuçların yüzde kaçı sıfırın
 diğer tarafında?"
