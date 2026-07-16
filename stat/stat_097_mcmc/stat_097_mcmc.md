@@ -67,6 +67,40 @@ $$\alpha(x,y) = \min\left(1, \frac{\pi(y)}{\pi(x)}\right)$$
 geçeriz; aksi takdirde teklifi reddeder ve mevcut $x$ konumumuzda
 kalıp bu konumu tekrar sayarız.
 
+Yani ana amacimiz bir Markov Zinciri yaratmak ki bu zinciri gezerken
+$\pi(x)$'ten orneklem topluyor olalim. Peki bunu nasil garanti ederiz?
+Bir Markov Zincirinin duragan dagiliminin $\pi(x)$ olmasi icin detayli
+denge kosulunu tatmin etmek yeterlidir. Bu kosul,
+
+$$
+\pi(x) p(x,y) = \pi(y) p(y,x)
+$$
+
+ki $p(x,y)$ degeri $x$ konumundan $y$ konumuna gecis
+olasiligi. $x$'ten $y$'ye gecebilmek icin bir teklif dagilimi
+$q(x,y)$'den bir $y$ gecisi teklif edilir, bu teklif $\alpha(x,y)$
+olasiligi ile kabul edilir. Bunlarin sebeplerini ispat kisninda
+gorecegiz. Yani gecis olasiligi
+
+$$
+p(x,y) = q(y\vert{}x) \alpha(x,y)
+$$
+
+haline gelir. Bunu detayli denge formulune koyunca
+
+$$
+\pi(x) q(y\vert{}x) \alpha(x,y) = \pi(y) q(x\vert{}y) \alpha(y,x)
+$$
+
+Eger teklif dagilimi simetrik ise (mesela Gaussian) o zaman
+$q(y\vert{}x) = q(x\vert{}y)$
+
+$$
+\pi(x) \alpha(x,y) = \pi(y) \alpha(y,x)
+$$
+
+[devam edecek]
+
 En Büyük Numara: Normalleştirme Sabitinden Kurtulmak. Bayes usulü
 analizde veya karmaşık fizik modellerinde hedef dağılımımız genellikle
 $\pi(x) = \frac{\pi^*(x)}{Z}$ biçimindedir. Burada $\pi^*(x)$
@@ -291,7 +325,13 @@ atlama olasılığına eşittir. İki durum arasındaki akış her iki yönde
 dengelenmiştir. Bunun durağanlığı ima ettiğini, her iki tarafı da $x$
 üzerinden entegre ederek doğrulayabiliriz:
 
-$$\int \pi(x)\, p(x, y)\, dx = \int \pi(y)\, p(y, x)\, dx = \pi(y) \int p(y, x)\, dx = \pi(y)$$
+$$
+\int \pi(x)\, p(x, y)\, dx = \int \pi(y)\, p(y, x)\, dx 
+$$
+
+$$
+= \pi(y) \int p(y, x)\, dx = \pi(y)
+$$
 
 Bu tam olarak durağanlık koşuludur. Not: $\int p(y,x)\,dx = 1$; çünkü
 $p(y,x)$ bir geçiş yoğunluğu ve tüm olası sonraki durumlar üzerinden

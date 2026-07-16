@@ -196,12 +196,13 @@ Parçacık filtresini, ya da Sıralı Monte Carlo yaklaşımını anlamak için
 statik tahmin ile dinamik durum-uzayı modelleri arasındaki boşluğu
 kapatmamız gerekiyor. Gereken matematiksel işlemler alttadır.
 
-Monte Carlo İntegrasyonu: Bu konuyu üstte işlemiştik, tekrar üzerinden
-geçelim. Monte Carlo yöntemleri, karmaşık bir integrali, $p(x)$
+Monte Carlo Entegrasyonu: Bu konuyu üstte işlemiştik, tekrar üzerinden
+geçelim. Monte Carlo yöntemleri, karmaşık bir entegrali, $p(x)$
 dağılımını $N$ adet rastgele örnek (parçacık) kümesiyle
 $\{x^{(i)}\}_{i=1}^N$ temsil ederek yaklaşık olarak hesaplar.
 
-Şu formdaki bir integral için:
+Şu formdaki bir entegral için:
+
 $$I = \int f(x) p(x) dx$$
 
 Bunu sayısal ortalama kullanarak yaklaşık olarak hesaplayabiliriz:
