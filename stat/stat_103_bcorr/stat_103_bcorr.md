@@ -453,13 +453,13 @@ Korelasyon katsayısının efrekansçı ve Bayes ile birbirine yakın
 olduğunu olduğunu görüyoruz.
 
 P-değeri hesabı birinde 0.79 diğerinde 0.39 çıktı, 0.05 altında
-olmadıkları için bu sonuçların bulunan $\rho$'nun istatistiki olarak
-önemli olmadığı sonucuna varabiliriz.
+olmadıkları için, bulunan $\rho$'nun istatistiki olarak önemli
+(significant) olmadığı sonucuna varabiliriz.
 
 Bayes yaklaşımında elde edilen sonuç sonsal dağılımdır demiştik, daha
 detaylandırmak gerekirse sonsal dağılımdan toplanmış
 örneklemlerdir. Bu örneklem vektörü üzerinde sayısal güven aralıkları
-hesaplanabilir, ve frekansçı dünyadaki güven aralıkları (confidence
+hesaplanabilir, ve frekansçı dünyadaki güven aralıklarının (confidence
 interval) Bayes dünyasındaki karşılığı budur, Bayes literatürü onlara
 "inandırıcı aralık (credible interval)" ismini veriyor, Bayes güven
 aralığı olarak ta tanımlanabilirler.
@@ -472,14 +472,14 @@ merkez alan bir özet hesabı yaratmak. Bir sonuç elde ettik, şunu
 soruyoruz, "acaba ters işaretli olan sonuçların yüzde kaçı sıfırın
 diğer tarafında?"
 
-Bir diğer önemli gösterge Bayes güven aralığı olabilir. Üstte görülen
-sonuçlarda aralık -0.0353 ve 0.0251 olarak hesaplanmış. Sıfır değeri
-bu aralığın içinde (hatta neredeyse tam ortasında) olduğu için
-korelasyon olmadığı sonucu daha kuvvetlenmiş demektir, ayrıca güven
-aralığının ne kadar sıkı (tight) olduğuna da bakabiliriz. Gördüğümüz
-raporda aralık uçları birbirine oldukca yakın, demek ki aralık dar, ve
-demek ki sıfırın bu aralıkta olması çok çok muhtemel, böylece
-korelasyon olmadığı tezi daha da kuvvetlenmiş oluyor.
+Bayes güven aralığı şöyle kullanılabilir; Üstte görülen sonuçlarda
+aralık -0.0353 ve 0.0251 olarak hesaplanmış. Sıfır değeri bu aralığın
+içinde (hatta neredeyse tam ortasında) olduğu için korelasyon olmadığı
+sonucu daha kuvvetlenmiş demektir, ayrıca güven aralığının ne kadar
+sıkı (tight) olduğuna da bakabiliriz. Gördüğümüz raporda aralık uçları
+birbirine oldukca yakın, demek ki aralık dar, ve demek ki sıfırın bu
+aralıkta olması çok çok muhtemel, böylece korelasyon olmadığı tezi
+daha da kuvvetlenmiş oluyor.
 
 Kaynaklar
 
