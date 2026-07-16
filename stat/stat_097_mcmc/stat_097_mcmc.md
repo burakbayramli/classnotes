@@ -79,24 +79,11 @@ $$
 ki $p(x,y)$ degeri $x$ konumundan $y$ konumuna gecis
 olasiligi. $x$'ten $y$'ye gecebilmek icin bir teklif dagilimi
 $q(x,y)$'den bir $y$ gecisi teklif edilir, bu teklif $\alpha(x,y)$
-olasiligi ile kabul edilir. Bunlarin sebeplerini ispat kisninda
+olasiligi ile kabul edilir. Bunlarin sebeplerini ispat kisminda
 gorecegiz. Yani gecis olasiligi
 
 $$
 p(x,y) = q(y\vert{}x) \alpha(x,y)
-$$
-
-haline gelir. Bunu detayli denge formulune koyunca
-
-$$
-\pi(x) q(y\vert{}x) \alpha(x,y) = \pi(y) q(x\vert{}y) \alpha(y,x)
-$$
-
-Eger teklif dagilimi simetrik ise (mesela Gaussian) o zaman
-$q(y\vert{}x) = q(x\vert{}y)$
-
-$$
-\pi(x) \alpha(x,y) = \pi(y) \alpha(y,x)
 $$
 
 [devam edecek]
