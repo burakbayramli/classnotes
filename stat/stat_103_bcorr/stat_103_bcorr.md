@@ -477,7 +477,9 @@ birörnek dağılımlar vardı hatırlarsak, ve bu dağılımlar belli
 aralıklar içinde kalmalıdır. `sigma1`, `sigma2`, `rho` eğer istenmeyen
 değerlere gelirlerse fonksiyondan `np.inf` yani sonsuz değer
 döndürüyoruz (oradaki olasılığı sıfırlamış oluyoruz, log olasılıkta
-sıfırın log değeri sonsuz).
+sıfırın log değeri sonsuz). Metropolis algoritması muhtemel değerleri
+gezerken sınır dışı değerler için sıfır olasılık alınca o bölgelerden
+uzak durmak isteyecektir.
 
 Sonuçlara bakalım: Korelasyon katsayısının frekansçı ve Bayes ile
 birbirine yakın olduğunu olduğunu görüyoruz. P-değeri hesabı birinde
