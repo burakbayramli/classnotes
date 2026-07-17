@@ -18,14 +18,14 @@ değildir. Değerlendirmesi kolay ama doğrudan örneklemesi zor olan pek
 $$\pi^*(x) = \frac{1}{100} \sum_{k=1}^{100} \mathcal{N}(x \mid \mu_k,
 \Sigma_k)$$
 
-Bu tamamen açık, normalize edilmiş bir olasılık yoğunluk fonksiyonudur
-— anında değerlendirilebilir. Ancak örnekleme zordur; çünkü modlar
-birbirinden çok uzak ve neredeyse sıfır olasılıklı bölgelerle ayrılmış
-olabilir. Naif / basit bir örnekleyici bir modda sıkışır ve
-diğerlerini hiç keşfedemez. Bu genel soruna çok modluluk denir. Asıl
-sorun ise "boyutluluğun laneti"dir. Daha temelde, bilinen bir
-olasılıksal yoğunluk fonksiyonundan örneklemenin standart numaraları
-yüksek boyutlarda ise yaramaz:
+Bu tamamen açık, normalize edilmiş bir olasılık yoğunluk
+fonksiyonudur, anında değerlendirilebilir. Ancak örnekleme zordur;
+çünkü tepeler birbirinden çok uzak ve neredeyse sıfır olasılıklı
+bölgelerle ayrılmış olabilir. Naif / basit bir örnekleyici bir tepede
+sıkışır ve diğerlerini hiç keşfedemez. Bu genel soruna çok tepelilik
+(multi-modal) denir. Asıl sorun ise "boyutluluğun laneti"dir. Daha
+derin bir sorun olasılıksal yoğunluk fonksiyonlarından örneklemenin
+standart numaralarının yüksek boyutlarda ise yaramasıdır:
 
 - Ters CDF: $F^{-1}(u)$'yu hesaplamayı gerektirir; bu da $\pi^*$'yi
   entegre etmek demektir,  yüksek boyutta çözümsüzdür.
@@ -40,10 +40,126 @@ yüksek boyutlarda ise yaramaz:
   bile tamamen olanaksızdır.
 
 Değerlendirilebilirlik bize yerel bilgi verir (bu noktadaki yoğunluk
-nedir?), örnekleme ise küresel bilgi gerektirir (yoğunluk uzayın
+nedir?), örnekleme ise global bilgi gerektirir (yoğunluk uzayın
 tamamında nasıl davranıyor?). Bu uçurumu kapatmak tam olarak MCMC'nin
 yaptığı şeydir: yalnızca yerel değerlendirmeleri kullanarak uzayı
 keşfeden bir Markov zinciri inşa eder.
+
+Ana amacımız bir Markov Zinciri yaratmak ki bu zinciri gezerken
+$\pi(x)$'ten örneklem topluyor olalım. Peki bunu nasıl garanti ederiz?
+Bir Markov Zincirinin durağan dağılımının $\pi(x)$ olması için detaylı
+denge koşulunu tatmin etmek yeterlidir. Bu koşul,
+
+$$
+\pi(x) p(x,y) = \pi(y) p(y,x)
+$$
+
+ki $p(x,y)$ değeri $x$ konumundan $y$ konumuna geçiş
+olasılığı. $x$'ten $y$'ye geçebilmek için bir teklif dağılımı
+$q(x,y)$'den bir $y$ geçişi teklif edilir, bu teklif $\alpha(x,y)$
+olasılığı ile kabul edilir. Bunların sebeplerini ispat kısmında
+göreceğiz. Yani geçiş olasılığı
+
+$$
+p(x,y) = q(y | x) \alpha(x,y)
+$$
+
+haline gelir, ayni sekilde
+
+$$
+p(y,x) = q(x | y) \alpha(y,x)
+$$
+
+Nihai detaylı denge,
+
+$$
+\pi(x)q(y|x)\alpha(x,y) = \pi(y)q(x|y)\alpha(y,x)
+$$
+
+Eğer öneri dağılımı simetrik ise (Gaussian gibi) o zaman $q(y|x) = q(x|y)$,
+formülden elenirler, geriye kalanlar
+
+$$
+\pi(x)\alpha(x,y) = \pi(y)\alpha(y,x)
+$$
+
+Bu noktada kendimize soralım, bir kabul olasılığı değişkeninin sahip
+olması gereken özellikler nedir? Birinci muhakkak $0 \le \alpha(x,y)
+\le 1$. İkincisi, eğer teklif bizi daha yüksek yoğunluklu bir bölgeye
+götürüyor ise bu teklifi kabul etmek gerekir.
+
+Yani alttaki koşul var ise
+
+$$
+\pi(y)\ge\pi(x).
+$$
+
+En kolay seçim
+
+$$
+\alpha(x,y) = 1
+$$
+
+olur. Bu seçimin detaylı denge üzerinde etkileri olacaktır, 
+
+$$
+\pi(x) = \pi(y)\alpha(y,x)
+$$
+
+Tekrar düzenlersek,
+
+$$
+\alpha(y,x) = \frac{\pi(x)}{\pi(y)}
+$$
+
+İşte kabul oranını elde ettik. Dikkat edersek bu değer otomatik olarak
+0 ile 1 arasında çünkü $\pi(x) \le \pi(y)$.
+
+Ters yone de gidebiliriz. Farz edelim
+
+$$
+\pi(x)\ge\pi(y).
+$$
+
+En kolay seçim
+
+$$
+\alpha(y,x) = 1
+$$
+
+O zaman 
+
+$$
+\pi(y) = \pi(x)\alpha(x,y)
+$$
+
+$$
+\alpha(x,y) = \frac{\pi(y)}{\pi(x)}
+$$
+
+Simdi $\alpha(x,y)$ nedir sorusuna donersek, ustteki iki farkli
+senaryoyu biraraya getirirsek,
+
+$$ \alpha(x,y)= \begin{cases} 1, & \pi(y)\ge\pi(x), \\
+\dfrac{\pi(y)}{\pi(x)}, & \pi(y)<\pi(x).  \end{cases}
+$$
+
+Bu ifade bize bir diger matematiksel formulu hatirlatabilir, bu $\min$
+ifadesi. Genel olarak $\min$ nedir?
+
+$$
+\min(a,b)=
+\begin{cases}
+a, & a\le b,\\
+b,&  b <  a
+\end{cases}
+$$
+
+Bunu iki üstteki formüle uygularsak,
+
+$$
+\alpha(x,y) = \min\left(1,\frac{\pi(y)}{\pi(x)}\right)
+$$
 
 Metropolis Yöntemi: Temel Mantık
 
@@ -66,63 +182,6 @@ $$\alpha(x,y) = \min\left(1, \frac{\pi(y)}{\pi(x)}\right)$$
 çekeriz. Eğer $u < \alpha$ ise öneriyi kabul edip $y$ konumuna
 geçeriz; aksi takdirde teklifi reddeder ve mevcut $x$ konumumuzda
 kalıp bu konumu tekrar sayarız.
-
-Yani ana amacimiz bir Markov Zinciri yaratmak ki bu zinciri gezerken
-$\pi(x)$'ten orneklem topluyor olalim. Peki bunu nasil garanti ederiz?
-Bir Markov Zincirinin duragan dagiliminin $\pi(x)$ olmasi icin detayli
-denge kosulunu tatmin etmek yeterlidir. Bu kosul,
-
-$$
-\pi(x) p(x,y) = \pi(y) p(y,x)
-$$
-
-ki $p(x,y)$ degeri $x$ konumundan $y$ konumuna gecis
-olasiligi. $x$'ten $y$'ye gecebilmek icin bir teklif dagilimi
-$q(x,y)$'den bir $y$ gecisi teklif edilir, bu teklif $\alpha(x,y)$
-olasiligi ile kabul edilir. Bunlarin sebeplerini ispat kisminda
-gorecegiz. Yani gecis olasiligi
-
-$$
-p(x,y) = q(y\vert{}x) \alpha(x,y)
-$$
-
-[devam edecek]
-
-En Büyük Numara: Normalleştirme Sabitinden Kurtulmak. Bayes usulü
-analizde veya karmaşık fizik modellerinde hedef dağılımımız genellikle
-$\pi(x) = \frac{\pi^*(x)}{Z}$ biçimindedir. Burada $\pi^*(x)$
-formülünü kolayca hesaplayabildiğimiz ham fonksiyon, $Z$ ise
-hesaplaması imkansız olan normalleştirme sabitidir (entegral veya
-payda).
-
-Metropolis yönteminin asıl dehası kabul oranında gizlidir. Orana
-koyduğumuzda $Z$ sabiti tamamen sadeleşir:
-
-$$
-\alpha(x,y) = \min\left(1, \frac{\pi^*(y) / Z}{\pi^*(x) / Z}\right)
-= \min\left(1, \frac{\pi^*(y)}{\pi^*(x)}\right)
-$$
-
-Yani dağılımın uzayda toplamda 1'e entegre olup olmaması MCMC'nin
-umurunda değildir; algoritma sadece o an tırmandığı tepelerin
-birbirine oranına (eğimine) bakar.
-
-Önsel (Prior) Seçimiyle Sınırları Yönetmek. Aynı sadeleşme mantığı
-Bayes modellerinde parametrelere sınır koymak için de mükemmel bir
-araçtır. Diyelim ki sonsal (posterior) dağılımdan örneklem
-çekiyoruz. Bayes kuralı gereği $\text{Sonsal} \propto
-\text{Olabilirlik (Likelihood)} \times \text{Önsel (Prior)}$ olduğunu
-biliyoruz.
-
-Kabul oranını yazarken bu çarpımı kullanırız. Eğer bulmaya
-uğraştığımız bir katsayının muhakkak belli bir aralıkta kalmasını
-istiyorsak bunu onsel dağılıma birörnek (uniform) bir sınır koyarak
-çözebiliriz. Aday adım bu sınırların dışına çıktığı an önsel değeri
-$0$ (log uzayında $-\infty$) döndürebilir, bu da $\alpha$ kabul
-oranını anında sıfırlayarak zincirin o yasaklı bölgeye basmasını
-engeller. Algoritma içerisinde olasılıkların çarpımı yerine sayısal
-taşmaları önlemek için logarıtmik toplamlar ($\ln(\text{Likelihood}) +
-\ln(\text{Prior})$) kullanılabilir.
 
 Basit Bir Örnek: Standart Gaussian Dağılımından Örnekleme
 
@@ -171,64 +230,6 @@ plt.savefig('stat_097_mcmc_04.jpg')
 ```
 
 ![](stat_097_mcmc_04.jpg)
-
-Biraz önce önsel dağılımlarda sınır tanımlamaktan bahsettik, bunu
-sıfır log uzayda sonsuz değer döndürerek yapabiliyoruz. Fakat bu durum
-1'e entegre olması gereken dağılımlar bağlamında problem çıkarmıyor
-mu? Olmuyor, nedeninden bahsedelim. Önsel ve olurluk fonksiyonlarının
-kendi içlerinde de olasılık dağılımı olmalarından kaynaklanan
-normalleştirme sabitleri (örneğin Gaussian formülünün başındaki
-$\frac{1}{\sigma\sqrt{2\pi}}$ gibi ifadeler) var. Bu sabitleri
-$c_{\text{olurluk}}$ ve $c_{\text{önsel}}$ olarak ayıralım
-ve fonksiyonları ham halleriyle yazalım:
-
-* $P(D | \theta) = c_{\text{olurluk}} \times P^*(D | \theta)$
-
-* $P(\theta) = c_{\text{önsel}} \times P^*(\theta)$
-
-Şimdi bu ifadeleri Metropolis kabul oranına ($\alpha$) yerleştirelim
-ve mevcut bir $\theta_{\text{mevcut}}$ konumundan önerilen bir
-$\theta_{\text{aday}}$ konumuna geçiş cebirini inceleyelim:
-
-$$\alpha = \min\left(1,
-\frac{\pi(\theta_{\text{aday}})}{\pi(\theta_{\text{mevcut}})}\right) =
-\min\left(1, \frac{\frac{P(D | \theta_{\text{aday}})
-P(\theta_{\text{aday}})}{P(D)}}{\frac{P(D | \theta_{\text{mevcut}})
-P(\theta_{\text{mevcut}})}{P(D)}}\right)$$
-
-Paydadaki hesaplanamaz $P(D)$ terimleri parametreye bağlı olmadıkları
-için birbirini doğrudan götürür:
-
-$$\alpha = \min\left(1, \frac{P(D | \theta_{\text{aday}})
-P(\theta_{\text{aday}})}{P(D | \theta_{\text{mevcut}})
-P(\theta_{\text{mevcut}})}\right)$$
-
-Şimdi fonksiyonların içindeki normalleştirme sabitlerini de yerine
-koyalım:
-
-$$
-\alpha = \min\left(1, \frac{\left[c_{\text{olurluk}} \times P^*(D |
-\theta_{\text{aday}})\right] \times \left[c_{\text{önsel}} \times
-P^*(\theta_{\text{aday}})\right]}{\left[c_{\text{olurluk}} \times P^*(D |
-\theta_{\text{mevcut}})\right] \times \left[c_{\text{önsel}} \times
-P^*(\theta_{\text{mevcut}})\right]}\right)
-$$
-
-Görüldüğü üzere hem olurluktan gelen $c_{\text{olurluk}}$ sabitleri hem
-de önselden gelen $c_{\text{prior}}$ sabitleri kesrin pay ve
-paydasında sadeleşir. Sonuç olarak kabul oranı sadece ham
-fonksiyonların çarpımına eşitlenir:
-
-$$\alpha = \min\left(1, \frac{P^*(D | \theta_{\text{aday}}) \times
-P^*(\theta_{\text{aday}})}{P^*(D | \theta_{\text{mevcut}}) \times
-P^*(\theta_{\text{mevcut}})}\right)$$
-
-Yani MCMC simülasyonu yaparken ne $P(D)$ paydasını entegre etmek
-zorundayız ne de önsel dağılımın alanının 1'e eşit olmasını sağlayan o
-karmaşık katsayıları hesaplamak zorundayız. Algoritma sadece o an
-tırmandığı tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod
-yazarken önsel dağılımın sadece "şeklini" korumamız matematiksel
-olarak tamamen geçerlidir.
 
 Zincire Kaydedilenler
 
@@ -352,7 +353,7 @@ bu olasılığı dengeyi yeniden sağlayacak şekilde seçiyoruz:
 
 $$\pi(x)\, q(y \mid x)\, \alpha(x, y) = \pi(y)\, q(x \mid y)$$
 
-En zekice çözüm:
+En iyi çözüm,
 
 $$\alpha(x, y) = \min\!\left(1,\, \frac{\pi(y)\, q(x \mid y)}{\pi(x)\, q(y \mid x)}\right)$$
 
@@ -395,6 +396,102 @@ alınan sayı ile karşılaştırmak önemli, ancak o şekilde $\alpha$
 olasılığına bağlı zar atabilmiş oluyoruz. Eğer $\alpha$ değeri 0.2 ise
 10 örneklem içinden 2 tane kabul olmalı 8 tane ret olmalı. Bunu tarif
 edilen örneklem aşaması ile gerçekleştirmiş oluyoruz.
+
+Normalleştirme Sabitinden Kurtulmak
+
+Bayes usulü analizde veya karmaşık fizik modellerinde hedef
+dağılımımız genellikle $\pi(x) = \frac{\pi^*(x)}{Z}$
+biçimindedir. Burada $\pi^*(x)$ formülünü kolayca hesaplayabildiğimiz
+ham fonksiyon, $Z$ ise hesaplaması imkansız olan normalleştirme
+sabitidir (entegral veya payda).
+
+Metropolis yönteminin asıl dehası kabul oranında gizlidir. Orana
+koyduğumuzda $Z$ sabiti tamamen sadeleşir:
+
+$$
+\alpha(x,y) = \min\left(1, \frac{\pi^*(y) / Z}{\pi^*(x) / Z}\right)
+= \min\left(1, \frac{\pi^*(y)}{\pi^*(x)}\right)
+$$
+
+Yani dağılımın uzayda toplamda 1'e entegre olup olmaması MCMC'nin
+umurunda değildir; algoritma sadece o an tırmandığı tepelerin
+birbirine oranına (eğimine) bakar.
+
+Önsel (Prior) Seçimiyle Sınırları Yönetmek. Aynı sadeleşme mantığı
+Bayes modellerinde parametrelere sınır koymak için de mükemmel bir
+araçtır. Diyelim ki sonsal (posterior) dağılımdan örneklem
+çekiyoruz. Bayes kuralı gereği $\text{Sonsal} \propto
+\text{Olabilirlik (Likelihood)} \times \text{Önsel (Prior)}$ olduğunu
+biliyoruz.
+
+Kabul oranını yazarken bu çarpımı kullanırız. Eğer bulmaya
+uğraştığımız bir katsayının muhakkak belli bir aralıkta kalmasını
+istiyorsak bunu onsel dağılıma birörnek (uniform) bir sınır koyarak
+çözebiliriz. Aday adım bu sınırların dışına çıktığı an önsel değeri
+$0$ (log uzayında $-\infty$) döndürebilir, bu da $\alpha$ kabul
+oranını anında sıfırlayarak zincirin o yasaklı bölgeye basmasını
+engeller. Algoritma içerisinde olasılıkların çarpımı yerine sayısal
+taşmaları önlemek için logarıtmik toplamlar ($\ln(\text{Likelihood}) +
+\ln(\text{Prior})$) kullanılabilir.
+
+
+Biraz önce önsel dağılımlarda sınır tanımlamaktan bahsettik, bunu
+sıfır log uzayda sonsuz değer döndürerek yapabiliyoruz. Fakat bu durum
+1'e entegre olması gereken dağılımlar bağlamında problem çıkarmıyor
+mu? Olmuyor, nedeninden bahsedelim. Önsel ve olurluk fonksiyonlarının
+kendi içlerinde de olasılık dağılımı olmalarından kaynaklanan
+normalleştirme sabitleri (örneğin Gaussian formülünün başındaki
+$\frac{1}{\sigma\sqrt{2\pi}}$ gibi ifadeler) var. Bu sabitleri
+$c_{\text{olurluk}}$ ve $c_{\text{önsel}}$ olarak ayıralım
+ve fonksiyonları ham halleriyle yazalım:
+
+* $P(D | \theta) = c_{\text{olurluk}} \times P^*(D | \theta)$
+
+* $P(\theta) = c_{\text{önsel}} \times P^*(\theta)$
+
+Şimdi bu ifadeleri Metropolis kabul oranına ($\alpha$) yerleştirelim
+ve mevcut bir $\theta_{\text{mevcut}}$ konumundan önerilen bir
+$\theta_{\text{aday}}$ konumuna geçiş cebirini inceleyelim:
+
+$$\alpha = \min\left(1,
+\frac{\pi(\theta_{\text{aday}})}{\pi(\theta_{\text{mevcut}})}\right) =
+\min\left(1, \frac{\frac{P(D | \theta_{\text{aday}})
+P(\theta_{\text{aday}})}{P(D)}}{\frac{P(D | \theta_{\text{mevcut}})
+P(\theta_{\text{mevcut}})}{P(D)}}\right)$$
+
+Paydadaki hesaplanamaz $P(D)$ terimleri parametreye bağlı olmadıkları
+için birbirini doğrudan götürür:
+
+$$\alpha = \min\left(1, \frac{P(D | \theta_{\text{aday}})
+P(\theta_{\text{aday}})}{P(D | \theta_{\text{mevcut}})
+P(\theta_{\text{mevcut}})}\right)$$
+
+Şimdi fonksiyonların içindeki normalleştirme sabitlerini de yerine
+koyalım:
+
+$$
+\alpha = \min\left(1, \frac{\left[c_{\text{olurluk}} \times P^*(D |
+\theta_{\text{aday}})\right] \times \left[c_{\text{önsel}} \times
+P^*(\theta_{\text{aday}})\right]}{\left[c_{\text{olurluk}} \times P^*(D |
+\theta_{\text{mevcut}})\right] \times \left[c_{\text{önsel}} \times
+P^*(\theta_{\text{mevcut}})\right]}\right)
+$$
+
+Görüldüğü üzere hem olurluktan gelen $c_{\text{olurluk}}$ sabitleri hem
+de önselden gelen $c_{\text{prior}}$ sabitleri kesrin pay ve
+paydasında sadeleşir. Sonuç olarak kabul oranı sadece ham
+fonksiyonların çarpımına eşitlenir:
+
+$$\alpha = \min\left(1, \frac{P^*(D | \theta_{\text{aday}}) \times
+P^*(\theta_{\text{aday}})}{P^*(D | \theta_{\text{mevcut}}) \times
+P^*(\theta_{\text{mevcut}})}\right)$$
+
+Yani MCMC simülasyonu yaparken ne $P(D)$ paydasını entegre etmek
+zorundayız ne de önsel dağılımın alanının 1'e eşit olmasını sağlayan o
+karmaşık katsayıları hesaplamak zorundayız. Algoritma sadece o an
+tırmandığı tepelerin birbirine oranına (eğimine) bakar. Bu yüzden kod
+yazarken önsel dağılımın sadece "şeklini" korumamız matematiksel
+olarak tamamen geçerlidir.
 
 Örnek: Gaussian Karışımı
 
