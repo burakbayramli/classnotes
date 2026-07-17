@@ -14,11 +14,8 @@ Bayesçi bağlamdan (paydada çözümsüz entegraller yaratan) ibaret
 değildir. Değerlendirmesi kolay ama doğrudan örneklemesi zor olan pek
 çok açık, kapalı-form dağılım vardır. İşte çirkin bir karışım
 örneği. $\mathbb{R}^{10}$'da 100 Gaussian'ın karışımını ele alalım:
-
-$$\pi^*(x) = \frac{1}{100} \sum_{k=1}^{100} \mathcal{N}(x \mid \mu_k,
-\Sigma_k)$$
-
-Bu tamamen açık, normalize edilmiş bir olasılık yoğunluk
+$\pi^*(x) = \frac{1}{100} \sum_{k=1}^{100} \mathcal{N}(x \mid \mu_k,
+\Sigma_k)$. Bu tamamen açık, normalize edilmiş bir olasılık yoğunluk
 fonksiyonudur, anında değerlendirilebilir. Ancak örnekleme zordur;
 çünkü tepeler birbirinden çok uzak ve neredeyse sıfır olasılıklı
 bölgelerle ayrılmış olabilir. Naif / basit bir örnekleyici bir tepede
