@@ -1,7 +1,7 @@
 # Markov Rasgele Alanları (Markov Random Fields -MRF-), Gürültü Giderme
 
 MRF formülasyonu şöyle der: Bir görüntüyü gözlemlediğimizde, aslında
-gözlemleyemediğimiz bir şeyin — temiz, gerçek sahnenin — gürültülü bir
+gözlemleyemediğimiz bir şeyin (temiz, gerçek sahnenin) gürültülü bir
 versiyonunu görüyoruz. Gürültü giderme problemi özünde şu soruyu
 sormaktır: elimizdeki bozulmuş piksellerden yola çıkarak, altta yatan
 gerçeği nasıl kurtarabiliriz?
@@ -50,17 +50,18 @@ rastgele değişkendir.
 
 $$P(Y | X) \propto P(X | Y)\, P(Y)$$
 
-Olurluk — gürültü piksel bazında bağımsızdır
+Olurluk gürültü piksel bazında bağımsızdır
 
 $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
-Önsel (prior) dağılım — her piksel yalnızca komşularına bağlıdır (MRF varsayımı):
+Önsel (prior) dağılım her piksel yalnızca komşularına bağlıdır (MRF
+varsayımı):
 
 $$P(Y) = \prod_{i,j} P(y_{i,j} | \mathcal{N}(y_{i,j}))$$
 
 burada $\mathcal{N}(y_{i,j})$ konum bağlamındaki komşulardır.
 
-Kanıt — tüm Y için yalnızca bir normalleştirme sabiti:
+Kanıt tüm Y için yalnızca bir normalleştirme sabiti:
 
 $$P(X) = \text{sabit}$$
 
@@ -81,8 +82,8 @@ Y_{-(i,j)}, X)$'i, yani diğer her şey sabit tutulduğunda tek bir
 pikselin dağılımını hesaplamamız gerekir. Bunu, $y_{i,j}$'yi içermeyen
 tüm terimleri sabit olarak ele alarak yaparız. Çarpımları gözden
 geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler hangileri?" diye
-sorduğumuzda yalnızca ikisi hayatta kalır: olabilirlik çarpımından
-$P(x_{i,j} \mid y_{i,j})$ ve on dağılım çarpımından $P(y_{i,j} \mid
+sorduğumuzda yalnızca ikisi hayatta kalır: olurluk çarpımından
+$P(x_{i,j} \mid y_{i,j})$ ve ön dağılım çarpımından $P(y_{i,j} \mid
 \mathcal{N}(y_{i,j}))$, tabii $y_{i,j}$'nin komşularına ait MRF
 terimleri de $y_{i,j}$'yi içerir, ancak Hammersley-Clifford teoremi
 kapsamında (ki yakın komşulara bağlılık uzak olanlarla eşdeğerdir der)
@@ -91,7 +92,7 @@ indirgenir. Dolayısıyla $(k,l) \neq (i,j)$ olan tüm $y_{k,l}$'leri
 sabitler, sabit olan her şeyi atarız ve geriye kalan $P(x_{i,j} \mid
 y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile orantılıdır. Bu
 odaklama adımı aslında diğer tüm pikselleri onlara koşullanarak dışarı
-marjinalleştirmektir — ki bu da Gibbs adımıdır.
+marjinalleştirmektir, ki bu da Gibbs adımıdır.
 
 Artık tek bir piksel için şunu yazabiliriz:
 
@@ -154,7 +155,10 @@ prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - z), axis=1)
 loss = lam * np.abs(target_noisy[:, np.newaxis] - z)
 ```
 
-$\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z|$ olasılıksal bir nicelik olarak garip görünebilir, ama neyi ölçtüğünü düşünün — bir aday piksel değeri $k$'nın komşularıyla olan toplam uyuşmazlığını ölçüyor. Bu toplam:
+$\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z|$ olasılıksal bir
+nicelik olarak garip görünebilir, ama neyi ölçtüğünü düşünün, bir aday
+piksel değeri $k$'nın komşularıyla olan toplam uyuşmazlığını
+ölçüyor. Bu toplam:
 
 - Küçük olduğunda: $k$ komşularına yakındır → düşük enerji → yüksek
   olasılık. Piksel "uyum sağlar."
@@ -163,11 +167,11 @@ $\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z|$ olasılıksal bir nicelik olar
   düşük olasılık. Piksel "öne çıkar."
 
 Karşılaştırmak gerekirse, Gaussian dağılımı da bir şeyden uzaklığı
-ölçer — bu durumda bir değer ile ortalama arasındaki
+ölçer, bu durumda bir değer ile ortalama arasındaki
 uzaklığı. Ortalamadan uzaklaştıkça ceza artar (düşük olasılık);
 yaklaştıkça ödül büyür (yüksek olasılık). L1 önsel dağılımı aynı
 şekilde çalışır; yalnızca 'ortalama', yerel komşuluk uzlaşısıyla
-değiştirilir — sabit bir hedef yoktur, yalnızca yakın piksellerin
+değiştirilir, sabit bir hedef yoktur, yalnızca yakın piksellerin
 anlaşması vardır.
 
 $\exp(-E)$ neden düşük enerji = yüksek olasılık sağlar? $E$ arttıkça
@@ -247,11 +251,19 @@ Yukarıdaki satırlar, her komşu $z$ ve her aday değer $k \in \{0,
 uzakta?" sorusunu soran vektörleştirilmiş bir yoldur. Boyutlar daha
 açık hale getirir:
 
-- `target_neighbors` boyutu $(K, 8)$'dir — geçerli maskede $K$ piksel, her birinin 8 komşusu
+- `target_neighbors` boyutu $(K, 8)$'dir, geçerli maskede $K$ piksel,
+  her birinin 8 komşusu
+
 - `[:, :, np.newaxis]` sonrasında $(K, 8, 1)$ olur
-- `possible_vals` boyutu $(256,)$'dir, $(1, 1, 256)$'ya "vektöre yayınlanır (broadcast)" 
-- sonuç $(K, 8, 256)$'dir — $K$ pikselin her biri için, 8 komşunun her biri için, 256 aday değerden mutlak fark
-- `np.sum(..., axis=1)` ise 8 komşu üzerinde toplar ve $(K, 256)$ boyutunu verir
+
+- `possible_vals` boyutu $(256,)$'dir, $(1, 1, 256)$'ya "vektöre
+  yayınlanır (broadcast)"
+
+- sonuç $(K, 8, 256)$'dir — $K$ pikselin her biri için, 8 komşunun her
+  biri için, 256 aday değerden mutlak fark
+
+- `np.sum(..., axis=1)` ise 8 komşu üzerinde toplar ve $(K, 256)$
+  boyutunu verir
 
 Dolayısıyla nihai `prior` dizisi, tüm $K$ piksel ve $k$'nin tüm 256
 değeri için eşzamanlı olarak değerlendirilen $\sum_{z \in
@@ -286,8 +298,8 @@ Parçalar Hâlinde Gibbs ve $P(Y)$
 
 Gibbs Örneklemesi bir Markov Zinciri Monte Carlo (MCMC)
 yöntemidir. $P(y_1, y_2, \ldots, y_n)$ birleşik olasılığını hesaplamak
-yerine — bu $256^{\text{Yükseklik} \times \text{Genişlik}}$
-kombinasyonu gerektirir — yerel koşullu dağılımlardan örnekleme
+yerine,bu $256^{\text{Yükseklik} \times \text{Genişlik}}$ kombinasyonu
+gerektirir, yerel koşullu dağılımlardan örnekleme
 yaparsınız. Matematik, her pikselin yerel koşullu dağılımından
 yeterince uzun süre örnekleme yaparsanız, elde edilen Y görüntüsünün
 nihayetinde gerçek, global sonsal (posterior) dağılımından $P(Y | X)$
@@ -346,7 +358,7 @@ gelir. Makale, olasılıksal çıkarım aracını (Gibbs) optimizasyon
 problemini (MAP) çözmek için kullanır; çünkü dağınık, gürültülü
 verilere karşı daha dayanıklıdır.
 
-MAP size tek bir yanıt verir — tek en olası temiz görüntü. Gibbs
+MAP size tek bir yanıt verir, tek en olası temiz görüntü. Gibbs
 örneklemesi ise prensipte makul temiz görüntülerin bir dağılımını
 verir. Pratikte, yeterli sayıda iterasyondan ve yüksek $\beta$'dan
 sonra örnekleyici zamanının neredeyse tamamını MAP çözümünün yakınında
