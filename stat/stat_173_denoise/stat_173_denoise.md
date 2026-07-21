@@ -106,8 +106,27 @@ olarak bozulmaya uğramış kabul ediyoruz):
 
 $$P(x_{i,j} | y_{i,j}) \propto \exp(-\lambda|y_{i,j} - x_{i,j}|)$$
 
-Düzgün bir önsel dağılım varsayımıyla (bir piksel komşularıyla
-uyuşmalıdır):
+Üstteki ifade Laplace dağılımı ile gürültü eklememiş olmamızdan ileri
+geliyor, gürültülü $x_{i,j}$ değeri gerçek değer $y_{i,j}$ artı
+gürültü dedik, yani
+
+$$x_{i,j} = y_{i,j} + \epsilon$$
+
+Yani bana $y_{i,j}$ merkezli $b$ ölçekleme parametresine sahip bir
+Laplace dağılımı ver demiş oluyoruz, 
+
+$$P(x_{i,j} \mid y_{i,j}) = \frac{1}{2b} \exp\left( -\frac{|x_{i,j} -
+y_{i,j}|}{b} \right)$$
+
+Orantısal işlem kullanınca $1/2b$ atılabilir, ayrıca $\exp$ içindekine
+$\lambda = 1/b$ dersek,
+
+$$P(x_{i,j} \mid y_{i,j}) \propto \exp(-\lambda |x_{i,j} - y_{i,j}|)$$
+
+elde ediyoruz.
+
+Devam edelim, düzgün bir önsel dağılım varsayımıyla (bir piksel
+komşularıyla uyuşmalıdır):
 
 $$
 P(y_{i,j} | \mathcal{N}(y_{i,j})) \propto \exp\!\left(-\sum_{z \in
