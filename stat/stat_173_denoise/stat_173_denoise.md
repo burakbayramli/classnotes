@@ -54,7 +54,7 @@ Olurluk gürültü piksel bazında bağımsızdır
 
 $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
-Önsel (prior) dağılım her piksel yalnızca komşularına bağlıdır (MRF
+Önsel (prior) dağılımda her piksel yalnızca komşularına bağlıdır (MRF
 varsayımı):
 
 $$P(Y) = \prod_{i,j} P(y_{i,j} | \mathcal{N}(y_{i,j}))$$

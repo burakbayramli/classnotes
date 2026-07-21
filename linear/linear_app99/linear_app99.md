@@ -1,18 +1,24 @@
 # Uzaklıklar, Norm, Benzerlik
 
-Literatürdeki anlatım norm ve uzaklık konusu etrafında biraz kafa karışıklığı
-yaratabiliyor, bu yazıda biraz açıklık getirmeye çalışalım. Norm bir büyüklük
-ölçüsüdür. Vektör uzayları ile olan alakasını görmek için {\em Fonksiyonel
-  Analiz} notlarına bakılabilir. Büyüklük derken bir $x$ vektörünün
-büyüklüğünden bahsediyoruz, ki bu çoğunlukla $||x||$ gibi bir kullanımda
-görülür, eğer altsimge yok ise, o zaman 2 kabul edilir, yani $||x||_2$. Bu ifade
-bir L2 norm'unu ifade eder. $||x||_1$ varsa L1 norm'ü olurdu.
+Literatürdeki anlatım norm ve uzaklık konusu etrafında biraz kafa
+karışıklığı yaratabiliyor, bu yazıda biraz açıklık getirmeye
+çalışalım. Norm bir büyüklük ölçüsüdür. Vektör uzayları ile olan
+alakasını görmek için *Fonksiyonel Analiz* notlarına
+bakılabilir. Büyüklük derken bir $x$ vektörünün büyüklüğünden
+bahsediyoruz, ki bu çoğunlukla $||x||$ gibi bir kullanımda görülür,
+eğer altsimge yok ise, o zaman 2 kabul edilir, yani $||x||_2$. Bu
+ifade bir L2 norm'unu ifade eder. $||x||_1$ varsa L1 norm'u olurdu.
 
-L1,L2 normaları, ya da genel olarak $p$ üzerinden $L_p$ normları şöyle gösterilir,
+L1,L2 normları, ya da genel olarak $p$ üzerinden $L_p$ normları şöyle
+gösterilir,
 
 $$ ||x||_p = (\sum_i |x_i|^p)^{1/p} $$
 
-ki $x_i$, $x$ vektörü içindeki öğelerdir. Eğer $p=2$ ise, L2 norm
+ki $x_i$, $x$ vektörü içindeki öğelerdir. Dikkat tek dikey çubuk
+işareti $|x_i|$ şeklinde, mutlak değer (absolute value) anlamına
+geliyor.
+
+Eğer $p=2$ ise, L2 norm
 
 $$ ||x||_2 = \bigg(\sum_i |x_i|^2 \bigg)^{1/2} $$
 
@@ -20,14 +26,18 @@ $$ ||x||_2 = \bigg(\sum_i |x_i|^2 \bigg)^{1/2} $$
 
 $$ ||x||_2 = \sqrt{\sum |x_i|^2} $$
 
-Bu norm ayrıca Öklitsel (Euclidian) norm olarak ta bilinir, tabii ki bunun
-Öklitsel uzaklık ile yakın bağlantısı var (iki vektörü birbirinden çıkartıp
-Öklit normunu alırsak Öklit uzaklığını hesaplamış oluruz).
+Bu norm ayrıca Oklitsel (Euclidian) norm olarak ta bilinir, tabii ki
+bu Oklitsel uzaklığın ta kendisidir. Dikkat, çoğu zaman yapay öğrenme
+dalında bu norm mutlak değer operatörü $|$ olmadan gösterilir, bunun
+sebebi $p=2$ olduğunda $x_i^2 = |x_i|^2$ birbirine eşittir, bu sebeple
+ekstra işaret notasyondan atılır. Fakat daha yüksek $p$ seviyelerinde
+ve $p$ tek bir sayı olduğunda mutlak değer operatörü gerekecektir.
 
-Eğer $p=1$ olsaydı, yani L1 norm, o zaman üstel olarak $1/1$ olur, yani hiçbir
-üstel / köksel işlem yapılmasına gerek yoktur, iptal olurlar,
+Eğer $p=1$ olsaydı, yani L1 norm, o zaman üstel olarak $1/1$ olur,
+yani hiçbir üstel / köksel işlem yapılmasına gerek yoktur, iptal
+olurlar,
 
-$$ ||x||_1 = \sum |x_i|^2 $$
+$$ ||x||_1 = \sum |x_i| $$
 
 Örnek
 
@@ -41,10 +51,9 @@ $$ ||a|| = \sqrt{3^2+(-2)^2+1^2} = 3.742 $$
 
 Örnekte altsimge yok, demek ki L2 norm. 
 
-Ek Notasyon, İşlemler
-
-L1 normu için yapılan işlemi düşünelim, vektör öğeleri kendileri ile
-çarpılıyor ve sonuçlar toplanıyor. Bu işlem
+Diğer bir kısayol, notasyon kavisi şöyle: L1 normu için yapılan işlemi
+düşünelim, vektör ögeleri kendileri ile çarpılıyor ve sonuçlar
+toplanıyor. Bu işlem
 
 $||x||_1 = x^Tx$
 
@@ -56,7 +65,29 @@ norm. Sonra L2 normun karesi alınmış, fakat L2 normu tanımına göre bir
 karekök almıyor muydu? Evet, fakat o zaman kare işlemi karekökü iptal eder,
 demek ki L2 normunun karesini almak bizi L1 normuna döndürür! Eh bu normu
 da $x^Tx$ olarak hesaplayabildiğimize göre hemen o notasyona geçebiliriz,
-demek ki $||x||^2 = x^Tx = x \cdot x$. 
+demek ki $||x||^2 = x^Tx = x \cdot x$.
+
+Norm Nereden Geliyor
+
+Üstteki norm formülü bizim önkabul olarak ortaya attığımız bir
+operatör / tanım, başka bir diğer formülden türetilmiyor, ya da onun
+uzantısı değil. Fakat yine de norm kavramının temel aldığı bir
+matematiksel altyapı var.
+
+Lineer cebir ve fonksiyonel analizde istediğimiz herhangi bir formülü
+norm olarak tanımlayabiliriz. Fakat bir fonksiyon $f(\mathbf{x})$'nin
+norm etiketine sahip olabilmesi için $\mathbf{x}, \mathbf{y}$
+vektörleri ve $a$ tek sayıları için dört temel önermeyi (axiom) tatmin
+etmesi gerekir.
+
+Negatif olmama: $|\mathbf{x}| \ge 0$
+
+Kesinlik: $|\mathbf{x}| = 0 \iff \mathbf{x} = \mathbf{0}$
+
+Tam homojenlik: $|a\mathbf{x}| = |a||\mathbf{x}|$
+
+Üçgensel Eşitsizlik: $|\mathbf{x} + \mathbf{y}| \le |\mathbf{x}| +
+|\mathbf{y}|$ *(iki nokta arasındaki en kısa yol düz çizgi).*
 
 İkisel Vektörlerde Benzerlik
 

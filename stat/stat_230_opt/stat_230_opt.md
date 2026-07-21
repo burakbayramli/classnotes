@@ -448,7 +448,7 @@ Genz fonksiyonu istenen boyutta tanımlanabilir, ve boyutlar arttıkça
 minimum noktası çok daha zor bulunur hale gelir. Biz şimdi
 optimizasyonu iyice zorlaştırmak için 100 boyutlu bir Genz fonksiyonu
 seçiyoruz. Onu dağılım haline getireceğiz, fakat bu sefer dağılımı
-paralel parçacık filtresi ile onu gezeceğiz... Parçacık filtrelerinin
+paralel parçacık filtresi ile gezeceğiz... Parçacık filtrelerinin
 parallelliğe yatkın bir yaklaşım olduğunu görmüştük, her parçacık
 farklı bir CPU/GPU çekirdeği üzerinde işleyebilir. Alttaki `pf_tf.py`
 kodu da aynen bunu yapıyor.
