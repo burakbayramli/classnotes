@@ -125,172 +125,159 @@ $$P(x_{i,j} \mid y_{i,j}) \propto \exp(-\lambda |x_{i,j} - y_{i,j}|)$$
 
 elde ediyoruz.
 
-Devam edelim, düzgün bir önsel dağılım varsayımıyla (bir piksel
-komşularıyla uyuşmalıdır):
+Devam edelim, şimdi komşu pikseller icin düzgün / pürüzsüz bir önsel
+dağılım varsayımı yapıyoruz, yani bir piksel komşularıyla uyuşmalıdır
+diyoruz. Bunu formülsel olarak belirtmek için bir piksel $y_{i,j}$ ve
+onun etrafındaki komşular $z \in \mathcal{N}(y_{i,j})$ arasındaki
+farkın sıfır merkezli bir Laplace dağılımını takip ettiğini farz
+ediyoruz (üstte uyguladığımızla benzer bir numara). Niye Laplace?
+Çünkü $|y_{i,j} - z|$ uzaklık ölçütü resim piksel gradyanlarının
+(yanyana piksel farkları) geniş etekli (heavy-tailed) bir dağılıma
+sahip olduğunu farz ediyor. Eğer bunun yerine bir Gaussian önseli
+kullansaydık bu dağılım ekstrem değerleri cezalandırırdı / onları daha
+az olası görürdü, bu da takip eden diğer işlemleri kötü yönde
+etkilerdi.
+
+MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin onsel
+dağılımı o pikselin her komşu $z \in \mathcal{N}(y_{i,j})$ ile olan
+ikili olasılığının çarpımıyla elde edilir. 
+
+$$
+P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
+\propto \prod_{z \in \mathcal{N}(y_{i,j})} P(y_{i,j} \mid z)
+$$
+
+Her ikili olasılığı Laplace dağılımı olarak modellemiştik, bunu yerine koyarsak,
+
+$$
+P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
+\propto \prod_{z \in \mathcal{N}(y_{i,j})} \exp\left(-\beta
+|y_{i,j} - z|\right)
+$$
+
+$\exp(a) \cdot \exp(b) = \exp(a + b)$ kurali sebebiyle tum komsular
+uzerindeki carpim ustelin icindeki bir toplama cevirilebilir, 
+
+$$
+P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
+\propto \exp\left( -\beta \sum_{z \in \mathcal{N}(y_{i,j})}
+|y_{i,j} - z| \right)
+$$
+
+Eger $\beta = 1$ dersek,
 
 $$
 P(y_{i,j} | \mathcal{N}(y_{i,j})) \propto \exp\!\left(-\sum_{z \in
 \mathcal{N}(y_{i,j})} |y_{i,j} - z|\right) \tag{2}
 $$
 
-İkisini çarpıp $-\log$ alarak:
+elde ederiz.
 
-$$P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) \propto \exp(-E(y_{i,j}))$$
+Nihai sonsalı elde etmek için hatırlayalım, 
 
-burada:
+Olurluk: $P(x_{i,j} \mid y_{i,j}) \propto \exp(-\lambda |y_{i,j}
+- x_{i,j}|)$
 
-$$
-E(y_{i,j}) = \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z| +
-\lambda|y_{i,j} - x_{i,j}|
-$$
+Önsel (Komşu Pürüzsüzlüğü): $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
+\propto \exp\left(-\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
+z|\right)$
 
-Fiziğe dayalı modellerde olasılığı Enerji (E) ile
-ilişkilendiririz. (2)'de $\propto$ kullandık; bu normalleştiricinin
-atıldığı anlamına gelir. Tam ifade şöyledir:
+İkisini çarpınca 
 
-$$P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j}) = \frac{1}{Z} \exp(-E(y_{i,j}))$$
+$$P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) \propto
+\exp\left(-\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
+z|\right) \cdot \exp(-\lambda |y_{i,j} - x_{i,j}|)$$
 
-$Z$ hakkında daha detaylı açıklama için belge sonuna danışılabilir.
+Yine $\exp(a) \cdot \exp(b) = \exp(a + b)$ kuralını kullanarak,
 
-Enerji, birbiriyle rekabet eden iki terimden oluşur:
+$$P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) \propto \exp\left( -
+\left[ \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z| +
+\lambda |y_{i,j} - x_{i,j}| \right] \right)$$
 
-- Önsel Dağılım Terimi (R): Düzgünlüğü teşvik etmek için bir piksel
-  ile komşuları arasındaki farkları cezalandırır. Bu açıdan "önsel
-  dağılım" salt göreli bir düzgünlük cezasıdır. Doğal görüntülerin
-  yerel olarak düzgün olduğu inancını kodlar; bir pikselin mutlak
-  anlamda hangi değeri alması gerektiğine dair hiçbir taahhütte
-  bulunmaz.
+Log alalım
 
-- Kayıp Terimi (L): Gerçeğin çok uzağına sapmamamızı sağlamak için
-  gürültü giderilen piksel ile orijinal gürültülü gözlem arasındaki
-  farkı cezalandırır.
+$$\log P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) = \log\left(
+\exp\left( - \left[ \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
+z| + \lambda |y_{i,j} - x_{i,j}| \right] \right)
+\right)$$
 
-Kod
-```
-# z aday piksel değeridir -sözde kod-
-# L1 Önsel Dağılım: toplam|komşular - değer|
-prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - z), axis=1)
-# L1 Kayıp: lambda |gürültülü - değer|
-loss = lam * np.abs(target_noisy[:, np.newaxis] - z)
-```
-
-$\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z|$ olasılıksal bir
-nicelik olarak garip görünebilir, ama neyi ölçtüğünü düşünün, bir aday
-piksel değeri $k$'nın komşularıyla olan toplam uyuşmazlığını
-ölçüyor. Bu toplam:
-
-- Küçük olduğunda: $k$ komşularına yakındır → düşük enerji → yüksek
-  olasılık. Piksel "uyum sağlar."
-
-- Büyük olduğunda: $k$ komşularından çok farklıdır → yüksek enerji →
-  düşük olasılık. Piksel "öne çıkar."
-
-Karşılaştırmak gerekirse, Gaussian dağılımı da bir şeyden uzaklığı
-ölçer, bu durumda bir değer ile ortalama arasındaki
-uzaklığı. Ortalamadan uzaklaştıkça ceza artar (düşük olasılık);
-yaklaştıkça ödül büyür (yüksek olasılık). L1 önsel dağılımı aynı
-şekilde çalışır; yalnızca 'ortalama', yerel komşuluk uzlaşısıyla
-değiştirilir, sabit bir hedef yoktur, yalnızca yakın piksellerin
-anlaşması vardır.
-
-$\exp(-E)$ neden düşük enerji = yüksek olasılık sağlar? $E$ arttıkça
-$-E$ azalır ve dolayısıyla $\exp(-E)$ monoton biçimde azalır. Üstel
-fonksiyonun özellikle seçilmesi, bunu istatistiksel fiziğe (Boltzmann
-dağılımı) bağlayan ve olasılıkların her zaman pozitif olmasını güvence
-altına alan şeydir.
-
-Maskeleri (dama tahtası deseni) kullanmamızın nedeni bu rastgele
-değişkenlerin bağımsızlığıyla ilgilidir. Bir MRF'de iki rastgele
-değişken $y_a$ ve $y_b$, komşu değillerse koşullu olarak
-bağımsızdır. Bu, vektörleştirilmiş kodda Gibbs örneklemesinin
-kurallarını ihlal etmeden binlerce pikseli aynı anda örneklememizi
-sağlayan kaldıraç / mekanizmadır.
-
-Amacımız bu olasılığı maksimize eden Y'yi bulmaktır (MAP
-tahmini). $P(X)$ herhangi bir gürültülü görüntü için sabit olduğundan,
-payı maksimize etmeye odaklanırız: $P(X | Y)\, P(Y)$. Kodda bu, her
-hedef piksel için 8 çevreleyen pikseli (3×3 pencere) toplayan
-doldurulmuş görüntü ve komşular yığını tarafından işlenir.
-
-Örnekleme
-
-Bu enerji değerlerini piksel değeri için bir "seçime" dönüştürmek
-amacıyla Gibbs dağılımını kullanırız.
-
-Sayısal İstikrar (Stability): $\exp(-E)$ hesaplanırken bilgisayar
-hatalarını (NaN) önlemek için üs almadan önce minimum enerjiyi
-çıkarırız:
+$\log$ ve $\exp$ birbirini iptal eder, geriye sonsal dağılım kalır
 
 $$
-\frac{e^{-E_i}}{\sum_j e^{-E_j}} = \frac{e^{-(E_i - \min E)}}{\sum_j
-e^{-(E_j - \min E)}}
+= - \left( \underbrace{\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
+z|}_{\text{Log Prior (8 komşu üzerinden toplam)}} +
+\underbrace{\lambda |y_{i,j} - x_{i,j}|}_{\text{Log Likelihood
+(tek piksel karşılaştırması)}}
+\right)
 $$
+
+$$
+= - \sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} - z| -
+\lambda |y_{i,j} - x_{i,j}| 
+$$
+
+Dikkat, toplam işareti sadece ilk terim üzerinde aktif, ikinci üzerinde değil.
 
 Kod
 
 ```python
-# min(energy) çıkarmak exp()'nin çok küçük olmasını engeller (alt taşma)
-probs = np.exp(np.min(energy, axis=1, keepdims=True) - energy)
-probs /= np.sum(probs, axis=1, keepdims=True)  # Toplamı 1 olacak şekilde normalleştir
+from scipy.special import softmax
+import numpy as np, skimage
+
+def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
+    M, N = noisy_img.shape
+    Y = Y = noisy_img.copy().astype(np.float32)
+    possible_vals = np.arange(256, dtype=np.float32)
+    
+    masks = [
+        (np.arange(M)%2 == 0)[:, None] & (np.arange(N)%2 == 0),
+        (np.arange(M)%2 == 0)[:, None] & (np.arange(N)%2 == 1),
+        (np.arange(M)%2 == 1)[:, None] & (np.arange(N)%2 == 0),
+        (np.arange(M)%2 == 1)[:, None] & (np.arange(N)%2 == 1)
+    ]
+    
+    for it in range(iterations):
+        for mask in masks:
+            padded = np.pad(Y, 1, mode='edge')
+            neighbors = np.stack([
+                padded[0:-2, 0:-2], padded[0:-2, 1:-1], padded[0:-2, 2:],
+                padded[1:-1, 0:-2],                 padded[1:-1, 2:],
+                padded[2:, 0:-2],   padded[2:, 1:-1],   padded[2:, 2:]
+            ], axis=-1)
+            
+            target_neighbors = neighbors[mask]
+            target_noisy = noisy_img[mask]
+            
+            log_prior = -np.sum(np.abs(target_neighbors[:, :, np.newaxis] - possible_vals), axis=1)
+            
+            log_likelihood = -lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)            
+            log_posterior = log_prior + log_likelihood
+            probs = softmax(log_posterior, axis=1)
+            
+            cum_probs = np.cumsum(probs, axis=1)
+            random_vals = np.random.rand(len(target_noisy), 1)
+            Y[mask] = np.argmax(cum_probs > random_vals, axis=1)
+            
+    return Y
+
+img_noisy = skimage.io.imread('../../func_analysis/func_70_tvd/lena-noise.jpg', as_gray=True)
+if img_noisy.max() <= 1.0:
+    img_noisy = (img_noisy * 255).astype(np.uint8)
+
+denoised_img = denoise_mrf_gibbs(img_noisy, iterations=10, lam=2.5)
+
+fig, axes = plt.subplots(1, 2)
+axes[0].imshow(img_noisy, cmap='gray')
+axes[0].set_title('Gürültülü')
+axes[0].axis('off')
+axes[1].imshow(denoised_img, cmap='gray')
+axes[1].set_title('Gürültü Giderilmiş')
+axes[1].axis('off')
+plt.tight_layout()
+plt.savefig('lena1.jpg')
 ```
 
-Koddaki örnekleme adımı, $P(y_{i,j} | \mathcal{N}(y_{i,j}), x_{i,j})$
-koşullu olasılık dağılımına uygulanan Ters Dönüşüm Örneklemesinin
-doğrudan bir uygulamasıdır. Bu, hesaplanması imkânsız olan global
-normalleştirme sabitini hesaplamadan görüntü uzayını keşfetmemizi
-sağlayan Gibbs Örnekleyicisinin temel mekanizmasıdır.
-
-Koşullu Dağılım
-
-Bir Markov Rastgele Alanında, komşuluğu $\mathcal{N}(y_{i,j})$ ve
-gözlemlenen veri $x_{i,j}$ verildiğinde tek bir pikselin olasılığı
-şöyledir:
-
-$$
-P(y_{i,j} = k \mid \mathcal{N}(y_{i,j}),\, x_{i,j}) =
-\frac{\exp(-E(k))}{\sum_{m=0}^{255} \exp(-E(m))} \tag{1}
-$$
-
-Burada $E(k)$, piksel $k \in \{0, \ldots, 255\}$ değerini aldığındaki
-enerjidir. Kodda `probs` değişkeni, geçerli maskedeki her piksel için
-bu ayrık olasılık dağılımını temsil eder. Paydayı değerlendirmek için
-aynı anda tüm 256 aday için $E(k)$'ya ihtiyacımız vardır. Kodda $z$,
-`possible_vals = np.arange(256)` ile değiştirilir; bu da yukarıdaki
-skaler hesaplamayı tüm adaylar üzerinde vektörleştirilmiş bir
-hesaplamaya dönüştürür:
-
-```python
-prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - possible_vals), axis=1)
-loss = lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)
-```
-
-Yukarıdaki satırlar, her komşu $z$ ve her aday değer $k \in \{0,
-\ldots, 255\}$ için $|z - k|$'yı hesaplıyor. "Bu pikselin alabileceği
-256 olası değerin her biri için, komşular bu değerden ne kadar
-uzakta?" sorusunu soran vektörleştirilmiş bir yoldur. Boyutlar daha
-açık hale getirir:
-
-- `target_neighbors` boyutu $(K, 8)$'dir, geçerli maskede $K$ piksel,
-  her birinin 8 komşusu
-
-- `[:, :, np.newaxis]` sonrasında $(K, 8, 1)$ olur
-
-- `possible_vals` boyutu $(256,)$'dir, $(1, 1, 256)$'ya "vektöre
-  yayınlanır (broadcast)"
-
-- sonuç $(K, 8, 256)$'dir — $K$ pikselin her biri için, 8 komşunun her
-  biri için, 256 aday değerden mutlak fark
-
-- `np.sum(..., axis=1)` ise 8 komşu üzerinde toplar ve $(K, 256)$
-  boyutunu verir
-
-Dolayısıyla nihai `prior` dizisi, tüm $K$ piksel ve $k$'nin tüm 256
-değeri için eşzamanlı olarak değerlendirilen $\sum_{z \in
-\mathcal{N}(y_{i,j})} |k - z|$'dir. Vektörsel yayınlama,
-matematikte her aday $k$ için komşular üzerindeki toplam olarak
-yazacağınız işi yapıyor.
-
-Kümülatif Dağılım Fonksiyonu (CDF)
+![](lena1.jpg)
 
 `probs`'daki olasılıklara göre bir $k$ değeri seçmek için Kümülatif
 Dağılım Fonksiyonunu (CDF) kullanırız. $F(k)$ olarak tanımlanan CDF,
@@ -324,17 +311,6 @@ yeterince uzun süre örnekleme yaparsanız, elde edilen Y görüntüsünün
 nihayetinde gerçek, global sonsal (posterior) dağılımından $P(Y | X)$
 bir örnek olacağını garanti eder.
 
-Özet Tablo: Matematikten Koda
-
-| Matematiksel Adım | Formül | Kod Satırı |
-|---|---|---|
-| Yerel Koşullu | $P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j})$ | `probs = np.exp(...) / sum(...)` |
-| CDF Hesabı | $F(k) = \sum P(m)$ | `np.cumsum(probs, ...)` |
-| Düzgün Rastgele | $U \sim \text{Unif}(0,1)$ | `np.random.rand(...)` |
-| Ters Eşleme | $k^* = \min\{k : F(k) \geq U\}$ | `np.argmax(cum_probs > random_vals, ...)` |
-
-`np.argmax`'ı bir boolean dizi üzerinde kullanarak (`cum_probs > random_vals`), NumPy koşulun doğru olduğu ilk indeksi belirler; bu da vektörleştirilmiş maskedeki her piksel için eşzamanlı olarak $F^{-1}(U)$ işlemini gerçekleştirir.
-
 Vektörleştirme (Dama Tahtası)
 
 Standart bir döngüde bir pikseli güncelleyip ardından bir sonrakine
@@ -349,134 +325,6 @@ $x_{i,j}$ kanıtının sabit kaldığını garanti ederiz.
 Kod: İşte bu yüzden `for mask in masks:` vardır ve ardından binlerce
 piksel için aynı anda 256 olası gri düzeyin tümü için enerjiyi
 hesaplayan devasa bir NumPy vektörsel yayını gelir.
-
-MAP ile Tam Sonsal Çıkarım Karşılaştırması
-
-Kesin olarak söylemek gerekirse, MAP (Maksimum A Posteriori) ve Gibbs
-Örneklemesi iki farklı çıkarım felsefesini temsil eder; ancak bu
-makale ve MRF bağlamında genellikle aynı madalyonun iki yüzü olarak
-tartışılırlar. Bu, bir çelişkiden çok optimizasyondan simülasyona bir
-geçiştir.
-
-- MAP (Optimizasyon): $P(Y | X)$'i maksimize eden tek en olası Y
-  görüntüsünü bulur. Genellikle gradyan inişi veya graf kesmeleri
-  kullanılarak çözülür.
-
-- Tam Sonsal (Örnekleme): Ortalamayı, varyansı veya belirsizliği
-  anlamak için $P(Y | X)$'ten pek çok görüntü örneklenir.
-
-MAP için neden Gibbs kullanılır?
-
-Gradyan yükselişi gibi yöntemler sıklıkla yerel maksimumda takılı
-kalır. Gibbs Örneklemesi, enerji yüzeyinde daha sağlam biçimde
-gezinir: yalnızca "tepeyi tırmanmak" yerine örnekleme yaparak
-algoritma yerel minimumlardan çıkabilir. $\beta$'yı (ters sıcaklık)
-artırdıkça, $P(Y | X)$ dağılımı mod etrafında çok "sivri" hale gelir
-ve yüksek $\beta$'da sonsaldan örnekleme MAP'i bulmakla eşdeğer hale
-gelir. Makale, olasılıksal çıkarım aracını (Gibbs) optimizasyon
-problemini (MAP) çözmek için kullanır; çünkü dağınık, gürültülü
-verilere karşı daha dayanıklıdır.
-
-MAP size tek bir yanıt verir, tek en olası temiz görüntü. Gibbs
-örneklemesi ise prensipte makul temiz görüntülerin bir dağılımını
-verir. Pratikte, yeterli sayıda iterasyondan ve yüksek $\beta$'dan
-sonra örnekleyici zamanının neredeyse tamamını MAP çözümünün yakınında
-geçirir; dolayısıyla zincirin son karesi gürültü giderilmiş çıktı
-olarak kullanılır. Yani Gibbs kullanarak MAP sonucuna erişmiş
-oluyoruz, örnekleme sonsal dağılımı geziyor, fakat o zincirin
-ortalamasını almak yerine son varılan noktayı raporlayarak bir optimal
-tek nokta hesabı yapmış oluyoruz.
-
-Normalize Edici Sabit $Z$
-
-$Z = \sum_{k=0}^{255} \exp(-E(k))$, bölme fonksiyonudur —
-olasılıkların toplamının 1 olmasını sağlamak üzere seçilmiştir, tüm
-256 olası piksel değeri üzerinden $\exp(-E)$'nin toplamıdır.
-
-Örnekleme kodu $Z$'yi hiçbir zaman açıkça hesaplamaz; `probs /=
-np.sum(probs, axis=1, keepdims=True)` satırı normalizasyonu analitik
-olarak değil, 256 aday değer üzerinden örtük biçimde
-gerçekleştirir. Başka bir deyişle, kod normalizasyonu yapar, yalnızca
-$Z = \sum_{k=0}^{255} \exp(-E(k))$'yı softmax benzeri adımın bir
-parçası olarak örtük biçimde hesaplar.
-
-Dolayısıyla $\propto$ ifadesi dağılımın formunu türetmek için
-yeterlidir, ancak $Z$ kodda olasılık normalizasyon adımının paydası
-kılığında belirir. Bu, özet tabloda doğrudan karşılık bulur:
-
-$$P(y_{i,j} \mid \mathcal{N}(y_{i,j}), x_{i,j}) =
-\frac{\exp(-E(k))}{\sum_{m=0}^{255} \exp(-E(m))}$$
-
-Bu payda $Z$'nin ta kendisidir; `probs /= np.sum(...)` bölme işlemi
-$Z$'yi yerel olarak hesaplar. `probs.shape`'e bakıldığında bizim örnek
-için `(12769, 256)` sonucu görüyoruz; buradaki 256, toplama işleminin
-gerçekleştirildiği 256 aday değere karşılık gelir.
-
-`(12769, 256)` dizisinin her satırı, bir pikselin 256 aday değer
-üzerindeki tam dağılımını temsil eder. `probs /= np.sum(probs, axis=1,
-keepdims=True)` işleminde `axis=1` boyunca, yani o 256 sütun üzerinden
-toplama yapılır; bu da maskedeki 12769 pikselin her biri için $Z =
-\sum_{k=0}^{255} \exp(-E(k))$'yı bağımsız olarak hesaplamak anlamına
-gelir. Böylece, piksel başına bir tane olmak üzere, 12769 ayrı
-bölümleme fonksiyonu tek bir vektörleştirilmiş adımda elde edilir.
-
-12769 sayısı bir doğruluk kontrolü işlevi görüyor aslında: görüntü $113
-\times 113 = 12769$ piksel boyutundaysa, her seferinde piksellerin
-yaklaşık dörtte biri dama tahtası maskelerinden birine düşer.
-
-Kod
-
-```python
-import numpy as np, skimage
-
-def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
-    M, N = noisy_img.shape
-    Y = noisy_img.copy().astype(np.float32)
-    possible_vals = np.arange(256, dtype=np.float32)
-    masks = [
-        (np.arange(M)%2 == 0)[:, None] & (np.arange(N)%2 == 0),
-        (np.arange(M)%2 == 0)[:, None] & (np.arange(N)%2 == 1),
-        (np.arange(M)%2 == 1)[:, None] & (np.arange(N)%2 == 0),
-        (np.arange(M)%2 == 1)[:, None] & (np.arange(N)%2 == 1)
-    ]
-    for it in range(iterations):
-        for mask in masks:
-            padded = np.pad(Y, 1, mode='edge')
-            neighbors = np.stack([
-                padded[0:-2, 0:-2], padded[0:-2, 1:-1], padded[0:-2, 2:],
-                padded[1:-1, 0:-2], padded[1:-1, 2:],
-                padded[2:, 0:-2], padded[2:, 1:-1], padded[2:, 2:]
-            ], axis=-1)
-            target_neighbors = neighbors[mask]
-            target_noisy = noisy_img[mask]
-            prior = np.sum(np.abs(target_neighbors[:, :, np.newaxis] - possible_vals), axis=1)
-            loss = lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)
-            energy = prior + loss
-            probs = np.exp(np.min(energy, axis=1, keepdims=True) - energy)
-            probs /= np.sum(probs, axis=1, keepdims=True)
-            cum_probs = np.cumsum(probs, axis=1)
-            random_vals = np.random.rand(len(target_noisy), 1)
-            Y[mask] = np.argmax(cum_probs > random_vals, axis=1)
-    return Y
-
-img_noisy = skimage.io.imread('../../func_analysis/func_70_tvd/lena-noise.jpg', as_gray=True)
-if img_noisy.max() <= 1.0:
-    img_noisy = (img_noisy * 255).astype(np.uint8)
-
-denoised_img = denoise_mrf_gibbs(img_noisy, iterations=10, lam=2.5)
-
-fig, axes = plt.subplots(1, 2)
-axes[0].imshow(img_noisy, cmap='gray')
-axes[0].set_title('Gürültülü')
-axes[0].axis('off')
-axes[1].imshow(denoised_img, cmap='gray')
-axes[1].set_title('Gürültü Giderilmiş')
-axes[1].axis('off')
-plt.tight_layout()
-plt.savefig('lena1.jpg')
-```
-
-![](lena1.jpg)
 
 Kaynaklar
 
