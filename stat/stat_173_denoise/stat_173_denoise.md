@@ -205,8 +205,8 @@ $\log$ ve $\exp$ birbirini iptal eder, geriye sonsal dağılım kalır
 
 $$
 = - \left( \underbrace{\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
-z|}_{\text{Log Prior (8 komşu üzerinden toplam)}} +
-\underbrace{\lambda |y_{i,j} - x_{i,j}|}_{\text{Log Likelihood
+z|}_{\text{Log Önsel (8 komşu üzerinden toplam)}} +
+\underbrace{\lambda |y_{i,j} - x_{i,j}|}_{\text{Log Olurluk
 (tek piksel karşılaştırması)}}
 \right)
 $$
@@ -250,8 +250,10 @@ def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
             
             log_prior = -np.sum(np.abs(target_neighbors[:, :, np.newaxis] - possible_vals), axis=1)
             
-            log_likelihood = -lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)            
+            log_likelihood = -lam * np.abs(target_noisy[:, np.newaxis] - possible_vals)
+	    
             log_posterior = log_prior + log_likelihood
+	    
             probs = softmax(log_posterior, axis=1)
             
             cum_probs = np.cumsum(probs, axis=1)

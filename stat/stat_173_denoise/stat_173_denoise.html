@@ -280,8 +280,8 @@ class="math inline">\(\exp\)</span> birbirini iptal eder, geriye sonsal
 dağılım kalır</p>
 <p><span class="math display">\[
 = - \left( \underbrace{\sum_{z \in \mathcal{N}(y_{i,j})} |y_{i,j} -
-z|}_{\text{Log Prior (8 komşu üzerinden toplam)}} +
-\underbrace{\lambda |y_{i,j} - x_{i,j}|}_{\text{Log Likelihood
+z|}_{\text{Log Önsel (8 komşu üzerinden toplam)}} +
+\underbrace{\lambda |y_{i,j} - x_{i,j}|}_{\text{Log Olurluk
 (tek piksel karşılaştırması)}}
 \right)
 \]</span></p>
@@ -322,31 +322,33 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            </span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            log_prior <span class="op">=</span> <span class="op">-</span>np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(target_neighbors[:, :, np.newaxis] <span class="op">-</span> possible_vals), axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            log_likelihood <span class="op">=</span> <span class="op">-</span>lam <span class="op">*</span> np.<span class="bu">abs</span>(target_noisy[:, np.newaxis] <span class="op">-</span> possible_vals)            </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            log_posterior <span class="op">=</span> log_prior <span class="op">+</span> log_likelihood</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            probs <span class="op">=</span> softmax(log_posterior, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            cum_probs <span class="op">=</span> np.cumsum(probs, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            random_vals <span class="op">=</span> np.random.rand(<span class="bu">len</span>(target_noisy), <span class="dv">1</span>)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            Y[mask] <span class="op">=</span> np.argmax(cum_probs <span class="op">&gt;</span> random_vals, axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>img_noisy <span class="op">=</span> skimage.io.imread(<span class="st">&#39;../../func_analysis/func_70_tvd/lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> img_noisy.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    img_noisy <span class="op">=</span> (img_noisy <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> denoise_mrf_gibbs(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            log_likelihood <span class="op">=</span> <span class="op">-</span>lam <span class="op">*</span> np.<span class="bu">abs</span>(target_noisy[:, np.newaxis] <span class="op">-</span> possible_vals)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            log_posterior <span class="op">=</span> log_prior <span class="op">+</span> log_likelihood</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            probs <span class="op">=</span> softmax(log_posterior, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            cum_probs <span class="op">=</span> np.cumsum(probs, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            random_vals <span class="op">=</span> np.random.rand(<span class="bu">len</span>(target_noisy), <span class="dv">1</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            Y[mask] <span class="op">=</span> np.argmax(cum_probs <span class="op">&gt;</span> random_vals, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>img_noisy <span class="op">=</span> skimage.io.imread(<span class="st">&#39;../../func_analysis/func_70_tvd/lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> img_noisy.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    img_noisy <span class="op">=</span> (img_noisy <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(denoised_img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&#39;Gürültü Giderilmiş&#39;</span>)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;lena1.jpg&#39;</span>)</span></code></pre></div>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> denoise_mrf_gibbs(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(denoised_img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&#39;Gürültü Giderilmiş&#39;</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;lena1.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="lena1.jpg" /></p>
 <p><code>probs</code>’daki olasılıklara göre bir <span
 class="math inline">\(k\)</span> değeri seçmek için Kümülatif Dağılım
