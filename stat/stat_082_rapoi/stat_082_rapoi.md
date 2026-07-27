@@ -166,7 +166,7 @@ $$
 \lambda_{A,t} = e^{\alpha} \cdot e^{\beta} \cdot e^{u_t}
 $$
 
-yapısına izin vermek / onu aktıve etmek. Böylece $\lambda$'nin pozitif
+yapısına izin vermek / onu aktive etmek. Böylece $\lambda$'nin pozitif
 olmasını sağlıyoruz (çünkü Poisson oran $\lambda$ pozitif olmalıdır),
 ayrıca oran hesapları çarpımsal parametreler içerdiği için bu
 varsayımı modele dahil etmiş oluyoruz. Tıpta bir ilaç uygulaması
@@ -405,7 +405,9 @@ kümelendiği yer 1'den çok uzakta.
 
 Kaynaklar
 
-[1] Bayramli, Istatistik, *Sayım, Poisson ve Negatif Binom Bazlı Genel Lineer Modelleri (GLM)*
+[1] Bayramlı, İstatistik, *Sayım, Poisson ve Negatif Binom Bazlı Genel Lineer Modelleri (GLM)*
 
 [2] Clarke, *An application of the Poisson distribution*,
      [https://www.actuaries.org.uk/system/files/documents/pdf/0481.pdf](https://www.actuaries.org.uk/system/files/documents/pdf/0481.pdf)
+
+
