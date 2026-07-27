@@ -127,16 +127,16 @@ elde ediyoruz.
 
 Devam edelim, şimdi komşu pikseller icin düzgün / pürüzsüz bir önsel
 dağılım varsayımı yapıyoruz, yani bir piksel komşularıyla uyuşmalıdır
-diyoruz. Bunu formülsel olarak belirtmek için bir piksel $y_{i,j}$ ve
-onun etrafındaki komşular $z \in \mathcal{N}(y_{i,j})$ arasındaki
+diyoruz. Bunu olasılıksal olarak belirtmek için bir piksel $y_{i,j}$
+ve onun etrafındaki komşular $z \in \mathcal{N}(y_{i,j})$ arasındaki
 farkın sıfır merkezli bir Laplace dağılımını takip ettiğini farz
-ediyoruz (üstte uyguladığımızla benzer bir numara). Niye Laplace?
-Çünkü $|y_{i,j} - z|$ uzaklık ölçütü resim piksel gradyanlarının
-(yanyana piksel farkları) geniş etekli (heavy-tailed) bir dağılıma
-sahip olduğunu farz ediyor. Eğer bunun yerine bir Gaussian önseli
-kullansaydık bu dağılım ekstrem değerleri cezalandırırdı / onları daha
-az olası görürdü, bu da takip eden diğer işlemleri kötü yönde
-etkilerdi.
+ediyoruz ($P(x_{i,j} | y_{i,j})$ için uyguladığımız benzer
+numara). Niye Laplace?  Çünkü $|y_{i,j} - z|$ uzaklık ölçütü resim
+piksel gradyanlarının (yanyana piksel farkları) geniş etekli
+(heavy-tailed) bir dağılıma sahip olduğunu farz ediyor. Eğer bunun
+yerine bir Gaussian önseli kullansaydık bu dağılım ekstrem değerleri
+cezalandırırdı / onları daha az olası görürdü, bu da takip eden diğer
+işlemleri kötü yönde etkilerdi.
 
 MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin onsel
 dağılımı o pikselin her komşu $z \in \mathcal{N}(y_{i,j})$ ile olan
@@ -155,8 +155,8 @@ P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
 |y_{i,j} - z|\right)
 $$
 
-$\exp(a) \cdot \exp(b) = \exp(a + b)$ kurali sebebiyle tum komsular
-uzerindeki carpim ustelin icindeki bir toplama cevirilebilir, 
+$\exp(a) \cdot \exp(b) = \exp(a + b)$ kuralı sebebiyle tüm komşular
+üzerindeki çarpım üstelin içindeki bir toplama çevirilebilir, 
 
 $$
 P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
@@ -290,14 +290,11 @@ $$F(k) = P(Y \leq k) = \sum_{m=0}^{k} P(y = m)$$
 Kod: `cum_probs = np.cumsum(probs, axis=1)`
 
 Bu satır, olasılık kütle fonksiyonunu (toplamı 1 olan) 0'dan başlayıp
-1'de biten bir "merdiven" fonksiyonuna dönüştürür.
-
-Ters Dönüşüm Örneklemesi
-
-Örneklemenin temel teoremi şunu belirtir: $U$, $[0, 1]$ üzerinde
-düzgün dağılımlı bir rastgele değişkense, $X = F^{-1}(U)$, $F$
-dağılımına sahiptir. Bunu uygulamak için: $r \in [0, 1]$ aralığında
-düzgün bir rastgele sayı üretilir. Kod: `random_vals =
+1'de biten bir "merdiven" fonksiyonuna dönüştürür. Ters Dönüşüm
+Örneklemesi: Örneklemenin temel teoremi şunu belirtir: $U$, $[0, 1]$
+üzerinde düzgün dağılımlı bir rastgele değişkense, $X = F^{-1}(U)$,
+$F$ dağılımına sahiptir. Bunu uygulamak için: $r \in [0, 1]$
+aralığında düzgün bir rastgele sayı üretilir. Kod: `random_vals =
 np.random.rand(len(target_noisy), 1)`. $F(k) \geq r$ koşulunu sağlayan
 en küçük $k$ indeksi bulunur. Kod: `Y[mask] = np.argmax(cum_probs >
 random_vals, axis=1)`.
@@ -311,24 +308,27 @@ gerektirir, yerel koşullu dağılımlardan örnekleme
 yaparsınız. Matematik, her pikselin yerel koşullu dağılımından
 yeterince uzun süre örnekleme yaparsanız, elde edilen Y görüntüsünün
 nihayetinde gerçek, global sonsal (posterior) dağılımından $P(Y | X)$
-bir örnek olacağını garanti eder.
+bir örnek olacağını garanti eder. Gibbs her adımda bir değişkene
+odaklanır, diğerlerini sabit kabul eder, bu uygulama için her döngüde
+işlenen i'inci pikseldir. İşlenen piksel indisinde iken örneklem alma
+mekanizması işleme ters dönüşüm örneklemesi ile yapılır (yani
+Metropolis tekniği kullanılmadı).
 
-Vektörleştirme (Dama Tahtası)
-
-Standart bir döngüde bir pikseli güncelleyip ardından bir sonrakine
-geçersiniz. Ancak bir piksel yalnızca komşularına ve $x_{i,j}$'ye
-bağlı olduğundan, tüm "Çift" pikselleri aynı anda
-güncelleyebilirsiniz; çünkü hiçbiri birbirinin komşusu değildir.
-
-Matematik: Görüntüyü bağımsız kümelere (4 maske) bölerek, bir
+Vektörleştirme (Dama Tahtası): Standart bir döngüde bir pikseli
+güncelleyip ardından bir sonrakine geçersiniz. Ancak bir piksel
+yalnızca komşularına ve $x_{i,j}$'ye bağlı olduğundan, tüm "Çift"
+pikselleri aynı anda güncelleyebilirsiniz; çünkü hiçbiri birbirinin
+komşusu değildir. Görüntüyü bağımsız kümelere (4 maske) bölerek, bir
 $y_{i,j}$ değerleri grubunu güncellerken $\mathcal{N}(y_{i,j})$ ve
 $x_{i,j}$ kanıtının sabit kaldığını garanti ederiz.
 
-Kod: İşte bu yüzden `for mask in masks:` vardır ve ardından binlerce
+İşte bu yüzden kodda `for mask in masks:` var ve ardından binlerce
 piksel için aynı anda 256 olası gri düzeyin tümü için enerjiyi
-hesaplayan devasa bir NumPy vektörsel yayını gelir.
+hesaplayan devasa bir NumPy vektörsel yayını geliyor.
 
 Kaynaklar
 
 [1] Yue, <a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
          Markov Random Fields and Gibbs Sampling for Image Denoising</a>
+
+

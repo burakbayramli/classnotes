@@ -212,17 +212,18 @@ atılabilir, ayrıca <span class="math inline">\(\exp\)</span> içindekine
 <p>elde ediyoruz.</p>
 <p>Devam edelim, şimdi komşu pikseller icin düzgün / pürüzsüz bir önsel
 dağılım varsayımı yapıyoruz, yani bir piksel komşularıyla uyuşmalıdır
-diyoruz. Bunu formülsel olarak belirtmek için bir piksel <span
+diyoruz. Bunu olasılıksal olarak belirtmek için bir piksel <span
 class="math inline">\(y_{i,j}\)</span> ve onun etrafındaki komşular
 <span class="math inline">\(z \in \mathcal{N}(y_{i,j})\)</span>
 arasındaki farkın sıfır merkezli bir Laplace dağılımını takip ettiğini
-farz ediyoruz (üstte uyguladığımızla benzer bir numara). Niye Laplace?
-Çünkü <span class="math inline">\(|y_{i,j} - z|\)</span> uzaklık ölçütü
-resim piksel gradyanlarının (yanyana piksel farkları) geniş etekli
-(heavy-tailed) bir dağılıma sahip olduğunu farz ediyor. Eğer bunun
-yerine bir Gaussian önseli kullansaydık bu dağılım ekstrem değerleri
-cezalandırırdı / onları daha az olası görürdü, bu da takip eden diğer
-işlemleri kötü yönde etkilerdi.</p>
+farz ediyoruz (<span class="math inline">\(P(x_{i,j} | y_{i,j})\)</span>
+için uyguladığımız benzer numara). Niye Laplace? Çünkü <span
+class="math inline">\(|y_{i,j} - z|\)</span> uzaklık ölçütü resim piksel
+gradyanlarının (yanyana piksel farkları) geniş etekli (heavy-tailed) bir
+dağılıma sahip olduğunu farz ediyor. Eğer bunun yerine bir Gaussian
+önseli kullansaydık bu dağılım ekstrem değerleri cezalandırırdı / onları
+daha az olası görürdü, bu da takip eden diğer işlemleri kötü yönde
+etkilerdi.</p>
 <p>MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin
 onsel dağılımı o pikselin her komşu <span class="math inline">\(z \in
 \mathcal{N}(y_{i,j})\)</span> ile olan ikili olasılığının çarpımıyla
@@ -239,8 +240,8 @@ P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
 |y_{i,j} - z|\right)
 \]</span></p>
 <p><span class="math inline">\(\exp(a) \cdot \exp(b) = \exp(a +
-b)\)</span> kurali sebebiyle tum komsular uzerindeki carpim ustelin
-icindeki bir toplama cevirilebilir,</p>
+b)\)</span> kuralı sebebiyle tüm komşular üzerindeki çarpım üstelin
+içindeki bir toplama çevirilebilir,</p>
 <p><span class="math display">\[
 P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
 \propto \exp\left( -\beta \sum_{z \in \mathcal{N}(y_{i,j})}
@@ -359,9 +360,8 @@ tüm değerlerin olasılıklarının toplamıdır:</p>
 = m)\]</span></p>
 <p>Kod: <code>cum_probs = np.cumsum(probs, axis=1)</code></p>
 <p>Bu satır, olasılık kütle fonksiyonunu (toplamı 1 olan) 0’dan başlayıp
-1’de biten bir “merdiven” fonksiyonuna dönüştürür.</p>
-<p>Ters Dönüşüm Örneklemesi</p>
-<p>Örneklemenin temel teoremi şunu belirtir: <span
+1’de biten bir “merdiven” fonksiyonuna dönüştürür. Ters Dönüşüm
+Örneklemesi: Örneklemenin temel teoremi şunu belirtir: <span
 class="math inline">\(U\)</span>, <span class="math inline">\([0,
 1]\)</span> üzerinde düzgün dağılımlı bir rastgele değişkense, <span
 class="math inline">\(X = F^{-1}(U)\)</span>, <span
@@ -383,21 +383,24 @@ dağılımlardan örnekleme yaparsınız. Matematik, her pikselin yerel
 koşullu dağılımından yeterince uzun süre örnekleme yaparsanız, elde
 edilen Y görüntüsünün nihayetinde gerçek, global sonsal (posterior)
 dağılımından <span class="math inline">\(P(Y | X)\)</span> bir örnek
-olacağını garanti eder.</p>
-<p>Vektörleştirme (Dama Tahtası)</p>
-<p>Standart bir döngüde bir pikseli güncelleyip ardından bir sonrakine
-geçersiniz. Ancak bir piksel yalnızca komşularına ve <span
-class="math inline">\(x_{i,j}\)</span>’ye bağlı olduğundan, tüm “Çift”
-pikselleri aynı anda güncelleyebilirsiniz; çünkü hiçbiri birbirinin
-komşusu değildir.</p>
-<p>Matematik: Görüntüyü bağımsız kümelere (4 maske) bölerek, bir <span
-class="math inline">\(y_{i,j}\)</span> değerleri grubunu güncellerken
-<span class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve <span
+olacağını garanti eder. Gibbs her adımda bir değişkene odaklanır,
+diğerlerini sabit kabul eder, bu uygulama için her döngüde işlenen
+i’inci pikseldir. İşlenen piksel indisinde iken örneklem alma
+mekanizması işleme ters dönüşüm örneklemesi ile yapılır (yani Metropolis
+tekniği kullanılmadı).</p>
+<p>Vektörleştirme (Dama Tahtası): Standart bir döngüde bir pikseli
+güncelleyip ardından bir sonrakine geçersiniz. Ancak bir piksel yalnızca
+komşularına ve <span class="math inline">\(x_{i,j}\)</span>’ye bağlı
+olduğundan, tüm “Çift” pikselleri aynı anda güncelleyebilirsiniz; çünkü
+hiçbiri birbirinin komşusu değildir. Görüntüyü bağımsız kümelere (4
+maske) bölerek, bir <span class="math inline">\(y_{i,j}\)</span>
+değerleri grubunu güncellerken <span
+class="math inline">\(\mathcal{N}(y_{i,j})\)</span> ve <span
 class="math inline">\(x_{i,j}\)</span> kanıtının sabit kaldığını garanti
 ederiz.</p>
-<p>Kod: İşte bu yüzden <code>for mask in masks:</code> vardır ve
-ardından binlerce piksel için aynı anda 256 olası gri düzeyin tümü için
-enerjiyi hesaplayan devasa bir NumPy vektörsel yayını gelir.</p>
+<p>İşte bu yüzden kodda <code>for mask in masks:</code> var ve ardından
+binlerce piksel için aynı anda 256 olası gri düzeyin tümü için enerjiyi
+hesaplayan devasa bir NumPy vektörsel yayını geliyor.</p>
 <p>Kaynaklar</p>
 <p>[1] Yue,
 <a href="https://stanford.edu/class/ee367/Winter2018/yue_ee367_win18_report.pdf">
