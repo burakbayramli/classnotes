@@ -18,19 +18,19 @@ boyunca birbirine bağlıdır. Bu ikinci bağlantı kümesi kritiktir —
 doğal görüntülerin yerel olarak düzgün olma eğiliminde olduğu, yani
 komşu piksellerin birbirine yakın değerler alması gerektiği inancını
 kodlar. Olasılıksal açıdan düğüm (değişken) arasındaki bağlantılar bir
-koşulsal olasılık ilişkisini ima eder.
+koşulsal olasılık ilişkisidir.
 
-Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak şunu
-söylememizi sağlar: her $y_{i,j}$, tüm görüntü verildiğinde yalnızca
+Bu yapı bir Markov Rastgele Alanı (MRF) ve matematiksel olarak şunu
+söylememizi sağlıyor: her $y_{i,j}$, tüm görüntü verildiğinde yalnızca
 doğrudan komşularına bağlıdır. Bu yerel bağımsızlık özelliği,
-hesaplanamaz görünen küresel bir olasılık problemini yönetilebilir
-yerel bir probleme dönüştürür ve aşağıda türetilen gürültü giderme
+hesaplanamaz görünen bir olasılık problemini yönetilebilir yerel bir
+probleme dönüştürür ve aşağıda türetilen gürültü giderme
 algoritmasının temelidir.
 
 Görüntü gürültü giderme matematiğini türetmek için görüntüyü yalnızca
 bir sayı ızgarası olarak değil, rastgele değişkenlerden oluşan bir
 küme olarak ele alıyoruz, ve olasılıksal bir çerçeveden probleme
-bakıyoruz. İki bilgi parçasıyla başlıyoruz:
+bakıyoruz. İki bilgi parçasıyla başlarız,
 
 - X: Gözlemlediğimiz gürültülü görüntü.
 - Y: Bulmak istediğimiz "gerçek" temiz görüntü.
@@ -50,7 +50,8 @@ rastgele değişkendir.
 
 $$P(Y | X) \propto P(X | Y)\, P(Y)$$
 
-Olurluk gürültü piksel bazında bağımsızdır
+Olurluk / gürültü piksel bazında bağımsızdır, bu sebeple birleşik
+dağılım basit çarpım işlemidir,
 
 $$P(X | Y) = \prod_{i,j} P(x_{i,j} | y_{i,j})$$
 
@@ -59,13 +60,11 @@ varsayımı):
 
 $$P(Y) = \prod_{i,j} P(y_{i,j} | \mathcal{N}(y_{i,j}))$$
 
-burada $\mathcal{N}(y_{i,j})$ konum bağlamındaki komşulardır.
+ki $\mathcal{N}(y_{i,j})$ piksel konumu bağlamındaki komşulardır.
 
-Kanıt tüm Y için yalnızca bir normalleştirme sabiti:
-
-$$P(X) = \text{sabit}$$
-
-Dolayısıyla piksel düzeyindeki tam Bayes ifadesi şöyledir:
+Bölende yer alan kanıt, $P(X) = \text{sabit}$, tüm Y için yalnızca bir
+normalleştirme sabiti. Dolayısıyla piksel düzeyindeki tam Bayes
+ifadesi şöyledir:
 
 $$
 P(Y | X) \propto \prod_{i,j} P(x_{i,j} | y_{i,j}) \cdot \prod_{i,j}
@@ -75,24 +74,23 @@ $$
 Gibbs örneklemesi sayesinde tüm pikseller üzerindeki bu devasa
 birleşik dağılımdan tek seferde örnekleme yapmak yerine, her pikseli
 kendi yerel koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize
-tüm pikseller üzerindeki birleşik sonsalı aynı anda verir.
+tüm pikseller üzerindeki birleşik sonsalı veriyor.
 
-Tek bir piksel $y_{i,j}$ için koşullu dağılım $P(y_{i,j} \mid
-Y_{-(i,j)}, X)$'i, yani diğer her şey sabit tutulduğunda tek bir
-pikselin dağılımını hesaplamamız gerekir. Bunu, $y_{i,j}$'yi içermeyen
-tüm terimleri sabit olarak ele alarak yaparız. Çarpımları gözden
-geçirip "$y_{i,j}$'ye gerçekten bağlı olan terimler hangileri?" diye
-sorduğumuzda yalnızca ikisi hayatta kalır: olurluk çarpımından
-$P(x_{i,j} \mid y_{i,j})$ ve ön dağılım çarpımından $P(y_{i,j} \mid
-\mathcal{N}(y_{i,j}))$, tabii $y_{i,j}$'nin komşularına ait MRF
-terimleri de $y_{i,j}$'yi içerir, ancak Hammersley-Clifford teoremi
-kapsamında (ki yakın komşulara bağlılık uzak olanlarla eşdeğerdir der)
-bunlar önsel dağılım teriminin kodladığı yerele
-indirgenir. Dolayısıyla $(k,l) \neq (i,j)$ olan tüm $y_{k,l}$'leri
-sabitler, sabit olan her şeyi atarız ve geriye kalan $P(x_{i,j} \mid
-y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile orantılıdır. Bu
-odaklama adımı aslında diğer tüm pikselleri onlara koşullanarak dışarı
-marjinalleştirmektir, ki bu da Gibbs adımıdır.
+Tek bir piksel $y_{i,j}$ için koşullu dağılım, yani diğer her şey
+sabit tutulduğunda tek bir pikselin dağılımını hesaplamamız
+gerekir. Bunu, $y_{i,j}$'yi içermeyen tüm terimleri sabit olarak ele
+alarak yaparız. Çarpımları gözden geçirip "$y_{i,j}$'ye gerçekten
+bağlı olan terimler hangileri?" diye sorduğumuzda yalnızca iki şey
+hayatta kalır: olurluk çarpımından $P(x_{i,j} \mid y_{i,j})$ ve ön
+dağılım çarpımından $P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$, tabii
+$y_{i,j}$'nin komşularına ait MRF terimleri de $y_{i,j}$'yi içerir,
+ancak Hammersley-Clifford teoremi kapsamında (ki yakın komşulara
+bağlılık uzak olanlarla eşdeğerdir der) bunlar önsel dağılım teriminin
+kodladığı yerele indirgenir. Dolayısıyla $(k,l) \neq (i,j)$ olan tüm
+$y_{k,l}$'leri sabitler, sabit olan her şeyi atarız ve geriye kalan
+$P(x_{i,j} \mid y_{i,j})\, P(y_{i,j} \mid \mathcal{N}(y_{i,j}))$ ile
+orantılıdır. Bu odaklama adımı aslında diğer tüm pikselleri onlara
+koşullanarak dışarı marjinalleştirmektir, ki bu da Gibbs adımıdır.
 
 Artık tek bir piksel için şunu yazabiliriz:
 
@@ -138,9 +136,9 @@ yerine bir Gaussian önseli kullansaydık bu dağılım ekstrem değerleri
 cezalandırırdı / onları daha az olası görürdü, bu da takip eden diğer
 işlemleri kötü yönde etkilerdi.
 
-MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin onsel
+MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin önsel
 dağılımı o pikselin her komşu $z \in \mathcal{N}(y_{i,j})$ ile olan
-ikili olasılığının çarpımıyla elde edilir. 
+ikili olasılığının çarpımıyla elde edilir.
 
 $$
 P(y_{i,j} \mid \mathcal{N}(y_{i,j}))
@@ -224,7 +222,7 @@ Kod
 from scipy.special import softmax
 import numpy as np, skimage
 
-def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
+def denoise_mrf(noisy_img, iterations=12, lam=1.0):
     M, N = noisy_img.shape
     Y = Y = noisy_img.copy().astype(np.float32)
     possible_vals = np.arange(256, dtype=np.float32)
@@ -263,10 +261,11 @@ def denoise_mrf_gibbs(noisy_img, iterations=12, lam=1.0):
     return Y
 
 img_noisy = skimage.io.imread('../../func_analysis/func_70_tvd/lena-noise.jpg', as_gray=True)
+
 if img_noisy.max() <= 1.0:
     img_noisy = (img_noisy * 255).astype(np.uint8)
 
-denoised_img = denoise_mrf_gibbs(img_noisy, iterations=10, lam=2.5)
+denoised_img = denoise_mrf(img_noisy, iterations=10, lam=2.5)
 
 fig, axes = plt.subplots(1, 2)
 axes[0].imshow(img_noisy, cmap='gray')
@@ -281,38 +280,36 @@ plt.savefig('lena1.jpg')
 
 ![](lena1.jpg)
 
-`probs`'daki olasılıklara göre bir $k$ değeri seçmek için Kümülatif
-Dağılım Fonksiyonunu (CDF) kullanırız. $F(k)$ olarak tanımlanan CDF,
-$k$'ya kadar tüm değerlerin olasılıklarının toplamıdır:
+Parçalar Hâlinde Gibbs ve $P(Y)$: Gibbs Örneklemesi bir Markov Zinciri
+Monte Carlo (MCMC) yöntemidir. $P(y_1, y_2, \ldots, y_n)$ birleşik
+olasılığını hesaplamak yerine, bu $256^{\text{Yükseklik} \times
+\text{Genişlik}}$ kombinasyonu gerektirirdi, yerel koşullu
+dağılımlardan örnekleme yapmak burada daha iyidir. Her pikselin yerel
+koşullu dağılımından yeterince uzun süre örnekleme yapılınca, elde
+edilen Y görüntüsünün nihayetinde gerçek, global sonsal (posterior)
+dağılımından $P(Y | X)$ bir örneklem alınması garantidir.
+
+Gibbs her adımda bir değişkene odaklanır, diğerlerini sabit kabul
+eder, bu uygulama için her döngüde işlenen i'inci pikseldir. İşlenen
+piksel indisinde iken örneklem alma mekanizması ters dönüşüm
+örneklemesi (inverse transform sampling) ile yapılır (yani Metropolis
+tekniği kullanılmadı). Ters Dönüşüm Örneklemesi: `probs`'daki
+olasılıklara göre bir $k$ değeri seçmek için Kümülatif Dağılım
+Fonksiyonunu (CDF) kullanırız. $F(k)$ olarak tanımlanan CDF, $k$'ya
+kadar tüm değerlerin olasılıklarının toplamıdır:
 
 $$F(k) = P(Y \leq k) = \sum_{m=0}^{k} P(y = m)$$
 
 Kod: `cum_probs = np.cumsum(probs, axis=1)`
 
 Bu satır, olasılık kütle fonksiyonunu (toplamı 1 olan) 0'dan başlayıp
-1'de biten bir "merdiven" fonksiyonuna dönüştürür. Ters Dönüşüm
-Örneklemesi: Örneklemenin temel teoremi şunu belirtir: $U$, $[0, 1]$
-üzerinde düzgün dağılımlı bir rastgele değişkense, $X = F^{-1}(U)$,
-$F$ dağılımına sahiptir. Bunu uygulamak için: $r \in [0, 1]$
-aralığında düzgün bir rastgele sayı üretilir. Kod: `random_vals =
-np.random.rand(len(target_noisy), 1)`. $F(k) \geq r$ koşulunu sağlayan
-en küçük $k$ indeksi bulunur. Kod: `Y[mask] = np.argmax(cum_probs >
-random_vals, axis=1)`.
-
-Parçalar Hâlinde Gibbs ve $P(Y)$
-
-Gibbs Örneklemesi bir Markov Zinciri Monte Carlo (MCMC)
-yöntemidir. $P(y_1, y_2, \ldots, y_n)$ birleşik olasılığını hesaplamak
-yerine,bu $256^{\text{Yükseklik} \times \text{Genişlik}}$ kombinasyonu
-gerektirir, yerel koşullu dağılımlardan örnekleme
-yaparsınız. Matematik, her pikselin yerel koşullu dağılımından
-yeterince uzun süre örnekleme yaparsanız, elde edilen Y görüntüsünün
-nihayetinde gerçek, global sonsal (posterior) dağılımından $P(Y | X)$
-bir örnek olacağını garanti eder. Gibbs her adımda bir değişkene
-odaklanır, diğerlerini sabit kabul eder, bu uygulama için her döngüde
-işlenen i'inci pikseldir. İşlenen piksel indisinde iken örneklem alma
-mekanizması işleme ters dönüşüm örneklemesi ile yapılır (yani
-Metropolis tekniği kullanılmadı).
+1'de biten bir "merdiven" fonksiyonuna dönüştürür. Örneklemenin temel
+teoremi şunu belirtir: $U$, $[0, 1]$ üzerinde düzgün dağılımlı bir
+rastgele değişkense, $X = F^{-1}(U)$, $F$ dağılımına sahiptir. Bunu
+uygulamak için: $r \in [0, 1]$ aralığında düzgün bir rastgele sayı
+üretilir. Kod: `random_vals = np.random.rand(len(target_noisy),
+1)`. $F(k) \geq r$ koşulunu sağlayan en küçük $k$ indeksi
+bulunur. Kod: `Y[mask] = np.argmax(cum_probs > random_vals, axis=1)`.
 
 Vektörleştirme (Dama Tahtası): Standart bir döngüde bir pikseli
 güncelleyip ardından bir sonrakine geçersiniz. Ancak bir piksel

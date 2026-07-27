@@ -108,18 +108,17 @@ yatay ve dikey komşuluklar boyunca birbirine bağlıdır. Bu ikinci
 bağlantı kümesi kritiktir — doğal görüntülerin yerel olarak düzgün olma
 eğiliminde olduğu, yani komşu piksellerin birbirine yakın değerler
 alması gerektiği inancını kodlar. Olasılıksal açıdan düğüm (değişken)
-arasındaki bağlantılar bir koşulsal olasılık ilişkisini ima eder.</p>
-<p>Bu yapı bir Markov Rastgele Alanıdır (MRF) ve matematiksel olarak
-şunu söylememizi sağlar: her <span
-class="math inline">\(y_{i,j}\)</span>, tüm görüntü verildiğinde
-yalnızca doğrudan komşularına bağlıdır. Bu yerel bağımsızlık özelliği,
-hesaplanamaz görünen küresel bir olasılık problemini yönetilebilir yerel
-bir probleme dönüştürür ve aşağıda türetilen gürültü giderme
-algoritmasının temelidir.</p>
+arasındaki bağlantılar bir koşulsal olasılık ilişkisidir.</p>
+<p>Bu yapı bir Markov Rastgele Alanı (MRF) ve matematiksel olarak şunu
+söylememizi sağlıyor: her <span class="math inline">\(y_{i,j}\)</span>,
+tüm görüntü verildiğinde yalnızca doğrudan komşularına bağlıdır. Bu
+yerel bağımsızlık özelliği, hesaplanamaz görünen bir olasılık problemini
+yönetilebilir yerel bir probleme dönüştürür ve aşağıda türetilen gürültü
+giderme algoritmasının temelidir.</p>
 <p>Görüntü gürültü giderme matematiğini türetmek için görüntüyü yalnızca
 bir sayı ızgarası olarak değil, rastgele değişkenlerden oluşan bir küme
 olarak ele alıyoruz, ve olasılıksal bir çerçeveden probleme bakıyoruz.
-İki bilgi parçasıyla başlıyoruz:</p>
+İki bilgi parçasıyla başlarız,</p>
 <ul>
 <li>X: Gözlemlediğimiz gürültülü görüntü.</li>
 <li>Y: Bulmak istediğimiz “gerçek” temiz görüntü.</li>
@@ -140,18 +139,19 @@ kümesindeki herhangi bir tam sayı değerini alabilen ayrık bir rastgele
 değişkendir.</p>
 <p><span class="math display">\[P(Y | X) \propto P(X | Y)\,
 P(Y)\]</span></p>
-<p>Olurluk gürültü piksel bazında bağımsızdır</p>
+<p>Olurluk / gürültü piksel bazında bağımsızdır, bu sebeple birleşik
+dağılım basit çarpım işlemidir,</p>
 <p><span class="math display">\[P(X | Y) = \prod_{i,j} P(x_{i,j} |
 y_{i,j})\]</span></p>
 <p>Önsel (prior) dağılımda her piksel yalnızca komşularına bağlıdır (MRF
 varsayımı):</p>
 <p><span class="math display">\[P(Y) = \prod_{i,j} P(y_{i,j} |
 \mathcal{N}(y_{i,j}))\]</span></p>
-<p>burada <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span>
-konum bağlamındaki komşulardır.</p>
-<p>Kanıt tüm Y için yalnızca bir normalleştirme sabiti:</p>
-<p><span class="math display">\[P(X) = \text{sabit}\]</span></p>
-<p>Dolayısıyla piksel düzeyindeki tam Bayes ifadesi şöyledir:</p>
+<p>ki <span class="math inline">\(\mathcal{N}(y_{i,j})\)</span> piksel
+konumu bağlamındaki komşulardır.</p>
+<p>Bölende yer alan kanıt, <span class="math inline">\(P(X) =
+\text{sabit}\)</span>, tüm Y için yalnızca bir normalleştirme sabiti.
+Dolayısıyla piksel düzeyindeki tam Bayes ifadesi şöyledir:</p>
 <p><span class="math display">\[
 P(Y | X) \propto \prod_{i,j} P(x_{i,j} | y_{i,j}) \cdot \prod_{i,j}
 P(y_{i,j} | \mathcal{N}(y_{i,j}))
@@ -159,15 +159,14 @@ P(y_{i,j} | \mathcal{N}(y_{i,j}))
 <p>Gibbs örneklemesi sayesinde tüm pikseller üzerindeki bu devasa
 birleşik dağılımdan tek seferde örnekleme yapmak yerine, her pikseli
 kendi yerel koşullu dağılımından örnekliyoruz. Yukarıdaki denklem bize
-tüm pikseller üzerindeki birleşik sonsalı aynı anda verir.</p>
+tüm pikseller üzerindeki birleşik sonsalı veriyor.</p>
 <p>Tek bir piksel <span class="math inline">\(y_{i,j}\)</span> için
-koşullu dağılım <span class="math inline">\(P(y_{i,j} \mid Y_{-(i,j)},
-X)\)</span>’i, yani diğer her şey sabit tutulduğunda tek bir pikselin
+koşullu dağılım, yani diğer her şey sabit tutulduğunda tek bir pikselin
 dağılımını hesaplamamız gerekir. Bunu, <span
 class="math inline">\(y_{i,j}\)</span>’yi içermeyen tüm terimleri sabit
 olarak ele alarak yaparız. Çarpımları gözden geçirip “<span
 class="math inline">\(y_{i,j}\)</span>’ye gerçekten bağlı olan terimler
-hangileri?” diye sorduğumuzda yalnızca ikisi hayatta kalır: olurluk
+hangileri?” diye sorduğumuzda yalnızca iki şey hayatta kalır: olurluk
 çarpımından <span class="math inline">\(P(x_{i,j} \mid y_{i,j})\)</span>
 ve ön dağılım çarpımından <span class="math inline">\(P(y_{i,j} \mid
 \mathcal{N}(y_{i,j}))\)</span>, tabii <span
@@ -225,7 +224,7 @@ dağılıma sahip olduğunu farz ediyor. Eğer bunun yerine bir Gaussian
 daha az olası görürdü, bu da takip eden diğer işlemleri kötü yönde
 etkilerdi.</p>
 <p>MRF der ki verili komşu piksellere koşullanmış ortadaki pikselin
-onsel dağılımı o pikselin her komşu <span class="math inline">\(z \in
+önsel dağılımı o pikselin her komşu <span class="math inline">\(z \in
 \mathcal{N}(y_{i,j})\)</span> ile olan ikili olasılığının çarpımıyla
 elde edilir.</p>
 <p><span class="math display">\[
@@ -297,7 +296,7 @@ z|}_{\text{Log Önsel (8 komşu üzerinden toplam)}} +
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> softmax</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np, skimage</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> denoise_mrf_gibbs(noisy_img, iterations<span class="op">=</span><span class="dv">12</span>, lam<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> denoise_mrf(noisy_img, iterations<span class="op">=</span><span class="dv">12</span>, lam<span class="op">=</span><span class="fl">1.0</span>):</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    M, N <span class="op">=</span> noisy_img.shape</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> Y <span class="op">=</span> noisy_img.copy().astype(np.float32)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    possible_vals <span class="op">=</span> np.arange(<span class="dv">256</span>, dtype<span class="op">=</span>np.float32)</span>
@@ -336,58 +335,58 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Y</span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>img_noisy <span class="op">=</span> skimage.io.imread(<span class="st">&#39;../../func_analysis/func_70_tvd/lena-noise.jpg&#39;</span>, as_gray<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> img_noisy.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    img_noisy <span class="op">=</span> (img_noisy <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> denoise_mrf_gibbs(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(denoised_img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&#39;Gürültü Giderilmiş&#39;</span>)</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;lena1.jpg&#39;</span>)</span></code></pre></div>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> img_noisy.<span class="bu">max</span>() <span class="op">&lt;=</span> <span class="fl">1.0</span>:</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    img_noisy <span class="op">=</span> (img_noisy <span class="op">*</span> <span class="dv">255</span>).astype(np.uint8)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>denoised_img <span class="op">=</span> denoise_mrf(img_noisy, iterations<span class="op">=</span><span class="dv">10</span>, lam<span class="op">=</span><span class="fl">2.5</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(img_noisy, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&#39;Gürültülü&#39;</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].imshow(denoised_img, cmap<span class="op">=</span><span class="st">&#39;gray&#39;</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&#39;Gürültü Giderilmiş&#39;</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axis(<span class="st">&#39;off&#39;</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;lena1.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="lena1.jpg" /></p>
-<p><code>probs</code>’daki olasılıklara göre bir <span
-class="math inline">\(k\)</span> değeri seçmek için Kümülatif Dağılım
-Fonksiyonunu (CDF) kullanırız. <span class="math inline">\(F(k)\)</span>
-olarak tanımlanan CDF, <span class="math inline">\(k\)</span>’ya kadar
-tüm değerlerin olasılıklarının toplamıdır:</p>
+<p>Parçalar Hâlinde Gibbs ve <span class="math inline">\(P(Y)\)</span>:
+Gibbs Örneklemesi bir Markov Zinciri Monte Carlo (MCMC) yöntemidir.
+<span class="math inline">\(P(y_1, y_2, \ldots, y_n)\)</span> birleşik
+olasılığını hesaplamak yerine, bu <span
+class="math inline">\(256^{\text{Yükseklik} \times
+\text{Genişlik}}\)</span> kombinasyonu gerektirirdi, yerel koşullu
+dağılımlardan örnekleme yapmak burada daha iyidir. Her pikselin yerel
+koşullu dağılımından yeterince uzun süre örnekleme yapılınca, elde
+edilen Y görüntüsünün nihayetinde gerçek, global sonsal (posterior)
+dağılımından <span class="math inline">\(P(Y | X)\)</span> bir örneklem
+alınması garantidir.</p>
+<p>Gibbs her adımda bir değişkene odaklanır, diğerlerini sabit kabul
+eder, bu uygulama için her döngüde işlenen i’inci pikseldir. İşlenen
+piksel indisinde iken örneklem alma mekanizması ters dönüşüm örneklemesi
+(inverse transform sampling) ile yapılır (yani Metropolis tekniği
+kullanılmadı). Ters Dönüşüm Örneklemesi: <code>probs</code>’daki
+olasılıklara göre bir <span class="math inline">\(k\)</span> değeri
+seçmek için Kümülatif Dağılım Fonksiyonunu (CDF) kullanırız. <span
+class="math inline">\(F(k)\)</span> olarak tanımlanan CDF, <span
+class="math inline">\(k\)</span>’ya kadar tüm değerlerin olasılıklarının
+toplamıdır:</p>
 <p><span class="math display">\[F(k) = P(Y \leq k) = \sum_{m=0}^{k} P(y
 = m)\]</span></p>
 <p>Kod: <code>cum_probs = np.cumsum(probs, axis=1)</code></p>
 <p>Bu satır, olasılık kütle fonksiyonunu (toplamı 1 olan) 0’dan başlayıp
-1’de biten bir “merdiven” fonksiyonuna dönüştürür. Ters Dönüşüm
-Örneklemesi: Örneklemenin temel teoremi şunu belirtir: <span
-class="math inline">\(U\)</span>, <span class="math inline">\([0,
-1]\)</span> üzerinde düzgün dağılımlı bir rastgele değişkense, <span
-class="math inline">\(X = F^{-1}(U)\)</span>, <span
-class="math inline">\(F\)</span> dağılımına sahiptir. Bunu uygulamak
-için: <span class="math inline">\(r \in [0, 1]\)</span> aralığında
-düzgün bir rastgele sayı üretilir. Kod:
+1’de biten bir “merdiven” fonksiyonuna dönüştürür. Örneklemenin temel
+teoremi şunu belirtir: <span class="math inline">\(U\)</span>, <span
+class="math inline">\([0, 1]\)</span> üzerinde düzgün dağılımlı bir
+rastgele değişkense, <span class="math inline">\(X = F^{-1}(U)\)</span>,
+<span class="math inline">\(F\)</span> dağılımına sahiptir. Bunu
+uygulamak için: <span class="math inline">\(r \in [0, 1]\)</span>
+aralığında düzgün bir rastgele sayı üretilir. Kod:
 <code>random_vals = np.random.rand(len(target_noisy), 1)</code>. <span
 class="math inline">\(F(k) \geq r\)</span> koşulunu sağlayan en küçük
 <span class="math inline">\(k\)</span> indeksi bulunur. Kod:
 <code>Y[mask] = np.argmax(cum_probs &gt; random_vals, axis=1)</code>.</p>
-<p>Parçalar Hâlinde Gibbs ve <span
-class="math inline">\(P(Y)\)</span></p>
-<p>Gibbs Örneklemesi bir Markov Zinciri Monte Carlo (MCMC) yöntemidir.
-<span class="math inline">\(P(y_1, y_2, \ldots, y_n)\)</span> birleşik
-olasılığını hesaplamak yerine,bu <span
-class="math inline">\(256^{\text{Yükseklik} \times
-\text{Genişlik}}\)</span> kombinasyonu gerektirir, yerel koşullu
-dağılımlardan örnekleme yaparsınız. Matematik, her pikselin yerel
-koşullu dağılımından yeterince uzun süre örnekleme yaparsanız, elde
-edilen Y görüntüsünün nihayetinde gerçek, global sonsal (posterior)
-dağılımından <span class="math inline">\(P(Y | X)\)</span> bir örnek
-olacağını garanti eder. Gibbs her adımda bir değişkene odaklanır,
-diğerlerini sabit kabul eder, bu uygulama için her döngüde işlenen
-i’inci pikseldir. İşlenen piksel indisinde iken örneklem alma
-mekanizması işleme ters dönüşüm örneklemesi ile yapılır (yani Metropolis
-tekniği kullanılmadı).</p>
 <p>Vektörleştirme (Dama Tahtası): Standart bir döngüde bir pikseli
 güncelleyip ardından bir sonrakine geçersiniz. Ancak bir piksel yalnızca
 komşularına ve <span class="math inline">\(x_{i,j}\)</span>’ye bağlı
