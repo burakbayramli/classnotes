@@ -11,7 +11,7 @@ uyumluluğa bakabiliriz.
 Mesela olayların coğrafi olarak dağılımına bakalım..  Bu tür olayları
 nasıl modelleriz? Olaylar depremler, yangınlar, ya da bir savaşta bir
 alana atılan bombalar olabilir, ve bu tür sayılar Poisson dağılımı ile
-modellenir. Bu dağılım ilk bölümde gördüğümüz gibi,
+modellenir, dağılım,
 
 $$ f(x) = P(X=x) = e^{-\lambda}\frac{\lambda^{x}}{x!} $$
 

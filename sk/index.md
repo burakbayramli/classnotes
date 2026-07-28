@@ -3,15 +3,15 @@
 
 ## En Son
 
+28/7 - [Coğrafi İstatistiki Hesaplar, Oranlar - Yeni Kod](https://burakbayramli.github.io/dersblog/stat/stat_082_rapoi/cografi_istatistiki_hesaplar_oranlar.html)
+
+28/7 - [MRF, Gürültü Giderme - Ekler](https://burakbayramli.github.io/dersblog/stat/stat_173_denoise/markov_rasgele_alanlari__markov_random_fields_mrf__gurultu_giderme.html)
+
 17/7 - [Markov Zincirleri Monte Carlo - Ekler](https://burakbayramli.github.io/dersblog/stat/stat_097_mcmc/markov_zincirleri_monte_carlo_metropolishastings_gibbs.html)
 
 15/7 - [Korelasyon Hesaplamak, p-değeri - Ekler - Bayes](https://burakbayramli.github.io/dersblog/stat/stat_103_bcorr/korelasyon_pdegerleri_bayes_yaklasimi.html)
 
 3/7 - [Bayes Usulü Parçalı Regresyon](https://burakbayramli.github.io/dersblog/stat/stat_102_regchpt/bayes_usulu_parcali_regresyon.html)
-
-3/7 - [Lineer Regresyon - Ekler - Korelasyon](https://burakbayramli.github.io/dersblog/stat/stat_055_linreg/lineer_regresyon.html)
-
-26/6 - [Örgü (Lattice) Boltzmann Metodu](https://burakbayramli.github.io/dersblog/compscieng/compscieng_bpp43lbm/orgu__lattice__boltzmann_metodu.html)
 
 ## Konular, Referans
 
