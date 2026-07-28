@@ -260,6 +260,27 @@ print (group2)
  0 0 0 0 0 0]
 ```
 
+Benzer olan zaman serileri
+
+```python
+import pandas as pd
+
+pd.DataFrame({"A1": A1, "B1": B1},index=years1).plot()
+plt.savefig('stat_082_rapoi_01.jpg')
+```
+
+![](stat_082_rapoi_01.jpg)
+
+Benzer olmayan zaman serileri
+
+```python
+pd.DataFrame({"A2": A2, "B2": B2},index=years2).plot()
+plt.savefig('stat_082_rapoi_03.jpg')
+```
+
+![](stat_082_rapoi_03.jpg)
+
+
 Şimdi oranın sonsal dağılımını MCMC ile ortaya çıkartalım ve ondan
 örneklem alalım. Gereken fonksiyonlar,
 

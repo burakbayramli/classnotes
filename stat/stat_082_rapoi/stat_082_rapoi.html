@@ -323,131 +323,143 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a hr
 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
  1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
  0 0 0 0 0 0]</code></pre>
+<p>Benzer olan zaman serileri</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({<span class="st">&quot;A1&quot;</span>: A1, <span class="st">&quot;B1&quot;</span>: B1},index<span class="op">=</span>years1).plot()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_01.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_082_rapoi_01.jpg" /></p>
+<p>Benzer olmayan zaman serileri</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pd.DataFrame({<span class="st">&quot;A2&quot;</span>: A2, <span class="st">&quot;B2&quot;</span>: B2},index<span class="op">=</span>years2).plot()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_03.jpg&#39;</span>)</span></code></pre></div>
+<p><img src="stat_082_rapoi_03.jpg" /></p>
 <p>Şimdi oranın sonsal dağılımını MCMC ile ortaya çıkartalım ve ondan
 örneklem alalım. Gereken fonksiyonlar,</p>
-<div class="sourceCode" id="cb5"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, poisson</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(params, counts, group, year_idx, n_years):</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">    params vektor icerigi, aranan parametreler beraber bu vektor icinde:</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    [alpha, beta, log_sigma_year, year_offset_0, year_offset_1, ...]</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Not: log(sigma_year)&#39;dan orneklem aliyoruz ki pozitif degerler almak garanti olsun</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> params[<span class="dv">0</span>]</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> params[<span class="dv">1</span>]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    log_sigma <span class="op">=</span> params[<span class="dv">2</span>]</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    sigma_year <span class="op">=</span> np.exp(log_sigma)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    year_offset <span class="op">=</span> params[<span class="dv">3</span>:]</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Priors</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    log_p_alpha <span class="op">=</span> norm.logpdf(alpha, <span class="fl">0.0</span>, <span class="fl">2.0</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    log_p_beta <span class="op">=</span> norm.logpdf(beta, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Half-Normal(1.0) prior for sigma_year with Jacobian adjustment for log-transform</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sigma_year <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    log_p_sigma <span class="op">=</span> np.log(<span class="fl">2.0</span>) <span class="op">+</span> norm.logpdf(sigma_year, <span class="fl">0.0</span>, <span class="fl">1.0</span>) <span class="op">+</span> log_sigma</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    log_p_offsets <span class="op">=</span> np.<span class="bu">sum</span>(norm.logpdf(year_offset, <span class="fl">0.0</span>, <span class="fl">1.0</span>))</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Likelihood</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    year_effect <span class="op">=</span> year_offset <span class="op">*</span> sigma_year</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    log_lambda <span class="op">=</span> alpha <span class="op">+</span> beta <span class="op">*</span> group <span class="op">+</span> year_effect[year_idx]</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> np.exp(log_lambda)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    log_lik <span class="op">=</span> np.<span class="bu">sum</span>(poisson.logpmf(counts, lam))</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_p_alpha <span class="op">+</span> log_p_beta <span class="op">+</span> log_p_sigma <span class="op">+</span> log_p_offsets <span class="op">+</span> log_lik</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_metropolis(counts, group, year_idx, n_years, n_samples<span class="op">=</span><span class="dv">20000</span>, burn_in<span class="op">=</span><span class="dv">10000</span>):</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    n_params <span class="op">=</span> <span class="dv">3</span> <span class="op">+</span> n_years</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initial state</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    current_params <span class="op">=</span> np.zeros(n_params)</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">3.0</span>           <span class="co"># alpha init</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.0</span>           <span class="co"># beta init</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">2</span>] <span class="op">=</span> np.log(<span class="fl">0.4</span>)   <span class="co"># log_sigma init</span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    current_log_post <span class="op">=</span> log_posterior(current_params, counts, group, year_idx, n_years)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Adaptive proposal step sizes (tuned for stability across dimensions)</span></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    proposal_std <span class="op">=</span> np.full(n_params, <span class="fl">0.02</span>)</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.03</span> <span class="co"># alpha</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.02</span> <span class="co"># beta</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">2</span>] <span class="op">=</span> <span class="fl">0.03</span> <span class="co"># log_sigma</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    chain <span class="op">=</span> np.zeros((n_samples, n_params))</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    accepted <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_samples):</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Propose step</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        proposal <span class="op">=</span> current_params <span class="op">+</span> np.random.normal(<span class="dv">0</span>, proposal_std, size<span class="op">=</span>n_params)</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        prop_log_post <span class="op">=</span> log_posterior(proposal, counts, group, year_idx, n_years)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Metropolis acceptance probability</span></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>        log_acc_ratio <span class="op">=</span> prop_log_post <span class="op">-</span> current_log_post</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.log(np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">&lt;</span> log_acc_ratio:</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>            current_params <span class="op">=</span> proposal</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>            current_log_post <span class="op">=</span> prop_log_post</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>            accepted <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>        chain[i, :] <span class="op">=</span> current_params</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Acceptance rate: </span><span class="sc">{</span>accepted <span class="op">/</span> n_samples<span class="sc">:.2%}</span><span class="ss">&quot;</span>)</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract chains post burn-in</span></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>    post_chain <span class="op">=</span> chain[burn_in:]</span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>    beta_samples <span class="op">=</span> post_chain[:, <span class="dv">1</span>]</span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>    rate_ratio_samples <span class="op">=</span> np.exp(beta_samples)</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rate_ratio_samples</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> norm, poisson</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_posterior(params, counts, group, year_idx, n_years):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">    params vektor icerigi, aranan parametreler beraber bu vektor icinde:</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">    [alpha, beta, log_sigma_year, year_offset_0, year_offset_1, ...]</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Not: log(sigma_year)&#39;dan orneklem aliyoruz ki pozitif degerler almak garanti olsun</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> params[<span class="dv">0</span>]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> params[<span class="dv">1</span>]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    log_sigma <span class="op">=</span> params[<span class="dv">2</span>]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    sigma_year <span class="op">=</span> np.exp(log_sigma)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    year_offset <span class="op">=</span> params[<span class="dv">3</span>:]</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Priors</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    log_p_alpha <span class="op">=</span> norm.logpdf(alpha, <span class="fl">0.0</span>, <span class="fl">2.0</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    log_p_beta <span class="op">=</span> norm.logpdf(beta, <span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Half-Normal(1.0) prior for sigma_year with Jacobian adjustment for log-transform</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sigma_year <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>np.inf</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    log_p_sigma <span class="op">=</span> np.log(<span class="fl">2.0</span>) <span class="op">+</span> norm.logpdf(sigma_year, <span class="fl">0.0</span>, <span class="fl">1.0</span>) <span class="op">+</span> log_sigma</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    log_p_offsets <span class="op">=</span> np.<span class="bu">sum</span>(norm.logpdf(year_offset, <span class="fl">0.0</span>, <span class="fl">1.0</span>))</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Likelihood</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    year_effect <span class="op">=</span> year_offset <span class="op">*</span> sigma_year</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    log_lambda <span class="op">=</span> alpha <span class="op">+</span> beta <span class="op">*</span> group <span class="op">+</span> year_effect[year_idx]</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    lam <span class="op">=</span> np.exp(log_lambda)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    log_lik <span class="op">=</span> np.<span class="bu">sum</span>(poisson.logpmf(counts, lam))</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> log_p_alpha <span class="op">+</span> log_p_beta <span class="op">+</span> log_p_sigma <span class="op">+</span> log_p_offsets <span class="op">+</span> log_lik</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_metropolis(counts, group, year_idx, n_years, n_samples<span class="op">=</span><span class="dv">20000</span>, burn_in<span class="op">=</span><span class="dv">10000</span>):</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    n_params <span class="op">=</span> <span class="dv">3</span> <span class="op">+</span> n_years</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initial state</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    current_params <span class="op">=</span> np.zeros(n_params)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">3.0</span>           <span class="co"># alpha init</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.0</span>           <span class="co"># beta init</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    current_params[<span class="dv">2</span>] <span class="op">=</span> np.log(<span class="fl">0.4</span>)   <span class="co"># log_sigma init</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    current_log_post <span class="op">=</span> log_posterior(current_params, counts, group, year_idx, n_years)</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Adaptive proposal step sizes (tuned for stability across dimensions)</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    proposal_std <span class="op">=</span> np.full(n_params, <span class="fl">0.02</span>)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">0</span>] <span class="op">=</span> <span class="fl">0.03</span> <span class="co"># alpha</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">1</span>] <span class="op">=</span> <span class="fl">0.02</span> <span class="co"># beta</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    proposal_std[<span class="dv">2</span>] <span class="op">=</span> <span class="fl">0.03</span> <span class="co"># log_sigma</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    chain <span class="op">=</span> np.zeros((n_samples, n_params))</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    accepted <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_samples):</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Propose step</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>        proposal <span class="op">=</span> current_params <span class="op">+</span> np.random.normal(<span class="dv">0</span>, proposal_std, size<span class="op">=</span>n_params)</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>        prop_log_post <span class="op">=</span> log_posterior(proposal, counts, group, year_idx, n_years)</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Metropolis acceptance probability</span></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>        log_acc_ratio <span class="op">=</span> prop_log_post <span class="op">-</span> current_log_post</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.log(np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">&lt;</span> log_acc_ratio:</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>            current_params <span class="op">=</span> proposal</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>            current_log_post <span class="op">=</span> prop_log_post</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>            accepted <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>        chain[i, :] <span class="op">=</span> current_params</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Acceptance rate: </span><span class="sc">{</span>accepted <span class="op">/</span> n_samples<span class="sc">:.2%}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract chains post burn-in</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>    post_chain <span class="op">=</span> chain[burn_in:]</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>    beta_samples <span class="op">=</span> post_chain[:, <span class="dv">1</span>]</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>    rate_ratio_samples <span class="op">=</span> np.exp(beta_samples)</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rate_ratio_samples</span></code></pre></div>
 <p>Simülasyonları artık işletebiliriz,</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rr_samples1 <span class="op">=</span> run_metropolis(counts1, group1, year_idx1, <span class="bu">len</span>(years1))</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>rr_samples2 <span class="op">=</span> run_metropolis(counts2, group2, year_idx2, <span class="bu">len</span>(years2))</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rr_samples1 <span class="op">=</span> run_metropolis(counts1, group1, year_idx1, <span class="bu">len</span>(years1))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>rr_samples2 <span class="op">=</span> run_metropolis(counts2, group2, year_idx2, <span class="bu">len</span>(years2))</span></code></pre></div>
 <pre class="text"><code>Acceptance rate: 38.36%
 Acceptance rate: 46.71%</code></pre>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">4.5</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, samples, title, color <span class="kw">in</span> <span class="bu">zip</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    axes, </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    [rr_samples1, rr_samples2], </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;Case 1: Ratio Near 1&quot;</span>, <span class="st">&quot;Case 2: Ratio Not Near 1&quot;</span>],</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;skyblue&quot;</span>, <span class="st">&quot;orange&quot;</span>]</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    mean_val <span class="op">=</span> np.mean(samples)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    prob_gt_1 <span class="op">=</span> np.mean(samples <span class="op">&gt;</span> <span class="fl">1.0</span>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simple 95% Equal-Tailed Credible Interval using standard percentiles</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    ci_low, ci_high <span class="op">=</span> np.percentile(samples, [<span class="fl">2.5</span>, <span class="fl">97.5</span>])</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Histogram</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    ax.hist(samples, bins<span class="op">=</span><span class="dv">40</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span>color, edgecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Reference line for Ratio = 1.0</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">&#39;Ratio = 1.0&#39;</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Two vertical lines for the 95% Credible Interval</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    ax.axvline(ci_low, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;:&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f&#39;95% CI [</span><span class="sc">{</span>ci_low<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ci_high<span class="sc">:.2f}</span><span class="ss">]&#39;</span>)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    ax.axvline(ci_high, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;:&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    contains_one <span class="op">=</span> <span class="st">&quot;INCLUDED&quot;</span> <span class="cf">if</span> (ci_low <span class="op">&lt;=</span> <span class="fl">1.0</span> <span class="op">&lt;=</span> ci_high) <span class="cf">else</span> <span class="st">&quot;EXCLUDED&quot;</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    ax.set_title(</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;</span><span class="sc">{</span>title<span class="sc">}</span><span class="ch">\n</span><span class="ss">Mean: </span><span class="sc">{</span>mean_val<span class="sc">:.2f}</span><span class="ss">, P(Ratio &gt; 1): </span><span class="sc">{</span>prob_gt_1<span class="sc">:.3f}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;95% CI: [</span><span class="sc">{</span>ci_low<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ci_high<span class="sc">:.2f}</span><span class="ss">] (1.0 is </span><span class="sc">{</span>contains_one<span class="sc">}</span><span class="ss">)&quot;</span>,</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>        fontsize<span class="op">=</span><span class="dv">10</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Rate Ratio [exp(beta)]&quot;</span>)</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;Density&quot;</span>)</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">&#39;upper right&#39;</span>)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_02.jpg&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="fl">4.5</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, samples, title, color <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    axes, </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    [rr_samples1, rr_samples2], </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;Case 1: Ratio Near 1&quot;</span>, <span class="st">&quot;Case 2: Ratio Not Near 1&quot;</span>],</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;skyblue&quot;</span>, <span class="st">&quot;orange&quot;</span>]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    mean_val <span class="op">=</span> np.mean(samples)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    prob_gt_1 <span class="op">=</span> np.mean(samples <span class="op">&gt;</span> <span class="fl">1.0</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simple 95% Equal-Tailed Credible Interval using standard percentiles</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    ci_low, ci_high <span class="op">=</span> np.percentile(samples, [<span class="fl">2.5</span>, <span class="fl">97.5</span>])</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Histogram</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    ax.hist(samples, bins<span class="op">=</span><span class="dv">40</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span>color, edgecolor<span class="op">=</span><span class="st">&#39;black&#39;</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Reference line for Ratio = 1.0</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    ax.axvline(<span class="fl">1.0</span>, color<span class="op">=</span><span class="st">&#39;red&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;--&#39;</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">&#39;Ratio = 1.0&#39;</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Two vertical lines for the 95% Credible Interval</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    ax.axvline(ci_low, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;:&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f&#39;95% CI [</span><span class="sc">{</span>ci_low<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ci_high<span class="sc">:.2f}</span><span class="ss">]&#39;</span>)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    ax.axvline(ci_high, color<span class="op">=</span><span class="st">&#39;black&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;:&#39;</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    contains_one <span class="op">=</span> <span class="st">&quot;INCLUDED&quot;</span> <span class="cf">if</span> (ci_low <span class="op">&lt;=</span> <span class="fl">1.0</span> <span class="op">&lt;=</span> ci_high) <span class="cf">else</span> <span class="st">&quot;EXCLUDED&quot;</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    ax.set_title(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;</span><span class="sc">{</span>title<span class="sc">}</span><span class="ch">\n</span><span class="ss">Mean: </span><span class="sc">{</span>mean_val<span class="sc">:.2f}</span><span class="ss">, P(Ratio &gt; 1): </span><span class="sc">{</span>prob_gt_1<span class="sc">:.3f}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;95% CI: [</span><span class="sc">{</span>ci_low<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ci_high<span class="sc">:.2f}</span><span class="ss">] (1.0 is </span><span class="sc">{</span>contains_one<span class="sc">}</span><span class="ss">)&quot;</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>        fontsize<span class="op">=</span><span class="dv">10</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">&quot;Rate Ratio [exp(beta)]&quot;</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">&#39;upper right&#39;</span>)</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;stat_082_rapoi_02.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="stat_082_rapoi_02.jpg" /></p>
 <p>Görüyoruz ki ilk simülasyonda oranın dağılımı 1 etrafında kümelenmiş,
 1 değeri yüzde 95 güven aralığı içinde, o zaman iki sayım zaman
