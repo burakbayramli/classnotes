@@ -84,46 +84,6 @@ istiyorsak kavşak dışındaki sayımları ölçekleyip diğer ölçüme
 skalasına yaklaştırmamız gerekir. Bu çok zor olmasa gerek, basit bir
 toplam ve bölme işlemi ile bunu başarabiliriz.
 
-Şimdi üzerinde karşılaştırma yapmak için sentetik veri üretelim. İlk
-veri birbirine yakın iki zaman serisi gösteriyor.
-
-```python
-import pandas as pd
-import pymc as pm
-import arviz as az
-import data
-
-years = np.arange(1950, 2011)
-
-sim = data.generate_synthetic(years=years,
-                              alpha_log=3.2,
-                              beta_log=0,
-                              sigma_year=0.4,
-                              obs_model="poisson",
-                              trend=data.slow_trend)
-
-df = pd.DataFrame({
-    "year": sim["years"],
-    "A": sim["A"],
-    "B": sim["B"]
-})
-
-SEED = 333
-np.random.seed(SEED)
-
-# quick plot of generated counts
-plt.figure(figsize=(10,4))
-plt.plot(df.year, df.A, label="kavsak", marker="o")
-plt.plot(df.year, df.B, label="diger", marker="x")
-plt.xlabel("Sene"); plt.ylabel("Sayim")
-plt.title("Sentetik sayim (Poisson)")
-plt.legend()
-plt.tight_layout()
-plt.savefig('stat_082_rapoi_01.jpg')
-```
-
-![](stat_082_rapoi_01.jpg)
-
 Verinin modeli ne olacak? Her sene farklı bir Poisson dağılımı olsun
 demiştik, ama bu dağılımların birbirine bazı yönlerden benzerlikleri
 de olmalı. Bir Poisson GLM (genel lineer model -generalized linear
@@ -227,181 +187,223 @@ Senesel farklar, eğer var ise, her sene için farklı olmasına izin
 verdiğimiz $u_t$ ile olabilir, bu parametre ile o farklılığı
 "yakalayabiliyoruz".
 
-Verinin nasıl oluşturulduğunu görelim,
+Matematiksel tanımlar şöyle oluyor, sayım verisi için bir GLM
+oluşturduk,
+
+$$\log(\lambda_{i}) = \alpha + \beta \cdot \text{group}_i + u_{\text{year}[i]}$$
+
+$$\lambda_i = \exp\left(\log(\lambda_{i})\right)$$
+
+$$y_i \sim \text{Poisson}(\lambda_i)$$
+
+ki,
+
+* $u_t = \text{yearoffset}_t \times \sigma_{\text{year}}$
+* $\alpha \sim \mathcal{N}(0, 2^2)$
+* $\beta \sim \mathcal{N}(0, 1^2)$
+* $\sigma_{\text{year}} \sim \text{HalfNormal}(1.0)$
+* $\text{yearoffset}_t \sim \mathcal{N}(0, 1^2)$
+* $\text{ratio} = \exp(\beta)$
+
+Verinin nasıl oluşturulduğunu görelim, 
 
 ```python
+
 def build_stacked_arrays(simdict):
     years = np.array(simdict["years"])
     A = np.array(simdict["A"])
-    B  = np.array(simdict["B"])
+    B = np.array(simdict["B"])
     n_years = len(years)
     counts = np.concatenate([A, B])
     group = np.concatenate([np.ones(n_years, dtype=int), np.zeros(n_years, dtype=int)])
     year_idx = np.concatenate([np.arange(n_years), np.arange(n_years)])
-    return years, counts, group, year_idx, A, B
+    return years, counts, group, year_idx
 
-years, counts_pois, group_pois, year_idx_pois, A_arr, B_arr = build_stacked_arrays(sim)
-print (len(A_arr), A_arr[:5], '..')
-print (len(B_arr), B_arr[:5], '..')
-print (len(counts_pois), counts_pois)
-print ('A mi B mi?')
-print (group_pois)
+# Senaryo 1: Oran 1'e yakin
+np.random.seed(333)
+years1 = np.arange(1950, 2011)
+T1 = len(years1)
+u_t1 = np.random.normal(0, 0.4, size=T1)
+alpha_true = 3.2
+beta_true1 = 0.0
+mu_B1 = np.exp(alpha_true + u_t1)
+mu_A1 = np.exp(alpha_true + beta_true1 + u_t1)
+A1 = np.random.poisson(mu_A1)
+B1 = np.random.poisson(mu_B1)
+sim1 = {"years": years1, "A": A1, "B": B1}
+
+# Senaryo 2: Oran 1 yakininda degil (1.3 civari)
+np.random.seed(42)
+years2 = np.arange(1980, 2020)
+T2 = len(years2)
+u_t2 = np.random.normal(0, 0.4, size=T2)
+beta_true2 = np.log(1.3)
+mu_B2 = np.exp(alpha_true + u_t2)
+mu_A2 = np.exp(alpha_true + beta_true2 + u_t2)
+A2 = np.random.poisson(mu_A2)
+B2 = np.random.poisson(mu_B2)
+sim2 = {"years": years2, "A": A2, "B": B2}
+
+years1, counts1, group1, year_idx1 = build_stacked_arrays(sim1)
+print (group1)
+years2, counts2, group2, year_idx2 = build_stacked_arrays(sim2)
+print (group2)
 ```
 
 ```text
-61 [14 24 38 15 13] ..
-61 [10 24 26 13 12] ..
-122 [14 24 38 15 13 47  7 17 28 13 14 22 43 19 26 18 53 46 30 25 33 44 14 37
- 15 26 22 12 24 15 21  8 10 23 51 19 22 24 16 23 14 16 20 34 34 21 67 26
- 44 57 20 16 54 18 26 49 35 51 50 25 18 10 24 26 13 12 39 10 22 41 15 15
- 24 33 18 18 17 64 57 35 22 32 44 15 31  8 14 35 14 27 22 26 10 13 17 41
- 27 31 42 11 27 19 12 31 27 28 25 69 36 30 69 20 17 52 15 33 53 38 51 44
- 37 27]
-A mi B mi?
 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0
  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
  0 0 0 0 0 0 0 0 0 0 0]
+[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0]
 ```
 
-Şimdi oranın sonsal dağılımını PyMC ile ortaya çıkartalım ve ondan
-örneklem alalım.
+Şimdi oranın sonsal dağılımını MCMC ile ortaya çıkartalım ve ondan
+örneklem alalım. Gereken fonksiyonlar,
 
 ```python
-def fit_poisson_ratio(years, A_arr, B_arr, fout):
-    n_years = len(years)
-    with pm.Model() as model_synth:
-        sigma_year = pm.HalfNormal("sigma_year", sigma=1.0)
-        year_offset = pm.Normal("year_offset", 0.0, 1.0, shape=n_years)
-        year_effect = pm.Deterministic("year_effect", year_offset * sigma_year)
+from scipy.stats import norm, poisson
 
-        alpha = pm.Normal("alpha", 0.0, 2.0)
-        beta  = pm.Normal("beta", 0.0, 1.0)
+def log_posterior(params, counts, group, year_idx, n_years):
+    """
+    params vektor icerigi, aranan parametreler beraber bu vektor icinde:
+    [alpha, beta, log_sigma_year, year_offset_0, year_offset_1, ...]
+    Not: log(sigma_year)'dan orneklem aliyoruz ki pozitif degerler almak garanti olsun
+    """
+    alpha = params[0]
+    beta = params[1]
+    log_sigma = params[2]
+    sigma_year = np.exp(log_sigma)
+    year_offset = params[3:]
 
-        log_lambda = alpha + beta * group_pois + year_effect[year_idx_pois]
-        lambda_ = pm.math.exp(log_lambda)
+    # Priors
+    log_p_alpha = norm.logpdf(alpha, 0.0, 2.0)
+    log_p_beta = norm.logpdf(beta, 0.0, 1.0)
+    
+    # Half-Normal(1.0) prior for sigma_year with Jacobian adjustment for log-transform
+    if sigma_year <= 0:
+        return -np.inf
+    log_p_sigma = np.log(2.0) + norm.logpdf(sigma_year, 0.0, 1.0) + log_sigma
+    
+    log_p_offsets = np.sum(norm.logpdf(year_offset, 0.0, 1.0))
 
-        obs = pm.Poisson("obs", mu=lambda_, observed=counts_pois)
+    # Likelihood
+    year_effect = year_offset * sigma_year
+    log_lambda = alpha + beta * group + year_effect[year_idx]
+    lam = np.exp(log_lambda)
 
-        rate_ratio = pm.Deterministic("rate_ratio", pm.math.exp(beta))
+    log_lik = np.sum(poisson.logpmf(counts, lam))
 
-        idata = pm.sample(1000, tune=1000, target_accept=0.9, return_inferencedata=True, random_seed=SEED)
+    return log_p_alpha + log_p_beta + log_p_sigma + log_p_offsets + log_lik
 
-        graphviz = pm.model_to_graphviz(model_synth)
-        graphviz.graph_attr.update(dpi="100")
-        graphviz.render(fout, format="jpg")
-        print(az.summary(idata, var_names=["alpha", "beta", "sigma_year", "rate_ratio"], round_to=3))
-        rr_samples = idata.posterior["rate_ratio"].values.flatten()
-        p_gt_1 = (rr_samples > 1.0).mean()
-        print(f"\nP(rate_ratio > 1) = {p_gt_1:.3f}")    
-        return idata
-	
-idata = fit_poisson_ratio(years, A_arr, B_arr, "stat_082_rapoi_03")
+def run_metropolis(counts, group, year_idx, n_years, n_samples=20000, burn_in=10000):
+    n_params = 3 + n_years
+    
+    # Initial state
+    current_params = np.zeros(n_params)
+    current_params[0] = 3.0           # alpha init
+    current_params[1] = 0.0           # beta init
+    current_params[2] = np.log(0.4)   # log_sigma init
+    
+    current_log_post = log_posterior(current_params, counts, group, year_idx, n_years)
+
+    # Adaptive proposal step sizes (tuned for stability across dimensions)
+    proposal_std = np.full(n_params, 0.02)
+    proposal_std[0] = 0.03 # alpha
+    proposal_std[1] = 0.02 # beta
+    proposal_std[2] = 0.03 # log_sigma
+
+    chain = np.zeros((n_samples, n_params))
+    accepted = 0
+
+    for i in range(n_samples):
+        # Propose step
+        proposal = current_params + np.random.normal(0, proposal_std, size=n_params)
+        prop_log_post = log_posterior(proposal, counts, group, year_idx, n_years)
+
+        # Metropolis acceptance probability
+        log_acc_ratio = prop_log_post - current_log_post
+
+        if np.log(np.random.uniform(0, 1)) < log_acc_ratio:
+            current_params = proposal
+            current_log_post = prop_log_post
+            accepted += 1
+
+        chain[i, :] = current_params
+
+    print(f"Acceptance rate: {accepted / n_samples:.2%}")
+    
+    # Extract chains post burn-in
+    post_chain = chain[burn_in:]
+    beta_samples = post_chain[:, 1]
+    rate_ratio_samples = np.exp(beta_samples)
+    
+    return rate_ratio_samples
+```
+
+Simülasyonları artık işletebiliriz,
+
+```python
+rr_samples1 = run_metropolis(counts1, group1, year_idx1, len(years1))
+
+rr_samples2 = run_metropolis(counts2, group2, year_idx2, len(years2))
 ```
 
 ```text
-                                                                                
-                              Step      Grad      Sampli…                       
-  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
-
-     2000    0         0.229     15        639.58    0:00:03   0:00:00   
-                                           draws/s                       
-     2000    0         0.306     15        676.39    0:00:02   0:00:00   
-                                           draws/s                       
-     2000    0         0.217     15        625.81    0:00:03   0:00:00   
-                                           draws/s                       
-     2000    0         0.278     15        660.10    0:00:03   0:00:00   
-                                                  draws/s                       
-                                                                                
-             mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-alpha       3.234  0.068   3.107    3.366  ...    0.002   480.667   818.932  1.012
-beta       -0.040  0.035  -0.107    0.023  ...    0.001  6166.596  2749.392  1.000
-sigma_year  0.489  0.050   0.397    0.582  ...    0.001   615.175  1211.197  1.011
-rate_ratio  0.961  0.033   0.899    1.024  ...    0.001  6166.596  2749.392  1.000
-
-[4 rows x 9 columns]
-
-P(rate_ratio > 1) = 0.121
+Acceptance rate: 38.36%
+Acceptance rate: 46.71%
 ```
 
-![](stat_082_rapoi_03.jpg)
-
-
 ```python
-rr_samples = idata.posterior["rate_ratio"].values.flatten()
-plt.figure(figsize=(6,3))
-az.plot_posterior(rr_samples, hdi_prob=0.95)
-plt.title("Hesaplanan oran (Poisson)")
-plt.legend()
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+
+for ax, samples, title, color in zip(
+    axes, 
+    [rr_samples1, rr_samples2], 
+    ["Case 1: Ratio Near 1", "Case 2: Ratio Not Near 1"],
+    ["skyblue", "orange"]
+):
+    mean_val = np.mean(samples)
+    prob_gt_1 = np.mean(samples > 1.0)
+    
+    # Simple 95% Equal-Tailed Credible Interval using standard percentiles
+    ci_low, ci_high = np.percentile(samples, [2.5, 97.5])
+    
+    # 1. Histogram
+    ax.hist(samples, bins=40, density=True, alpha=0.6, color=color, edgecolor='black')
+    
+    # 2. Reference line for Ratio = 1.0
+    ax.axvline(1.0, color='red', linestyle='--', linewidth=1.5, label='Ratio = 1.0')
+    
+    # 3. Two vertical lines for the 95% Credible Interval
+    ax.axvline(ci_low, color='black', linestyle=':', linewidth=2, label=f'95% CI [{ci_low:.2f}, {ci_high:.2f}]')
+    ax.axvline(ci_high, color='black', linestyle=':', linewidth=2)
+    
+    contains_one = "INCLUDED" if (ci_low <= 1.0 <= ci_high) else "EXCLUDED"
+    
+    ax.set_title(
+        f"{title}\nMean: {mean_val:.2f}, P(Ratio > 1): {prob_gt_1:.3f}\n"
+        f"95% CI: [{ci_low:.2f}, {ci_high:.2f}] (1.0 is {contains_one})",
+        fontsize=10
+    )
+    ax.set_xlabel("Rate Ratio [exp(beta)]")
+    ax.set_ylabel("Density")
+    ax.legend(loc='upper right')
+
 plt.tight_layout()
 plt.savefig('stat_082_rapoi_02.jpg')
 ```
 
 ![](stat_082_rapoi_02.jpg)
 
-Görüyoruz ki oranın dağılımı 1 etrafında kümelenmiş, o zaman iki sayım
-zaman serisinin birbirine yakın olduğuna karar verebiliriz çünkü
-oranları 1'e yakın.
-
-Şimdi yakın olmayan iki zaman serisi yaratalım,
-
-
-```python
-np.random.seed(42)
-years = np.arange(1980, 2020)
-T = len(years)
-u_t = np.random.normal(0, 0.4, size=T)
-alpha = 3.0
-beta_true = np.log(1.3)   # 30% higher A rate
-mu_B = np.exp(alpha + u_t)
-mu_A = np.exp(alpha + beta_true + u_t)
-B = np.random.poisson(mu_B)
-A = np.random.poisson(mu_A)
-
-sim = {"years": years, "A": A, "B": B}
-years, counts_pois, group_pois, year_idx_pois, A_arr, B_arr = build_stacked_arrays(sim)
-idata = fit_poisson_ratio(years, A_arr, B_arr, "stat_082_rapoi_03")
-```
-
-```text
-                                                                                
-                              Step      Grad      Sampli…                       
-  Progre…   Draws   Diverg…   size      evals     Speed     Elapsed   Remaini…  
-
-     2000    0         0.346     7         693.28    0:00:02   0:00:00   
-                                           draws/s                       
-     2000    0         0.305     15        707.15    0:00:02   0:00:00   
-                                           draws/s                       
-     2000    0         0.314     15        658.19    0:00:03   0:00:00   
-                                           draws/s                       
-     2000    0         0.278     15        651.81    0:00:03   0:00:00   
-                                                  draws/s                       
-                                                                                
-             mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
-alpha       2.879  0.073   2.736    3.011  ...    0.001  1030.075  1813.990  1.002
-beta        0.317  0.047   0.229    0.408  ...    0.001  8153.224  2749.679  1.000
-sigma_year  0.379  0.053   0.277    0.474  ...    0.001  1173.341  1764.667  1.003
-rate_ratio  1.375  0.065   1.258    1.503  ...    0.001  8153.224  2749.679  1.000
-
-[4 rows x 9 columns]
-
-P(rate_ratio > 1) = 1.000
-```
-
-```python
-rr_samples = idata.posterior["rate_ratio"].values.flatten()
-plt.figure(figsize=(6,3))
-az.plot_posterior(rr_samples, hdi_prob=0.95)
-plt.title("Hesaplanan oran (Poisson)")
-plt.legend()
-plt.tight_layout()
-plt.savefig('stat_082_rapoi_04.jpg')
-```
-
-![](stat_082_rapoi_04.jpg)
-
-Bu zaman serileri birbirine yakın değiller. Sonsal dağılımın
-kümelendiği yer 1'den çok uzakta. 
+Görüyoruz ki ilk simülasyonda oranın dağılımı 1 etrafında kümelenmiş,
+1 değeri yüzde 95 güven aralığı içinde, o zaman iki sayım zaman
+serisinin birbirine yakın olduğuna karar verebiliriz çünkü oranları
+1'e yakın. İkinci gruptaki zaman serileri birbirine yakın
+değiller. Sonsal dağılımın kümelendiği yer 1'den çok uzakta, yüzde 95
+aralığının dışında.
 
 Kaynaklar
 
