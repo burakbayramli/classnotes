@@ -1,40 +1,40 @@
 # Zaman Serisi Tahmini (Forecasting), R, VAR, rpy2
 
-Zaman serisi modellemesinde VAR modelleri bugunlerde en populer
-olanlari. VAR, vector autoregression kelimelerinden geliyor, yani tek
-bir zaman serisi degil, birkac tanesine birden, ayni anda modellemeye
-ugrasiyoruz.
+Zaman serisi modellemesinde VAR modelleri bugünlerde en popüler
+olanları. VAR, vector autoregression kelimelerinden geliyor, yani tek
+bir zaman serisi değil, birkaç tanesine birden, aynı anda modellemeye
+uğraşıyoruz.
 
 Autregression, zaman serisinin kendi kendisiyle regresyona
-sokulmasidir; bilindigi gibi regresyon y = f(x) modellemesinde
-gurultulu elde edilen y ile, x degerleri arasindaki baglantinin
-bulunmasina yardim eder (eger f(x) lineer ise iyi sonuclar da
-bulur). Tek boyutlu zaman serisi modellemesi icin soyle bir numara
-kullanilir, serinin kopyasi alinir, bir geri kaydirilir, x bu
-kaydilirilmis seri, y esas seri olur, bu ikili regresyona
-sokulur. Boylece zaman serisinin kendisini ve regresyon mekanizmasi
-kullanilarak zaman serisi tahmini yapilabilir.
+sokulmasıdır; bilindiği gibi regresyon y = f(x) modellemesinde
+gürültülü elde edilen y ile, x değerleri arasındaki bağlantının
+bulunmasına yardım eder (eğer f(x) lineer ise iyi sonuçlar da
+bulur). Tek boyutlu zaman serisi modellemesi için şöyle bir numara
+kullanılır, serinin kopyası alınır, bir geri kaydırılır, x bu
+kaydılırılmış seri, y esas seri olur, bu ikili regresyona
+sokulur. Böylece zaman serisinin kendisini ve regresyon mekanizması
+kullanılarak zaman serisi tahmini yapılabilir.
 
-VAR ise bunu cok boyutlu yapar. Her seriyi hem kendisi, hem de diger
-tum serilerin p kadar gecmis degeri goz onune alinir. Oldukca guclu
+VAR ise bunu çok boyutlu yapar. Her seriyi hem kendisi, hem de diğer
+tüm serilerin p kadar geçmiş değeri göz önüne alınır. Oldukça güçlü
 bir metottur.
 
-Bu alanda unlu isimlerden Sims'i bilmek gerekir, 1980 yilinda yazdigi
-ve kendi alanini elestirdigi bir makalede makroekonomide yapisal
-modeller yerine, ciplak veriye bakmak gerektigini, ve bunu yapmak icin
-her zaman serilerine tek baslarina degil tum diger serilere de
-baglantilarini goz onune alarak incelemek gerektigini soyler. VAR
-matematigi buradan cikmistir. Granger ismi de vardir, VAR modellemesi
-sonrasi serilerin "birbirine ne kadar etki ettigini" hesaplayan
-"Granger istatistigi" mesela ona aittir.
+Bu alanda ünlü isimlerden Sims'i bilmek gerekir, 1980 yılında yazdığı
+ve kendi alanını eleştirdiği bir makalede makroekonomide yapısal
+modeller yerine, çıplak veriye bakmak gerektiğini, ve bunu yapmak için
+her zaman serilerine tek başlarına değil tüm diğer serilere de
+bağlantılarını göz önüne alarak incelemek gerektiğini söyler. VAR
+matematiği buradan çıkmıştır. Granger ismi de vardır, VAR modellemesi
+sonrası serilerin "birbirine ne kadar etki ettiğini" hesaplayan
+"Granger istatistiği" mesela ona aittir.
 
-Isin matematigine sonra daha detayli girebiliriz, simdilik kodlama
-acisindan ornekleri verelim. Bu alanda R kodculari cok aktif, o yuzden
-bir R paketi vars kullanacagiz, ve onu Python uzerinden cagiracagiz.
+İşin matematiğine sonra daha detaylı girebiliriz, şimdilik kodlama
+açısından örnekleri verelim. Bu alanda R kodcuları çok aktif, o yüzden
+bir R paketi vars kullanacağız, ve onu Python üzerinden çağıracağız.
 
-Diyelim ki bir predict-1.csv icinde bir ulkenin GDP ve tuketim
-verileri (cons) var, 1959-2009 arasi icin (bu oldukca standart bir
-veri seti). Once R kurulur
+Diyelim ki bir predict-1.csv içinde bir ülkenin GDP ve tüketim
+verileri (cons) var, 1959-2009 arası için (bu oldukca standart bir
+veri seti). Önce R kurulur
 
 ```
 sudo apt-get install r-base-dev r-base python-rpy2
@@ -44,13 +44,13 @@ Sonra R'ye girilir
 > install.packages("vars")
 ```
 
-Simdi su R kodu kullanilabilir
+Şimdi şu R kodu kullanılabilir
 
 ```
 library("vars")file = "predict-1.csv"a <- read.csv(file, header = TRUE, sep = ",", na.strings="")impute.med <- function(x) {    z <- median(x, na.rm = TRUE)    x[is.na(x)] <- z    return(x)}a2 <- sapply(a, function(x){    if(is.numeric(x) & any(is.na(x))){            impute.med(x)        } else {            x        }    })out <- VAR(a2, p = 2, type = "const")out.prd <- predict(out, n.ahead = 30, ci = 0.95)
 ```
 
-Bunu Python'dan cagirmak icin rpy2 kullaniriz,
+Bunu Python'dan çağırmak için rpy2 kullanırız,
 
 ```
 import os, sys
@@ -67,11 +67,13 @@ res = np.array(res)
 np.savetxt('predict-2.csv',res,delimiter=",",fmt='%s')
 ```
 
-Python isledikten sonra sonuc predict-2.csv icinde olacak. Sonuclar
-2009 sonrasi 30 sene sonrasi icin gdp ve tuketim rakamlarini tahmin
+Python işledikten sonra sonuç predict-2.csv içinde olacak. Sonuçlar
+2009 sonrası 30 sene sonrası için gdp ve tüketim rakamlarını tahmin
 edecek.
 
-Eger pur Python kullanmak isteseydik, scikits statsmodels adinda bir paketi de kullanabilirdik. Bu durumda hic R kodlamasi olmayacak, kurmak icin
+Eğer pür Python kullanmak isteseydik, scikits statsmodels adında bir
+paketi de kullanabilirdik. Bu durumda hiç R kodlaması olmayacak,
+kurmak için
 
 https://github.com/statsmodels/statsmodels
 
@@ -97,13 +99,13 @@ f = res.forecast(data[-2:], 30)
 np.savetxt('predict-3.csv',f,delimiter=",",fmt='%s')
 ```
 
-Ustteki kod sonuclar predict-3.csv icine yazar.
+Üstteki kod sonuçlar predict-3.csv içine yazar.
 
-VAR ile zaman serisi tahminlerinde onemli bazi konular incelenen
-verinin (zaman serisinin) duragan (stationary), ve beraber entegre
-(co-integrated) olup olmadigidir -- bu durumlarda bazi ek numaralar
-kullanmak gerekebilir, mesela duragan bir veri seti yoksa serinin
-farklarini kullanmak gibi..
+VAR ile zaman serisi tahminlerinde önemli bazı konular incelenen
+verinin (zaman serisinin) durağan (stationary), ve beraber entegre
+(co-integrated) olup olmadığıdır -- bu durumlarda bazı ek numaralar
+kullanmak gerekebilir, mesela durağan bir veri seti yoksa serinin
+farklarını kullanmak gibi..
 
 
 
