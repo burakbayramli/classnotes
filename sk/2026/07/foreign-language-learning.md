@@ -12,23 +12,26 @@ gerekiyor, bizim örnekte İngilizce ve Rusça. Dosyaları indirip,
 zıpleri açıp `/opt/Downloads/rü_lang` altına koyarsak, `lang_data.py`
 kodu bu eşleştirmeyi yapar.
 
-Nihai dosya `en_ru_pairs.csv` içinde her satırda önce Rusça cümle,
-sonra virgülden sonra onun İngilizcesi var. Bu dosya hala çok fazla,
-oradan seçip istenilenleri biz `en_ru.csv` içine koyduk. 
+Nihai dosya `en_ru_pairs.csv` içinde, her satırda önce Rusça cümle,
+sonra virgülden sonra onun İngilizcesi var. Bu dosya çok fazla ise,
+oradan seçip istenilenleri biz `en_ru.csv` içine koyulabilir.
 
+Dosyaların ses dosyası haline çevirilmesi için gerekli paketler,
 
+```
+pip install edge-tts
+pip install pydub
+```
 
+Altta görülen `reclang.py` kodu `en_ru.csv` içindeki cümleleri okuyup
+bir MP3 dosyasına kaydeder. Cümleler rasgele sırada seçilir, eğer
+dinleyici hep aynı sıradan sıkılırsa farklı sıradaki bir mp3
+yaratabilir.
 
-
-
-
-
-
-
-
-
-
-
+Ses dosyasında her cümle önce İngilizce, sonra iki kez Rusça
+kaydediliyor, ikinci Rusça okuma birinciden biraz daha yavaş, eğer
+dinleyen kelimeleri tam duymadıysa ikinci kez onları duyma şansını 
+böylece elde eder.
 
 Kodlar
 
