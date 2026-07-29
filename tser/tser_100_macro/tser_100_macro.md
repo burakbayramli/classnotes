@@ -169,6 +169,113 @@ bankaların "özel kişilerin mevduatını borç olarak verdiği'' doğru
 değildir. Bankaların borç vermek mevduata ihtiyacı yoktur, parayı basar ve
 verir [5].
 
+```python
+import pymc as pm
+import numpy as np
+import pandas as pd
+import arviz as az
+import matplotlib.pyplot as plt
+
+df_clean = pd.read_csv('arg_final.csv', index_col=0, parse_dates=True)
+
+def standardize(series):
+    return (series - series.mean()) / series.std()
+
+df_clean['bop_z']        = standardize(df_clean['bop'])
+df_clean['xch_deprec_z'] = standardize(df_clean['xch_deprec'])
+df_clean['ir_z']         = standardize(df_clean['real_ir'])
+df_clean['inf_z']        = standardize(df_clean['inflation'])
+
+# -----------------------------------------------------------------------------
+# Gecikmeli t-1 turu dizinleri hazirla
+# -----------------------------------------------------------------------------
+bop_t  = df_clean['bop_z'].values[1:]
+bop_l1 = df_clean['bop_z'].values[:-1]
+
+xch_t  = df_clean['xch_deprec_z'].values[1:]
+xch_l1 = df_clean['xch_deprec_z'].values[:-1]
+
+ir_t   = df_clean['ir_z'].values[1:]
+ir_l1  = df_clean['ir_z'].values[:-1]
+
+inf_t  = df_clean['inf_z'].values[1:]
+inf_l1 = df_clean['inf_z'].values[:-1]
+
+with pm.Model() as macro_feedback_dag:
+    
+    # Kesiler
+    a_xch = pm.Normal("a_xch", mu=0, sigma=1)
+    a_ir  = pm.Normal("a_ir",  mu=0, sigma=1)
+    a_inf = pm.Normal("a_inf", mu=0, sigma=1)
+    
+    # Standard Sapmalar
+    sigma_xch = pm.HalfNormal("sigma_xch", sigma=1)
+    sigma_ir  = pm.HalfNormal("sigma_ir",  sigma=1)
+    sigma_inf = pm.HalfNormal("sigma_inf", sigma=1)
+    
+    # Path 1: BOP Deficit -> Exchange Rate Depreciation
+    gamma_bop_to_xch = pm.Normal("gamma_bop_to_xch", mu=0, sigma=1)
+    
+    # Path 2: BOP Deficit & Depreciation -> Central Bank Interest Rate Hike
+    gamma_bop_to_ir  = pm.Normal("gamma_bop_to_ir", mu=0, sigma=1)
+    gamma_xch_to_ir  = pm.Normal("gamma_xch_to_ir", mu=0, sigma=1)
+    
+    # Path 3: Exchange Rate Depreciation & Interest Rates -> Inflation
+    gamma_xch_to_inf = pm.Normal("gamma_xch_to_inf", mu=0, sigma=1)
+    gamma_ir_to_inf  = pm.Normal("gamma_ir_to_inf", mu=0, sigma=1)
+    
+    # Autoregressive Lag Coefficients
+    beta_xch = pm.Normal("beta_xch", mu=0.5, sigma=0.5)
+    beta_ir  = pm.Normal("beta_ir",  mu=0.5, sigma=0.5)
+    beta_inf = pm.Normal("beta_inf", mu=0.5, sigma=0.5)
+    
+    # --- Equation 1: Exchange Rate Depreciation ---
+    # Tests if a BOP deficit (negative bop_z) drives FX depreciation
+    mu_xch = a_xch + gamma_bop_to_xch * bop_l1 + beta_xch * xch_l1
+    obs_xch = pm.Normal("obs_xch", mu=mu_xch, sigma=sigma_xch, observed=xch_t)
+    
+    # --- Equation 2: Policy Interest Rate Reaction Function ---
+    # Tests if Central Bank hikes interest rates in response to BOP pressure & FX drops
+    mu_ir = a_ir + gamma_bop_to_ir * bop_t + gamma_xch_to_ir * xch_t + beta_ir * ir_l1
+    obs_ir = pm.Normal("obs_ir", mu=mu_ir, sigma=sigma_ir, observed=ir_t)
+    
+    # --- Equation 3: Exchange Rate Pass-Through to Inflation ---
+    # Tests if currency drops directly trigger inflation bursts
+    mu_inf = a_inf + gamma_xch_to_inf * xch_t + gamma_ir_to_inf * ir_t + beta_inf * inf_l1
+    obs_inf = pm.Normal("obs_inf", mu=mu_inf, sigma=sigma_inf, observed=inf_t)
+    
+    # --- Indirect Mediated Chain: BOP -> Interest Rate Reaction ---
+    bop_ir_reaction = pm.Deterministic("bop_to_ir_reaction", gamma_bop_to_ir)
+    
+    # -------------------------------------------------------------------------
+    # 4. MCMC Sampling
+    # -------------------------------------------------------------------------
+    trace_feedback = pm.sample(draws=1000, tune=1000,
+                               chains=2, return_inferencedata=True,
+			       progressbar=False)
+
+# -----------------------------------------------------------------------------
+# 5. Visualizing Posteriors
+# -----------------------------------------------------------------------------
+az.plot_posterior(
+    trace_feedback, 
+    var_names=[
+        "gamma_bop_to_xch", 
+        "gamma_bop_to_ir", 
+        "gamma_xch_to_ir", 
+        "gamma_xch_to_inf",
+        "gamma_ir_to_inf"
+    ],
+    figsize=(10, 6)
+)
+plt.tight_layout()
+plt.savefig('dag_results.jpg')
+```
+
+![](dag_results.jpg)
+
+[devam edecek]
+
 Kaynaklar
 
 [1] Marginal Revolution University, *Quantity Theory of Money*, 
@@ -182,18 +289,4 @@ Kaynaklar
 
 [5] *Money as Debt*, 
     [https://www.youtube.com/watch?v=2nBPN-MKefA](https://www.youtube.com/watch?v=2nBPN-MKefA)
-
-[6] Wikipedia, *Money supply*, 
-    [https://en.wikipedia.org/wiki/Money_supply](https://en.wikipedia.org/wiki/Money_supply)
-
-[7] *Reconsidering Monetary Policy: An Empirical Examination of the Relationship Between Interest Rates and Nominal GDP Growth in the U.S., U.K., Germany and Japan*,
-    [https://www.sciencedirect.com/science/article/pii/S0921800916307510](https://www.sciencedirect.com/science/article/pii/S0921800916307510)
-
-[8] *Applying the Quantity Theory of Credit: The role of the ECB in the propagation of the European financial and sovereign debt crisis and the policy implications*, 
-   [http://www2.euromemorandum.eu/uploads/werner_qtc_ecb_and_policy.pdf](http://www2.euromemorandum.eu/uploads/werner_qtc_ecb_and_policy.pdf)
-
-[14] Bayramlı, Lineer Cebir, *Ülkelerin Ekonomik  Kapasiteleri*
-
-
-
 
