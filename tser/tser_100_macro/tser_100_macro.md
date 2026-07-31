@@ -80,8 +80,12 @@ import pandas as pd
 import arviz as az
 import matplotlib.pyplot as plt
 
+# -----------------------------------------------------------------------------
+# 1. Load Data & Merge Datasets
+# -----------------------------------------------------------------------------
 df_clean = pd.read_csv('arg_final.csv', index_col=0, parse_dates=True)
 
+# Standardize series for MCMC numerical stability
 def standardize(series):
     return (series - series.mean()) / series.std()
 
@@ -91,7 +95,7 @@ df_clean['ir_z']         = standardize(df_clean['real_ir'])
 df_clean['inf_z']        = standardize(df_clean['inflation'])
 
 # -----------------------------------------------------------------------------
-# Gecikmeli t-1 turu dizinleri hazirla
+# 2. Prepare Lagged Arrays for Structural System
 # -----------------------------------------------------------------------------
 bop_t  = df_clean['bop_z'].values[1:]
 bop_l1 = df_clean['bop_z'].values[:-1]
@@ -105,18 +109,22 @@ ir_l1  = df_clean['ir_z'].values[:-1]
 inf_t  = df_clean['inf_z'].values[1:]
 inf_l1 = df_clean['inf_z'].values[:-1]
 
+# -----------------------------------------------------------------------------
+# 3. Structural Causal Model Specification (PyMC)
+# -----------------------------------------------------------------------------
 with pm.Model() as macro_feedback_dag:
     
-    # Kesiler
+    # Intercepts
     a_xch = pm.Normal("a_xch", mu=0, sigma=1)
     a_ir  = pm.Normal("a_ir",  mu=0, sigma=1)
     a_inf = pm.Normal("a_inf", mu=0, sigma=1)
     
-    # Standard Sapmalar
+    # Standard Deviations
     sigma_xch = pm.HalfNormal("sigma_xch", sigma=1)
     sigma_ir  = pm.HalfNormal("sigma_ir",  sigma=1)
     sigma_inf = pm.HalfNormal("sigma_inf", sigma=1)
     
+    # --- Causal Path Coefficients ---
     # Path 1: BOP Deficit -> Exchange Rate Depreciation
     gamma_bop_to_xch = pm.Normal("gamma_bop_to_xch", mu=0, sigma=1)
     
@@ -154,8 +162,9 @@ with pm.Model() as macro_feedback_dag:
     # -------------------------------------------------------------------------
     # 4. MCMC Sampling
     # -------------------------------------------------------------------------
-    trace_feedback = pm.sample(draws=1000, tune=1000,
-                               chains=2, return_inferencedata=True,
+    
+    trace_feedback = pm.sample(draws=1000, tune=1000, chains=2,
+                               return_inferencedata=True,
 			       progressbar=False)
 
 # -----------------------------------------------------------------------------
@@ -170,9 +179,10 @@ az.plot_posterior(
         "gamma_xch_to_inf",
         "gamma_ir_to_inf"
     ],
-    figsize=(10, 6)
+    figsize=(10,6)
 )
 plt.tight_layout()
+
 plt.savefig('dag_results.jpg')
 ```
 

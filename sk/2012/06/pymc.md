@@ -1,5 +1,7 @@
 # PyMC
 
+Not: PyMC paketini temelden anlatan esas yazi artik [surada](../../2026/07/pymc.html).
+
 Cok seviyeli hiyerarsik model kullanimi icin BUGS, JAGS, PyMC'den
 bahsettik. PyMC kurulumu icin
 

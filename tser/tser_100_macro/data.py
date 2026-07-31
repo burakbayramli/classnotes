@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import pandas_datareader.data as web
 
+# -----------------------------------------------------------------------------
+# 1. Fetch FRED Macro Series
+# -----------------------------------------------------------------------------
 def fetch_fred_data(start_year=1990):
     today = datetime.datetime.now()
     start = datetime.datetime(start_year, 1, 1)
@@ -10,7 +13,7 @@ def fetch_fred_data(start_year=1990):
     
     cols = [
         "ARGBCAGDPBP6",       # Balance of Payments (BOP % GDP)
-        "ARGCPALTT01GPM",     # CPI Index
+        "ARGCPALTT01GPM",     # CPI Index (Monthly CPI)
         "CRDQARBPUBIS",       # Domestic Credit
         "MKTGDPARA646NWDB",   # Nominal GDP
         "RBARBIS",            # Real Effective Exchange Rate (XCH)
@@ -30,48 +33,38 @@ df = fetch_fred_data(1990)
 df = df[df.index <= '2025-12-31'].copy()
 
 # -----------------------------------------------------------------------------
-# 2. Load External Datasets & Anchor Annual Series
+# 2. Load External Interest Rates & Anchor Annual Series
 # -----------------------------------------------------------------------------
-print("Loading external annual datasets (arg_inf.csv & arg_real_ir.csv)...")
+print("Loading external interest rate dataset (arg_real_ir.csv)...")
 
-# Load Annual Inflation (arg_inf.csv)
-# Assuming no header: column 0 = year, column 1 = annual_inflation
-df_inf = pd.read_csv('arg_inf.csv', header=None, names=['year', 'annual_inflation'])
+# Load Annual Interest Rates (arg_real_ir.csv containing 'year' and 'real_ir')
+df_ir = pd.read_csv('arg_real_ir.csv')
 
-# Load Annual Interest Rates (arg_real_ir.csv)
-df_ir = pd.read_csv('arg_real_ir.csv')  # Contains 'year' and 'real_ir'
+# Initialize empty NaN column in the monthly dataframe for interest rate anchor
+df['real_ir_anchor'] = np.nan
 
-# Initialize empty NaN columns in the monthly dataframe
-df['annual_inflation_anchor'] = np.nan
-df['real_ir_anchor']           = np.nan
-
-# Place anchor points on July 1st (mid-year point) for every annual observation
-for _, row in df_inf.iterrows():
-    yr = int(row['year'])
-    anchor_date = f"{yr}-07-01"
-    if anchor_date in df.index:
-        df.loc[anchor_date, 'annual_inflation_anchor'] = row['annual_inflation']
-
+# Place anchor points on July 1st (mid-year point) for annual observations
 for _, row in df_ir.iterrows():
     yr = int(row['year'])
     anchor_date = f"{yr}-07-01"
     if anchor_date in df.index:
         df.loc[anchor_date, 'real_ir_anchor'] = row['real_ir']
 
-# -----------------------------------------------------------------------------
-# 3. Monthly Interpolation & Variable Construction
-# -----------------------------------------------------------------------------
-print("Performing smooth monthly linear interpolation...")
-
-# Interpolate the anchored annual metrics linearly across monthly timestamps
-df['inflation'] = df['annual_inflation_anchor'].interpolate(method='linear')
-df['real_ir']   = df['real_ir_anchor'].interpolate(method='linear')
+# Smooth linear interpolation for interest rates
+df['real_ir'] = df['real_ir_anchor'].interpolate(method='linear')
 
 # Interpolate missing values in monthly/quarterly FRED series (e.g. bop, xch, govdebt)
 df_interp = df.interpolate(method='linear')
 
-# Derived economic metrics
-# Exchange Rate Depreciation (log change): Positive value = Peso weakening
+# -----------------------------------------------------------------------------
+# 3. Dynamic High-Frequency Derived Metrics
+# -----------------------------------------------------------------------------
+print("Calculating monthly CPI growth and exchange rate depreciation...")
+
+# True Monthly Inflation Rate (Percentage Log-Change of CPI Index)
+df_interp['inflation'] = np.log(df_interp['cpi'] / df_interp['cpi'].shift(1)) * 100.0
+
+# Exchange Rate Depreciation (Log-Change of REER): Positive value = Peso weakening
 df_interp['xch_deprec'] = -np.log(df_interp['xch'] / df_interp['xch'].shift(1)) * 100.0
 
 # Fiscal Deficit definition (negative net lending/borrowing balance)
@@ -83,7 +76,7 @@ df_interp['growth'] = (df_interp['gdp'] - df_interp['gdp'].shift(12)) / df_inter
 # -----------------------------------------------------------------------------
 # 4. Clean & Export Final Dataset
 # -----------------------------------------------------------------------------
-# Drop initial NaN rows created by lag/shift operations
+# Drop initial NaN rows created by lag/shift operations and CPI coverage limits
 df_clean = df_interp.dropna(subset=['bop', 'xch_deprec', 'real_ir', 'inflation']).copy()
 
 # Keep relevant columns for exporting
