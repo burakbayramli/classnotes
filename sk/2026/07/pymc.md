@@ -27,7 +27,7 @@ alanında rasgele değişkenlerin düz formüller ile birleştirilmesine
 benzer. İki Gaussian dağılımı toplayabiliriz, log'unu alıp
 çarpabiliriz, vs.
 
-Bir model icinde kodlama suna benzer,
+Bir model içinde kodlama şuna benzer,
 
 
 ```python
@@ -44,6 +44,27 @@ with pm.Model() as model:
     # 3. Olurluk (Anchored) -> Gozlemlenen verinin, modeli baz alarak, olurlugunu hesapla
     y_obs = pm.Normal("y_obs", mu=mu, sigma=sigma, observed=y_data)
 ```
+
+Problem formülize edildikten sonra PyMC sonsaldan örneklem toplamaya
+başlayabilir. Paket hangi değişkenin örneklemleneceği nasıl bilir?
+Basit, mesela `pm.Normal( .. observed=y_data)` şeklinde tanımlı her
+olasılıksal değişken bir olurluk hesabı demektir, paket `observed`
+kelimesini görünce takip eden veriyi alıp o dağılıma ne kadar muhtemel
+/ olur olduğunu "sorar". Sonuç olurluk (likelihood) hesabıdır. Geri
+kalan her şey örneklenir, üstte görülen `alpha`, `beta` bu kategoriye
+girer, bir onsel tanımları vardır, ama `observed` geçilmemiştir, bu
+değişkenler her döngü adımında örneklenir.
+
+Altta daha geniş, nihai bir örnek görüyoruz. Diyelim ki bir lineer
+regresyon yapmak istiyoruz, $y = \alpha + \beta x$ formülünü veriye
+uyduracağız. Bayes yaklaşımında $\alpha,\beta$ değişkenleri
+olasılıksaldır, ve onsel dağılımları vardır, alttaki örnek için
+
+$$
+\alpha \sim Normal(0, 10), \quad
+\beta \sim Normal(0,5), \quad
+\sigma \sim HalfNormal(5)
+$$
 
 
 ```python
@@ -141,7 +162,7 @@ olurluğu doğrultusunda parametre uzayında adımlar atar. Bu adımların
 her biri `InferenceData` (`idata`) nesnesinin içindeki `posterior`
 veri yapısında saklanır.
 
-Örneklem zinciri tamamlandıktan sonra, parametrelerin adımlarını tek
+Örneklem zinciri tamamlandıktan sonra parametrelerin adımlarını tek
 tek incelemek veya her döngüdeki değerlerine erişmek
 mümkündür. Örneğin ilk zincirdeki (Chain 0) ilk 5 örneklem adımına
 erişmek için:
@@ -169,13 +190,12 @@ Grafik ve özet tablosu incelendiğinde ise:
 * Sentetik Veri Üretim Parametreleri: $\alpha = 2.0$, $\beta = 3.5$,
     $\sigma = 1.2$
 
-* Modelin Bulduğu Sonsal Ortalamalar: $\alpha \approx 1.98$, $\beta
-    \approx 3.36$, $\sigma \approx 1.10$
+* Sonsal Ortalamalar: $\alpha \approx 1.98$, $\beta \approx 3.36$,
+    $\sigma \approx 1.10$
 
-Bayessel yaklaşım sadece nokta tahmini vermekle kalmamış, $\%94$
-Yüksek Yoğunluk Aralığı (**HDI - High Density Interval**) ile gerçek
+Bayessel yaklaşım sadece nokta tahmini vermekle kalmıyor, $\%94$
+Yüksek Yoğunluk Aralığı (HDİ - High Density İnterval) ile gerçek
 parametrelerin hangi aralıkta bulunduğuna dair belirsizliği de
 başarıyla modellemiştir. Metriklerdeki $R_{hat} = 1.0$ değeri ise
-Markov zincirlerinin kusursuz şekilde yakınsadığını (converge
-olduğunu) teyit eder.
+Markov zincirlerinin yakınsadığını (converge) teyit eder.
 

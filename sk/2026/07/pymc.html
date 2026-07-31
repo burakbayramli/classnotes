@@ -110,7 +110,7 @@ olasılıksal olduğu için onlar da olasılıksaldır. Bu temel olasılık
 alanında rasgele değişkenlerin düz formüller ile birleştirilmesine
 benzer. İki Gaussian dağılımı toplayabiliriz, log’unu alıp çarpabiliriz,
 vs.</p>
-<p>Bir model icinde kodlama suna benzer,</p>
+<p>Bir model içinde kodlama şuna benzer,</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -124,6 +124,26 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Olurluk (Anchored) -&gt; Gozlemlenen verinin, modeli baz alarak, olurlugunu hesapla</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Normal(<span class="st">&quot;y_obs&quot;</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_data)</span></code></pre></div>
+<p>Problem formülize edildikten sonra PyMC sonsaldan örneklem toplamaya
+başlayabilir. Paket hangi değişkenin örneklemleneceği nasıl bilir?
+Basit, mesela <code>pm.Normal( .. observed=y_data)</code> şeklinde
+tanımlı her olasılıksal değişken bir olurluk hesabı demektir, paket
+<code>observed</code> kelimesini görünce takip eden veriyi alıp o
+dağılıma ne kadar muhtemel / olur olduğunu “sorar”. Sonuç olurluk
+(likelihood) hesabıdır. Geri kalan her şey örneklenir, üstte görülen
+<code>alpha</code>, <code>beta</code> bu kategoriye girer, bir onsel
+tanımları vardır, ama <code>observed</code> geçilmemiştir, bu
+değişkenler her döngü adımında örneklenir.</p>
+<p>Altta daha geniş, nihai bir örnek görüyoruz. Diyelim ki bir lineer
+regresyon yapmak istiyoruz, <span class="math inline">\(y = \alpha +
+\beta x\)</span> formülünü veriye uyduracağız. Bayes yaklaşımında <span
+class="math inline">\(\alpha,\beta\)</span> değişkenleri olasılıksaldır,
+ve onsel dağılımları vardır, alttaki örnek için</p>
+<p><span class="math display">\[
+\alpha \sim Normal(0, 10), \quad
+\beta \sim Normal(0,5), \quad
+\sigma \sim HalfNormal(5)
+\]</span></p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -211,7 +231,7 @@ algoritma (varsayılan olarak NUTS/HMC) önsel dağılımlardan başlayarak
 verinin olurluğu doğrultusunda parametre uzayında adımlar atar. Bu
 adımların her biri <code>InferenceData</code> (<code>idata</code>)
 nesnesinin içindeki <code>posterior</code> veri yapısında saklanır.</p>
-<p>Örneklem zinciri tamamlandıktan sonra, parametrelerin adımlarını tek
+<p>Örneklem zinciri tamamlandıktan sonra parametrelerin adımlarını tek
 tek incelemek veya her döngüdeki değerlerine erişmek mümkündür. Örneğin
 ilk zincirdeki (Chain 0) ilk 5 örneklem adımına erişmek için:</p>
 <div class="sourceCode" id="cb5"><pre
@@ -233,18 +253,16 @@ Adim 4: alpha = 1.9791, beta = 3.3675</code></pre>
 class="math inline">\(\alpha = 2.0\)</span>, <span
 class="math inline">\(\beta = 3.5\)</span>, <span
 class="math inline">\(\sigma = 1.2\)</span></p></li>
-<li><p>Modelin Bulduğu Sonsal Ortalamalar: <span
-class="math inline">\(\alpha \approx 1.98\)</span>, <span
-class="math inline">\(\beta  \approx 3.36\)</span>, <span
-class="math inline">\(\sigma \approx 1.10\)</span></p></li>
+<li><p>Sonsal Ortalamalar: <span class="math inline">\(\alpha \approx
+1.98\)</span>, <span class="math inline">\(\beta \approx 3.36\)</span>,
+<span class="math inline">\(\sigma \approx 1.10\)</span></p></li>
 </ul>
-<p>Bayessel yaklaşım sadece nokta tahmini vermekle kalmamış, <span
-class="math inline">\(\%94\)</span> Yüksek Yoğunluk Aralığı (<strong>HDI
-- High Density Interval</strong>) ile gerçek parametrelerin hangi
-aralıkta bulunduğuna dair belirsizliği de başarıyla modellemiştir.
-Metriklerdeki <span class="math inline">\(R_{hat} = 1.0\)</span> değeri
-ise Markov zincirlerinin kusursuz şekilde yakınsadığını (converge
-olduğunu) teyit eder.</p>
+<p>Bayessel yaklaşım sadece nokta tahmini vermekle kalmıyor, <span
+class="math inline">\(\%94\)</span> Yüksek Yoğunluk Aralığı (HDİ - High
+Density İnterval) ile gerçek parametrelerin hangi aralıkta bulunduğuna
+dair belirsizliği de başarıyla modellemiştir. Metriklerdeki <span
+class="math inline">\(R_{hat} = 1.0\)</span> değeri ise Markov
+zincirlerinin yakınsadığını (converge) teyit eder.</p>
 <p>
   <a href="..">Yukarı</a>
 </p>
