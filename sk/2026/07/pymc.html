@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+      MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"],
+        ud: ["Macro", "{\\,\\mathrm{d}#1}\\,", 1]
+      });
+    });
+    </script>  
+   
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML-full"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+</div>
+<h1 id="pymc">PyMC</h1>
+<p>Olasılıksal Programlama adı verilen yaklaşımın en iyi örneği PyMC
+paketidir herhalde. Bir Bayessel modelden örneklem toplamak, yani sonsal
+(posterior) dağılımını bulmak için paket kullanmak istemezsek bunu
+Metropolis yöntemi, ya da Gibbs örneklemesi gibi yöntemlerle
+yapabilirdik, her şeyi sıfırdan kendimiz kodlardık. Fakat eğer elimizde
+çetrefil bir model ise, ve/ya da pek çok farklı değişkeni, onların
+ilişkilerini ardı ardına denemek istersek, PyMC gibi “Olasılıksal
+Programcılık” yapmamızı sağlayan kütüphaneleri de kullanmak
+mümkündür.</p>
+<p>Temel olarak PyMC ile yapılan değişkenleri, varsa onların dağılımını
+tanımlamak, veriyi sağlayıp gerisini pakete bırakmaktır.</p>
+<p>PyMC değişkenleri deterministik olabilir, ya da olasılıksal olabilir.
+Bir olasılıksal değişken, şöyle olabilir,</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pm.Normal(<span class="st">&quot;beta&quot;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
+<p>Deterministik değişkenler düz hesaptırlar, olasılıksal ya da diğer
+değişkenleri kullanarak bir hesap yaparlar, tabii ki temelleri
+olasılıksal olduğu için onlar da olasılıksaldır. Bu temel olasılık
+alanında rasgele değişkenlerin düz formüller ile birleştirilmesine
+benzer. İki Gaussian dağılımı toplayabiliriz, log’unu alıp çarpabiliriz,
+vs.</p>
+<p>Bir model icinde kodlama suna benzer,</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> model:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Onseller -&gt; Gozlemlenmiyor, sabit degerleri var</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> pm.Normal(<span class="st">&quot;beta&quot;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma&quot;</span>, sigma<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Deterministik (Direk Hesap) -&gt; Onsellerin fonksiyonu, her adimda guncellenir</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> beta <span class="op">*</span> x_data</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Olurluk (Anchored) -&gt; Gozlemlenen verinin, modeli baz alarak, olurlugunu hesapla</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Normal(<span class="st">&quot;y_obs&quot;</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_data)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Ornek veri yarat</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>true_intercept <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>true_slope <span class="op">=</span> <span class="fl">3.5</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>true_sigma <span class="op">=</span> <span class="fl">1.2</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>x_data <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>, size<span class="op">=</span>N)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> np.random.normal(<span class="dv">0</span>, true_sigma, size<span class="op">=</span>N)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>y_data <span class="op">=</span> true_intercept <span class="op">+</span> true_slope <span class="op">*</span> x_data <span class="op">+</span> noise</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Model tanimla</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> pm.Model() <span class="im">as</span> tutorial_model:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Onseller, baz degerleri sabit hiperparametreler (dagilimlar)</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    alpha <span class="op">=</span> pm.Normal(<span class="st">&quot;alpha&quot;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">10</span>)       <span class="co"># Intercept prior</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    beta <span class="op">=</span> pm.Normal(<span class="st">&quot;beta&quot;</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="dv">10</span>)         <span class="co"># Slope prior</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> pm.HalfNormal(<span class="st">&quot;sigma&quot;</span>, sigma<span class="op">=</span><span class="dv">5</span>)          <span class="co"># Noise scale prior</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Deterministik hesap (her MCMC adiminda hesaplanir)</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Onselleri tahmin edici parametreler ile birlestirip bir lineer tahmin yaratir</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    mu <span class="op">=</span> pm.Deterministic(<span class="st">&quot;mu&quot;</span>, alpha <span class="op">+</span> beta <span class="op">*</span> x_data)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Olurluk, gozlemlenen veri burada dahil edilir, modele gore verinin olurlugu nedir</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    y_obs <span class="op">=</span> pm.Normal(<span class="st">&quot;y_obs&quot;</span>, mu<span class="op">=</span>mu, sigma<span class="op">=</span>sigma, observed<span class="op">=</span>y_data)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> tutorial_model:</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    idata <span class="op">=</span> pm.sample(</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        draws<span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        tune<span class="op">=</span><span class="dv">1000</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        chains<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        return_inferencedata<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        random_seed<span class="op">=</span><span class="dv">42</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        progressbar<span class="op">=</span><span class="va">True</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(az.summary(idata, var_names<span class="op">=</span>[<span class="st">&quot;alpha&quot;</span>, <span class="st">&quot;beta&quot;</span>, <span class="st">&quot;sigma&quot;</span>]))</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>az.plot_posterior(</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    idata,</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    var_names<span class="op">=</span>[<span class="st">&quot;alpha&quot;</span>, <span class="st">&quot;beta&quot;</span>, <span class="st">&quot;sigma&quot;</span>],</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>axes[<span class="dv">0</span>]</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">&quot;Sonsallar (94% HDI)&quot;</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(x_data, y_data, color<span class="op">=</span><span class="st">&quot;black&quot;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&quot;Gozlemlenen Veri&quot;</span>)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>post_alpha <span class="op">=</span> idata.posterior[<span class="st">&quot;alpha&quot;</span>].values.flatten()</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>post_beta <span class="op">=</span> idata.posterior[<span class="st">&quot;beta&quot;</span>].values.flatten()</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>x_plot <span class="op">=</span> np.linspace(x_data.<span class="bu">min</span>(), x_data.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>mean_alpha <span class="op">=</span> post_alpha.mean()</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>mean_beta <span class="op">=</span> post_beta.mean()</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(x_plot, mean_alpha <span class="op">+</span> mean_beta <span class="op">*</span> x_plot, color<span class="op">=</span><span class="st">&quot;firebrick&quot;</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">&quot;Sonsal Ortalama Uyumu&quot;</span>)</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">&quot;X (Tahminci)&quot;</span>)</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">&quot;Y (Sonuc)&quot;</span>)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">&quot;Veriye Uydurulan Model&quot;</span>)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&quot;pymc_01.jpg&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Data successfully generated.
+        mean     sd  hdi_3%  hdi_97%  ...  mcse_sd  ess_bulk  ess_tail  r_hat
+alpha  1.984  0.112   1.771    2.185  ...    0.003    2730.0    1388.0    1.0
+beta   3.363  0.091   3.178    3.526  ...    0.002    3119.0    1368.0    1.0
+sigma  1.101  0.079   0.952    1.253  ...    0.002    2778.0    1354.0    1.0
+
+[3 rows x 9 columns]</code></pre>
+<p><img src="pymc_01.jpg" /></p>
+<p>MCMC Örneklem Değerlerine Erişim ve Sonsal Dağılımın Yorumlanması</p>
+<p>PyMC ile model örneklemesi (<code>pm.sample</code>) tamamlandığında,
+algoritma (varsayılan olarak NUTS/HMC) önsel dağılımlardan başlayarak
+verinin olurluğu doğrultusunda parametre uzayında adımlar atar. Bu
+adımların her biri <code>InferenceData</code> (<code>idata</code>)
+nesnesinin içindeki <code>posterior</code> veri yapısında saklanır.</p>
+<p>Örneklem zinciri tamamlandıktan sonra, parametrelerin adımlarını tek
+tek incelemek veya her döngüdeki değerlerine erişmek mümkündür. Örneğin
+ilk zincirdeki (Chain 0) ilk 5 örneklem adımına erişmek için:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Her parametreye ait örneklem adımlarını ornekleyelim</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>alphas <span class="op">=</span> idata.posterior[<span class="st">&quot;alpha&quot;</span>].values</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> idata.posterior[<span class="st">&quot;beta&quot;</span>].values</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># İlk 5 adımı basalım</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> draw <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Adim </span><span class="sc">{</span>draw<span class="sc">}</span><span class="ss">: alpha = </span><span class="sc">{</span>alphas[<span class="dv">0</span>, draw]<span class="sc">:.4f}</span><span class="ss">, beta = </span><span class="sc">{</span>betas[<span class="dv">0</span>, draw]<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<pre class="text"><code>Adim 0: alpha = 1.8337, beta = 3.2055
+Adim 1: alpha = 1.8564, beta = 3.4190
+Adim 2: alpha = 1.9959, beta = 3.2733
+Adim 3: alpha = 1.9791, beta = 3.3675
+Adim 4: alpha = 1.9791, beta = 3.3675</code></pre>
+<p>Grafik ve özet tablosu incelendiğinde ise:</p>
+<ul>
+<li><p>Sentetik Veri Üretim Parametreleri: <span
+class="math inline">\(\alpha = 2.0\)</span>, <span
+class="math inline">\(\beta = 3.5\)</span>, <span
+class="math inline">\(\sigma = 1.2\)</span></p></li>
+<li><p>Modelin Bulduğu Sonsal Ortalamalar: <span
+class="math inline">\(\alpha \approx 1.98\)</span>, <span
+class="math inline">\(\beta  \approx 3.36\)</span>, <span
+class="math inline">\(\sigma \approx 1.10\)</span></p></li>
+</ul>
+<p>Bayessel yaklaşım sadece nokta tahmini vermekle kalmamış, <span
+class="math inline">\(\%94\)</span> Yüksek Yoğunluk Aralığı (<strong>HDI
+- High Density Interval</strong>) ile gerçek parametrelerin hangi
+aralıkta bulunduğuna dair belirsizliği de başarıyla modellemiştir.
+Metriklerdeki <span class="math inline">\(R_{hat} = 1.0\)</span> değeri
+ise Markov zincirlerinin kusursuz şekilde yakınsadığını (converge
+olduğunu) teyit eder.</p>
+<p>
+  <a href="..">Yukarı</a>
+</p>
+</body>
+</html>
