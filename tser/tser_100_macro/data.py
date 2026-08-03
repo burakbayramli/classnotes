@@ -3,17 +3,13 @@ import numpy as np
 import pandas as pd
 import pandas_datareader.data as web
 
-# -----------------------------------------------------------------------------
-# 1. Fetch FRED Macro Series
-# -----------------------------------------------------------------------------
-def fetch_fred_data(start_year=1990):
+def fetch_and_prepare_quarterly_data(start_year=1990):
     today = datetime.datetime.now()
     start = datetime.datetime(start_year, 1, 1)
     end = datetime.datetime(today.year, today.month, today.day)
     
     cols = [
         "ARGBCAGDPBP6",       # Balance of Payments (BOP % GDP)
-        "ARGCPALTT01GPM",     # CPI Index (Monthly CPI)
         "CRDQARBPUBIS",       # Domestic Credit
         "MKTGDPARA646NWDB",   # Nominal GDP
         "RBARBIS",            # Real Effective Exchange Rate (XCH)
@@ -22,73 +18,50 @@ def fetch_fred_data(start_year=1990):
         "SLUEM1524ZSARG"      # Unemployment Rate
     ]
     
+    print("Fetching FRED macroeconomic data...")
     df = web.DataReader(cols, 'fred', start, end)
-    df.columns = ["bop", "cpi", "domcred", "gdp", "xch", "govdebt", "m2", "unemploy"]
-    return df
+    df.columns = ["bop", "domcred", "gdp", "xch", "govdebt", "m2", "unemploy"]
+    df = df[df.index <= '2025-12-31'].copy()
 
-print("Fetching FRED macroeconomic data...")
-df = fetch_fred_data(1990)
+    # Load External Annual Interest Rates & forward fill
+    print("Loading interest rate dataset (arg_real_ir.csv)...")
+    df_ir = pd.read_csv('arg_real_ir.csv')
+    df['real_ir_anchor'] = np.nan
+    for _, row in df_ir.iterrows():
+        yr = int(row['year'])
+        anchor_date = f"{yr}-07-01"
+        if anchor_date in df.index:
+            df.loc[anchor_date, 'real_ir_anchor'] = row['real_ir']
 
-# Filter out future projection ramps (cap at end of 2025)
-df = df[df.index <= '2025-12-31'].copy()
+    df['real_ir'] = df['real_ir_anchor'].ffill().bfill()
+    #df = df.interpolate(method='polynomial', order=4)
+    df = df.interpolate(method='cubic', order=4)
 
-# -----------------------------------------------------------------------------
-# 2. Load External Interest Rates & Anchor Annual Series
-# -----------------------------------------------------------------------------
-print("Loading external interest rate dataset (arg_real_ir.csv)...")
+    # Resample to Quarterly Frequency
+    df_q = df.resample('Q').mean()
 
-# Load Annual Interest Rates (arg_real_ir.csv containing 'year' and 'real_ir')
-df_ir = pd.read_csv('arg_real_ir.csv')
+    # Load Annual Inflation and linearly interpolate across quarterly index
+    print("Loading arg_inf.csv and linearly interpolating quarterly inflation...")
+    df_inf = pd.read_csv('arg_inf.csv', header=None, names=['year', 'inf_rate'])
+    df_inf['date'] = pd.to_datetime(df_inf['year'].astype(str) + '-12-31')
+    df_inf = df_inf.set_index('date')
+    
+    df_q['inf_rate'] = df_inf['inf_rate'].reindex(df_q.index).interpolate(method='linear').bfill().ffill()
 
-# Initialize empty NaN column in the monthly dataframe for interest rate anchor
-df['real_ir_anchor'] = np.nan
+    # Quarterly Transformations (% change & first differences)
+    print("Calculating quarterly transformations...")
+    df_q['m2_diff']  = np.log(df_q['m2'] / df_q['m2'].shift(1)) * 100.0
+    df_q['xch_diff'] = -np.log(df_q['xch'] / df_q['xch'].shift(1)) * 100.0  # Depreciation rate
+    df_q['bop_diff'] = df_q['bop'].diff()
+    df_q['ir_diff']  = df_q['real_ir'].diff()
+    df_q['inf_diff'] = df_q['inf_rate']
 
-# Place anchor points on July 1st (mid-year point) for annual observations
-for _, row in df_ir.iterrows():
-    yr = int(row['year'])
-    anchor_date = f"{yr}-07-01"
-    if anchor_date in df.index:
-        df.loc[anchor_date, 'real_ir_anchor'] = row['real_ir']
+    # Clean NAs
+    export_cols = ['bop_diff', 'xch_diff', 'ir_diff', 'inf_diff', 'm2_diff']
+    df_clean = df_q[export_cols].dropna().copy()
+    return df_clean
 
-# Smooth linear interpolation for interest rates
-df['real_ir'] = df['real_ir_anchor'].interpolate(method='linear')
-
-# Interpolate missing values in monthly/quarterly FRED series (e.g. bop, xch, govdebt)
-df_interp = df.interpolate(method='linear')
-
-# -----------------------------------------------------------------------------
-# 3. Dynamic High-Frequency Derived Metrics
-# -----------------------------------------------------------------------------
-print("Calculating monthly CPI growth and exchange rate depreciation...")
-
-# True Monthly Inflation Rate (Percentage Log-Change of CPI Index)
-df_interp['inflation'] = np.log(df_interp['cpi'] / df_interp['cpi'].shift(1)) * 100.0
-
-# Exchange Rate Depreciation (Log-Change of REER): Positive value = Peso weakening
-df_interp['xch_deprec'] = -np.log(df_interp['xch'] / df_interp['xch'].shift(1)) * 100.0
-
-# Fiscal Deficit definition (negative net lending/borrowing balance)
-df_interp['deficit'] = -df_interp['govdebt']
-
-# GDP Growth (% YoY)
-df_interp['growth'] = (df_interp['gdp'] - df_interp['gdp'].shift(12)) / df_interp['gdp'].shift(12) * 100.0
-
-# -----------------------------------------------------------------------------
-# 4. Clean & Export Final Dataset
-# -----------------------------------------------------------------------------
-# Drop initial NaN rows created by lag/shift operations and CPI coverage limits
-df_clean = df_interp.dropna(subset=['bop', 'xch_deprec', 'real_ir', 'inflation']).copy()
-
-# Keep relevant columns for exporting
-export_cols = ['bop', 'xch', 'xch_deprec', 'real_ir', 'inflation', 'deficit', 'm2', 'growth', 'unemploy']
-df_clean = df_clean[export_cols]
-
-print("\n--- Pipeline Summary ---")
-print(f"Dataset start date : {df_clean.index.min().strftime('%Y-%m-%d')}")
-print(f"Dataset end date   : {df_clean.index.max().strftime('%Y-%m-%d')}")
-print(f"Total observations : {len(df_clean)} months")
-print("\nFirst 5 rows preview:")
-print(df_clean[['bop', 'xch_deprec', 'real_ir', 'inflation']].head())
-
-# Save clean dataset for PyMC MCMC sampling
-df_clean.to_csv('arg_final.csv')
+if __name__ == "__main__":
+    df_clean = fetch_and_prepare_quarterly_data()
+    df_clean.to_csv('arg_quarterly_final.csv')
+    print("Quarterly dataset exported to 'arg_quarterly_final.csv'.")

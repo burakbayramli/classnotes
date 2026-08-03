@@ -18,171 +18,157 @@ veri üzerinden simülasyon yapabiliriz. Bayes yaklaşımı bize bilinmeyen
 değişkenlere, onlara özel, bir dağılım tipi atamamızı sağlar, ve önsel
 dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.
 
-Önsel Dağılımlar
+Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags)
 
-$$
-\alpha_i \sim \mathcal{N}(0, 1^2) \quad \text{ki } i \in \{\text{xch}, \text{ir}, \text{inf}\}
-$$
+Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
+nedensellik ilişkilerini incelemek amacıyla $k=3$ aylık gecikmeli bir
+Bayes VAR (BVAR) modeli kurulmuştur. Veriler logaritmik farklar ($\%$)
+ve birinci derece farklar ($\Delta$) üzerinden durağanlaştırılmıştır.
 
-$$
-\gamma_{\text{path}} \sim \mathcal{N}(0, 1^2)
-$$
+Denklemler
 
-$$
-\beta_i \sim \mathcal{N}(0.5, 0.5^2) \quad \text{1-gecikmeli kendisiyle regresyon terimleri}
-$$
+$$a_i \sim \mathcal{N}(\mu = 0, \sigma^2 = 5^2), \quad i \in \{\text{xch}, \text{ir}, \text{inf}\}$$
 
-$$
-\sigma_i \sim \text{Half-Normal}(\sigma = 1) \quad \text{yapısal hata ölçeği}
-$$
+$$\sigma_i \sim \text{Half-Normal}(\sigma = 10), \quad i \in \{\text{xch}, \text{ir}, \text{inf}\}$$
 
-Olurluk Fonksiyonları (Gaussian Olurlukları)
+$$\gamma_{\text{bop} \to \text{xch}} \sim \mathcal{N}(0, 2^2), \quad \gamma_{\text{m2} \to \text{xch}} \sim \mathcal{N}(0, 2^2)$$
 
-$$
-\text{Exch}_t \sim \mathcal{N}\left(\alpha_1 +
-\gamma_{\text{bop}\rightarrow\text{xch}} \cdot \text{BOP}_{t-1} +
-\beta_1 \text{Exch}_{t-1}, \, \sigma_{\text{xch}}^2\right)
-$$
+$$\gamma_{\text{bop} \to \text{ir}} \sim \mathcal{N}(0, 2^2), \quad \gamma_{\text{xch} \to \text{ir}} \sim \mathcal{N}(0, 2^2)$$
 
-$$
-\text{IR}_t \sim \mathcal{N}\left(\alpha_2 +
-\gamma_{\text{bop}\rightarrow\text{ir}} \cdot \text{BOP}_t +
-\gamma_{\text{xch}\rightarrow\text{ir}} \cdot \text{Exch}_t +
-\beta_2 \text{IR}_{t-1}, \, \sigma_{\text{ir}}^2\right)
-$$
+$$\gamma_{\tt{xch\_lag} \to \text{inf}} \sim \mathcal{N}(0, 2^2), \quad \gamma_{\text{m2} \to \text{inf}} \sim \mathcal{N}(0, 2^2), \quad \gamma_{\text{ir} \to \text{inf}} \sim \mathcal{N}(0, 2^2)$$
 
-$$
-\text{Inf}_t \sim \mathcal{N}\left(\alpha_3 +
-\gamma_{\text{xch}\rightarrow\text{inf}} \cdot \text{Exch}_t +
-\gamma_{\text{ir}\rightarrow\text{inf}} \cdot \text{IR}_t + \beta_3
-\text{Inf}_{t-1}, \, \sigma_{\text{inf}}^2\right)
-$$
+$$\gamma_{\tt{xch\_contemp} \to \text{inf}} \sim \mathcal{N}(0, 2^2)$$
 
-Birleşik Sonsal
+$$\beta_{\text{xch}} \sim \mathcal{N}(0, 1^2), \quad \beta_{\text{ir}} \sim \mathcal{N}(0, 1^2), \quad \beta_{\text{inf}} \sim \mathcal{N}(0, 1^2)$$
 
-Bayes Kuralını kullanarak örneklem alınan birleşik sonsal,
+Olurluk Fonksiyonları
 
-$$p(\boldsymbol{\alpha}, \boldsymbol{\gamma}, \boldsymbol{\beta},
-\boldsymbol{\sigma} \mid \mathbf{Y}) \propto \left[ \prod_{t=1}^T
-p(\text{Exch}_t \mid \cdot) \cdot p(\text{IR}_t \mid \cdot) \cdot
-p(\text{Inf}_t \mid \cdot) \right] \cdot p(\boldsymbol{\alpha})
-p(\boldsymbol{\gamma}) p(\boldsymbol{\beta}) p(\boldsymbol{\sigma})$$
+$$XCH_t \sim \mathcal{N}\left(a_{\text{xch}} + \gamma_{\text{bop} \to \text{xch}} BOP_{t-1} + \gamma_{\text{m2} \to \text{xch}} M2_{t-1} + \beta_{\text{xch}} XCH_{t-1}, \; \sigma^2_{\text{xch}}\right)$$
 
-Because each structural equation conditioned on its DAG parents is
-independent in its error term $\epsilon_{i,t}$, the joint likelihood
-factors neatly into the product of these Gaussian univariate
-likelihoods.
+$$IR_t \sim \mathcal{N}\left(a_{\text{ir}} + \gamma_{\text{bop} \to \text{ir}} BOP_{t-1} + \gamma_{\text{xch} \to \text{ir}} XCH_{t-1} + \beta_{\text{ir}} IR_{t-1}, \; \sigma^2_{\text{ir}}\right)$$
+
+$$\text{Inf}_t \sim \mathcal{N}\left(a_{\text{inf}} + \mathbf{\gamma_{\tt{xch\_contemp} \to \text{inf}} XCH_t} + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} + \gamma_{\text{m2} \to \text{inf}} M2_{t-1} + \gamma_{\text{ir} \to \text{inf}} IR_{t-1} + \beta_{\text{inf}} \text{Inf}_{t-1}, \; \sigma^2_{\text{inf}}\right)$$
+
+Kümülatif ve Dolaylı Etkiler
+
+
+$$\Gamma_{\text{xch} \to \text{inf}} = \gamma_{\tt{xch\_contemp} \to \text{inf}} + \gamma_{\tt{xch\_lag} \to \text{inf}}$$
+
+$$\tt{m2\_indirect\_effect} = \gamma_{\text{m2} \to \text{xch}} \times \Gamma_{\text{xch} \to \text{inf}}$$
+
+$$\tt{m2\_total\_effect} = \tt{m2\_indirect\_effect} + \gamma_{\text{m2} \to \text{inf}}$$
+
+Birleşik Sonsal Dağılım
+
+$$p(\mathbf{\Theta} \mid \mathbf{Y}) \propto \left[ \prod_{t=2}^{T} p(XCH_t \mid \mathbf{Y}_{t-1}, \mathbf{\Theta}) \cdot p(IR_t \mid \mathbf{Y}_{t-1}, \mathbf{\Theta}) \cdot p(\text{Inf}_t \mid XCH_t, \mathbf{Y}_{t-1}, \mathbf{\Theta}) \right] \cdot p(a) \, p(\gamma) \, p(\beta) \, p(\sigma)$$
+
+
+Not: DAG yapısı gereği her bir yapısal denklem kendi koşullu
+ebeveynleri verildiğinde bağımsız hata terimlerine ($\epsilon_{i,t}$)
+sahip olduğundan, birleşik olurluk fonksiyonu tek değişkenli Normal
+olurlukların çarpımı şeklinde ayrışır.
+
 
 ```python
-import pymc as pm
-import numpy as np
 import pandas as pd
+import pymc as pm
 import arviz as az
-import matplotlib.pyplot as plt
 
-# -----------------------------------------------------------------------------
-# 1. Load Data & Merge Datasets
-# -----------------------------------------------------------------------------
-df_clean = pd.read_csv('arg_final.csv', index_col=0, parse_dates=True)
+df_clean = pd.read_csv('arg_quarterly_final.csv', index_col=0, parse_dates=True)
 
-# Standardize series for MCMC numerical stability
-def standardize(series):
-    return (series - series.mean()) / series.std()
+# Lags alignment (1-lag for quarterly structural dynamics)
+max_lag = 1
+N = len(df_clean) - max_lag
 
-df_clean['bop_z']        = standardize(df_clean['bop'])
-df_clean['xch_deprec_z'] = standardize(df_clean['xch_deprec'])
-df_clean['ir_z']         = standardize(df_clean['real_ir'])
-df_clean['inf_z']        = standardize(df_clean['inflation'])
+# Dependent variables at time t (t = max_lag .. T-1)
+xch_t = df_clean['xch_diff'].values[max_lag:]
+ir_t  = df_clean['ir_diff'].values[max_lag:]
+inf_t = df_clean['inf_diff'].values[max_lag:]
 
-# -----------------------------------------------------------------------------
-# 2. Prepare Lagged Arrays for Structural System
-# -----------------------------------------------------------------------------
-bop_t  = df_clean['bop_z'].values[1:]
-bop_l1 = df_clean['bop_z'].values[:-1]
+# Contemporaneous exchange rate at time t
+xch_contemp = df_clean['xch_diff'].values[max_lag:]
 
-xch_t  = df_clean['xch_deprec_z'].values[1:]
-xch_l1 = df_clean['xch_deprec_z'].values[:-1]
+# Lags at time t-1
+m2_lag1  = df_clean['m2_diff'].shift(1).values[max_lag:]
+bop_lag1 = df_clean['bop_diff'].shift(1).values[max_lag:]
+xch_lag1 = df_clean['xch_diff'].shift(1).values[max_lag:]
+inf_lag1 = df_clean['inf_diff'].shift(1).values[max_lag:]
+ir_lag1  = df_clean['ir_diff'].shift(1).values[max_lag:]
 
-ir_t   = df_clean['ir_z'].values[1:]
-ir_l1  = df_clean['ir_z'].values[:-1]
-
-inf_t  = df_clean['inf_z'].values[1:]
-inf_l1 = df_clean['inf_z'].values[:-1]
-
-# -----------------------------------------------------------------------------
-# 3. Structural Causal Model Specification (PyMC)
-# -----------------------------------------------------------------------------
-with pm.Model() as macro_feedback_dag:
+with pm.Model() as model:
     
-    # Intercepts
-    a_xch = pm.Normal("a_xch", mu=0, sigma=1)
-    a_ir  = pm.Normal("a_ir",  mu=0, sigma=1)
-    a_inf = pm.Normal("a_inf", mu=0, sigma=1)
+    # Intercepts & Standard Deviations
+    a_xch = pm.Normal("a_xch", mu=0, sigma=5)
+    a_ir  = pm.Normal("a_ir",  mu=0, sigma=5)
+    a_inf = pm.Normal("a_inf", mu=0, sigma=5)
     
-    # Standard Deviations
-    sigma_xch = pm.HalfNormal("sigma_xch", sigma=1)
-    sigma_ir  = pm.HalfNormal("sigma_ir",  sigma=1)
-    sigma_inf = pm.HalfNormal("sigma_inf", sigma=1)
+    sigma_xch = pm.HalfNormal("sigma_xch", sigma=10)
+    sigma_ir  = pm.HalfNormal("sigma_ir",  sigma=10)
+    sigma_inf = pm.HalfNormal("sigma_inf", sigma=10)
     
-    # --- Causal Path Coefficients ---
-    # Path 1: BOP Deficit -> Exchange Rate Depreciation
-    gamma_bop_to_xch = pm.Normal("gamma_bop_to_xch", mu=0, sigma=1)
+    # Coefficients: Exchange Rate Equation
+    gamma_bop_to_xch = pm.Normal("gamma_bop_to_xch", mu=0, sigma=2)
+    gamma_m2_to_xch  = pm.Normal("gamma_m2_to_xch",  mu=0, sigma=2)
+    beta_xch         = pm.Normal("beta_xch",         mu=0, sigma=1)
     
-    # Path 2: BOP Deficit & Depreciation -> Central Bank Interest Rate Hike
-    gamma_bop_to_ir  = pm.Normal("gamma_bop_to_ir", mu=0, sigma=1)
-    gamma_xch_to_ir  = pm.Normal("gamma_xch_to_ir", mu=0, sigma=1)
-    
-    # Path 3: Exchange Rate Depreciation & Interest Rates -> Inflation
-    gamma_xch_to_inf = pm.Normal("gamma_xch_to_inf", mu=0, sigma=1)
-    gamma_ir_to_inf  = pm.Normal("gamma_ir_to_inf", mu=0, sigma=1)
-    
-    # Autoregressive Lag Coefficients
-    beta_xch = pm.Normal("beta_xch", mu=0.5, sigma=0.5)
-    beta_ir  = pm.Normal("beta_ir",  mu=0.5, sigma=0.5)
-    beta_inf = pm.Normal("beta_inf", mu=0.5, sigma=0.5)
-    
-    # --- Equation 1: Exchange Rate Depreciation ---
-    # Tests if a BOP deficit (negative bop_z) drives FX depreciation
-    mu_xch = a_xch + gamma_bop_to_xch * bop_l1 + beta_xch * xch_l1
+    # Coefficients: Interest Rate Equation
+    gamma_bop_to_ir  = pm.Normal("gamma_bop_to_ir", mu=0, sigma=2)
+    gamma_xch_to_ir  = pm.Normal("gamma_xch_to_ir", mu=0, sigma=2)
+    beta_ir          = pm.Normal("beta_ir",         mu=0, sigma=1)
+
+    # Coefficients: Inflation Equation (Contemporaneous xch_t + Lagged dynamics)
+    gamma_xch_contemp_to_inf = pm.Normal("gamma_xch_contemp_to_inf", mu=0, sigma=2)
+    gamma_xch_lag_to_inf     = pm.Normal("gamma_xch_lag_to_inf",     mu=0, sigma=2)
+    gamma_m2_to_inf          = pm.Normal("gamma_m2_to_inf",          mu=0, sigma=2)
+    gamma_ir_to_inf          = pm.Normal("gamma_ir_to_inf",          mu=0, sigma=2)
+    beta_inf                 = pm.Normal("beta_inf",                 mu=0, sigma=1)
+
+    # Equations
+    mu_xch = a_xch + gamma_bop_to_xch * bop_lag1 + gamma_m2_to_xch * m2_lag1 + beta_xch * xch_lag1
     obs_xch = pm.Normal("obs_xch", mu=mu_xch, sigma=sigma_xch, observed=xch_t)
     
-    # --- Equation 2: Policy Interest Rate Reaction Function ---
-    # Tests if Central Bank hikes interest rates in response to BOP pressure & FX drops
-    mu_ir = a_ir + gamma_bop_to_ir * bop_t + gamma_xch_to_ir * xch_t + beta_ir * ir_l1
+    mu_ir = a_ir + gamma_bop_to_ir * bop_lag1 + gamma_xch_to_ir * xch_lag1 + beta_ir * ir_lag1
     obs_ir = pm.Normal("obs_ir", mu=mu_ir, sigma=sigma_ir, observed=ir_t)
     
-    # --- Equation 3: Exchange Rate Pass-Through to Inflation ---
-    # Tests if currency drops directly trigger inflation bursts
-    mu_inf = a_inf + gamma_xch_to_inf * xch_t + gamma_ir_to_inf * ir_t + beta_inf * inf_l1
+    # INF equation uses CONTEMPORANEOUS xch_t + Lagged XCH
+    mu_inf = (a_inf 
+              + gamma_xch_contemp_to_inf * xch_contemp 
+              + gamma_xch_lag_to_inf * xch_lag1 
+              + gamma_m2_to_inf * m2_lag1 
+              + gamma_ir_to_inf * ir_lag1 
+              + beta_inf * inf_lag1)
     obs_inf = pm.Normal("obs_inf", mu=mu_inf, sigma=sigma_inf, observed=inf_t)
     
-    # --- Indirect Mediated Chain: BOP -> Interest Rate Reaction ---
-    bop_ir_reaction = pm.Deterministic("bop_to_ir_reaction", gamma_bop_to_ir)
-    
-    # -------------------------------------------------------------------------
-    # 4. MCMC Sampling
-    # -------------------------------------------------------------------------
-    
-    trace_feedback = pm.sample(draws=1000, tune=1000, chains=2,
-                               return_inferencedata=True,
-			       progressbar=False)
+    # Aggregated Deterministics
+    total_xch_to_inf   = pm.Deterministic("total_xch_to_inf", gamma_xch_contemp_to_inf + gamma_xch_lag_to_inf)
+    m2_indirect_effect = pm.Deterministic("m2_indirect_effect", gamma_m2_to_xch * total_xch_to_inf)
+    m2_total_effect    = pm.Deterministic("m2_total_effect", m2_indirect_effect + gamma_m2_to_inf)
 
-# -----------------------------------------------------------------------------
-# 5. Visualizing Posteriors
-# -----------------------------------------------------------------------------
+    # Sampling
+    trace = pm.sample(
+        draws=1000, 
+        tune=1000, 
+        chains=2, 
+        target_accept=0.9,
+        return_inferencedata=True, 
+        progressbar=False
+    )
+
 az.plot_posterior(
-    trace_feedback, 
+    trace, 
     var_names=[
-        "gamma_bop_to_xch", 
-        "gamma_bop_to_ir", 
-        "gamma_xch_to_ir", 
-        "gamma_xch_to_inf",
-        "gamma_ir_to_inf"
+        "gamma_bop_to_xch",
+        "gamma_m2_to_xch",
+        "gamma_bop_to_ir",
+        "gamma_xch_to_ir",
+        "gamma_xch_contemp_to_inf",
+        "total_xch_to_inf",
+        "gamma_m2_to_inf",
+        "m2_total_effect"
     ],
-    figsize=(10,6)
+    figsize=(14, 12)
 )
 plt.tight_layout()
-
 plt.savefig('dag_results.jpg')
 ```
 

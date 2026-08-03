@@ -170,14 +170,12 @@ sigma  1.101  0.079   0.952    1.253  ...    0.002    2778.0    1354.0    1.0
 
 MCMC Örneklem Değerlerine Erişim ve Sonsal Dağılımın Yorumlanması
 
-PyMC ile model örneklemesi (`pm.sample`) tamamlandığında, algoritma
-(mesela NUTS/HMC) önsel dağılımlardan başlayarak verinin olurluğu
-doğrultusunda parametre uzayında adımlar atar. Bu adımların her biri
-`InferenceData` (`idata`) nesnesinin içindeki `posterior` veri
-yapısında saklanır.
-
-Örneklem zinciri tamamlandıktan sonra parametrelerin adımlarını tek
-tek incelemek veya her döngüdeki değerlerine erişmek
+PyMC ile model örneklemesi `pm.sample` (arka planda mesela NUTS/HMC)
+önsel dağılımlardan başlayarak verinin olurluğu doğrultusunda
+parametre uzayında adımlar atar. Bu adımların her biri `InferenceData`
+(`idata`) nesnesinin içindeki `posterior` veri yapısında
+saklanır. Örneklem zinciri tamamlandıktan sonra parametrelerin
+adımlarını tek tek incelemek veya her döngüdeki değerlerine erişmek
 mümkündür. Örneğin ilk zincirdeki (Chain 0) ilk 5 örneklem adımına
 erişmek için:
 
@@ -212,7 +210,7 @@ değişkenler için aynı şekilde. Grafik ve özet tablosu incelendiğinde,
 
 Bayessel yaklaşım sadece nokta tahmini vermekle kalmıyor, elimizde bir
 örneklem zinciri olduğu için bu veri üzerinden $\%94$ Yüksek Yoğunluk
-Aralığı (HDI - High Density İnterval) ile gerçek parametrelerin hangi
+Aralığı (HDI - High Density Interval) ile gerçek parametrelerin hangi
 aralıkta bulunduğuna dair belirsizliği de başarıyla ortaya
 çıkartıyor. $R_{hat} = 1.0$ değeri ise Markov zincirlerinin
 yakınsadığını (converge) teyit eder.
