@@ -8,9 +8,9 @@ diğerinde değişime *sebep* olur (tam tersi doğru olmayabilir).
 
 Klasik istatistik yöntemlerden Granger istatiği nedensellik (causal)
 sorularına cevap verebilir. Çok boyutlu zaman serileri için kendisiyle
-regresyon olan bir sistemi VAR (vector autoregression) ile analiz
-edebiliriz. Fakat her iki yaklaşımda da problemi bir şablona sokmak
-gerekecek.
+regresyon olan bir sistemi vektör otoregresyon (vector autoregression,
+VAR) ile analiz edebiliriz. Fakat her iki yaklaşımda da problemi bir
+şablona sokmak gerekecek.
 
 Bayes, ve Olasılıksal Programlama teknikleri ile istediğimiz her türlü
 ilişkiyi ileri yönde kodlayıp, bilinmeyen değişkenleri bulmak için
@@ -21,9 +21,10 @@ dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.
 Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags)
 
 Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
-nedensellik ilişkilerini incelemek amacıyla $k=3$ aylık gecikmeli bir
-Bayes VAR (BVAR) modeli kurulmuştur. Veriler logaritmik farklar ($\%$)
-ve birinci derece farklar ($\Delta$) üzerinden durağanlaştırılmıştır.
+nedensellik ilişkilerini incelemek amacıyla gecikmeli (lagged) bir
+Bayes VAR (BVAR) modeli kurulmuştur [3]. Veriler logaritmik farklar
+($\%$), birinci derece farklar ($\Delta$) ve yüzde değişimler
+üzerinden durağanlaştırılmıştır.
 
 Denklemler
 
@@ -356,6 +357,9 @@ Kaynaklar
 
 [2] Marginal Revolution University, *Causes of Inflation*, 
     [https://youtu.be/gi7jx5IJtik](https://youtu.be/gi7jx5IJtik)
+
+[3] Koop, G., & Korobilis, D. (2010). *Bayesian Multivariate Time
+    Series Methods for Empirical Macroeconomics*
 
 [4] Marginal Revolution University, *Why Governments Create Inflation*, 
     [https://youtu.be/E6A_WpUY2LI](https://youtu.be/E6A_WpUY2LI)
