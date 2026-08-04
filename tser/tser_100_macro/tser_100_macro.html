@@ -105,12 +105,14 @@ türlü ilişkiyi ileri yönde kodlayıp, bilinmeyen değişkenleri bulmak için
 veri üzerinden simülasyon yapabiliriz. Bayes yaklaşımı bize bilinmeyen
 değişkenlere, onlara özel, bir dağılım tipi atamamızı sağlar, ve önsel
 dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.</p>
-<p>Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed
-Lags)</p>
-<p>Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
+<h3 id="seçilmiş-değişkenler-ile-pymc">Seçilmiş Değişkenler ile
+PyMC</h3>
+<p>Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags):
+Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
 nedensellik ilişkilerini incelemek amacıyla gecikmeli (lagged) bir Bayes
-VAR (BVAR) modeli kurulmuştur [3]. Veriler logaritmik farklar (<span
-class="math inline">\(\%\)</span>), birinci derece farklar (<span
+VAR (BVAR) modeli kurulmuştur [3], ve seçili değişkenler arasındaki
+ilişki direk formüller ile yapılmıştır. Veriler logaritmik farklar
+(<span class="math inline">\(\%\)</span>), birinci derece farklar (<span
 class="math inline">\(\Delta\)</span>) ve yüzde değişimler üzerinden
 durağanlaştırılmıştır.</p>
 <p>Denklemler</p>
@@ -272,7 +274,28 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;dag_results.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="dag_results.jpg" /></p>
-<p>Paranın Miktar Teorisi (Quantity Theory of Money)</p>
+<h3 id="bvar">BVAR</h3>
+<p>Degiskenlerin kendisi ve digerleri arasindaki istenen oranda geriye
+dogru bakan bir analizi eger genel bir sekilde (her degiskenin her diger
+degisken ile) yaklasmak istesek bunu klasik BVAR yaklasimi ile
+yapabilirdik [6].</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lesage</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;arg_quarterly_final.csv&#39;</span>, index_col<span class="op">=</span><span class="dv">0</span>, parse_dates<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>var_names <span class="op">=</span> [<span class="st">&#39;xch_diff&#39;</span>, <span class="st">&#39;ir_diff&#39;</span>, <span class="st">&#39;inf_diff&#39;</span>, <span class="st">&#39;m2_diff&#39;</span>, <span class="st">&#39;bop_diff&#39;</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df_macro <span class="op">=</span> df[var_names].dropna()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_macro.values</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>nlag <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>tight <span class="op">=</span> <span class="fl">0.3</span>     <span class="co"># Overall tightness</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>weight <span class="op">=</span> <span class="fl">0.5</span>    <span class="co"># Cross-variable tightness</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>decay <span class="op">=</span> <span class="fl">1.0</span>     <span class="co"># Lag decay</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> lesage.bvar(y, nlag<span class="op">=</span>nlag, tight<span class="op">=</span>tight, weight<span class="op">=</span>weight, decay<span class="op">=</span>decay, vnames<span class="op">=</span>var_names)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>lesage.write_results(results,<span class="st">&quot;bvar1.txt&quot;</span>)</span></code></pre></div>
+<p>Sonuçlar <code>bvar1.txt</code> içinde.</p>
+<h3 id="paranın-miktar-teorisi-quantity-theory-of-money">Paranın Miktar
+Teorisi (Quantity Theory of Money)</h3>
 <p>Bir liranın günlük hayat içinde dolaşımını düşünelim. Ben gidiyorum
 mesela köşe başındaki satıcıdan bir poğaça alıyorum. Bu satıcı lirayı
 kızına veriyor, kızı da onu lunaparkta ata binmek için kullanıyor. Atı
@@ -437,7 +460,7 @@ verdiği’’ doğru değildir. Bankaların borç vermek mevduata ihtiyacı
 yoktur, parayı basar ve verir [5].</p>
 <p>[devam edecek]</p>
 <p>Kodlar</p>
-<p><a href="data.py">data.py</a></p>
+<p><a href="data.py">data.py</a>, <a href="lesage.py">lesage.py</a></p>
 <p>Kaynaklar</p>
 <p>[1] Marginal Revolution University, <em>Quantity Theory of
 Money</em>, <a
@@ -451,6 +474,7 @@ Inflation</em>, <a
 href="https://youtu.be/E6A_WpUY2LI">https://youtu.be/E6A_WpUY2LI</a></p>
 <p>[5] <em>Money as Debt</em>, <a
 href="https://www.youtube.com/watch?v=2nBPN-MKefA">https://www.youtube.com/watch?v=2nBPN-MKefA</a></p>
+<p>[6] LeSage, <em>Econometrics Using Matlab</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

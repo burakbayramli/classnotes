@@ -18,12 +18,14 @@ veri üzerinden simülasyon yapabiliriz. Bayes yaklaşımı bize bilinmeyen
 değişkenlere, onlara özel, bir dağılım tipi atamamızı sağlar, ve önsel
 dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.
 
-Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags)
+### Seçilmiş Değişkenler ile PyMC
 
+Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags):
 Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
 nedensellik ilişkilerini incelemek amacıyla gecikmeli (lagged) bir
-Bayes VAR (BVAR) modeli kurulmuştur [3]. Veriler logaritmik farklar
-($\%$), birinci derece farklar ($\Delta$) ve yüzde değişimler
+Bayes VAR (BVAR) modeli kurulmuştur [3], ve seçili değişkenler
+arasındaki ilişki direk formüller ile yapılmıştır. Veriler logaritmik
+farklar ($\%$), birinci derece farklar ($\Delta$) ve yüzde değişimler
 üzerinden durağanlaştırılmıştır.
 
 Denklemler
@@ -175,7 +177,32 @@ plt.savefig('dag_results.jpg')
 
 ![](dag_results.jpg)
 
-Paranın Miktar Teorisi (Quantity Theory of Money) 
+### BVAR
+
+Degiskenlerin kendisi ve digerleri arasindaki istenen oranda geriye
+dogru bakan bir analizi eger genel bir sekilde (her degiskenin her
+diger degisken ile) yaklasmak istesek bunu klasik BVAR yaklasimi ile
+yapabilirdik [6]. 
+
+```python
+import pandas as pd
+import lesage
+df = pd.read_csv('arg_quarterly_final.csv', index_col=0, parse_dates=True)
+var_names = ['xch_diff', 'ir_diff', 'inf_diff', 'm2_diff', 'bop_diff']
+df_macro = df[var_names].dropna()
+y = df_macro.values
+nlag = 2
+tight = 0.3     # Overall tightness
+weight = 0.5    # Cross-variable tightness
+decay = 1.0     # Lag decay
+
+results = lesage.bvar(y, nlag=nlag, tight=tight, weight=weight, decay=decay, vnames=var_names)
+lesage.write_results(results,"bvar1.txt")
+```
+
+Sonuçlar `bvar1.txt` içinde.
+
+### Paranın Miktar Teorisi (Quantity Theory of Money) 
 
 Bir liranın günlük hayat içinde dolaşımını düşünelim. Ben gidiyorum mesela
 köşe başındaki satıcıdan bir poğaça alıyorum. Bu satıcı lirayı kızına
@@ -348,7 +375,7 @@ verir [5].
 
 Kodlar
 
-[data.py](data.py)
+[data.py](data.py), [lesage.py](lesage.py)
 
 Kaynaklar
 
@@ -366,4 +393,6 @@ Kaynaklar
 
 [5] *Money as Debt*, 
     [https://www.youtube.com/watch?v=2nBPN-MKefA](https://www.youtube.com/watch?v=2nBPN-MKefA)
+
+[6] LeSage, *Econometrics Using Matlab*
 
