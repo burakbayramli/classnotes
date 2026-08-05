@@ -146,8 +146,8 @@ BOP_{t-1} + \gamma_{\text{m2} \to \text{xch}} M2_{t-1} +
 \text{ir}} XCH_{t-1} + \beta_{\text{ir}} IR_{t-1}, \;
 \sigma^2_{\text{ir}}\right)\]</span></p>
 <p><span class="math display">\[\text{Inf}_t \sim
-\mathcal{N}\left(a_{\text{inf}} + \mathbf{\gamma_{\tt{xch\_contemp} \to
-\text{inf}} XCH_t} + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} +
+\mathcal{N}\left(a_{\text{inf}} + \gamma_{\tt{xch\_contemp} \to
+\text{inf}} XCH_t + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} +
 \gamma_{\text{m2} \to \text{inf}} M2_{t-1} + \gamma_{\text{ir} \to
 \text{inf}} IR_{t-1} + \beta_{\text{inf}} \text{Inf}_{t-1}, \;
 \sigma^2_{\text{inf}}\right)\]</span></p>
@@ -162,11 +162,11 @@ BOP_{t-1} + \gamma_{\text{m2} \to \text{xch}} M2_{t-1} +
 \tt{m2\_indirect\_effect} + \gamma_{\text{m2} \to
 \text{inf}}\]</span></p>
 <p>Birleşik Sonsal Dağılım</p>
-<p><span class="math display">\[p(\mathbf{\Theta} \mid \mathbf{Y})
-\propto \left[ \prod_{t=2}^{T} p(XCH_t \mid \mathbf{Y}_{t-1},
-\mathbf{\Theta}) \cdot p(IR_t \mid \mathbf{Y}_{t-1}, \mathbf{\Theta})
-\cdot p(\text{Inf}_t \mid XCH_t, \mathbf{Y}_{t-1}, \mathbf{\Theta})
-\right] \cdot p(a) \, p(\gamma) \, p(\beta) \, p(\sigma)\]</span></p>
+<p><span class="math display">\[p(\Theta \mid Y) \propto \left[
+\prod_{t=2}^{T} p(XCH_t \mid
+Y_{t-1}, \Theta) \cdot p(IR_t \mid Y_{t-1}, \Theta) \cdot
+p(\text{Inf}_t \mid XCH_t, Y_{t-1}, \Theta) \right] \cdot p(a) \,
+p(\gamma) \, p(\beta) \, p(\sigma)\]</span></p>
 <p>Not: DAG yapısı gereği her bir yapısal denklem kendi koşullu
 ebeveynleri verildiğinde bağımsız hata terimlerine (<span
 class="math inline">\(\epsilon_{i,t}\)</span>) sahip olduğundan,
@@ -274,11 +274,86 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;dag_results.jpg&#39;</span>)</span></code></pre></div>
 <p><img src="dag_results.jpg" /></p>
-<h3 id="bvar">BVAR</h3>
-<p>Degiskenlerin kendisi ve digerleri arasindaki istenen oranda geriye
-dogru bakan bir analizi eger genel bir sekilde (her degiskenin her diger
-degisken ile) yaklasmak istesek bunu klasik BVAR yaklasimi ile
-yapabilirdik [6].</p>
+<p>Ana Model Bulguları</p>
+<ul>
+<li><p>Döviz Kuru (xch) Enflasyonu Yönlendiriyor: Döviz kuru değer
+kaybının enflasyon üzerindeki toplam etkisi
+(<code>total_xch_to_inf</code>) güçlü bir pozitif etki göstermektedir;
+posterior ortalama <span class="math inline">\(0.23\)</span> (%94 HDI:
+<span class="math inline">\([0.16, 0.31]\)</span>).</p></li>
+<li><p>Eşzamanlı ve Gecikmeli Geçişkenlik: Eşzamanlı etki
+(<code>gamma_xch_contemp_to_inf</code>) bu etkinin neredeyse yarısını
+oluşturmaktadır; posterior ortalama <span
+class="math inline">\(0.11\)</span> (%94 HDI: <span
+class="math inline">\([0.044, 0.18]\)</span>), bu da döviz kuru
+şoklarının aynı çeyrek içinde hızla enflasyona yansıdığını
+göstermektedir.</p></li>
+<li><p>Ödemeler Dengesi (BOP) Dinamikleri: Ödemeler dengesi şokları,
+döviz kuru değişimleri üzerinde büyük bir pozitif etki
+(<code>gamma_bop_to_xch</code> ortalama <span class="math inline">\(=
+4.7\)</span>, %94 HDI: <span class="math inline">\([2.6, 7.0]\)</span>)
+ve faiz oranı değişimleri üzerinde de bir etki
+(<code>gamma_bop_to_ir</code> ortalama <span class="math inline">\(=
+0.61\)</span>, %94 HDI: <span class="math inline">\([-0.13,
+1.5]\)</span>) göstermektedir.</p></li>
+<li><p>Faiz Oranı Duyarlılığı: Döviz kuru değişimleri, faiz oranları
+üzerinde neredeyse hiç doğrudan gecikmeli etki göstermemektedir
+(<code>gamma_xch_to_ir</code> ortalama <span class="math inline">\(=
+-0.0088\)</span>, %94 HDI: <span class="math inline">\([-0.07,
+0.048]\)</span>), bu da %94 HDI’nin sıfırı sıkı bir şekilde kapsadığını
+göstermektedir.</p></li>
+</ul>
+<p>Ödemeler Dengesi (<code>bop</code>) Etkileri:</p>
+<ul>
+<li><p>Döviz Kuru (<code>xch</code>) Üzerinde: Pozitif ve güçlü doğrudan
+etki (<code>gamma_bop_to_xch</code> <span class="math inline">\(=
+4.7\)</span>), yapısal modelde döviz kuru hareketlerinin başlıca itici
+gücü olarak işlev görmektedir.</p></li>
+<li><p>Faiz Oranı (<code>ir</code>) Üzerinde: Ilımlı pozitif doğrudan
+etki (<code>gamma_bop_to_ir</code> <span class="math inline">\(=
+0.61\)</span>), ancak %94 HDI’si sıfırı içermektedir, bu da daha yüksek
+parametre belirsizliğini yansıtmaktadır.</p></li>
+</ul>
+<p>Parasal Taban M2 (<code>m2</code>) Etkileri:</p>
+<ul>
+<li><p>Döviz Kuru (<code>xch</code>) Üzerinde: Pozitif doğrudan etki
+(<code>gamma_m2_to_xch</code> <span class="math inline">\(=
+0.54\)</span>, %94 HDI: <span class="math inline">\([0.31,
+0.77]\)</span>), M2 genişlemesinin para birimi değer kaybına katkıda
+bulunduğunu göstermektedir.</p></li>
+<li><p>Enflasyon (<code>inf</code> Doğrudan) Üzerinde: Zayıf ile hafif
+negatif arasında doğrudan etki (<code>gamma_m2_to_inf</code> <span
+class="math inline">\(= -0.087\)</span>, %94 HDI: <span
+class="math inline">\([-0.18, 0.0018]\)</span>).</p></li>
+<li><p>Enflasyon (<code>inf</code> Toplam) Üzerinde: Doğrudan etki ile
+döviz kuru değer kaybı yoluyla dolaylı yolu
+(<code>gamma_m2_to_xch</code> <span
+class="math inline">\(\times\)</span> <code>total_xch_to_inf</code>)
+birleştiren hesaplanmış toplam etki (<code>m2_total_effect</code>),
+sıfıra yakın bir posterior ortalama vermektedir (0.038, %94 HDI: <span
+class="math inline">\([-0.06, 0.15]\)</span>). Bu, M2’nin bu modelde
+enflasyona giden başlıca aktarım kanalının döviz kuru değer kaybı
+yoluyla dolaylı olarak gerçekleştiğini göstermektedir.</p></li>
+</ul>
+<p>Döviz Kuru Değer Kaybı (<code>xch</code>) Etkileri:</p>
+<ul>
+<li><p>Enflasyon (<code>inf</code>) Üzerinde: Fiyat düzeyi
+değişimlerinin başlıca aktarıcısı olarak işlev görmektedir. Enflasyonu
+hem eşzamanlı olarak (<code>gamma_xch_contemp_to_inf</code> <span
+class="math inline">\(= 0.11\)</span>) hem de zaman içinde kümülatif
+olarak (<code>total_xch_to_inf</code> <span class="math inline">\(=
+0.23\)</span>) doğrudan artırmaktadır.</p></li>
+<li><p>Faiz Oranı (<code>ir</code>) Üzerinde: Anlamlı bir doğrudan etki
+göstermemektedir (<code>gamma_xch_to_ir</code> <span
+class="math inline">\(= -0.0088\)</span>), posterior yoğunluk sıfırın
+etrafında sıkı bir şekilde yoğunlaşmıştır.</p></li>
+</ul>
+<h3 id="matris-bvar">Matris BVAR</h3>
+<p>Değişkenlerin kendisi ve diğerleri arasında geriye doğru bakan bir
+analizi eğer genel bir şekilde (her değişkenin her diğer değişken ile)
+yaklaşmak istesek bunu klasik BVAR yaklaşımı ile yapabilirdik [6]. Bu
+yaklaşımda kendisiyle otokorelasyon matrisler ile gerçekleştirilir, ve
+nihai hesap standart regresyon ile çözülür.</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lesage</span>

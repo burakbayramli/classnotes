@@ -50,7 +50,7 @@ $$XCH_t \sim \mathcal{N}\left(a_{\text{xch}} + \gamma_{\text{bop} \to \text{xch}
 
 $$IR_t \sim \mathcal{N}\left(a_{\text{ir}} + \gamma_{\text{bop} \to \text{ir}} BOP_{t-1} + \gamma_{\text{xch} \to \text{ir}} XCH_{t-1} + \beta_{\text{ir}} IR_{t-1}, \; \sigma^2_{\text{ir}}\right)$$
 
-$$\text{Inf}_t \sim \mathcal{N}\left(a_{\text{inf}} + \mathbf{\gamma_{\tt{xch\_contemp} \to \text{inf}} XCH_t} + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} + \gamma_{\text{m2} \to \text{inf}} M2_{t-1} + \gamma_{\text{ir} \to \text{inf}} IR_{t-1} + \beta_{\text{inf}} \text{Inf}_{t-1}, \; \sigma^2_{\text{inf}}\right)$$
+$$\text{Inf}_t \sim \mathcal{N}\left(a_{\text{inf}} + \gamma_{\tt{xch\_contemp} \to \text{inf}} XCH_t + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} + \gamma_{\text{m2} \to \text{inf}} M2_{t-1} + \gamma_{\text{ir} \to \text{inf}} IR_{t-1} + \beta_{\text{inf}} \text{Inf}_{t-1}, \; \sigma^2_{\text{inf}}\right)$$
 
 Kümülatif ve Dolaylı Etkiler
 
@@ -63,7 +63,10 @@ $$\tt{m2\_total\_effect} = \tt{m2\_indirect\_effect} + \gamma_{\text{m2} \to \te
 
 Birleşik Sonsal Dağılım
 
-$$p(\mathbf{\Theta} \mid \mathbf{Y}) \propto \left[ \prod_{t=2}^{T} p(XCH_t \mid \mathbf{Y}_{t-1}, \mathbf{\Theta}) \cdot p(IR_t \mid \mathbf{Y}_{t-1}, \mathbf{\Theta}) \cdot p(\text{Inf}_t \mid XCH_t, \mathbf{Y}_{t-1}, \mathbf{\Theta}) \right] \cdot p(a) \, p(\gamma) \, p(\beta) \, p(\sigma)$$
+$$p(\Theta \mid Y) \propto \left[ \prod_{t=2}^{T} p(XCH_t \mid
+Y_{t-1}, \Theta) \cdot p(IR_t \mid Y_{t-1}, \Theta) \cdot
+p(\text{Inf}_t \mid XCH_t, Y_{t-1}, \Theta) \right] \cdot p(a) \,
+p(\gamma) \, p(\beta) \, p(\sigma)$$
 
 
 Not: DAG yapısı gereği her bir yapısal denklem kendi koşullu
@@ -177,12 +180,44 @@ plt.savefig('dag_results.jpg')
 
 ![](dag_results.jpg)
 
-### BVAR
+Ana Model Bulguları
 
-Degiskenlerin kendisi ve digerleri arasindaki istenen oranda geriye
-dogru bakan bir analizi eger genel bir sekilde (her degiskenin her
-diger degisken ile) yaklasmak istesek bunu klasik BVAR yaklasimi ile
-yapabilirdik [6]. 
+* Döviz Kuru (xch) Enflasyonu Yönlendiriyor: Döviz kuru değer kaybının enflasyon üzerindeki toplam etkisi (`total_xch_to_inf`) güçlü bir pozitif etki göstermektedir; posterior ortalama $0.23$ (%94 HDI: $[0.16, 0.31]$).
+
+* Eşzamanlı ve Gecikmeli Geçişkenlik: Eşzamanlı etki (`gamma_xch_contemp_to_inf`) bu etkinin neredeyse yarısını oluşturmaktadır; posterior ortalama $0.11$ (%94 HDI: $[0.044, 0.18]$), bu da döviz kuru şoklarının aynı çeyrek içinde hızla enflasyona yansıdığını göstermektedir.
+
+* Ödemeler Dengesi (BOP) Dinamikleri: Ödemeler dengesi şokları, döviz kuru değişimleri üzerinde büyük bir pozitif etki (`gamma_bop_to_xch` ortalama $= 4.7$, %94 HDI: $[2.6, 7.0]$) ve faiz oranı değişimleri üzerinde de bir etki (`gamma_bop_to_ir` ortalama $= 0.61$, %94 HDI: $[-0.13, 1.5]$) göstermektedir.
+
+* Faiz Oranı Duyarlılığı: Döviz kuru değişimleri, faiz oranları üzerinde neredeyse hiç doğrudan gecikmeli etki göstermemektedir (`gamma_xch_to_ir` ortalama $= -0.0088$, %94 HDI: $[-0.07, 0.048]$), bu da %94 HDI'nin sıfırı sıkı bir şekilde kapsadığını göstermektedir.
+
+Ödemeler Dengesi (`bop`) Etkileri:
+
+* Döviz Kuru (`xch`) Üzerinde: Pozitif ve güçlü doğrudan etki (`gamma_bop_to_xch` $= 4.7$), yapısal modelde döviz kuru hareketlerinin başlıca itici gücü olarak işlev görmektedir.
+
+* Faiz Oranı (`ir`) Üzerinde: Ilımlı pozitif doğrudan etki (`gamma_bop_to_ir` $= 0.61$), ancak %94 HDI'si sıfırı içermektedir, bu da daha yüksek parametre belirsizliğini yansıtmaktadır.
+
+Parasal Taban M2 (`m2`) Etkileri:
+
+* Döviz Kuru (`xch`) Üzerinde: Pozitif doğrudan etki (`gamma_m2_to_xch` $= 0.54$, %94 HDI: $[0.31, 0.77]$), M2 genişlemesinin para birimi değer kaybına katkıda bulunduğunu göstermektedir.
+
+* Enflasyon (`inf` Doğrudan) Üzerinde: Zayıf ile hafif negatif arasında doğrudan etki (`gamma_m2_to_inf` $= -0.087$, %94 HDI: $[-0.18, 0.0018]$).
+
+* Enflasyon (`inf` Toplam) Üzerinde: Doğrudan etki ile döviz kuru değer kaybı yoluyla dolaylı yolu (`gamma_m2_to_xch` $\times$ `total_xch_to_inf`) birleştiren hesaplanmış toplam etki (`m2_total_effect`), sıfıra yakın bir posterior ortalama vermektedir (0.038, %94 HDI: $[-0.06, 0.15]$). Bu, M2'nin bu modelde enflasyona giden başlıca aktarım kanalının döviz kuru değer kaybı yoluyla dolaylı olarak gerçekleştiğini göstermektedir.
+
+Döviz Kuru Değer Kaybı (`xch`) Etkileri:
+
+* Enflasyon (`inf`) Üzerinde: Fiyat düzeyi değişimlerinin başlıca aktarıcısı olarak işlev görmektedir. Enflasyonu hem eşzamanlı olarak (`gamma_xch_contemp_to_inf` $= 0.11$) hem de zaman içinde kümülatif olarak (`total_xch_to_inf` $= 0.23$) doğrudan artırmaktadır.
+
+* Faiz Oranı (`ir`) Üzerinde: Anlamlı bir doğrudan etki göstermemektedir (`gamma_xch_to_ir` $= -0.0088$), posterior yoğunluk sıfırın etrafında sıkı bir şekilde yoğunlaşmıştır.
+
+
+### Matris BVAR
+
+Değişkenlerin kendisi ve diğerleri arasında geriye doğru bakan bir
+analizi eğer genel bir şekilde (her değişkenin her diğer değişken ile)
+yaklaşmak istesek bunu klasik BVAR yaklaşımı ile yapabilirdik [6]. Bu
+yaklaşımda kendisiyle otokorelasyon matrisler ile gerçekleştirilir, ve
+nihai hesap standart regresyon ile çözülür. 
 
 ```python
 import pandas as pd
