@@ -20,13 +20,19 @@ dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.
 
 ### Seçilmiş Değişkenler ile PyMC
 
-Para, Enflasyon, Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags):
+Örnek olarak Arjantin'in verisini inceleyelim. Bir Para, Enflasyon,
+Kurlar ve Dağıtılmış Gecikmeler (Distribüted Lags) modeli kuracağız:
 Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
 nedensellik ilişkilerini incelemek amacıyla gecikmeli (lagged) bir
 Bayes VAR (BVAR) modeli kurulmuştur [3], ve seçili değişkenler
-arasındaki ilişki direk formüller ile yapılmıştır. Veriler logaritmik
-farklar ($\%$), birinci derece farklar ($\Delta$) ve yüzde değişimler
-üzerinden durağanlaştırılmıştır.
+arasındaki ilişki direk formüller ile yapılmıştır. 
+
+Değişkenler
+
+Analiz için seçilen değişkenler ödemeler dengesi (bop), döviz kuru
+değer kaybı (exch), enflasyon (inf) ve merkez bankası faiz oranı
+(ir). Veriler logaritmik farklar ($\%$), birinci derece farklar
+($\Delta$) ve yüzde değişimler üzerinden durağanlaştırılmıştır.
 
 Denklemler
 
@@ -68,11 +74,13 @@ Y_{t-1}, \Theta) \cdot p(IR_t \mid Y_{t-1}, \Theta) \cdot
 p(\text{Inf}_t \mid XCH_t, Y_{t-1}, \Theta) \right] \cdot p(a) \,
 p(\gamma) \, p(\beta) \, p(\sigma)$$
 
-
 Not: DAG yapısı gereği her bir yapısal denklem kendi koşullu
 ebeveynleri verildiğinde bağımsız hata terimlerine ($\epsilon_{i,t}$)
 sahip olduğundan, birleşik olurluk fonksiyonu tek değişkenli Normal
 olurlukların çarpımı şeklinde ayrışır.
+
+Veriyi baştan hazırlamak için `data.py` kodu işletilebilir. Veri
+hazırsa, alttaki kod analizi yapar.
 
 
 ```python
@@ -180,35 +188,74 @@ plt.savefig('dag_results.jpg')
 
 ![](dag_results.jpg)
 
-Ana Model Bulguları
+Arjantin Ekonomisi Hakkında Ana Bulgular
 
-* Döviz Kuru (xch) Enflasyonu Yönlendiriyor: Döviz kuru değer kaybının enflasyon üzerindeki toplam etkisi (`total_xch_to_inf`) güçlü bir pozitif etki göstermektedir; posterior ortalama $0.23$ (%94 HDI: $[0.16, 0.31]$).
+Bilindiği gibi Arjantin zaman zaman hiperinflasyona yakalanan, ciddi
+dış ticaret açıkları veren bir ülkedir. Analizden elde edilen bazı
+sonuçlar alttadır,
 
-* Eşzamanlı ve Gecikmeli Geçişkenlik: Eşzamanlı etki (`gamma_xch_contemp_to_inf`) bu etkinin neredeyse yarısını oluşturmaktadır; posterior ortalama $0.11$ (%94 HDI: $[0.044, 0.18]$), bu da döviz kuru şoklarının aynı çeyrek içinde hızla enflasyona yansıdığını göstermektedir.
+* Döviz Kuru (xch) Enflasyonu Yönlendiriyor: Döviz kuru değer kaybının
+  enflasyon üzerindeki toplam etkisi (`total_xch_to_inf`) güçlü bir
+  pozitif etki göstermektedir; posterior ortalama $0.23$ (%94 HDI:
+  $[0.16, 0.31]$).
 
-* Ödemeler Dengesi (BOP) Dinamikleri: Ödemeler dengesi şokları, döviz kuru değişimleri üzerinde büyük bir pozitif etki (`gamma_bop_to_xch` ortalama $= 4.7$, %94 HDI: $[2.6, 7.0]$) ve faiz oranı değişimleri üzerinde de bir etki (`gamma_bop_to_ir` ortalama $= 0.61$, %94 HDI: $[-0.13, 1.5]$) göstermektedir.
+* Eşzamanlı ve Gecikmeli Geçişkenlik: Eşzamanlı etki
+  (`gamma_xch_contemp_to_inf`) bu etkinin neredeyse yarısını
+  oluşturmaktadır; posterior ortalama $0.11$ (%94 HDI: $[0.044,
+  0.18]$), bu da döviz kuru şoklarının aynı çeyrek içinde hızla
+  enflasyona yansıdığını göstermektedir.
 
-* Faiz Oranı Duyarlılığı: Döviz kuru değişimleri, faiz oranları üzerinde neredeyse hiç doğrudan gecikmeli etki göstermemektedir (`gamma_xch_to_ir` ortalama $= -0.0088$, %94 HDI: $[-0.07, 0.048]$), bu da %94 HDI'nin sıfırı sıkı bir şekilde kapsadığını göstermektedir.
+* Ödemeler Dengesi (BOP) Dinamikleri: Ödemeler dengesi şokları, döviz
+  kuru değişimleri üzerinde büyük bir pozitif etki (`gamma_bop_to_xch`
+  ortalama $= 4.7$, %94 HDI: $[2.6, 7.0]$) ve faiz oranı değişimleri
+  üzerinde de bir etki (`gamma_bop_to_ir` ortalama $= 0.61$, %94 HDI:
+  $[-0.13, 1.5]$) göstermektedir.
+
+* Faiz Oranı Duyarlılığı: Döviz kuru değişimleri, faiz oranları
+  üzerinde neredeyse hiç doğrudan gecikmeli etki göstermemektedir
+  (`gamma_xch_to_ir` ortalama $= -0.0088$, %94 HDI: $[-0.07, 0.048]$),
+  bu da %94 HDI'nin sıfırı sıkı bir şekilde kapsadığını
+  göstermektedir.
 
 Ödemeler Dengesi (`bop`) Etkileri:
 
-* Döviz Kuru (`xch`) Üzerinde: Pozitif ve güçlü doğrudan etki (`gamma_bop_to_xch` $= 4.7$), yapısal modelde döviz kuru hareketlerinin başlıca itici gücü olarak işlev görmektedir.
+* Döviz Kuru (`xch`) Üzerinde: Pozitif ve güçlü doğrudan etki
+  (`gamma_bop_to_xch` $= 4.7$), yapısal modelde döviz kuru
+  hareketlerinin başlıca itici gücü olarak işlev görmektedir.
 
-* Faiz Oranı (`ir`) Üzerinde: Ilımlı pozitif doğrudan etki (`gamma_bop_to_ir` $= 0.61$), ancak %94 HDI'si sıfırı içermektedir, bu da daha yüksek parametre belirsizliğini yansıtmaktadır.
+* Faiz Oranı (`ir`) Üzerinde: Ilımlı pozitif doğrudan etki
+  (`gamma_bop_to_ir` $= 0.61$), ancak %94 HDI'si sıfırı içermektedir,
+  bu da daha yüksek parametre belirsizliğini yansıtmaktadır.
 
 Parasal Taban M2 (`m2`) Etkileri:
 
-* Döviz Kuru (`xch`) Üzerinde: Pozitif doğrudan etki (`gamma_m2_to_xch` $= 0.54$, %94 HDI: $[0.31, 0.77]$), M2 genişlemesinin para birimi değer kaybına katkıda bulunduğunu göstermektedir.
+* Döviz Kuru (`xch`) Üzerinde: Pozitif doğrudan etki
+  (`gamma_m2_to_xch` $= 0.54$, %94 HDI: $[0.31, 0.77]$), M2
+  genişlemesinin para birimi değer kaybına katkıda bulunduğunu
+  göstermektedir.
 
-* Enflasyon (`inf` Doğrudan) Üzerinde: Zayıf ile hafif negatif arasında doğrudan etki (`gamma_m2_to_inf` $= -0.087$, %94 HDI: $[-0.18, 0.0018]$).
+* Enflasyon (`inf` Doğrudan) Üzerinde: Zayıf ile hafif negatif
+  arasında doğrudan etki (`gamma_m2_to_inf` $= -0.087$, %94 HDI:
+  $[-0.18, 0.0018]$).
 
-* Enflasyon (`inf` Toplam) Üzerinde: Doğrudan etki ile döviz kuru değer kaybı yoluyla dolaylı yolu (`gamma_m2_to_xch` $\times$ `total_xch_to_inf`) birleştiren hesaplanmış toplam etki (`m2_total_effect`), sıfıra yakın bir posterior ortalama vermektedir (0.038, %94 HDI: $[-0.06, 0.15]$). Bu, M2'nin bu modelde enflasyona giden başlıca aktarım kanalının döviz kuru değer kaybı yoluyla dolaylı olarak gerçekleştiğini göstermektedir.
+* Enflasyon (`inf` Toplam) Üzerinde: Doğrudan etki ile döviz kuru
+  değer kaybı yoluyla dolaylı yolu (`gamma_m2_to_xch` $\times$
+  `total_xch_to_inf`) birleştiren hesaplanmış toplam etki
+  (`m2_total_effect`), sıfıra yakın bir posterior ortalama vermektedir
+  (0.038, %94 HDI: $[-0.06, 0.15]$). Bu, M2'nin bu modelde enflasyona
+  giden başlıca aktarım kanalının döviz kuru değer kaybı yoluyla
+  dolaylı olarak gerçekleştiğini göstermektedir.
 
 Döviz Kuru Değer Kaybı (`xch`) Etkileri:
 
-* Enflasyon (`inf`) Üzerinde: Fiyat düzeyi değişimlerinin başlıca aktarıcısı olarak işlev görmektedir. Enflasyonu hem eşzamanlı olarak (`gamma_xch_contemp_to_inf` $= 0.11$) hem de zaman içinde kümülatif olarak (`total_xch_to_inf` $= 0.23$) doğrudan artırmaktadır.
+* Enflasyon (`inf`) Üzerinde: Fiyat düzeyi değişimlerinin başlıca
+  aktarıcısı olarak işlev görmektedir. Enflasyonu hem eşzamanlı olarak
+  (`gamma_xch_contemp_to_inf` $= 0.11$) hem de zaman içinde kümülatif
+  olarak (`total_xch_to_inf` $= 0.23$) doğrudan artırmaktadır.
 
-* Faiz Oranı (`ir`) Üzerinde: Anlamlı bir doğrudan etki göstermemektedir (`gamma_xch_to_ir` $= -0.0088$), posterior yoğunluk sıfırın etrafında sıkı bir şekilde yoğunlaşmıştır.
+* Faiz Oranı (`ir`) Üzerinde: Anlamlı bir doğrudan etki
+  göstermemektedir (`gamma_xch_to_ir` $= -0.0088$), posterior yoğunluk
+  sıfırın etrafında sıkı bir şekilde yoğunlaşmıştır.
 
 
 ### Matris BVAR
