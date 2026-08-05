@@ -21,13 +21,11 @@ dağılımlar ile parametrelerin arandığı uzayı daraltmak mümkündür.
 ### Seçilmiş Değişkenler ile PyMC
 
 Örnek olarak Arjantin'in verisini inceleyelim. Bir Para, Enflasyon,
-Kurlar ve Dağıtılmış Gecikmeler (Distribüted Lags) modeli kuracağız:
-Bu modelde, makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
+Kurlar ve Dağıtılmış Gecikmeler (Distributed Lags) modeli kuracağız:
+Bu modelde makroekonomik değişkenler arasındaki gecikmeli ve dolaylı
 nedensellik ilişkilerini incelemek amacıyla gecikmeli (lagged) bir
 Bayes VAR (BVAR) modeli kurulmuştur [3], ve seçili değişkenler
-arasındaki ilişki direk formüller ile yapılmıştır. 
-
-Değişkenler
+arasındaki ilişki direk formüller ile yapılmıştır.
 
 Analiz için seçilen değişkenler ödemeler dengesi (bop), döviz kuru
 değer kaybı (exch), enflasyon (inf) ve merkez bankası faiz oranı
@@ -263,8 +261,8 @@ Döviz Kuru Değer Kaybı (`xch`) Etkileri:
 Değişkenlerin kendisi ve diğerleri arasında geriye doğru bakan bir
 analizi eğer genel bir şekilde (her değişkenin her diğer değişken ile)
 yaklaşmak istesek bunu klasik BVAR yaklaşımı ile yapabilirdik [6]. Bu
-yaklaşımda kendisiyle otokorelasyon matrisler ile gerçekleştirilir, ve
-nihai hesap standart regresyon ile çözülür. 
+yaklaşımda kendisiyle korelasyon durumunu matrisler ile analiz eder,
+ve nihai hesap standart regresyon ile çözülür.
 
 ```python
 import pandas as pd
