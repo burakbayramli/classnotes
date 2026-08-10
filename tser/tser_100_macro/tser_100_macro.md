@@ -32,7 +32,7 @@ değer kaybı (exch), enflasyon (inf) ve merkez bankası faiz oranı
 (ir). Veriler logaritmik farklar ($\%$), birinci derece farklar
 ($\Delta$) ve yüzde değişimler üzerinden durağanlaştırılmıştır.
 
-Denklemler
+Önsel Dağılımlar (Priors)
 
 $$a_i \sim \mathcal{N}(\mu = 0, \sigma^2 = 5^2), \quad i \in \{\text{xch}, \text{ir}, \text{inf}\}$$
 
@@ -57,7 +57,6 @@ $$IR_t \sim \mathcal{N}\left(a_{\text{ir}} + \gamma_{\text{bop} \to \text{ir}} B
 $$\text{Inf}_t \sim \mathcal{N}\left(a_{\text{inf}} + \gamma_{\tt{xch\_contemp} \to \text{inf}} XCH_t + \gamma_{\tt{xch\_lag} \to \text{inf}} XCH_{t-1} + \gamma_{\text{m2} \to \text{inf}} M2_{t-1} + \gamma_{\text{ir} \to \text{inf}} IR_{t-1} + \beta_{\text{inf}} \text{Inf}_{t-1}, \; \sigma^2_{\text{inf}}\right)$$
 
 Kümülatif ve Dolaylı Etkiler
-
 
 $$\Gamma_{\text{xch} \to \text{inf}} = \gamma_{\tt{xch\_contemp} \to \text{inf}} + \gamma_{\tt{xch\_lag} \to \text{inf}}$$
 
@@ -255,14 +254,22 @@ Döviz Kuru Değer Kaybı (`xch`) Etkileri:
   göstermemektedir (`gamma_xch_to_ir` $= -0.0088$), posterior yoğunluk
   sıfırın etrafında sıkı bir şekilde yoğunlaşmıştır.
 
+Not: Verinin işlenişi hakkında bir ek, `data.py` içine bakılırsa orada
+enflasyon verisinin senelik bazda `arg_inf.csv` dosyasından alındığı
+görülecektir. Bunun sebebi FRED'den gelen verinin yeterince geriye
+gitmemesiydi. Ayrıca eldeki diğer veriler aylık bazda olduğu için dış
+enflasyonu kullanmak için aradeğerleme (interpolation) gerekliydi. Bu
+aradeğerlemeyi lineer değil kupsel (cubiç) yaptık, analiz ancak bu
+şekilde görülen değerleri veriyor. Ayrıca tarih detay skalası / öğe
+boyu (granularity) ceyrek (quarter) olarak seçildi.
 
 ### Matris BVAR
 
 Değişkenlerin kendisi ve diğerleri arasında geriye doğru bakan bir
 analizi eğer genel bir şekilde (her değişkenin her diğer değişken ile)
 yaklaşmak istesek bunu klasik BVAR yaklaşımı ile yapabilirdik [6]. Bu
-yaklaşımda kendisiyle korelasyon durumunu matrisler ile analiz eder,
-ve nihai hesap standart regresyon ile çözülür.
+yaklaşım kendisiyle korelasyon durumunu matrisler ile analiz eder, ve
+nihai hesap standart regresyon ile çözülür.
 
 ```python
 import pandas as pd
@@ -280,7 +287,7 @@ results = lesage.bvar(y, nlag=nlag, tight=tight, weight=weight, decay=decay, vna
 lesage.write_results(results,"bvar1.txt")
 ```
 
-Sonuçlar `bvar1.txt` içinde.
+Sonuçlar [bvar1.txt](bvar1.txt) içinde.
 
 ### Paranın Miktar Teorisi (Quantity Theory of Money) 
 
@@ -302,15 +309,16 @@ servislerin fiyatı ise $P$ oluyor. PMT için gerekli değişkenler bunlar.
 ![](tser_macro_02.png)
 
 Tüm ekonomi bazında düşünürsek, $M$ para arzı (money supply) yani
-ekonomideki tüm para miktarı. $V$ ürün ve servis almak için bir liranın kaç
-kez kullanıldığı; bazıları parayı yastığın altına koyar onların parası
-"yavaştır'', kimisi habire alışveriştedir, onların parası hızlıdır. Hız
-tüm paraların hız averajı üzerinden hesaplanıyor tabii. $P$ tüm ürün ve
-servislerin (yine ortalama) fiyat seviyesi. Son olarak $Y$, ekonomide
-satılan tüm ürün ve servislerin miktarı, yani Gayrisafi Yurtiçi Hasıla,
-GSYH (İngilizce GDP). Onun fiyat seviyesi ile çarpılmış hali Reel GSYH
-(Nominal GDP), bu ekonominin ürettiği ürünlerin tüm lira bazında
-toplamı. Formülün bir tarafı bu.
+ekonomideki tüm para miktarı (üstteki örneklerde m2 ile
+gösterilen). $V$ ürün ve servis almak için bir liranın kaç kez
+kullanıldığı; bazıları parayı yastığın altına koyar onların parası
+"yavaştır'', kimisi habire alışveriştedir, onların parası
+hızlıdır. Hız tüm paraların hız averajı üzerinden hesaplanıyor
+tabii. $P$ tüm ürün ve servislerin (yine ortalama) fiyat seviyesi. Son
+olarak $Y$, ekonomide satılan tüm ürün ve servislerin miktarı, yani
+Gayrisafi Yurtiçi Hasıla, GSYH (İngilizce GDP). Onun fiyat seviyesi
+ile çarpılmış hali Reel GSYH (Nominal GDP), bu ekonominin ürettiği
+ürünlerin tüm lira bazında toplamı. Formülün bir tarafı bu.
 
 Formülün diğer tarafı $M$ çarpı $V$; ekonomideki tüm para miktarını o
 paranın ekonomi içinde senede kaç kez döndüğü ile çarparsak bu bize, aynı
@@ -450,8 +458,6 @@ tarafından kabul edildi. Evet bankalar hiç yoktan para yaratıyorlar. Yani
 bankaların "özel kişilerin mevduatını borç olarak verdiği'' doğru
 değildir. Bankaların borç vermek mevduata ihtiyacı yoktur, parayı basar ve
 verir [5].
-
-[devam edecek]
 
 Kodlar
 

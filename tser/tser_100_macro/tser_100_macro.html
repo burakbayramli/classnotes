@@ -118,7 +118,7 @@ değer kaybı (exch), enflasyon (inf) ve merkez bankası faiz oranı (ir).
 Veriler logaritmik farklar (<span class="math inline">\(\%\)</span>),
 birinci derece farklar (<span class="math inline">\(\Delta\)</span>) ve
 yüzde değişimler üzerinden durağanlaştırılmıştır.</p>
-<p>Denklemler</p>
+<p>Önsel Dağılımlar (Priors)</p>
 <p><span class="math display">\[a_i \sim \mathcal{N}(\mu = 0, \sigma^2 =
 5^2), \quad i \in \{\text{xch}, \text{ir}, \text{inf}\}\]</span></p>
 <p><span class="math display">\[\sigma_i \sim \text{Half-Normal}(\sigma
@@ -356,11 +356,20 @@ göstermemektedir (<code>gamma_xch_to_ir</code> <span
 class="math inline">\(= -0.0088\)</span>), posterior yoğunluk sıfırın
 etrafında sıkı bir şekilde yoğunlaşmıştır.</p></li>
 </ul>
+<p>Not: Verinin işlenişi hakkında bir ek, <code>data.py</code> içine
+bakılırsa orada enflasyon verisinin senelik bazda
+<code>arg_inf.csv</code> dosyasından alındığı görülecektir. Bunun sebebi
+FRED’den gelen verinin yeterince geriye gitmemesiydi. Ayrıca eldeki
+diğer veriler aylık bazda olduğu için dış enflasyonu kullanmak için
+aradeğerleme (interpolation) gerekliydi. Bu aradeğerlemeyi lineer değil
+kupsel (cubiç) yaptık, analiz ancak bu şekilde görülen değerleri
+veriyor. Ayrıca tarih detay skalası / öğe boyu (granularity) ceyrek
+(quarter) olarak seçildi.</p>
 <h3 id="matris-bvar">Matris BVAR</h3>
 <p>Değişkenlerin kendisi ve diğerleri arasında geriye doğru bakan bir
 analizi eğer genel bir şekilde (her değişkenin her diğer değişken ile)
 yaklaşmak istesek bunu klasik BVAR yaklaşımı ile yapabilirdik [6]. Bu
-yaklaşımda kendisiyle korelasyon durumunu matrisler ile analiz eder, ve
+yaklaşım kendisiyle korelasyon durumunu matrisler ile analiz eder, ve
 nihai hesap standart regresyon ile çözülür.</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -376,7 +385,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> lesage.bvar(y, nlag<span class="op">=</span>nlag, tight<span class="op">=</span>tight, weight<span class="op">=</span>weight, decay<span class="op">=</span>decay, vnames<span class="op">=</span>var_names)</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>lesage.write_results(results,<span class="st">&quot;bvar1.txt&quot;</span>)</span></code></pre></div>
-<p>Sonuçlar <code>bvar1.txt</code> içinde.</p>
+<p>Sonuçlar <a href="bvar1.txt">bvar1.txt</a> içinde.</p>
 <h3 id="paranın-miktar-teorisi-quantity-theory-of-money">Paranın Miktar
 Teorisi (Quantity Theory of Money)</h3>
 <p>Bir liranın günlük hayat içinde dolaşımını düşünelim. Ben gidiyorum
@@ -398,12 +407,13 @@ değişkenler bunlar.</p>
 <p><img src="tser_macro_02.png" /></p>
 <p>Tüm ekonomi bazında düşünürsek, <span
 class="math inline">\(M\)</span> para arzı (money supply) yani
-ekonomideki tüm para miktarı. <span class="math inline">\(V\)</span>
-ürün ve servis almak için bir liranın kaç kez kullanıldığı; bazıları
-parayı yastığın altına koyar onların parası “yavaştır’’, kimisi habire
-alışveriştedir, onların parası hızlıdır. Hız tüm paraların hız averajı
-üzerinden hesaplanıyor tabii. <span class="math inline">\(P\)</span> tüm
-ürün ve servislerin (yine ortalama) fiyat seviyesi. Son olarak <span
+ekonomideki tüm para miktarı (üstteki örneklerde m2 ile gösterilen).
+<span class="math inline">\(V\)</span> ürün ve servis almak için bir
+liranın kaç kez kullanıldığı; bazıları parayı yastığın altına koyar
+onların parası “yavaştır’’, kimisi habire alışveriştedir, onların parası
+hızlıdır. Hız tüm paraların hız averajı üzerinden hesaplanıyor tabii.
+<span class="math inline">\(P\)</span> tüm ürün ve servislerin (yine
+ortalama) fiyat seviyesi. Son olarak <span
 class="math inline">\(Y\)</span>, ekonomide satılan tüm ürün ve
 servislerin miktarı, yani Gayrisafi Yurtiçi Hasıla, GSYH (İngilizce
 GDP). Onun fiyat seviyesi ile çarpılmış hali Reel GSYH (Nominal GDP), bu
@@ -541,7 +551,6 @@ Bankaları tarafından kabul edildi. Evet bankalar hiç yoktan para
 yaratıyorlar. Yani bankaların”özel kişilerin mevduatını borç olarak
 verdiği’’ doğru değildir. Bankaların borç vermek mevduata ihtiyacı
 yoktur, parayı basar ve verir [5].</p>
-<p>[devam edecek]</p>
 <p>Kodlar</p>
 <p><a href="data.py">data.py</a>, <a href="lesage.py">lesage.py</a></p>
 <p>Kaynaklar</p>
