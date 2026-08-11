@@ -653,10 +653,9 @@ fonksiyonu,
 
 $$ f(x;m,p) = \frac{m!}{x_1! \cdot \cdot !x_k!} p_{1}^{x_1} \cdot \cdot  p_{1}^{x_k} $$
 
-Beklenti $ E(X) = p $. Her kategori, hücre $i$ için tabii ki $ E(X_i) = p$, 
-varyans ise $Var(X_i) = m p_i(1-p_i)$. Kovaryans $Covar(X_i,X_j) =
--mp_ip_j$. 
-Bunun türetilmesini ilerideki bir bölümde göreceğiz. 
+Beklenti $E(X) = p$. Her kategori, hücre $i$ için tabii ki $E(X_i) =
+p$, varyans ise $Var(X_i) = m p_i(1-p_i)$. Kovaryans $Covar(X_i,X_j) =
+-mp_ip_j$.  Bunun türetilmesini ilerideki bir bölümde göreceğiz.
 
 ![](multinom.png)
 
