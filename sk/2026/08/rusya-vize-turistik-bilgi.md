@@ -73,6 +73,9 @@ para olması iyi olur, metro için gerekecek. Not: Döviz değişimlerinde
 bir dükkan aynı kişi için bir günde sadece 400 Euro'luk değişim
 yapabilir. Daha fazlası gerekirse başka dükkana gidilebilir tabii.
 
+Otelinizin odalarında kasa sistemi olması iyi olur, yanda taşınması
+fazla olan para kasada tutulabilir.
+
 Metro
 
 Seyahat kartı almak için kullanılacak aletin ekranı, başlangıç hali
@@ -96,14 +99,18 @@ kullanması sebebiyle Rusya büyük şehirlerde GPS sinyallerini
 karıştırıcı teknoloji kullanıyor (jamming). GPS ile konum belirleme
 büyük şehirlerde işlemiyor. Anladığım kadarıyla Rusya'nın kendi uydu
 sistemleri GLONASS da bu blokeden nasibini almış, taksiciler, taşıyıcı
-firmalar durumdan şikayetçi, onlar da konum bilgisine güvenemiyorlar.
+firmalar durumdan şikayetçi, onlar da konum bilgisine
+güvenemiyorlar.
 
-Gitmeden önce Web'den baktık, "yapay zeka"'ya sorduk", "mobil gezici
-(roaming) ayarını yapın, Internet kullanabilirsiniz" gibi yorumlar
-vardı. Bunlara güvenmeyin. Roaming işlemiyor. Çoğu popüler İnternet
-sitesi blok halinde, onlara da erişilemiyor. "VPN ile bloku aşarsınız"
-diyenler var, otelimizin Wifi'i üzerinden birkaç bedava VPN denedik,
-VPN olmadı.
+Kampçılıktan alışkanlık yanımızda hep taşıdığımız pusula ise yaradı,
+GPS olmayınca güney, kuzey neresidir diye bilmek iyi olabiliyor.
+
+Internet: Gitmeden önce Web'den baktık, "yapay zeka"'ya sorduk",
+"mobil gezici (roaming) ayarını yapın, Internet kullanabilirsiniz"
+gibi yorumlar vardı. Bunlara güvenmeyin. Roaming işlemiyor. Çoğu
+popüler İnternet sitesi blok halinde, onlara da erişilemiyor. "VPN ile
+bloku aşarsınız" diyenler var, otelimizin Wifi'i üzerinden birkaç
+bedava VPN denedik, VPN olmadı.
 
 Eğer RU telefon / mobil / Internet hattı olsa, onun üzerinden cüzi
 para ödeyip VPN kurulması mümkün imiş (Red Shield?), ama turistik
@@ -130,14 +137,26 @@ bulunabilir.
 
 Uygulamanın sol üst köşesinde katmanlar (layers) kısmında metro
 haritası katmanı vardır, bu Moskova'da benim çok işime yaradı, tüm
-hatlar, bağlantılar orada gösteriliyor. Kampçilıktan alışkanlık
-yanımızda hep taşıdığımız pusula bile ise yaradı, GPS olmayınca güney,
-kuzey neresidir diye bilmek gerekli olabiliyor.
+hatlar, bağlantılar orada gösteriliyor.
 
-### Ozet
+Maps.Me'nin bir diğer özelliği dışarıdan GPX yol izi dosyalarını
+haritaya ekleyebilmesi. Mesela altta benim paylaştığım [1] hattı GPX
+olarak indirilebilir, ve o dosyaya Android'de tıklanınca dosya Maps.ME
+içinde açılır. Bu tür önceden gezilmiş hat bilgileri faydalı olabilir.
+
+### Özet
 
 Güvenlik durumu nedir? Büyük şehirlerde bir tehlike yok. Her diğer gün
-bir yerde duman, patlama duyulması gibi bir durum değil, ama muhakkak
-savaş durumu, ciddi iş, belli olmaz.
+bir yerde duman görülmesi, patlama duyulması gibi bir durum yok, ama
+muhakkak savaş durumu, ciddi iş, belli olmaz.
 
+Moskova metrosunun kullanımı rahat, hatlar arası transfer için dışarı
+çıkılması gerekmez.
+
+Yoldan taksi çevirmek zor, durak noktalarına gitmek lazım, bu noktalar
+Maps.Me uygulamasında gösteriliyor.
+
+Kaynaklar
+
+[1] [Moskova Restoran Gezisi](https://www.wikiloc.com/hiking-trails/moscow-restaurant-trail-280431532)
 
