@@ -101,7 +101,7 @@ convert in.jpg -crop 300x200+0+0 +repage out.jpg
 ```
 
 Üstteki komut kesmenin hangi noktadan başlayaçığini söylüyor,
-seceeneklere göre üst sol köşeye referanslı olarak 0,0 noktasından
+seceneklere göre üst sol köşeye referanslı olarak 0,0 noktasından
 başlanıyor, ve oradan başlayarak sağa doğru 300 piksel ve aşağı doğru
 200 piksel alınıyor, gerisi atılıyor.
 
@@ -137,6 +137,4 @@ convert -brightness-contrast 30x20 in.tif out.tif
 ```
 
 Bu örnekte ışık seviyesi 30 farklılık 20 arttırıldı.
-
-
 

@@ -40,8 +40,9 @@ $$
 
 denklemi de doğrudur, ki $f'(u) = \frac{\mathrm{d} f}{\mathrm{d} u}$.
 
-(2) türünden denklemleri tek boyutta çözmeyi işleyeceğiz öncelikle, çünkü çok
-boyutta çözüm tek boyuta indirgenerek yapılabiliyor.
+Formül (2) türünden denklemleri tek boyutta çözmeyi işleyeceğiz
+öncelikle, çünkü çok boyutta çözüm tek boyuta indirgenerek
+yapılabiliyor.
 
 Hiperbolik denklemleri analitik, kesin (exact) çözmek için birkaç konuyu
 yakından anlamak lazım. Birincisi Riemann problemleri; bu yaklaşımla hiperbolik
@@ -797,7 +798,7 @@ Kaynaklar
 
 [10] Bayramlı, *Cok Degiskenli Calculus, Ders 11*
 
-[11] Muller, {Learn CFD, Lecture 15 - Part b},
+[11] Muller, *Learn CFD, Lecture 15 - Part b*,
      [https://youtu.be/f8fuMRFZYwQ](https://youtu.be/f8fuMRFZYwQ)
 
 [12] Bayramlı, *Fizik, Gazlar, Sıvılar 2*
@@ -812,6 +813,4 @@ Kaynaklar
 [16] Lee, *Computational Fluid Dynamics*
 
 [17] Bayramlı, *Fizik, Gazlar, Sivilar - 2*
-
-
 
