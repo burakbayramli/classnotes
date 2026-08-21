@@ -7,16 +7,19 @@ $$
 \frac{1}{c^2}\frac{\partial^2 y}{\partial t^2}
 $$
 
-Denkleme yakından bakarsak onun bir kısmı türevsel denklem (PDE) olduğunu
-görürüz. İki tane bağımsız değişken temel alınıyor, $x,t$. Ayrıca denklem
-2. derece, çünkü ikinci türevi içeriyor. Bu bilgiler denklemi çözmek için
-önemli [2].
+Denkleme yakından bakarsak onun bir kısmi türevsel denklem (PDE)
+olduğunu görürüz. İki tane bağımsız değişken temel alınıyor,
+$x,t$. Ayrıca denklem 2. derece, çünkü ikinci türevi içeriyor. Bu
+bilgiler denklemi çözmek için önemli [2]. $y$ değişkeni doğal olarak
+yatay eksenden olan uzaklıktır, dalga yüksekliğidir, eğer bir gitar
+gelinin titremesini modelliyorsak, telin normal halinden dikey
+katettiği mesafedir.
 
-Çözümde bir başlangıç şartı gerekli çünkü diferansiyel denklemleri "entegre
-ederken'' daha doğrusu ileri doğru geçen zamanda hesaplarken bir başlangıç
-noktası gerekiyor, bunun için bir teli kaldırıp (geçici bir süre üçgen haline
-getirip) oradan bıraktığımızı düşünebiliriz, ki bu üçgen şekli alttaki gibi
-modellenebilir,
+Çözümde bir başlangıç şartı gerekli çünkü diferansiyel denklemleri
+"entegre ederken'' daha doğrusu ileri doğru geçen zamanda hesaplarken
+bir başlangıç noktası gerekiyor, bunun için bir teli kaldırıp (geçici
+bir süre üçgen haline getirip) oradan bıraktığımızı düşünebiliriz, ki
+bu üçgen şekli alttaki gibi modellenebilir,
 
 $$
 y(x,t=0)=\begin{cases}
@@ -58,26 +61,26 @@ yapıyoruz,
 
 $$
 y(x +\Delta x, t)  = y(x,t) +
-\frac{\partial U}{\partial x}\Delta x + \frac{1}{2}
-\frac{\partial^2 U}{\partial x^2}(\Delta x)^2 + \cdots
+\frac{\partial y}{\partial x}\Delta x + \frac{1}{2}
+\frac{\partial^2 y}{\partial x^2}(\Delta x)^2 + \cdots
 $$
 
 $$
 y(x -\Delta x, t)  = y(x,t) -
-\frac{\partial U}{\partial x} \Delta x + \frac{1} {2}
-\frac{\partial^2 U}{\partial x^2} (\Delta x)^2 - \cdots
+\frac{\partial y}{\partial x} \Delta x + \frac{1} {2}
+\frac{\partial^2 y}{\partial x^2} (\Delta x)^2 - \cdots
 $$
 
 $$
 y(x, y +\Delta t)  = y(x,t) +
-\frac{\partial U}{\partial t}\Delta y + \frac{1}{2}
-\frac{\partial^2 U}{\partial t^2}(\Delta t)^2 + \cdots
+\frac{\partial y}{\partial t}\Delta y + \frac{1}{2}
+\frac{\partial^2 y}{\partial t^2}(\Delta t)^2 + \cdots
 $$
 
 $$
 y(x, y -\Delta t) = y(x,t) -
-\frac{\partial U}{\partial t} \Delta t + \frac{1} {2}
-\frac{\partial^2 U}{\partial t^2} (\Delta t)^2 - \cdots
+\frac{\partial y}{\partial t} \Delta t + \frac{1} {2}
+\frac{\partial^2 y}{\partial t^2} (\Delta t)^2 - \cdots
 $$
 
 Noktalı yerlerdeki terimleri yok sayıyoruz (2. derece yaklaşıklama yapmış olduk

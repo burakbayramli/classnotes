@@ -21,7 +21,7 @@ kalması planlanan otel ismi, adresi verilebilir.
 
 Başvuru programı bir noktada vesika / yüz resmi, bir diğerinde
 pasaport resmi isteyecektir. Vesika için biyometrik (tercihen
-fotoğrafçıda çekilmiş olan) resimlerden birinini telefonla dijital
+fotoğrafçıda çekilmiş olan) resimlerden birininin telefonla dijital
 fotosunu alabilirsiniz. Bu fotoyu yanlardan traşlayarak kenarları tam
 fiziksel fotoda olduğu hale getirilebilir (mesela Gimp programı ile
 bölge seçimi yapıp 'crop to selection' ile).
@@ -39,13 +39,13 @@ komutu kullanılır.
 Pasaport resmi için böyle bir şart yok, onu da benzer şekilde telefon
 ile fotolayıp, o dijital resmi traşlayıp yükleyebiliriz. Pasaport
 resmi için tek yapılması gereken seri no'sunun yükleme programının alt
-kare bölgesine hedeflemek. Site kullanınca görülecektir, pasaport
-resmi hareket ettirilebiliyor, fotoyu kaydırıp o hücre içine pasaport
-nosunu getiriyorsunuz.
+kare bölgesine hedeflemek. Sitede görülecektir, pasaport resmi hareket
+ettirilebiliyor, fotoyu kaydırıp tam o hücre içine pasaport nosunun
+üzerine getiriyorsunuz. Bu olursa site resmi kabul ediyor.
 
-Geri kalan bilgiler girilip, kredi kartı ile ücret ödemesi yapılıyor,
-bu kadar. [2-3 gün sonra vize kabulü size email
-ile gönderilecek, onu PDF dosyasını da yazıcıdan bastırın.
+Sonra geri kalan bilgiler girilip, kredi kartı ile ücret ödemesi
+yapılıyor, bu kadar. 2-3 gün sonra vize kabulü size email ile
+gönderilecek, onun da PDF dosyasını yazıcıdan bastırmak iyi olur.
 
 Para
 
@@ -59,19 +59,20 @@ TR Havalanı Çıkış
 Çıkarken harç ödemesi lazım, bu mobil bankacılık ile yapılabilir
 (Sabiha Gökçen'deki "harç kioskları" güvenilir degil, ben baktığımda
 bu aletler çalışmıyordu). Programda "Ödemeler | Harç" seçilir, şehir
-"İstanbul" seçilir, ilçe herhangi bir ilçe olabilir. Bu ay itibarı ile
-1500 TL.  Eski günlerde "pul" satan birisi olurdu, o pul pasaport
-içine konurdu, artık o günler geride kalmış ama hala bir harç
+"İstanbul" seçilir, ilçe herhangi bir ilçe olabilir. Mevcut tarih
+itibarı ile 1500 TL.  Eski günlerde "pul" satan birisi olurdu, o pul
+pasaport içine konurdu, artık o günler geride kalmış ama hala bir harç
 alınıyor.
 
-### RUSYA
+### Rusya
 
 Para
 
 Gelir gelmez havaalanında döviz verip ruble alınır. 100-200'lük kağıt
-para olması iyi olur, metro için gerekecek. Not: Döviz değişimlerinde
-bir dükkan aynı kişi için bir günde sadece 400 Euro'luk değişim
-yapabilir. Daha fazlası gerekirse başka dükkana gidilebilir tabii.
+para olması iyi olur, metro için gerekecek. Bir ek bilgi, döviz
+değişimlerinde bir dükkan aynı kişi için bir günde sadece 400 Euro'luk
+değişim yapabilir. Daha fazlası gerekirse başka dükkana gidilebilir
+tabii.
 
 Otelinizin odalarında kasa sistemi olması iyi olur, yanda taşınması
 fazla olan para kasada tutulabilir.
@@ -100,40 +101,38 @@ karıştırıcı teknoloji kullanıyor (jamming). GPS ile konum belirleme
 büyük şehirlerde işlemiyor. Anladığım kadarıyla Rusya'nın kendi uydu
 sistemleri GLONASS da bu blokeden nasibini almış, taksiciler, taşıyıcı
 firmalar durumdan şikayetçi, onlar da konum bilgisine
-güvenemiyorlar.
+güvenemiyorlar. Kampçılıktan alışkanlık yanımızda hep taşıdığımız
+pusula ise yaradı, GPS olmayınca güney, kuzey neresidir diye bilmek
+iyi olabiliyor.
 
-Kampçılıktan alışkanlık yanımızda hep taşıdığımız pusula ise yaradı,
-GPS olmayınca güney, kuzey neresidir diye bilmek iyi olabiliyor.
-
-Internet: Gitmeden önce Web'den baktık, "yapay zeka"'ya sorduk",
-"mobil gezici (roaming) ayarını yapın, Internet kullanabilirsiniz"
-gibi yorumlar vardı. Bunlara güvenmeyin. Roaming işlemiyor. Çoğu
-popüler İnternet sitesi blok halinde, onlara da erişilemiyor. "VPN ile
-bloku aşarsınız" diyenler var, otelimizin Wifi'i üzerinden birkaç
-bedava VPN denedik, VPN olmadı.
+Internet: Gitmeden önce Web'den baktık, "yapay zeka"'ya sorduk, "mobil
+gezici (roaming) ayarını yapın, Internet kullanabilirsiniz" gibi
+yorumlar vardı. Bunlara güvenmeyin. Roaming işlemiyor. Çoğu popüler
+İnternet sitesi blok halinde, onlara da erişilemiyor. "VPN ile bloku
+aşarsınız" diyenler var, otelimizin Wifi'i üzerinden birkaç bedava VPN
+denedik, VPN olmadı.
 
 Eğer RU telefon / mobil / Internet hattı olsa, onun üzerinden cüzi
 para ödeyip VPN kurulması mümkün imiş (Red Shield?), ama turistik
 seyahat için bunlarla uğraşmak istemedik. Blok edilmiş siteler,
-uygulamaların bazıları YouTube, Whatsapp, Telegram, Google Gemini (ama
-Google Arama, GMail işliyor).
+uygulamaların bazıları YouTube, Whatsapp, Telegram, Instagram, Google
+Gemini (ama Google Arama, GMail işliyor).
 
-RU on ödemeli (prepaid) SIM kartı alınması uzun iş, geldiğimde
-havaalanından çıkarken turistler için "geçici" kartlar satan birisini
-vardı, ama yabancıların SIM alması resmi prosedür gerektiriyor, kart
-hemen açılıyor(muş) ama otelinizin gerekli bakanlığa kaydınızı
-bildirmesi gerekiyor. Bu bildirim oteller için kolay bir iş dediler,
-fakat geçici kart için ne kadar değer mi? 
+On ödemeli (prepaid) SIM kartı alınması uzun iş, fakat geldiğimde
+havaalanından çıkarken turistler için "geçici" kartlar satan birisi
+vard. Normalde yabancıların SIM alması resmi prosedür gerektiriyor, bu
+turistik olan kartlar hemen açılıyor(muş) ama otelinizin gerekli
+bakanlığa kaydınızı bildirmesi gerekiyor. Bu bildirim oteller için
+kolay bir iş dediler, fakat kart geçici, bunu belirtelim.
 
 Harita
 
 Benim en çok işime yarayan Maps.Me uygulaması oldu. Bu programın
 Internet bağlantısına ihtiyacı yoktur, çevrimdışı (offline)
-çalışabilir. Gitmeden öne TR'de iken gidilecek yerin tüm kısımlarına
-tıklayıp o bölge bilgilerinin indirilmesi iyi olur. Böylece yer
-bulunamasa bile önemli nokta, park, müze, cafe isimleri girerek
-(maps.me arama özelliği) konum yaklaşık olarak
-bulunabilir.
+çalışabilir. Gitmeden önce TR'de iken gidilecek yerin tüm kısımlarına
+tıklayıp o bölge bilgilerinin indirilmesi iyi olur. Böylece GPS ile
+yer bulunamasa bile önemli nokta, park, müze, cafe isimleri girerek
+arama ile konum yaklaşık olarak bulunabilir.
 
 Uygulamanın sol üst köşesinde katmanlar (layers) kısmında metro
 haritası katmanı vardır, bu Moskova'da benim çok işime yaradı, tüm
@@ -154,7 +153,9 @@ Moskova metrosunun kullanımı rahat, hatlar arası transfer için dışarı
 çıkılması gerekmez.
 
 Yoldan taksi çevirmek zor, durak noktalarına gitmek lazım, bu noktalar
-Maps.Me uygulamasında gösteriliyor.
+Maps.Me uygulamasında gösteriliyor. İnternet'ten taksi almak için
+Yandex Gö tavsiye edildi (Uber işlemiyor), bu uygulaması olan birisi
+sizin için taksi çağırabilir.
 
 Kaynaklar
 
