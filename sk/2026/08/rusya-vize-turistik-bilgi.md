@@ -113,10 +113,10 @@ aşarsınız" diyenler var, otelimizin Wifi'i üzerinden birkaç bedava VPN
 denedik, VPN olmadı.
 
 Eğer RU telefon / mobil / Internet hattı olsa, onun üzerinden cüzi
-para ödeyip VPN kurulması mümkün imiş (Red Shield?), ama turistik
-seyahat için bunlarla uğraşmak istemedik. Blok edilmiş siteler,
-uygulamaların bazıları YouTube, Whatsapp, Telegram, Instagram, Google
-Gemini (ama Google Arama, GMail işliyor).
+para ödeyip VPN kurulması mümkün imiş (Red Shield?, Incy?), ama
+turistik seyahat için bunlarla uğraşmak istemedik. Blok edilmiş
+siteler, uygulamaların bazıları YouTube, Whatsapp, Telegram,
+Instagram, Google Gemini (ama Google Arama, GMail işliyor).
 
 On ödemeli (prepaid) SIM kartı alınması uzun iş, fakat geldiğimde
 havaalanından çıkarken turistler için "geçici" kartlar satan birisi

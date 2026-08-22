@@ -93,6 +93,22 @@ ayarı. Onu mesela tam sola çekince ekran tam kararabiliyor. Bu tabii
 bir yazılımsal numara olduğu için ekranda yan etkileri olabilir,
 mesela fare imleci (pointer) bazen garip davranabiliyor.
 
+Firmware
+
+BİOS ile bir kere "güncelleme uyarısı" gelmeye başladı. "firmware
+update avaılable for UEFİ CA..." diye giden iki uyarı. UEFİ OS yükleme
+ile alakalı ve bazı durumlarda Linux yüklemeyi engellediği için bu
+güncellemeyi yapmak istemedik,
+
+```
+sudo snap stop --disable firmware-updater.firmware-notifier
+sudo systemctl stop fwupd
+sudo systemctl disable fwupd
+sudo systemctl mask fwupd
+```
+
+ile firmware mesajlarını susturmayı seçtik.
+
 Python 
 
 Sistem için bile olsa sık kullanılan Python paketleri bir sanal
