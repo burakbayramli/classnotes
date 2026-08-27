@@ -171,6 +171,14 @@ index 36fca2e..2bc68cc 100644
          f.close()
 ```
 
+Chrome'da İki Parmak Kaydırma (Swipe) ile Geri Gitme
+
+Tarayıcıda işlem yaparken pek çok kez yanlışlıkla iki parmak ile
+yukarı / aşağı giderken bazen sağa / sola kaydırma yaptığımız oluyor,
+bunlar Chrome üzerinde "geri git" komutuna eşdeğer. Bunu iptal etmek
+için sağ üst köşedeki üç noktaya tıklıyoruz, Settings'e gidiyoruz, ve
+orada arama kutusunda "Swipe between pages" seçeneğini kapatıyoruz.
+
 Tıklama ile Masaüstünü Göster (Show Desktop)
 
 Bazen pencereler çok birikir, tek bir tuşa basıp hepsini minimize

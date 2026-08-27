@@ -383,7 +383,7 @@ R_m = \rho R_v = \rho A v = \textrm{sabit}
 \tag{3}
 $$
 
-sonucuna da varılabilir [9, sf. 399].
+sonucuna da varılabilir.
 
 Bernoulli Deklemi
 
@@ -995,22 +995,11 @@ Kaynaklar
 
 [3] Leveque, Finite Volume Methods
 
-[4] Feynman, *Feynman Lectures on Physics, I*
-
-
 [5] Resnick, *Fundamentals of Physics, 10th Ed*
-
-[6] Khanacademy, 
-    [https://www.khanacademy.org/science/physics/fluids/fluid-dynamics/a/what-is-bernoullis-equation](https://www.khanacademy.org/science/physics/fluids/fluid-dynamics/a/what-is-bernoullis-equation)
 
 [7] Wittenberg, *Flight Physics*
 
 [8] Carpenter, *Aerodynamics for Engineering Students*
-
-[9] Bayramlı, *SU2*,
-    [https://burakbayramli.github.io/dersblog/sk/2021/10/su2.html](https://burakbayramli.github.io/dersblog/sk/2021/10/su2.html)
-
-[10] Aerodynamics for Engineering Students
 
 [11] Storey, *Fluid Dynamics*
 
@@ -1019,38 +1008,8 @@ Kaynaklar
 
 [13] Berloff, *Introduction to Geophysical Fluid Dynamics*,
     [https://wwwf.imperial.ac.uk/~pberloff/gfd_lectures.pdf](https://wwwf.imperial.ac.uk/~pberloff/gfd_lectures.pdf)
-
-[14] Matthews, *Vector Calculus*
-
-[15] Bayramlı, *Cok Boyutlu Calculus, Ders 28,29*
     
 [16] Anderson, *Computational Fluid Dynamics, the basics with applications*
 
-[17] Liu, *Particle Methods for Multi-scale and Multi-physics*
-
-[19] Kreyzig, *Advanced Engineering Mathematics, 10th Edition*
-
-[20] *Mathematics, Numerics, Derivations, and OpenFOAM*
-
-[21] *Introduction to Atmospheric Physics, 2nd Edition*
-
-[22] Hesthaven, *Numerical Methods for Conservation Laws*
-
-[23] Versteeg, *An Introduction to CFD*
-
-[24] Katz, *Introduction to Fluid Mechanics*
-
-[25] Bayramlı, *Fizik, İdeal Gazlar Kanunu*
-
-[26] Leveque, *Numerical Methods for Conservation Laws*
-
-[27] Bayramlı, *Fizik, Gazlar, Sıvılar 1*
-
-[28] Leveque, *Finite Volume Methods*
-
-[29] Zingale, *Tutorial on Computational Astrophysics*,
-    [https://zingale.github.io/comp_astro_tutorial/advection_euler/euler/euler.html](https://zingale.github.io/comp_astro_tutorial/advection_euler/euler/euler.html)
-
-[30] Mueller, *Essentials of Computational Fluid Mechanics*
     
 
