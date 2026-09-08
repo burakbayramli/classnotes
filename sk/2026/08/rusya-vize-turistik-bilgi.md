@@ -54,6 +54,15 @@ Nakit götürülmesi gerekir, oteli bile telefonla rezervasyon sonrası
 ödemesini nakit ile orada yaptık. 10000 USD altındaki yolcunun yanında
 taşıdığı nakitlerin deklere edilmesi gerekmez, en rahat seçenek budur.
 
+Döviz nakit USD, EUR olarak götürülebilir, Rusya'da Ruble değişimi
+yapılır. TR'den dövizi almak için döviz bürolarından YTL karşılığı USD
+alınabilir, fakat eğer çok fazla YTL taşınmak istenmezse, kendi
+bankamızdan dövizi direk alabiliriz. Burada en rahat seçenek bir USD,
+EUR vadesiz hesabı açmak, döviz alımını önce kendi hesabımız içinde
+yapmak. Ardından banka şubesine gidilir oradan direk naktı alabiliriz,
+eğer istenen miktarda döviz o gün yok ise, bir gün sonrası için
+talimat verilip tekrar gidilir, döviz alınır.
+
 TR Havalanı Çıkış
 
 Çıkarken harç ödemesi lazım, bu mobil bankacılık ile yapılabilir
@@ -65,6 +74,14 @@ pasaport içine konurdu, artık o günler geride kalmış ama hala bir harç
 alınıyor.
 
 ### Rusya
+
+Giris
+
+Girişteki görevli elektronik olarak parmak izi, yüz fotoğrafı
+alıyor. Ayrıca size ufak, pasaport sayfası büyüklüğünde bir giriş
+belgesi veriliyor, bu belgeyi hep pasaport içinde tutmak iyi olur
+(pasaportu hep yanda taşımak ta), çıkarken görevli yine parmak izi,
+yüz fotoğrafı sonrası o belgeyi geri alıyor. 
 
 Para
 
