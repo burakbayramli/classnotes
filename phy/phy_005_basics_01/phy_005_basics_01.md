@@ -247,7 +247,7 @@ değer 5.515'e oldukca yaklaşmıştı.
 İş (Work)
 
 İş, günlük terminolojideki iş kavramından farklı. Bir sandalyeyi kaldırıp birkaç
-dakika tutsam çok iş yapmış gibi gelebilir bana [1, sf. 184], ama aslında fiziki
+dakika tutsam çok iş yapmış gibi gelebilir bana [5, sf. 184], ama aslında fiziki
 iş tanımı açısından hiç iş yapmadım. Fizikteki iş bir objeyi bir yönde hareket
 ettiren güç çarpı o objenin aynı yöndeki katettiği mesafe $d$. Eğer kuvvet
 vektörü tam o yönde değilse o yöne tekabül eden bileşenine bakılır, $W = F d
@@ -339,9 +339,9 @@ F_x d = \frac{1}{2} m v^2 - \frac{1}{2} m v_0^2
 $$
 
 Yani yapılan iş ile objeye (boncuğa) enerji transfer
-edilmiştir. Başlangıçtaki kinetik enerji $\frac{1}{2} m v_0^2$ yapılan iş
-ile $\frac{1}{2} m v^2$ olmuş. Aradaki fark $F_x d$ ile hesaplanıyor, ki bu
-çoğunlukla $W$ ile tanımlanan iş. 
+edilmiştir. Başlangıçtaki kinetik enerji $\frac{1}{2} m v_0^2$ yapılan
+iş ile $\frac{1}{2} m v^2$ olmuş. Aradaki fark $F_x d$ ile
+hesaplanıyor, ki bu çoğunlukla $W$ ile tanımlanan iş.
 
 Güç (Power)
 
@@ -362,16 +362,20 @@ $$
 P \equiv \lim_{\Delta t \to 0} \frac{W}{\Delta t} = \frac{\mathrm{d} W}{\mathrm{d} t}
 $$
 
-Eğer uygulanan gücün yol açtığı yer değişimini sonsuz küçük $\mathrm{d} s$ ile
-belirtsek, $\mathrm{d} W = F \cdot \mathrm{d} s$ diyebilirdik o zaman üstteki formül
+Eğer uygulanan gücün yol açtığı yer değişimini sonsuz küçük
+$\mathrm{d} s$ ile belirtsek, $\mathrm{d} W = F \cdot \mathrm{d} s$
+diyebilirdik o zaman üstteki formül
 
 $$
-P = \frac{\mathrm{d} W}{\mathrm{d} t} = F \cdot \frac{\mathrm{d} s}{\mathrm{d} t} = F \cdot v
+P = \frac{\mathrm{d} W}{\mathrm{d} t} =
+F \cdot \frac{\mathrm{d} s}{\mathrm{d} t} =
+F \cdot v
 $$
 
-ki burada $v = \mathrm{d} s / \mathrm{d} t$ eşitliğini kullandık. Yani elimizde kuvvet ve hız
-var ise, yer değişimine bakmadan gücü direk bu iki öğeden bulabiliriz, çünkü hız
-zaten birim zamandaki yer değişimini temsil ediyor.
+ki burada $v = \mathrm{d} s / \mathrm{d} t$ eşitliğini kullandık. Yani
+elimizde kuvvet ve hız var ise, yer değişimine bakmadan gücü direk bu
+iki öğeden bulabiliriz, çünkü hız zaten birim zamandaki yer değişimini
+temsil ediyor.
 
 Örnek
 
@@ -541,10 +545,11 @@ Bir araba motoru hala bu gücü sağlayabilir.
 
 Yokuş Yukarı Sabit Hız
 
-İvmelenmeyi gözönüne almak istemiyorsak [9], sadece yokus yukarı yerçeki
-kuvvetine yetecek bir kuvvetle belli sabit bir hızda gitmek için gereken gücü
-hesaplamamız gerekse, mesela 8.53 derece yukarı, saatte 90 km/s, 1200 kg
-ağırlığındaki araba için, $P = F \cdot v$ formülünden hareketle,
+İvmelenmeyi gözönüne almak istemiyorsak, sadece yokuş yukarı yerçekim
+kuvvetine yetecek bir kuvvetle belli sabit bir hızda gitmek için
+gereken gücü hesaplamamız gerekse, mesela 8.53 derece yukarı, saatte
+90 km/s, 1200 kg ağırlığındaki araba için, $P = F \cdot v$ formülünden
+hareketle,
 
 ```python
 print (int(1200 * 9.8 * (90 / 3.6) * np.sin(8.53) / 1000.0), 'KWatt')
@@ -596,14 +601,4 @@ Kaynaklar
 
 [8] Wikipedia, [https://en.wikipedia.org/wiki/Earth_mass#Early_estimates](https://en.wikipedia.org/wiki/Earth_mass#Early_estimates)
 
-[9] Kelly, *University of Auckland, Solid Mechanics, Part I*
-
 [10] Masson, *Elastic Collisions in 3D*, [https://exploratoria.github.io/exhibits/mechanics/elastic-collisions-in-3d/index.html](https://exploratoria.github.io/exhibits/mechanics/elastic-collisions-in-3d/index.html)
-
-
-
-
-
-
-
-

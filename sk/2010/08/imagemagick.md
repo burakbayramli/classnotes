@@ -22,6 +22,14 @@ endiselendirmez, o zaman kalitede indirim de yapılabilir, `-quality 90` ile,
 convert buyuk_resim.jpg  -quality 90  -scale 50% yeni_resim.jpg
 ```
 
+Bazen cep telefonundan gelen fotolar ne yaparsak yapalım
+küçülmüyorlar, bunun sebebi telefon kamera programının ekstra bazı
+bilgileri JPG dosyasının içine yazmasıdır. Bu bilgileri çıkartıp
+küçültme yaparsak sonuç alabiliriz,
+
+```
+convert -auto-orient -scale 40% -strip -quality 30 input.jpg output.jpg
+```
 
 Eğer animasyon gif dosyası üzerinde aynı komutu işletirsek,
 animasyondaki her kare ayrı bir png dosyası olarak verilirdi. Sonek

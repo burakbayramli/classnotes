@@ -2,6 +2,12 @@
 
 ### TR
 
+Sabiha Gökçen'e Gidiş
+
+Mesela Bursa Otogar'dan Havaist otobüsleri kalkar, SBH kapısı önünde
+indirir. Biletler bus.hava.ist ile alınabilir. SBH Gökçen metro girişi
+kapılardan doğuya doğru yürüyerek bulunabilir.
+
 Seyahat Sigortası
 
 Vize başvurusu öncesi elde olması gereken tek belge sağlık
@@ -67,11 +73,12 @@ TR Havalanı Çıkış
 
 Çıkarken harç ödemesi lazım, bu mobil bankacılık ile yapılabilir
 (Sabiha Gökçen'deki "harç kioskları" güvenilir degil, ben baktığımda
-bu aletler çalışmıyordu). Programda "Ödemeler | Harç" seçilir, şehir
-"İstanbul" seçilir, ilçe herhangi bir ilçe olabilir. Mevcut tarih
-itibarı ile 1500 TL.  Eski günlerde "pul" satan birisi olurdu, o pul
-pasaport içine konurdu, artık o günler geride kalmış ama hala bir harç
-alınıyor.
+bu aletler çalışmıyordu). Programda "Ödemeler | Pasaport Yurt Disi
+Cikis Harci" seçilir, sonra "Yurt Disi Cikis Harci", vergi dairesi
+sehri "İstanbul" seçilir, ilçe herhangi bir ilçe olabilir. Mevcut
+tarih itibarı ile 1500 TL.  Eski günlerde "pul" satan birisi olurdu, o
+pul pasaport içine konurdu, artık o günler geride kalmış ama hala bir
+harç alınıyor.
 
 ### Rusya
 
@@ -159,6 +166,14 @@ Maps.Me'nin bir diğer özelliği dışarıdan GPX yol izi dosyalarını
 haritaya ekleyebilmesi. Mesela altta benim paylaştığım [1] hattı GPX
 olarak indirilebilir, ve o dosyaya Android'de tıklanınca dosya Maps.ME
 içinde açılır. Bu tür önceden gezilmiş hat bilgileri faydalı olabilir.
+
+Sabiha Gökçen'den Dönüş
+
+Yine Havaist kullanmak isteyenler için, SBH otobüs binis noktası
+"metro girişi" olarak söyleniyor, dikkat, bu giriş İŞG Oteli önündeki
+havalanı kapılarına yakın giriş değil, metronun *diğer ucundaki*
+giriş.
+
 
 ### Özet
 
