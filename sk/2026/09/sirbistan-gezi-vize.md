@@ -41,6 +41,14 @@ güvenilebilir (çünkü oy verme vs. sistemi var), ve bu uygulamalar
 zaten taksiye binmeden önce aşağı yukarı ne kadar ödeneceğini
 söylüyor.
 
+Yemekler
+
+Ünlü yemeklerden biri *ćevapı*, bu bir köfte şekli, bizim Tekirdağ /
+Inegöl köftesine benziyor, daha çok Tekirdağ, TR versiyonu daha iyi
+diyebilirim. :) Bir restoranda yine bizim mutfağa benzer etli biber
+dolma vardı, fena değil, her nedense patates püre üzerinde servis
+ediliyor. Kahvaltılar ne Yunan ne bizim tarza benziyor.
+
 Internet
 
 Aynen Rusya'da [1] oldugu gibi mobil saglayicinizin gezinti modu
@@ -59,10 +67,8 @@ kullanmak mumkun olur.
 
 Odeme
 
-Sirbistan'da her turlu kredi karti isler. Benim on odemeli (prepaid)
-dandik bir kredi kartim bile temazsiz odeme POS'larinda isledi.
-
-
+Sırbistan'da her türlü kredi kartı işler. Benim on ödemeli (prepaid)
+dandik bir kredi kartım bile temazsız ödeme POS'larında işledi.
 
 Kaynaklar
 
