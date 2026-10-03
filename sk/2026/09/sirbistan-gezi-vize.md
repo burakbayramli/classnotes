@@ -7,7 +7,7 @@ AJet
 
 Bu bir düşük maliyetli havayoludur (budget airliner), THY tarafından
 oluşturulan bir yeni şirket (Pegasus ile rekabet için).  Bu tür
-havayollarında hiçbir bedava ikram olmuyor, şu için bile kredi kartı
+havayollarında hiçbir bedava ikram olmuyor, su için bile kredi kartı
 ile ödeme yapıyorsunuz. Bir diğer problem agresif müşteri
 kabulü. Koltuk sayısından fazla müşteriye bilet veriliyor, istatistiki
 olarak bazı müşteriler gelmiyor, ve sonunda (normalde) koltuklar
@@ -18,52 +18,66 @@ Bu sebeple kayıt (check in) önceden yapılırsa iyi olur. Eğer gidiş
 günü / saatinden bir gün önce AJet kayıt (check in) için bir email
 yollarsa, bu mail ile muhakkak online kayıt yapıp koltuk numarası
 almak lazım. Eğer koltuk numarası önceden alınmazsa bilet ücreti
-ödenmiş olsa bile, o gün bizzat gidip müşteri gisesine (birkaç saat
-önce olsa bile) gidildiğinde "bekleyen müşteri (stand by)" haline
-düşmek mümkündür.
+ödenmiş olsa bile, o gün bizzat müşteri gisesine (birkaç saat önce
+olsa bile) gidildiğinde "bekleyen müşteri (stand by)" haline düşmek
+mümkündür.
 
 Sırbistan Havaalanı
 
 Nikola Tesla Havalanına (kodu BEG) indikten sonra onların para birimi
-dınar alınabilir, standart döviz türleri kabul ediliyor.
+dinar alınabilir, otomat makinalar var, gise de var, standart döviz
+türleri kabul ediliyor.
 
 Taksi için dolandırıcılara karşı bir sistem kurmuşlar, havaalanındaki
 bir alet üzerinden Belgrad'da gidilecek bölge seçilip o aletten bir
-fıs (voucher) alınıyor, taksiciye o fıste söylenenden fazla
+fiş (voucher) alınıyor, taksiciye o fişte söylenenden fazla
 ödenmiyor. Ben bunu kullanmadım, taksi durağındaki ilk taksiye bindik,
-problem olmadı. Fakat niştepen iyi bir bölgedeki bir AVM önündeki
-durakta bekleyen taksi ile problem çıktı. Çözüm şudur, taksi için
-Sırbistan'da en iyi sistem Yandex Gö. BEG havalanında, ve pek çok
-yerde, bedava Wifi var zaten. App Store'dan indirilir, kayıt olunur
-(TR no problem değil), ve bilinen taksi çağırma (ride hailing)
-uygulamalarında olduğu gibi taksi çağrılır. Buradan gelen taksilere
-güvenilebilir (çünkü oy verme vs. sistemi var), ve bu uygulamalar
-zaten taksiye binmeden önce aşağı yukarı ne kadar ödeneceğini
-söylüyor.
+problem olmadı. Fakat nistepen iyi bir bölgedeki bir AVM önündeki
+durakta bekleyen taksi ile problem çıktı.
+
+Çözüm şudur, taksi için Sırbistan'da en iyi sistem Yandex Go. BEG
+havalanında, ve pek çok yerde bedava Wifi var zaten. App Store'dan
+indirilir, kayıt olunur (TR cep no problem değil), ve bilinen taksi
+çağırma (ride hailing) uygulamalarında olduğu gibi taksi
+çağrılır. Buradan gelen taksilere güvenilebilir (çünkü oy verme
+vs. sistemi var), ve bu uygulamalar zaten taksiye binmeden önce aşağı
+yukarı ne kadar ödeneceğini söylüyor.
 
 Yemekler
 
 Ünlü yemeklerden biri *ćevapı*, bu bir köfte şekli, bizim Tekirdağ /
 Inegöl köftesine benziyor, daha çok Tekirdağ, TR versiyonu daha iyi
-diyebilirim. :) Bir restoranda yine bizim mutfağa benzer etli biber
-dolma vardı, fena değil, her nedense patates püre üzerinde servis
-ediliyor. Kahvaltılar ne Yunan ne bizim tarza benziyor.
+diyebilirim. Bir restoranda yine bizim mutfağa benzer etli biber dolma
+vardı, fena değil, patates püre üzerinde servis ediliyor. Kahvaltılar
+ne Yunan ne bizim tarza benziyor, daha çok Bulgaristan benzerliği var
+dendi. Börek zenginliği TR'de olduğu gibi, ıspanaklı, kıymalı her
+çeşit mevcut. Starbucks'ta bile ıspanaklı börek servis ediliyor (bu
+TR'de bir ara vardı, artık yok).
+
+Gezilecek Yerler
+
+Belgrad'ın en modern yeri şu anda Belgrade Waterfront, Sava nehri
+doğusunda Galerija AVM'yi merkez alan bölge. Hip cafe'ler, yeni
+yapılmış ev manzaraları isteyenler için burası güzel.
+
+Kalamegdan parkı bir diger tavsiye, park içinden geçip nehir
+manzarası, oradan sahile iniş ve Galerija'ya yürüyüş mümkün.
 
 Internet
 
-Aynen Rusya'da [1] oldugu gibi mobil saglayicinizin gezinti modu
-(roaming) servisi guvenilir degil. Ne kadar onceden bu ayarlari acmis
-olsak ta (roaming olsun, disarida kullanim olsun) mobil internet veri
-baglantisi Sirbistan'da calismaz.
+Aynen Rusya'da [1] olduğu gibi mobil sağlayıcınızın gezinti modu
+(roaming) servisi veri için işlemiyor. Ne kadar önceden bu ayarları
+açmış olsak ta (roaming olsun, dışarıda kullanım olsun) mobil ınternet
+veri bağlantısı Sırbistan'da çalışmadı.
 
 AVM, cafe, restoran gibi pek cok yerde bedava Wifi var.
 
-Fakat en kalici cozum herhalde esim kullanmak, mesela simify gibi bir
-servisle onceden odenmis (prepaid) bir paket alinir, App indirilir, ve
-bu erisim paketi SIM kartiymis gibi kullanilir, mobil veri islemlerini
-bu esim halleder. Onceden 3-5 GB kapasitesinde esim paket alinirsa
-acil isler icin herhalde yeterli olur. En azindan her yerde Yandex Go
-kullanmak mumkun olur.
+Fakat en kalıcı çözüm herhalde `esim` kullanmak, mesela simify gibi
+bir servisle önceden ödenmiş (prepaid) bir paket alınır, App
+indirilir, ve bu erişim paketi SIM kartıymış gibi kullanılır, mobil
+veri işlemlerini bu `esim` halleder. Önceden 3-5 GB kapasitesinde
+paket alınırsa acil işler için herhalde yeterli olur. En azından her
+yerde Yandex Go kullanmak mümkün olur.
 
 Odeme
 
@@ -73,3 +87,4 @@ dandik bir kredi kartım bile temazsız ödeme POS'larında işledi.
 Kaynaklar
 
 [1] [Rusya](../08/rusya-vize-turistik-bilgi.html)
+
