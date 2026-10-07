@@ -22,13 +22,23 @@ edelim, bu kutunun hacmi tabii ki $dV=\ud x \ud y \ud z$ olur. Dikkat,
 burada anahtar kelime *sabitlenmiş*. Sıvı bu sabit kutunun içinden
 akıyor, kutunun kendisi hareket etmiyor.
 
-Sıvının (gazın) her noktasında elimizdeki büyüklükler, ölçümler şunlar,
+Sıvının (gazın) her noktasındaki büyüklükler şunlar,
 
 * yoğunluk $\rho(x,y,z,t)$;
 * basınç $p(x,y,z,t)$;
 * hız $V=(u,v,w)$
 * spesifik iç enerji $e$.
 
+Ulaşmak istediğimiz bir muhafaza kanunu olacak, bu sebeple içinden
+sıvının geçtiği sabitlenmiş bir hacim seçtik, ve bu hacim içinde
+muhafazasını garanti edeceğimiz büyüklükler $\rho,\rho u,\rho v,\rho
+w,\rho E$ olacak. Bunlar nedir,
+
+* $\rho$: birim hacimdeki kütle
+* $\rho u$: birim hacimdeki $x$-momentum
+* $\rho v:$ birim hacimdeki $y$-momentum 
+* $\rho u$: birim hacimdeki $z$-momentum 
+* $\rho E$: birim hacimdeki toplam enerji
 
 
 
