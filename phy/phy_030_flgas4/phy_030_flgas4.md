@@ -71,6 +71,23 @@ $$
 \frac{\mathrm{J}}{\mathrm{m^3}}
 $$
 
+Kütle Muhafazası
+
+Fiziksel prensibi hatırlayalım, evrende kütle yeniden yaratılmaz ve
+kaybolmaz. Bu prensibin sonucu o kutuya giren çıkan kütleleri hesaba
+katmamız gerektiğidir, yani kutu sınırlarından giren ve çıkan kütle o
+kutudaki kütle miktarını artırır ya da azaltır. Yani artan, azalan,
+giren, çıkan tüm kütle miktarlarının muhasebesi yapılmalıdır.
+
+
+
+
+
+
+
+
+
+
 
 
 
