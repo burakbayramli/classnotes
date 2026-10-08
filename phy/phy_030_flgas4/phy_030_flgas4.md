@@ -74,12 +74,34 @@ $$
 Kütle Muhafazası
 
 Fiziksel prensibi hatırlayalım, evrende kütle yeniden yaratılmaz ve
-kaybolmaz. Bu prensibin sonucu o kutuya giren çıkan kütleleri hesaba
-katmamız gerektiğidir, yani kutu sınırlarından giren ve çıkan kütle o
-kutudaki kütle miktarını artırır ya da azaltır. Yani artan, azalan,
-giren, çıkan tüm kütle miktarlarının muhasebesi yapılmalıdır.
+kaybolmaz. Bu prensip sebebiyle ufak kutumuza giren çıkan kütleleri
+hesaba katmamız gerekir (dikkat kutu *içindeki* kütlenin
+muhafazasından bahsedilmiyor), kutu sınırlarından giren ve çıkan kütle
+o kutudaki kütle miktarını artırır ya da azaltır. Yani artan, azalan,
+giren, her miktarların muhasebesi yapılmalıdır.
 
+$$
+\text{kutu içindeki kütle artış oranı} = \text{kutuya giren kütle oranı} - \text{çıkan kütle oranı}.
+$$
 
+Ya da
+
+$$
+\text{kütle artış oranı} +  \text{net kütle çıkış oranı} = 0
+$$
+
+Ufak kutumuzun içindeki kütle,
+
+$$
+\ud m=\rho \ud x \ud y \ud z
+$$
+
+Bu kütlenin artış oranı için eşitliğin sağ tarafının zamana göre kısmi
+türevini alabiliriz,
+
+$$
+\frac{\partial\rho}{\partial t} \ud x \ud y \ud z.
+$$
 
 
 
