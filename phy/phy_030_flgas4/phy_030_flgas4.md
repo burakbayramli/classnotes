@@ -40,10 +40,36 @@ w,\rho E$ olacak. Bunlar nedir,
 * $\rho u$: birim hacimdeki $z$-momentum 
 * $\rho E$: birim hacimdeki toplam enerji
 
+Dikkat $E$ büyüklüğü toplam spesifik enerji, birimi birim kütledeki
+(mass) toplam enerji, $E=\frac{\text{energy}}{\text{mass}}$,
 
+$$
+E=\frac{J}{kg}
+=\frac{kg \cdot m^2}{s^2 \cdot kg}
+=\frac{m^2}{s^2}.
+$$
 
+Metre ve saniye ile enerji bağlantısı ne olabilir diye düşünülürse
+kinetik enerji hatırlanabilir, birim kütledeki kinetik enerji
+terimleri şöyle olurdu,
 
+$$
+\frac{1}{2}v^2 \implies \left(\frac{\text{m}}{\text{s}}\right)^2 =
+\frac{\text{m}^2}{\text{s}^2}
+$$
 
+$\rho E$'ye dönersek, $\rho$ birim hacimdeki kütle olduğuna göre yani
+$\rho=\frac{\mathrm{kg}}{\mathrm{m^3}}$, o zaman $\rho$ ve $E$
+çarpılınca
+
+$$
+\rho E
+=
+\frac{\mathrm{kg}}{\mathrm{m^3}}
+\frac{\mathrm{J}}{\mathrm{kg}}
+=
+\frac{\mathrm{J}}{\mathrm{m^3}}
+$$
 
 
 
