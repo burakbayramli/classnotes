@@ -103,18 +103,125 @@ $$
 \frac{\partial\rho}{\partial t} \ud x \ud y \ud z.
 $$
 
-Simdi usttekinin neye esit olduguna / onun tanimina gelelim. Bu tanim
-daha once belirttigimiz gibi kutuya giren ve cikan kutle oranlarinin
-farkini kullanacak. 
+Şimdi üsttekinin neye eşit olduğuna / onun tanımına gelelim. Bu tanım
+daha önce belirttiğimiz gibi kutuya giren ve çıkan kütle oranlarının
+farkını kullanacak. Hesabı şöyle yapabiliriz. Önce $x$ tarafına bakan
+dikdörtgeni alalım, alanı $\ud y \ud z$ olsun, oradan akan kütle
+oranını hesaplayabiliriz. Bu yüzeye dikgen / normal olan akış $u$ ile
+gösteriliyor, çünkü akış hız vektörünün bileşenlerini daha önce
+göstermiştik, $V=(u,v,w)$, işte $u$ buradaki $u$. Bu hızı temel
+alalım, $\ud t$ zamanı sonunda $u \ud t$ kadar kütle akmıştır
+diyebiliriz.
 
+O akmış olan kütlenin hacmini de hesaplayabiliriz, $\ud V = u \ud t
+\ud y \ud z$, kütlesi $\ud m = \rho \ud V$, yani $dm = \rho u \ud t
+\ud y \ud z$. Simdi her seyi $\ud t$ ile bölersek, $\frac{\ud m}{\ud
+t} = \rho u \ud y \ud z$ elde ederiz, işte bu $\ud y \ud z$ alanından
+akan kütle akış oranıdır. Bu yuzdeki akisa, sola bakan yuz diyebiliriz,
 
+$$
+(\rho u)_x \ud y \ud z
+\tag{2}
+$$
 
+ismi verelim. Şimdi kutunun diğer yüzeyinden olan akışa bakalım,
+üstteki $x$ noktasındaydı, şimdi $x+\ud x$ noktasındaki yüzeye
+bakalım, bu da sağdaki yüz olabilir, oradaki akış için $(\rho u)_x$
+ifadesini kullanarak Taylor açılımı yapabiliriz,
 
+$$
+(\rho u)_{x+\ud x} = (\rho u)_x + \frac{\partial(\rho u)}{\partial x}\ud x.
+$$
 
+Yani $f(x+dx)$ gibi bir ifade kullanmak yerine $f(x)$ içeren ve onun
+yersel (spatial) türevini içeren bir formül kullanmak daha iyi oldu,
+cebiri basitleştirdi. Matematiksel olarak Taylor açılımı kullanmak
+uydundur çünkü $\ud x \to 0$ olduğu bir ortamda işleyecek bir
+diferansiyel denklem türetiyorum, ve bu sebeple Taylor açılımındaki
+daha yüksek dereceli terimleri yok sayabiliyorum.
 
+Devam edelim, o zaman sağ yüzde akış,
 
+$$
+\left[
+(\rho u)_x + \frac{\partial(\rho u)}{\partial x}\ud x
+\right]
+\ud y \ud z
+\tag{3}
+$$
 
+Demek ki $x$ yönündeki net akış (2) eksi (3) ile hesaplanabilir,
 
+$$
+\left[ (\rho u)_x\,dy\,dz +
+\frac{\partial(\rho u)}{\partial x}\ud x \ud y \ud z \right] -
+(\rho u)_x \ud y \ud z
+$$
+
+$$
+= \frac{\partial(\rho u)}{\partial x} \ud x \ud y \ud z.
+$$
+
+Benzer mantığı $y$ yönü için kullanırsak,
+
+$$
+\frac{\partial(\rho v)}{\partial y}
+\ud x \ud y \ud z
+$$
+
+$z$ yönü için de
+
+$$
+\frac{\partial(\rho w)}{\partial z}
+\ud x \ud y \ud z
+$$
+
+Şimdi nihai formüle gelelim, eğer net pozitif bir akış var ise bu
+birim hacimimizden kütle çıkışı var demektir [1, sf. 55], bu bir
+azalmayı temsil eder. Formülü o zaman şu şekilde oluşturmalıyız,
+
+$$
+\frac{\partial\rho}{\partial t}\ud x \ud y \ud z
+=
+- \frac{\partial(\rho u)}{\partial x}\ud x \ud y \ud z
+- \frac{\partial(\rho v)}{\partial y}\ud x \ud y \ud z
+- \frac{\partial(\rho w)}{\partial z}\ud x \ud y \ud z
+$$
+
+$\ud x \ud y \ud z$ ile bölersek, ve tüm terimleri bir tarafa alırsak,
+
+$$
+\frac{\partial\rho}{\partial t}
++
+\frac{\partial(\rho u)}{\partial x}
++
+\frac{\partial(\rho v)}{\partial y}
++
+\frac{\partial(\rho w)}{\partial z}
+=0.
+$$
+
+Üstteki ifadeyi uzaklaşım (divergence) operatörü ile göstermek daha
+yalın formül verebilir,
+
+$$
+\textrm{div} (\rho\mathbf V) =
+\nabla\cdot(\rho\mathbf V) =
+\frac{\partial(\rho u)}{\partial x}
++
+\frac{\partial(\rho v)}{\partial y}
++
+\frac{\partial(\rho w)}{\partial z},
+$$
+
+Yani
+
+$$
+\frac{\partial\rho}{\partial t}
++
+\nabla\cdot(\rho\mathbf V)
+=0.
+$$
 
 
 
@@ -123,5 +230,5 @@ farkini kullanacak.
 
 Kaynaklar
 
-[1] Anderson, Computational Fluid Dynamics, The Basics With Applications
+[1] Anderson, *Computational Fluid Dynamics, The Basics With Applications*
 
