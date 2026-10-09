@@ -103,7 +103,9 @@ $$
 \frac{\partial\rho}{\partial t} \ud x \ud y \ud z.
 $$
 
-
+Simdi usttekinin neye esit olduguna / onun tanimina gelelim. Bu tanim
+daha once belirttigimiz gibi kutuya giren ve cikan kutle oranlarinin
+farkini kullanacak. 
 
 
 

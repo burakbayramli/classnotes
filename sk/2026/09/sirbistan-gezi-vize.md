@@ -1,4 +1,4 @@
-# Sirbistan
+# Sırbistan
 
 Bu ülke için vizeye ihtiyaç yoktur. Sabiha Gökçen'den AJet ile
 gidilebiliyor. Harç vb gibi ek konular için bkz [1].
@@ -67,7 +67,7 @@ Internet
 
 Aynen Rusya'da [1] olduğu gibi mobil sağlayıcınızın gezinti modu
 (roaming) servisi veri için işlemiyor. Ne kadar önceden bu ayarları
-açmış olsak ta (roaming olsun, dışarıda kullanım olsun) mobil ınternet
+açmış olsak ta (roaming olsun, dışarıda kullanım olsun) mobil internet
 veri bağlantısı Sırbistan'da çalışmadı.
 
 AVM, cafe, restoran gibi pek cok yerde bedava Wifi var.
@@ -79,7 +79,7 @@ veri işlemlerini bu `esim` halleder. Önceden 3-5 GB kapasitesinde
 paket alınırsa acil işler için herhalde yeterli olur. En azından her
 yerde Yandex Go kullanmak mümkün olur.
 
-Odeme
+Ödeme
 
 Sırbistan'da her türlü kredi kartı işler. Benim on ödemeli (prepaid)
 dandik bir kredi kartım bile temazsız ödeme POS'larında işledi.
@@ -87,4 +87,6 @@ dandik bir kredi kartım bile temazsız ödeme POS'larında işledi.
 Kaynaklar
 
 [1] [Rusya](../08/rusya-vize-turistik-bilgi.html)
+
+
 
