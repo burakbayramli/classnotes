@@ -137,8 +137,8 @@ aşarsınız" diyenler var, otelimizin Wifi'i üzerinden birkaç bedava VPN
 denedik, işlemedi.
 
 Eğer RU telefon / mobil / Internet hattı olsa, onun üzerinden cüzi
-para ödeyip VPN kurulması mümkün imiş (Red Shield?, Incy?), ama
-turistik seyahat için bunlarla uğraşmak istemedik. Blok edilmiş
+para ödeyip VPN kurulması mümkün imiş (Red Shield?, Incy?, SuperVPN?),
+ama turistik seyahat için bunlarla uğraşmak istemedik. Blok edilmiş
 siteler, uygulamaların bazıları YouTube, Whatsapp, Telegram,
 Instagram, Google Gemini (ama Google Arama, GMail işliyor).
 
