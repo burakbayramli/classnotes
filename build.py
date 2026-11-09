@@ -100,6 +100,8 @@ def title_sci(to):
             fout.write("<p><a href='%s'>%s</a><p/>" % (html,title))
         fout.write("<br/><a href='../index.html'>Yukarı</a><br/>")
 
+def strip_em(match):
+    return re.sub(r'</?em>', '_', match.group(0))
 
 def gen_html_sk():
     dirs, files = ls(os.getcwd() + "/sk")
@@ -120,6 +122,7 @@ def gen_html_sk():
                 res = util.html_head.replace("[title]","")
                 res += markdown2.markdown(content, extras=['fenced-code-blocks'])
                 res += util.bottom
+                res = re.sub(r'<p>\$\$.*?\$\$</p>', strip_em, res, flags=re.DOTALL)
                 fout = open(path + "/" + fhtml, "w")
                 fout.write(res)
                 fout.close()
