@@ -3,12 +3,11 @@
 Sabitlenmiş bir kur devaluasyon yasamaya yakın mıdır? Bir ülkenin kur
 krizi yaşama ihtimali nedir? The Global Macro Database [1] adı verilen
 veriyi kullanarak kriz tahmini yapma amaçlı bir gösterge (indicator)
-takip eden / saptayıcı / tahminci yazılımı paylaşacağız.
-
-GMD verisi IMF, Dünya Bankası, OECD verilerini birleştirir ve finans,
-kur krizlerini etiketleyerek araştırmacıların rahatça erisebileceği
-bir kaynak sağlar. Veriyi direk [2]'den zip / csv olarak
-indirebiliriz. Bir diğer yöntem,
+takip eden / saptayıcı / tahminci yazılımı paylaşacağız. GMD verisi
+IMF, Dünya Bankası, OECD verilerini birleştirir ve finans, kur
+krizlerini etiketleyerek araştırmacıların rahatça erisebileceği bir
+kaynak sağlar. GMD her çeyrekte güncellenir. Veriyi direk [2]'den zip
+/ csv olarak indirebiliriz. Bir diğer yöntem,
 
 ```
 pip install global_macro_data
@@ -25,7 +24,17 @@ df.to_csv('/opt/Downloads/gmd/gmd.csv')
 Bu yöntem eğer güncel yeni veri varsa en son versiyonu indirir, yoksa
 eski versiyonu tutar, veri indirmesi olmaz.
 
-Tasarım
+GMD ham verisine bakınca mevcut seneden ilerideki seneler için de veri
+olduğunu görüyoruz. Mesela 2026'da isek veri içinde
+2027,2028,.. verileri var. Neden? Tabanı yaratanlar ileri seneler için
+de kendi tahminlerini veriye eklemiser. Büyük ihtimalle bazı analiz
+araçları buna ihtiyaç duyuyor, eki ondan yapmışlar. Not olarak buraya
+düşelim, eğer analizinizin böyle bir ihtiyacı yoksa sadece bir
+başlangıç senesi değil, bitiş senesi de filtre şartı olarak koymak
+gerekebilir, çünkü tahmin edilmiş seneleri analize dahil etmek
+istenmeyebilir.
+
+### Tasarım
 
 Yaklaşmakta olan krizlerin farklı önden gelen göstergeleri (leading
 indicator) olabilir. Altta tahmin amaçlı bizim kullandıklarımızı
@@ -122,6 +131,40 @@ dengesi bozulur, gerçek döviz kuru (yani `rer`) çok yükselir. Bu
 sinyal analiz için faydalı olacaktır. Ülke ekonomisine zarar veren
 eylemler krize yol açma potansiyeli olan anlara işaret edebilir.
 
+Altta Arjantin ülkesi için tarif edilen hesabın nasıl yapıldığını
+görüyoruz.
+
+```python
+import pandas as pd
+
+df = pd.read_csv("/opt/Downloads/gmd/gmd.csv")
+df = df[df.year > 1950]
+us_cpi = df[df.ISO3 == "USA"].set_index("year")["CPI"]
+dlog = lambda s: np.log(s.where(s > 0)).diff()
+country = "ARG"
+
+def build(g):
+    g = g.sort_values("year").set_index("year")
+    g = g.reindex(range(int(g.index.min()), int(g.index.max()) + 1))
+    g["ISO3"] = g["ISO3"].ffill().bfill()
+    idx = g.index
+    rer = np.log((g["USDfx"] * us_cpi.reindex(idx) / g["CPI"]).where(lambda s: s > 0))
+    rer = rer.replace([np.inf, -np.inf], np.nan)
+    return rer
+
+dfs = df[df["ISO3"] == country]
+res = build(dfs)
+
+crisis_years = dfs[dfs['CurrencyCrisis'] == 1]['year']
+for cy in crisis_years:
+  plt.axvline(x=cy,color='red',linestyle='--',alpha=0.7)
+
+res.plot()
+plt.savefig('curr_02.jpg')
+```
+
+![](curr_02.jpg)
+
 Fakat salt `rer` tek başına yeterli değil. Ülkelerin ABD'ye göre kur
 seviyeleri, oran olarak hesaplamış olsak bile, birbirinden değişik
 olabilir, herkesin fiyat seviyesi farklıdır. O zaman tüm ülkeleri
@@ -129,11 +172,9 @@ kapsayacak `rer` bazlı bir regresyon iyi sonuç vermez.  Fakat her ülke
 için farklı olsa da `rer`'den sapma kalıplarına odaklanırsak, daha
 faydalı bir sinyal çıkartabiliriz. İşte `rer_dev` burada devreye
 girer. Bir trend hesaplarız, o trend'den sapmayı sinyal haline
-getiririz.
-
-Trend hesabını kaydırılan pencereler üzerinde lineer regresyon ile
-hesaplayabiliriz. Altta bu hesabı örnek bir zaman serisi üzerinde
-görüyoruz (Amazon şirketinin senet fiyatı),
+getiririz. Trend hesabını kaydırılan bir pencere üzerinde lineer
+regresyon ile hesaplayabiliriz. Altta bu hesabı örnek bir zaman serisi
+üzerinde görüyoruz (Amazon şirketinin senet fiyatı),
 
 ```python
 import pandas as pd
@@ -156,6 +197,10 @@ plt.savefig('curr_01.jpg')
 
 ![](curr_01.jpg)
 
+Artık sapmaları hesaplamak gayet basit, ham veriyi trend'den
+çıkartınca geri kalan sapma olacaktır.
+
+### Nihai Kod
 
 
 
