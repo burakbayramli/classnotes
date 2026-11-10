@@ -38,9 +38,8 @@ istenmeyebilir.
 
 Yaklaşmakta olan krizlerin farklı önden gelen göstergeleri (leading
 indicator) olabilir. Altta tahmin amaçlı bizim kullandıklarımızı
-altta, onları saptarken [3,4] yazılarını temel aldık.
-
-Tahmin amacıyla lojistik regresyon istatistik yöntemini baz aldık. Bir
+altta, onları saptarken [3,4] yazılarını temel aldık. Tahmin tekniği
+olarak lojistik regresyon istatistik yöntemini kullanıldı. Bir
 senedeki (birazdan listeleyeceğimiz) değişkenler bir *sonraki*
 senedeki kriz varlığı (1/0) ile regresyona verilecek. Kriz kolonu
 GMD'de `CurrencyCrisis`. Ardından tanımladığımız değişkenlerin
