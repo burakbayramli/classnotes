@@ -3,6 +3,8 @@
 
 ## En Son
 
+12/11 - [Kur Krizi Alarmı](https://burakbayramli.github.io/dersblog/sk/2026/11/currency-crisis-detector.html)
+
 5/8 - [Para, Enflasyon, Kurlar](https://burakbayramli.github.io/dersblog/tser/tser_100_macro/para_enflasyon_kurlar.html)
 
 31/7 - [PyMC](https://burakbayramli.github.io/dersblog/sk/2026/07/pymc.html)
@@ -10,8 +12,6 @@
 28/7 - [Coğrafi İstatistiki Hesaplar, Oranlar - Yeni Kod](https://burakbayramli.github.io/dersblog/stat/stat_082_rapoi/cografi_istatistiki_hesaplar_oranlar.html)
 
 28/7 - [MRF, Gürültü Giderme - Ekler](https://burakbayramli.github.io/dersblog/stat/stat_173_denoise/markov_rasgele_alanlari__markov_random_fields_mrf__gurultu_giderme.html)
-
-17/7 - [Markov Zincirleri Monte Carlo - Ekler](https://burakbayramli.github.io/dersblog/stat/stat_097_mcmc/markov_zincirleri_monte_carlo_metropolishastings_gibbs.html)
 
 ## Konular, Referans
 

@@ -123,6 +123,7 @@ def gen_html_sk():
                 res += markdown2.markdown(content, extras=['fenced-code-blocks'])
                 res += util.bottom
                 res = re.sub(r'<p>\$\$.*?\$\$</p>', strip_em, res, flags=re.DOTALL)
+                res = re.sub(r'</?em>(?=.*?\{)', '_', res, flags=re.IGNORECASE)
                 fout = open(path + "/" + fhtml, "w")
                 fout.write(res)
                 fout.close()

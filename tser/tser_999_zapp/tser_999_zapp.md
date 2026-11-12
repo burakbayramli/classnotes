@@ -1,6 +1,6 @@
 # Ekler
 
-Log Veri Analizi 
+### Log Veri Analizi 
 
 Zaman serisi veri analizlerini anlatan kaynaklarda bazen "şimdi veriyi
 ilişkisel olarak analiz etmek için onun log'unu alalım'' gibi ifadeler
@@ -29,11 +29,31 @@ B $\log_{10}(100)$'den $\log_{10}(110)$'a çıktı yani 2'de 2.0413'e çıktı.
 
 Görüldüğü gibi yüzde değişiklik salt değer değişimine dönmüş oldu.
 
-<hr>
+Özetlemek ve genişletmek gerekirse üstteki yaklaşımı tercih etmenin
+bazı sebepleri şunlar olabilir:
 
-Bazı Zaman Serileri Hesaplama Numaraları
+- Log getiri hesaplarının birbirine eklenebilen bir özelliği var. Bu
+  sebeple bir periyotun kumulatif getirisini hesaplamak için birim log
+  farklarının birbirine toplanması yeterli olur. Kıyasla basit yüzde
+  değişimleri çarpımsal birleşikleme (compounding) gerektirir,
+  ($1+r$), ki bu yaklaşım çok periyotlu birleştirme, kaydırılan
+  pencere hesapları ve regresyon modelleri için kullanması zor bir
+  durum yaratabilir.
 
-Faiz Getiri Hesabı
+- Log getiriler aynı büyüklükteki herhangi yöndeki artışın yine aynı
+  bir büyüklüğün pozitif ya da negatif işaretli haliyle kullanılmasına
+  izin verir, mesela $+0.1$ log getiri $-0.1$ getirisini tamamen
+  dengeler / iptal eder. Basit yüzde değişimleri böyle değildir, onlar
+  asimetriktir, mesela $+100\%$ değişimi bir sonraki adımda nötralize
+  etmek için $-50\%$ kullanmak gerekir.
+
+- Daha önce bahsedildiği gibi veriyi log ile transform edince
+  değişimler normalize edilip birbirine oranlı büyüme hızı haline
+  gelirler. Böylece yüzde değişimleri birbirleri ile
+  karşılaştırılabilir hale gelir, büyüyen baz rakamın ne olduğu önemli
+  olmaz, 1 TL ya da 100 TL farketmez.
+
+### Faiz Getiri Hesabı
 
 Eldeki sermaye 100 lira, ve her ay yüzde 5 kazandıran bir yatırım var, 10
 ay sonra elde ne var? Not: her ay sonunda eldeki tüm sermayeyi tekrar geri
@@ -126,9 +146,7 @@ print (cumret.tail(1))
 Name: dice, dtype: float64
 ```
 
-<hr>
-
-Getiri Eğrisi (Yield Curve)
+### Getiri Eğrisi (Yield Curve)
 
 Bir tahvilin getirisinden bahsettik. Önemli bir grafik türü farklı olgunlaşma
 (maturity) tarihlerindeki aynı tip tahvillerin herhangi bir gündeki
@@ -171,9 +189,7 @@ eğrilere "tersine dönmüş (inverted)'' deniyor, normalde olanın tersi
 çünkü. Terse dönmüş eğrilerin gelmekte olan ekonomik durgunluğu tahmin ettiği
 söylenir [4, sf. 85]. 
 
-<hr>
-
-Taylor Kuralı (Taylor Rule)
+### Taylor Kuralı (Taylor Rule)
 
 Merkez Bankalarına yardımcı olan araçlardan biri Taylor Kuralı; bu kural,
 yani formül, olması gereken Merkez Bankası faiz oranı, mevcut enflasyon
@@ -214,9 +230,7 @@ yerler. Mesela 2000'lı yılların başlarında faizler formülün dediğinden d
 düşük, ve 2008 krizine giden yol taşlarından birinin aşırı düşük faizler olduğu
 biliniyor. Daha fazla detay için [4, sf. 278]. 
 
-<hr>
-
-Alış Fiyatı-Satış Fiyatı Aralık Tahmini (Bid/Ask Spread Estimation)
+### Alış Fiyatı-Satış Fiyatı Aralık Tahmini (Bid/Ask Spread Estimation)
 
 AFSF aralığının tanımı terimler kısminda bulunabilir. Akla soru gelebilir, aynen
 günün en düşük, en yüksek fiyatları gibi AFSF fiyatları piyasalar tarafından
@@ -291,9 +305,7 @@ olarak kabul etmek. Eğer birkaç gün üzerinden ortalama alınırsa tabii ki b
 sıfır değerleri nihai ortalamanın aşağı inmesini sağlayacaktır. 
 
 
-<hr>
-
-Kurları Tahmin Etmek (Taslak)
+### Kurları Tahmin Etmek (Taslak)
 
 İki ülke arasındaki kurlar o ülkelerin fiyat seviyelerinin oranıdır. Değil
 mi? Eğer berbere Japonya'da 1000 yen Türkiye'de 10 lira veriyorsam (ve
@@ -368,9 +380,7 @@ giderek kuru tahmin edebileceğimizi kontrol etmeye uğraştık, 5 periyot geriy
 gitmek en iyi sonucu verdi, bu zaman serisinde periyot ay bazlı, yani 5 ay
 öncesinden gelecekteki kuru tahmin etmek mümkün!
 
-<hr>
-
-Finans Terimleri Açıklamaları
+### Finans Terimleri Açıklamaları
 
 Arbitrage (Arbitraj)
 
@@ -591,9 +601,7 @@ Kaynaklar
 
 [7] Heydt, *Mastering Pandas for Finance*
 
-<hr>
-
-Yunan Harfleri
+### Yunan Harfleri
 
 ![](../../algs/algs_999_zapp/letters.png)
 

@@ -5,7 +5,7 @@ krizi yaşama ihtimali nedir? The Global Macro Database [1] adı verilen
 veriyi kullanarak kriz tahmini yapma amaçlı bir gösterge (indicator)
 takip eden / saptayıcı / tahminci yazılımı paylaşacağız. GMD verisi
 IMF, Dünya Bankası, OECD verilerini birleştirir ve finans, kur
-krizlerini etiketleyerek araştırmacıların rahatça erisebileceği bir
+krizlerini etiketleyerek araştırmacıların rahatça erişebileceği bir
 kaynak sağlar. GMD her çeyrekte güncellenir. Veriyi direk [2]'den zip
 / csv olarak indirebiliriz. Bir diğer yöntem,
 
@@ -27,26 +27,26 @@ eski versiyonu tutar, veri indirmesi olmaz.
 GMD ham verisine bakınca mevcut seneden ilerideki seneler için de veri
 olduğunu görüyoruz. Mesela 2026'da isek veri içinde
 2027,2028,.. verileri var. Neden? Tabanı yaratanlar ileri seneler için
-de kendi tahminlerini veriye eklemiser. Büyük ihtimalle bazı analiz
+de kendi tahminlerini veriye eklemişler. Büyük ihtimalle bazı analiz
 araçları buna ihtiyaç duyuyor, eki ondan yapmışlar. Not olarak buraya
 düşelim, eğer analizinizin böyle bir ihtiyacı yoksa sadece bir
 başlangıç senesi değil, bitiş senesi de filtre şartı olarak koymak
-gerekebilir, çünkü tahmin edilmiş seneleri analize dahil etmek
+gerekebilir, çünkü tahmin edilmiş seneler analize dahil etmek
 istenmeyebilir.
 
 ### Tasarım
 
 Yaklaşmakta olan krizlerin farklı önden gelen göstergeleri (leading
-indicator) olabilir. Altta tahmin amaçlı bizim kullandıklarımızı
-altta, onları saptarken [3,4] yazılarını temel aldık. Tahmin tekniği
-olarak lojistik regresyon istatistik yöntemini kullanıldı. Bir
-senedeki (birazdan listeleyeceğimiz) değişkenler bir *sonraki*
-senedeki kriz varlığı (1/0) ile regresyona verilecek. Kriz kolonu
-GMD'de `CurrencyCrisis`. Ardından tanımladığımız değişkenlerin
-katsayıları bir sonraki adımda tahmin amaçlı kullanılabilecek, tahmini
-istenen T senesi ise T-1 senesindeki değişkenlerin değerleri
-katsayıları ile birlikte lojistik formülüne sorulacak. Bu formül tüm
-katsayıları ile birlikte şu şekilde,
+indicator) olabilir. Altta tahmin amaçlı bizim kullandıklarımız,
+onları saptarken [3,4] yazılarını temel aldık. Tahmin tekniği olarak
+lojistik regresyon istatistik yöntemi kullanıldı. Bir senedeki
+(birazdan listeleyeceğimiz) değişkenler bir *sonraki* senedeki kriz
+varlığı (1/0) ile regresyona verilecek. Kriz kolonu GMD'de
+`CurrencyCrisis`. Ardından tanımladığımız değişkenlerin katsayıları
+bir sonraki adımda tahmin amaçlı kullanılabilecek, tahmini istenen T
+senesi ise T-1 senesindeki değişkenlerin değerleri katsayıları ile
+birlikte lojistik formülüne sorulacak. Bu formül tüm katsayıları ile
+birlikte şu şekilde,
 
 $$\left(
 \text{Crisis}_{t+1}=1\right)=
@@ -77,6 +77,55 @@ ve farkı kapatmak için dış sermaye akışına ihtiyaç duyar / onu
 kullanır. Negatif alarak cari açığı (negatif değer) pozitif bir risk
 seviyesine çeviriyoruz, çünkü dış sermayenin birden bire durması
 mümkündür bu da ülkenin kuru üzerinde bir risk yaratır.
+
+Değişken: `exports`, ihracat büyümesi, baz alınan GMD verisi
+`exports_USD`
+
+Bu değişken için `exports_USD` yani dolar bazında ihracatın log
+değerlerinin farkları alınır ki bu dolaylı olarak bir artış oranı
+hesaplar (matematiksel olarak $\log(y_{t} / y_{t-1}) = \log(y_t) - \log(y_{t-1})$ 
+olduğunu biliyoruz [5]). Eğer zayıf ya da negatif ihracat artışı var
+ise bu bir ülkenin kuruna olan talebin zayıf olduğuna işaret eder, ki
+bu zayıflık o ülkenin ithalatı için gereken dövizin alımını, ya da
+mevcut döviz bazlı borcun geri ödenmesini zorlaştırır, ve yaklaşan bir
+krize işaret edebilir.
+
+Değişken: `output`, Reel GSMH Büyümesi
+
+Kullanılan baz GMD değişkeni `rGDP`, ekonominin reel üretiminin
+büyümesi hızını gösterir. Üstte bahsedilen loglama tekniği yine
+kullanılır, ve değerin negatifi alınır böylece ekonomik daralmalar,
+yavaşlamalar pozitif değerlere sebep versin, pozitif risk sinyali
+alınabilsin. Yani küçülme (negatif değer) eksi ile çarpılınca pozitif
+(artan risk) haline gelir.
+
+Değişken: `infl`, Enflasyon
+
+Baz değişken `infl`, bu değerin negatife çevrilmesine gerek yoktur,
+artan enflasyon direk artan kur kriz riski anlamına gelir. Artan
+enflasyon yerel para biriminin nisbi alım gücünü aşağı indirir,
+makroekonomik stabilite bozukluğu, disiplinini kaybetmiş para
+politikasına işaret edebilir. Yükselen enflasyon para birimine olan
+güveni baltalar, onun bir tasarruf aracı olarak kullanılmasını
+engelleyecektir.
+
+Değişken: `credit`
+
+`nGDP` üzerinden hesaplanan nominal GSMH büyümesi paraya olan işlemsel
+(transactional) olan talebin büyümesini gösterir. İşlemsel derken her
+türlü alım / satım işleminden bahsediyoruz, ki bu gerçek ekonominin
+büyümesine işaret ediyor. M2 sayısı ise tüm ekonomideki mevcut likit
+para seviyesidir, bankadaki vadesiz, ya da hızla nakite çevrilebilen
+her tür yatırım onun içindedir, sistemde dolaşım halinde olan
+likiditenin göstergesidir. Nominal GSMH büyümesinden M2 büyümesini
+çıkartırsak elde edilen değer gereğinden fazla tetiklenmiş parasal
+büyümeye işaret eder, yani sistemde gerçek ekonomik büyümenin
+gerektirdiğinden daha fazla para arzı vardır. M2 ekonominin
+kendisinden daha hızlı şekilde büyüyorsa, bu parasal bir şişme
+yaratılmış demektir. Bu fazlalık aşırı kredi talebi, varlık yatırım
+balonları, ithalatta fazla yükseliş, sermaye kaçışı gibi sonuçlara yol
+açabilir, ve tüm bu olası sonuçlar gelmekte olan bir kur krizinin
+habercisi olabilir.
 
 Değişken: `rer_dev`, gerçek döviz kuru trendinden sapma (Real Exchange
 Rate Deviation)
@@ -113,7 +162,7 @@ $\text{USCPI}_t$: ABD fiyat seviyesi
 
 $\text{CPI}_t$: Yerel fiyat seviyesi
 
-Yerel denilen ülke hangi ülkeyi analiz ediyorsak odur, eğer Arjantin'e
+Yerel denilen ülke hangi ülkeyi analiz ediyorsak odur, eğer Arjantin
 inceleniyorsa onun fiyat seviyesinin ABD fiyat seviyesine (aktif kur
 üzerinden ABD yerele çevirildikten sonra) oranına bakılır. Burada
 yakalanmaya uğraşılan sinyaller var; eğer yerel enflasyon ABD
@@ -199,10 +248,98 @@ plt.savefig('curr_01.jpg')
 Artık sapmaları hesaplamak gayet basit, ham veriyi trend'den
 çıkartınca geri kalan sapma olacaktır.
 
-### Nihai Kod
+### Kodlama
 
+Ekte görülen kod ile sistemin eğitim fazı gerçekleştirilir ve elde
+edilen ağırlıklar üzerinden tahmin yapılabilir. Bir senedeki üstte
+tanımlı değişkenler üzerinden elde edilen veri bir sonraki senedeki
+kriz varlığı 0/1 etiketiyle lojistik regresyona verilir, ve sonraki
+adımda tahmin yapılmaya uğraşılır.
 
+Dikkat: Eğitim verisi oluşturulurken o anda kriz yaşayan seneler bir
+sonraki sene krizi tahmini için kullanılmaz. Bu nokta önemli, bunun
+yapılmasının sebebi kriz olduğu sırada onunla mücadele etmek için
+yapılan eylemlerin makroekonomik sinyalleri bozabilme ihtimali. Kriz
+sırasında hükümetler sıra dışı müdaheleler yapabilirler, bunları
+eğitimin dışında tutmak analiz için faydalı olur.
 
+```python
+import curr_crisis
+
+logit, tier_ref, cut_amber, cut_red, full, train = curr_crisis.train_logit()
+```
+
+```text
+Train obs: 3892, Test obs: 518
+Test target distribution:
+target
+0.0    510
+1.0      8
+Name: count, dtype: int64
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                 target   No. Observations:                 3892
+Model:                          Logit   Df Residuals:                     3885
+Method:                           MLE   Df Model:                            6
+Date:                Thu, 12 Nov 2026   Pseudo R-squ.:                 0.03404
+Time:                        10:55:31   Log-Likelihood:                -635.44
+converged:                       True   LL-Null:                       -657.83
+Covariance Type:              cluster   LLR p-value:                 5.170e-08
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         -3.2773      0.094    -34.694      0.000      -3.462      -3.092
+ca             0.1090      0.090      1.216      0.224      -0.067       0.285
+rer_dev        0.0597      0.060      0.995      0.320      -0.058       0.177
+exports        0.1758      0.122      1.442      0.149      -0.063       0.415
+output         0.2990      0.098      3.046      0.002       0.107       0.491
+infl           0.1898      0.056      3.385      0.001       0.080       0.300
+credit         0.0752      0.107      0.701      0.483      -0.135       0.285
+==============================================================================
+
+AUC in-sample (train): 0.6892129025656767
+AUC out-of-time (test): 0.7230392156862745
+
+Tier reference (training sample, in-sample):
+          n  crises  hit_rate  lift_vs_train_base
+tier                                             
+AMBER   389    31.0  0.079692            1.975537
+GREEN  3113    84.0  0.026984            0.668919
+RED     390    42.0  0.107692            2.669672
+```
+
+```python
+curr_crisis.predict("TUR", 2027, logit, tier_ref, cut_amber, cut_red, full, train)
+```
+
+```text
+
+=== Single country-year prediction ===
+                            ISO3: TUR
+                     target_year: 2027
+              features_from_year: 2026
+                     probability: 0.0469
+             percentile_vs_train: 80.1901
+                            tier: AMBER
+             tier_train_hit_rate: 0.0797
+                 train_base_rate: 0.0403
+          crisis_in_feature_year: False
+  realized_crisis_in_target_year: nan
+                imputed_features: ['credit']
+
+Feature breakdown:
+         z_score   coef  contribution
+ca         0.462  0.109         0.050
+rer_dev    1.444  0.060         0.086
+exports   -0.237  0.176        -0.042
+output     0.026  0.299         0.008
+infl       0.857  0.190         0.163
+credit     0.000  0.075         0.000
+```
+
+Kodlar
+
+[curr_crisis.py](curr_crisis.py)
 
 [devam edecek]
 
@@ -216,3 +353,6 @@ Kaynaklar
 
 [4] Reinhart, <a href="https://www.imf.org/external/pubs/ft/staffp/1998/03-98/pdf/kaminsky.pdf">Leading Indicators of Currency Crises</a>
 
+[5] Bayramlı, *Zaman Serileri - Ekler*
+
+   
