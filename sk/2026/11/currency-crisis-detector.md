@@ -263,6 +263,18 @@ yapılan eylemlerin makroekonomik sinyalleri bozabilme ihtimali. Kriz
 sırasında hükümetler sıra dışı müdaheleler yapabilirler, bunları
 eğitimin dışında tutmak analiz için faydalı olur.
 
+Sınıflama amacıyla kullanılan teknikten bahsedelim; tahmin edilen sene
+için lojistik regresyon ile bir kriz olasılığı rakamına bakmak
+mümkün. Fakat daha direk bir cevap şöyle alınabilir; eğitimden sonra
+eğitim kümesinde tüm veri noktalarının kriz olasılığı hesaplanır, ve
+bu sonuçlar sıralanır. Ardından tahmin sırasında üretilen kriz
+olasılığının bu listede hangi aralığa, hangi yüzdelik dilime
+(quantile) düştüğü bulunur, ve kriz ihtimal sinyali bu aralığa göre
+hesaplanır. Yani tahmin belli dilimler içinde ise bu yüksek / alçak
+kriz olasılıkları gibi algılanabilir. Kod içinde tehlike seviyeleri
+ortalama (açık sarı -amber-), ve yüksek (kırmızı -red-) ile, sayısal
+olarak 0.80 ve 0.90 yüzdelik dilimleri üzerinden tanımlandı.
+
 ```python
 import curr_crisis
 
