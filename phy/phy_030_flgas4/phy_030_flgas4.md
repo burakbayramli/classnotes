@@ -58,6 +58,12 @@ $$
 \frac{\text{m}^2}{\text{s}^2}
 $$
 
+Peki mesela $\rho u$ nasıl birim hacimdeki momentum oluyor? $u$ birimi
+$m/sec$, $\rho$ birimi $kg / m^3$, o zaman $\rho u$ hesabı
+$\frac{kg}{m^3} \frac{m}{sec}$ -> $\frac{1}{m^3} \underbrace{\frac{kg
+\cdot m}{sec}}_{momentum}$, yani birim hacimdeki momentum.
+
+
 $\rho E$'ye dönersek, $\rho$ birim hacimdeki kütle olduğuna göre yani
 $\rho=\frac{\mathrm{kg}}{\mathrm{m^3}}$, o zaman $\rho$ ve $E$
 çarpılınca
@@ -117,7 +123,7 @@ O akmış olan kütlenin hacmini de hesaplayabiliriz, $\ud V = u \ud t
 \ud y \ud z$, kütlesi $\ud m = \rho \ud V$, yani $dm = \rho u \ud t
 \ud y \ud z$. Simdi her seyi $\ud t$ ile bölersek, $\frac{\ud m}{\ud
 t} = \rho u \ud y \ud z$ elde ederiz, işte bu $\ud y \ud z$ alanından
-akan kütle akış oranıdır. Bu yuzdeki akisa, sola bakan yuz diyebiliriz,
+akan kütle akış oranıdır. Bu yüzdeki akışa, sola bakan yüz diyebiliriz,
 
 $$
 (\rho u)_x \ud y \ud z

@@ -1,8 +1,8 @@
 # Zaman Serisi Veri Analizi
 
-Daha fazla ilerlemeden bu yazıda bazı veri işlem numaraları göreceğiz.
+Bazı veri işlem numaralarını, püf noktalarını bu yazıda işleyeceğiz.
 
-Durağanlık
+### Durağanlık
 
 Yapay Öğrenim (machine learning) ya da diğer istatistiki tahminsel yaklaşımlar
 çoğunlukla işledikleri verinin durağan olmasının beklerler [1]. Durağanlık zaman
@@ -32,13 +32,15 @@ O zaman eldeki tek durağan seri b ve g.
 
 Testler
 
-Durağanlığı bulmak için bazı istatistiki testler var, bu testlere birim kök
-(unit root) testleri adı veriliyor, en popüleri olanı eklemlenmiş Dickey-Fuller
-testi. Bu teste göre sıfır hipotezi serinin durağan olmadığıdır, o zaman bu
-hipotez reddedilirse, mesela 0.05, ya da 0.01'den az bir p-değeri elde edilirse,
-bu demektir ki elde bir durağan seri var. 
+Durağanlığı bulmak için bazı istatistiki testler var, bu testlere
+birim kök (unit root) testleri adı veriliyor, en popüleri olanı
+eklemlenmiş Dickey-Fuller testi. Bu teste göre sıfır hipotezi serinin
+durağan olmadığıdır, o zaman bu hipotez reddedilirse, mesela testte
+0.05, ya da 0.01'den az bir p-değeri elde edilirse, bu demektir ki
+elde bir durağan seri var.
 
-Örnek olarak elmas verisine bakalım,
+Örnek olarak elmas verisine bakalım, bu veri farklı elmasların
+bilgilerini içeriyor, ölçü, fiyat gibi,
 
 ```python
 import seaborn as sns
@@ -61,10 +63,11 @@ Critical thresholds:
 	10%: -2.566798537945544
 ```
 
-p-değerine bakıyoruz, neredeyse sıfır. O zaman H0 reddedildi, seri durağan.
+Fiyat (price) değişkeni üzerinde testi işlettik, p-değerine bakıyoruz,
+neredeyse sıfır. O zaman H0 reddedildi, seri durağan.
 
 Şimdi büyük ihtimalle durağan olmayan bir seriye bakalım, Apple şirketinin
-hisse senet fiyati bu,
+hisse senet fiyatı bu,
 
 ```python
 import pandas as pd
@@ -75,7 +78,7 @@ plt.savefig('tser_008_data_04.png')
 
 ![](tser_008_data_04.png)
 
-Şeride açık bir yukarı doğru trend var. Test edelim,
+Seride açık bir yukarı doğru trend var. Test edelim,
 
 ```python
 adfuller(df)[1]
@@ -119,15 +122,15 @@ $$
 \frac{f(x)-f(x+\Delta)}{\Delta}
 $$
 
-ki $\Delta$ değerleri 1'de sabitlenmiş oluyor (ve yokolur) ve bir sonraki
-$f(x)$'e ulaşmak için sabit artış farzedersek o zaman zaman serisinde fark almak
-bir tür türev almakla eşdeğerdir [2]. Bu sebeple basit fark işlemi trendi
-çıkartır, eğer elde gürültülü bir $y = ax + b$ var ise türev sonrası (gürültülü)
-$a$ elde edilmesi gibi..
+ki $\Delta$ değerleri 1'de sabitlenmiş oluyor (ve yokolur) ve bir
+sonraki $f(x)$'e ulaşmak için sabit artış farzedersek o zaman zaman
+serisinde fark almak bir tür türev almakla eşdeğerdir [2]. Bu sebeple
+basit fark işlemi trendi çıkartır, eğer elde gürültülü bir $y = ax +
+b$ var ise türev sonrası (gürültülü) $a$ elde edilmiş olur.
 
-Fark işlemleri birkaç derecede yapılabilir, mesela iki kez türev almaya
-eşdeğer olan farkın farkını almak, `diff(periods=2)` ile yapılabilir.
-Birkaç örneği yanyana görelim,
+Fark işlemleri birkaç derecede yapılabilir, mesela iki kez türev
+almaya eşdeğer olan farkın farkını almak, `diff(periods=2)` ile
+yapılabilir.  Birkaç örneği yanyana görelim,
 
 ```python
 pd.set_option('display.max_columns', None)
@@ -176,10 +179,11 @@ Trend çıkarılmış grafik için `resid` verisi kullanıldı çünkü bu deği
 içinde model ile gerçek değerler arasındaki fark, 'artıklar' gösteriliyor, ki bu
 dolaylı olarak veriden trend çıkartılmış hal demektir.
 
-Gayri-Lineerlik
+Gayrı Lineerlik (Nonlinearity)
 
-Fakat her dağılım bu kadar kolayca idare edilemeyebilir. Mesela alttaki
-zaman serisine bakalım, bu Amazon şirketinin hisse senet fiyatları,
+Fakat her dağılım bu kadar kolayca manipüle edilemeyebilir. Mesela
+alttaki zaman serisine bakalım, bu Amazon şirketinin hisse senet
+fiyatı,
 
 ```python
 import pandas as pd
@@ -190,9 +194,10 @@ plt.savefig('tser_008_data_06.png')
 
 ![](tser_008_data_06.png)
 
-Bu seride fark almadan önce bariz olan gayrı lineerligi göz önüne almamız
-gerekiyor, yoksa fark aldıktan sonra bile seri durağan olmaz. Gayri-lineerligi
-çıkartmak için logaritmik fonksiyon kullanılabilir, ondan sonra fark alınır.
+Bu seride fark almadan önce bariz olan gayrı lineerligi göz önüne
+almamız gerekiyor, yoksa fark aldıktan sonra bile seri durağan
+olmaz. Gayrı lineerliği çıkartmak için logaritmik fonksiyon
+kullanılabilir, ondan sonra fark alınır.
 
 ```python
 transformed_amzn = np.log(df).diff().dropna()
@@ -202,7 +207,7 @@ plt.savefig('tser_008_data_07.png')
 
 ![](tser_008_data_07.png)
 
-Gayri lineerligi çıkartmak ile log alakası nedir? Bildiğimiz gibi
+Gayrı lineerligi çıkartmak ile log alakası nedir? Bildiğimiz gibi
 nüfus artışı, gelir dağılımı gibi pek çok ölçüm mevcut seviyeye bağlı
 olarak artan serilerdir, ve orada bir üstel bağlantı vardır, $e^{ax}$
 gibi.. Bu tür serileri lineerize etmek için üstel fonksiyonu nötralize
@@ -252,15 +257,69 @@ Out[1]: np.float64(8.209874468611811e-06)
 Bu çok ufak bir değer demek ki seri durağan hale geldi, transformasyonlar
 ise yaradı.
 
-Fakat akılda tutalım ki her zaman serisi farklıdır ve durağanlığa erişmek için
-farklı operasyonları ardı ardına zincirleme kullanmak gerekebilir.  Fakat bu
-işlemler çoğunlukla logarıtma almak, birinci, ikinci derece ya da sezonsal fark
-almak olacaktır.
+Fakat akılda tutalım ki her zaman serisi farklıdır ve durağanlığa
+erişmek için farklı operasyonları ardı ardına zincirleme kullanmak
+gerekebilir.  Fakat bu işlemler çoğunlukla logaritma almak, birinci,
+ikinci derece ya da sezonsal fark almak olacaktır.
 
-Not: Bu yazıdaki anlatım konuya daha pür verisel yaklaştı, ilk bakılan veride
-yapılabilecek ilk işlemleri gördük bir bakıma. Durağanlık, sezonsallık,
-kendisiyle korelasyon hakkında daha derin detaylar [3,4,5,6] yazılarında
-bulunabilir.
+### Log Farkları ve Getiriler
+
+Zaman serisi veri analizlerini anlatan kaynaklarda bazen "şimdi veriyi
+ilişkisel olarak analiz etmek için onun log'unu alalım'' gibi ifadeler
+görebiliyoruz. Bu sözle ne demek isteniyor? 
+
+Diyelim ki $y_1,y_2,..,y_n$ zaman serimiz var, log matematiğinden biliyoruz ki
+
+$log(y_{t}/y_{t-1}) = \log(y_t) - \log(y_{t-1})$  
+
+Yani bu serinin önce log'unu alıp sonra farkını hesaplarsak, sanki artış
+yüzdesinin log'unu analiz etmiş gibi oluruz, yani yüzde değişim rakamına
+odaklanmış oluruz, o artışın baz aldığı önceki seviye ne olursa olsun. 
+
+Ama başta sadece log'u analiz edelim diyor, farkı hesaplamadık diyelim?
+Yine de dolaylı olarak o farka odaklanıyor olabiliriz, mesela kullandığımız
+metot matematiksel olarak arda arda gelen noktaların farkını bir şekilde
+ortaya çıkartmaya uğraşıyor ise (pek çok metot bu kategoriye girer), o
+zaman yine veriye "ilişkisel olarak'' bakmış oluruz.
+
+Sayısal örnek: hisse senedi A 1 TL'den 1.10 TL'ye çıktı, senet B 100 TL'den
+110 TL'ye çıktı. Hem A, hem B yüzde 10 arttı. Fakat A TL olarak 10 kuruş
+kazandı, B 10 TL kazandı. Eğer log uzayına çevirirsek, 
+
+A $\log_{10}(1)$'den $\log_{10}(1.10)$'a çıktı yani 0'dan 0.0413'e çıktı. 
+B $\log_{10}(100)$'den $\log_{10}(110)$'a çıktı yani 2'de 2.0413'e çıktı. 
+
+Görüldüğü gibi yüzde değişiklik salt değer değişimine dönmüş oldu.
+
+Özetlemek ve genişletmek gerekirse üstteki yaklaşımı tercih etmenin
+bazı sebepleri şunlar olabilir:
+
+- Log getiri hesaplarının birbirine eklenebilen bir özelliği var. Bu
+  sebeple bir periyotun kumulatif getirisini hesaplamak için birim log
+  farklarının birbirine toplanması yeterli olur. Kıyasla basit yüzde
+  değişimleri çarpımsal birleşikleme (compounding) gerektirir,
+  ($1+r$), ki bu yaklaşım çok periyotlu birleştirme, kaydırılan
+  pencere hesapları ve regresyon modelleri için kullanması zor bir
+  durum yaratabilir.
+
+- Log getiriler aynı büyüklükteki herhangi yöndeki artışın yine aynı
+  bir büyüklüğün pozitif ya da negatif işaretli haliyle kullanılmasına
+  izin verir, mesela $+0.1$ log getiri $-0.1$ getirisini tamamen
+  dengeler / iptal eder. Basit yüzde değişimleri böyle değildir, onlar
+  asimetriktir, mesela $+100\%$ değişimi bir sonraki adımda nötralize
+  etmek için $-50\%$ kullanmak gerekir.
+
+- Daha önce bahsedildiği gibi veriyi log ile transform edince
+  değişimler normalize edilip birbirine oranlı büyüme hızı haline
+  gelirler. Böylece yüzde değişimleri birbirleri ile
+  karşılaştırılabilir hale gelir, büyüyen baz rakamın ne olduğu önemli
+  olmaz, 1 TL ya da 100 TL farketmez.
+
+
+Not: Bu yazıdaki anlatım konuya daha pür verisel yaklaştı, ilk bakılan
+veride yapılabilecek ilk işlemleri gördük bir bakıma. Durağanlık,
+sezonsallık, kendisiyle korelasyon hakkında daha derin detaylar
+[3,4,5,6] yazılarında bulunabilir.
 
 Kaynaklar
 

@@ -1,9 +1,9 @@
 # Portföy Performansı
 
-Bir stratejiyi tasarladıktan sonra onu piyasada kullanmadan önce geriye dönük
-veri üzerinde testten geçirmek iyi olur. Hatta mevcut işlemekte olan bir
-stratejinin o ana kadar olan başarısını da aynı tekniklerle ölçebilmek
-faydalı olurdu.
+Bir stratejiyi tasarladıktan sonra onu piyasada kullanmadan önce
+tarihi veri üzerinde testten geçirmek iyi olur. Hatta mevcut işlemekte
+olan bir stratejinin o ana kadar olan başarısını da aynı tekniklerle
+ölçebilmek faydalı.
 
 Geriye Dönük Testler (Backtesting)
 

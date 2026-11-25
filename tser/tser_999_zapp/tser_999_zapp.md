@@ -1,58 +1,5 @@
 # Ekler
 
-### Log Veri Analizi 
-
-Zaman serisi veri analizlerini anlatan kaynaklarda bazen "şimdi veriyi
-ilişkisel olarak analiz etmek için onun log'unu alalım'' gibi ifadeler
-görebiliyoruz. Bu sözle ne demek isteniyor? 
-
-Diyelim ki $y_1,y_2,..,y_n$ zaman serimiz var, log matematiğinden biliyoruz ki
-
-$log(y_{t}/y_{t-1}) = \log(y_t) - \log(y_{t-1})$  
-
-Yani bu serinin önce log'unu alıp sonra farkını hesaplarsak, sanki artış
-yüzdesinin log'unu analiz etmiş gibi oluruz, yani yüzde değişim rakamına
-odaklanmış oluruz, o artışın baz aldığı önceki seviye ne olursa olsun. 
-
-Ama başta sadece log'u analiz edelim diyor, farkı hesaplamadık diyelim?
-Yine de dolaylı olarak o farka odaklanıyor olabiliriz, mesela kullandığımız
-metot matematiksel olarak arda arda gelen noktaların farkını bir şekilde
-ortaya çıkartmaya uğraşıyor ise (pek çok metot bu kategoriye girer), o
-zaman yine veriye "ilişkisel olarak'' bakmış oluruz.
-
-Sayısal örnek: hisse senedi A 1 TL'den 1.10 TL'ye çıktı, senet B 100 TL'den
-110 TL'ye çıktı. Hem A, hem B yüzde 10 arttı. Fakat A TL olarak 10 kuruş
-kazandı, B 10 TL kazandı. Eğer log uzayına çevirirsek, 
-
-A $\log_{10}(1)$'den $\log_{10}(1.10)$'a çıktı yani 0'dan 0.0413'e çıktı. 
-B $\log_{10}(100)$'den $\log_{10}(110)$'a çıktı yani 2'de 2.0413'e çıktı. 
-
-Görüldüğü gibi yüzde değişiklik salt değer değişimine dönmüş oldu.
-
-Özetlemek ve genişletmek gerekirse üstteki yaklaşımı tercih etmenin
-bazı sebepleri şunlar olabilir:
-
-- Log getiri hesaplarının birbirine eklenebilen bir özelliği var. Bu
-  sebeple bir periyotun kumulatif getirisini hesaplamak için birim log
-  farklarının birbirine toplanması yeterli olur. Kıyasla basit yüzde
-  değişimleri çarpımsal birleşikleme (compounding) gerektirir,
-  ($1+r$), ki bu yaklaşım çok periyotlu birleştirme, kaydırılan
-  pencere hesapları ve regresyon modelleri için kullanması zor bir
-  durum yaratabilir.
-
-- Log getiriler aynı büyüklükteki herhangi yöndeki artışın yine aynı
-  bir büyüklüğün pozitif ya da negatif işaretli haliyle kullanılmasına
-  izin verir, mesela $+0.1$ log getiri $-0.1$ getirisini tamamen
-  dengeler / iptal eder. Basit yüzde değişimleri böyle değildir, onlar
-  asimetriktir, mesela $+100\%$ değişimi bir sonraki adımda nötralize
-  etmek için $-50\%$ kullanmak gerekir.
-
-- Daha önce bahsedildiği gibi veriyi log ile transform edince
-  değişimler normalize edilip birbirine oranlı büyüme hızı haline
-  gelirler. Böylece yüzde değişimleri birbirleri ile
-  karşılaştırılabilir hale gelir, büyüyen baz rakamın ne olduğu önemli
-  olmaz, 1 TL ya da 100 TL farketmez.
-
 ### Faiz Getiri Hesabı
 
 Eldeki sermaye 100 lira, ve her ay yüzde 5 kazandıran bir yatırım var, 10

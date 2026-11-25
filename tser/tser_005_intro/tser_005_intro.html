@@ -8,7 +8,8 @@
     <script type="text/x-mathjax-config">
     MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
       MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
-        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"]
+        cancel: ["Extension","cancel"], cancelto: ["Extension","cancel"],
+        ud: ["Macro", "{\\,\\mathrm{d}#1}\\,", 1]
       });
     });
     </script>  
@@ -89,11 +90,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <h1 id="zaman-serileri">Zaman Serileri</h1>
 <p>Bir zaman serisi <span class="math inline">\(t\)</span> anında belli
-bir değeri olan veri noktalarıdır. Finans bağlamında çoğunlukla
-birbirini takip eden iki veri noktası arasında bağlantı olduğu
-ispatlanmıştır. Altta örnek bir zaman serisi görüyoruz; 500 senetin
-ağırlıklı ortalaması olan S&amp;P 500 indisinin zaman göre gidişatı
-(düzeltilmiş kapanış hesaplarını baz alarak),</p>
+değeri olan veri noktalarıdır. Finans bağlamında çoğunlukla birbirini
+takip eden iki veri noktası arasında bağlantı olduğu ispatlanmıştır.
+Altta örnek bir zaman serisi görüyoruz; 500 senetin ağırlıklı ortalaması
+olan S&amp;P 500 indisinin zaman göre gidişatı (düzeltilmiş kapanış
+hesaplarını baz alarak),</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">&#39;../tser_065_kelly/SPY2.csv&#39;</span>,parse_dates<span class="op">=</span><span class="va">True</span>,index_col<span class="op">=</span><span class="st">&#39;Date&#39;</span>)</span>
@@ -103,11 +104,11 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">&#39;Adj Close&#39;</span>].plot()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_intro_01.png&#39;</span>)</span></code></pre></div>
 <p><img src="tser_intro_01.png" /></p>
-<p>Zaman serileri hakkında önemli bir bilgi onların “getirisidir
+<p>Zaman serileri hakkında önemli bir faktör onların “getirisidir
 (returns)’’. Getiri hesabı <span class="math inline">\(t\)</span> ile
 <span class="math inline">\(t-1\)</span> arasındaki değişim oranı, yani
 <span class="math inline">\(X_{t}-X_{t-1}/X_{t-1}\)</span>. Bu sayıyı
-100 ile çarpınca ise yüzde değişimi elde ederiz. Pandas ile,</p>
+100 ile çarpınca yüzde değişimi elde ederiz. Pandas ile,</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>returns <span class="op">=</span> df[<span class="st">&#39;Adj Close&#39;</span>].pct_change()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (returns.head())</span></code></pre></div>
@@ -121,12 +122,12 @@ Name: Adj Close, dtype: float64</code></pre>
 <p>İlk veri noktası <code>NaN</code> oldu çünkü bir önceki veri noktası
 yok.</p>
 <p>Bu değişim oranı getiri zaman serilerinin doğasına göre bir yukarı
-bir aşağı iner, çünkü arz talebe, ya da diğer sebeplere göre senet
-fiyatları bazen çıkar, bazen düşer. Bir trend de olabilir tabii, bazen
-daha çok çıkabilir, bazen daha çok inebilir. Tamama bakılınca ve bu
+bir aşağı iner, çünkü arz / talebe, ya da diğer sebeplere göre senet
+fiyatları bazen çıkar, bazen düşer. Bir trend olabilir, bazen çıkışlar
+daha yüksek, bazen daha az olabilir. Bütüne bakılınca ve bu
 <em>getirilerin</em>, dikkat fiyat veri noktalarının değil, frekansını
 düşünürsek bu getirilerin bir dağılımdan geldiği kabul edilebilir,
-histograma bakalım,</p>
+histogram şöyle,</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>returns.plot(kind<span class="op">=</span><span class="st">&#39;hist&#39;</span>,bins<span class="op">=</span><span class="dv">100</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">&#39;tser_intro_02.png&#39;</span>)</span></code></pre></div>
@@ -136,28 +137,29 @@ frekansla görüldüğünü söylüyor. Bir histogram ile bir olasılık dağıl
 arasında yakın bağlantılar var, histogram bir dağılımın sayısal hali
 denebilir. Şekil Gaussian dağılımına benziyor. Fakat genel bağlamda
 finans serilerinde tüm getirilerin Gaussian olduğunu direk söylemek
-hatalı olur, bu konuyu işleyeceğiz.</p>
-<p>Histogramı okurken şöyle çıkarımlar yapabiliriz; mesela yüzdeliklere
-bakarız, ve diyelim ki yüzde 5 noktasında (histogram alanının yüzde
-5’ine tekabül eden x-eksenindeki nokta) değeri okuruz, bu değer 0.02
-civarında gibi duruyor; o zaman varılacak sonuç şöyle seslendirilebilir,
-“100 günün 5 gününde %2’lik düşüşler görülebilir’’. Bu mantıklı
-herhalde, çünkü bir dağılımdaki belli bir alan o alanın x-eksenindeki
-değerlerin ortaya çıkma olasılığını verir. Ortaya çıkma birimi gün ise,
-yüzde 5, 100 gün içinde 5 gün demektir.</p>
+hatalı olur, bu konuyu işleyeceğiz. Histogramı okurken şöyle çıkarımlar
+yapabiliriz; mesela yüzdeliklere bakarız, ve diyelim ki yüzde 5
+noktasında (histogram alanının yüzde 5’ine tekabül eden x-eksenindeki
+nokta) değeri okuruz, bu değer 0.02 civarında gibi duruyor; o zaman
+varılacak sonuç şöyle seslendirilebilir, “100 günün 5 gününde %2’lik
+düşüşler görülebilir’’. Bu mantıklı herhalde, çünkü bir dağılımdaki
+belli bir alan o alanın x-eksenindeki değerlerin ortaya çıkma
+olasılığını verir. Ortaya çıkma birimi gün ise, yüzde 5, 100 gün içinde
+5 gün demektir.</p>
 <p>Çıplak gözle bakmak yerine direk veriden bu hesabı yapabiliriz,</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span> (returns.quantile(q<span class="op">=</span><span class="fl">0.05</span>))</span></code></pre></div>
 <pre class="text"><code>-0.01775411051963858</code></pre>
 <p>Gaussian durumu ilginç; kabaca Gaussian kabulü yapılabilir, fakat
 literatürdeki çoğu yazı finans serilerinde düşüşlerin daha sert olduğunu
-belirtir, yani Gaussian’da sola, negatif değerlere doğru bir yamukluk
-(skew) vardır. Ayrıca fazla sayıda zaman serilerine bakıldığında her iki
-yönde aşırı değerlerin Gaussian faraziyesine uymayan şekilde daha fazla
-olduğu tespit edilmiştir, yani finans getirilerinin dağlımı “etekleri
-kabarık’’ bir Gaussian’dır, daha doğrusu Öğrenci t dağılımıdır. Fakat
-basitleştirme amacıyla Gaussian kullanılabilir, tabii bu faraziyenin
-sınırlarını bilmek şartıyla.</p>
+belirtir, yani Gaussian’da sola, negatif değerlere doğru bir yamukluk /
+yeltenme / meyil (skew) vardır. Ayrıca fazla sayıda zaman serilerine
+bakıldığında her iki yönde aşırı değerlerin Gaussian faraziyesine
+uymayan şekilde daha fazla olduğu tespit edilmiştir, yani finans
+getirilerinin dağlımı “etekleri kabarık’’ bir Gaussian’dır, daha doğrusu
+Öğrenci t (Student’s T) dağılımıdır. Fakat basitleştirme amacıyla
+Gaussian kullanılabilir, tabii bu faraziyenin sınırlarını bilmek
+şartıyla.</p>
 <p>Oynaklık (Volatility)</p>
 <p>Artışların, düşüşlerin ne kadar sert, yüksek boyutta olduğunun iyi
 bir göstergesi olarak oynaklık kullanılır, oynaklık üstteki Gaussian
@@ -175,24 +177,25 @@ tekabül ettiğini biliyoruz.</p>
 <p>Bu demektir ki getiriler Gaussian ile dağılmışsa artı ya da eksi tek
 sigmalık (ya da ondan azı olan) değişimlerin olasılığı yüzde 68’dir. İki
 sigmalık (ve daha azı) büyüklüğünde getirilerin olasılığı yüzde
-95’tır.</p>
+95’tir.</p>
 <p>Günlükten yıllığa geçmek için getiriler için direk 256 ile çarpılır,
 bir yıl içinde aşağı yukarı 256 tane iş günü vardır. Standart sapma
 geçişi için <span class="math inline">\(\sqrt{256}\)</span> yani 16 ile
 çarpmak gerekir. Bazıları 252 kullanıyor, çünkü NYSE borsasında 252
-günde alışveriş yapılabilir. Karekök basitliği sebebiyle bizce 256 daha
-uygun.</p>
+günde alışveriş yapılabilir. Karekök basitliği sebebiyle 256 tercih
+edilebilir.</p>
 <p>Niye <span class="math inline">\(\sqrt{252}\)</span> ile çarpıyoruz?
-Bu durum varlık fiyat zaman serisinin Brownian yürüyüş olmasıyla
-alakalı. BM serilerinde varyans <span class="math inline">\(t\)</span>
-ile doğru orantılıdır, yani başlangıç noktasından ne kadar uzaklaşırsak
-varyans o kadar büyür, çünkü her adımdaki varyans toplanır (oynaklık
-standart sapmadır, ki bu varyansın kareköku o sebeple zamanın kareköku
-ile çarpıyoruz). <em>Olasılıksal Calculus</em> yazısında bu matematiği
-görüyoruz. Kabaca düşünmek gerekirse BM ‘sarhoş yürüyüşü’ ise ve bu
-yürüyüş her adımda rasgele bir hareket yapıyorsa, bu adımlar toplana
-toplana tabii ki başlangıç noktasından bizi çok uzak noktalara
-taşıyabilir (ve geri getirebilir).</p>
+Bu durum varlık fiyat zaman serisinin Brownian yürüyüş (motion)
+olmasıyla alakalı. BM serilerinde varyans <span
+class="math inline">\(t\)</span> ile doğru orantılıdır, yani başlangıç
+noktasından ne kadar uzaklaşırsak varyans o kadar büyür, çünkü her
+adımdaki varyans toplanır (oynaklık standart sapmadır, ki bu varyansın
+karekökü o sebeple zamanın karekökü ile çarpıyoruz). <em>Olasılıksal
+Calculus</em> yazısında [3] bu matematiği görüyoruz. Kabaca düşünmek
+gerekirse BM ‘sarhoş yürüyüşü’ ise ve bu yürüyüş her adımda rasgele bir
+hareket yapıyorsa, bu adımlar toplana toplana tabii ki başlangıç
+noktasından bizi çok uzak noktalara taşıyabilir (ve geri
+getirebilir).</p>
 <p>Kabaca borsacılar bilir ki senetlerin yıllık standart sapması %20
 civarıdır, daha güvenli olan tahvillerin ise %1.5. Kaldıraç, yani borç
 kullanıldığı zaman, mesela 10 kat kaldıraç olduğunu düşünelim, bu
@@ -215,12 +218,12 @@ hatırlayalım, son derece iyimser bir getiri, 10 kat seviyesinde bir
 kaldıraçla başlamıştık.</p>
 <p>Sharpe Oranı (Sharpe Ratio)</p>
 <p>Sharpe oranı (SO) bir işlem stratejisinin, ya da bir varlığı elde
-tutmanın, ki basit olsa bile bu da bir strateji, ne kadar karlı
-olacağını ölçek bir hesaptır. Hesaplamak için getirileri riske göre
-uyarlarız. Formel olarak getirinin ortalamasını aynı periyottaki
-standart sapmaya böleriz. Bu bize günlük SO verir, yıllığı hesaplamak
-için <span class="math inline">\(\sqrt{256}\)</span> ile çarpmak
-gerekir.</p>
+tutmanın (basit olsa bile bu da bir strateji), ne kadar karlı olacağını
+ölçen bir hesaptır. Hesaplamak için getirileri riske göre uyarlarız.
+Formel olarak getirinin ortalamasını aynı periyottaki standart sapmaya
+böleriz. Bu bize günlük SO verir, yıllığı hesaplamak için <span
+class="math inline">\(\sqrt{256}\)</span> ile çarpmak gerekir. Özetle
+her birim risk için ne kadar getiri elde edildiğine bakıyoruz.</p>
 <p>Rasgele Yürüyüş (Random Walk)</p>
 <p>Senet fiyatlarının rasgele yürüyüşe göre hareket ettiği söylenir.
 Modelin bir şekli</p>
@@ -286,11 +289,10 @@ olmasına rağmen tamamen farklı görüntüler çıktı. Görüntüler borsadak
 senet fiyatlarını da andırıyor!</p>
 <p>Her adımda Gaussian gürültü eklendiği için veri analizi yaparken
 Guassian’lığı fiyatların getirisi / farkında görmek mümkündür. Günlük
-bazda diyelim artış / azalışın histogramını alırsak, ünlü can eğrisini
+bazda diyelim artış / azalışın histogramını alırsak, ünlü çan eğrisini
 elde ederiz. Tabii şunu da eklemek lazım, değişimin dağılımı “tam
 olarak’’ Gaussian kabul edilmiyor, bu dağılımın”etekleri daha
-kabarıktır’’, yani ekstrem değerler Gaussian’a göre daha muhtemeldir. Bu
-dağılımın Öğrenci t (Student t) dağılımı olduğu söylenir. Fakat kolaylık
+kabarıktır’’, bundan bahsettik, Öğrenci t dağılımı. Fakat kolaylık
 açısından, kriz şartlarına dikkat etmek koşuluyla, Gaussian
 kullanılabilir.</p>
 <p>Bağımlılık</p>
@@ -506,6 +508,7 @@ tahmin durumunda yine bilmemiz gereken herşeyi bize söyler.</p>
 <p>[2] Macrooption, <em>Why Is Volatility Proportional to the Square
 Root of Time</em>, <a
 href="https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/">https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/</a></p>
+<p>[3] Bayramlı, <em>Zaman Serileri - Olasılıksal Calculus</em></p>
 <p>
   <a href="..">Yukarı</a>
 </p>

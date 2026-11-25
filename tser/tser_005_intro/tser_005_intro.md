@@ -1,10 +1,11 @@
 # Zaman Serileri 
 
-Bir zaman serisi $t$ anında belli bir değeri olan veri noktalarıdır. Finans
-bağlamında çoğunlukla birbirini takip eden iki veri noktası arasında bağlantı
-olduğu ispatlanmıştır. Altta örnek bir zaman serisi görüyoruz; 500 senetin
-ağırlıklı ortalaması olan S\&P 500 indisinin zaman göre gidişatı (düzeltilmiş
-kapanış hesaplarını baz alarak),
+Bir zaman serisi $t$ anında belli değeri olan veri
+noktalarıdır. Finans bağlamında çoğunlukla birbirini takip eden iki
+veri noktası arasında bağlantı olduğu ispatlanmıştır. Altta örnek bir
+zaman serisi görüyoruz; 500 senetin ağırlıklı ortalaması olan S\&P 500
+indisinin zaman göre gidişatı (düzeltilmiş kapanış hesaplarını baz
+alarak),
 
 ```python
 import pandas as pd
@@ -20,10 +21,10 @@ plt.savefig('tser_intro_01.png')
 
 ![](tser_intro_01.png)
 
-Zaman serileri hakkında önemli bir bilgi onların "getirisidir
-(returns)''. Getiri hesabı $t$ ile $t-1$ arasındaki değişim oranı, yani
-$X_{t}-X_{t-1}/X_{t-1}$. Bu sayıyı 100 ile çarpınca ise yüzde değişimi elde
-ederiz. Pandas ile,
+Zaman serileri hakkında önemli bir faktör onların "getirisidir
+(returns)''. Getiri hesabı $t$ ile $t-1$ arasındaki değişim oranı,
+yani $X_{t}-X_{t-1}/X_{t-1}$. Bu sayıyı 100 ile çarpınca yüzde
+değişimi elde ederiz. Pandas ile,
 
 ```python
 returns = df['Adj Close'].pct_change()
@@ -42,12 +43,13 @@ Name: Adj Close, dtype: float64
 
 İlk veri noktası `NaN` oldu çünkü bir önceki veri noktası yok.
 
-Bu değişim oranı getiri zaman serilerinin doğasına göre bir yukarı bir aşağı
-iner, çünkü arz talebe, ya da diğer sebeplere göre senet fiyatları bazen çıkar,
-bazen düşer. Bir trend de olabilir tabii, bazen daha çok çıkabilir, bazen daha
-çok inebilir. Tamama bakılınca ve bu *getirilerin*, dikkat fiyat veri
-noktalarının değil, frekansını düşünürsek bu getirilerin bir dağılımdan geldiği
-kabul edilebilir, histograma bakalım,
+Bu değişim oranı getiri zaman serilerinin doğasına göre bir yukarı bir
+aşağı iner, çünkü arz / talebe, ya da diğer sebeplere göre senet
+fiyatları bazen çıkar, bazen düşer. Bir trend olabilir, bazen çıkışlar
+daha yüksek, bazen daha az olabilir. Bütüne bakılınca ve bu
+*getirilerin*, dikkat fiyat veri noktalarının değil, frekansını
+düşünürsek bu getirilerin bir dağılımdan geldiği kabul edilebilir,
+histogram şöyle,
 
 ```python
 returns.plot(kind='hist',bins=100)
@@ -56,19 +58,20 @@ plt.savefig('tser_intro_02.png')
 
 ![](tser_intro_02.png)
 
-İstatistikten hatırlarsak histogram bize belli değerlerin hangi frekansla
-görüldüğünü söylüyor. Bir histogram ile bir olasılık dağılımı arasında yakın
-bağlantılar var, histogram bir dağılımın sayısal hali denebilir. Şekil Gaussian
-dağılımına benziyor. Fakat genel bağlamda finans serilerinde tüm getirilerin
-Gaussian olduğunu direk söylemek hatalı olur, bu konuyu işleyeceğiz.
-
-Histogramı okurken şöyle çıkarımlar yapabiliriz; mesela yüzdeliklere bakarız, ve
-diyelim ki yüzde 5 noktasında (histogram alanının yüzde 5'ine tekabül eden
-x-eksenindeki nokta) değeri okuruz, bu değer 0.02 civarında gibi duruyor; o
-zaman varılacak sonuç şöyle seslendirilebilir, "100 günün 5 gününde \%2'lik
-düşüşler görülebilir''.  Bu mantıklı herhalde, çünkü bir dağılımdaki belli bir
-alan o alanın x-eksenindeki değerlerin ortaya çıkma olasılığını verir. Ortaya
-çıkma birimi gün ise, yüzde 5, 100 gün içinde 5 gün demektir.
+İstatistikten hatırlarsak histogram bize belli değerlerin hangi
+frekansla görüldüğünü söylüyor. Bir histogram ile bir olasılık
+dağılımı arasında yakın bağlantılar var, histogram bir dağılımın
+sayısal hali denebilir. Şekil Gaussian dağılımına benziyor. Fakat
+genel bağlamda finans serilerinde tüm getirilerin Gaussian olduğunu
+direk söylemek hatalı olur, bu konuyu işleyeceğiz. Histogramı okurken
+şöyle çıkarımlar yapabiliriz; mesela yüzdeliklere bakarız, ve diyelim
+ki yüzde 5 noktasında (histogram alanının yüzde 5'ine tekabül eden
+x-eksenindeki nokta) değeri okuruz, bu değer 0.02 civarında gibi
+duruyor; o zaman varılacak sonuç şöyle seslendirilebilir, "100 günün 5
+gününde \%2'lik düşüşler görülebilir''.  Bu mantıklı herhalde, çünkü
+bir dağılımdaki belli bir alan o alanın x-eksenindeki değerlerin
+ortaya çıkma olasılığını verir. Ortaya çıkma birimi gün ise, yüzde 5,
+100 gün içinde 5 gün demektir.
 
 Çıplak gözle bakmak yerine direk veriden bu hesabı yapabiliriz,
 
@@ -80,14 +83,16 @@ print (returns.quantile(q=0.05))
 -0.01775411051963858
 ```
 
-Gaussian durumu ilginç; kabaca Gaussian kabulü yapılabilir, fakat literatürdeki
-çoğu yazı finans serilerinde düşüşlerin daha sert olduğunu belirtir, yani
-Gaussian'da sola, negatif değerlere doğru bir yamukluk (skew) vardır. Ayrıca
-fazla sayıda zaman serilerine bakıldığında her iki yönde aşırı değerlerin
-Gaussian faraziyesine uymayan şekilde daha fazla olduğu tespit edilmiştir, yani
-finans getirilerinin dağlımı "etekleri kabarık'' bir Gaussian'dır, daha doğrusu
-Öğrenci t dağılımıdır. Fakat basitleştirme amacıyla Gaussian kullanılabilir,
-tabii bu faraziyenin sınırlarını bilmek şartıyla.
+Gaussian durumu ilginç; kabaca Gaussian kabulü yapılabilir, fakat
+literatürdeki çoğu yazı finans serilerinde düşüşlerin daha sert
+olduğunu belirtir, yani Gaussian'da sola, negatif değerlere doğru bir
+yamukluk / yeltenme / meyil (skew) vardır. Ayrıca fazla sayıda zaman
+serilerine bakıldığında her iki yönde aşırı değerlerin Gaussian
+faraziyesine uymayan şekilde daha fazla olduğu tespit edilmiştir, yani
+finans getirilerinin dağlımı "etekleri kabarık'' bir Gaussian'dır,
+daha doğrusu Öğrenci t (Student's T) dağılımıdır. Fakat basitleştirme
+amacıyla Gaussian kullanılabilir, tabii bu faraziyenin sınırlarını
+bilmek şartıyla.
 
 Oynaklık (Volatility)
 
@@ -112,23 +117,24 @@ biliyoruz.
 
 Bu demektir ki getiriler Gaussian ile dağılmışsa artı ya da eksi tek sigmalık
 (ya da ondan azı olan) değişimlerin olasılığı yüzde 68'dir. İki sigmalık (ve
-daha azı) büyüklüğünde getirilerin olasılığı yüzde 95'tır.
+daha azı) büyüklüğünde getirilerin olasılığı yüzde 95'tir.
 
-Günlükten yıllığa geçmek için getiriler için direk 256 ile çarpılır, bir yıl
-içinde aşağı yukarı 256 tane iş günü vardır. Standart sapma geçişi için
-$\sqrt{256}$ yani 16 ile çarpmak gerekir. Bazıları 252 kullanıyor, çünkü NYSE
-borsasında 252 günde alışveriş yapılabilir. Karekök basitliği sebebiyle bizce
-256 daha uygun.
+Günlükten yıllığa geçmek için getiriler için direk 256 ile çarpılır,
+bir yıl içinde aşağı yukarı 256 tane iş günü vardır. Standart sapma
+geçişi için $\sqrt{256}$ yani 16 ile çarpmak gerekir. Bazıları 252
+kullanıyor, çünkü NYSE borsasında 252 günde alışveriş
+yapılabilir. Karekök basitliği sebebiyle 256 tercih edilebilir.
 
-Niye $\sqrt{252}$ ile çarpıyoruz? Bu durum varlık fiyat zaman serisinin Brownian
-yürüyüş olmasıyla alakalı. BM serilerinde varyans $t$ ile doğru orantılıdır,
-yani başlangıç noktasından ne kadar uzaklaşırsak varyans o kadar büyür, çünkü
-her adımdaki varyans toplanır (oynaklık standart sapmadır, ki bu varyansın
-kareköku o sebeple zamanın kareköku ile çarpıyoruz). *Olasılıksal Calculus*
-yazısında bu matematiği görüyoruz. Kabaca düşünmek gerekirse BM 'sarhoş
-yürüyüşü' ise ve bu yürüyüş her adımda rasgele bir hareket yapıyorsa, bu adımlar
-toplana toplana tabii ki başlangıç noktasından bizi çok uzak noktalara
-taşıyabilir (ve geri getirebilir).
+Niye $\sqrt{252}$ ile çarpıyoruz? Bu durum varlık fiyat zaman
+serisinin Brownian yürüyüş (motion) olmasıyla alakalı. BM serilerinde
+varyans $t$ ile doğru orantılıdır, yani başlangıç noktasından ne kadar
+uzaklaşırsak varyans o kadar büyür, çünkü her adımdaki varyans
+toplanır (oynaklık standart sapmadır, ki bu varyansın karekökü o
+sebeple zamanın karekökü ile çarpıyoruz). *Olasılıksal Calculus*
+yazısında [3] bu matematiği görüyoruz. Kabaca düşünmek gerekirse BM
+'sarhoş yürüyüşü' ise ve bu yürüyüş her adımda rasgele bir hareket
+yapıyorsa, bu adımlar toplana toplana tabii ki başlangıç noktasından
+bizi çok uzak noktalara taşıyabilir (ve geri getirebilir).
 
 Kabaca borsacılar bilir ki senetlerin yıllık standart sapması \%20 civarıdır,
 daha güvenli olan tahvillerin ise \%1.5. Kaldıraç, yani borç kullanıldığı zaman,
@@ -151,11 +157,13 @@ seviyesinde bir kaldıraçla başlamıştık.
 
 Sharpe Oranı (Sharpe Ratio)
 
-Sharpe oranı (SO) bir işlem stratejisinin, ya da bir varlığı elde tutmanın, ki
-basit olsa bile bu da bir strateji, ne kadar karlı olacağını ölçek bir
-hesaptır. Hesaplamak için getirileri riske göre uyarlarız. Formel olarak
-getirinin ortalamasını aynı periyottaki standart sapmaya böleriz. Bu bize günlük
-SO verir, yıllığı hesaplamak için $\sqrt{256}$ ile çarpmak gerekir. 
+Sharpe oranı (SO) bir işlem stratejisinin, ya da bir varlığı elde
+tutmanın (basit olsa bile bu da bir strateji), ne kadar karlı
+olacağını ölçen bir hesaptır. Hesaplamak için getirileri riske göre
+uyarlarız. Formel olarak getirinin ortalamasını aynı periyottaki
+standart sapmaya böleriz. Bu bize günlük SO verir, yıllığı hesaplamak
+için $\sqrt{256}$ ile çarpmak gerekir. Özetle her birim risk için ne
+kadar getiri elde edildiğine bakıyoruz.
 
 Rasgele Yürüyüş (Random Walk)
 
@@ -224,14 +232,14 @@ yani aynı kod arka arkaya dört kez işledi, ama herbirinde aynı başlangıç 
 olmasına rağmen tamamen farklı görüntüler çıktı. Görüntüler borsadaki senet
 fiyatlarını da andırıyor!
 
-Her adımda Gaussian gürültü eklendiği için veri analizi yaparken Guassian'lığı
-fiyatların getirisi / farkında görmek mümkündür. Günlük bazda diyelim artış /
-azalışın histogramını alırsak, ünlü can eğrisini elde ederiz. Tabii şunu da
-eklemek lazım, değişimin dağılımı "tam olarak'' Gaussian kabul edilmiyor, bu
-dağılımın "etekleri daha kabarıktır'', yani ekstrem değerler Gaussian'a göre
-daha muhtemeldir. Bu dağılımın Öğrenci t (Student t) dağılımı olduğu
-söylenir. Fakat kolaylık açısından, kriz şartlarına dikkat etmek koşuluyla,
-Gaussian kullanılabilir.
+Her adımda Gaussian gürültü eklendiği için veri analizi yaparken
+Guassian'lığı fiyatların getirisi / farkında görmek mümkündür. Günlük
+bazda diyelim artış / azalışın histogramını alırsak, ünlü çan eğrisini
+elde ederiz. Tabii şunu da eklemek lazım, değişimin dağılımı "tam
+olarak'' Gaussian kabul edilmiyor, bu dağılımın "etekleri daha
+kabarıktır'', bundan bahsettik, Öğrenci t dağılımı. Fakat kolaylık
+açısından, kriz şartlarına dikkat etmek koşuluyla, Gaussian
+kullanılabilir.
 
 Bağımlılık
 
@@ -463,7 +471,4 @@ Kaynaklar
 [2] Macrooption, *Why Is Volatility Proportional to the Square Root of  Time*,
     [https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/](https://www.macroption.com/why-is-volatility-proportional-to-square-root-of-time/)
 
-
-
-
-
+[3] Bayramlı, *Zaman Serileri - Olasılıksal Calculus*

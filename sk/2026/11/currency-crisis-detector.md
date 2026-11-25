@@ -365,6 +365,4 @@ Kaynaklar
 
 [4] Reinhart, <a href="https://www.imf.org/external/pubs/ft/staffp/1998/03-98/pdf/kaminsky.pdf">Leading Indicators of Currency Crises</a>
 
-[5] Bayramlı, *Zaman Serileri - Ekler*
-
-   
+[5] Bayramlı, *Zaman Serisi Veri Analizi*
