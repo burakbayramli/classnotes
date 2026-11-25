@@ -119,14 +119,13 @@ o kutudaki kütle miktarını artırır ya da azaltır. Yani artan, azalan,
 giren, her miktarların muhasebesi yapılmalıdır.
 
 $$
-\text{kutu içindeki kütle artış oranı} = \text{kutuya giren kütle oranı} - \text{çıkan kütle oranı}.
+\text{kutu içindeki kütle değişimi} = \text{kutuya giren kütle oranı} - \text{çıkan kütle oranı}.
 $$
 
-Ya da
-
-$$
-\text{kütle artış oranı} +  \text{net kütle çıkış oranı} = 0
-$$
+Tabii soldaki formül artı ise bu kütle artışı, eğer eksi ise azalması
+demektir. Bu durum eşitliğin sağına yansımış durumda, eğer giren kütle
+çıkandan fazla ise sonuç pozitif olurdu, bu da solda "artış" ile
+uyumludur.
 
 Ufak kutumuzun içindeki kütle,
 
@@ -139,17 +138,19 @@ türevini alabiliriz,
 
 $$
 \frac{\partial\rho}{\partial t} \ud x \ud y \ud z.
+\tag{1}
 $$
 
 Şimdi üsttekinin neye eşit olduğuna / onun tanımına gelelim. Bu tanım
 daha önce belirttiğimiz gibi kutuya giren ve çıkan kütle oranlarının
 farkını kullanacak. Hesabı şöyle yapabiliriz. Önce $x$ tarafına bakan
 dikdörtgeni alalım, alanı $\ud y \ud z$ olsun, oradan akan kütle
-oranını hesaplayabiliriz. Bu yüzeye dikgen / normal olan akış $u$ ile
-gösteriliyor, çünkü akış hız vektörünün bileşenlerini daha önce
-göstermiştik, $V=(u,v,w)$, işte $u$ buradaki $u$. Bu hızı temel
-alalım, $\ud t$ zamanı sonunda $u \ud t$ kadar kütle akmıştır
-diyebiliriz.
+oranını hesaplayabiliriz, ki bu akış bir içeri giriş anlamina gelir,
+çünkü o yöne doğru hareket pozitif işaretli. Bu yüzeye dikgen / normal
+olan akış $u$ ile gösteriliyor, çünkü akış hız vektörünün
+bileşenlerini daha önce göstermiştik, $V=(u,v,w)$, işte $u$ buradaki
+$u$. Bu hızı temel alalım, $\ud t$ zamanı sonunda $u \ud t$ kadar
+kütle akmıştır diyebiliriz.
 
 O akmış olan kütlenin hacmini de hesaplayabiliriz, $\ud V = u \ud t
 \ud y \ud z$, kütlesi $\ud m = \rho \ud V$, yani $dm = \rho u \ud t
@@ -188,35 +189,32 @@ $$
 \tag{3}
 $$
 
-Demek ki $x$ yönündeki net akış (2) eksi (3) ile hesaplanabilir,
+Demek ki $x$ yönündeki içeri net akış (2) eksi (3) ile hesaplanabilir,
 
 $$
-\left[ (\rho u)_x\,dy\,dz +
-\frac{\partial(\rho u)}{\partial x}\ud x \ud y \ud z \right] -
-(\rho u)_x \ud y \ud z
+(\rho u)_x \ud y \ud z -
+\left[
+    (\rho u)_x \ud y \ud z + \frac{\partial(\rho u)}{\partial x} \ud x \ud y \ud z
+\right] 
 $$
 
 $$
-= \frac{\partial(\rho u)}{\partial x} \ud x \ud y \ud z.
+= -\frac{\partial(\rho u)}{\partial x} \ud x \ud y \ud z.
 $$
 
 Benzer mantığı $y$ yönü için kullanırsak,
 
 $$
-\frac{\partial(\rho v)}{\partial y}
-\ud x \ud y \ud z
+- \frac{\partial(\rho v)}{\partial y} \ud x \ud y \ud z
 $$
 
 $z$ yönü için de
 
 $$
-\frac{\partial(\rho w)}{\partial z}
-\ud x \ud y \ud z
+- \frac{\partial(\rho w)}{\partial z} \ud x \ud y \ud z
 $$
 
-Şimdi nihai formüle gelelim, eğer net pozitif bir akış var ise bu
-birim hacimimizden kütle çıkışı var demektir [1, sf. 55], bu bir
-azalmayı temsil eder. Formülü o zaman şu şekilde oluşturmalıyız,
+Şimdi nihai formüle gelelim, 
 
 $$
 \frac{\partial\rho}{\partial t}\ud x \ud y \ud z
