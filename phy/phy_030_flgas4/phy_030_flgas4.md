@@ -58,13 +58,7 @@ $$
 \frac{\text{m}^2}{\text{s}^2}
 $$
 
-Peki mesela $\rho u$ nasıl birim hacimdeki momentum oluyor? $u$ birimi
-$m/sec$, $\rho$ birimi $kg / m^3$, o zaman $\rho u$ hesabı
-$\frac{kg}{m^3} \frac{m}{sec}$ -> $\frac{1}{m^3} \underbrace{\frac{kg
-\cdot m}{sec}}_{momentum}$, yani birim hacimdeki momentum.
-
-
-$\rho E$'ye dönersek, $\rho$ birim hacimdeki kütle olduğuna göre yani
+$\rho E$:, $\rho$ birim hacimdeki kütle olduğuna göre yani
 $\rho=\frac{\mathrm{kg}}{\mathrm{m^3}}$, o zaman $\rho$ ve $E$
 çarpılınca
 
@@ -76,6 +70,44 @@ $$
 =
 \frac{\mathrm{J}}{\mathrm{m^3}}
 $$
+
+Peki mesela $\rho u$ nasıl birim hacimdeki momentum oluyor? $u$ birimi
+$m/sec$, $\rho$ birimi $kg / m^3$, o zaman $\rho u$ hesabı
+$\frac{kg}{m^3} \frac{m}{sec}$ -> $\frac{1}{m^3} \underbrace{\frac{kg
+\cdot m}{sec}}_{momentum}$, yani birim hacimdeki momentum.
+
+"Birim hacimdeki momentum" kavramı küçükten büyüğe giderken, ve
+"momentumları toplarken" kavram karışıklığı yaşanabilir. Momentumlar
+nasıl toplanıyor? Bunun kavramsal olarak kütle hesabından pek farkı
+yok, yoğunluğu $\rho$ olan bir sıvının ufak bir $\ud V$ içindeki
+kütlesi $dm = \rho \ud V$. İstediğimiz büyüklükteki bir $V$ haciminin
+kütlesi için $m = \int_V \rho \ud V$ hesabını yapıyoruz. Bu hesapta
+her küçük hacim bir kütle katkısında bulunuyor, bunlar toplanıyor, ve
+sonuç nihai kütle oluyor.
+
+Aynı şekilde bir $V$ hacimindeki $x$-momentum hesabı için şöyle
+düşünebiliriz, hızı $u$, kütlesi $\ud m$ olan ufak bir sıvının $x$
+yönündeki momentumu
+
+$$
+\ud P_x = u \ud m
+$$
+
+$\ud m = \rho \ud V$ eşitliğini yerine koyalım,
+
+$$
+\ud P_x = \rho u \ud V
+$$
+
+Şimdi $V$ hacmindeki momentum için üsttekinin entegralini alabiliriz,
+
+$$
+P_x = \int_V \rho u \ud V
+$$
+
+Bu işler, çünkü dikkat, entegral her $x,y,z$ noktasındaki $\rho$'nun
+ve $u$'nun değisebileceğini hesaba katıyor, ve tüm bu ufak momentum
+hesaplarını "toplayarak" nihai sonuca varıyor.
 
 Kütle Muhafazası
 
