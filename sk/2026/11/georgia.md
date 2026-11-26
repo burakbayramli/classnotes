@@ -25,6 +25,9 @@ bunu sevenler daha da çok hoşlanacaktır.
 Kafeler
 
 - Aroma
-- Minimalist
+- Minimalist (Batumi Seaview)
 - Bezh Mezh
+- Hilton Batumi (Cafe)
+- Minimalist (Hilton yakindaki)
+- Randez Vouz
 
