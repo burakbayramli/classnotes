@@ -285,14 +285,14 @@ $$
 
 Noktalı olan bir yer var, orayı boş bıraktık çünkü bir ek yapmamız
 lazım. Basınç faktörü işte burada devreye giriyor. Bildiğimiz gibi
-basınç, kuvvet bölü yüzey alanı olarak hesaplanır, ve matematiksel
+basınç, kuvvet bölü yüzey alanı olarak hesaplanır, kuvvet matematiksel
 olarak momentumun türevidir, onun değişimine eşittir [2]. İşte kutumuz
 içindeki tüm momentum değişimini hesaplamak istiyorsak dışarıdan bu
-kuvvet uygulamasını (onun türevini) hesaba dahil etmemiz gerekir. Bu
-durum momentum taşınımından nasıl farklı? Taşınım kütle hareketiyle
-ortaya çıkar, sıvı molekülleri dışarıdan içeri girer. Basınç ise kütle
-eki olmadan, içeri giriş olmadan moleküllerin dışarıdan uyguladığı
-kuvvetle alakalıdır. Kutunun hayali sınırındaki molekülleri düşünelim,
+kuvvet uygulamasını hesaba dahil etmemiz gerekir. Bu durum momentum
+taşınımından nasıl farklı? Taşınım kütle hareketiyle ortaya çıkar,
+sıvı molekülleri dışarıdan içeri girer. Basınç ise kütle eki olmadan,
+içeri giriş olmadan moleküllerin dışarıdan uyguladığı kuvvetle
+alakalıdır. Kutunun hayali sınırındaki molekülleri düşünelim,
 dışarıdaki bazı moleküller mesela o sınırdaki moleküllere çarpıyorlar,
 sonra sekiyorlar diyelim, içeri girmiyorlar fakat bu çarpış bir kuvvet
 uygulamasıdır ve kutu içindeki momentumu değiştirir.
@@ -347,8 +347,8 @@ $$
 Ekşi işaret çıkması iyi oldu, bu önemli, sıvının yüksek basınçtan
 alçak basınca doğru ivmelendiğini söylüyor.
 
-İşte eksik olan basınç kuvvetini bulduk, şimdi onun $x$ üzerinden
-türevini momentum değişimi formülümüze dahil edebiliriz,
+İşte eksik olan basınç kuvvetini bulduk, şimdi onu momentum değişimi
+formülümüze dahil edebiliriz,
 
 $$
 \frac{\partial(\rho u)}{\partial t}
