@@ -286,7 +286,7 @@ $$
 Noktalı olan bir yer var, orayı boş bıraktık çünkü bir ek yapmamız
 lazım. Basınç faktörü işte burada devreye giriyor. Bildiğimiz gibi
 basınç, kuvvet bölü yüzey alanı olarak hesaplanır, ve matematiksel
-olarak momentumun türevidir, onun değişimine eşittir. İşte kutumuz
+olarak momentumun türevidir, onun değişimine eşittir [2]. İşte kutumuz
 içindeki tüm momentum değişimini hesaplamak istiyorsak dışarıdan bu
 kuvvet uygulamasını (onun türevini) hesaba dahil etmemiz gerekir. Bu
 durum momentum taşınımından nasıl farklı? Taşınım kütle hareketiyle
@@ -405,9 +405,49 @@ $$
 =0
 $$
 
+Üç denklemi tek denklem olarak göstermek istersek, matris formu
+kullanabiliriz.
+
+$$
+\mathbf V=
+\begin{bmatrix}
+u \\ v \\ w
+\end{bmatrix}
+$$
+
+tanımını yapalım. O zaman
+
+$$
+\mathbf V\mathbf V^T
+=
+\begin{bmatrix}
+u^2 & uv & uw\\
+uv & v^2 & vw\\
+uw & vw & w^2
+\end{bmatrix}
+$$
+
+elde edebiliriz. Matris içindeki terimlerin üç denklemimizdeki
+terimlere tekabül ettiğini görüyoruz. O zaman nihai diferansiyel
+denklem
+
+$$
+\frac{\partial(\rho\mathbf V)}{\partial t}
++
+\nabla\cdot(\rho\mathbf V\mathbf V^T)
++
+\nabla p
+=0
+$$
+
+olarak gösterilebilir.
+
+
 [devam edecek]
 
 Kaynaklar
 
 [1] Anderson, *Computational Fluid Dynamics, The Basics With Applications*
+
+[2] Bayramlı, *Fizik - Temel Fizik 1, İvme, Hız, Yerçekimi*
 
