@@ -259,9 +259,151 @@ $$
 =0.
 $$
 
+Momentum Muhafazası
 
+Burada kullanılacak mantık kütle müfahazasına benziyor, sadece taşınan
+kütle yerine taşınan momentum var. Fakat iki farktan bahsetmemiz
+gerekiyor, hız üç vektör öğesinden oluştuğu için üç tane momentum
+taşınım denklemi gerekecek, ve bir diğer fark ufak kutumuzdaki
+momentum değişiminin tek sebebi taşınım değil, dışarıdan uygulanan
+basınç ta formülizasyon dahil edilmeli.
 
+Taşınım denklemleri için aşağı yukarı önceki şablonu takip ediyoruz,
+kütle için taşınan $\rho$ idi, şimdi x yönündeki taşınım için $\rho u$
+var. O zaman $x$ yönü için formül,
 
+$$
+\frac{\partial(\rho u)}{\partial t} =
+-
+\frac{\partial(\rho u^2)}{\partial x}
+-
+\frac{\partial(\rho uv)}{\partial y}
+-
+\frac{\partial(\rho uw)}{\partial z} -
+\dots
+$$
+
+Noktalı olan bir yer var, orayı boş bıraktık çünkü bir ek yapmamız
+lazım. Basınç faktörü işte burada devreye giriyor. Bildiğimiz gibi
+basınç, kuvvet bölü yüzey alanı olarak hesaplanır, ve matematiksel
+olarak momentumun türevidir, onun değişimine eşittir. İşte kutumuz
+içindeki tüm momentum değişimini hesaplamak istiyorsak dışarıdan bu
+kuvvet uygulamasını (onun türevini) hesaba dahil etmemiz gerekir. Bu
+durum momentum taşınımından nasıl farklı? Taşınım kütle hareketiyle
+ortaya çıkar, sıvı molekülleri dışarıdan içeri girer. Basınç ise kütle
+eki olmadan, içeri giriş olmadan moleküllerin dışarıdan uyguladığı
+kuvvetle alakalıdır. Kutunun hayali sınırındaki molekülleri düşünelim,
+dışarıdaki bazı moleküller mesela o sınırdaki moleküllere çarpıyorlar,
+sonra sekiyorlar diyelim, içeri girmiyorlar fakat bu çarpış bir kuvvet
+uygulamasıdır ve kutu içindeki momentumu değiştirir.
+
+Basınç hesabı için $x$ eksenine dik olan iki yüzey düşünelim, bu
+yüzeyler $\ud x, \ud y, \ud z$ kenarları olan bir hacimde, diyelim ki
+$x$ eksenine dik olan iki yüzeyden biri $x$ noktasında diğeri $x + \ud
+x$ noktasında. Bu hacmin solundaki yüzeye sıvı $+x$ yönüne doğru bir
+basınç uyguluyor, bu kuvvet
+
+$$
+p(x) \ud y \ud z
+$$
+
+çünkü kuvvet eşittir basınç çarpı alan. Hacmin sağındaki yüzeye ise
+basınç $-x$ yönüne doğru bir basınç var, oradaki kuvvet
+
+$$
+p(x + \ud x) \ud y \ud z
+$$
+
+O zaman $x$ yönündeki net basınç kuvveti
+
+$$
+p(x) \ud y \ud z - p(x+\ud x) \ud y \ud z
+\tag{4}
+$$
+
+Daha önce uyguladığımız Taylor numarasını yine kullanıyoruz, $p(x+\ud x)$'in
+Taylor açılımını yapıyoruz,
+
+$$
+p(x+\ud x) = p(x)+\frac{\partial p}{\partial x}\ud x
+$$
+
+Üsttekini (4)'e koyarsak
+
+$$
+p(x) \ud y \ud z - \left[ p(x)+\frac{\partial p}{\partial x}\ud x \right] \ud y \ud z
+$$
+
+$$
+= p(x) \ud y \ud z - p(x) \ud y \ud z - \frac{\partial p}{\partial x}\ud x \ud y \ud z 
+$$
+
+Yani
+
+$$
+F_x = - \frac{\partial p}{\partial x}\ud x \ud y \ud z 
+$$
+
+Ekşi işaret çıkması iyi oldu, bu önemli, sıvının yüksek basınçtan
+alçak basınca doğru ivmelendiğini söylüyor.
+
+İşte eksik olan basınç kuvvetini bulduk, şimdi onun $x$ üzerinden
+türevini momentum değişimi formülümüze dahil edebiliriz,
+
+$$
+\frac{\partial(\rho u)}{\partial t}
+=
+\frac{\partial(\rho u^2)}{\partial x}
+-
+\frac{\partial(\rho uv)}{\partial y}
+-
+\frac{\partial(\rho uw)}{\partial z}
+-
+\frac{\partial p}{\partial x}
+$$
+
+Tüm terimleri tek bir tarafta toplarsak,
+
+$$
+\frac{\partial(\rho u)}{\partial t}
++
+\frac{\partial(\rho u^2)}{\partial x}
++
+\frac{\partial(\rho uv)}{\partial y}
++
+\frac{\partial(\rho uw)}{\partial z}
++
+\frac{\partial p}{\partial x}
+= 0
+$$
+
+$y$ ve $z$ yönündeki momentumlar için benzer kalıp takip edilecek,
+
+$$
+\frac{\partial(\rho v)}{\partial t}
++
+\frac{\partial(\rho uv)}{\partial x}
++
+\frac{\partial(\rho v^2)}{\partial y}
++
+\frac{\partial(\rho vw)}{\partial z}
++
+\frac{\partial p}{\partial y}
+=0
+$$
+
+$$
+\frac{\partial(\rho w)}{\partial t}
++
+\frac{\partial(\rho uw)}{\partial x}
++
+\frac{\partial(\rho vw)}{\partial y}
++
+\frac{\partial(\rho w^2)}{\partial z}
++
+\frac{\partial p}{\partial z}
+=0
+$$
 
 [devam edecek]
 
